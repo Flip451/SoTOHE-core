@@ -61,13 +61,8 @@ pub enum WaiverVerdict {
 /// different key, so the frozen verdict is no longer found (IN-09 / CN-04).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ObligationFulfillmentCacheKey {
-    // Read by the fulfillment cache codec (T012) when it (de)serializes cache
-    // keys; no read accessors are declared in this batch's type contract.
-    #[allow(dead_code)]
     bound_tests_set_hash: BoundTestsSetHash,
-    #[allow(dead_code)]
     declaration_hash: DeclarationHash,
-    #[allow(dead_code)]
     anchor_text_hash: AnchorTextHash,
 }
 
@@ -81,20 +76,32 @@ impl ObligationFulfillmentCacheKey {
     ) -> Self {
         Self { bound_tests_set_hash, declaration_hash, anchor_text_hash }
     }
+
+    /// Returns the bound-tests-set hash (claim side).
+    #[must_use]
+    pub fn bound_tests_set_hash(&self) -> &BoundTestsSetHash {
+        &self.bound_tests_set_hash
+    }
+
+    /// Returns the entry-declaration hash (evidence side).
+    #[must_use]
+    pub fn declaration_hash(&self) -> &DeclarationHash {
+        &self.declaration_hash
+    }
+
+    /// Returns the anchor-text hash (evidence side).
+    #[must_use]
+    pub fn anchor_text_hash(&self) -> &AnchorTextHash {
+        &self.anchor_text_hash
+    }
 }
 
 /// A single frozen obligation-fulfillment verdict entry.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ObligationFulfillmentCacheEntry {
-    // Read by the fulfillment cache codec (T012); no read accessors are declared
-    // in this batch's type contract.
-    #[allow(dead_code)]
     edge_id: TestObligationEdgeId,
-    #[allow(dead_code)]
     obligation_id: TestObligationId,
-    #[allow(dead_code)]
     key: ObligationFulfillmentCacheKey,
-    #[allow(dead_code)]
     verdict: ObligationFulfillmentVerdict,
 }
 
@@ -109,14 +116,35 @@ impl ObligationFulfillmentCacheEntry {
     ) -> Self {
         Self { edge_id, obligation_id, key, verdict }
     }
+
+    /// Returns the obligation edge this verdict is frozen against.
+    #[must_use]
+    pub fn edge_id(&self) -> &TestObligationEdgeId {
+        &self.edge_id
+    }
+
+    /// Returns the obligation this verdict concerns.
+    #[must_use]
+    pub fn obligation_id(&self) -> &TestObligationId {
+        &self.obligation_id
+    }
+
+    /// Returns the three-component cache key freezing this verdict.
+    #[must_use]
+    pub fn key(&self) -> &ObligationFulfillmentCacheKey {
+        &self.key
+    }
+
+    /// Returns the frozen fulfillment verdict.
+    #[must_use]
+    pub fn verdict(&self) -> &ObligationFulfillmentVerdict {
+        &self.verdict
+    }
 }
 
 /// Track-scoped collection of frozen obligation-fulfillment verdicts.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ObligationFulfillmentCacheDocument {
-    // Read by the fulfillment cache codec (T012); no read accessor is declared in
-    // this batch's type contract.
-    #[allow(dead_code)]
     track_id: TrackId,
     entries: Vec<ObligationFulfillmentCacheEntry>,
 }
@@ -126,6 +154,12 @@ impl ObligationFulfillmentCacheDocument {
     #[must_use]
     pub fn new(track_id: TrackId, entries: Vec<ObligationFulfillmentCacheEntry>) -> Self {
         Self { track_id, entries }
+    }
+
+    /// Returns the track this cache was frozen for.
+    #[must_use]
+    pub fn track_id(&self) -> &TrackId {
+        &self.track_id
     }
 
     /// Returns the frozen fulfillment verdict entries.
@@ -142,13 +176,8 @@ impl ObligationFulfillmentCacheDocument {
 /// different key, so the frozen verdict is no longer found (IN-09 / CN-04).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WaiverCacheKey {
-    // Read by the waiver cache codec (T012); no read accessors are declared in
-    // this batch's type contract.
-    #[allow(dead_code)]
     waived_reason_hash: WaivedReasonHash,
-    #[allow(dead_code)]
     declaration_hash: DeclarationHash,
-    #[allow(dead_code)]
     anchor_text_hash: AnchorTextHash,
 }
 
@@ -162,18 +191,31 @@ impl WaiverCacheKey {
     ) -> Self {
         Self { waived_reason_hash, declaration_hash, anchor_text_hash }
     }
+
+    /// Returns the waived-reason hash (claim side).
+    #[must_use]
+    pub fn waived_reason_hash(&self) -> &WaivedReasonHash {
+        &self.waived_reason_hash
+    }
+
+    /// Returns the entry-declaration hash (evidence side).
+    #[must_use]
+    pub fn declaration_hash(&self) -> &DeclarationHash {
+        &self.declaration_hash
+    }
+
+    /// Returns the anchor-text hash (evidence side).
+    #[must_use]
+    pub fn anchor_text_hash(&self) -> &AnchorTextHash {
+        &self.anchor_text_hash
+    }
 }
 
 /// A single frozen waiver verdict entry.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WaiverCacheEntry {
-    // Read by the waiver cache codec (T012); no read accessors are declared in
-    // this batch's type contract.
-    #[allow(dead_code)]
     edge_id: TestObligationEdgeId,
-    #[allow(dead_code)]
     key: WaiverCacheKey,
-    #[allow(dead_code)]
     verdict: WaiverVerdict,
 }
 
@@ -183,14 +225,29 @@ impl WaiverCacheEntry {
     pub fn new(edge_id: TestObligationEdgeId, key: WaiverCacheKey, verdict: WaiverVerdict) -> Self {
         Self { edge_id, key, verdict }
     }
+
+    /// Returns the obligation edge this waiver verdict is frozen against.
+    #[must_use]
+    pub fn edge_id(&self) -> &TestObligationEdgeId {
+        &self.edge_id
+    }
+
+    /// Returns the three-component cache key freezing this verdict.
+    #[must_use]
+    pub fn key(&self) -> &WaiverCacheKey {
+        &self.key
+    }
+
+    /// Returns the frozen waiver verdict.
+    #[must_use]
+    pub fn verdict(&self) -> &WaiverVerdict {
+        &self.verdict
+    }
 }
 
 /// Track-scoped collection of frozen waiver verdicts.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WaiverCacheDocument {
-    // Read by the waiver cache codec (T012); no read accessor is declared in this
-    // batch's type contract.
-    #[allow(dead_code)]
     track_id: TrackId,
     entries: Vec<WaiverCacheEntry>,
 }
@@ -200,6 +257,12 @@ impl WaiverCacheDocument {
     #[must_use]
     pub fn new(track_id: TrackId, entries: Vec<WaiverCacheEntry>) -> Self {
         Self { track_id, entries }
+    }
+
+    /// Returns the track this cache was frozen for.
+    #[must_use]
+    pub fn track_id(&self) -> &TrackId {
+        &self.track_id
     }
 
     /// Returns the frozen waiver verdict entries.

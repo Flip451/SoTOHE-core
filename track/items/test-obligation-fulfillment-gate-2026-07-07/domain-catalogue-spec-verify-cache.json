@@ -699,11 +699,11 @@
       }
     },
     {
-      "claim_hash": "4b3659e7a459cd10c18e6af139913ded659ef48c9f21daf8dd9643ba7f061bbd",
+      "claim_hash": "7ead8d733f60ccab2c56791ad0d55a9e6539c0439c1c4ef87cf3c3d4db158fec",
       "evidence_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
       "verdict": {
         "kind": "pass",
-        "citation": "obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する"
+        "citation": "obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)】【。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -723,11 +723,11 @@
       }
     },
     {
-      "claim_hash": "4b3659e7a459cd10c18e6af139913ded659ef48c9f21daf8dd9643ba7f061bbd",
+      "claim_hash": "7ead8d733f60ccab2c56791ad0d55a9e6539c0439c1c4ef87cf3c3d4db158fec",
       "evidence_hash": "05cf2fcdde6a24ed77b505f6e97d70267bb3f578da05515dfc09ca9e048e4c08",
       "verdict": {
         "kind": "pass",
-        "citation": "verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。"
+        "citation": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し、pass verdict には裏付け引用（根拠のどの箇所が主張を裏付けるかの引用）を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。fast → final → 人間 の段階引き上げが参照ペア単位で発火する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -747,11 +747,11 @@
       }
     },
     {
-      "claim_hash": "6805c785b15154bfea6d1d67a5f69bd5c99eb033fd3eb85ee72bd3354fad623d",
+      "claim_hash": "d661b1e75429581b8350aead5eb7030e92b5ea9c81f79307d5938976fdb16460",
       "evidence_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
       "verdict": {
         "kind": "pass",
-        "citation": "verdict をキャッシュキーの三つ組で凍結する"
+        "citation": "verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -771,7 +771,7 @@
       }
     },
     {
-      "claim_hash": "6805c785b15154bfea6d1d67a5f69bd5c99eb033fd3eb85ee72bd3354fad623d",
+      "claim_hash": "d661b1e75429581b8350aead5eb7030e92b5ea9c81f79307d5938976fdb16460",
       "evidence_hash": "05cf2fcdde6a24ed77b505f6e97d70267bb3f578da05515dfc09ca9e048e4c08",
       "verdict": {
         "kind": "pass",
@@ -795,11 +795,11 @@
       }
     },
     {
-      "claim_hash": "9ba016f6769f0d18b5d299dbdb09724eab015928be920435c085f37163e817c4",
+      "claim_hash": "87ed44e95d7b9a198f2cfc723700a531d0b6a8fdd9722194448e396f1b8ab26d",
       "evidence_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
       "verdict": {
         "kind": "pass",
-        "citation": "verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)"
+        "citation": "obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -819,11 +819,11 @@
       }
     },
     {
-      "claim_hash": "9ba016f6769f0d18b5d299dbdb09724eab015928be920435c085f37163e817c4",
+      "claim_hash": "87ed44e95d7b9a198f2cfc723700a531d0b6a8fdd9722194448e396f1b8ab26d",
       "evidence_hash": "05cf2fcdde6a24ed77b505f6e97d70267bb3f578da05515dfc09ca9e048e4c08",
       "verdict": {
         "kind": "pass",
-        "citation": "verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。"
+        "citation": "verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -843,7 +843,7 @@
       }
     },
     {
-      "claim_hash": "9ba016f6769f0d18b5d299dbdb09724eab015928be920435c085f37163e817c4",
+      "claim_hash": "87ed44e95d7b9a198f2cfc723700a531d0b6a8fdd9722194448e396f1b8ab26d",
       "evidence_hash": "f5b3a5ffaaa5a66b3145d0206b23ae2322d2754cb7336f4843509b4f3bc2c97a",
       "verdict": {
         "kind": "pass",
@@ -2859,11 +2859,11 @@
       }
     },
     {
-      "claim_hash": "196bd9287a40fa178ea8364728694cf11e5e42b2094dda4a0e9d7f76bb1deb19",
+      "claim_hash": "f48b0c2b8c685812367e13af39da309376fabcaef72cba25d07869562dfbe50c",
       "evidence_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
       "verdict": {
         "kind": "pass",
-        "citation": "waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)"
+        "citation": "obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2883,7 +2883,7 @@
       }
     },
     {
-      "claim_hash": "196bd9287a40fa178ea8364728694cf11e5e42b2094dda4a0e9d7f76bb1deb19",
+      "claim_hash": "f48b0c2b8c685812367e13af39da309376fabcaef72cba25d07869562dfbe50c",
       "evidence_hash": "05cf2fcdde6a24ed77b505f6e97d70267bb3f578da05515dfc09ca9e048e4c08",
       "verdict": {
         "kind": "pass",
@@ -2907,11 +2907,11 @@
       }
     },
     {
-      "claim_hash": "4c363cac9e37f1c036cf85504672967d10ed22e335dcfb0a525b5ac8b4745a35",
+      "claim_hash": "2eac817213704d98a54f38735b53adc62fad9e0a1340d3403d9cb8e9ff9a73a7",
       "evidence_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
       "verdict": {
         "kind": "pass",
-        "citation": "「waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）を評価し、verdict をキャッシュキーの三つ組で凍結する: … waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)」"
+        "citation": "waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2931,7 +2931,7 @@
       }
     },
     {
-      "claim_hash": "4c363cac9e37f1c036cf85504672967d10ed22e335dcfb0a525b5ac8b4745a35",
+      "claim_hash": "2eac817213704d98a54f38735b53adc62fad9e0a1340d3403d9cb8e9ff9a73a7",
       "evidence_hash": "05cf2fcdde6a24ed77b505f6e97d70267bb3f578da05515dfc09ca9e048e4c08",
       "verdict": {
         "kind": "pass",
@@ -2955,11 +2955,11 @@
       }
     },
     {
-      "claim_hash": "1156c588f3935260c84097d5e926fdc0b9fc4a23acc0fd0e9d8cf6ca9d42bc45",
+      "claim_hash": "657b74d4cc16615bb83be9e676dd384607409b4a607a7a8a448502eb3e68ea22",
       "evidence_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
       "verdict": {
         "kind": "pass",
-        "citation": "waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。"
+        "citation": "waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2979,11 +2979,11 @@
       }
     },
     {
-      "claim_hash": "1156c588f3935260c84097d5e926fdc0b9fc4a23acc0fd0e9d8cf6ca9d42bc45",
+      "claim_hash": "657b74d4cc16615bb83be9e676dd384607409b4a607a7a8a448502eb3e68ea22",
       "evidence_hash": "05cf2fcdde6a24ed77b505f6e97d70267bb3f578da05515dfc09ca9e048e4c08",
       "verdict": {
         "kind": "pass",
-        "citation": "verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。"
+        "citation": "verdict は waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -3003,11 +3003,11 @@
       }
     },
     {
-      "claim_hash": "1156c588f3935260c84097d5e926fdc0b9fc4a23acc0fd0e9d8cf6ca9d42bc45",
+      "claim_hash": "657b74d4cc16615bb83be9e676dd384607409b4a607a7a8a448502eb3e68ea22",
       "evidence_hash": "f5b3a5ffaaa5a66b3145d0206b23ae2322d2754cb7336f4843509b4f3bc2c97a",
       "verdict": {
         "kind": "pass",
-        "citation": "verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点で既存 verdict は無効となり「存在しない」ものとして扱う。"
+        "citation": "鮮度と verdict の結合は fail-closed。verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点で既存 verdict は無効となり「存在しない」ものとして扱う。hash 再計算だけで鮮度を回復する経路は存在せず、回復は再評価（`evaluate`）の pass のみで達成される。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

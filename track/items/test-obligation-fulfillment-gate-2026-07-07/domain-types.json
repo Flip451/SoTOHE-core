@@ -2212,6 +2212,14 @@
           "params": [],
           "receiver": "&self",
           "returns": "&[ObligationFulfillmentCacheEntry]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackId"
         }
       ],
       "module_path": "tddd::test_obligation::verdict",
@@ -2265,6 +2273,38 @@
             }
           ],
           "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "edge_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationEdgeId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "obligation_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "key",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ObligationFulfillmentCacheKey"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verdict",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ObligationFulfillmentVerdict"
         }
       ],
       "module_path": "tddd::test_obligation::verdict",
@@ -2314,6 +2354,30 @@
             }
           ],
           "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "bound_tests_set_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BoundTestsSetHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "declaration_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&DeclarationHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "anchor_text_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&AnchorTextHash"
         }
       ],
       "module_path": "tddd::test_obligation::verdict",
@@ -4673,6 +4737,14 @@
           "params": [],
           "receiver": "&self",
           "returns": "&[WaiverCacheEntry]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackId"
         }
       ],
       "module_path": "tddd::test_obligation::verdict",
@@ -4722,6 +4794,30 @@
             }
           ],
           "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "edge_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationEdgeId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "key",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&WaiverCacheKey"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verdict",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&WaiverVerdict"
         }
       ],
       "module_path": "tddd::test_obligation::verdict",
@@ -4771,6 +4867,30 @@
             }
           ],
           "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "waived_reason_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&WaivedReasonHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "declaration_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&DeclarationHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "anchor_text_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&AnchorTextHash"
         }
       ],
       "module_path": "tddd::test_obligation::verdict",

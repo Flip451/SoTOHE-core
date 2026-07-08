@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "9e3b5f31241ec551037bf251b90c37a9a66feb96d0aa55dfc4e6312fbc58c086",
+  "catalogue_declaration_hash": "74b51cb4e441d891e6e4eccc6136fd8c7fa0e68960b910dee9c5c60a1faddab7",
   "signals": [
     {
       "type_name": "AnchorTextHash",
@@ -65,17 +65,17 @@
     {
       "type_name": "ObligationFulfillmentCacheDocument",
       "signal": "blue",
-      "entry_hash": "4b3659e7a459cd10c18e6af139913ded659ef48c9f21daf8dd9643ba7f061bbd"
+      "entry_hash": "7ead8d733f60ccab2c56791ad0d55a9e6539c0439c1c4ef87cf3c3d4db158fec"
     },
     {
       "type_name": "ObligationFulfillmentCacheEntry",
       "signal": "blue",
-      "entry_hash": "6805c785b15154bfea6d1d67a5f69bd5c99eb033fd3eb85ee72bd3354fad623d"
+      "entry_hash": "d661b1e75429581b8350aead5eb7030e92b5ea9c81f79307d5938976fdb16460"
     },
     {
       "type_name": "ObligationFulfillmentCacheKey",
       "signal": "blue",
-      "entry_hash": "9ba016f6769f0d18b5d299dbdb09724eab015928be920435c085f37163e817c4"
+      "entry_hash": "87ed44e95d7b9a198f2cfc723700a531d0b6a8fdd9722194448e396f1b8ab26d"
     },
     {
       "type_name": "ObligationFulfillmentVerdict",
@@ -260,17 +260,17 @@
     {
       "type_name": "WaiverCacheDocument",
       "signal": "blue",
-      "entry_hash": "196bd9287a40fa178ea8364728694cf11e5e42b2094dda4a0e9d7f76bb1deb19"
+      "entry_hash": "f48b0c2b8c685812367e13af39da309376fabcaef72cba25d07869562dfbe50c"
     },
     {
       "type_name": "WaiverCacheEntry",
       "signal": "blue",
-      "entry_hash": "4c363cac9e37f1c036cf85504672967d10ed22e335dcfb0a525b5ac8b4745a35"
+      "entry_hash": "2eac817213704d98a54f38735b53adc62fad9e0a1340d3403d9cb8e9ff9a73a7"
     },
     {
       "type_name": "WaiverCacheKey",
       "signal": "blue",
-      "entry_hash": "1156c588f3935260c84097d5e926fdc0b9fc4a23acc0fd0e9d8cf6ca9d42bc45"
+      "entry_hash": "657b74d4cc16615bb83be9e676dd384607409b4a607a7a8a448502eb3e68ea22"
     },
     {
       "type_name": "WaiverVerdict",

@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成
 
-## Tasks (0/23 resolved)
+## Tasks (4/23 resolved)
 
 ### S1 — Preceding shared foundation: semantic-verdict core & ref-verify migration
 
@@ -16,10 +16,10 @@
 
 ### S3 — Domain foundation: hashes, ids, obligations, bindings, verdicts, drift, errors, ports
 
-- [~] **T006**: Target libs/domain tddd::test_obligation::{hashes,ids}. Add AnchorTextHash, DeclarationHash, BoundTestsSetHash, WaivedReasonHash, TestBodySpanHash; TestObligationId, TestObligationAnchorId, TestObligationEdgeId, TestObligationItemIdentifier, TestObligationBrief, TestModulePath, TestFunctionName, WaivedReason, RoleName, DiagnosticMessage (IN-05/IN-06/CN-01). Add unit tests covering IN-05/IN-06/CN-01.
-- [~] **T007**: Target libs/domain tddd::test_obligation::{obligations,binding,scope}. Add TestObligation, ObligationsDocument; TestLocation, NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument; TestObligationScopePresence, UncitedSpecElementFinding (IN-05/IN-06/IN-14/IN-16/CN-02/CN-07/CN-13/CN-15/AC-13). Add unit tests covering those anchors.
-- [~] **T008**: Target libs/domain tddd::test_obligation::{verdict,drift}. Add ObligationFulfillmentVerdict, WaiverVerdict; ObligationFulfillmentCacheKey, ObligationFulfillmentCacheEntry, ObligationFulfillmentCacheDocument; WaiverCacheKey, WaiverCacheEntry, WaiverCacheDocument; TestObligationDriftKind, TestObligationDrift, EdgeResolutionOutcome, EdgeVerdictRecord (IN-13/CN-01/CN-04/AC-05). Add unit tests covering those anchors.
-- [~] **T009**: Target libs/domain tddd::test_obligation::{errors,ports,vocab}. Add ObligationCheckError, ObligationDeriveError, ObligationEvaluateError, ObligationResultsError, FulfillmentFailCategory, SemanticVerifierError, ArtifactCodecError, TestSourceScanError, VerifyCacheError; ObligationsArtifactPort, TestBindingsArtifactPort, ObligationFulfillmentCachePort, WaiverCachePort, ObligationFulfillmentVerifierPort, WaiverVerifierPort, TestSourceScannerPort (IN-08/IN-11/IN-12/CN-08). Add unit tests for Display/Error over every error variant.
+- [x] **T006**: Target libs/domain tddd::test_obligation::{hashes,ids}. Add AnchorTextHash, DeclarationHash, BoundTestsSetHash, WaivedReasonHash, TestBodySpanHash; TestObligationId, TestObligationAnchorId, TestObligationEdgeId, TestObligationItemIdentifier, TestObligationBrief, TestModulePath, TestFunctionName, WaivedReason, RoleName, DiagnosticMessage (IN-05/IN-06/CN-01). Add unit tests covering IN-05/IN-06/CN-01. (`1b9c8c26`)
+- [x] **T007**: Target libs/domain tddd::test_obligation::{obligations,binding,scope}. Add TestObligation, ObligationsDocument; TestLocation, NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument; TestObligationScopePresence, UncitedSpecElementFinding (IN-05/IN-06/IN-14/IN-16/CN-02/CN-07/CN-13/CN-15/AC-13). Add unit tests covering those anchors. (`1b9c8c26`)
+- [x] **T008**: Target libs/domain tddd::test_obligation::{verdict,drift}. Add ObligationFulfillmentVerdict, WaiverVerdict; ObligationFulfillmentCacheKey, ObligationFulfillmentCacheEntry, ObligationFulfillmentCacheDocument; WaiverCacheKey, WaiverCacheEntry, WaiverCacheDocument; TestObligationDriftKind, TestObligationDrift, EdgeResolutionOutcome, EdgeVerdictRecord (IN-13/CN-01/CN-04/AC-05). Add unit tests covering those anchors. (`1b9c8c26`)
+- [x] **T009**: Target libs/domain tddd::test_obligation::{errors,ports,vocab}. Add ObligationCheckError, ObligationDeriveError, ObligationEvaluateError, ObligationResultsError, FulfillmentFailCategory, SemanticVerifierError, ArtifactCodecError, TestSourceScanError, VerifyCacheError; ObligationsArtifactPort, TestBindingsArtifactPort, ObligationFulfillmentCachePort, WaiverCachePort, ObligationFulfillmentVerifierPort, WaiverVerifierPort, TestSourceScannerPort (IN-08/IN-11/IN-12/CN-08). Add unit tests for Display/Error over every error variant. (`1b9c8c26`)
 
 ### S4 — Infrastructure codecs
 

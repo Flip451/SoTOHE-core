@@ -111,7 +111,7 @@ enum SpecSectionKindDto {
 }
 
 /// Wire format for [`CatalogueSectionKey`].
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case", deny_unknown_fields)]
 enum CatalogueSectionKeyDto {
     Types,
@@ -137,12 +137,43 @@ struct AdrDecisionRefDto {
 }
 
 /// Wire format for [`CatalogueEntryRef`].
-#[derive(Debug, Serialize, Deserialize)]
+///
+/// Public so the test-obligation obligations codec can reuse it as its
+/// `CatalogueEntryRefDto` type alias rather than redeclaring the same wire shape
+/// (IN-05).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-struct CatalogueEntryRefDto {
+pub struct CatalogueEntryRefDto {
     file_path: String,
     section_key: CatalogueSectionKeyDto,
     entry_key: String,
+}
+
+impl CatalogueEntryRefDto {
+    /// Projects a domain [`CatalogueEntryRef`] onto its wire DTO.
+    #[must_use]
+    pub fn from_domain(entry: &CatalogueEntryRef) -> Self {
+        Self {
+            file_path: entry.file_path.clone(),
+            section_key: catalogue_section_key_to_dto(&entry.section_key),
+            entry_key: entry.entry_key.as_str().to_owned(),
+        }
+    }
+
+    /// Projects the wire DTO back onto a domain [`CatalogueEntryRef`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ValidationError`] when the `entry_key` is empty or
+    /// whitespace-only.
+    pub fn into_domain(self) -> Result<CatalogueEntryRef, ValidationError> {
+        let entry_key = CatalogueEntryKey::try_new(self.entry_key)?;
+        Ok(CatalogueEntryRef::new(
+            self.file_path,
+            catalogue_section_key_from_dto(self.section_key),
+            entry_key,
+        ))
+    }
 }
 
 /// Wire format for [`VerifyOriginRef`].
@@ -434,11 +465,7 @@ fn origin_to_dto(origin: &VerifyOriginRef) -> VerifyOriginRefDto {
             decision_id: r.decision_id.clone(),
         }),
         VerifyOriginRef::CatalogueEntry(r) => {
-            VerifyOriginRefDto::CatalogueEntry(CatalogueEntryRefDto {
-                file_path: r.file_path.clone(),
-                section_key: catalogue_section_key_to_dto(&r.section_key),
-                entry_key: r.entry_key.as_str().to_owned(),
-            })
+            VerifyOriginRefDto::CatalogueEntry(CatalogueEntryRefDto::from_domain(r))
         }
     }
 }
@@ -461,16 +488,10 @@ fn origin_from_dto(dto: VerifyOriginRefDto) -> Result<VerifyOriginRef, SemanticV
             Ok(VerifyOriginRef::AdrDecision(AdrDecisionRef::new(r.file_path, r.decision_id)))
         }
         VerifyOriginRefDto::CatalogueEntry(r) => {
-            let entry_key = CatalogueEntryKey::try_new(r.entry_key).map_err(|e| {
-                SemanticVerifyCodecError::Validation {
-                    message: format!("invalid catalogue entry key in origin: {e}"),
-                }
+            let entry = r.into_domain().map_err(|e| SemanticVerifyCodecError::Validation {
+                message: format!("invalid catalogue entry key in origin: {e}"),
             })?;
-            Ok(VerifyOriginRef::CatalogueEntry(CatalogueEntryRef::new(
-                r.file_path,
-                catalogue_section_key_from_dto(r.section_key),
-                entry_key,
-            )))
+            Ok(VerifyOriginRef::CatalogueEntry(entry))
         }
     }
 }

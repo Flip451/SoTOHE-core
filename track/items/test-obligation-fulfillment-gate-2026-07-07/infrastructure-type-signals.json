@@ -1,13 +1,21 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-07T22:45:08Z",
-  "declaration_hash": "999b3e4660d2fb05f5f0f0370189803ee0b163c057375a340f6281030078e0e9",
+  "generated_at": "2026-07-08T00:19:15Z",
+  "declaration_hash": "cea8aebd97fb0601a5f04756547528a4d2a0ca7625a1d1d365cb99779b311a0c",
   "signals": [
     {
       "type_name": "CatalogueEntryRefDto",
       "kind_tag": "dto",
       "signal": "yellow",
-      "found_type": false
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
+      ]
     },
     {
       "type_name": "ContractRoleKey",
@@ -36,13 +44,15 @@
     {
       "type_name": "FulfillmentFailCategoryDto",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
@@ -60,28 +70,34 @@
     {
       "type_name": "JsonObligationFulfillmentCacheCodec",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "ObligationFulfillmentCachePort"
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ObligationFulfillmentCachePort",
+        "core::clone::Clone",
+        "core::fmt::Debug"
       ]
     },
     {
       "type_name": "JsonObligationsCodec",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "ObligationsArtifactPort"
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ObligationsArtifactPort",
+        "core::clone::Clone",
+        "core::fmt::Debug"
       ]
     },
     {
       "type_name": "JsonTestBindingsCodec",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "TestBindingsArtifactPort"
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TestBindingsArtifactPort",
+        "core::clone::Clone",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -98,46 +114,54 @@
     {
       "type_name": "JsonWaiverCacheCodec",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "WaiverCachePort"
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "WaiverCachePort",
+        "core::clone::Clone",
+        "core::fmt::Debug"
       ]
     },
     {
       "type_name": "ObligationFulfillmentCacheDocumentDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
       "type_name": "ObligationFulfillmentCacheEntryDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
       "type_name": "ObligationFulfillmentVerdictDto",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
@@ -152,19 +176,21 @@
     {
       "type_name": "ObligationsCodecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ObligationsDocumentDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
@@ -204,103 +230,119 @@
     {
       "type_name": "TestBindingRecordDto",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
       "type_name": "TestBindingsCodecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TestBindingsDocumentDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
       "type_name": "TestLocationDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
       "type_name": "TestObligationAnchorIdDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
       "type_name": "TestObligationDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
       "type_name": "TestObligationEdgeIdDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
       "type_name": "TestObligationIdDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
       "type_name": "TestObligationKindDto",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
@@ -345,37 +387,43 @@
     {
       "type_name": "WaiverCacheDocumentDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
       "type_name": "WaiverCacheEntryDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {
       "type_name": "WaiverVerdictDto",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
       ]
     },
     {

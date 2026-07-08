@@ -546,6 +546,236 @@
       "action": "add",
       "trait_ref": "core::clone::Clone",
       "for_type": "JsonTestObligationRulesLoader"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "CatalogueEntryRefDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "CatalogueEntryRefDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "ObligationsDocumentDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "ObligationsDocumentDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "TestObligationDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "TestObligationDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "TestObligationIdDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "TestObligationIdDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "TestObligationAnchorIdDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "TestObligationAnchorIdDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "TestObligationKindDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "TestObligationKindDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "TestBindingsDocumentDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "TestBindingsDocumentDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "TestBindingRecordDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "TestBindingRecordDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "TestLocationDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "TestLocationDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "TestObligationEdgeIdDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "TestObligationEdgeIdDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "ObligationFulfillmentCacheDocumentDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "ObligationFulfillmentCacheDocumentDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "ObligationFulfillmentCacheEntryDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "ObligationFulfillmentCacheEntryDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "ObligationFulfillmentVerdictDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "ObligationFulfillmentVerdictDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "FulfillmentFailCategoryDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "FulfillmentFailCategoryDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "WaiverCacheDocumentDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "WaiverCacheDocumentDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "WaiverCacheEntryDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "WaiverCacheEntryDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "WaiverVerdictDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "WaiverVerdictDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "CatalogueEntryRefDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "CatalogueEntryRefDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "CatalogueEntryRefDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "CatalogueEntryRefDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "JsonObligationsCodec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "JsonObligationsCodec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "JsonTestBindingsCodec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "JsonTestBindingsCodec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "JsonObligationFulfillmentCacheCodec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "JsonObligationFulfillmentCacheCodec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "JsonWaiverCacheCodec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "JsonWaiverCacheCodec"
     }
   ],
   "traits": {},
