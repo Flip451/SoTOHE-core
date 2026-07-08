@@ -50,11 +50,10 @@ if ! command -v cargo >/dev/null 2>&1; then
 fi
 echo "[OK] cargo available"
 
-if ! command -v jq >/dev/null 2>&1; then
-  echo "[FAIL] jq not found. Install jq so install-sotp can read .harness/config/sotp-version.json."
-  exit 1
-fi
-echo "[OK] jq available"
+# jq is only required by install-sotp (which does its own preflight). When
+# `sotp template export` transplanted the running binary into bin/sotp, the
+# tagless first-run path skips install-sotp entirely and jq is not needed
+# (ADR 2026-07-08-0541 D1 tagless first run must not depend on jq).
 
 # 2. Docker images
 echo ""

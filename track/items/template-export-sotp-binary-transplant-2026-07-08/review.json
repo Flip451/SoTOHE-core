@@ -1,39 +1,21 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
+    "spec": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9e4b5b9f1a04dc9d492a0dd6c7a1bed203eab3493288e20107f048fa32fe9975",
-          "at": "2026-07-08T09:03:29Z"
+          "hash": "rvw1:sha256:38ea8f0343d5740b7f5f7bd6fb780ae8c8b240ebf170caf8157e62c549fb5ab7",
+          "at": "2026-07-08T07:49:34Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9e4b5b9f1a04dc9d492a0dd6c7a1bed203eab3493288e20107f048fa32fe9975",
-          "at": "2026-07-08T09:08:50Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:65d1048856b7454e8c1ff749d68b8f5c6c7cff89270c3231214a457af8528e7f",
-          "at": "2026-07-08T05:56:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:65d1048856b7454e8c1ff749d68b8f5c6c7cff89270c3231214a457af8528e7f",
-          "at": "2026-07-08T05:58:24Z"
+          "hash": "rvw1:sha256:38ea8f0343d5740b7f5f7bd6fb780ae8c8b240ebf170caf8157e62c549fb5ab7",
+          "at": "2026-07-08T07:53:05Z"
         }
       ]
     },
@@ -52,6 +34,38 @@
           "findings": [],
           "hash": "rvw1:sha256:8ec45e6872d0a163e602a6e71ef1f3e643fba9358fcf755bf02dce5b61bbe67b",
           "at": "2026-07-08T09:06:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:119bd157166377b3931bf19a72c6235ab8af5b0809fa554f597310cc70cd5039",
+          "at": "2026-07-08T09:38:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:119bd157166377b3931bf19a72c6235ab8af5b0809fa554f597310cc70cd5039",
+          "at": "2026-07-08T09:42:19Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e4b5b9f1a04dc9d492a0dd6c7a1bed203eab3493288e20107f048fa32fe9975",
+          "at": "2026-07-08T09:03:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e4b5b9f1a04dc9d492a0dd6c7a1bed203eab3493288e20107f048fa32fe9975",
+          "at": "2026-07-08T09:08:50Z"
         }
       ]
     },
@@ -188,72 +202,21 @@
         }
       ]
     },
-    "cli_composition": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e119b8c3041d4df9c2b3bb9faf7eb075da0aadb39fdb3ff688215ee906a87911",
-          "at": "2026-07-08T09:02:10Z"
+          "hash": "rvw1:sha256:65d1048856b7454e8c1ff749d68b8f5c6c7cff89270c3231214a457af8528e7f",
+          "at": "2026-07-08T05:56:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e119b8c3041d4df9c2b3bb9faf7eb075da0aadb39fdb3ff688215ee906a87911",
-          "at": "2026-07-08T09:06:21Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new README bootstrap flow describes an auto-branching `cargo make bootstrap` path with a fallback to `cargo make install-sotp`, but this scoped `Makefile.toml` still only defines `build-sotp` and its Step 3 always runs `cargo make build-sotp` unconditionally. In the file set under review, the documented fallback/skip path is not wired up, so users following the README will hit a missing task or a bootstrap that does not behave as documented.",
-              "severity": "P1",
-              "file": "README.md",
-              "line": 78,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:7c7c5ae59162c72e8afb2787195a036d4866884972e7c9fe52643effd91a513c",
-          "at": "2026-07-08T09:04:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:00986736d9d1f4051bde258b6625e5ea2a1119a1aa974048cdbbb17b8b85c78a",
-          "at": "2026-07-08T09:10:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:00986736d9d1f4051bde258b6625e5ea2a1119a1aa974048cdbbb17b8b85c78a",
-          "at": "2026-07-08T09:13:42Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:38ea8f0343d5740b7f5f7bd6fb780ae8c8b240ebf170caf8157e62c549fb5ab7",
-          "at": "2026-07-08T07:49:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:38ea8f0343d5740b7f5f7bd6fb780ae8c8b240ebf170caf8157e62c549fb5ab7",
-          "at": "2026-07-08T07:53:05Z"
+          "hash": "rvw1:sha256:65d1048856b7454e8c1ff749d68b8f5c6c7cff89270c3231214a457af8528e7f",
+          "at": "2026-07-08T05:58:24Z"
         }
       ]
     },
@@ -272,6 +235,24 @@
           "findings": [],
           "hash": "rvw1:sha256:4603177d87ecde78fc6b871bbcc8148d653bd52d91f2e0d9c475b8f960e47375",
           "at": "2026-07-08T09:08:27Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e119b8c3041d4df9c2b3bb9faf7eb075da0aadb39fdb3ff688215ee906a87911",
+          "at": "2026-07-08T09:02:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e119b8c3041d4df9c2b3bb9faf7eb075da0aadb39fdb3ff688215ee906a87911",
+          "at": "2026-07-08T09:06:21Z"
         }
       ]
     },
@@ -348,6 +329,39 @@
           "findings": [],
           "hash": "rvw1:sha256:e91d7b5cb80f27d125c43d8362775db3d834063687f5930f022eb834caf5cdf8",
           "at": "2026-07-08T08:22:46Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new README bootstrap flow describes an auto-branching `cargo make bootstrap` path with a fallback to `cargo make install-sotp`, but this scoped `Makefile.toml` still only defines `build-sotp` and its Step 3 always runs `cargo make build-sotp` unconditionally. In the file set under review, the documented fallback/skip path is not wired up, so users following the README will hit a missing task or a bootstrap that does not behave as documented.",
+              "severity": "P1",
+              "file": "README.md",
+              "line": 78,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:7c7c5ae59162c72e8afb2787195a036d4866884972e7c9fe52643effd91a513c",
+          "at": "2026-07-08T09:04:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00986736d9d1f4051bde258b6625e5ea2a1119a1aa974048cdbbb17b8b85c78a",
+          "at": "2026-07-08T09:10:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00986736d9d1f4051bde258b6625e5ea2a1119a1aa974048cdbbb17b8b85c78a",
+          "at": "2026-07-08T09:13:42Z"
         }
       ]
     }
