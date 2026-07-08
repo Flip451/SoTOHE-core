@@ -1,136 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`knowledge/research/README.md:19` still tells bootstrap readers to update `track/tech-stack.md`, but that file is deleted in this PR. The overlay copy has already been migrated to ADR-based guidance, so the live repo docs are now inconsistent and this instruction points at a nonexistent file.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/knowledge/research/README.md",
-              "line": 19,
-              "category": "dead-reference"
-            },
-            {
-              "message": "`knowledge/research/version-baseline-template.md:40` still has the checklist item for updating `track/tech-stack.md`. Since that document is removed, the template now instructs users to modify a nonexistent file instead of recording the baseline decision in an ADR.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/knowledge/research/version-baseline-template.md",
-              "line": 40,
-              "category": "dead-reference"
-            }
-          ],
-          "hash": "rvw1:sha256:613cda934f92594eb1280a98a0283cb80fdcb3c17e116309418e970962618065",
-          "at": "2026-07-08T14:37:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:613cda934f92594eb1280a98a0283cb80fdcb3c17e116309418e970962618065",
-          "at": "2026-07-08T14:45:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:613cda934f92594eb1280a98a0283cb80fdcb3c17e116309418e970962618065",
-          "at": "2026-07-08T14:48:47Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c75d406919979db95f3bb9e62a76b80259ee889db69c5124132a56f494704a1f",
-          "at": "2026-07-08T12:24:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Entry `infrastructure::verify::tech_stack::verify` declares `AC-01` in `spec_refs`, but `AC-01` is only about `Makefile.toml` task/dependency removal and Makefile string searches. The infrastructure function deletion is covered by `IN-01` / `AC-03`; keeping this unrelated anchor weakens catalogue-to-spec trace integrity.",
-              "severity": "P1",
-              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/infrastructure-types.json",
-              "line": 12,
-              "category": "spec_refs off-topic"
-            },
-            {
-              "message": "`VerifyCommand.docs` restates the upstream behavior contract by saying that invoking `sotp verify tech-stack` returns an unknown-subcommand error. Per `knowledge/conventions/no-upstream-restatement.md`, catalogue docs should identify the changed type/operation and cite `AC-02`, not duplicate the acceptance behavior in prose.",
-              "severity": "P1",
-              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/cli-types.json",
-              "line": 10,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:c75d406919979db95f3bb9e62a76b80259ee889db69c5124132a56f494704a1f",
-          "at": "2026-07-08T12:33:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a93379a4817cadddb8d6dfdc4c6b5910e1284baa6bd9145c13ed81096685e1e",
-          "at": "2026-07-08T12:39:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b409655bfe13f43058f1ce3ec378c8522d0cd61672dd6ecbc0f7d92f9eb166a5",
-          "at": "2026-07-08T13:50:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b409655bfe13f43058f1ce3ec378c8522d0cd61672dd6ecbc0f7d92f9eb166a5",
-          "at": "2026-07-08T13:56:57Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:067620a657ef711bf00ce3317ffe9ebc8f9d4d0dce367e25beaae2c720f5c499",
-          "at": "2026-07-08T14:35:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:067620a657ef711bf00ce3317ffe9ebc8f9d4d0dce367e25beaae2c720f5c499",
-          "at": "2026-07-08T14:41:16Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e0db90b60e07802e2ce6cc41b639a3dfa8041ebe5016e9300ec53a2d3d7a1571",
-          "at": "2026-07-08T14:34:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e0db90b60e07802e2ce6cc41b639a3dfa8041ebe5016e9300ec53a2d3d7a1571",
-          "at": "2026-07-08T14:39:25Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -197,293 +67,6 @@
           "findings": [],
           "hash": "rvw1:sha256:4956930186bf47b40440da0cc13c4924f7844960b8de8c59c35b60f93d927773",
           "at": "2026-07-08T14:58:02Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0f27b173f582d67691eff272b7a3b207379f3fb7476826219e06fa2c83d59905",
-          "at": "2026-07-08T14:36:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0f27b173f582d67691eff272b7a3b207379f3fb7476826219e06fa2c83d59905",
-          "at": "2026-07-08T14:43:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0a24bb8edc2b91c43e3d6eb9c9ea1043d0b11ffdb6c8848a50de40ac6bc9e5a",
-          "at": "2026-07-08T15:18:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0a24bb8edc2b91c43e3d6eb9c9ea1043d0b11ffdb6c8848a50de40ac6bc9e5a",
-          "at": "2026-07-08T15:22:52Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1794e8a026d7f852cbff46e0c05b80985085aeba2a87e986b5f95174166e624b",
-          "at": "2026-07-08T14:36:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1794e8a026d7f852cbff46e0c05b80985085aeba2a87e986b5f95174166e624b",
-          "at": "2026-07-08T14:43:12Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cedd4f00bf02a44297ed430fcfe730b67ce696781d75090ab709911a8c41dfb4",
-          "at": "2026-07-08T12:22:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-04 says renamed/archive copies must be included in the final absence check, but the observable procedure it defines only checks the three exact tracked paths and filesystem paths. A retained copy under another name or location could satisfy those commands while violating IN-02, leaving downstream phases to invent the copy-detection rule.",
-              "severity": "P1",
-              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json",
-              "line": 354,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:cedd4f00bf02a44297ed430fcfe730b67ce696781d75090ab709911a8c41dfb4",
-          "at": "2026-07-08T12:27:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:882e7dc81a1ca6bde4cd550fd37aad21026c1d4fc6efb08fd53de1f7dc36f54e",
-          "at": "2026-07-08T12:32:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AC-14` mixes two machine-checkable grep requirements with a subjective requirement that the absorbed product-vision text be \"consistent with\" README's existing structure and preserve placeholder-free onboarding. That part is not deterministically verifiable as written, so downstream phases can only interpret it heuristically.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.md",
-              "line": 60,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:7c2ab7c5f9cecc65b45a615ceb349c7b926eed6551580b33bb47a40cefdb0f58",
-          "at": "2026-07-08T13:10:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0af79fbd55e222ec12511a50e7cd1698d2fb66ef113b5a43d6ab284bbdf26a4c",
-          "at": "2026-07-08T13:15:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-14 is not a deterministic acceptance check for the README absorption requirement. It verifies absence of old paths/headings, then relies on whatever product.md-derived information was “judged worth keeping,” but the spec never enumerates that retained content or requires a recorded decision. An implementation could delete product.md, preserve no product vision text in README, satisfy the grep checks, and still leave IN-04 / GO-02 unproven.",
-              "severity": "P1",
-              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json",
-              "line": 470,
-              "category": "acceptance criterion non-observable"
-            },
-            {
-              "message": "GO-01 states that document TODO markers must no longer act as state anywhere in the harness, but the acceptance criteria only prove removal of the verify-tech-stack path and a few named documentation references. A remaining or newly introduced workflow that treats generic TODO-marker absence as readiness, without using the retired tech-stack identifiers or paths, would still pass AC-01..AC-14. This leaves the broad TODO-marker state-removal goal without deterministic AC coverage.",
-              "severity": "P1",
-              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json",
-              "line": 8,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:3fd8e194d3150c30c73c57ee650d4468c175f4547a7eb80f598cc5dba15205df",
-          "at": "2026-07-08T13:21:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-14 makes README placement depend on reading `git diff -- README.md` hunk context. That is not a stable final-state acceptance check: once the track is committed or reviewed from a clean branch, this command can return no hunk context even if the required README strings were placed under the wrong section. The criterion should be expressible against repository state, such as parsing README sections or using an explicit base diff, so downstream phases can verify it deterministically.",
-              "severity": "P1",
-              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json",
-              "line": 470,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:45db7302d88addf375e6496803b537b203d2f7ff3c7ac9f930daa3014672a59a",
-          "at": "2026-07-08T13:28:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9dce01d11ebad5317635dcce0cd8df80dac72eae30e90bce54fbc703ccb49797",
-          "at": "2026-07-08T13:31:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d0ee16caf15127b1ea0fa7dd6231308c5ced016ad8868fec67450e5e7bc01545",
-          "at": "2026-07-08T13:46:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d0ee16caf15127b1ea0fa7dd6231308c5ced016ad8868fec67450e5e7bc01545",
-          "at": "2026-07-08T13:50:44Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D4 reads like an implementation checklist rather than a decision record: it names specific follow-up files (`CLAUDE.md`, `.claude/rules/08/09/10`, `Makefile`, `README`, boundary manifest/overlay) and says they must be updated in lockstep. That constrains downstream implementation work that should be captured in spec/impl-plan, not in the ADR body.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
-              "line": 48,
-              "category": "scope leakage into ADR body"
-            }
-          ],
-          "hash": "rvw1:sha256:407f22d530c0b7e0f5bcab2488712751ce65c060abb0fdecda2aabbe12364839",
-          "at": "2026-07-08T10:47:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8a0eb8707d7603bcebbb60527c34260cdcca8fdfa0e234ddc925fa108e417fab",
-          "at": "2026-07-08T10:51:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8a0eb8707d7603bcebbb60527c34260cdcca8fdfa0e234ddc925fa108e417fab",
-          "at": "2026-07-08T10:53:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:33b730e6d61a340667050674890769afe2af1961e17e81f1fe47858f735f1ada",
-          "at": "2026-07-08T14:36:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1 states that no async runtime such as tokio is introduced and that the execution model is synchronous, but the current grandfathered baseline already has an accepted semantic-dup stack whose LanceDB adapter uses Tokio to bridge LanceDB's async API behind a synchronous port. As written, downstream spec/types have no way to tell whether Tokio is globally forbidden or allowed for that existing infrastructure adapter, so the ADR would incorrectly erase an already-accepted exception.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-08-1405-grandfathered-tech-and-product-baseline.md",
-              "line": 67,
-              "category": "decision underspecified for downstream consumption"
-            },
-            {
-              "message": "D4 records persistence as JSON files and says DB/KVS-style storage is not introduced, but the existing semantic-dup decision uses a local LanceDB vector database as a persistent index. Without an explicit scope carve-out for generated semantic indexes, downstream artifacts will read this as a blanket persistence rule and conflict with the existing LanceDB-backed adapter.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-08-1405-grandfathered-tech-and-product-baseline.md",
-              "line": 79,
-              "category": "decision underspecified for downstream consumption"
-            }
-          ],
-          "hash": "rvw1:sha256:a6e4e1690c47d32dd47bf4110c053658230ab992af3852500d7f1e81b4ce7bcd",
-          "at": "2026-07-08T14:45:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cf548aa7b360ba98d3844bdd6078f095ff63384c672a290825a22739b4a2cdf4",
-          "at": "2026-07-08T14:59:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D9 says version-selection grounding lives in `knowledge/research/version-baseline-YYYY-MM-DD.md`, but the scoped research workflow defines the output as `YYYY-MM-DD-HHmm-version-baseline.md` and the template still names a third pattern without the time prefix. That leaves downstream spec/verification work with incompatible pathname contracts for the same SoT, so the decision is not consumable as an observable rule until the ADR and research docs agree on one baseline filename convention.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-08-1405-grandfathered-tech-and-product-baseline.md",
-              "line": 116,
-              "category": "research grounding mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:cf548aa7b360ba98d3844bdd6078f095ff63384c672a290825a22739b4a2cdf4",
-          "at": "2026-07-08T15:03:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The rejected-alternative narrative points readers to D3 for the repository-contract async trait change, but D3 is only the domain modeling decision; the repository synchronization contract is defined in D1. That makes the ADR's own rationale self-referentially wrong and can mislead downstream spec/type work about which decision owns repository-surface changes.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-08-1405-grandfathered-tech-and-product-baseline.md",
-              "line": 172,
-              "category": "broken narrative reference"
-            }
-          ],
-          "hash": "rvw1:sha256:66129979062717b5e51b81fc66307f52c6574b98c99f18fd5f0a70b115b3944b",
-          "at": "2026-07-08T15:07:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f2d5a18bc169b0ee51ed16e380e3d9969c2f20f0dbb350e62c467a846e94537f",
-          "at": "2026-07-08T15:10:29Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9882970a9b82f9df72acfd21671957dff3164462a04b37b7f9a9c4b21ee2d076",
-          "at": "2026-07-08T14:35:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9882970a9b82f9df72acfd21671957dff3164462a04b37b7f9a9c4b21ee2d076",
-          "at": "2026-07-08T14:40:39Z"
         }
       ]
     },
@@ -691,6 +274,437 @@
           "findings": [],
           "hash": "rvw1:sha256:b9e78d751ce711e3148d77c402cf16b67b043eb81580504bb4159e53320208e3",
           "at": "2026-07-08T14:42:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8f1f4025982765977a15f5dca05cc49be631d294904487d6c2e035e59adfda3",
+          "at": "2026-07-08T15:30:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8f1f4025982765977a15f5dca05cc49be631d294904487d6c2e035e59adfda3",
+          "at": "2026-07-08T15:33:40Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9882970a9b82f9df72acfd21671957dff3164462a04b37b7f9a9c4b21ee2d076",
+          "at": "2026-07-08T14:35:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9882970a9b82f9df72acfd21671957dff3164462a04b37b7f9a9c4b21ee2d076",
+          "at": "2026-07-08T14:40:39Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1794e8a026d7f852cbff46e0c05b80985085aeba2a87e986b5f95174166e624b",
+          "at": "2026-07-08T14:36:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1794e8a026d7f852cbff46e0c05b80985085aeba2a87e986b5f95174166e624b",
+          "at": "2026-07-08T14:43:12Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cedd4f00bf02a44297ed430fcfe730b67ce696781d75090ab709911a8c41dfb4",
+          "at": "2026-07-08T12:22:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 says renamed/archive copies must be included in the final absence check, but the observable procedure it defines only checks the three exact tracked paths and filesystem paths. A retained copy under another name or location could satisfy those commands while violating IN-02, leaving downstream phases to invent the copy-detection rule.",
+              "severity": "P1",
+              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json",
+              "line": 354,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:cedd4f00bf02a44297ed430fcfe730b67ce696781d75090ab709911a8c41dfb4",
+          "at": "2026-07-08T12:27:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:882e7dc81a1ca6bde4cd550fd37aad21026c1d4fc6efb08fd53de1f7dc36f54e",
+          "at": "2026-07-08T12:32:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AC-14` mixes two machine-checkable grep requirements with a subjective requirement that the absorbed product-vision text be \"consistent with\" README's existing structure and preserve placeholder-free onboarding. That part is not deterministically verifiable as written, so downstream phases can only interpret it heuristically.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.md",
+              "line": 60,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:7c2ab7c5f9cecc65b45a615ceb349c7b926eed6551580b33bb47a40cefdb0f58",
+          "at": "2026-07-08T13:10:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0af79fbd55e222ec12511a50e7cd1698d2fb66ef113b5a43d6ab284bbdf26a4c",
+          "at": "2026-07-08T13:15:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-14 is not a deterministic acceptance check for the README absorption requirement. It verifies absence of old paths/headings, then relies on whatever product.md-derived information was “judged worth keeping,” but the spec never enumerates that retained content or requires a recorded decision. An implementation could delete product.md, preserve no product vision text in README, satisfy the grep checks, and still leave IN-04 / GO-02 unproven.",
+              "severity": "P1",
+              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json",
+              "line": 470,
+              "category": "acceptance criterion non-observable"
+            },
+            {
+              "message": "GO-01 states that document TODO markers must no longer act as state anywhere in the harness, but the acceptance criteria only prove removal of the verify-tech-stack path and a few named documentation references. A remaining or newly introduced workflow that treats generic TODO-marker absence as readiness, without using the retired tech-stack identifiers or paths, would still pass AC-01..AC-14. This leaves the broad TODO-marker state-removal goal without deterministic AC coverage.",
+              "severity": "P1",
+              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json",
+              "line": 8,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:3fd8e194d3150c30c73c57ee650d4468c175f4547a7eb80f598cc5dba15205df",
+          "at": "2026-07-08T13:21:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-14 makes README placement depend on reading `git diff -- README.md` hunk context. That is not a stable final-state acceptance check: once the track is committed or reviewed from a clean branch, this command can return no hunk context even if the required README strings were placed under the wrong section. The criterion should be expressible against repository state, such as parsing README sections or using an explicit base diff, so downstream phases can verify it deterministically.",
+              "severity": "P1",
+              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json",
+              "line": 470,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:45db7302d88addf375e6496803b537b203d2f7ff3c7ac9f930daa3014672a59a",
+          "at": "2026-07-08T13:28:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9dce01d11ebad5317635dcce0cd8df80dac72eae30e90bce54fbc703ccb49797",
+          "at": "2026-07-08T13:31:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0ee16caf15127b1ea0fa7dd6231308c5ced016ad8868fec67450e5e7bc01545",
+          "at": "2026-07-08T13:46:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0ee16caf15127b1ea0fa7dd6231308c5ced016ad8868fec67450e5e7bc01545",
+          "at": "2026-07-08T13:50:44Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f27b173f582d67691eff272b7a3b207379f3fb7476826219e06fa2c83d59905",
+          "at": "2026-07-08T14:36:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f27b173f582d67691eff272b7a3b207379f3fb7476826219e06fa2c83d59905",
+          "at": "2026-07-08T14:43:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0a24bb8edc2b91c43e3d6eb9c9ea1043d0b11ffdb6c8848a50de40ac6bc9e5a",
+          "at": "2026-07-08T15:18:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0a24bb8edc2b91c43e3d6eb9c9ea1043d0b11ffdb6c8848a50de40ac6bc9e5a",
+          "at": "2026-07-08T15:22:52Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0db90b60e07802e2ce6cc41b639a3dfa8041ebe5016e9300ec53a2d3d7a1571",
+          "at": "2026-07-08T14:34:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0db90b60e07802e2ce6cc41b639a3dfa8041ebe5016e9300ec53a2d3d7a1571",
+          "at": "2026-07-08T14:39:25Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:067620a657ef711bf00ce3317ffe9ebc8f9d4d0dce367e25beaae2c720f5c499",
+          "at": "2026-07-08T14:35:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:067620a657ef711bf00ce3317ffe9ebc8f9d4d0dce367e25beaae2c720f5c499",
+          "at": "2026-07-08T14:41:16Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c75d406919979db95f3bb9e62a76b80259ee889db69c5124132a56f494704a1f",
+          "at": "2026-07-08T12:24:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Entry `infrastructure::verify::tech_stack::verify` declares `AC-01` in `spec_refs`, but `AC-01` is only about `Makefile.toml` task/dependency removal and Makefile string searches. The infrastructure function deletion is covered by `IN-01` / `AC-03`; keeping this unrelated anchor weakens catalogue-to-spec trace integrity.",
+              "severity": "P1",
+              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/infrastructure-types.json",
+              "line": 12,
+              "category": "spec_refs off-topic"
+            },
+            {
+              "message": "`VerifyCommand.docs` restates the upstream behavior contract by saying that invoking `sotp verify tech-stack` returns an unknown-subcommand error. Per `knowledge/conventions/no-upstream-restatement.md`, catalogue docs should identify the changed type/operation and cite `AC-02`, not duplicate the acceptance behavior in prose.",
+              "severity": "P1",
+              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/cli-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:c75d406919979db95f3bb9e62a76b80259ee889db69c5124132a56f494704a1f",
+          "at": "2026-07-08T12:33:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a93379a4817cadddb8d6dfdc4c6b5910e1284baa6bd9145c13ed81096685e1e",
+          "at": "2026-07-08T12:39:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b409655bfe13f43058f1ce3ec378c8522d0cd61672dd6ecbc0f7d92f9eb166a5",
+          "at": "2026-07-08T13:50:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b409655bfe13f43058f1ce3ec378c8522d0cd61672dd6ecbc0f7d92f9eb166a5",
+          "at": "2026-07-08T13:56:57Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/research/README.md:19` still tells bootstrap readers to update `track/tech-stack.md`, but that file is deleted in this PR. The overlay copy has already been migrated to ADR-based guidance, so the live repo docs are now inconsistent and this instruction points at a nonexistent file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/knowledge/research/README.md",
+              "line": 19,
+              "category": "dead-reference"
+            },
+            {
+              "message": "`knowledge/research/version-baseline-template.md:40` still has the checklist item for updating `track/tech-stack.md`. Since that document is removed, the template now instructs users to modify a nonexistent file instead of recording the baseline decision in an ADR.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/knowledge/research/version-baseline-template.md",
+              "line": 40,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:613cda934f92594eb1280a98a0283cb80fdcb3c17e116309418e970962618065",
+          "at": "2026-07-08T14:37:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:613cda934f92594eb1280a98a0283cb80fdcb3c17e116309418e970962618065",
+          "at": "2026-07-08T14:45:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:613cda934f92594eb1280a98a0283cb80fdcb3c17e116309418e970962618065",
+          "at": "2026-07-08T14:48:47Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 reads like an implementation checklist rather than a decision record: it names specific follow-up files (`CLAUDE.md`, `.claude/rules/08/09/10`, `Makefile`, `README`, boundary manifest/overlay) and says they must be updated in lockstep. That constrains downstream implementation work that should be captured in spec/impl-plan, not in the ADR body.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+              "line": 48,
+              "category": "scope leakage into ADR body"
+            }
+          ],
+          "hash": "rvw1:sha256:407f22d530c0b7e0f5bcab2488712751ce65c060abb0fdecda2aabbe12364839",
+          "at": "2026-07-08T10:47:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a0eb8707d7603bcebbb60527c34260cdcca8fdfa0e234ddc925fa108e417fab",
+          "at": "2026-07-08T10:51:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a0eb8707d7603bcebbb60527c34260cdcca8fdfa0e234ddc925fa108e417fab",
+          "at": "2026-07-08T10:53:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33b730e6d61a340667050674890769afe2af1961e17e81f1fe47858f735f1ada",
+          "at": "2026-07-08T14:36:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 states that no async runtime such as tokio is introduced and that the execution model is synchronous, but the current grandfathered baseline already has an accepted semantic-dup stack whose LanceDB adapter uses Tokio to bridge LanceDB's async API behind a synchronous port. As written, downstream spec/types have no way to tell whether Tokio is globally forbidden or allowed for that existing infrastructure adapter, so the ADR would incorrectly erase an already-accepted exception.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-08-1405-grandfathered-tech-and-product-baseline.md",
+              "line": 67,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D4 records persistence as JSON files and says DB/KVS-style storage is not introduced, but the existing semantic-dup decision uses a local LanceDB vector database as a persistent index. Without an explicit scope carve-out for generated semantic indexes, downstream artifacts will read this as a blanket persistence rule and conflict with the existing LanceDB-backed adapter.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-08-1405-grandfathered-tech-and-product-baseline.md",
+              "line": 79,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:a6e4e1690c47d32dd47bf4110c053658230ab992af3852500d7f1e81b4ce7bcd",
+          "at": "2026-07-08T14:45:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf548aa7b360ba98d3844bdd6078f095ff63384c672a290825a22739b4a2cdf4",
+          "at": "2026-07-08T14:59:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D9 says version-selection grounding lives in `knowledge/research/version-baseline-YYYY-MM-DD.md`, but the scoped research workflow defines the output as `YYYY-MM-DD-HHmm-version-baseline.md` and the template still names a third pattern without the time prefix. That leaves downstream spec/verification work with incompatible pathname contracts for the same SoT, so the decision is not consumable as an observable rule until the ADR and research docs agree on one baseline filename convention.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-08-1405-grandfathered-tech-and-product-baseline.md",
+              "line": 116,
+              "category": "research grounding mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:cf548aa7b360ba98d3844bdd6078f095ff63384c672a290825a22739b4a2cdf4",
+          "at": "2026-07-08T15:03:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rejected-alternative narrative points readers to D3 for the repository-contract async trait change, but D3 is only the domain modeling decision; the repository synchronization contract is defined in D1. That makes the ADR's own rationale self-referentially wrong and can mislead downstream spec/type work about which decision owns repository-surface changes.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-08-1405-grandfathered-tech-and-product-baseline.md",
+              "line": 172,
+              "category": "broken narrative reference"
+            }
+          ],
+          "hash": "rvw1:sha256:66129979062717b5e51b81fc66307f52c6574b98c99f18fd5f0a70b115b3944b",
+          "at": "2026-07-08T15:07:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2d5a18bc169b0ee51ed16e380e3d9969c2f20f0dbb350e62c467a846e94537f",
+          "at": "2026-07-08T15:10:29Z"
         }
       ]
     }
