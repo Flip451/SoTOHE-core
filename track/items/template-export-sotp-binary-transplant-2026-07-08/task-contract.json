@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "track_id": "template-export-sotp-binary-transplant-2026-07-08",
+  "entries": {
+    "T001": [
+      { "layer": "usecase", "entry_key": "SelfBinaryTransplantError" },
+      { "layer": "usecase", "entry_key": "SelfBinaryTransplantPort" }
+    ],
+    "T002": [
+      { "layer": "usecase", "entry_key": "TemplateExportError" },
+      { "layer": "usecase", "entry_key": "TemplateExportInteractor" },
+      { "layer": "usecase", "entry_key": "TemplateExportCommand" },
+      { "layer": "usecase", "entry_key": "TemplateExportPort" },
+      { "layer": "usecase", "entry_key": "TemplateExportPortError" },
+      { "layer": "usecase", "entry_key": "TemplateExportReport" },
+      { "layer": "usecase", "entry_key": "TemplateExportService" }
+    ],
+    "T003": [
+      { "layer": "infrastructure", "entry_key": "FsSelfBinaryTransplantAdapter" }
+    ],
+    "T004": [],
+    "T005": [],
+    "T006": [],
+    "T007": []
+  }
+}

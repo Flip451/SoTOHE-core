@@ -1,0 +1,81 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FsSelfBinaryTransplantAdapter"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "FsSelfBinaryTransplantAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "FsSelfBinaryTransplantAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "FsSelfBinaryTransplantAdapter",
+      "trait_ref": "usecase::template_export::SelfBinaryTransplantPort"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "FsSelfBinaryTransplantAdapter": {
+      "action": "add",
+      "docs": "Filesystem adapter implementing `SelfBinaryTransplantPort` for the `sotp template export` transplant stage (IN-01, IN-02, CN-01, CN-02, CN-06, AC-01, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "unit" }
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        }
+      ]
+    }
+  }
+}

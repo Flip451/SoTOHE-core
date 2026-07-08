@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "65cfa2fd13f02b93b05ef106b61a4fcc050adc03b9254c8818ea69a9a996db5b",
+  "signals": [
+    {
+      "type_name": "SelfBinaryTransplantError",
+      "signal": "blue",
+      "entry_hash": "6986e85d50394077f953ac201d547c82ac0fe032c15f5fd579e2d72805c16007"
+    },
+    {
+      "type_name": "TemplateExportCommand",
+      "signal": "blue",
+      "entry_hash": "d12ae16e95ac826bc676cdec1b41b878d1a6ede394c739cde87d2730b14a99a0"
+    },
+    {
+      "type_name": "TemplateExportError",
+      "signal": "blue",
+      "entry_hash": "be07f918fc5c374ac475792f64fb86db5f3c8700829d17b30f2d672976bcfec8"
+    },
+    {
+      "type_name": "TemplateExportInteractor",
+      "signal": "blue",
+      "entry_hash": "9e8f6e9b4753134a8a9fcd09e084e45a7a7d1cefaac54f6b33d03864d1763199"
+    },
+    {
+      "type_name": "TemplateExportPortError",
+      "signal": "blue",
+      "entry_hash": "6a660cf5a3e9a0a8289fc7cb028403e413dc2ba7a580e44e3881072ac2810db6"
+    },
+    {
+      "type_name": "TemplateExportReport",
+      "signal": "blue",
+      "entry_hash": "f8f11ff24b4c2440817ea369cfeeb1b524b48706fdfb71aa450323043049e1e1"
+    },
+    {
+      "type_name": "SelfBinaryTransplantPort",
+      "signal": "blue",
+      "entry_hash": "5fc5eaefb4739b452b57968043e393330636b3879c294ec5886b6159acd09508"
+    },
+    {
+      "type_name": "TemplateExportPort",
+      "signal": "blue",
+      "entry_hash": "6c805bb34c429ef7fe54b13018c95c8e4bff382e37b8e83427da5562ac66e406"
+    },
+    {
+      "type_name": "TemplateExportService",
+      "signal": "blue",
+      "entry_hash": "8fe3eeb52659e938960096fafa08365eee326b99bfe50fefd7005791aa1a57e3"
+    }
+  ]
+}

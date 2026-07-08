@@ -1,0 +1,994 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "a22a39e353397d7662eca0e4bba98993ba6dd660eb0033ffc7aa9a36d56002fa",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「sotp template export は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "現行の 3 症状 (公開リポジトリにタグが 1 本も無く初回導入が成立しない / 同一ホストで固定タグから再ビルドが冗長 / export に使ったバイナリと出力側 sotp のバージョン一致が保証されない) を、export が実行中の自バイナリを出力ツリーの `bin/sotp` に移植する動作契約を持つことで同時に解消する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "1fb8efe37619d78b186d1bb5e71d4ca0f2c4c350e6f773af75fd66469d042484",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず、更新時と他ホストでの再導入用の経路として残す。初回導入はタグ非依存になり、タグの位置づけは「初回導入の前提」から「更新時の再現性」へ変わる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "固定タグ経路 (`sotp-version.json` + bootstrap の install-sotp) を廃止せず、更新時と他ホストでの再導入用の経路として残す。初回導入は自バイナリ移植でタグ非依存となり、タグの位置づけを「初回導入の前提」から「更新時の再現性」へ移す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "c3497c7087bd8aebc4e10f7caaeffc25d7fd02decd2adfdadf4337e3120b2fc6",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp template export` の動作契約に、実行中の自バイナリを出力ツリーの `bin/sotp` として移植 (実行権限を保持したコピー) するステップを組み込む。移植元は現在のプロセスの実行バイナリのパスであり、リポジトリ tree 上の `bin/sotp` ファイルではない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "4e265531c5f36cbdc900d70aa25cf8ef00283767552443c4b35e72d238d9bdc9",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "移植ステップの fail-closed 動作契約。実行中バイナリのパス取得失敗、出力先への書き込み失敗、実行権限の設定失敗など、いずれかで移植が完了しない場合、export は非ゼロ exit で終了する (silent skip、部分成功、後段でのカバーは許容しない)。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "69737247b047c7f3f60c56f84b94d799b7fc57ba326e9633f3d46d7ecbe08660",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "bootstrap 経路 (`install-sotp` 相当) の動作契約の再定義。出力ツリーに `bin/sotp` が既に存在し、read-only 起動 (`--help` 等) が成功する場合、cargo install を呼び出さずに bootstrap 全体が成立する。`bin/sotp` が存在しない、または read-only 起動に失敗する場合は、従来通り `.harness/config/sotp-version.json` に基づく固定タグからの cargo install 経路を実行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "69737247b047c7f3f60c56f84b94d799b7fc57ba326e9633f3d46d7ecbe08660",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず」および「初回導入はタグ非依存になり」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "bootstrap 経路 (`install-sotp` 相当) の動作契約の再定義。出力ツリーに `bin/sotp` が既に存在し、read-only 起動 (`--help` 等) が成功する場合、cargo install を呼び出さずに bootstrap 全体が成立する。`bin/sotp` が存在しない、または read-only 起動に失敗する場合は、従来通り `.harness/config/sotp-version.json` に基づく固定タグからの cargo install 経路を実行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "6f9bae5dca71321f1ae30471e499f3549279710e8cb90b70c17ec46d3180a014",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず、更新時と他ホストでの再導入用の経路として残す。初回導入はタグ非依存になり、タグの位置づけは「初回導入の前提」から「更新時の再現性」へ変わる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`.harness/config/sotp-version.json` の位置づけの再位置づけ。前トラックで確立された schema と bootstrap 側読み出し経路を維持しつつ、意味論を「初回導入の前提」から「更新時 / 他ホスト再導入時の SSoT」に変更する。ファイル自体・schema・キー構造は本トラックで変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "0993932e9ceb574757a5abd63e4ca234997cd2f75cd9f05e320542073a1d0d7e",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "export 出力側スモークゲートの拡張。export を実行した後の出力ツリーに `bin/sotp` が存在し、実行権限を持ち、read-only 起動が exit 0 で終わることを機械的に検証する。移植ステップの regression (未生成 / 実行不能 / 権限欠落) がスモークゲートで red になる状態を得る。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "bf3d86ae35a9c08fbaef2756804cf5ce7e684d6077c4a30fa4851ed7f77298a8",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "利用者向け bootstrap 手順ドキュメントの更新。(a) 初回導入は clone → build → export で `bin/sotp` が移植済みとなりタグ非依存で完結する経路、(b) 他ホスト / 更新時は `sotp-version.json` の固定タグから cargo install する経路、の 2 つと、それぞれが選ばれる分岐条件を明示する。テンプレート利用者が初回導入時にタグ運用を前提とせずに済む状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "bf3d86ae35a9c08fbaef2756804cf5ce7e684d6077c4a30fa4851ed7f77298a8",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず、更新時と他ホストでの再導入用の経路として残す。初回導入はタグ非依存になり」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "利用者向け bootstrap 手順ドキュメントの更新。(a) 初回導入は clone → build → export で `bin/sotp` が移植済みとなりタグ非依存で完結する経路、(b) 他ホスト / 更新時は `sotp-version.json` の固定タグから cargo install する経路、の 2 つと、それぞれが選ばれる分岐条件を明示する。テンプレート利用者が初回導入時にタグ運用を前提とせずに済む状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "de3edb6e51f60380fd70d9322ed9dfa0dff82639a15d135cf31a8e949c28f3ad",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "前トラックで確立された境界 manifest (`.harness/config/template-boundary.json`) の運用方針との整合。移植ステップは境界 manifest の分類 (include / exclude / overlay) を経由する経路ではなく、export の直交ステップとして位置づける (移植元は実行中プロセスのパスであり、リポジトリ tree 上のファイルではないため)。manifest schema や既存分類そのものの拡張は本トラックの必須要件ではないが、`bin` の分類が移植動作と矛盾しない状態を最終形として満たす (具体的な manifest 変更の是非は type-designer / impl-planner に委ねる)。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "98fda20ed29a49190aa46800808450e31dc48a7f75c33d7d6599d73763a6e78a",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "現行方式のみ (`sotp-version.json` からの cargo install だけで初回導入を成立させる) 案 (ADR Rejected Alternative A)。タグ運用が初回導入のブロッカーになり、同一ホストでの再ビルドが冗長で、export バイナリと出力側のバージョン一致も保証されないため本トラックでは採らない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "3868b07b0f3a7872bd3826b14440cca3bb9cef7f0cad17fad905a026278e7e10",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "GitHub Releases でのプレビルトバイナリ配布 (ADR Rejected Alternative B, 先送り)。ビルド・署名・マルチプラットフォーム matrix の運用コストが先行するため、利用プロジェクトが複数現れてから再評価する。本トラックでは実施しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "de748aa151f48a593e166bd377a2a0a9f95627fa6848d316d9c340ee23b4af95",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "テンプレートに sotp ソースを同梱し利用者側でビルドする方式 (ADR Rejected Alternative C)。利用者のワークスペースに sotp の重いビルド前提が漏れ、境界分離の趣旨に反するため本トラックでは採らない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ebde3e41d392cb588cc97233f111a7686372ced826d81410a54cc5f11fbfcfcf",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず、更新時と他ホストでの再導入用の経路として残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "固定タグ経路 (`sotp-version.json` + install-sotp) の廃止。D2 で更新・他ホスト導入用として明示的に残置決定されているため、本トラックで削除しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "30649a2f4e7567c00faa1152d44e5ec133895e94f7070b43dc51666d2b451c71",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず、更新時と他ホストでの再導入用の経路として残す。初回導入はタグ非依存になり、タグの位置づけは「初回導入の前提」から「更新時の再現性」へ変わる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "クロスプラットフォームビルド matrix / 署名 / release インフラの整備。移植バイナリのビルドホスト固有性を解消する経路として GitHub Releases 案 (OS-02) と同じ再評価事項に含まれるが、本トラックでは行わない。別ホスト利用は D2 の固定タグ経路で受ける。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "8ae560ad714b9fa8888ab14141fd2a8362c45bf799cf64c1a199f86db45ef9ed",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-06",
+          "text_label": "bootstrap host 側 protoc / sotp MSRV 要件の除去 (lancedb 系 feature-gate 化)。前 ADR (`template-extraction-boundary`) で follow-up として明示的に切り出された事項であり、本トラックでも決定しない。将来別トラックで検討する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "91d87febbfd5118a62bc3fffe068a6bcdd08e20af577f6d859397c196f2637b9",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず、更新時と他ホストでの再導入用の経路として残す。初回導入はタグ非依存になり、タグの位置づけは「初回導入の前提」から「更新時の再現性」へ変わる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-07",
+          "text_label": "移植バイナリのクロスプラットフォーム互換性検証 (Linux で export したものが macOS で動作するか等)。移植バイナリはビルドホスト固有 (ADR Consequences Negative) であり、別ホストでは D2 の固定タグ経路で再導入することを前提とする。移植バイナリを他 OS / ABI で強制動作させる互換 layer は本トラックで作らない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "4977620bdf4aedbaf26965364b2849ee6e5a5aa8d684a2c67d770884d0bca2cd",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-08",
+          "text_label": "出力ツリー内 `bin/sotp` の gitignore ポリシーそのものの決定・enforce。D1 は「実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する」動作のみを decision として含み、移植された `bin/sotp` の git 管理方針 (ignore / track の是非、CI 強制の要否) を decision に含まない。本トラックは D1 が扱わない gitignore ポリシーの決定・enforce を out of scope とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "cde90f93acac0aa1e1d67d1cbf640c7153a677b9a07fef01f00e92232f2595fd",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-09",
+          "text_label": "境界 manifest schema そのものの再設計 (「実行時生成物」を表す新分類の導入等)。前トラックで確立された `include` / `exclude` / `overlay` の三分類は維持し、移植ステップは manifest 直交の直接書き込みとして実装する経路が採れる。schema 変更が impl の唯一解と決まった場合のみ impl-plan / type-designer 側で扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "edb6084ac8c34fbf915d6b5c35169a27fa8d83c8521e3c4dceff84ed99b6c5ad",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "出力ツリーの `bin/sotp` は、export を実行した sotp バイナリと **バイト単位で同一** である。export 実行と出力側 sotp のバージョン (機能 / 依存性含む) が食い違う状態を作らない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "a657ad8071311e23563c22423bf7b6234e01ed58207b7ae87317d9e94786628a",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "出力ツリーの `bin/sotp` は実行権限を保持している。移植後に追加コマンド (chmod 等) なしで `bin/sotp` を直接起動できる状態を要件とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "bf285dedb98ae1652fa94e36813c485bddc1b9b3e2747ca327ee7a2e5b1b5520",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "初回導入経路 (`sotp template export` を実行した同一ホスト上の `cargo make bootstrap`) が、公開リポジトリに sotp タグが 1 本も無い状態でも成立する。初回導入がタグの存在 / 到達性に依存しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ed39115e58bc79330c59ea47dffebd614a7487921aaad755137955ec17d238a5",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず、更新時と他ホストでの再導入用の経路として残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "固定タグ経路 (`sotp-version.json` + bootstrap の install-sotp) は本トラックで廃止しない。D2 の定義する更新時 / 他ホスト再導入用の経路として同居する状態を保つ。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "c53166c83f45966190bf886f31549d3631b932b512c6d157a851efe4563b9dad",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず、更新時と他ホストでの再導入用の経路として残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "`.harness/config/sotp-version.json` の schema・キー・値の意味論を本トラックで変更しない。前トラックで確立された SSoT 定義がそのまま更新経路として引き継がれる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "924e7a055c16d1de691cc13141e4c58ae1ec1a610d1404b10fe53b86a50427ff",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "移植ステップの失敗 (パス取得失敗 / 書き込み失敗 / 権限設定失敗) は fail-closed で export の exit を非ゼロにする。silent skip、部分成功、後続 CI ゲートに委ねる形の遅延検出を許容しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "4ca545c97faa5d0a708b79dadd8b0b3254aca5222b6a935c52ed02c1b5a118c1",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず、更新時と他ホストでの再導入用の経路として残す。初回導入はタグ非依存になり、タグの位置づけは「初回導入の前提」から「更新時の再現性」へ変わる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "bootstrap の経路分岐 (`bin/sotp` 既存 → cargo install skip、未導入 → タグから install) は、テンプレート利用者に追加のフラグ / 環境変数の指定を要求せずデフォルト動作で正しく分岐する。利用者が「どちらの経路を通るか」を意識せずに `cargo make bootstrap` 一発で完結する状態を要件とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "79f5005acc7fd4c3e9c8388bdf5ddda3a6cb5434b96dd1b38c8011b9b4c5a02a",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-08",
+          "text_label": "本トラックが追加/拡張する verifier / スモークゲート (`bin/sotp` に対する検証) の scope は、D1 が明示する移植動作契約 (実行中バイナリの `bin/sotp` へのコピー、byte-identical、実行権限保持、read-only 起動成功) の検証に限定する。移植動作契約の外側 (テンプレート利用者所有領域における設定選択・運用判断) は D1 の decision に含まれないため、本トラックの verifier / スモークゲートで扱わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "64cc7e0f2ace93a4145c0513f86448c6e5a65b3a6bf8f5c6f17a6ea5e5c83e81",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "本トラックの完成 gate は D1 の移植動作契約に対する検証で構成する: (a) 既存の SoT Chain 信号評価 (spec / ADR / catalogue / impl-plan の整合)、(b) 出力側スモークゲートによる `bin/sotp` の存在・実行権限・read-only 起動確認、(c) 移植ステップ内部の fail-closed 動作 (パス取得失敗 / 書き込み失敗 / 権限設定失敗 → 非ゼロ exit)。D1 は移植動作契約のみを decision として含み、追加の承認フローや状態管理 field を要求しないため、本トラックは新規の状態フィールド (`approved` / `Status` 等) や事前承認ステップを新設しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ba3977dd8d6ab571788f2b052c2647c7a148680ee306a6386b2f78bec03785bb",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp template export` を実行した後、出力ディレクトリの `bin/sotp` が、export を実行したプロセスの実行バイナリと **バイト単位で同一** の内容を持ち、かつ実行権限が付与されている。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d6eae3547d280e61009262a8892064a2ecc9219158e577bbffe249ce62c4e7ff",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "出力ディレクトリの `bin/sotp` を read-only 起動 (`bin/sotp --help` 等) すると exit 0 で終了する (移植後に追加コマンドを要さず、そのまま実行可能である状態を機械検証する)。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "3a6e110a0ebe4b9d1ac4349cf1b6236593bed782e992f98bad19ba833e5d43c7",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sotp template export は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "実行中バイナリのパス取得失敗、出力先への書き込み失敗、または実行権限設定失敗のいずれかの状況を人為的に発生させた場合、`sotp template export` は非ゼロ exit で終了し、部分的な出力ツリー (transplant 失敗を示唆する不完全な `bin/sotp` を含む) を残さないか、または後段の検証で必ず失敗として検出可能な状態にとどめる。silent skip や部分成功として扱われない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "bc9c4707b973d2b2b242101aa1fd8fc39c50452db4e7e442ba45696af9ce6067",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`bin/sotp` が既に存在し read-only 起動が成功する出力ツリーで `cargo make bootstrap` を実行すると、`sotp-version.json` の指すタグが公開リポジトリに存在しなくても bootstrap 全体が exit 0 で完結する (cargo install --git --tag が呼ばれない、または呼ばれても bin/sotp の存在確認によって skip される)。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "bc9c4707b973d2b2b242101aa1fd8fc39c50452db4e7e442ba45696af9ce6067",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "初回導入はタグ非依存になり、タグの位置づけは「初回導入の前提」から「更新時の再現性」へ変わる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`bin/sotp` が既に存在し read-only 起動が成功する出力ツリーで `cargo make bootstrap` を実行すると、`sotp-version.json` の指すタグが公開リポジトリに存在しなくても bootstrap 全体が exit 0 で完結する (cargo install --git --tag が呼ばれない、または呼ばれても bin/sotp の存在確認によって skip される)。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "f77ee563b9e1760ffc015ceeb1915d2a3d4ae830b4ac7d0238c707c6c040da20",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず、更新時と他ホストでの再導入用の経路として残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`bin/sotp` が存在しない状態の出力ツリーで `cargo make bootstrap` (または `cargo make install-sotp`) を実行すると、`sotp-version.json` の指す (実在する) タグから `cargo install --git ... --tag ... --locked` が実行され、`bin/sotp` が生成され、read-only 起動 (`--help`) が exit 0 で終わる。他ホスト / 更新時経路が引き続き機能する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5f928eb2700d24c2efdeac4b8dec3e0902d6eb1ef15124bfc013d3edbde7340",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず、更新時と他ホストでの再導入用の経路として残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`.harness/config/sotp-version.json` の `schema_version` / `git_url` / `tag` / `crate` / `binary` を含むキー構造と意味論が、本トラックの変更前後で保持されている (schema drift ゼロ)。同ファイルは更新時 / 他ホスト再導入時の SSoT として引き続き機能する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "62fd4b8764cb6196487cc161d4b942ee7d3704933486a940bd4a39a40faab637",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "export 出力側スモークゲートに `bin/sotp` の (a) 存在確認、(b) 実行権限確認、(c) read-only 起動 (`--help`) exit 0 の 3 検証が組み込まれており、移植ステップの regression (未生成 / 非実行可能 / 起動失敗) でスモークゲートが red で終わる状態に到達している。既存の export スモークゲート (前トラックで登録済み) を破壊せずに拡張する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "57efd9a118bd27c10aa9fe454fd8cdbd0e656ab8e27519d704dff1d1df678c79",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。これにより export に使ったバイナリと出力テンプレートの sotp は常に同一になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "利用者向け bootstrap ドキュメント (README ないし該当 bootstrap 手順文書) に、(a) 初回導入は clone → build → `sotp template export` により `bin/sotp` が移植済みでタグ非依存で完結する経路、(b) 他ホスト / 更新時は `sotp-version.json` の固定タグから cargo install する経路、の 2 経路と、それぞれが選ばれる分岐条件が記述されている。「タグが必要」という初回導入の前提を利用者向け説明から除去する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "57efd9a118bd27c10aa9fe454fd8cdbd0e656ab8e27519d704dff1d1df678c79",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「固定タグ経路は廃止せず、更新時と他ホストでの再導入用の経路として残す。初回導入はタグ非依存になり」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "利用者向け bootstrap ドキュメント (README ないし該当 bootstrap 手順文書) に、(a) 初回導入は clone → build → `sotp template export` により `bin/sotp` が移植済みでタグ非依存で完結する経路、(b) 他ホスト / 更新時は `sotp-version.json` の固定タグから cargo install する経路、の 2 経路と、それぞれが選ばれる分岐条件が記述されている。「タグが必要」という初回導入の前提を利用者向け説明から除去する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "72d2a3a5e468dbcc3adca5d201a9b16e6673105e21fde0d4882b353032ada5b6",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "sotp 自身のリポジトリで `cargo make ci` (fmt-check + clippy + test + deny + check-layers + verify-* + template-export-smoke) が pass する。移植ステップ追加・bootstrap 分岐追加・スモークゲート拡張によって既存 gate に regression が発生していない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "72d2a3a5e468dbcc3adca5d201a9b16e6673105e21fde0d4882b353032ada5b6",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず、更新時と他ホストでの再導入用の経路として残す。初回導入はタグ非依存になり、タグの位置づけは「初回導入の前提」から「更新時の再現性」へ変わる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "sotp 自身のリポジトリで `cargo make ci` (fmt-check + clippy + test + deny + check-layers + verify-* + template-export-smoke) が pass する。移植ステップ追加・bootstrap 分岐追加・スモークゲート拡張によって既存 gate に regression が発生していない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "abce4fd8d4628c652f9b0d7bec74b8f8c1b780b5a0c6f3b0d8b95ee4b1739de5",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` は、実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する（実行権限を保持したコピー）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "移植ステップの成功経路 (パス取得 → 書き込み → 権限設定 → 検証) と fail-closed 経路 (各段階での失敗検出) が unit test / integration test でカバーされている。bootstrap 側経路分岐 (bin/sotp 既存 → skip、未導入 → タグ install) もテストで covered されている。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "abce4fd8d4628c652f9b0d7bec74b8f8c1b780b5a0c6f3b0d8b95ee4b1739de5",
+      "evidence_hash": "1938f9644ff2a4e867140c66fead243e88ca2e3f21582f979c509f0ed50faeb9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "固定タグ経路（`sotp-version.json` + bootstrap の install-sotp）は廃止せず、更新時と他ホストでの再導入用の経路として残す。初回導入はタグ非依存になり、タグの位置づけは「初回導入の前提」から「更新時の再現性」へ変わる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "移植ステップの成功経路 (パス取得 → 書き込み → 権限設定 → 検証) と fail-closed 経路 (各段階での失敗検出) が unit test / integration test でカバーされている。bootstrap 側経路分岐 (bin/sotp 既存 → skip、未導入 → タグ install) もテストで covered されている。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "decision_id": "D2"
+        }
+      }
+    }
+  ]
+}

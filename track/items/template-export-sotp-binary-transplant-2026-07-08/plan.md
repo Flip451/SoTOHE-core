@@ -1,4 +1,48 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # sotp template export の自バイナリ移植 — 初回導入をタグ非依存にし、export バイナリと出力側 sotp のバージョン一致を保証する
 
-> **Note**: `impl-plan.json` not yet generated. Run `/track:impl-plan` to generate the implementation plan.
+## Summary
+
+T001: libs/usecase/src/template_export/mod.rs — add SelfBinaryTransplantError + SelfBinaryTransplantPort (IN-01, IN-02, CN-01, CN-02, CN-06, AC-01, AC-03).
+T002: libs/usecase/src/template_export/mod.rs — modify TemplateExportError (BinaryTransplant + From) and TemplateExportInteractor (3-port constructor + body) with mock-port unit tests (IN-01, IN-02, CN-01, CN-02, CN-06, CN-09, AC-01, AC-03, AC-10).
+T003: libs/infrastructure/src/template_export/mod.rs + libs/infrastructure/src/lib.rs — add FsSelfBinaryTransplantAdapter with tempdir integration tests (IN-01, IN-02, IN-07, CN-01, CN-02, CN-06, CN-09, AC-01, AC-03, AC-10, OS-07).
+T004: apps/cli-composition/src/template_export/mod.rs — wire the transplant port into TemplateCompositionRoot::template_driver and extend the composition-root smoke test end-to-end (IN-01, IN-07, CN-01, CN-02, OS-09, AC-01, AC-02, AC-09, AC-10).
+T005: overlay/Makefile.toml — modify bootstrap step 3 and leave install-sotp + sotp-version.json untouched (IN-03, IN-04, CN-03, CN-04, CN-05, CN-07, AC-04, AC-05, AC-06, AC-09, AC-10, OS-01, OS-03, OS-04, OS-05, OS-06).
+T006: Makefile.toml — modify [tasks.template-export-smoke-local] post-export bin/sotp checks (IN-05, CN-08, CN-09, AC-02, AC-07, AC-09, AC-10).
+T007: README.md — edit 前提条件 / はじめ方 sections for bootstrap paths and branch condition (IN-06, AC-08, AC-09, OS-02, OS-08).
+Goal traceability: GO-01 → T001/T002/T003/T004/T005/T006; GO-02 → T005/T007.
+
+## Tasks (0/7 resolved)
+
+### S1 — Usecase: transplant port + interactor extension
+
+> libs/usecase/src/template_export/mod.rs — run T001 (add SelfBinaryTransplantError + SelfBinaryTransplantPort) then T002 (modify TemplateExportError + TemplateExportInteractor + mock-port unit tests for the successful path and the three fail-closed variants) (IN-01, IN-02, CN-01, CN-02, CN-06, CN-09, AC-01, AC-03, AC-10).
+
+- [ ] **T001**: libs/usecase/src/template_export/mod.rs — add SelfBinaryTransplantError enum (per usecase-types.json:types.SelfBinaryTransplantError) with the Debug/Display/Error trait_impls, and add the SelfBinaryTransplantPort trait (per usecase-types.json:traits.SelfBinaryTransplantPort) with the transplant method signature (IN-01, IN-02, CN-01, CN-02, CN-06, AC-01, AC-03).
+- [ ] **T002**: libs/usecase/src/template_export/mod.rs — modify TemplateExportError to add the BinaryTransplant variant and the From<SelfBinaryTransplantError> trait_impl (per usecase-types.json:types.TemplateExportError + trait_impls); modify TemplateExportInteractor to add the transplant_port field, update the new constructor to the 3-port signature (per usecase-types.json:inherent_impls.TemplateExportInteractor.methods.new), and extend TemplateExportService::export body to invoke the transplant step after export_port.export succeeds; extend interactor mock-port unit tests to cover the successful 3-port path plus the three fail-closed variants of SelfBinaryTransplantError → TemplateExportError::BinaryTransplant (IN-01, IN-02, CN-01, CN-02, CN-06, CN-09, AC-01, AC-03, AC-10).
+
+### S2 — Infrastructure: fs transplant adapter
+
+> libs/infrastructure/src/template_export/mod.rs + libs/infrastructure/src/lib.rs — run T003 (add FsSelfBinaryTransplantAdapter with Default + Debug + SelfBinaryTransplantPort trait_impls, inherent new, and tempdir integration tests) (IN-01, IN-02, IN-07, CN-01, CN-02, CN-06, CN-09, AC-01, AC-03, AC-10, OS-07).
+
+- [ ] **T003**: libs/infrastructure/src/template_export/mod.rs and libs/infrastructure/src/lib.rs — add FsSelfBinaryTransplantAdapter (per infrastructure-types.json:types.FsSelfBinaryTransplantAdapter) with its Default + Debug + SelfBinaryTransplantPort trait_impls and an inherent new constructor, and add tempdir integration tests for the adapter (IN-01, IN-02, IN-07, CN-01, CN-02, CN-06, CN-09, AC-01, AC-03, AC-10, OS-07).
+
+### S3 — CLI composition: wire the transplant port + end-to-end smoke test
+
+> apps/cli-composition/src/template_export/mod.rs — run T004 (update TemplateCompositionRoot::template_driver internal wiring for the 3-port TemplateExportInteractor::new and add the tempdir-backed composition-root end-to-end assertion for bin/sotp) (IN-01, IN-07, CN-01, CN-02, OS-09, AC-01, AC-02, AC-09, AC-10).
+
+- [ ] **T004**: apps/cli-composition/src/template_export/mod.rs — update TemplateCompositionRoot::template_driver internal wiring to instantiate FsSelfBinaryTransplantAdapter and pass it as the third argument to the modified TemplateExportInteractor::new (public composition-root surface unchanged); extend the composition-root smoke test with a tempdir-backed end-to-end assertion for bin/sotp (IN-01, IN-07, CN-01, CN-02, OS-09, AC-01, AC-02, AC-09, AC-10).
+
+### S4 — Bootstrap runtime + smoke gate extension
+
+> overlay/Makefile.toml — run T005 (modify [tasks.bootstrap] step 3; keep [tasks.install-sotp] and .harness/config/sotp-version.json untouched) (IN-03, IN-04, CN-03, CN-04, CN-05, CN-07, AC-04, AC-05, AC-06, AC-09, AC-10, OS-01, OS-03, OS-04, OS-05, OS-06).
+> Makefile.toml — run T006 (modify [tasks.template-export-smoke-local] source-binary step and post-export bin/sotp checks) (IN-05, CN-08, CN-09, AC-02, AC-07, AC-09, AC-10).
+
+- [ ] **T005**: overlay/Makefile.toml — modify [tasks.bootstrap] step 3 to add the IN-03 / AC-04 bootstrap branch, and keep [tasks.install-sotp] plus .harness/config/sotp-version.json schema / keys / semantics untouched (IN-03, IN-04, CN-03, CN-04, CN-05, CN-07, AC-04, AC-05, AC-06, AC-09, AC-10, OS-01, OS-03, OS-04, OS-05, OS-06).
+- [ ] **T006**: Makefile.toml — modify [tasks.template-export-smoke-local] to remove the source-binary lend-and-copy step (mkdir bin + cp $SOTP_SRC_BIN), add the three post-export checks against bin/sotp, and keep the verify chain, cargo-deny step, and ci-container / ci-local registration intact (IN-05, CN-08, CN-09, AC-02, AC-07, AC-09, AC-10).
+
+### S5 — User-facing bootstrap docs
+
+> README.md — run T007 (edit 前提条件 / はじめ方 sections for bootstrap paths, branch condition, and OS-02 / OS-08 notes) (IN-06, AC-08, AC-09, OS-02, OS-08).
+
+- [ ] **T007**: README.md — extend 前提条件 / はじめ方 sections with the two bootstrap paths, the automatic default branch condition, and OS-02 / OS-08 notes (IN-06, AC-08, AC-09, OS-02, OS-08).

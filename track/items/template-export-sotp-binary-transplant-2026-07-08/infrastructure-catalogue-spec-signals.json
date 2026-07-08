@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e06a96f77e3c2d822a20c93bb0a70691543a618428d351310ae684fe0cb23387",
+  "signals": [
+    {
+      "type_name": "FsSelfBinaryTransplantAdapter",
+      "signal": "blue",
+      "entry_hash": "113acdf9ffb53130da72eb48f5e922304f105dfa67695a341bf558f370310a62"
+    }
+  ]
+}

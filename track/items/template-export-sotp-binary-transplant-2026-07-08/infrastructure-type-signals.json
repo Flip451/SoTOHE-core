@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-08T08:29:51Z",
+  "declaration_hash": "e06a96f77e3c2d822a20c93bb0a70691543a618428d351310ae684fe0cb23387",
+  "signals": [
+    {
+      "type_name": "FsSelfBinaryTransplantAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "SelfBinaryTransplantPort",
+        "core::default::Default",
+        "core::fmt::Debug"
+      ]
+    }
+  ]
+}
