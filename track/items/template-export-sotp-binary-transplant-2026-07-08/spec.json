@@ -1,0 +1,496 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "sotp template export の自バイナリ移植 — 初回導入をタグ非依存にし、export バイナリと出力側 sotp のバージョン一致を保証する",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "現行の 3 症状 (公開リポジトリにタグが 1 本も無く初回導入が成立しない / 同一ホストで固定タグから再ビルドが冗長 / export に使ったバイナリと出力側 sotp のバージョン一致が保証されない) を、export が実行中の自バイナリを出力ツリーの `bin/sotp` に移植する動作契約を持つことで同時に解消する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "固定タグ経路 (`sotp-version.json` + bootstrap の install-sotp) を廃止せず、更新時と他ホストでの再導入用の経路として残す。初回導入は自バイナリ移植でタグ非依存となり、タグの位置づけを「初回導入の前提」から「更新時の再現性」へ移す。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "`sotp template export` の動作契約に、実行中の自バイナリを出力ツリーの `bin/sotp` として移植 (実行権限を保持したコピー) するステップを組み込む。移植元は現在のプロセスの実行バイナリのパスであり、リポジトリ tree 上の `bin/sotp` ファイルではない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "移植ステップの fail-closed 動作契約。実行中バイナリのパス取得失敗、出力先への書き込み失敗、実行権限の設定失敗など、いずれかで移植が完了しない場合、export は非ゼロ exit で終了する (silent skip、部分成功、後段でのカバーは許容しない)。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "bootstrap 経路 (`install-sotp` 相当) の動作契約の再定義。出力ツリーに `bin/sotp` が既に存在し、read-only 起動 (`--help` 等) が成功する場合、cargo install を呼び出さずに bootstrap 全体が成立する。`bin/sotp` が存在しない、または read-only 起動に失敗する場合は、従来通り `.harness/config/sotp-version.json` に基づく固定タグからの cargo install 経路を実行する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "`.harness/config/sotp-version.json` の位置づけの再位置づけ。前トラックで確立された schema と bootstrap 側読み出し経路を維持しつつ、意味論を「初回導入の前提」から「更新時 / 他ホスト再導入時の SSoT」に変更する。ファイル自体・schema・キー構造は本トラックで変更しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "export 出力側スモークゲートの拡張。export を実行した後の出力ツリーに `bin/sotp` が存在し、実行権限を持ち、read-only 起動が exit 0 で終わることを機械的に検証する。移植ステップの regression (未生成 / 実行不能 / 権限欠落) がスモークゲートで red になる状態を得る。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "利用者向け bootstrap 手順ドキュメントの更新。(a) 初回導入は clone → build → export で `bin/sotp` が移植済みとなりタグ非依存で完結する経路、(b) 他ホスト / 更新時は `sotp-version.json` の固定タグから cargo install する経路、の 2 つと、それぞれが選ばれる分岐条件を明示する。テンプレート利用者が初回導入時にタグ運用を前提とせずに済む状態にする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "前トラックで確立された境界 manifest (`.harness/config/template-boundary.json`) の運用方針との整合。移植ステップは境界 manifest の分類 (include / exclude / overlay) を経由する経路ではなく、export の直交ステップとして位置づける (移植元は実行中プロセスのパスであり、リポジトリ tree 上のファイルではないため)。manifest schema や既存分類そのものの拡張は本トラックの必須要件ではないが、`bin` の分類が移植動作と矛盾しない状態を最終形として満たす (具体的な manifest 変更の是非は type-designer / impl-planner に委ねる)。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "現行方式のみ (`sotp-version.json` からの cargo install だけで初回導入を成立させる) 案 (ADR Rejected Alternative A)。タグ運用が初回導入のブロッカーになり、同一ホストでの再ビルドが冗長で、export バイナリと出力側のバージョン一致も保証されないため本トラックでは採らない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "GitHub Releases でのプレビルトバイナリ配布 (ADR Rejected Alternative B, 先送り)。ビルド・署名・マルチプラットフォーム matrix の運用コストが先行するため、利用プロジェクトが複数現れてから再評価する。本トラックでは実施しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "テンプレートに sotp ソースを同梱し利用者側でビルドする方式 (ADR Rejected Alternative C)。利用者のワークスペースに sotp の重いビルド前提が漏れ、境界分離の趣旨に反するため本トラックでは採らない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D1"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": "knowledge/conventions/responsibility-boundary.md",
+            "anchor": "Rules"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "固定タグ経路 (`sotp-version.json` + install-sotp) の廃止。D2 で更新・他ホスト導入用として明示的に残置決定されているため、本トラックで削除しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "クロスプラットフォームビルド matrix / 署名 / release インフラの整備。移植バイナリのビルドホスト固有性を解消する経路として GitHub Releases 案 (OS-02) と同じ再評価事項に含まれるが、本トラックでは行わない。別ホスト利用は D2 の固定タグ経路で受ける。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "bootstrap host 側 protoc / sotp MSRV 要件の除去 (lancedb 系 feature-gate 化)。前 ADR (`template-extraction-boundary`) で follow-up として明示的に切り出された事項であり、本トラックでも決定しない。将来別トラックで検討する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-07",
+        "text": "移植バイナリのクロスプラットフォーム互換性検証 (Linux で export したものが macOS で動作するか等)。移植バイナリはビルドホスト固有 (ADR Consequences Negative) であり、別ホストでは D2 の固定タグ経路で再導入することを前提とする。移植バイナリを他 OS / ABI で強制動作させる互換 layer は本トラックで作らない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D2"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": "knowledge/conventions/responsibility-boundary.md",
+            "anchor": "Rules"
+          }
+        ]
+      },
+      {
+        "id": "OS-08",
+        "text": "出力ツリー内 `bin/sotp` の gitignore ポリシーそのものの決定・enforce。D1 は「実行中の自バイナリを出力ツリーの `bin/sotp` へ移植する」動作のみを decision として含み、移植された `bin/sotp` の git 管理方針 (ignore / track の是非、CI 強制の要否) を decision に含まない。本トラックは D1 が扱わない gitignore ポリシーの決定・enforce を out of scope とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D1"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": "knowledge/conventions/responsibility-boundary.md",
+            "anchor": "Rules"
+          }
+        ]
+      },
+      {
+        "id": "OS-09",
+        "text": "境界 manifest schema そのものの再設計 (「実行時生成物」を表す新分類の導入等)。前トラックで確立された `include` / `exclude` / `overlay` の三分類は維持し、移植ステップは manifest 直交の直接書き込みとして実装する経路が採れる。schema 変更が impl の唯一解と決まった場合のみ impl-plan / type-designer 側で扱う。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "出力ツリーの `bin/sotp` は、export を実行した sotp バイナリと **バイト単位で同一** である。export 実行と出力側 sotp のバージョン (機能 / 依存性含む) が食い違う状態を作らない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "出力ツリーの `bin/sotp` は実行権限を保持している。移植後に追加コマンド (chmod 等) なしで `bin/sotp` を直接起動できる状態を要件とする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "初回導入経路 (`sotp template export` を実行した同一ホスト上の `cargo make bootstrap`) が、公開リポジトリに sotp タグが 1 本も無い状態でも成立する。初回導入がタグの存在 / 到達性に依存しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "固定タグ経路 (`sotp-version.json` + bootstrap の install-sotp) は本トラックで廃止しない。D2 の定義する更新時 / 他ホスト再導入用の経路として同居する状態を保つ。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "`.harness/config/sotp-version.json` の schema・キー・値の意味論を本トラックで変更しない。前トラックで確立された SSoT 定義がそのまま更新経路として引き継がれる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "移植ステップの失敗 (パス取得失敗 / 書き込み失敗 / 権限設定失敗) は fail-closed で export の exit を非ゼロにする。silent skip、部分成功、後続 CI ゲートに委ねる形の遅延検出を許容しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/enforce-by-mechanism.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "bootstrap の経路分岐 (`bin/sotp` 既存 → cargo install skip、未導入 → タグから install) は、テンプレート利用者に追加のフラグ / 環境変数の指定を要求せずデフォルト動作で正しく分岐する。利用者が「どちらの経路を通るか」を意識せずに `cargo make bootstrap` 一発で完結する状態を要件とする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-08",
+      "text": "本トラックが追加/拡張する verifier / スモークゲート (`bin/sotp` に対する検証) の scope は、D1 が明示する移植動作契約 (実行中バイナリの `bin/sotp` へのコピー、byte-identical、実行権限保持、read-only 起動成功) の検証に限定する。移植動作契約の外側 (テンプレート利用者所有領域における設定選択・運用判断) は D1 の decision に含まれないため、本トラックの verifier / スモークゲートで扱わない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/responsibility-boundary.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "CN-09",
+      "text": "本トラックの完成 gate は D1 の移植動作契約に対する検証で構成する: (a) 既存の SoT Chain 信号評価 (spec / ADR / catalogue / impl-plan の整合)、(b) 出力側スモークゲートによる `bin/sotp` の存在・実行権限・read-only 起動確認、(c) 移植ステップ内部の fail-closed 動作 (パス取得失敗 / 書き込み失敗 / 権限設定失敗 → 非ゼロ exit)。D1 は移植動作契約のみを decision として含み、追加の承認フローや状態管理 field を要求しないため、本トラックは新規の状態フィールド (`approved` / `Status` 等) や事前承認ステップを新設しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+          "anchor": "Rules"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "`sotp template export` を実行した後、出力ディレクトリの `bin/sotp` が、export を実行したプロセスの実行バイナリと **バイト単位で同一** の内容を持ち、かつ実行権限が付与されている。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "出力ディレクトリの `bin/sotp` を read-only 起動 (`bin/sotp --help` 等) すると exit 0 で終了する (移植後に追加コマンドを要さず、そのまま実行可能である状態を機械検証する)。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "実行中バイナリのパス取得失敗、出力先への書き込み失敗、または実行権限設定失敗のいずれかの状況を人為的に発生させた場合、`sotp template export` は非ゼロ exit で終了し、部分的な出力ツリー (transplant 失敗を示唆する不完全な `bin/sotp` を含む) を残さないか、または後段の検証で必ず失敗として検出可能な状態にとどめる。silent skip や部分成功として扱われない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "`bin/sotp` が既に存在し read-only 起動が成功する出力ツリーで `cargo make bootstrap` を実行すると、`sotp-version.json` の指すタグが公開リポジトリに存在しなくても bootstrap 全体が exit 0 で完結する (cargo install --git --tag が呼ばれない、または呼ばれても bin/sotp の存在確認によって skip される)。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "`bin/sotp` が存在しない状態の出力ツリーで `cargo make bootstrap` (または `cargo make install-sotp`) を実行すると、`sotp-version.json` の指す (実在する) タグから `cargo install --git ... --tag ... --locked` が実行され、`bin/sotp` が生成され、read-only 起動 (`--help`) が exit 0 で終わる。他ホスト / 更新時経路が引き続き機能する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "`.harness/config/sotp-version.json` の `schema_version` / `git_url` / `tag` / `crate` / `binary` を含むキー構造と意味論が、本トラックの変更前後で保持されている (schema drift ゼロ)。同ファイルは更新時 / 他ホスト再導入時の SSoT として引き続き機能する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "export 出力側スモークゲートに `bin/sotp` の (a) 存在確認、(b) 実行権限確認、(c) read-only 起動 (`--help`) exit 0 の 3 検証が組み込まれており、移植ステップの regression (未生成 / 非実行可能 / 起動失敗) でスモークゲートが red で終わる状態に到達している。既存の export スモークゲート (前トラックで登録済み) を破壊せずに拡張する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "利用者向け bootstrap ドキュメント (README ないし該当 bootstrap 手順文書) に、(a) 初回導入は clone → build → `sotp template export` により `bin/sotp` が移植済みでタグ非依存で完結する経路、(b) 他ホスト / 更新時は `sotp-version.json` の固定タグから cargo install する経路、の 2 経路と、それぞれが選ばれる分岐条件が記述されている。「タグが必要」という初回導入の前提を利用者向け説明から除去する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "sotp 自身のリポジトリで `cargo make ci` (fmt-check + clippy + test + deny + check-layers + verify-* + template-export-smoke) が pass する。移植ステップ追加・bootstrap 分岐追加・スモークゲート拡張によって既存 gate に regression が発生していない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "移植ステップの成功経路 (パス取得 → 書き込み → 権限設定 → 検証) と fail-closed 経路 (各段階での失敗検出) が unit test / integration test でカバーされている。bootstrap 側経路分岐 (bin/sotp 既存 → skip、未導入 → タグ install) もテストで covered されている。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-08-0541-template-export-sotp-binary-transplant.md",
+          "anchor": "D2"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/testing.md",
+          "anchor": "Rules"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": "knowledge/conventions/testing.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/no-upstream-restatement.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/responsibility-boundary.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/enforce-by-mechanism.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    }
+  ],
+  "signals": {
+    "blue": 37,
+    "yellow": 0,
+    "red": 0
+  }
+}

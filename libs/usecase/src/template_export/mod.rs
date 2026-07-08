@@ -1,7 +1,7 @@
 //! Use-case layer for the `sotp template export` command (spec IN-01, AC-01).
 //!
 //! This module owns the behavioural contract for exporting the workspace as a
-//! reusable template. The [`TemplateExportService`] primary port drives two
+//! reusable template. The [`TemplateExportService`] primary port drives three
 //! secondary ports:
 //!
 //! - [`TemplateBoundaryManifestPort`] loads the boundary manifest SSoT that
@@ -9,11 +9,16 @@
 //! - [`TemplateExportPort`] performs the filesystem export driven purely by
 //!   those classifications; it never parses or rewrites file contents
 //!   (spec IN-03, CN-03).
+//! - [`SelfBinaryTransplantPort`] moves the running `sotp` binary into the
+//!   exported tree's `bin/sotp` slot so the exported template can bootstrap
+//!   without depending on a published tag (spec IN-01, IN-02, CN-01, CN-02,
+//!   CN-06).
 //!
 //! Ports live in the use-case layer (hexagonal architecture): the domain
 //! carries no concept of filesystem traversal, so both secondary ports abstract
 //! infrastructure concerns behind traits the interactor depends on.
-//! See ADR `2026-07-06-1717-template-extraction-boundary.md` D1/D4.
+//! See ADR `2026-07-06-1717-template-extraction-boundary.md` D1/D4 and
+//! `2026-07-08-0541-template-export-sotp-binary-transplant.md` D1.
 
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -68,10 +73,12 @@ pub struct TemplateExportReport {
 // Errors
 // ---------------------------------------------------------------------------
 
-/// `TemplateExportService::export` error (IN-01, IN-02, IN-12, AC-01, AC-02, CN-03).
+/// `TemplateExportService::export` error (IN-01, IN-02, IN-12, AC-01, AC-02, AC-03, CN-03, CN-06).
 ///
 /// Distinguishes a manifest-read failure from an export failure so callers can
-/// report the failing stage precisely.
+/// report the failing stage precisely. The `BinaryTransplant` variant surfaces
+/// fail-closed diagnostics from the self-binary transplant step (spec IN-02,
+/// AC-03, CN-06).
 #[derive(Debug, Error)]
 pub enum TemplateExportError {
     /// The boundary manifest could not be read or validated.
@@ -87,6 +94,45 @@ pub enum TemplateExportError {
         /// Underlying export-port failure.
         #[from]
         source: TemplateExportPortError,
+    },
+    /// The self-binary transplant step failed (spec IN-01, IN-02, AC-03, CN-06).
+    #[error("failed to transplant sotp binary: {source}")]
+    BinaryTransplant {
+        /// Underlying transplant-port failure.
+        #[from]
+        source: SelfBinaryTransplantError,
+    },
+}
+
+/// `SelfBinaryTransplantPort::transplant` fail-closed error surface
+/// (spec IN-02, AC-03, CN-06).
+///
+/// Distinguishes the three transplant failure modes so callers can report the
+/// failing stage precisely: resolving the running-binary path, writing the
+/// destination, or setting the executable permission bit.
+#[derive(Debug, Error)]
+pub enum SelfBinaryTransplantError {
+    /// The path of the running binary could not be resolved.
+    #[error("failed to resolve running binary path: {reason}")]
+    SourcePathUnavailable {
+        /// Human-readable diagnostic describing the resolution failure.
+        reason: FreeText,
+    },
+    /// Writing the running binary to the destination failed.
+    #[error("failed to write sotp binary to {path}: {reason}")]
+    DestinationWriteFailure {
+        /// Destination path the write targeted.
+        path: PathBuf,
+        /// Human-readable diagnostic describing the write failure.
+        reason: FreeText,
+    },
+    /// Setting the destination's executable permission failed.
+    #[error("failed to set executable permission on {path}: {reason}")]
+    PermissionSetFailure {
+        /// Destination path the permission-set targeted.
+        path: PathBuf,
+        /// Human-readable diagnostic describing the permission-set failure.
+        reason: FreeText,
     },
 }
 
@@ -236,43 +282,76 @@ pub trait TemplateExportPort: Send + Sync {
     ) -> Result<TemplateExportReport, TemplateExportPortError>;
 }
 
+/// Self-binary transplant secondary port (IN-01, IN-02, IN-07, CN-01, CN-02,
+/// CN-06, AC-01, AC-03).
+///
+/// Abstracts moving the running `sotp` binary into the exported tree so the
+/// exported template's bootstrap path can invoke it directly without depending
+/// on a published tag. Orthogonal to the boundary manifest: the source is the
+/// running process's binary path, not a workspace file.
+pub trait SelfBinaryTransplantPort: Send + Sync {
+    /// Transplant the running binary to `destination` (IN-01, IN-02, CN-01,
+    /// CN-02, CN-06, AC-03).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SelfBinaryTransplantError::SourcePathUnavailable`] if the
+    /// running binary path cannot be resolved,
+    /// [`SelfBinaryTransplantError::DestinationWriteFailure`] if the copy
+    /// fails, or [`SelfBinaryTransplantError::PermissionSetFailure`] if the
+    /// executable permission cannot be applied.
+    fn transplant(&self, destination: &Path) -> Result<(), SelfBinaryTransplantError>;
+}
+
 // ---------------------------------------------------------------------------
 // Interactor
 // ---------------------------------------------------------------------------
 
-/// `TemplateExportService` interactor (IN-01, AC-01).
+/// `TemplateExportService` interactor (IN-01, IN-02, AC-01, AC-03).
 ///
-/// Orchestrates [`TemplateBoundaryManifestPort`] (load manifest) and
-/// [`TemplateExportPort`] (perform export).
+/// Orchestrates [`TemplateBoundaryManifestPort`] (load manifest),
+/// [`TemplateExportPort`] (perform export), and [`SelfBinaryTransplantPort`]
+/// (transplant the running binary into `<output_dir>/bin/sotp`).
 pub struct TemplateExportInteractor {
     manifest_port: Arc<dyn TemplateBoundaryManifestPort>,
     export_port: Arc<dyn TemplateExportPort>,
+    transplant_port: Arc<dyn SelfBinaryTransplantPort>,
 }
 
 impl TemplateExportInteractor {
-    /// Constructor.
+    /// Constructor — dependency-injected manifest, filesystem-export, and
+    /// self-binary transplant ports (IN-01, IN-02).
     #[must_use]
     pub fn new(
         manifest_port: Arc<dyn TemplateBoundaryManifestPort>,
         export_port: Arc<dyn TemplateExportPort>,
+        transplant_port: Arc<dyn SelfBinaryTransplantPort>,
     ) -> Self {
-        Self { manifest_port, export_port }
+        Self { manifest_port, export_port, transplant_port }
     }
 }
 
 impl TemplateExportService for TemplateExportInteractor {
-    /// Reads the boundary manifest, then performs the filesystem export.
+    /// Reads the boundary manifest, performs the filesystem export, then
+    /// transplants the running binary into `<output_dir>/bin/sotp`.
     ///
     /// # Errors
     ///
     /// Returns [`TemplateExportError::ManifestRead`] if the manifest cannot be
-    /// read, or [`TemplateExportError::Export`] if the export fails.
+    /// read, [`TemplateExportError::Export`] if the export fails, or
+    /// [`TemplateExportError::BinaryTransplant`] if the self-binary transplant
+    /// fails.
     fn export(
         &self,
         command: TemplateExportCommand,
     ) -> Result<TemplateExportReport, TemplateExportError> {
         let manifest = self.manifest_port.read(&command.manifest_path)?;
         let report = self.export_port.export(&command, &manifest)?;
+        // ADR 2026-07-08-0541 D1: transplant the running binary into the
+        // exported tree's `bin/sotp` slot after the export succeeds so the
+        // exported template can bootstrap without depending on a published tag.
+        let destination = command.output_dir.join("bin/sotp");
+        self.transplant_port.transplant(&destination)?;
         Ok(report)
     }
 }
@@ -313,6 +392,13 @@ mod tests {
         }
     }
 
+    mock! {
+        TransplantPort {}
+        impl SelfBinaryTransplantPort for TransplantPort {
+            fn transplant(&self, destination: &Path) -> Result<(), SelfBinaryTransplantError>;
+        }
+    }
+
     fn sample_command() -> TemplateExportCommand {
         TemplateExportCommand {
             workspace_root: PathBuf::from("/ws"),
@@ -347,8 +433,20 @@ mod tests {
         let mut export_port = MockExportPort::new();
         export_port.expect_export().times(1).returning(|_, _| Ok(sample_report()));
 
-        let interactor =
-            TemplateExportInteractor::new(Arc::new(manifest_port), Arc::new(export_port));
+        // The transplant port must be invoked with `<output_dir>/bin/sotp` after
+        // the export succeeds (ADR 2026-07-08-0541 D1).
+        let mut transplant_port = MockTransplantPort::new();
+        transplant_port
+            .expect_transplant()
+            .withf(|destination: &Path| destination == Path::new("/out/bin/sotp"))
+            .times(1)
+            .returning(|_| Ok(()));
+
+        let interactor = TemplateExportInteractor::new(
+            Arc::new(manifest_port),
+            Arc::new(export_port),
+            Arc::new(transplant_port),
+        );
         let result = interactor.export(sample_command());
 
         assert_eq!(result.unwrap(), sample_report());
@@ -363,12 +461,18 @@ mod tests {
             })
         });
 
-        // Export port must never be called when the manifest read fails.
+        // Export port and transplant port must never be called when the manifest
+        // read fails (ADR D1 fail-closed ordering).
         let mut export_port = MockExportPort::new();
         export_port.expect_export().times(0);
+        let mut transplant_port = MockTransplantPort::new();
+        transplant_port.expect_transplant().times(0);
 
-        let interactor =
-            TemplateExportInteractor::new(Arc::new(manifest_port), Arc::new(export_port));
+        let interactor = TemplateExportInteractor::new(
+            Arc::new(manifest_port),
+            Arc::new(export_port),
+            Arc::new(transplant_port),
+        );
         let result = interactor.export(sample_command());
 
         assert!(matches!(
@@ -389,8 +493,15 @@ mod tests {
             Err(TemplateExportPortError::OutputDirExists { path: PathBuf::from("/out") })
         });
 
-        let interactor =
-            TemplateExportInteractor::new(Arc::new(manifest_port), Arc::new(export_port));
+        // Transplant port must never be called when the export step fails.
+        let mut transplant_port = MockTransplantPort::new();
+        transplant_port.expect_transplant().times(0);
+
+        let interactor = TemplateExportInteractor::new(
+            Arc::new(manifest_port),
+            Arc::new(export_port),
+            Arc::new(transplant_port),
+        );
         let result = interactor.export(sample_command());
 
         assert!(matches!(
@@ -399,6 +510,107 @@ mod tests {
                 source: TemplateExportPortError::OutputDirExists { .. }
             })
         ));
+    }
+
+    #[test]
+    fn test_export_with_transplant_source_unavailable_maps_to_binary_transplant() {
+        let mut manifest_port = MockManifestPort::new();
+        manifest_port.expect_read().times(1).returning(|_| Ok(sample_manifest()));
+
+        let mut export_port = MockExportPort::new();
+        export_port.expect_export().times(1).returning(|_, _| Ok(sample_report()));
+
+        let mut transplant_port = MockTransplantPort::new();
+        transplant_port.expect_transplant().times(1).returning(|_| {
+            Err(SelfBinaryTransplantError::SourcePathUnavailable {
+                reason: FreeText::new("current_exe failed"),
+            })
+        });
+
+        let interactor = TemplateExportInteractor::new(
+            Arc::new(manifest_port),
+            Arc::new(export_port),
+            Arc::new(transplant_port),
+        );
+        let result = interactor.export(sample_command());
+
+        assert!(matches!(
+            result,
+            Err(TemplateExportError::BinaryTransplant {
+                source: SelfBinaryTransplantError::SourcePathUnavailable { .. }
+            })
+        ));
+    }
+
+    #[test]
+    fn test_export_with_transplant_destination_write_failure_maps_to_binary_transplant() {
+        let mut manifest_port = MockManifestPort::new();
+        manifest_port.expect_read().times(1).returning(|_| Ok(sample_manifest()));
+
+        let mut export_port = MockExportPort::new();
+        export_port.expect_export().times(1).returning(|_, _| Ok(sample_report()));
+
+        let mut transplant_port = MockTransplantPort::new();
+        transplant_port.expect_transplant().times(1).returning(|destination: &Path| {
+            Err(SelfBinaryTransplantError::DestinationWriteFailure {
+                path: destination.to_path_buf(),
+                reason: FreeText::new("permission denied"),
+            })
+        });
+
+        let interactor = TemplateExportInteractor::new(
+            Arc::new(manifest_port),
+            Arc::new(export_port),
+            Arc::new(transplant_port),
+        );
+        let result = interactor.export(sample_command());
+
+        assert!(matches!(
+            result,
+            Err(TemplateExportError::BinaryTransplant {
+                source: SelfBinaryTransplantError::DestinationWriteFailure { .. }
+            })
+        ));
+    }
+
+    #[test]
+    fn test_export_with_transplant_permission_set_failure_maps_to_binary_transplant() {
+        let mut manifest_port = MockManifestPort::new();
+        manifest_port.expect_read().times(1).returning(|_| Ok(sample_manifest()));
+
+        let mut export_port = MockExportPort::new();
+        export_port.expect_export().times(1).returning(|_, _| Ok(sample_report()));
+
+        let mut transplant_port = MockTransplantPort::new();
+        transplant_port.expect_transplant().times(1).returning(|destination: &Path| {
+            Err(SelfBinaryTransplantError::PermissionSetFailure {
+                path: destination.to_path_buf(),
+                reason: FreeText::new("chmod failed"),
+            })
+        });
+
+        let interactor = TemplateExportInteractor::new(
+            Arc::new(manifest_port),
+            Arc::new(export_port),
+            Arc::new(transplant_port),
+        );
+        let result = interactor.export(sample_command());
+
+        assert!(matches!(
+            result,
+            Err(TemplateExportError::BinaryTransplant {
+                source: SelfBinaryTransplantError::PermissionSetFailure { .. }
+            })
+        ));
+    }
+
+    #[test]
+    fn test_export_error_from_self_binary_transplant_error_maps_to_binary_transplant() {
+        let transplant_err = SelfBinaryTransplantError::SourcePathUnavailable {
+            reason: FreeText::new("current_exe failed"),
+        };
+        let export_err = TemplateExportError::from(transplant_err);
+        assert!(matches!(export_err, TemplateExportError::BinaryTransplant { .. }));
     }
 
     #[test]

@@ -7,11 +7,14 @@ use std::path::{Path, PathBuf};
 
 use tempfile::TempDir;
 use usecase::template_export::{
-    TemplateBoundaryManifestPort, TemplateBoundaryManifestReadError, TemplateExportCommand,
-    TemplateExportPort, TemplateExportPortError,
+    SelfBinaryTransplantError, SelfBinaryTransplantPort, TemplateBoundaryManifestPort,
+    TemplateBoundaryManifestReadError, TemplateExportCommand, TemplateExportPort,
+    TemplateExportPortError,
 };
 
-use super::{FsTemplateBoundaryManifestAdapter, FsTemplateExportAdapter};
+use super::{
+    FsSelfBinaryTransplantAdapter, FsTemplateBoundaryManifestAdapter, FsTemplateExportAdapter,
+};
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -584,4 +587,61 @@ fn test_export_descends_into_unclassified_directory() {
     let report = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap();
     assert_eq!(report.included_count, 1);
     assert!(command.output_dir.join("libs/domain/src/lib.rs").exists());
+}
+
+// ---------------------------------------------------------------------------
+// FsSelfBinaryTransplantAdapter
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_transplant_copies_running_binary_verbatim() {
+    let dir = TempDir::new().unwrap();
+    let destination = dir.path().join("bin/sotp");
+
+    FsSelfBinaryTransplantAdapter::new().transplant(&destination).unwrap();
+
+    // Byte-identity to the running binary (spec CN-01, AC-01). In the test
+    // harness `env::current_exe` returns the running test binary; copying it
+    // and comparing the two proves the adapter emits a byte-for-byte copy of
+    // whatever binary is executing — the same property the CLI relies on.
+    let source = std::env::current_exe().unwrap();
+    let source_bytes = std::fs::read(&source).unwrap();
+    let destination_bytes = std::fs::read(&destination).unwrap();
+    assert_eq!(source_bytes, destination_bytes, "transplant must be byte-identical");
+}
+
+#[cfg(unix)]
+#[test]
+fn test_transplant_preserves_executable_permission() {
+    use std::os::unix::fs::PermissionsExt as _;
+
+    let dir = TempDir::new().unwrap();
+    let destination = dir.path().join("bin/sotp");
+
+    FsSelfBinaryTransplantAdapter::new().transplant(&destination).unwrap();
+
+    // The destination must carry the executable bit for at least the owner
+    // (spec CN-02, AC-01) — matching the running binary's mode.
+    let mode = std::fs::metadata(&destination).unwrap().permissions().mode();
+    assert!(mode & 0o100 != 0, "destination must have owner-execute bit: mode={mode:o}");
+}
+
+#[test]
+fn test_transplant_destination_write_failure_when_parent_is_a_file() {
+    let dir = TempDir::new().unwrap();
+    // Place a file where the transplant will try to create a directory: the
+    // destination's parent (`bin/`) cannot be created because `bin` is a file.
+    let blocking_file = dir.path().join("bin");
+    std::fs::write(&blocking_file, b"blocking").unwrap();
+    let destination = blocking_file.join("sotp");
+
+    let err = FsSelfBinaryTransplantAdapter::new().transplant(&destination).unwrap_err();
+    assert!(
+        matches!(
+            err,
+            SelfBinaryTransplantError::DestinationWriteFailure { ref path, .. }
+                if path == &destination
+        ),
+        "unexpected error: {err}"
+    );
 }

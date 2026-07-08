@@ -50,11 +50,10 @@ if ! command -v cargo >/dev/null 2>&1; then
 fi
 echo "[OK] cargo available"
 
-if ! command -v jq >/dev/null 2>&1; then
-  echo "[FAIL] jq not found. Install jq so install-sotp can read .harness/config/sotp-version.json."
-  exit 1
-fi
-echo "[OK] jq available"
+# jq is only required by install-sotp (which does its own preflight). When
+# `sotp template export` transplanted the running binary into bin/sotp, the
+# tagless first-run path skips install-sotp entirely and jq is not needed
+# (ADR 2026-07-08-0541 D1 tagless first run must not depend on jq).
 
 # 2. Docker images
 echo ""
@@ -64,10 +63,22 @@ docker compose build tools
 echo "[OK] Docker tools image built"
 
 # 3. Install pinned sotp CLI binary
+#
+# ADR 2026-07-08-0541 D1/D2: when `sotp template export` transplants the
+# running binary into the exported tree, `bin/sotp` is already present and
+# executable — a fresh cargo install would be redundant work at best and
+# would collide with a tag-less initial adoption at worst. Detect that path
+# and skip install-sotp when `bin/sotp` runs read-only successfully; fall back
+# to the fixed-tag install path (D2) otherwise. Users do not choose the branch
+# (CN-07): the default flow selects it automatically.
 echo ""
 echo "--- Step 3/6: Install sotp CLI binary (pinned tag) ---"
-cargo make install-sotp
-echo "[OK] bin/sotp installed"
+if [ -x bin/sotp ] && bin/sotp --help >/dev/null 2>&1; then
+  echo "[OK] bin/sotp already present (transplanted by sotp template export); skipping install-sotp"
+else
+  cargo make install-sotp
+  echo "[OK] bin/sotp installed"
+fi
 
 # 4. Git hooks path
 echo ""

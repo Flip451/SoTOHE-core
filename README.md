@@ -56,7 +56,10 @@ track 作業には `/adr:add <slug>` で ADR を作り `/track:adr2pr` で PR �
 このテンプレートを使うには以下が必要:
 
 - **Docker + docker compose** — CI と開発用サービスはコンテナ内で実行される
-- **Rust toolchain + cargo-make** — host で `cargo make bootstrap` を実行し、`bootstrap` 内で `bin/sotp` をビルドする
+- **Rust toolchain + cargo-make** — host で `cargo make bootstrap` を実行する
+- **`bin/sotp` の入手** — 以下 2 経路のいずれか (詳細は「はじめ方」参照)
+  - a. SoTOHE-core を clone → `sotp template export` を実行すると、出力ツリーに `bin/sotp` が移植された状態で完結する (タグ非依存、初回導入向け)
+  - b. 更新時 / 別ホスト再導入時は `.harness/config/sotp-version.json` の固定タグから `cargo install` で導入する
 - **Claude Code** — 主操作面。`/track:*` コマンドの入口
 - **Codex CLI** — 既定 profile (`default`) のレビュー担当 (`reviewer`)
 - **Gemini CLI** — 既定 profile (`default`) のリサーチ担当 (`researcher`)
@@ -65,20 +68,31 @@ track 作業には `/adr:add <slug>` で ADR を作り `/track:adr2pr` で PR �
 
 - Linux で uid/gid が `1000:1000` 以外なら `HOST_UID=$(id -u)` / `HOST_GID=$(id -g)` を export してから compose wrapper を使う
 - capability の担当者は `.harness/config/agent-profiles.json` で切り替えられる
+- 出力ツリー内 `bin/sotp` を git 管理するかどうか (ignore / track) は利用者側の判断領域であり、本テンプレートは強制しない
+- プレビルトバイナリ配布 (GitHub Releases) は現時点では実施していない (将来検討)
 
 ## はじめ方
 
 ### 初回セットアップ
 
+以下は `sotp template export` で生成された出力ツリーでの初回セットアップ手順である。SoTOHE-core source repo 自体の `cargo make bootstrap` は開発用に `build-sotp` を実行する。
+
+出力ツリーでの `bin/sotp` 入手には 2 経路がある。デフォルトの分岐条件はテンプレート利用者が意識せず自動で選ばれる (出力ツリーの `cargo make bootstrap` Step 3 で判定される):
+
+- **経路 a (初回導入 / タグ非依存)**: SoTOHE-core を clone → build して `sotp template export` を出力ツリーに実行すると、実行中の自バイナリが出力ツリーの `bin/sotp` に移植される (実行権限保持のコピー)。出力ツリーで `cargo make bootstrap` を実行すると、Step 3 は `bin/sotp` が既に存在することを検出し、`install-sotp` を呼ばずに完結する。公開リポジトリに sotp タグが 1 本もなくてもこの経路は成立する。
+- **経路 b (更新 / 別ホスト再導入)**: 出力ツリーに `bin/sotp` が存在しない (または起動に失敗する) 場合、Step 3 は `cargo make install-sotp` を呼び、`.harness/config/sotp-version.json` の固定タグから `cargo install --git ... --tag ... --locked` で `bin/sotp` を導入する。別ホストへの再導入や sotp バージョンの更新はこの経路で行う。
+
 ```bash
-# ターミナルで:
-cargo make bootstrap      # Docker イメージビルド + CI 一括
+# 出力ツリーのターミナルで:
+cargo make bootstrap      # Docker イメージビルド + bin/sotp 入手 (経路 a/b を自動判定) + CI 一括
 ```
 
 ```text
 # Claude Code チャットで:
 /track:catchup            # 環境確認 + プロジェクト状態把握
 ```
+
+出力ツリーで `bin/sotp` を明示的に (再) 導入したい場合 (経路 b を強制したい場合など) は、bootstrap 前に `cargo make install-sotp` を単独で実行できる。移植バイナリはビルドしたホスト固有 (glibc / OS ABI 依存) なので、別ホストで動かない場合は経路 b で再導入する。
 
 ### 機能を開発する（正規フロー）
 

@@ -18,8 +18,9 @@ use std::path::{Component, Path, PathBuf};
 
 use domain::{FreeText, TemplateBoundaryManifest, TemplatePathClassification, TemplatePathPattern};
 use usecase::template_export::{
-    TemplateBoundaryManifestPort, TemplateBoundaryManifestReadError, TemplateExportCommand,
-    TemplateExportPort, TemplateExportPortError, TemplateExportReport,
+    SelfBinaryTransplantError, SelfBinaryTransplantPort, TemplateBoundaryManifestPort,
+    TemplateBoundaryManifestReadError, TemplateExportCommand, TemplateExportPort,
+    TemplateExportPortError, TemplateExportReport,
 };
 
 use crate::track::symlink_guard::reject_symlinks_below;
@@ -492,5 +493,96 @@ fn io_error(path: &Path, error: &std::io::Error) -> TemplateExportPortError {
     TemplateExportPortError::Io {
         path: path.to_path_buf(),
         reason: FreeText::new(error.to_string()),
+    }
+}
+
+// ---------------------------------------------------------------------------
+// FsSelfBinaryTransplantAdapter
+// ---------------------------------------------------------------------------
+
+/// `SelfBinaryTransplantPort` filesystem adapter (spec IN-01, IN-02, CN-01,
+/// CN-02, CN-06, AC-01, AC-03).
+///
+/// Resolves the running-process binary path via [`std::env::current_exe`],
+/// copies it verbatim to the destination via [`std::fs::copy`] (byte-identity
+/// is a property of the copy itself; the export never rewrites contents), and
+/// preserves the executable permission bit on unix. Each failure mode surfaces
+/// as a distinct [`SelfBinaryTransplantError`] variant so callers can report
+/// the failing stage precisely (fail-closed, spec CN-06).
+///
+/// Non-unix platforms skip the permission-set step because the concept of an
+/// executable bit does not apply the same way; the copy alone is sufficient
+/// there.
+#[derive(Debug, Default)]
+pub struct FsSelfBinaryTransplantAdapter;
+
+impl FsSelfBinaryTransplantAdapter {
+    /// Constructor.
+    #[must_use]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl SelfBinaryTransplantPort for FsSelfBinaryTransplantAdapter {
+    /// Transplants the running binary to `destination` verbatim, preserving
+    /// executable permission on unix.
+    ///
+    /// # Errors
+    ///
+    /// - [`SelfBinaryTransplantError::SourcePathUnavailable`] if
+    ///   [`std::env::current_exe`] fails to resolve the running binary path.
+    /// - [`SelfBinaryTransplantError::DestinationWriteFailure`] if the
+    ///   destination's parent directory cannot be created or the byte-copy
+    ///   fails.
+    /// - [`SelfBinaryTransplantError::PermissionSetFailure`] (unix only) if the
+    ///   source metadata cannot be read or the executable permission cannot be
+    ///   applied to the destination.
+    fn transplant(&self, destination: &Path) -> Result<(), SelfBinaryTransplantError> {
+        let source = std::env::current_exe().map_err(|error| {
+            SelfBinaryTransplantError::SourcePathUnavailable {
+                reason: FreeText::new(error.to_string()),
+            }
+        })?;
+
+        // Ensure the parent directory (`<output_dir>/bin/`) exists before the
+        // copy. Both parent-creation failure and the copy itself surface as
+        // `DestinationWriteFailure` — from the caller's perspective the write
+        // simply cannot land at `destination`.
+        if let Some(parent) = destination.parent() {
+            if !parent.as_os_str().is_empty() {
+                std::fs::create_dir_all(parent).map_err(|error| {
+                    SelfBinaryTransplantError::DestinationWriteFailure {
+                        path: destination.to_path_buf(),
+                        reason: FreeText::new(error.to_string()),
+                    }
+                })?;
+            }
+        }
+
+        std::fs::copy(&source, destination).map_err(|error| {
+            SelfBinaryTransplantError::DestinationWriteFailure {
+                path: destination.to_path_buf(),
+                reason: FreeText::new(error.to_string()),
+            }
+        })?;
+
+        #[cfg(unix)]
+        {
+            let permissions = std::fs::metadata(&source)
+                .map_err(|error| SelfBinaryTransplantError::PermissionSetFailure {
+                    path: destination.to_path_buf(),
+                    reason: FreeText::new(error.to_string()),
+                })?
+                .permissions();
+            std::fs::set_permissions(destination, permissions).map_err(|error| {
+                SelfBinaryTransplantError::PermissionSetFailure {
+                    path: destination.to_path_buf(),
+                    reason: FreeText::new(error.to_string()),
+                }
+            })?;
+        }
+
+        Ok(())
     }
 }
