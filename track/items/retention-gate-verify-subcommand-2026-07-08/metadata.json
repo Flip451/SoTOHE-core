@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "retention-gate-verify-subcommand-2026-07-08",
+  "title": "retention gate の verify サブコマンド化",
+  "branch": "track/retention-gate-verify-subcommand-2026-07-08",
+  "created_at": "2026-07-08T23:13:07Z",
+  "updated_at": "2026-07-08T23:13:07Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}
