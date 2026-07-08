@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e966b260ea26ca1b6a486d306a3f7b73f0acd9b2acd9cb8fc10cb653dff30a64",
+  "signals": [
+    {
+      "type_name": "SpecVerifyArgs",
+      "signal": "blue",
+      "entry_hash": "d0e7173276eba9d373c4013d323fa51ab063105fce0bacc3814ec98c3c2f6cd6"
+    },
+    {
+      "type_name": "VerifyArgs",
+      "signal": "blue",
+      "entry_hash": "9e20878fba2da8625c7f74e4bd7ad7f4c5e59fc36d227d8e86549d8989c56f6f"
+    },
+    {
+      "type_name": "VerifyCommand",
+      "signal": "blue",
+      "entry_hash": "53672e685fe989c852ae17c7f245c83c67e2f52735e107a6aee67cfd3b7b52d4"
+    }
+  ]
+}

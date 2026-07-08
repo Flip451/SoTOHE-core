@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-08T13:59:10Z",
+  "declaration_hash": "e966b260ea26ca1b6a486d306a3f7b73f0acd9b2acd9cb8fc10cb653dff30a64",
+  "signals": [
+    {
+      "type_name": "VerifyCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecVerifyArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
