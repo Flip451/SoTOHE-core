@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "template-export-sotp-binary-transplant-2026-07-08",
+  "title": "sotp template export の自バイナリ移植 — 初回導入をタグ非依存にし、export バイナリと出力側 sotp のバージョン一致を保証する",
+  "branch": "track/template-export-sotp-binary-transplant-2026-07-08",
+  "created_at": "2026-07-08T05:52:01Z",
+  "updated_at": "2026-07-08T05:52:01Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}
