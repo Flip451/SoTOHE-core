@@ -7,7 +7,7 @@
 | EdgeResolutionOutcome | enum | add | Fulfilled, Waived, Fail, Pending, MissingBinding | 🔵 | 🔵 |
 | FulfillmentFailCategory | enum | add | Contradiction, Substitution, CentralUnverified | 🔵 | 🔵 |
 | ObligationFulfillmentVerdict | enum | add | Fulfilled, Fail, Pending | 🔵 | 🔵 |
-| TargetEntryRoleKind | enum | add | DataRole, ContractRole, FunctionRole, TraitImpl, Pattern | 🟡 | 🔵 |
+| TargetEntryRoleKind | enum | add | DataRole, ContractRole, FunctionRole, TraitImpl, Pattern | 🔵 | 🔵 |
 | TestBindingRecord | enum | add | Fulfillment, Waiver, VoluntaryBinding | 🔵 | 🔵 |
 | TestObligationDriftKind | enum | add | Missing, Orphaned, SpecChanged, DeclChanged, TestChanged, ReasonChanged | 🔵 | 🔵 |
 | TestObligationKind | enum | add | Boundary, InvariantPreservation, EventEmission, LogicResult, PredicateBothBranches, ConstructionResult, Result, Reaction, Transition, Contract, ContractConformance, Logic | 🔵 | 🔵 |
@@ -67,7 +67,7 @@
 | SemanticVerifierError | error_type | add | VerifierPort | 🔵 | 🔵 |
 | TestObligationRulesLoadError | error_type | add | RoleNotCovered, ObligationsFieldOmitted, UnknownRoleName, InvalidRuleValue, IoError, MalformedJson | 🔵 | 🔵 |
 | TestSourceScanError | error_type | add | Io, Parse | 🔵 | 🔵 |
-| ValidationError | error_type | modify | InvalidObligationMinimum | 🟡 | 🔵 |
+| ValidationError | error_type | modify | EmptyString, InvalidTrackId, InvalidTaskId, InvalidCommitHash, InvalidTimestamp, InvalidTrackBranch, BranchIdMismatch, StatusOverrideMismatch, EmptyTrackTitle, EmptyTaskDescription, EmptyPlanSectionId, EmptyPlanSectionTitle, DuplicateTaskId, DuplicatePlanSectionId, UnknownTaskReference, DuplicateTaskReference, UnreferencedTask, OverrideIncompatibleWithResolvedTasks, TrackActivationRequiresPlanningOnly, TrackActivationRequiresSchemaV3, TrackAlreadyMaterialized, UnsupportedTargetStatus, SectionNotFound, NoSectionsAvailable, TaskDescriptionMutated, TaskRemoved, DuplicateElementId, InvalidLayerId, InvalidSpecElementId, EmptyAdrAnchor, EmptyConventionAnchor, InvalidContentHash, EmptyInformalGroundSummary, MultiLineInformalGroundSummary, EmptyDecisionGroundRef, InvalidObligationMinimum | 🔵 | 🔵 |
 | VerifyCacheError | error_type | add | Io, MalformedJson | 🔵 | 🔵 |
 
 ## Secondary Ports

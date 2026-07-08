@@ -2740,7 +2740,7 @@
             "name": "DataRole",
             "payload": {
               "fields": [
-                "RoleKind"
+                "DataRole"
               ],
               "kind": "tuple"
             }
@@ -2749,7 +2749,7 @@
             "name": "ContractRole",
             "payload": {
               "fields": [
-                "RoleKind"
+                "ContractRole"
               ],
               "kind": "tuple"
             }
@@ -2758,7 +2758,7 @@
             "name": "FunctionRole",
             "payload": {
               "fields": [
-                "RoleKind"
+                "FunctionRole"
               ],
               "kind": "tuple"
             }
@@ -2767,7 +2767,7 @@
             "name": "TraitImpl",
             "payload": {
               "fields": [
-                "RoleKind"
+                "ContractRole"
               ],
               "kind": "tuple"
             }
@@ -4532,33 +4532,360 @@
     },
     "ValidationError": {
       "action": "modify",
-      "docs": "ValidationError variant inventory for IN-02 / T003.",
-      "informal_grounds": [],
+      "role": {
+        "ErrorType": {}
+      },
       "kind": {
         "kind": "enum",
         "variants": [
           {
+            "name": "EmptyString",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidTrackId",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "InvalidTaskId",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "InvalidCommitHash",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "InvalidTimestamp",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "InvalidTrackBranch",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "BranchIdMismatch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "id",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "branch",
+                  "ty": "DiagnosticMessage"
+                }
+              ]
+            }
+          },
+          {
+            "name": "StatusOverrideMismatch",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "override_kind",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "required",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "actual",
+                  "ty": "DiagnosticMessage"
+                }
+              ]
+            }
+          },
+          {
+            "name": "EmptyTrackTitle",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyTaskDescription",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyPlanSectionId",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyPlanSectionTitle",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DuplicateTaskId",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "DuplicatePlanSectionId",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "UnknownTaskReference",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "DuplicateTaskReference",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "UnreferencedTask",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "OverrideIncompatibleWithResolvedTasks",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "TrackStatus"
+              ]
+            }
+          },
+          {
+            "name": "TrackActivationRequiresPlanningOnly",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "status",
+                  "ty": "TrackStatus"
+                }
+              ]
+            }
+          },
+          {
+            "name": "TrackActivationRequiresSchemaV3",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "schema_version",
+                  "ty": "u32"
+                }
+              ]
+            }
+          },
+          {
+            "name": "TrackAlreadyMaterialized",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "branch",
+                  "ty": "DiagnosticMessage"
+                }
+              ]
+            }
+          },
+          {
+            "name": "UnsupportedTargetStatus",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "SectionNotFound",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "NoSectionsAvailable",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TaskDescriptionMutated",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "DiagnosticMessage"
+                }
+              ]
+            }
+          },
+          {
+            "name": "TaskRemoved",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "DiagnosticMessage"
+                }
+              ]
+            }
+          },
+          {
+            "name": "DuplicateElementId",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "InvalidLayerId",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "InvalidSpecElementId",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "EmptyAdrAnchor",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyConventionAnchor",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidContentHash",
+            "payload": {
+              "kind": "tuple",
+              "fields": [
+                "DiagnosticMessage"
+              ]
+            }
+          },
+          {
+            "name": "EmptyInformalGroundSummary",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "MultiLineInformalGroundSummary",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyDecisionGroundRef",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
             "name": "InvalidObligationMinimum",
             "payload": {
+              "kind": "tuple",
               "fields": [
                 "usize"
-              ],
-              "kind": "tuple"
+              ]
             }
           }
         ]
       },
       "methods": [],
       "module_path": "error",
-      "role": {
-        "ErrorType": {}
-      },
+      "docs": "Domain validation error enum; see IN-02.",
       "spec_refs": [
         {
-          "anchor": "IN-02",
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "IN-02"
         }
-      ]
+      ],
+      "informal_grounds": []
     },
     "VerifyCacheError": {
       "action": "add",

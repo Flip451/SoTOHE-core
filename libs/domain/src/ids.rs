@@ -21,6 +21,7 @@
 use std::fmt;
 
 use crate::ValidationError;
+use crate::tddd::test_obligation::ids::DiagnosticMessage;
 
 /// A validated track identifier (lowercase slug format).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -40,7 +41,7 @@ impl TrackId {
         if is_valid_track_id(&value) {
             Ok(Self(value))
         } else {
-            Err(ValidationError::InvalidTrackId(value))
+            Err(ValidationError::InvalidTrackId(DiagnosticMessage::try_new(value)?))
         }
     }
 }
@@ -73,7 +74,7 @@ impl TaskId {
         if is_valid_task_id(&value) {
             Ok(Self(value))
         } else {
-            Err(ValidationError::InvalidTaskId(value))
+            Err(ValidationError::InvalidTaskId(DiagnosticMessage::try_new(value)?))
         }
     }
 }
@@ -106,7 +107,7 @@ impl CommitHash {
         if is_valid_commit_hash(&value) {
             Ok(Self(value))
         } else {
-            Err(ValidationError::InvalidCommitHash(value))
+            Err(ValidationError::InvalidCommitHash(DiagnosticMessage::try_new(value)?))
         }
     }
 }
@@ -141,7 +142,7 @@ impl TrackBranch {
                 return Ok(Self(value));
             }
         }
-        Err(ValidationError::InvalidTrackBranch(value))
+        Err(ValidationError::InvalidTrackBranch(DiagnosticMessage::try_new(value)?))
     }
 }
 

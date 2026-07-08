@@ -3,6 +3,7 @@
 use std::fmt;
 
 use crate::ValidationError;
+use crate::tddd::test_obligation::ids::DiagnosticMessage;
 
 /// A validated UTC timestamp backed by `chrono::DateTime<Utc>`.
 ///
@@ -50,9 +51,9 @@ impl Timestamp {
     /// Returns `ValidationError::InvalidTimestamp` if the value cannot be parsed.
     pub fn new(value: impl Into<String>) -> Result<Self, ValidationError> {
         let raw = value.into();
-        let dt = raw
-            .parse::<chrono::DateTime<chrono::Utc>>()
-            .map_err(|_| ValidationError::InvalidTimestamp(raw.clone()))?;
+        let Ok(dt) = raw.parse::<chrono::DateTime<chrono::Utc>>() else {
+            return Err(ValidationError::InvalidTimestamp(DiagnosticMessage::try_new(raw)?));
+        };
         Ok(Self { dt, raw })
     }
 
@@ -95,7 +96,7 @@ mod tests {
     #[test]
     fn test_timestamp_empty_rejected() {
         let result = Timestamp::new("");
-        assert!(matches!(result, Err(ValidationError::InvalidTimestamp(_))));
+        assert!(matches!(result, Err(ValidationError::EmptyString)));
     }
 
     #[test]

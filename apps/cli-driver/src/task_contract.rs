@@ -110,7 +110,8 @@ impl TaskContractDriver {
                 Ok(l) => Some(l),
                 Err(ValidationError::InvalidLayerId(v)) => {
                     return CommandOutcome::failure(Some(format!(
-                        "invalid layer '{v}': must be a non-empty ASCII identifier"
+                        "invalid layer '{}': must be a non-empty ASCII identifier",
+                        v.as_str()
                     )));
                 }
                 Err(e) => {

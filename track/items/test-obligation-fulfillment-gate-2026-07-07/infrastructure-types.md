@@ -26,7 +26,8 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueEntryRefDto | dto | add | — | 🟡 | 🔵 |
+| CatalogueEntryRefDto | dto | add | — | 🔵 | 🔵 |
+| ObligationCatalogueEntryRefDto | dto | add | — | 🔵 | 🔵 |
 | ObligationFulfillmentCacheDocumentDto | dto | add | — | 🔵 | 🔵 |
 | ObligationFulfillmentCacheEntryDto | dto | add | — | 🔵 | 🔵 |
 | ObligationsDocumentDto | dto | add | — | 🔵 | 🔵 |
@@ -51,7 +52,7 @@
 | JsonTestBindingsCodec | secondary_adapter | add | impl TestBindingsArtifactPort, impl Debug, impl Clone | 🔵 | 🔵 |
 | JsonTestObligationRulesLoader | secondary_adapter | add | impl TestObligationRulesLoaderPort, impl Debug, impl Clone | 🔵 | 🔵 |
 | JsonWaiverCacheCodec | secondary_adapter | add | impl WaiverCachePort, impl Debug, impl Clone | 🔵 | 🔵 |
-| ObligationFulfillmentVerifierAdapter | secondary_adapter | add | impl ObligationFulfillmentVerifierPort | 🟡 | 🔵 |
-| SynTestSourceScanner | secondary_adapter | add | impl TestSourceScannerPort | 🟡 | 🔵 |
-| WaiverVerifierAdapter | secondary_adapter | add | impl WaiverVerifierPort | 🟡 | 🔵 |
+| ObligationFulfillmentVerifierAdapter | secondary_adapter | add | impl ObligationFulfillmentVerifierPort | 🔵 | 🔵 |
+| SynTestSourceScanner | secondary_adapter | add | impl TestSourceScannerPort | 🔵 | 🔵 |
+| WaiverVerifierAdapter | secondary_adapter | add | impl WaiverVerifierPort | 🔵 | 🔵 |
 

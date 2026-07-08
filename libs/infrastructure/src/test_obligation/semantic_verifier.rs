@@ -1,0 +1,158 @@
+//! Shared runtime for the obligation-fulfillment and waiver semantic verifiers.
+//!
+//! The two verifier adapters ([`super::fulfillment_verifier`] /
+//! [`super::waiver_verifier`]) differ only in their verdict vocabulary and prompt
+//! wording; the provider-resolution, subprocess invocation, and fail-closed
+//! JSON-verdict decoding are identical. That responsibility-neutral core lives
+//! here so neither adapter re-implements it (ADR D7: share the semantic-verdict
+//! core rather than copy-pasting a third verifier).
+//!
+//! The default runner reuses the shared LLM subprocess pipeline
+//! ([`crate::ref_verify::make_ref_verifier_process_runner`]) — the same
+//! "sotp CLI wrapper" mechanics every semantic verifier spawns. Only the OS-level
+//! subprocess plumbing is shared; the obligation-fulfillment verdict / cache
+//! types stay independent of ref-verify (ADR D6).
+
+use std::path::PathBuf;
+use std::sync::Arc;
+
+use domain::ModelTier;
+use domain::tddd::test_obligation::errors::SemanticVerifierError;
+use usecase::ref_verify::RefVerifyError;
+
+use crate::agent_profiles::{AgentProfiles, ResolvedExecution, RoundType};
+use crate::test_obligation::diagnostic;
+
+/// Injectable seam for a semantic-verifier LLM call: takes a resolved
+/// provider/model and a rendered prompt, returns the raw model output.
+///
+/// The production runner spawns the provider subprocess; unit tests inject a
+/// closure returning canned output so no subprocess runs.
+pub(crate) type SemanticVerifierRunner =
+    dyn Fn(ResolvedExecution, String) -> Result<String, SemanticVerifierError> + Send + Sync;
+
+/// Wire form of the verdict discriminator shared by both verifiers.
+///
+/// `pass` maps to the verifier-specific success variant (fulfilled / waived),
+/// `fail` to a rejection, and `pending` to the fail-at-gate "could not confirm".
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub(crate) enum VerdictKindWire {
+    /// The claim holds; a citation is required (enforced by the caller).
+    Pass,
+    /// The claim does not hold; a reason is required (enforced by the caller).
+    Fail,
+    /// The verifier could not confirm; treated as fail at the gate.
+    Pending,
+}
+
+/// Builds a [`SemanticVerifierError::VerifierPort`] from a diagnostic message.
+pub(crate) fn semantic_verifier_error(message: &str) -> SemanticVerifierError {
+    SemanticVerifierError::VerifierPort(diagnostic(message))
+}
+
+/// Maps the domain [`ModelTier`] to the profile-resolution [`RoundType`].
+pub(crate) fn tier_to_round_type(tier: ModelTier) -> RoundType {
+    match tier {
+        ModelTier::Fast => RoundType::Fast,
+        ModelTier::Final => RoundType::Final,
+    }
+}
+
+/// Resolves the provider/model for `capability` at `round`, failing closed when
+/// the capability is not defined in `agent-profiles.json`.
+pub(crate) fn resolve_execution_or_err(
+    profile: &AgentProfiles,
+    capability: &str,
+    round: RoundType,
+) -> Result<ResolvedExecution, SemanticVerifierError> {
+    profile.resolve_execution(capability, round).ok_or_else(|| {
+        semantic_verifier_error(&format!(
+            "capability '{capability}' is not defined in agent-profiles.json"
+        ))
+    })
+}
+
+/// Parses the verifier response as exactly one JSON verdict object of type `T`.
+///
+/// The response must be a single JSON object after trimming; prose, examples, or
+/// trailing brace blocks fail closed rather than being scanned for a verdict.
+pub(crate) fn extract_verdict_json<T: serde::de::DeserializeOwned>(
+    raw: &str,
+) -> Result<T, SemanticVerifierError> {
+    let trimmed = raw.trim();
+    if trimmed.is_empty() {
+        return Err(semantic_verifier_error("semantic verifier returned empty output"));
+    }
+    serde_json::from_str::<T>(trimmed).map_err(|e| {
+        semantic_verifier_error(&format!(
+            "semantic verifier response must be exactly one verdict JSON object: {e}"
+        ))
+    })
+}
+
+/// Builds the production runner that spawns the configured provider subprocess.
+///
+/// Reuses [`crate::ref_verify::make_ref_verifier_process_runner`] (the shared
+/// claude / codex / gemini subprocess pipeline) and rewraps its failure into a
+/// [`SemanticVerifierError`] so the obligation gate never surfaces a ref-verify
+/// error type. The working directory is the process CWD (the workspace root when
+/// the gate runs); it is only used to spawn the provider and place transient
+/// provider output files.
+pub(crate) fn default_semantic_verifier_runner() -> Arc<SemanticVerifierRunner> {
+    let project_root = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+    let inner = crate::ref_verify::make_ref_verifier_process_runner(project_root);
+    Arc::new(move |resolved, prompt| {
+        inner(resolved, prompt).map_err(|err| match err {
+            RefVerifyError::VerifierPort { message } => semantic_verifier_error(&message),
+            other => {
+                semantic_verifier_error(&format!("semantic verifier subprocess failed: {other:?}"))
+            }
+        })
+    })
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn tier_to_round_type_maps_both_tiers() {
+        assert_eq!(tier_to_round_type(ModelTier::Fast), RoundType::Fast);
+        assert_eq!(tier_to_round_type(ModelTier::Final), RoundType::Final);
+    }
+
+    #[test]
+    fn extract_verdict_json_rejects_empty_output() {
+        let result: Result<serde_json::Value, _> = extract_verdict_json("   \n ");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn extract_verdict_json_rejects_prose_wrapped_object() {
+        let raw = r#"Here is my verdict: {"kind": "pass"} done."#;
+        let result: Result<serde_json::Value, _> = extract_verdict_json(raw);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn extract_verdict_json_parses_single_trimmed_object() {
+        let value: serde_json::Value = extract_verdict_json("\n  {\"kind\": \"pass\"}\n").unwrap();
+        assert_eq!(value.get("kind").and_then(serde_json::Value::as_str), Some("pass"));
+    }
+
+    #[test]
+    fn resolve_execution_or_err_reports_missing_capability() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("agent-profiles.json");
+        std::fs::write(&path, r#"{ "schema_version": 1, "providers": {}, "capabilities": {} }"#)
+            .unwrap();
+        let profile = AgentProfiles::load(&path).unwrap();
+        let err =
+            resolve_execution_or_err(&profile, "obligation-fulfillment-verifier", RoundType::Fast)
+                .unwrap_err();
+        let SemanticVerifierError::VerifierPort(message) = err;
+        assert!(message.as_str().contains("obligation-fulfillment-verifier"));
+    }
+}

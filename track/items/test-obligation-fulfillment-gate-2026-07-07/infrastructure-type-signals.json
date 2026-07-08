@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-08T00:19:15Z",
-  "declaration_hash": "cea8aebd97fb0601a5f04756547528a4d2a0ca7625a1d1d365cb99779b311a0c",
+  "generated_at": "2026-07-08T04:40:23Z",
+  "declaration_hash": "294dadf38c30efc185f5b5b40b814ac54a073cbd9cd7d920e920ea2d4a9c0142",
   "signals": [
     {
       "type_name": "CatalogueEntryRefDto",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -123,6 +123,20 @@
       ]
     },
     {
+      "type_name": "ObligationCatalogueEntryRefDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>",
+        "serde_core::ser::Serialize"
+      ]
+    },
+    {
       "type_name": "ObligationFulfillmentCacheDocumentDto",
       "kind_tag": "dto",
       "signal": "blue",
@@ -167,9 +181,9 @@
     {
       "type_name": "ObligationFulfillmentVerifierAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "ObligationFulfillmentVerifierPort"
       ]
     },
@@ -221,9 +235,9 @@
     {
       "type_name": "SynTestSourceScanner",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "TestSourceScannerPort"
       ]
     },
@@ -429,9 +443,9 @@
     {
       "type_name": "WaiverVerifierAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "WaiverVerifierPort"
       ]
     }

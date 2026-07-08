@@ -1,18 +1,18 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成
 
-## Tasks (4/23 resolved)
+## Tasks (11/23 resolved)
 
 ### S1 — Preceding shared foundation: semantic-verdict core & ref-verify migration
 
-- [ ] **T001**: Target libs/usecase tddd::semantic_verdict_core. Add SemanticEscalationDriverPort (generic K/V trait), SemanticEscalationFuture, SemanticEscalationVerdictBridge, SemanticCalibrationProbeConfig at semantic_verdict_core::{driver,verdict,probe} (IN-01/AC-15/OS-02). Add unit tests for bridge variant construction, probe config new(), and a stub SemanticEscalationDriverPort double covering evaluate_with_escalation.
+- [x] **T001**: Target libs/usecase tddd::semantic_verdict_core. Add SemanticEscalationDriverPort (generic K/V trait), SemanticEscalationFuture, SemanticEscalationVerdictBridge, SemanticCalibrationProbeConfig at semantic_verdict_core::{driver,verdict,probe} (IN-01/AC-15/OS-02). Add unit tests for bridge variant construction, probe config new(), and a stub SemanticEscalationDriverPort double covering evaluate_with_escalation. (`5b461d91`)
 - [ ] **T002**: Target libs/usecase ref_verify chain-1 (spec-adr) and chain-2 (catalog-spec) drivers. Migrate their fast/final/human escalation, hash-frozen cache access, and calibration probe injection to consume SemanticEscalationDriverPort + SemanticCalibrationProbeConfig from tddd::semantic_verdict_core (IN-01/AC-15/OS-02). Keep existing ref-verify public API and existing test surface unchanged; adjust wiring/composition only.
 
 ### S2 — Decision-table config surface
 
-- [ ] **T003**: Target libs/domain tddd::test_obligation::{rules,vocab,errors,ports}. Add RoleObligationRules, TestObligationRule, TestObligationRulesDocument, TestObligationBriefTemplate, TestObligationMinimum; TestObligationKind, TestObligationPerAxis, TestObligationPatternKind, TargetEntryRoleKind; TestObligationRulesLoadError, ValidationError; TestObligationRulesLoaderPort (IN-02/IN-04/IN-17/CN-05/CN-10/CN-16). Add unit tests for validating constructors and enum totality.
-- [ ] **T004**: Target libs/infrastructure test_obligation::rules_codec. Add DataRoleKey, ContractRoleKey, FunctionRoleKey, PatternKey, TestObligationPerAxisDto, TestObligationRuleDto, RoleObligationRulesDto, TestObligationRulesDocumentDto; JsonTestObligationRulesLoader impl TestObligationRulesLoaderPort (IN-02/IN-04/IN-17/AC-02/AC-16/CN-05/CN-10/OS-05). Add unit tests covering those anchors.
-- [ ] **T005**: Target .harness/config/test-obligation-rules.json. Author default test-obligation rules config (IN-02/IN-03/AC-01/CN-10/CN-12/CN-16/OS-03/OS-05). Add decoding smoke test for JsonTestObligationRulesLoader over the default config.
+- [x] **T003**: Target libs/domain tddd::test_obligation::{rules,vocab,errors,ports}. Add RoleObligationRules, TestObligationRule, TestObligationRulesDocument, TestObligationBriefTemplate, TestObligationMinimum; TestObligationKind, TestObligationPerAxis, TestObligationPatternKind, TargetEntryRoleKind; TestObligationRulesLoadError, ValidationError; TestObligationRulesLoaderPort (IN-02/IN-04/IN-17/CN-05/CN-10/CN-16). Add unit tests for validating constructors and enum totality. (`5b461d91`)
+- [x] **T004**: Target libs/infrastructure test_obligation::rules_codec. Add DataRoleKey, ContractRoleKey, FunctionRoleKey, PatternKey, TestObligationPerAxisDto, TestObligationRuleDto, RoleObligationRulesDto, TestObligationRulesDocumentDto; JsonTestObligationRulesLoader impl TestObligationRulesLoaderPort (IN-02/IN-04/IN-17/AC-02/AC-16/CN-05/CN-10/OS-05). Add unit tests covering those anchors. (`5b461d91`)
+- [x] **T005**: Target .harness/config/test-obligation-rules.json. Author default test-obligation rules config (IN-02/IN-03/AC-01/CN-10/CN-12/CN-16/OS-03/OS-05). Add decoding smoke test for JsonTestObligationRulesLoader over the default config. (`5b461d91`)
 
 ### S3 — Domain foundation: hashes, ids, obligations, bindings, verdicts, drift, errors, ports
 
@@ -23,9 +23,9 @@
 
 ### S4 — Infrastructure codecs
 
-- [ ] **T010**: Target libs/infrastructure test_obligation::obligations_codec. Add CatalogueEntryRefDto, ObligationsDocumentDto, TestObligationDto, TestObligationIdDto, TestObligationAnchorIdDto, TestObligationKindDto, ObligationsCodecError; JsonObligationsCodec impl ObligationsArtifactPort (IN-05/AC-03/CN-01). Add unit tests covering those anchors.
-- [ ] **T011**: Target libs/infrastructure test_obligation::bindings_codec. Add TestBindingsDocumentDto, TestBindingRecordDto (three-form union), TestLocationDto, TestObligationEdgeIdDto, TestBindingsCodecError; JsonTestBindingsCodec impl TestBindingsArtifactPort (IN-06/OS-06/AC-04). Add unit tests for each TestBindingRecord form (fulfillment / waiver / voluntary) round-tripping.
-- [ ] **T012**: Target libs/infrastructure test_obligation::{fulfillment_cache_codec,waiver_cache_codec}. Add ObligationFulfillmentCacheDocumentDto, ObligationFulfillmentCacheEntryDto, ObligationFulfillmentVerdictDto, FulfillmentFailCategoryDto; WaiverCacheDocumentDto, WaiverCacheEntryDto, WaiverVerdictDto; JsonObligationFulfillmentCacheCodec impl ObligationFulfillmentCachePort; JsonWaiverCacheCodec impl WaiverCachePort (AC-06/CN-04). Add unit tests: hash-triple serialization and decoding.
+- [x] **T010**: Target libs/infrastructure test_obligation::obligations_codec. Add ObligationCatalogueEntryRefDto; reference semantic_verify_codec::CatalogueEntryRefDto; add ObligationsDocumentDto, TestObligationDto, TestObligationIdDto, TestObligationAnchorIdDto, TestObligationKindDto, ObligationsCodecError; JsonObligationsCodec impl ObligationsArtifactPort (IN-05/AC-03/CN-01). Add unit tests covering those anchors. (`f023e089`)
+- [x] **T011**: Target libs/infrastructure test_obligation::bindings_codec. Add TestBindingsDocumentDto, TestBindingRecordDto (three-form union), TestLocationDto, TestObligationEdgeIdDto, TestBindingsCodecError; JsonTestBindingsCodec impl TestBindingsArtifactPort (IN-06/OS-06/AC-04). Add unit tests for each TestBindingRecord form (fulfillment / waiver / voluntary) round-tripping. (`f023e089`)
+- [x] **T012**: Target libs/infrastructure test_obligation::{fulfillment_cache_codec,waiver_cache_codec}. Add ObligationFulfillmentCacheDocumentDto, ObligationFulfillmentCacheEntryDto, ObligationFulfillmentVerdictDto, FulfillmentFailCategoryDto; WaiverCacheDocumentDto, WaiverCacheEntryDto, WaiverVerdictDto; JsonObligationFulfillmentCacheCodec impl ObligationFulfillmentCachePort; JsonWaiverCacheCodec impl WaiverCachePort (AC-06/CN-04). Add unit tests: hash-triple serialization and decoding. (`f023e089`)
 
 ### S5 — Test source scanning + LLM verifier adapters
 

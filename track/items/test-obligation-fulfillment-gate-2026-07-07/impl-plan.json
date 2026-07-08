@@ -4,7 +4,8 @@
     {
       "id": "T001",
       "description": "Target libs/usecase tddd::semantic_verdict_core. Add SemanticEscalationDriverPort (generic K/V trait), SemanticEscalationFuture, SemanticEscalationVerdictBridge, SemanticCalibrationProbeConfig at semantic_verdict_core::{driver,verdict,probe} (IN-01/AC-15/OS-02). Add unit tests for bridge variant construction, probe config new(), and a stub SemanticEscalationDriverPort double covering evaluate_with_escalation.",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "5b461d91"
     },
     {
       "id": "T002",
@@ -14,17 +15,20 @@
     {
       "id": "T003",
       "description": "Target libs/domain tddd::test_obligation::{rules,vocab,errors,ports}. Add RoleObligationRules, TestObligationRule, TestObligationRulesDocument, TestObligationBriefTemplate, TestObligationMinimum; TestObligationKind, TestObligationPerAxis, TestObligationPatternKind, TargetEntryRoleKind; TestObligationRulesLoadError, ValidationError; TestObligationRulesLoaderPort (IN-02/IN-04/IN-17/CN-05/CN-10/CN-16). Add unit tests for validating constructors and enum totality.",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "5b461d91"
     },
     {
       "id": "T004",
       "description": "Target libs/infrastructure test_obligation::rules_codec. Add DataRoleKey, ContractRoleKey, FunctionRoleKey, PatternKey, TestObligationPerAxisDto, TestObligationRuleDto, RoleObligationRulesDto, TestObligationRulesDocumentDto; JsonTestObligationRulesLoader impl TestObligationRulesLoaderPort (IN-02/IN-04/IN-17/AC-02/AC-16/CN-05/CN-10/OS-05). Add unit tests covering those anchors.",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "5b461d91"
     },
     {
       "id": "T005",
       "description": "Target .harness/config/test-obligation-rules.json. Author default test-obligation rules config (IN-02/IN-03/AC-01/CN-10/CN-12/CN-16/OS-03/OS-05). Add decoding smoke test for JsonTestObligationRulesLoader over the default config.",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "5b461d91"
     },
     {
       "id": "T006",
@@ -52,18 +56,21 @@
     },
     {
       "id": "T010",
-      "description": "Target libs/infrastructure test_obligation::obligations_codec. Add CatalogueEntryRefDto, ObligationsDocumentDto, TestObligationDto, TestObligationIdDto, TestObligationAnchorIdDto, TestObligationKindDto, ObligationsCodecError; JsonObligationsCodec impl ObligationsArtifactPort (IN-05/AC-03/CN-01). Add unit tests covering those anchors.",
-      "status": "todo"
+      "description": "Target libs/infrastructure test_obligation::obligations_codec. Add ObligationCatalogueEntryRefDto; reference semantic_verify_codec::CatalogueEntryRefDto; add ObligationsDocumentDto, TestObligationDto, TestObligationIdDto, TestObligationAnchorIdDto, TestObligationKindDto, ObligationsCodecError; JsonObligationsCodec impl ObligationsArtifactPort (IN-05/AC-03/CN-01). Add unit tests covering those anchors.",
+      "status": "done",
+      "commit_hash": "f023e089"
     },
     {
       "id": "T011",
       "description": "Target libs/infrastructure test_obligation::bindings_codec. Add TestBindingsDocumentDto, TestBindingRecordDto (three-form union), TestLocationDto, TestObligationEdgeIdDto, TestBindingsCodecError; JsonTestBindingsCodec impl TestBindingsArtifactPort (IN-06/OS-06/AC-04). Add unit tests for each TestBindingRecord form (fulfillment / waiver / voluntary) round-tripping.",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "f023e089"
     },
     {
       "id": "T012",
       "description": "Target libs/infrastructure test_obligation::{fulfillment_cache_codec,waiver_cache_codec}. Add ObligationFulfillmentCacheDocumentDto, ObligationFulfillmentCacheEntryDto, ObligationFulfillmentVerdictDto, FulfillmentFailCategoryDto; WaiverCacheDocumentDto, WaiverCacheEntryDto, WaiverVerdictDto; JsonObligationFulfillmentCacheCodec impl ObligationFulfillmentCachePort; JsonWaiverCacheCodec impl WaiverCachePort (AC-06/CN-04). Add unit tests: hash-triple serialization and decoding.",
-      "status": "todo"
+      "status": "done",
+      "commit_hash": "f023e089"
     },
     {
       "id": "T013",

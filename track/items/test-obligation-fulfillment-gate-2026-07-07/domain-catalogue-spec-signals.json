@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "74b51cb4e441d891e6e4eccc6136fd8c7fa0e68960b910dee9c5c60a1faddab7",
+  "catalogue_declaration_hash": "07e40686fad06bb4c90cb1ee1da105a31533b4725a4d27e77df773d7ecaf445a",
   "signals": [
     {
       "type_name": "AnchorTextHash",
@@ -110,7 +110,7 @@
     {
       "type_name": "TargetEntryRoleKind",
       "signal": "blue",
-      "entry_hash": "8aae003eb954e8fa0c745976abc3257a4b65a252f9ed4846f7ec7042b8c79b1b"
+      "entry_hash": "661e1e3cce1f0b09f61a8b737281b032104a5a478fd22e1d3478e67ec9f2840c"
     },
     {
       "type_name": "TestBindingRecord",
@@ -240,7 +240,7 @@
     {
       "type_name": "ValidationError",
       "signal": "blue",
-      "entry_hash": "1c4c6593031b2bf7fe9e4dce228667928403a1efb3a00b6cdce1cd76dcbcf371"
+      "entry_hash": "194cf08d7a5ae378498fc03a94993ffdd2be80a9280e598d0768386a51bc0155"
     },
     {
       "type_name": "VerifyCacheError",

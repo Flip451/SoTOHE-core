@@ -1,61 +1,484 @@
 {
   "schema_version": 2,
   "scopes": {
-    "usecase": {
+    "impl-plan": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:69f14b4393f0e49a8e5650a1baf701821f483d322973f8ee968bba24f18a9335",
-          "at": "2026-07-07T18:03:00Z"
+          "hash": "rvw1:sha256:af2253ae892ab1cbec06f35d8958d8c87bb9465caec89385fc3dacf61a5bc0c5",
+          "at": "2026-07-07T08:35:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af2253ae892ab1cbec06f35d8958d8c87bb9465caec89385fc3dacf61a5bc0c5",
+          "at": "2026-07-07T08:39:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Summary block restates the upstream design intent for the whole track in prose instead of keeping the text to target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S1 restates the semantic-verdict migration contract in prose; T001/T002 should be described only as target + operation + anchor cite per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 20,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S2 restates the rules/config behavior contract in prose, including the default config contents; T003-T005 should stay at target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 27,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S3 restates the domain-model contract in prose instead of limiting itself to executable task text.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 35,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S4 restates the codec behavior contract in prose; the section should not re-explain the serialization guarantees.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 44,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S5 restates the scanner/verifier behavior contract in prose; T013-T015 should avoid re-describing the upstream semantics.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 52,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S6 restates the derive/check/evaluate/results contracts in prose, including deterministic projection, totality, cache freezing, and aggregation semantics.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 60,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S7 restates the CLI wiring contract in prose; T020-T022 should be trimmed to target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 69,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S8 restates the capability-registration contract in prose instead of keeping the section to the executable change description.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "line": 77,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006's contract attributes `RoleName` and `DiagnosticMessage`, but the task text only scopes hashes/ids plus `WaivedReason`; that attribution is broader than the described work.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 50,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:7a20e6456bcfedec54ae578b79d6d8303fc4bd4e6c065af570578df8245d49dc",
+          "at": "2026-07-07T11:46:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 restates ADR D13 content (`data_roles (17), contract_roles (4), function_roles (2), patterns.typestate, trait_impls sections`) instead of keeping the task to target + operation + anchor cite; this violates `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S3 (T006-T008) embeds upstream behavior prose (`deterministic from identity fields only`, `cache-key triple invalidates verdict`, `six variants`) rather than just executable task directives; strip the contract prose and keep the target/operation/anchor cites.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S5 (T014-T015) restates verifier prompt semantics and fail-category behavior (`required supporting quotations`, `three-fail-type discrimination`, `edge-local self-containment`) in the task text; that belongs in the spec, not the impl-plan wording.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 84,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S6 (T016-T019) embeds the derive/check/evaluate/results behavioral contract (`Deterministic projection`, `Pure-read totality gate`, `always returns success outcome`, cache/traversal semantics) directly in task prose, which is upstream restatement.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 96,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T022 restates CLI behavior and exit semantics (`No --lenient / --force / --context / --layer / --scope flags`, `results exit is always 0`) instead of staying at target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 132,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T023 restates capability-routing behavior (`fast → final escalation resolves per capability`) rather than just naming the config/registry edits and anchor cite.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 138,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:2abdfbda1bd562e4a78e8c3153fbdce39f5864512ce16878651a4a2c6c10c3f1",
+          "at": "2026-07-07T11:52:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T009's contract overstates the task text: it attributes `SemanticVerifierError`, `ArtifactCodecError`, `TestSourceScanError`, and `VerifyCacheError`, but the task description only names `ObligationCheckError`, `ObligationDeriveError`, `ObligationEvaluateError`, `ObligationResultsError`, `FulfillmentFailCategory`, and the port types. Either expand the task description to cover those entries or remove them from the contract.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 76,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:c937a472718ac2415cdcf1054a9178a198c8d94c2230a571e9d077ad0c3fbb7e",
+          "at": "2026-07-07T12:07:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5e4e311299575c2ff8eb2b0a458cff7834f812fbe2a19faece1a4b3cb24e464",
+          "at": "2026-07-07T12:11:54Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`SemanticEscalationDriverPort` is the shared escalation/cache port for concurrent semantic evaluation, but the trait leaves `P`, `K`, `V`, `E`, and the future produced by the public `async fn` unconstrained. A non-`Send`/non-`Sync` implementation can satisfy this usecase port, so later ref-verify or obligation-gate orchestration cannot safely fan out evaluations across workers despite the port contract being the concurrency boundary. Add the required `Send`/`Sync` bounds and use a `Send` future shape at the trait boundary instead of an unconstrained public `async fn`.",
+              "message": "T020's task-contract attributes `TestObligationDeriveInput`, `TestObligationCheckInput`, `TestObligationEvaluateInput`, and `TestObligationResultsInput`, but the T020 task description only names the four handler types and does not claim to add or modify these input entries. This is a task-contract attribution mismatch: an executor following the plan would not know those catalogue entries are part of T020.",
               "severity": "P1",
-              "file": "libs/usecase/src/semantic_verdict_core/driver.rs",
-              "line": 21,
-              "category": "purity violation by trait or generic"
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 163,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T022's task-contract omits `TestObligationResultsArgs` even though the T022 task description explicitly lists `TestObligationResultsArgs` among the CLI args to add. That leaves a catalogue entry claimed by the task without task-contract attribution.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 171,
+              "category": "task-contract attribution mismatch"
             }
           ],
-          "hash": "rvw1:sha256:69f14b4393f0e49a8e5650a1baf701821f483d322973f8ee968bba24f18a9335",
-          "at": "2026-07-07T18:07:11Z"
+          "hash": "rvw1:sha256:b5e4e311299575c2ff8eb2b0a458cff7834f812fbe2a19faece1a4b3cb24e464",
+          "at": "2026-07-07T12:15:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AC-16` is mapped to `T014`, but `T014` only targets `test_obligation::fulfillment_verifier` provider wiring and its cited anchors are `IN-09/IN-12/CN-03/CN-08/AC-06/AC-08/OS-01`; it does not touch `trait_impls`, `contract_conformance`, or trait-edge evidence selection. This makes the `AC-16` coverage assignment implausible and misassigns load-bearing fulfillment-evaluation work away from the tasks that actually describe it.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-coverage.json",
+              "line": 68,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "`AC-11` is mapped to `T015`, but `T015` only adds the `WaiverVerifierAdapter` provider wiring. It does not target waiver-fail routing, preserving obligations without verifier-injected additions, or routing-brief handling, which are the load-bearing parts of `AC-11`; those are usecase/evaluate responsibilities already described by `T018`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-coverage.json",
+              "line": 63,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:4fd0d4b2030718de20c2db3a54c78f747ff64976c494ab52b155c6da5ef90c01",
+          "at": "2026-07-07T12:22:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-12 is mapped to T016 and T017, but those task descriptions do not cite AC-12 or describe the derive/check work needed for voluntary bindings; only T018 carries the AC-12 cite. That makes the coverage mapping implausible for the derive/check portions of AC-12's transition path.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-coverage.json",
+              "line": 64,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T004 restates upstream behavior in prose: `load-time totality verification and per-axis vocabulary parsing` plus the named fail cases duplicate AC-02/CN-05 details. Per `knowledge/conventions/no-upstream-restatement.md`, this should be target + operation + anchor cite only.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T010's test text restates the upstream identity/drift contract: `preserves TestObligationId identity when only declaration hash changes`. The impl-plan should cite IN-05/AC-03/CN-01 rather than restating that behavior.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 60,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T013 restates scanner/source-editing behavior in prose: locating tests by `(layer, module_path, test_name)`, extracting body spans, computing `TestBodySpanHash` without editing source, and whitespace stability. Those are upstream contract details covered by the cited anchors and should not be repeated here.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 78,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T023 restates AC-07's provider resolution behavior by spelling out `provider/model`, `fast_provider/fast_model`, and `RoundType::Fast` / `RoundType::Final` expectations. This violates the no-upstream-restatement convention for impl-plan task text.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 138,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:31ea1e8d9b3e7fd5fc802271dfdf3296e83a907b71d649f3fb7920e984e5448c",
+          "at": "2026-07-07T12:27:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T018 cites AC-07 and AC-08 and requires unit tests for those anchors, but task-coverage.json assigns AC-07 only to T023 and AC-08 only to T014. Those ACs cover capability registration / resolve_execution and fulfillment-verifier prompt calibration, while T018 targets the usecase evaluate interactor, so the plan gives T018 obligations that are not represented in coverage and are not executable at that target. Remove those citations from T018 or add explicit executable work plus matching coverage if the interactor must own them.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 108,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:14dead1d234cc012bc9ae67d118111b71d1e73b90a7972c65ab7cf9f5b7d228f",
+          "at": "2026-07-07T12:32:54Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7febbedb200015d97b4887d237b8bdc37a49453d65756bb9c28b8a2deeb3a3f7",
-          "at": "2026-07-07T18:26:51Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
+          "hash": "rvw1:sha256:22a3221ea6d08654ff95bbd28617c74c36fcc7e5f81e70a7f3cad0decc5faa79",
+          "at": "2026-07-07T12:37:43Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6b7a9402253fdb24d2375eb435222baa00a442a17e006f253b8639ca97f30d90",
-          "at": "2026-07-07T11:44:55Z"
+          "hash": "rvw1:sha256:d63f47dcf5cbd3264aa21f3b989688cd080945ff0c3c746bec11de9287648d41",
+          "at": "2026-07-07T18:01:47Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6b7a9402253fdb24d2375eb435222baa00a442a17e006f253b8639ca97f30d90",
-          "at": "2026-07-07T11:48:41Z"
+          "hash": "rvw1:sha256:d63f47dcf5cbd3264aa21f3b989688cd080945ff0c3c746bec11de9287648d41",
+          "at": "2026-07-07T18:06:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is attributed to the usecase catalogue entry `SemanticEscalationFuture`, but the T001 plan text only instructs the executor to add `SemanticEscalationDriverPort`, `SemanticEscalationVerdictBridge`, and `SemanticCalibrationProbeConfig` plus tests. Under the impl-plan policy, task-contract entries must match entries the task actually describes touching; either add `SemanticEscalationFuture` to T001's executable description or remove this attribution.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 9,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:8e97dc24f97466c25a6cca1fbd48df914bcca3dadf87aa4fe6b849c6e433bda4",
+          "at": "2026-07-07T20:49:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003's task-contract attribution list includes the new ValidationError bookkeeping entry but omits DomainError, even though the review briefing says both ValidationError and DomainError were added to T003 as required pre-review coverage-gate attribution. Leaving DomainError out keeps the task-contract SSoT incomplete for the Batch A attribution update.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 24,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:9658f8e6953382428d969f0649ff96073e148f296077b98ca446d50882027fd9",
+          "at": "2026-07-07T20:52:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 now attributes `ValidationError` in `task-contract.json`, but the T003 executable task text in `impl-plan.json`/`plan.md` still only names `TestObligationRulesLoadError` and `TestObligationRulesLoaderPort` for the errors/ports work. Because the plan never tells the executor to add or modify `ValidationError`, this attribution is not backed by the task description and can leave the catalogue entry unimplemented or implemented by guesswork.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 24,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:9658f8e6953382428d969f0649ff96073e148f296077b98ca446d50882027fd9",
+          "at": "2026-07-07T20:56:31Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:17f63b9787ca911a334b5bfdc3527f95e13f36c1b32058ef87ff4c51f450a407",
-          "at": "2026-07-07T15:58:51Z"
+          "hash": "rvw1:sha256:913242546aef791c7ff6d7de15532340adee77f4ea9f5bba188778cc0b16d354",
+          "at": "2026-07-07T21:01:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcddc6f0fbd933f223d45c24782b84c1da1370291fa2b2f6f038810bf78639f9",
+          "at": "2026-07-07T21:38:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcddc6f0fbd933f223d45c24782b84c1da1370291fa2b2f6f038810bf78639f9",
+          "at": "2026-07-07T21:41:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 now attributes the domain catalogue entry `NonEmptyTestLocations` in `task-contract.json`, but the T007 task text in `impl-plan.json`/`plan.md` only adds `TestObligation`, `ObligationsDocument`, `TestLocation`, `TestBindingRecord`, `TestBindingsDocument`, `TestObligationScopePresence`, and `UncitedSpecElementFinding`. That makes the task-contract claim work that the executable task description does not touch, so the implementer has no plan instruction to add or verify `NonEmptyTestLocations`. Remove this attribution or add the entry explicitly to T007's task description and rendered plan.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 63,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:b583d7be9902e13507e8a7b8d679b2ae2e4b46c15af3d14fab6dc94ec1496c47",
+          "at": "2026-07-07T22:38:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b155724b5129f172884443ecfdc6f7e89fe7182d5d297f79eff21106e71522b7",
+          "at": "2026-07-07T22:41:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The batch update in this round is on the wrong task set: the briefing says T010/T011/T012 should move to `in_progress`, but this plan marks T006/T007/T008/T009 as `done` and leaves T010-T012 untouched. That means the requested state transition is not reflected in the impl-plan, so the render in `plan.md` tracks the wrong batch.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 30,
+              "category": "dependency cycle or wrong ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:59ccfc46d22c44998e881915c849861e277718dbe5f4a30d54a04f6425a0d759",
+          "at": "2026-07-07T23:59:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:59ccfc46d22c44998e881915c849861e277718dbe5f4a30d54a04f6425a0d759",
+          "at": "2026-07-08T00:04:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Batch C was supposed to move T010/T011/T012 from `todo` to `in_progress`, but the plan still leaves T010 as `todo` here, with T011/T012 also still `todo` on the following task entries. As rendered in plan.md, this keeps the intended Batch C implementation tasks inactive rather than starting the correct batch.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 56,
+              "category": "wrong task state transition"
+            }
+          ],
+          "hash": "rvw1:sha256:59ccfc46d22c44998e881915c849861e277718dbe5f4a30d54a04f6425a0d759",
+          "at": "2026-07-08T00:08:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:59ccfc46d22c44998e881915c849861e277718dbe5f4a30d54a04f6425a0d759",
+          "at": "2026-07-08T00:14:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:59ccfc46d22c44998e881915c849861e277718dbe5f4a30d54a04f6425a0d759",
+          "at": "2026-07-08T00:17:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ea4cc1d6b7476ecaada2e0d1dc8d60c564b5b94d4e8c81c6687bcd34ff25c82",
+          "at": "2026-07-08T02:01:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010's task-contract attribution includes `ObligationCatalogueEntryRefDto`, but the T010 task description in `impl-plan.json`/rendered `plan.md` only instructs the implementer to add `CatalogueEntryRefDto` and never names or otherwise touches `ObligationCatalogueEntryRefDto`. That leaves an attributed catalogue entry that the executable task does not actually cover; update the T010 description/rendered plan to include the `ObligationCatalogueEntryRefDto` work or remove the attribution if it is not part of T010.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "line": 98,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:0ea4cc1d6b7476ecaada2e0d1dc8d60c564b5b94d4e8c81c6687bcd34ff25c82",
+          "at": "2026-07-08T02:06:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T010's description embeds the cleanup rationale in prose: \"renamed from the earlier `CatalogueEntryRefDto` proposal after the short-name collision cleanup ... keeps its name ... `action: reference`, not re-added\". Per `knowledge/conventions/no-upstream-restatement.md`, impl-plan task text should stay to target + operation + anchor cite; carrying this rationale in `impl-plan.json` (and therefore rendered `plan.md`) creates a second source of truth for the DTO split instead of leaving that decision upstream.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "line": 59,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:4bd0202b31ee7912c60199708395b239a3e2464c65cb69527c8e534f6310e096",
+          "at": "2026-07-08T02:27:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d157d7a444743764fa0537663f0df82f3ff94c03d4886a776d8ad442762603d",
+          "at": "2026-07-08T02:33:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5027fb06b8f6d08fc9582fe958ae2ffca8ef70a5828cbd96764115be330a952",
+          "at": "2026-07-08T04:38:04Z"
         }
       ]
     },
@@ -88,6 +511,38 @@
           "findings": [],
           "hash": "rvw1:sha256:d221f13079ac52fea12d5d991e74d9aad1e3bc97af5b4d7ee79df944c2bf3983",
           "at": "2026-07-07T18:06:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6fc35a9cc0d78d2c97711b92b0aa1553c9431d8ab1ed5a95babdc26a117332d6",
+          "at": "2026-07-08T02:00:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6fc35a9cc0d78d2c97711b92b0aa1553c9431d8ab1ed5a95babdc26a117332d6",
+          "at": "2026-07-08T02:04:56Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39a2670877a6332922e89b4caea82cfa087cd4d9a44264623acc93d4e22c913b",
+          "at": "2026-07-08T01:59:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39a2670877a6332922e89b4caea82cfa087cd4d9a44264623acc93d4e22c913b",
+          "at": "2026-07-08T02:04:10Z"
         }
       ]
     },
@@ -750,39 +1205,215 @@
           "findings": [],
           "hash": "rvw1:sha256:a41c59fec3e2d18ed59f1026e85d17fc74b87ddfa3107c21cfb98285834a4fa6",
           "at": "2026-07-08T00:16:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::ValidationError`'s `docs` field is change-log prose, not a contract note: it narrates the `String -> DiagnosticMessage` refactor, mentions `T006`, and defers work to an implementer follow-up. The catalog should just anchor the contract and avoid restating upstream rationale.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "line": 4881,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`test_obligation::obligations_codec::ObligationCatalogueEntryRefDto`'s `docs` field does the same thing: it explains the alias split and evaluator symbol-disambiguation rationale in prose instead of staying at the catalog-contract level. That violates the no-upstream-restatement rule for `docs` / `intent` fields.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 2276,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:01f842ce9af2a4c6224e8f2ca5d336077eea68023f1e08718b0a1d1842d154c0",
+          "at": "2026-07-08T02:05:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueEntryRefDto` is added as a public DTO, but this catalog entry records no inherent methods even though the implementation now exposes `from_domain` and `into_domain`. That leaves the post-change API shape incomplete in the type SSoT.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 2326,
+              "category": "missing companion modify"
+            }
+          ],
+          "hash": "rvw1:sha256:c4781f1278039aef60de8e2deb0a642f59b00f0063cffdce91abd2fd40b8a622",
+          "at": "2026-07-08T02:30:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Both `ObligationCatalogueEntryRefDto::into_domain` and `CatalogueEntryRefDto::into_domain` expose `domain::ValidationError`, but the only structurally reachable failure is `ValidationError::EmptyString` from `CatalogueEntryKey::try_new`; the other 35 variants are impossible at this boundary. Narrow the return type or document why callers must handle the whole enum.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 2304,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:84fd78afbb45933a38cd92e3584eb0f82f5f697a6ecd3e780e36fb73d7efa3b3",
+          "at": "2026-07-08T02:45:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueEntryRefDto` is the preexisting `semantic_verify_codec` DTO, so this entry should not be `action: add`. The source type is still a serde wire DTO, but the catalog now treats it as a brand-new struct and only lists `Debug`/`Clone`/`PartialEq`/`Eq`, dropping the `Serialize` / `Deserialize` trait_impls that the Rust code derives.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 2326,
+              "category": "action incoherent with diff"
+            }
+          ],
+          "hash": "rvw1:sha256:da155ca106081c89281da959ac9e7e564bf067437a2646a07c066d4cdb53632c",
+          "at": "2026-07-08T02:53:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_obligation::obligations_codec::ObligationCatalogueEntryRefDto` is a structural duplicate of `tddd::semantic_verify_codec::CatalogueEntryRefDto`: same empty DTO shape, same `from_domain`/`into_domain` signatures, and the same `CatalogueEntryRef` validation path. Because the catalogue does not declare a `reference` relation between them, the same wire contract now has to be maintained in two places (also mirrored in `contract-map.md`).",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 2274,
+              "category": "DRY"
+            }
+          ],
+          "hash": "rvw1:sha256:b6ff4a5de6f36ec7dd6d01a728fac96994911de678789e568d22558bce9db871",
+          "at": "2026-07-08T03:02:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ObligationCatalogueEntryRefDto`'s `docs` field restates the duplication rationale in prose ('independent struct', 'genuine local type', 'contract, not type reuse') instead of staying at the contract level. The accepted duplicate itself is fine; the docs field should not become a second source of truth for that decision.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 2303,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`ObligationCatalogueEntryRefDto::into_domain` and `CatalogueEntryRefDto::into_domain` both expose the full `domain::ValidationError` enum even though the only reachable failure is `ValidationError::EmptyString` from `CatalogueEntryKey::try_new`. That leaves the rest of the enum as dead vocabulary at this boundary without justification.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 2331,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`infrastructure::track::fs_store::load_impl_plan_for_track` is catalogued as `Result<Option<domain::ImplPlanDocument>, domain::RepositoryError>`, but the implementation at `/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/fs_store.rs:475` returns `Option<ImplPlanDocument>` and swallows all failures with `ok()?`. The catalog advertises an error path that cannot actually occur.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 17,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:bf2ba86e8d3bc4e11b06d0181f3737b28d82b729c1d63918b335cf235ef95888",
+          "at": "2026-07-08T03:29:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`tddd::semantic_verify_codec::CatalogueEntryRefDto` is a preexisting cross-track DTO, but this catalog entry is marked `action: add` and its serde trait impls are also recorded as `add`. The branch is claiming a new API surface here instead of referencing the existing type, so the type SSoT overstates the diff.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 2353,
+              "category": "action incoherent with diff"
+            },
+            {
+              "message": "The `docs` field for `infrastructure::track::fs_store::load_impl_plan_for_track` restates the helper's behavior and rationale (`None` on any failure, render-only helper for the T013 hardening path) instead of keeping the catalog entry to target + operation + anchor cite. That violates the no-upstream-restatement rule for `<layer>-types.json` docs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 21,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:4d389f9e1fe238fe624b5d973abaecdd97aa2b1a8c28af64a441a594b555376c",
+          "at": "2026-07-08T03:38:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueEntryRefDto` is catalogued as `action: add`, but this is the preexisting shared DTO in `tddd::semantic_verify_codec` that the track plan says to reference. The associated serde impls on the same surface are also marked `add`; they should be `reference` entries so the catalog reflects reuse rather than a new public type.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 2353,
+              "category": "action incoherent with diff"
+            },
+            {
+              "message": "`infrastructure::track::fs_store::load_impl_plan_for_track` is tied to `CN-14`, but that spec item is about test-source body handling and artifact-side hashes, not impl-plan loading. The anchor is off-topic for this helper, so the traceability link is misleading.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 22,
+              "category": "spec_refs missing or off-topic"
+            }
+          ],
+          "hash": "rvw1:sha256:94c03ed35482a0bb923dea0495c3d60c9ca75e18bbed80373ce3edbd76c1b18c",
+          "at": "2026-07-08T03:50:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`tddd::semantic_verify_codec::CatalogueEntryRefDto` is a preexisting cross-track DTO: the underlying Rust source in `libs/infrastructure/src/tddd/semantic_verify_codec.rs` is unchanged in this PR. This catalogue entry should therefore be `action: reference`, not `add`, and the attached `core::fmt::Debug` / `Clone` / `Eq` / `PartialEq` / `Serialize` / `Deserialize` rows should be `reference` as well; otherwise the track falsely claims ownership of an unchanged type.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "line": 2326,
+              "category": "action incoherent with diff"
+            }
+          ],
+          "hash": "rvw1:sha256:b63a537e12f4f2eac665fb0d5178d43d774ba67f80650f4dd84cd12181918be1",
+          "at": "2026-07-08T04:13:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b63a537e12f4f2eac665fb0d5178d43d774ba67f80650f4dd84cd12181918be1",
+          "at": "2026-07-08T04:26:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b63a537e12f4f2eac665fb0d5178d43d774ba67f80650f4dd84cd12181918be1",
+          "at": "2026-07-08T04:30:41Z"
         }
       ]
     },
-    "adr": {
+    "spec": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
-          "at": "2026-07-07T08:38:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D9 makes `anchor id` part of the obligation id, but D2 explicitly says obligations are derived per entry and are not multiplied by cite count. Downstream derivation cannot know whether to emit one obligation per declaration item, reusing its test group across all cited anchors, or one obligation per `(entry, anchor, kind, item)`. That changes obligation counts, binding shape, and totality semantics, so the ADR needs one consistent identity model before spec/types can translate it.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
-              "line": 224,
-              "category": "inconsistent_decisions"
-            }
-          ],
-          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
-          "at": "2026-07-07T08:41:44Z"
+          "hash": "rvw1:sha256:6b7a9402253fdb24d2375eb435222baa00a442a17e006f253b8639ca97f30d90",
+          "at": "2026-07-07T11:44:55Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c597270bfdf492126d9a4038ef233eb9ae3cba96657c8f231b9aeac5a6914bd0",
-          "at": "2026-07-07T08:52:17Z"
+          "hash": "rvw1:sha256:6b7a9402253fdb24d2375eb435222baa00a442a17e006f253b8639ca97f30d90",
+          "at": "2026-07-07T11:48:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17f63b9787ca911a334b5bfdc3527f95e13f36c1b32058ef87ff4c51f450a407",
+          "at": "2026-07-07T15:58:51Z"
         }
       ]
     },
@@ -896,6 +1527,147 @@
           "findings": [],
           "hash": "rvw1:sha256:51d780177e8a59b5549d76373567d570ee79354278a030aef1da63776b0c7d2a",
           "at": "2026-07-08T00:15:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`location.module_path()` is split into `crate_name`/`rest` and both are concatenated into `workspace_root/...` with `join`/`push` but no containment check against `workspace_root`. A crafted module path containing `..` or an absolute component can escape the worktree before `read_to_string` runs.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/test_obligation/source_scanner.rs",
+              "line": 57,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "`std::fs::read_to_string(&file)` will follow symlinks, but this scanner never does a `symlink_metadata()`/reject check on candidate files or the workspace root. That means a symlinked test source under the worktree is accepted instead of being fail-closed.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/test_obligation/source_scanner.rs",
+              "line": 187,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:60a21483662cb025b96543fb6a55c021e81847ac3bc171bf2d3709643dab9d2f",
+          "at": "2026-07-08T02:03:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`guarded_workspace_root()` canonicalizes the caller-supplied workspace root after only checking the final path component for symlinks. That can follow symlinked ancestor components and re-anchor the scanner on the target tree, which violates the trusted-root boundary. The existing `verify/trusted_root.rs` pattern keeps the root lexical and only rejects a symlinked root instead of calling `canonicalize()` here.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/test_obligation/source_scanner.rs",
+              "line": 82,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:c02e241053346a40977ac87ead872522aafabfc73e8e32e8f1bee7ef796c9587",
+          "at": "2026-07-08T02:30:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`guarded_workspace_root()` only `symlink_metadata()`-checks the leaf `workspace_root` path. If the repo is reached through a symlinked parent such as `/tmp/link/repo`, this passes, and the later `reject_symlinks_below()` calls treat that untrusted anchor as the trusted root. That leaves the scanner able to read from a redirected tree instead of rejecting the symlink boundary, which is the case the trusted-root / symlink-guard precedent in `verify/trusted_root.rs` is meant to block.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/source_scanner.rs",
+              "line": 67,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:ac7114bc5a53ff661014181b6d95c0ddc1686965aa9aea07e980bf30754cb5b3",
+          "at": "2026-07-08T02:43:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_track_metadata` and `load_impl_plan_for_track` still call `std::fs::read_to_string` on `items_dir.join(id)` paths without the `symlink_metadata` / `reject_symlinks_below` guard that `read_track_status_str` applies. A symlinked `items_dir` or track directory will be followed and can read outside the trusted root, so these public helpers do not fail closed at the filesystem boundary.",
+              "severity": "P0",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/fs_store.rs",
+              "line": 312,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:9ff992c0eeb5cee607dd33588ce267446e554d0804dc9525ab50d243787366cc",
+          "at": "2026-07-08T02:55:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`guarded_items_dir()` canonicalizes `items_dir` lexically before any containment check, so a path like `.../link/../items` can hide a symlinked component from `reject_symlinked_items_dir_chain()` and be re-anchored outside the intended track tree. `read_track_metadata()` / `load_impl_plan_for_track()` then trust that escaped directory as the root; this needs the same fail-closed `ParentDir`/containment guard used by the existing symlink-safe loaders.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/fs_store.rs",
+              "line": 304,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:72c6ef1e1c915e379dd508d613d22040b35bf997ddb1e9749cf2c0e835fe47cd",
+          "at": "2026-07-08T03:35:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab9a478e1096df8c561e28df9c1b6b91a5f0ebc5b49b3264f953afa8f28d4e21",
+          "at": "2026-07-08T03:52:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsTrackStore` still builds primary port paths with raw `self.root.join(...).join(...)` and then calls `path.exists()`/`std::fs::read_to_string` without rejecting symlinks. `ImplPlanReader::load_impl_plan` repeats the same pattern for `impl-plan.json`, so callers of `TrackReader::find` / `ImplPlanReader::load_impl_plan` can follow a symlinked track directory or leaf file under the configured items root. Route these reads through the same trusted-root and `reject_symlinks_below` guard used by `read_track_metadata` / `guarded_track_file_path`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/fs_store.rs",
+              "line": 44,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:ab9a478e1096df8c561e28df9c1b6b91a5f0ebc5b49b3264f953afa8f28d4e21",
+          "at": "2026-07-08T04:02:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`save_impl_plan` still builds the write target with `self.root.join(id.as_ref()).join(\"impl-plan.json\")` and writes via `atomic_write_file` without first applying the same trusted-root/symlink guard used by the read paths. A symlinked `items_dir` or track directory can therefore redirect the impl-plan write outside the intended track-items root; this should fail closed via the existing `guarded_items_dir`/`reject_symlinks_below` pattern before creating the parent or temp file.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/fs_store.rs",
+              "line": 263,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:236b2060cef4a8ef9e8edee081c62d389bded6ee5562749f8a11910b3a19ffb7",
+          "at": "2026-07-08T04:11:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`with_locked_document` derives `metadata.json.lock` from a guarded metadata path, but then opens the lock with `std::fs::File::create` without checking the lock path itself for symlinks. A pre-existing symlink at `<track>/metadata.json.lock` will be followed and truncated before the lock is taken, bypassing the symlink-rejection boundary used elsewhere and conflicting with the scope_config_loader.rs symlink-rejection precedent. Guard `lock_path` with `reject_symlinks_below` or equivalent no-follow semantics before creating it.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/track/fs_store.rs",
+              "line": 197,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:93d6a4bd51c59918b7d1eab709f023749e9036e4e42668081d5a48d4f493ea5e",
+          "at": "2026-07-08T04:28:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:43424a75b962dd0a6151b73c241e840da7c6c64fccccab8848325f9bcfed0725",
+          "at": "2026-07-08T04:34:51Z"
         }
       ]
     },
@@ -1024,436 +1796,100 @@
           "findings": [],
           "hash": "rvw1:sha256:26d6cf663f3f09e1064d53c72b69d0558211f75bc3f8f16b63be2f8b9a36d68d",
           "at": "2026-07-07T23:59:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80dca1c369538f4073480263327e0fad5a243cee72b133b3ca8bdcb90036c819",
+          "at": "2026-07-08T02:01:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80dca1c369538f4073480263327e0fad5a243cee72b133b3ca8bdcb90036c819",
+          "at": "2026-07-08T02:07:28Z"
         }
       ]
     },
-    "impl-plan": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:af2253ae892ab1cbec06f35d8958d8c87bb9465caec89385fc3dacf61a5bc0c5",
-          "at": "2026-07-07T08:35:55Z"
+          "hash": "rvw1:sha256:69f14b4393f0e49a8e5650a1baf701821f483d322973f8ee968bba24f18a9335",
+          "at": "2026-07-07T18:03:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SemanticEscalationDriverPort` is the shared escalation/cache port for concurrent semantic evaluation, but the trait leaves `P`, `K`, `V`, `E`, and the future produced by the public `async fn` unconstrained. A non-`Send`/non-`Sync` implementation can satisfy this usecase port, so later ref-verify or obligation-gate orchestration cannot safely fan out evaluations across workers despite the port contract being the concurrency boundary. Add the required `Send`/`Sync` bounds and use a `Send` future shape at the trait boundary instead of an unconstrained public `async fn`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_verdict_core/driver.rs",
+              "line": 21,
+              "category": "purity violation by trait or generic"
+            }
+          ],
+          "hash": "rvw1:sha256:69f14b4393f0e49a8e5650a1baf701821f483d322973f8ee968bba24f18a9335",
+          "at": "2026-07-07T18:07:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:af2253ae892ab1cbec06f35d8958d8c87bb9465caec89385fc3dacf61a5bc0c5",
-          "at": "2026-07-07T08:39:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Summary block restates the upstream design intent for the whole track in prose instead of keeping the text to target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "S1 restates the semantic-verdict migration contract in prose; T001/T002 should be described only as target + operation + anchor cite per `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
-              "line": 20,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "S2 restates the rules/config behavior contract in prose, including the default config contents; T003-T005 should stay at target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
-              "line": 27,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "S3 restates the domain-model contract in prose instead of limiting itself to executable task text.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
-              "line": 35,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "S4 restates the codec behavior contract in prose; the section should not re-explain the serialization guarantees.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
-              "line": 44,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "S5 restates the scanner/verifier behavior contract in prose; T013-T015 should avoid re-describing the upstream semantics.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
-              "line": 52,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "S6 restates the derive/check/evaluate/results contracts in prose, including deterministic projection, totality, cache freezing, and aggregation semantics.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
-              "line": 60,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "S7 restates the CLI wiring contract in prose; T020-T022 should be trimmed to target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
-              "line": 69,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "S8 restates the capability-registration contract in prose instead of keeping the section to the executable change description.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
-              "line": 77,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T006's contract attributes `RoleName` and `DiagnosticMessage`, but the task text only scopes hashes/ids plus `WaivedReason`; that attribution is broader than the described work.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
-              "line": 50,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:7a20e6456bcfedec54ae578b79d6d8303fc4bd4e6c065af570578df8245d49dc",
-          "at": "2026-07-07T11:46:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T005 restates ADR D13 content (`data_roles (17), contract_roles (4), function_roles (2), patterns.typestate, trait_impls sections`) instead of keeping the task to target + operation + anchor cite; this violates `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
-              "line": 30,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "S3 (T006-T008) embeds upstream behavior prose (`deterministic from identity fields only`, `cache-key triple invalidates verdict`, `six variants`) rather than just executable task directives; strip the contract prose and keep the target/operation/anchor cites.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
-              "line": 36,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "S5 (T014-T015) restates verifier prompt semantics and fail-category behavior (`required supporting quotations`, `three-fail-type discrimination`, `edge-local self-containment`) in the task text; that belongs in the spec, not the impl-plan wording.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
-              "line": 84,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "S6 (T016-T019) embeds the derive/check/evaluate/results behavioral contract (`Deterministic projection`, `Pure-read totality gate`, `always returns success outcome`, cache/traversal semantics) directly in task prose, which is upstream restatement.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
-              "line": 96,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T022 restates CLI behavior and exit semantics (`No --lenient / --force / --context / --layer / --scope flags`, `results exit is always 0`) instead of staying at target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
-              "line": 132,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T023 restates capability-routing behavior (`fast → final escalation resolves per capability`) rather than just naming the config/registry edits and anchor cite.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
-              "line": 138,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:2abdfbda1bd562e4a78e8c3153fbdce39f5864512ce16878651a4a2c6c10c3f1",
-          "at": "2026-07-07T11:52:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T009's contract overstates the task text: it attributes `SemanticVerifierError`, `ArtifactCodecError`, `TestSourceScanError`, and `VerifyCacheError`, but the task description only names `ObligationCheckError`, `ObligationDeriveError`, `ObligationEvaluateError`, `ObligationResultsError`, `FulfillmentFailCategory`, and the port types. Either expand the task description to cover those entries or remove them from the contract.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
-              "line": 76,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:c937a472718ac2415cdcf1054a9178a198c8d94c2230a571e9d077ad0c3fbb7e",
-          "at": "2026-07-07T12:07:21Z"
+          "hash": "rvw1:sha256:7febbedb200015d97b4887d237b8bdc37a49453d65756bb9c28b8a2deeb3a3f7",
+          "at": "2026-07-07T18:26:51Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b5e4e311299575c2ff8eb2b0a458cff7834f812fbe2a19faece1a4b3cb24e464",
-          "at": "2026-07-07T12:11:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T020's task-contract attributes `TestObligationDeriveInput`, `TestObligationCheckInput`, `TestObligationEvaluateInput`, and `TestObligationResultsInput`, but the T020 task description only names the four handler types and does not claim to add or modify these input entries. This is a task-contract attribution mismatch: an executor following the plan would not know those catalogue entries are part of T020.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
-              "line": 163,
-              "category": "task-contract attribution mismatch"
-            },
-            {
-              "message": "T022's task-contract omits `TestObligationResultsArgs` even though the T022 task description explicitly lists `TestObligationResultsArgs` among the CLI args to add. That leaves a catalogue entry claimed by the task without task-contract attribution.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
-              "line": 171,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:b5e4e311299575c2ff8eb2b0a458cff7834f812fbe2a19faece1a4b3cb24e464",
-          "at": "2026-07-07T12:15:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AC-16` is mapped to `T014`, but `T014` only targets `test_obligation::fulfillment_verifier` provider wiring and its cited anchors are `IN-09/IN-12/CN-03/CN-08/AC-06/AC-08/OS-01`; it does not touch `trait_impls`, `contract_conformance`, or trait-edge evidence selection. This makes the `AC-16` coverage assignment implausible and misassigns load-bearing fulfillment-evaluation work away from the tasks that actually describe it.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-coverage.json",
-              "line": 68,
-              "category": "task-coverage gap"
-            },
-            {
-              "message": "`AC-11` is mapped to `T015`, but `T015` only adds the `WaiverVerifierAdapter` provider wiring. It does not target waiver-fail routing, preserving obligations without verifier-injected additions, or routing-brief handling, which are the load-bearing parts of `AC-11`; those are usecase/evaluate responsibilities already described by `T018`.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-coverage.json",
-              "line": 63,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:4fd0d4b2030718de20c2db3a54c78f747ff64976c494ab52b155c6da5ef90c01",
-          "at": "2026-07-07T12:22:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-12 is mapped to T016 and T017, but those task descriptions do not cite AC-12 or describe the derive/check work needed for voluntary bindings; only T018 carries the AC-12 cite. That makes the coverage mapping implausible for the derive/check portions of AC-12's transition path.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-coverage.json",
-              "line": 64,
-              "category": "task-coverage gap"
-            },
-            {
-              "message": "T004 restates upstream behavior in prose: `load-time totality verification and per-axis vocabulary parsing` plus the named fail cases duplicate AC-02/CN-05 details. Per `knowledge/conventions/no-upstream-restatement.md`, this should be target + operation + anchor cite only.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
-              "line": 24,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T010's test text restates the upstream identity/drift contract: `preserves TestObligationId identity when only declaration hash changes`. The impl-plan should cite IN-05/AC-03/CN-01 rather than restating that behavior.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
-              "line": 60,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T013 restates scanner/source-editing behavior in prose: locating tests by `(layer, module_path, test_name)`, extracting body spans, computing `TestBodySpanHash` without editing source, and whitespace stability. Those are upstream contract details covered by the cited anchors and should not be repeated here.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
-              "line": 78,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T023 restates AC-07's provider resolution behavior by spelling out `provider/model`, `fast_provider/fast_model`, and `RoundType::Fast` / `RoundType::Final` expectations. This violates the no-upstream-restatement convention for impl-plan task text.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
-              "line": 138,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:31ea1e8d9b3e7fd5fc802271dfdf3296e83a907b71d649f3fb7920e984e5448c",
-          "at": "2026-07-07T12:27:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T018 cites AC-07 and AC-08 and requires unit tests for those anchors, but task-coverage.json assigns AC-07 only to T023 and AC-08 only to T014. Those ACs cover capability registration / resolve_execution and fulfillment-verifier prompt calibration, while T018 targets the usecase evaluate interactor, so the plan gives T018 obligations that are not represented in coverage and are not executable at that target. Remove those citations from T018 or add explicit executable work plus matching coverage if the interactor must own them.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
-              "line": 108,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:14dead1d234cc012bc9ae67d118111b71d1e73b90a7972c65ab7cf9f5b7d228f",
-          "at": "2026-07-07T12:32:54Z"
+          "hash": "rvw1:sha256:be3e439abe8fd795cb47dbf70e6943672a1c6d4db54f1ac8a5171f96fde985d9",
+          "at": "2026-07-08T01:59:47Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:22a3221ea6d08654ff95bbd28617c74c36fcc7e5f81e70a7f3cad0decc5faa79",
-          "at": "2026-07-07T12:37:43Z"
-        },
+          "hash": "rvw1:sha256:be3e439abe8fd795cb47dbf70e6943672a1c6d4db54f1ac8a5171f96fde985d9",
+          "at": "2026-07-08T02:03:52Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d63f47dcf5cbd3264aa21f3b989688cd080945ff0c3c746bec11de9287648d41",
-          "at": "2026-07-07T18:01:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d63f47dcf5cbd3264aa21f3b989688cd080945ff0c3c746bec11de9287648d41",
-          "at": "2026-07-07T18:06:18Z"
+          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
+          "at": "2026-07-07T08:38:10Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "T001 is attributed to the usecase catalogue entry `SemanticEscalationFuture`, but the T001 plan text only instructs the executor to add `SemanticEscalationDriverPort`, `SemanticEscalationVerdictBridge`, and `SemanticCalibrationProbeConfig` plus tests. Under the impl-plan policy, task-contract entries must match entries the task actually describes touching; either add `SemanticEscalationFuture` to T001's executable description or remove this attribution.",
+              "message": "D9 makes `anchor id` part of the obligation id, but D2 explicitly says obligations are derived per entry and are not multiplied by cite count. Downstream derivation cannot know whether to emit one obligation per declaration item, reusing its test group across all cited anchors, or one obligation per `(entry, anchor, kind, item)`. That changes obligation counts, binding shape, and totality semantics, so the ADR needs one consistent identity model before spec/types can translate it.",
               "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
-              "line": 9,
-              "category": "task-contract attribution mismatch"
+              "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+              "line": 224,
+              "category": "inconsistent_decisions"
             }
           ],
-          "hash": "rvw1:sha256:8e97dc24f97466c25a6cca1fbd48df914bcca3dadf87aa4fe6b849c6e433bda4",
-          "at": "2026-07-07T20:49:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T003's task-contract attribution list includes the new ValidationError bookkeeping entry but omits DomainError, even though the review briefing says both ValidationError and DomainError were added to T003 as required pre-review coverage-gate attribution. Leaving DomainError out keeps the task-contract SSoT incomplete for the Batch A attribution update.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
-              "line": 24,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:9658f8e6953382428d969f0649ff96073e148f296077b98ca446d50882027fd9",
-          "at": "2026-07-07T20:52:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T003 now attributes `ValidationError` in `task-contract.json`, but the T003 executable task text in `impl-plan.json`/`plan.md` still only names `TestObligationRulesLoadError` and `TestObligationRulesLoaderPort` for the errors/ports work. Because the plan never tells the executor to add or modify `ValidationError`, this attribution is not backed by the task description and can leave the catalogue entry unimplemented or implemented by guesswork.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
-              "line": 24,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:9658f8e6953382428d969f0649ff96073e148f296077b98ca446d50882027fd9",
-          "at": "2026-07-07T20:56:31Z"
+          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
+          "at": "2026-07-07T08:41:44Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:913242546aef791c7ff6d7de15532340adee77f4ea9f5bba188778cc0b16d354",
-          "at": "2026-07-07T21:01:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fcddc6f0fbd933f223d45c24782b84c1da1370291fa2b2f6f038810bf78639f9",
-          "at": "2026-07-07T21:38:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fcddc6f0fbd933f223d45c24782b84c1da1370291fa2b2f6f038810bf78639f9",
-          "at": "2026-07-07T21:41:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T007 now attributes the domain catalogue entry `NonEmptyTestLocations` in `task-contract.json`, but the T007 task text in `impl-plan.json`/`plan.md` only adds `TestObligation`, `ObligationsDocument`, `TestLocation`, `TestBindingRecord`, `TestBindingsDocument`, `TestObligationScopePresence`, and `UncitedSpecElementFinding`. That makes the task-contract claim work that the executable task description does not touch, so the implementer has no plan instruction to add or verify `NonEmptyTestLocations`. Remove this attribution or add the entry explicitly to T007's task description and rendered plan.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
-              "line": 63,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:b583d7be9902e13507e8a7b8d679b2ae2e4b46c15af3d14fab6dc94ec1496c47",
-          "at": "2026-07-07T22:38:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b155724b5129f172884443ecfdc6f7e89fe7182d5d297f79eff21106e71522b7",
-          "at": "2026-07-07T22:41:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The batch update in this round is on the wrong task set: the briefing says T010/T011/T012 should move to `in_progress`, but this plan marks T006/T007/T008/T009 as `done` and leaves T010-T012 untouched. That means the requested state transition is not reflected in the impl-plan, so the render in `plan.md` tracks the wrong batch.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
-              "line": 30,
-              "category": "dependency cycle or wrong ordering"
-            }
-          ],
-          "hash": "rvw1:sha256:59ccfc46d22c44998e881915c849861e277718dbe5f4a30d54a04f6425a0d759",
-          "at": "2026-07-07T23:59:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:59ccfc46d22c44998e881915c849861e277718dbe5f4a30d54a04f6425a0d759",
-          "at": "2026-07-08T00:04:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Batch C was supposed to move T010/T011/T012 from `todo` to `in_progress`, but the plan still leaves T010 as `todo` here, with T011/T012 also still `todo` on the following task entries. As rendered in plan.md, this keeps the intended Batch C implementation tasks inactive rather than starting the correct batch.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
-              "line": 56,
-              "category": "wrong task state transition"
-            }
-          ],
-          "hash": "rvw1:sha256:59ccfc46d22c44998e881915c849861e277718dbe5f4a30d54a04f6425a0d759",
-          "at": "2026-07-08T00:08:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:59ccfc46d22c44998e881915c849861e277718dbe5f4a30d54a04f6425a0d759",
-          "at": "2026-07-08T00:14:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:59ccfc46d22c44998e881915c849861e277718dbe5f4a30d54a04f6425a0d759",
-          "at": "2026-07-08T00:17:23Z"
+          "hash": "rvw1:sha256:c597270bfdf492126d9a4038ef233eb9ae3cba96657c8f231b9aeac5a6914bd0",
+          "at": "2026-07-07T08:52:17Z"
         }
       ]
     }

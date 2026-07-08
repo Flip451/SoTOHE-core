@@ -16,8 +16,9 @@ use std::str::FromStr;
 
 use domain::ContentHash;
 use domain::TrackId;
+use domain::ValidationError;
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
-use domain::tddd::semantic_verify::CatalogueEntryKey;
+use domain::tddd::semantic_verify::{CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey};
 use domain::tddd::test_obligation::errors::ArtifactCodecError;
 use domain::tddd::test_obligation::hashes::DeclarationHash;
 use domain::tddd::test_obligation::ids::{
@@ -37,13 +38,74 @@ use crate::track::symlink_guard::reject_symlinks_below;
 /// Artifact filename for the derived obligations document.
 const OBLIGATIONS_ARTIFACT: &str = "obligations.json";
 
-/// Infrastructure-local alias reusing the semantic-verify catalogue-entry DTO for
-/// the obligations codec (IN-05).
-pub type CatalogueEntryRefDto = crate::tddd::semantic_verify_codec::CatalogueEntryRefDto;
-
 /// Infrastructure-local alias for the artifact codec error surfaced by
 /// [`JsonObligationsCodec`] (IN-05).
 pub type ObligationsCodecError = ArtifactCodecError;
+
+/// Wire-format DTO for a catalogue-entry reference used by the obligations codec
+/// (IN-05).
+///
+/// Declared as an independent struct (rather than aliasing
+/// `semantic_verify_codec::CatalogueEntryRefDto`) so this track's public API
+/// surface is attributed to a genuine local type. The wire shape mirrors the
+/// semantic-verify DTO by contract, not by type reuse.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ObligationCatalogueEntryRefDto {
+    file_path: String,
+    section_key: ObligationCatalogueSectionKeyDto,
+    entry_key: String,
+}
+
+impl ObligationCatalogueEntryRefDto {
+    /// Projects a domain [`CatalogueEntryRef`] onto its wire DTO.
+    #[must_use]
+    pub fn from_domain(entry: &CatalogueEntryRef) -> Self {
+        Self {
+            file_path: entry.file_path.clone(),
+            section_key: ObligationCatalogueSectionKeyDto::from_domain(&entry.section_key),
+            entry_key: entry.entry_key.as_str().to_owned(),
+        }
+    }
+
+    /// Projects the wire DTO back onto a domain [`CatalogueEntryRef`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ValidationError`] when the `entry_key` is empty or
+    /// whitespace-only.
+    pub fn into_domain(self) -> Result<CatalogueEntryRef, ValidationError> {
+        let entry_key = CatalogueEntryKey::try_new(self.entry_key)?;
+        Ok(CatalogueEntryRef::new(self.file_path, self.section_key.into_domain(), entry_key))
+    }
+}
+
+/// Wire-format DTO for [`CatalogueSectionKey`], local to the obligations codec.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
+enum ObligationCatalogueSectionKeyDto {
+    Types,
+    Traits,
+    Functions,
+}
+
+impl ObligationCatalogueSectionKeyDto {
+    fn from_domain(key: &CatalogueSectionKey) -> Self {
+        match key {
+            CatalogueSectionKey::Types => Self::Types,
+            CatalogueSectionKey::Traits => Self::Traits,
+            CatalogueSectionKey::Functions => Self::Functions,
+        }
+    }
+
+    fn into_domain(self) -> CatalogueSectionKey {
+        match self {
+            Self::Types => CatalogueSectionKey::Types,
+            Self::Traits => CatalogueSectionKey::Traits,
+            Self::Functions => CatalogueSectionKey::Functions,
+        }
+    }
+}
 
 // ---------------------------------------------------------------------------
 // DTOs
@@ -116,7 +178,7 @@ enum TargetEntryRoleWire {
 #[serde(deny_unknown_fields)]
 pub struct TestObligationDto {
     id: TestObligationIdDto,
-    target_entry: CatalogueEntryRefDto,
+    target_entry: ObligationCatalogueEntryRefDto,
     target_role: TargetEntryRoleWire,
     brief: String,
     declaration_hash: String,
@@ -260,7 +322,7 @@ impl ObligationsArtifactPort for JsonObligationsCodec {
 fn obligation_to_dto(obligation: &TestObligation) -> TestObligationDto {
     TestObligationDto {
         id: obligation_id_to_dto(obligation.id()),
-        target_entry: CatalogueEntryRefDto::from_domain(obligation.target_entry()),
+        target_entry: ObligationCatalogueEntryRefDto::from_domain(obligation.target_entry()),
         target_role: target_role_to_wire(obligation.target_role()),
         brief: obligation.brief().as_str().to_owned(),
         declaration_hash: obligation.declaration_hash().as_hash().to_hex(),

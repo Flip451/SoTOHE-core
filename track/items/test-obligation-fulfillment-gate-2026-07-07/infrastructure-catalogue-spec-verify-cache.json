@@ -3,11 +3,11 @@
   "layer": "infrastructure",
   "entries": [
     {
-      "claim_hash": "61203f1b0c5773fbaef8d3f08d0877bd32a2f95ccef62caad94a8fbdadaa453d",
+      "claim_hash": "0b986e491c82bab5ffaebe3a182ff99feeec0b83896deba5d836ef115a13513c",
       "evidence_hash": "7516033ef86a92980d248ae7b0fca34f257a3c13e0014e4ecf6d18e1b643090a",
       "verdict": {
         "kind": "pass",
-        "citation": "obligations artifact（導出物・ツール書き）のスキーマ定義と codec 実装。artifact は義務一覧を含み、各義務は (義務 id, 対象 entry, 義務種別, 宣言内項目識別子, brief, entry宣言 hash) を持つ。"
+        "citation": "obligations artifact（導出物・ツール書き）のスキーマ定義と codec 実装。artifact は義務一覧を含み"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -551,6 +551,30 @@
           "section": "constraint",
           "element_id": "CN-04",
           "text_label": "鮮度と verdict の結合は fail-closed。verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点で既存 verdict は無効となり「存在しない」ものとして扱う。hash 再計算だけで鮮度を回復する経路は存在せず、回復は再評価（`evaluate`）の pass のみで達成される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2f3625eb2fdf24d37eb731a7d191f12ab64db496d51f56fe5603b53974c126be",
+      "evidence_hash": "7516033ef86a92980d248ae7b0fca34f257a3c13e0014e4ecf6d18e1b643090a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "obligations artifact（導出物・ツール書き）のスキーマ定義と codec 実装。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationCatalogueEntryRefDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "obligations artifact（導出物・ツール書き）のスキーマ定義と codec 実装。artifact は義務一覧を含み、各義務は (義務 id, 対象 entry, 義務種別, 宣言内項目識別子, brief, entry宣言 hash) を持つ。義務 id は (entry 識別子, 義務種別, 宣言内項目の識別子〔invariant 名・メソッド名・handles の型名等〕) のみから決定論的に構成し、内容 hash・位置 index を含めない（上流の内容変更は id を変えず、鮮度失効として再検証だけを引き起こす）。anchor / anchor hash は義務 id や義務一覧の同一性には含めず、現行 `spec_refs` から edge 会計側で解決する。"
         }
       }
     },

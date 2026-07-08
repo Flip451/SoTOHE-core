@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-08T00:19:08Z",
-  "declaration_hash": "74b51cb4e441d891e6e4eccc6136fd8c7fa0e68960b910dee9c5c60a1faddab7",
+  "generated_at": "2026-07-08T04:40:16Z",
+  "declaration_hash": "07e40686fad06bb4c90cb1ee1da105a31533b4725a4d27e77df773d7ecaf445a",
   "signals": [
     {
       "type_name": "AnchorTextHash",
@@ -264,7 +264,7 @@
     {
       "type_name": "TargetEntryRoleKind",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -590,7 +590,7 @@
     {
       "type_name": "ValidationError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",

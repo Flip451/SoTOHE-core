@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cea8aebd97fb0601a5f04756547528a4d2a0ca7625a1d1d365cb99779b311a0c",
+  "catalogue_declaration_hash": "294dadf38c30efc185f5b5b40b814ac54a073cbd9cd7d920e920ea2d4a9c0142",
   "signals": [
     {
       "type_name": "CatalogueEntryRefDto",
       "signal": "blue",
-      "entry_hash": "61203f1b0c5773fbaef8d3f08d0877bd32a2f95ccef62caad94a8fbdadaa453d"
+      "entry_hash": "0b986e491c82bab5ffaebe3a182ff99feeec0b83896deba5d836ef115a13513c"
     },
     {
       "type_name": "ContractRoleKey",
@@ -51,6 +51,11 @@
       "type_name": "JsonWaiverCacheCodec",
       "signal": "blue",
       "entry_hash": "341b7c4c1f02f2a95ada747bb6e475572ab556559d36d00d1732094ffc6e79c6"
+    },
+    {
+      "type_name": "ObligationCatalogueEntryRefDto",
+      "signal": "blue",
+      "entry_hash": "2f3625eb2fdf24d37eb731a7d191f12ab64db496d51f56fe5603b53974c126be"
     },
     {
       "type_name": "ObligationFulfillmentCacheDocumentDto",

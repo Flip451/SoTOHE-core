@@ -1275,11 +1275,11 @@
       }
     },
     {
-      "claim_hash": "8aae003eb954e8fa0c745976abc3257a4b65a252f9ed4846f7ec7042b8c79b1b",
+      "claim_hash": "661e1e3cce1f0b09f61a8b737281b032104a5a478fd22e1d3478e67ec9f2840c",
       "evidence_hash": "a2ff16310f5a09e7ad71e5f6cd3792b8ff9ac3604f959f5dbb64ecab338904bf",
       "verdict": {
         "kind": "pass",
-        "citation": "catalogue + spec + 決定表 config から obligations artifact を決定論的に導出して書き出す。"
+        "citation": "`bin/sotp test-obligation derive` の実装。catalogue + spec + 決定表 config から obligations artifact を決定論的に導出して書き出す。義務生成は entry 単位（宣言 → 義務一覧）で、件数は宣言のみの関数（anchor に乗算しない）。... trait_impls セクションの適用は `trait_ref` を track の層別カタログ中の TraitEntry に解決し、その ContractRole をキーとする"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1299,11 +1299,11 @@
       }
     },
     {
-      "claim_hash": "8aae003eb954e8fa0c745976abc3257a4b65a252f9ed4846f7ec7042b8c79b1b",
+      "claim_hash": "661e1e3cce1f0b09f61a8b737281b032104a5a478fd22e1d3478e67ec9f2840c",
       "evidence_hash": "c69bbbadc40cde7b502d17b6951b43eecf3ea508f28f15b4d77bc90a37c857a7",
       "verdict": {
         "kind": "pass",
-        "citation": "trait_impls セクションの導出エンジン側規則の実装。trait_impl entry は identity-only（role を持たない）ため、`trait_ref` を track の層別カタログ中の TraitEntry に解決し、その ContractRole をキーとして `trait_impls` セクションのルールを適用する"
+        "citation": "trait_impl entry は identity-only（role を持たない）ため、`trait_ref` を track の層別カタログ中の TraitEntry に解決し、その ContractRole をキーとして `trait_impls` セクションのルールを適用する"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2691,7 +2691,7 @@
       }
     },
     {
-      "claim_hash": "1c4c6593031b2bf7fe9e4dce228667928403a1efb3a00b6cdce1cd76dcbcf371",
+      "claim_hash": "194cf08d7a5ae378498fc03a94993ffdd2be80a9280e598d0768386a51bc0155",
       "evidence_hash": "35fb29717e9ffa94f0bfd806ced282d59085c048292878dd57e3faa4bfaa57f9",
       "verdict": {
         "kind": "pass",

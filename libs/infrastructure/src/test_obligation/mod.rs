@@ -9,12 +9,23 @@
 //!   AC-04).
 //! * [`fulfillment_cache_codec`] / [`waiver_cache_codec`] — hash-frozen verdict
 //!   caches (IN-09 / CN-04 / AC-06).
+//!
+//! It also holds the worktree / LLM secondary adapters the gate drives:
+//!
+//! * [`source_scanner`] — `syn`-based bound-test body scanner (IN-06 / IN-09).
+//! * [`fulfillment_verifier`] / [`waiver_verifier`] — capability adapters that
+//!   delegate the semantic judgement to the configured provider (IN-09 / IN-11 /
+//!   IN-12 / IN-15 / CN-08). Their shared runtime lives in `semantic_verifier`.
 
 pub mod bindings_codec;
 pub mod fulfillment_cache_codec;
+pub mod fulfillment_verifier;
 pub mod obligations_codec;
 pub mod rules_codec;
+mod semantic_verifier;
+pub mod source_scanner;
 pub mod waiver_cache_codec;
+pub mod waiver_verifier;
 
 use std::path::Path;
 

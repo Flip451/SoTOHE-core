@@ -95,6 +95,7 @@
       { "layer": "domain", "entry_key": "TestSourceScannerPort" }
     ],
     "T010": [
+      { "layer": "infrastructure", "entry_key": "ObligationCatalogueEntryRefDto" },
       { "layer": "infrastructure", "entry_key": "CatalogueEntryRefDto" },
       { "layer": "infrastructure", "entry_key": "ObligationsDocumentDto" },
       { "layer": "infrastructure", "entry_key": "TestObligationDto" },

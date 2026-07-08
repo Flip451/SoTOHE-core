@@ -550,16 +550,6 @@
     {
       "action": "add",
       "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "CatalogueEntryRefDto"
-    },
-    {
-      "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "CatalogueEntryRefDto"
-    },
-    {
-      "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
       "for_type": "ObligationsDocumentDto"
     },
     {
@@ -739,6 +729,16 @@
     },
     {
       "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "CatalogueEntryRefDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "CatalogueEntryRefDto"
+    },
+    {
+      "action": "add",
       "trait_ref": "core::fmt::Debug",
       "for_type": "JsonObligationsCodec"
     },
@@ -776,30 +776,40 @@
       "action": "add",
       "trait_ref": "core::clone::Clone",
       "for_type": "JsonWaiverCacheCodec"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "ObligationCatalogueEntryRefDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "ObligationCatalogueEntryRefDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "ObligationCatalogueEntryRefDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "ObligationCatalogueEntryRefDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::ser::Serialize",
+      "for_type": "ObligationCatalogueEntryRefDto"
+    },
+    {
+      "action": "add",
+      "trait_ref": "serde_core::de::Deserialize<'de>",
+      "for_type": "ObligationCatalogueEntryRefDto"
     }
   ],
   "traits": {},
   "types": {
-    "CatalogueEntryRefDto": {
-      "action": "add",
-      "docs": "Infrastructure-local alias reusing the existing semantic-verify CatalogueEntryRef DTO for obligations codec; see IN-05.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "type_alias",
-        "target": "infrastructure::tddd::semantic_verify_codec::CatalogueEntryRefDto"
-      },
-      "methods": [],
-      "module_path": "test_obligation::obligations_codec",
-      "role": {
-        "Dto": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-05",
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
-        }
-      ]
-    },
     "ContractRoleKey": {
       "action": "add",
       "docs": "Serde-map key DTO for domain ContractRole; see IN-03 / CN-05.",
@@ -2260,6 +2270,110 @@
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
+    },
+    "ObligationCatalogueEntryRefDto": {
+      "action": "add",
+      "docs": "Obligations codec catalogue-entry DTO with its local section-key wire vocabulary; see IN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "from_domain",
+          "receiver": null,
+          "params": [
+            {
+              "name": "entry",
+              "ty": "&domain::tddd::semantic_verify::CatalogueEntryRef"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Projects CatalogueEntryRef through the obligations-codec section-key wire vocabulary; see IN-05."
+        },
+        {
+          "name": "into_domain",
+          "receiver": "self",
+          "params": [],
+          "returns": "Result<domain::tddd::semantic_verify::CatalogueEntryRef, domain::ValidationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Reconstructs through the obligations-codec section-key wire vocabulary. Only ValidationError::EmptyString is reachable from CatalogueEntryKey::try_new; the shared ValidationError return type matches the domain constructor boundary."
+        }
+      ],
+      "module_path": "test_obligation::obligations_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "CatalogueEntryRefDto": {
+      "action": "add",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "from_domain",
+          "receiver": null,
+          "params": [
+            {
+              "name": "entry",
+              "ty": "&domain::tddd::semantic_verify::CatalogueEntryRef"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Projects CatalogueEntryRef through the semantic-verify section-key wire vocabulary; see IN-05."
+        },
+        {
+          "name": "into_domain",
+          "receiver": "self",
+          "params": [],
+          "returns": "Result<domain::tddd::semantic_verify::CatalogueEntryRef, domain::ValidationError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Reconstructs through the semantic-verify section-key wire vocabulary. Only ValidationError::EmptyString is reachable from CatalogueEntryKey::try_new; the shared ValidationError return type matches the domain constructor boundary."
+        }
+      ],
+      "module_path": "tddd::semantic_verify_codec",
+      "docs": "Semantic-verify catalogue-entry DTO publicized for its cache codec; see IN-05.",
+      "spec_refs": [
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "IN-05"
+        }
+      ],
+      "informal_grounds": []
     }
   }
 }

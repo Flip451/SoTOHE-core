@@ -142,7 +142,7 @@ mod tests {
 
         assert!(matches!(
             result,
-            Err(ValidationError::InvalidTrackId(value)) if value == "Not A Slug"
+            Err(ValidationError::InvalidTrackId(value)) if value.as_str() == "Not A Slug"
         ));
     }
 
@@ -152,7 +152,7 @@ mod tests {
 
         assert!(matches!(
             result,
-            Err(ValidationError::InvalidCommitHash(value)) if value == "abc123"
+            Err(ValidationError::InvalidCommitHash(value)) if value.as_str() == "abc123"
         ));
     }
 
