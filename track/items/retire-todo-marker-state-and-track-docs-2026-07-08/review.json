@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cdcfdd49dae808abd4de5ebb6dfc3b56707c47a6a5f0dca02c3539619e3dfb81",
+          "at": "2026-07-08T10:47:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cdcfdd49dae808abd4de5ebb6dfc3b56707c47a6a5f0dca02c3539619e3dfb81",
+          "at": "2026-07-08T10:51:23Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 reads like an implementation checklist rather than a decision record: it names specific follow-up files (`CLAUDE.md`, `.claude/rules/08/09/10`, `Makefile`, `README`, boundary manifest/overlay) and says they must be updated in lockstep. That constrains downstream implementation work that should be captured in spec/impl-plan, not in the ADR body.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+              "line": 48,
+              "category": "scope leakage into ADR body"
+            }
+          ],
+          "hash": "rvw1:sha256:407f22d530c0b7e0f5bcab2488712751ce65c060abb0fdecda2aabbe12364839",
+          "at": "2026-07-08T10:47:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a0eb8707d7603bcebbb60527c34260cdcca8fdfa0e234ddc925fa108e417fab",
+          "at": "2026-07-08T10:51:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a0eb8707d7603bcebbb60527c34260cdcca8fdfa0e234ddc925fa108e417fab",
+          "at": "2026-07-08T10:53:11Z"
+        }
+      ]
+    }
+  }
+}

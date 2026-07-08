@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "retire-todo-marker-state-and-track-docs-2026-07-08",
+  "title": "TODO マーカー状態管理の廃止 — verify tech-stack ゲート撤去と track 直下文書群の ADR 統合 / 参照元同時更新",
+  "branch": "track/retire-todo-marker-state-and-track-docs-2026-07-08",
+  "created_at": "2026-07-08T10:43:08Z",
+  "updated_at": "2026-07-08T10:43:08Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}
