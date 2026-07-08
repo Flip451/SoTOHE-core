@@ -4,44 +4,37 @@
     {
       "id": "T001",
       "description": "libs/usecase/src/template_export/mod.rs — add SelfBinaryTransplantError enum (per usecase-types.json:types.SelfBinaryTransplantError) with the Debug/Display/Error trait_impls, and add the SelfBinaryTransplantPort trait (per usecase-types.json:traits.SelfBinaryTransplantPort) with the transplant method signature (IN-01, IN-02, CN-01, CN-02, CN-06, AC-01, AC-03).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T002",
       "description": "libs/usecase/src/template_export/mod.rs — modify TemplateExportError to add the BinaryTransplant variant and the From<SelfBinaryTransplantError> trait_impl (per usecase-types.json:types.TemplateExportError + trait_impls); modify TemplateExportInteractor to add the transplant_port field, update the new constructor to the 3-port signature (per usecase-types.json:inherent_impls.TemplateExportInteractor.methods.new), and extend TemplateExportService::export body to invoke the transplant step after export_port.export succeeds; extend interactor mock-port unit tests to cover the successful 3-port path plus the three fail-closed variants of SelfBinaryTransplantError → TemplateExportError::BinaryTransplant (IN-01, IN-02, CN-01, CN-02, CN-06, CN-09, AC-01, AC-03, AC-10).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T003",
       "description": "libs/infrastructure/src/template_export/mod.rs and libs/infrastructure/src/lib.rs — add FsSelfBinaryTransplantAdapter (per infrastructure-types.json:types.FsSelfBinaryTransplantAdapter) with its Default + Debug + SelfBinaryTransplantPort trait_impls and an inherent new constructor, and add tempdir integration tests for the adapter (IN-01, IN-02, IN-07, CN-01, CN-02, CN-06, CN-09, AC-01, AC-03, AC-10, OS-07).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T004",
       "description": "apps/cli-composition/src/template_export/mod.rs — update TemplateCompositionRoot::template_driver internal wiring to instantiate FsSelfBinaryTransplantAdapter and pass it as the third argument to the modified TemplateExportInteractor::new (public composition-root surface unchanged); extend the composition-root smoke test with a tempdir-backed end-to-end assertion for bin/sotp (IN-01, IN-07, CN-01, CN-02, OS-09, AC-01, AC-02, AC-09, AC-10).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T005",
       "description": "overlay/Makefile.toml — modify [tasks.bootstrap] step 3 to add the IN-03 / AC-04 bootstrap branch, and keep [tasks.install-sotp] plus .harness/config/sotp-version.json schema / keys / semantics untouched (IN-03, IN-04, CN-03, CN-04, CN-05, CN-07, AC-04, AC-05, AC-06, AC-09, AC-10, OS-01, OS-03, OS-04, OS-05, OS-06).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T006",
       "description": "Makefile.toml — modify [tasks.template-export-smoke-local] to remove the source-binary lend-and-copy step (mkdir bin + cp $SOTP_SRC_BIN), add the three post-export checks against bin/sotp, and keep the verify chain, cargo-deny step, and ci-container / ci-local registration intact (IN-05, CN-08, CN-09, AC-02, AC-07, AC-09, AC-10).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T007",
       "description": "README.md — extend 前提条件 / はじめ方 sections with the two bootstrap paths, the automatic default branch condition, and OS-02 / OS-08 notes (IN-06, AC-08, AC-09, OS-02, OS-08).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     }
   ],
   "plan": {

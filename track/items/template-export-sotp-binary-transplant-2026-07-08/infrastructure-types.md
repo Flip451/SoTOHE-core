@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| FsSelfBinaryTransplantAdapter | secondary_adapter | add | impl Debug, impl Default, impl SelfBinaryTransplantPort | 🟡 | 🔵 |
+| FsSelfBinaryTransplantAdapter | secondary_adapter | add | impl Debug, impl Default, impl SelfBinaryTransplantPort | 🔵 | 🔵 |
 
