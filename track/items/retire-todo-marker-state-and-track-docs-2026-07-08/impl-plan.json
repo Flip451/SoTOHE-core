@@ -4,68 +4,57 @@
     {
       "id": "T001",
       "description": "Makefile.toml — remove `[tasks.verify-tech-stack]` and `[tasks.verify-tech-stack-local]` blocks and drop `verify-tech-stack-local` from the `dependencies` arrays of `[tasks.ci-local]` and `[tasks.ci-container]` (IN-01, AC-01).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T002",
       "description": "apps/cli/src/main.rs, apps/cli/src/commands/verify.rs, apps/cli/src/commands/verify_tests.rs, apps/cli-driver/src/verify.rs — remove `VerifyCommand::TechStack` (variant + `items_dir` arm + `execute` arm + `verify_command_gate_name` telemetry arm), `VerifyInput::TechStack` (variant + `VerifyDriver::handle` arm), and all TechStack-referencing tests (`test_verify_tech_stack_dispatch_via_run_cli_does_not_panic` in cli/main.rs; `setup_minimal_tech_stack`, `test_tech_stack_subcommand_returns_success_for_clean_project`, `test_tech_stack_subcommand_returns_failure_for_missing_file`, and `test_project_root_flag_is_respected` in cli/commands/verify_tests.rs — rebase the flag test onto a surviving variant such as `ArchDocs` to preserve `--project-root` coverage); keep `VerifyArgs` and `SpecVerifyArgs` as reference-only carrier entries for the surviving verify variants (IN-01, AC-02, AC-03).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T003",
       "description": "libs/usecase/src/verify.rs, libs/infrastructure/src/verify_adapter.rs, libs/infrastructure/src/verify/mod.rs, libs/infrastructure/src/verify/architecture_rules.rs, libs/domain/src/signal.rs — remove `verify_tech_stack` method from both `VerifyPort` and `VerifyService` traits and drop the `VerifyInteractor` impl body for it; remove the `FsVerifyAdapter::verify_tech_stack` impl body and the `test_verify_tech_stack_rejects_symlinked_project_root` inline test; remove `pub mod tech_stack;` from `libs/infrastructure/src/verify/mod.rs`; delete `libs/infrastructure/src/verify/tech_stack.rs` in its entirety (module body + tests); inside `libs/infrastructure/src/verify/architecture_rules.rs::verify_member_references`, drop the `track/tech-stack.md` cross-reference check (remove `tech_stack_content` loading, the per-member `tech_stack_content.contains(...)` assertion, and the `setup_tech_stack` test helper plus its call sites in the local `#[cfg(test)]` block, and adjust `test_missing_tech_stack_reference_fails` accordingly); replace the `#[case::document_plain(\"track/tech-stack.md\", Some(SignalBasis::Document))]` literal in `libs/domain/src/signal.rs::test_classify_source_tag` with a non-retired Document example; keep `VerifyOutcome` and `VerifyPortError` as reference-only return/error carrier entries for the surviving verify methods (IN-01, AC-03).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T004",
       "description": "knowledge/adr/ — author a new aggregate ADR at `knowledge/adr/YYYY-MM-DD-HHMM-<slug>.md` (path (b), `grandfathered: true`) from `track/tech-stack.md` and `track/product-guidelines.md`; use the `adr.md` schema and confirm `bin/sotp signal check-adr-user` reports zero red signals for the new ADR (IN-03, CN-03, AC-05).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T005",
       "description": "README.md — integrate reader-facing content from `track/product.md` into the existing README intro / value / prerequisites / getting-started structure while preserving the `/adr:add <slug>` → `/track:adr2pr` flow (IN-04, CN-06, AC-14).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T006",
       "description": "Delete `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md` from the tracked file set; update `.harness/config/template-boundary.json` `entries` array to drop the three overlay entries whose `pattern` equals those paths, leaving all other entries, ordering, and `schema_version` intact (IN-02, IN-08, AC-04, AC-09). Runs after T004 (aggregate ADR) and T005 (README absorption) so the upstream content is still readable during promotion.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T007",
       "description": "CLAUDE.md — remove the `Tech stack decisions | track/tech-stack.md` row from the `## Source of Truth map` table and remove the `## Hard invariants` bullet stating that implementation is blocked while `track/tech-stack.md` still has unresolved TODO-marker entries; confirm the file no longer contains any of the retirement tokens (`track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md`, `verify tech-stack`, `verify-tech-stack`) (IN-05, AC-06).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T008",
       "description": "`.claude/rules/01-language.md` (Documentation node target list), `.claude/rules/07-dev-environment.md` (Project Bootstrap section reflection instruction), `.claude/rules/08-orchestration.md` (Source Of Truth read-order list), `.claude/rules/09-maintainer-checklist.md` (co-update matrix track-docs bullet), `.claude/rules/10-guardrails.md` (the Core-guardrails bullet requiring `track/tech-stack.md` to remain free of blocking TODO-marker entries) — remove references to `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md`, `track/product*.md`, `verify tech-stack`, `verify-tech-stack` from each; confirm each file no longer contains any retirement token (IN-06, AC-07).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T009",
       "description": "`.harness/workflows/track/init.md` and `.harness/workflows/track/plan.md` Inputs sections, `.claude/commands/track/catchup.md` step 4 (the instruction that reads `track/tech-stack.md` and highlights unresolved TODO-marker items), `.claude/commands/track/setup.md` step 1 read list and step 4 next-action guidance (including any `Strict tech-stack guardrails` phrasing), `.claude/commands/architecture-customizer.md` step 2 read list, `.claude/skills/architecture-customizer/SKILL.md` Step 4 — remove references to `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md`, `verify tech-stack`, `verify-tech-stack`, and the TODO-marker verification procedure (IN-07, CN-01, AC-08).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T010",
       "description": "`knowledge/conventions/README.md` (Read Order + Maintenance Rules), `knowledge/conventions/hexagonal-architecture.md` (Note + Related Documents), `knowledge/conventions/testing.md` (2 async-runtime Notes), `knowledge/conventions/nightly-dev-tool.md` (Exceptions + Related Documents), `knowledge/conventions/source-attribution.md` (Blue source table row example + Placement inline example) — remove references to `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md`; replace the `[source: track/tech-stack.md]` and `[source: track/tech-stack.md §Architecture]` examples in `source-attribution.md` with alternative Blue source examples so the convention retains its illustrative role without pointing at a retired document; re-grep `knowledge/conventions/**` to catch any additional hits (IN-10, AC-10).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T011",
       "description": "apps/cli/tests/retention_gate.rs (or a workspace-picked-up equivalent) — add the IN-09 retention integration test, then run `bin/sotp track views sync` and `cargo make ci` as terminal validation (IN-09, CN-04, CN-05, CN-07, AC-11, AC-12, AC-13, OS-01, OS-06).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     }
   ],
   "plan": {

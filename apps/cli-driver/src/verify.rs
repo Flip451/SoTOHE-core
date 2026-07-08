@@ -16,11 +16,6 @@ use crate::render::CommandOutcome;
 
 /// Typed input for the `verify` command family.
 pub enum VerifyInput {
-    /// Check tech-stack.md for unresolved TODO markers.
-    TechStack {
-        /// Project root directory.
-        project_root: PathBuf,
-    },
     /// Check latest track artifacts for completeness.
     LatestTrack {
         /// Project root directory.
@@ -129,9 +124,6 @@ impl VerifyDriver {
     /// Handle a verify command.
     pub fn handle(&self, input: VerifyInput) -> CommandOutcome {
         match input {
-            VerifyInput::TechStack { project_root } => {
-                map_result(self.service.verify_tech_stack(project_root))
-            }
             VerifyInput::LatestTrack { project_root } => {
                 map_result(self.service.verify_latest_track(project_root))
             }

@@ -169,7 +169,8 @@ Include source links." 2>/dev/null
 ```
 
 調査結果を `knowledge/research/version-baseline-YYYY-MM-DD.md` に保存し、
-`Cargo.toml` / `Dockerfile` / `track/tech-stack.md` に反映してから実装を開始する。
+`Cargo.toml` / `Dockerfile` に反映してから実装を開始する。バージョン選定を
+決定として残す場合は pre-track ADR (`knowledge/adr/`) に記録する。
 
 ## Lint & Format
 

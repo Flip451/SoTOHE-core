@@ -72,6 +72,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [sotp 開発領域と汎用テンプレートの分離境界・切り出し方式](2026-07-06-1717-template-extraction-boundary.md) | Proposed | 2026-07-06 |
 | [export は自バイナリを移植する](2026-07-08-0541-template-export-sotp-binary-transplant.md) | Proposed | 2026-07-08 |
 | [TODO マーカー状態管理の廃止](2026-07-08-1020-retire-todo-marker-state-and-track-docs.md) | Proposed | 2026-07-08 |
+| [技術スタック・製品ガイドラインの grandfathered baseline](2026-07-08-1405-grandfathered-tech-and-product-baseline.md) | Proposed | 2026-07-08 |
 | [scripts/ Python ヘルパーの段階的 Rust 移行ロードマップ](2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md) | Proposed | 2026-04-13 |
 | [external_guides 撤去 — Python migration roadmap Phase 3 supersede](2026-04-28-1258-remove-external-guides.md) | — | 2026-04-28 |
 | [Python 固有ロジックの Rust 完全移行と Python ランタイム依存の撤去](2026-06-03-1327-python-runtime-full-removal.md) | Proposed | 2026-06-03 |

@@ -15,7 +15,7 @@ Read these first:
 - `knowledge/conventions/branch-strategy.md`
 - `knowledge/conventions/track-lifecycle.md`
 - `knowledge/conventions/git-notes.md`
-- `track/tech-stack.md`
+- `knowledge/adr/README.md` (pre-track ADR index — tech stack / product-policy decisions)
 - `track/registry.md`
 - `knowledge/conventions/README.md`
 - current `track/items/<id>/metadata.json`

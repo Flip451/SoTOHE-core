@@ -31,25 +31,6 @@ fn write_file(root: &std::path::Path, rel: &str, content: &str) {
     std::fs::write(&path, content).unwrap();
 }
 
-fn setup_minimal_tech_stack(root: &std::path::Path) {
-    write_file(root, "track/tech-stack.md", "# Tech Stack\n- Resolved\n");
-}
-
-#[test]
-fn test_tech_stack_subcommand_returns_success_for_clean_project() {
-    let tmp = TempDir::new().unwrap();
-    setup_minimal_tech_stack(tmp.path());
-    let exit = execute(VerifyCommand::TechStack(make_args(tmp.path())));
-    assert_eq!(exit, ExitCode::SUCCESS);
-}
-
-#[test]
-fn test_tech_stack_subcommand_returns_failure_for_missing_file() {
-    let tmp = TempDir::new().unwrap();
-    let exit = execute(VerifyCommand::TechStack(make_args(tmp.path())));
-    assert_eq!(exit, ExitCode::FAILURE);
-}
-
 #[test]
 fn test_latest_track_subcommand_returns_success_with_no_tracks() {
     let tmp = TempDir::new().unwrap();
@@ -66,12 +47,19 @@ fn test_arch_docs_subcommand_returns_failure_for_missing_rules() {
 
 #[test]
 fn test_project_root_flag_is_respected() {
+    // ArchDocs scans the directory supplied via --project-root: an empty temp
+    // dir has no architecture-rules.json, so the command must fail even though
+    // the process CWD (the real workspace) would pass the same check.
     let tmp = TempDir::new().unwrap();
-    setup_minimal_tech_stack(tmp.path());
-    // Execute with explicit --project-root pointing to the temp dir.
-    let args = VerifyArgs { project_root: tmp.path().to_path_buf() };
-    let exit = execute(VerifyCommand::TechStack(args));
-    assert_eq!(exit, ExitCode::SUCCESS);
+    let cli = TestCli::try_parse_from([
+        "sotp",
+        "arch-docs",
+        "--project-root",
+        tmp.path().to_str().unwrap(),
+    ])
+    .unwrap();
+    let exit = execute(cli.cmd);
+    assert_eq!(exit, ExitCode::FAILURE);
 }
 
 #[test]

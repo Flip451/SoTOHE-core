@@ -29,7 +29,6 @@ Sub-workflows used:
   both.
 - **ADR existence** — at least one relevant ADR must exist under `knowledge/adr/`. If none
   exists, stop and ask the user to author one (the `adr:add` command provides this path).
-- **`track/tech-stack.md`** — must be free of blocking `TODO:` markers before implementation.
 - **Current branch** — must be compatible with the operation: the configured base branch
   (`.harness/config/branch-strategy.json#base_branch`) for a new track, `track/<id>` for a
   track already initialized.

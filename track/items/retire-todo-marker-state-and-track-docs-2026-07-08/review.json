@@ -1,6 +1,255 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/research/README.md:19` still tells bootstrap readers to update `track/tech-stack.md`, but that file is deleted in this PR. The overlay copy has already been migrated to ADR-based guidance, so the live repo docs are now inconsistent and this instruction points at a nonexistent file.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/knowledge/research/README.md",
+              "line": 19,
+              "category": "dead-reference"
+            },
+            {
+              "message": "`knowledge/research/version-baseline-template.md:40` still has the checklist item for updating `track/tech-stack.md`. Since that document is removed, the template now instructs users to modify a nonexistent file instead of recording the baseline decision in an ADR.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/knowledge/research/version-baseline-template.md",
+              "line": 40,
+              "category": "dead-reference"
+            }
+          ],
+          "hash": "rvw1:sha256:613cda934f92594eb1280a98a0283cb80fdcb3c17e116309418e970962618065",
+          "at": "2026-07-08T14:37:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:613cda934f92594eb1280a98a0283cb80fdcb3c17e116309418e970962618065",
+          "at": "2026-07-08T14:45:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:613cda934f92594eb1280a98a0283cb80fdcb3c17e116309418e970962618065",
+          "at": "2026-07-08T14:48:47Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c75d406919979db95f3bb9e62a76b80259ee889db69c5124132a56f494704a1f",
+          "at": "2026-07-08T12:24:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Entry `infrastructure::verify::tech_stack::verify` declares `AC-01` in `spec_refs`, but `AC-01` is only about `Makefile.toml` task/dependency removal and Makefile string searches. The infrastructure function deletion is covered by `IN-01` / `AC-03`; keeping this unrelated anchor weakens catalogue-to-spec trace integrity.",
+              "severity": "P1",
+              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/infrastructure-types.json",
+              "line": 12,
+              "category": "spec_refs off-topic"
+            },
+            {
+              "message": "`VerifyCommand.docs` restates the upstream behavior contract by saying that invoking `sotp verify tech-stack` returns an unknown-subcommand error. Per `knowledge/conventions/no-upstream-restatement.md`, catalogue docs should identify the changed type/operation and cite `AC-02`, not duplicate the acceptance behavior in prose.",
+              "severity": "P1",
+              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/cli-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:c75d406919979db95f3bb9e62a76b80259ee889db69c5124132a56f494704a1f",
+          "at": "2026-07-08T12:33:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a93379a4817cadddb8d6dfdc4c6b5910e1284baa6bd9145c13ed81096685e1e",
+          "at": "2026-07-08T12:39:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b409655bfe13f43058f1ce3ec378c8522d0cd61672dd6ecbc0f7d92f9eb166a5",
+          "at": "2026-07-08T13:50:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b409655bfe13f43058f1ce3ec378c8522d0cd61672dd6ecbc0f7d92f9eb166a5",
+          "at": "2026-07-08T13:56:57Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:067620a657ef711bf00ce3317ffe9ebc8f9d4d0dce367e25beaae2c720f5c499",
+          "at": "2026-07-08T14:35:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:067620a657ef711bf00ce3317ffe9ebc8f9d4d0dce367e25beaae2c720f5c499",
+          "at": "2026-07-08T14:41:16Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0db90b60e07802e2ce6cc41b639a3dfa8041ebe5016e9300ec53a2d3d7a1571",
+          "at": "2026-07-08T14:34:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0db90b60e07802e2ce6cc41b639a3dfa8041ebe5016e9300ec53a2d3d7a1571",
+          "at": "2026-07-08T14:39:25Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3007a31e787aac1b6c757909467580f29475905b49073bfa663bbda33d23256a",
+          "at": "2026-07-08T13:48:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The impl-plan severity prompt still says the impl-plan reviewer owns the rendered `plan.md`, but the scope config now removes `plan.md` from the impl-plan patterns and places it under `review_operational`. Since composed briefings use this prompt to define the review boundary, reviewers will be told to inspect an artifact that no longer participates in the impl-plan scope/hash, which contradicts the new review-scope wiring.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/impl-plan.md",
+              "line": 3,
+              "category": "review-scope or briefing wiring inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:3007a31e787aac1b6c757909467580f29475905b49073bfa663bbda33d23256a",
+          "at": "2026-07-08T13:52:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35ccb3ff3c8d718833c74addec8a72367c3e22b3b0223a018bc7826980465bee",
+          "at": "2026-07-08T13:56:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b12e6a9070da495280c72fa836a3940c51e72952f8b0b1fdbc8ee03ab989d6f5",
+          "at": "2026-07-08T14:38:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`knowledge/conventions/nightly-dev-tool.md` is part of the template distribution surface, but this related-doc link points at a concrete historical track artifact under `track/items/`. `track/items` is excluded from the exported template (`.harness/config/template-boundary.json`), so a fresh consumer checkout will not have `track/items/bridge01-export-schema-2026-04-06/spec.json`; this is the template-distribution reference leak category described by the harness-policy severity policy. Replace this with a distributed ADR/convention reference or a placeholder-style track path.",
+              "severity": "P1",
+              "file": "knowledge/conventions/nightly-dev-tool.md",
+              "line": 42,
+              "category": "template-distribution reference leak"
+            }
+          ],
+          "hash": "rvw1:sha256:b12e6a9070da495280c72fa836a3940c51e72952f8b0b1fdbc8ee03ab989d6f5",
+          "at": "2026-07-08T14:45:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4956930186bf47b40440da0cc13c4924f7844960b8de8c59c35b60f93d927773",
+          "at": "2026-07-08T14:53:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4956930186bf47b40440da0cc13c4924f7844960b8de8c59c35b60f93d927773",
+          "at": "2026-07-08T14:58:02Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f27b173f582d67691eff272b7a3b207379f3fb7476826219e06fa2c83d59905",
+          "at": "2026-07-08T14:36:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f27b173f582d67691eff272b7a3b207379f3fb7476826219e06fa2c83d59905",
+          "at": "2026-07-08T14:43:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0a24bb8edc2b91c43e3d6eb9c9ea1043d0b11ffdb6c8848a50de40ac6bc9e5a",
+          "at": "2026-07-08T15:18:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0a24bb8edc2b91c43e3d6eb9c9ea1043d0b11ffdb6c8848a50de40ac6bc9e5a",
+          "at": "2026-07-08T15:22:52Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1794e8a026d7f852cbff46e0c05b80985085aeba2a87e986b5f95174166e624b",
+          "at": "2026-07-08T14:36:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1794e8a026d7f852cbff46e0c05b80985085aeba2a87e986b5f95174166e624b",
+          "at": "2026-07-08T14:43:12Z"
+        }
+      ]
+    },
     "spec": {
       "rounds": [
         {
@@ -114,93 +363,6 @@
         }
       ]
     },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c75d406919979db95f3bb9e62a76b80259ee889db69c5124132a56f494704a1f",
-          "at": "2026-07-08T12:24:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Entry `infrastructure::verify::tech_stack::verify` declares `AC-01` in `spec_refs`, but `AC-01` is only about `Makefile.toml` task/dependency removal and Makefile string searches. The infrastructure function deletion is covered by `IN-01` / `AC-03`; keeping this unrelated anchor weakens catalogue-to-spec trace integrity.",
-              "severity": "P1",
-              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/infrastructure-types.json",
-              "line": 12,
-              "category": "spec_refs off-topic"
-            },
-            {
-              "message": "`VerifyCommand.docs` restates the upstream behavior contract by saying that invoking `sotp verify tech-stack` returns an unknown-subcommand error. Per `knowledge/conventions/no-upstream-restatement.md`, catalogue docs should identify the changed type/operation and cite `AC-02`, not duplicate the acceptance behavior in prose.",
-              "severity": "P1",
-              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/cli-types.json",
-              "line": 10,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:c75d406919979db95f3bb9e62a76b80259ee889db69c5124132a56f494704a1f",
-          "at": "2026-07-08T12:33:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4a93379a4817cadddb8d6dfdc4c6b5910e1284baa6bd9145c13ed81096685e1e",
-          "at": "2026-07-08T12:39:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b409655bfe13f43058f1ce3ec378c8522d0cd61672dd6ecbc0f7d92f9eb166a5",
-          "at": "2026-07-08T13:50:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b409655bfe13f43058f1ce3ec378c8522d0cd61672dd6ecbc0f7d92f9eb166a5",
-          "at": "2026-07-08T13:56:57Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3007a31e787aac1b6c757909467580f29475905b49073bfa663bbda33d23256a",
-          "at": "2026-07-08T13:48:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The impl-plan severity prompt still says the impl-plan reviewer owns the rendered `plan.md`, but the scope config now removes `plan.md` from the impl-plan patterns and places it under `review_operational`. Since composed briefings use this prompt to define the review boundary, reviewers will be told to inspect an artifact that no longer participates in the impl-plan scope/hash, which contradicts the new review-scope wiring.",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/impl-plan.md",
-              "line": 3,
-              "category": "review-scope or briefing wiring inconsistency"
-            }
-          ],
-          "hash": "rvw1:sha256:3007a31e787aac1b6c757909467580f29475905b49073bfa663bbda33d23256a",
-          "at": "2026-07-08T13:52:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:35ccb3ff3c8d718833c74addec8a72367c3e22b3b0223a018bc7826980465bee",
-          "at": "2026-07-08T13:56:44Z"
-        }
-      ]
-    },
     "adr": {
       "rounds": [
         {
@@ -231,6 +393,97 @@
           "findings": [],
           "hash": "rvw1:sha256:8a0eb8707d7603bcebbb60527c34260cdcca8fdfa0e234ddc925fa108e417fab",
           "at": "2026-07-08T10:53:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33b730e6d61a340667050674890769afe2af1961e17e81f1fe47858f735f1ada",
+          "at": "2026-07-08T14:36:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 states that no async runtime such as tokio is introduced and that the execution model is synchronous, but the current grandfathered baseline already has an accepted semantic-dup stack whose LanceDB adapter uses Tokio to bridge LanceDB's async API behind a synchronous port. As written, downstream spec/types have no way to tell whether Tokio is globally forbidden or allowed for that existing infrastructure adapter, so the ADR would incorrectly erase an already-accepted exception.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-08-1405-grandfathered-tech-and-product-baseline.md",
+              "line": 67,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D4 records persistence as JSON files and says DB/KVS-style storage is not introduced, but the existing semantic-dup decision uses a local LanceDB vector database as a persistent index. Without an explicit scope carve-out for generated semantic indexes, downstream artifacts will read this as a blanket persistence rule and conflict with the existing LanceDB-backed adapter.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-08-1405-grandfathered-tech-and-product-baseline.md",
+              "line": 79,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:a6e4e1690c47d32dd47bf4110c053658230ab992af3852500d7f1e81b4ce7bcd",
+          "at": "2026-07-08T14:45:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf548aa7b360ba98d3844bdd6078f095ff63384c672a290825a22739b4a2cdf4",
+          "at": "2026-07-08T14:59:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D9 says version-selection grounding lives in `knowledge/research/version-baseline-YYYY-MM-DD.md`, but the scoped research workflow defines the output as `YYYY-MM-DD-HHmm-version-baseline.md` and the template still names a third pattern without the time prefix. That leaves downstream spec/verification work with incompatible pathname contracts for the same SoT, so the decision is not consumable as an observable rule until the ADR and research docs agree on one baseline filename convention.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-08-1405-grandfathered-tech-and-product-baseline.md",
+              "line": 116,
+              "category": "research grounding mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:cf548aa7b360ba98d3844bdd6078f095ff63384c672a290825a22739b4a2cdf4",
+          "at": "2026-07-08T15:03:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rejected-alternative narrative points readers to D3 for the repository-contract async trait change, but D3 is only the domain modeling decision; the repository synchronization contract is defined in D1. That makes the ADR's own rationale self-referentially wrong and can mislead downstream spec/type work about which decision owns repository-surface changes.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-08-1405-grandfathered-tech-and-product-baseline.md",
+              "line": 172,
+              "category": "broken narrative reference"
+            }
+          ],
+          "hash": "rvw1:sha256:66129979062717b5e51b81fc66307f52c6574b98c99f18fd5f0a70b115b3944b",
+          "at": "2026-07-08T15:07:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2d5a18bc169b0ee51ed16e380e3d9969c2f20f0dbb350e62c467a846e94537f",
+          "at": "2026-07-08T15:10:29Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9882970a9b82f9df72acfd21671957dff3164462a04b37b7f9a9c4b21ee2d076",
+          "at": "2026-07-08T14:35:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9882970a9b82f9df72acfd21671957dff3164462a04b37b7f9a9c4b21ee2d076",
+          "at": "2026-07-08T14:40:39Z"
         }
       ]
     },
@@ -424,6 +677,20 @@
           "findings": [],
           "hash": "rvw1:sha256:8be52b4c68368e57929f84b0ecf48f2b457342127941c1717d9ba8c38b2bae1d",
           "at": "2026-07-08T13:50:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9e78d751ce711e3148d77c402cf16b67b043eb81580504bb4159e53320208e3",
+          "at": "2026-07-08T14:35:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9e78d751ce711e3148d77c402cf16b67b043eb81580504bb4159e53320208e3",
+          "at": "2026-07-08T14:42:04Z"
         }
       ]
     }

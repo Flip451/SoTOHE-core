@@ -45,9 +45,6 @@ pub enum VerifyPortError {
 /// `infrastructure::verify::*` submodules.  Verify findings are encoded inside
 /// [`VerifyOutcome`]; adapter-level failures use [`VerifyPortError`].
 pub trait VerifyPort: Send + Sync {
-    /// Check tech-stack.md for unresolved TODO markers.
-    fn verify_tech_stack(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
-
     /// Check latest track artifacts for completeness.
     fn verify_latest_track(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
@@ -119,9 +116,6 @@ pub trait VerifyPort: Send + Sync {
 /// `VerifyPort` (DIP). `VerifyInteractor` implements this service by delegating to the
 /// injected `VerifyPort`.
 pub trait VerifyService: Send + Sync {
-    /// Check tech-stack.md for unresolved TODO markers.
-    fn verify_tech_stack(&self, project_root: PathBuf) -> Result<VerifyOutcome, VerifyPortError>;
-
     /// Check latest track artifacts for completeness.
     fn verify_latest_track(&self, project_root: PathBuf) -> Result<VerifyOutcome, VerifyPortError>;
 
@@ -208,10 +202,6 @@ impl VerifyInteractor {
 }
 
 impl VerifyService for VerifyInteractor {
-    fn verify_tech_stack(&self, project_root: PathBuf) -> Result<VerifyOutcome, VerifyPortError> {
-        self.port.verify_tech_stack(project_root.as_path())
-    }
-
     fn verify_latest_track(&self, project_root: PathBuf) -> Result<VerifyOutcome, VerifyPortError> {
         self.port.verify_latest_track(project_root.as_path())
     }

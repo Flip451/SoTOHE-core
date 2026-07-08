@@ -51,7 +51,7 @@ Use Google Search grounding to research the Rust ecosystem:
 Read from:
 
 ```
-track/tech-stack.md         # Tech stack (Rust version, crates in use)
+knowledge/adr/              # Tech stack / architecture decisions (pre-track ADRs)
 track/items/<id>/spec.md   # Feature specification
 knowledge/research/             # Save your research results here
 knowledge/research/             # Save crate documentation here

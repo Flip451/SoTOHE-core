@@ -27,7 +27,7 @@ Terms:
 
 Read these first before planning or implementation:
 
-- `track/tech-stack.md`
+- `knowledge/adr/README.md` (pre-track ADR index — tech stack / product-policy decisions)
 - `knowledge/conventions/branch-strategy.md`
 - `knowledge/conventions/track-lifecycle.md`
 - `knowledge/conventions/git-notes.md`
