@@ -1,170 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9408b1d0244968a350509493cb744ba1c81a779fe7190eaed96e9044ea15b708",
-          "at": "2026-07-09T01:16:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9408b1d0244968a350509493cb744ba1c81a779fe7190eaed96e9044ea15b708",
-          "at": "2026-07-09T01:30:20Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0268157e52d2170dfa228c6c1ea2606df5b615811b2dc3d5fbd413cbe726f242",
-          "at": "2026-07-09T00:07:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`infrastructure::verify::retention_gate::verify` restates upstream behavior in its `docs` field: live-surface scanning, retired identifier/path detection, M-token state-expression handling, and scanner I/O fail-closed/no-panic behavior are already owned by IN-03/IN-04/IN-05/CN-01. Per `knowledge/conventions/no-upstream-restatement.md`, catalogue docs should identify the changed symbol and cite anchors rather than reproduce the behavior contract.",
-              "severity": "P1",
-              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The `FsVerifyAdapter -> usecase::verify::VerifyPort` trait impl is declared `action: reference`, but this track requires that existing impl to gain the retention-gate delegation for the newly added `verify_retention_gate` port method. `reference` is for baseline entries the track does not modify, so this hides an adapter-side contract change that should be declared as a modified impl entry.",
-              "severity": "P1",
-              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
-              "line": 79,
-              "category": "action incoherent with the diff"
-            },
-            {
-              "message": "The `VerifyInteractor -> VerifyService` trait impl is declared `action: reference`, while `VerifyService` is modified to add `verify_retention_gate`; the existing interactor impl must add the corresponding delegation method. Keeping the impl as `reference` declares it unchanged and leaves the service-side implementation change outside the type contract.",
-              "severity": "P1",
-              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
-              "line": 8,
-              "category": "action incoherent with the diff"
-            }
-          ],
-          "hash": "rvw1:sha256:0268157e52d2170dfa228c6c1ea2606df5b615811b2dc3d5fbd413cbe726f242",
-          "at": "2026-07-09T00:13:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d93b103f52d395c644825df0dc4a31df0201a17c00ab8d3cc9130ba30b4cc771",
-          "at": "2026-07-09T00:18:44Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`walk()` accepts symlinked descendants under `LIVE_SURFACE`: `std::fs::metadata()` and `read_dir()` will follow a symlinked `libs/`, `.claude/*`, etc., so a repo can redirect the scan outside the workspace. The adapter only rejects a symlinked root; this boundary needs the same `symlink_metadata()`/reject pattern used by `track::symlink_guard::reject_symlinks_below` and the `scope_config_loader.rs` symlink tests.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/verify/retention_gate.rs",
-              "line": 93,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:16230e83b34effd6ca9df517991099b6934808ee724ce5f5ef40ec6556aa07a6",
-          "at": "2026-07-09T01:17:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7386bf4fe8c43bbbb8bf56fe76ad7f132355d4b6c397d961f1cf842fe49d0414",
-          "at": "2026-07-09T01:22:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The retention scanner reads each live-surface file into memory with `std::fs::read` while recursively walking broad roots such as `libs` and `apps`. A large or generated file under those roots can make `sotp verify retention-gate` allocate unbounded memory and abort before it can return a fail-closed `VerifyFinding`. The infrastructure policy treats unbounded I/O paths as correctness findings; stream the file with a bounded reader or reject files over an explicit size limit with an error finding.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/verify/retention_gate.rs",
-              "line": 151,
-              "category": "unbounded read"
-            }
-          ],
-          "hash": "rvw1:sha256:7386bf4fe8c43bbbb8bf56fe76ad7f132355d4b6c397d961f1cf842fe49d0414",
-          "at": "2026-07-09T01:31:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:26bfc0bc18da706b4e452d4e8ff1b99c43509d54d4e0376a05c6e5da7c53f99e",
-          "at": "2026-07-09T01:53:46Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:223751d3aa8ac06015e1ff9dfd07e8805f0167a3497502090b4aa080c85bd063",
-          "at": "2026-07-08T23:16:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:223751d3aa8ac06015e1ff9dfd07e8805f0167a3497502090b4aa080c85bd063",
-          "at": "2026-07-08T23:18:54Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`test_verify_command_gate_name_uses_verify_prefix` does not exercise the newly added `VerifyCommand::RetentionGate` branch, so the new `verify-retention-gate` telemetry label is effectively untested. A typo in that label would still pass this test because the subcommand list only covers `latest-track`, `arch-docs`, and `layers`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/apps/cli/src/main.rs",
-              "line": 984,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:df2a7a8e8c76efcaa96d86863713a6395393e604b2bc41c9e8b99115b41334d2",
-          "at": "2026-07-09T01:16:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d49648e60462767f1cdbfabeb448c0e9cd6760731f06e9e3a3322a541e018653",
-          "at": "2026-07-09T01:22:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d49648e60462767f1cdbfabeb448c0e9cd6760731f06e9e3a3322a541e018653",
-          "at": "2026-07-09T01:31:43Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -201,71 +37,6 @@
           "findings": [],
           "hash": "rvw1:sha256:d55f096cecbea886496ac8a123c983c2bfba1d94b596a204e2ef2150897461f0",
           "at": "2026-07-09T02:05:10Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0750c52a6b9012c352f9c459877444b8dccd23cf8331f6e35f2dd1d4b215cecf",
-          "at": "2026-07-09T00:00:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-03 says the live surface must be equivalent to the current gate, but then only requires scanning “at least” the listed roots. That leaves room to add more roots, while OS-04 explicitly declares live-surface expansion out of scope. Downstream implementers could satisfy IN-03 while violating OS-04, so the spec has a scope contradiction around scan semantics.",
-              "severity": "P1",
-              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
-              "line": 71,
-              "category": "scope / acceptance_criteria contradiction"
-            },
-            {
-              "message": "GO-01 requires the retention gate to run through the established verify chain, including infrastructure checker, usecase port/service, CLI driver input, CLI subcommand, and composition wiring. The acceptance criteria only prove the old integration test is gone and that a CLI help/execution path exists; a direct CLI shortcut could satisfy AC-01/AC-02 while bypassing the required architecture. This leaves GO-01 without deterministic AC coverage for the stated verify-chain contract.",
-              "severity": "P1",
-              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
-              "line": 8,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "GO-02 promises preservation of the live-surface scan semantics, and IN-03 lists the roots that define that surface, but no acceptance criterion proves the verifier actually scans each listed root. AC-03/AC-10 only require injection into one file under “the live surface,” so an implementation could omit roots such as `.claude/commands/**` or `.harness/capabilities/**` and still satisfy the AC text.",
-              "severity": "P1",
-              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
-              "line": 18,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:0750c52a6b9012c352f9c459877444b8dccd23cf8331f6e35f2dd1d4b215cecf",
-          "at": "2026-07-09T00:07:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:afe3564946b57d50469b79a72b82629df639a3a646ab5c96f0e1d6c5c435a57a",
-          "at": "2026-07-09T00:13:00Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:12ee0ebf1ac92a7af8e725f99fdd8373b6027cb54d7355964c59b0b3260d332b",
-          "at": "2026-07-09T01:15:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:12ee0ebf1ac92a7af8e725f99fdd8373b6027cb54d7355964c59b0b3260d332b",
-          "at": "2026-07-09T01:30:04Z"
         }
       ]
     },
@@ -406,6 +177,231 @@
           "findings": [],
           "hash": "rvw1:sha256:67349beaebd8f15671d78474e4deb64f3a4b4441ecd77d02cf960397f2480561",
           "at": "2026-07-09T02:03:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8a0dd41ced308e0298b09973b2522511a7197f5978e7a4f32ee8614f79ed833",
+          "at": "2026-07-09T02:15:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8a0dd41ced308e0298b09973b2522511a7197f5978e7a4f32ee8614f79ed833",
+          "at": "2026-07-09T02:18:50Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0750c52a6b9012c352f9c459877444b8dccd23cf8331f6e35f2dd1d4b215cecf",
+          "at": "2026-07-09T00:00:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-03 says the live surface must be equivalent to the current gate, but then only requires scanning “at least” the listed roots. That leaves room to add more roots, while OS-04 explicitly declares live-surface expansion out of scope. Downstream implementers could satisfy IN-03 while violating OS-04, so the spec has a scope contradiction around scan semantics.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
+              "line": 71,
+              "category": "scope / acceptance_criteria contradiction"
+            },
+            {
+              "message": "GO-01 requires the retention gate to run through the established verify chain, including infrastructure checker, usecase port/service, CLI driver input, CLI subcommand, and composition wiring. The acceptance criteria only prove the old integration test is gone and that a CLI help/execution path exists; a direct CLI shortcut could satisfy AC-01/AC-02 while bypassing the required architecture. This leaves GO-01 without deterministic AC coverage for the stated verify-chain contract.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
+              "line": 8,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "GO-02 promises preservation of the live-surface scan semantics, and IN-03 lists the roots that define that surface, but no acceptance criterion proves the verifier actually scans each listed root. AC-03/AC-10 only require injection into one file under “the live surface,” so an implementation could omit roots such as `.claude/commands/**` or `.harness/capabilities/**` and still satisfy the AC text.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
+              "line": 18,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:0750c52a6b9012c352f9c459877444b8dccd23cf8331f6e35f2dd1d4b215cecf",
+          "at": "2026-07-09T00:07:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:afe3564946b57d50469b79a72b82629df639a3a646ab5c96f0e1d6c5c435a57a",
+          "at": "2026-07-09T00:13:00Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9408b1d0244968a350509493cb744ba1c81a779fe7190eaed96e9044ea15b708",
+          "at": "2026-07-09T01:16:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9408b1d0244968a350509493cb744ba1c81a779fe7190eaed96e9044ea15b708",
+          "at": "2026-07-09T01:30:20Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`walk()` accepts symlinked descendants under `LIVE_SURFACE`: `std::fs::metadata()` and `read_dir()` will follow a symlinked `libs/`, `.claude/*`, etc., so a repo can redirect the scan outside the workspace. The adapter only rejects a symlinked root; this boundary needs the same `symlink_metadata()`/reject pattern used by `track::symlink_guard::reject_symlinks_below` and the `scope_config_loader.rs` symlink tests.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/verify/retention_gate.rs",
+              "line": 93,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:16230e83b34effd6ca9df517991099b6934808ee724ce5f5ef40ec6556aa07a6",
+          "at": "2026-07-09T01:17:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7386bf4fe8c43bbbb8bf56fe76ad7f132355d4b6c397d961f1cf842fe49d0414",
+          "at": "2026-07-09T01:22:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The retention scanner reads each live-surface file into memory with `std::fs::read` while recursively walking broad roots such as `libs` and `apps`. A large or generated file under those roots can make `sotp verify retention-gate` allocate unbounded memory and abort before it can return a fail-closed `VerifyFinding`. The infrastructure policy treats unbounded I/O paths as correctness findings; stream the file with a bounded reader or reject files over an explicit size limit with an error finding.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/retention_gate.rs",
+              "line": 151,
+              "category": "unbounded read"
+            }
+          ],
+          "hash": "rvw1:sha256:7386bf4fe8c43bbbb8bf56fe76ad7f132355d4b6c397d961f1cf842fe49d0414",
+          "at": "2026-07-09T01:31:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26bfc0bc18da706b4e452d4e8ff1b99c43509d54d4e0376a05c6e5da7c53f99e",
+          "at": "2026-07-09T01:53:46Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_verify_command_gate_name_uses_verify_prefix` does not exercise the newly added `VerifyCommand::RetentionGate` branch, so the new `verify-retention-gate` telemetry label is effectively untested. A typo in that label would still pass this test because the subcommand list only covers `latest-track`, `arch-docs`, and `layers`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/apps/cli/src/main.rs",
+              "line": 984,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:df2a7a8e8c76efcaa96d86863713a6395393e604b2bc41c9e8b99115b41334d2",
+          "at": "2026-07-09T01:16:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d49648e60462767f1cdbfabeb448c0e9cd6760731f06e9e3a3322a541e018653",
+          "at": "2026-07-09T01:22:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d49648e60462767f1cdbfabeb448c0e9cd6760731f06e9e3a3322a541e018653",
+          "at": "2026-07-09T01:31:43Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0268157e52d2170dfa228c6c1ea2606df5b615811b2dc3d5fbd413cbe726f242",
+          "at": "2026-07-09T00:07:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::verify::retention_gate::verify` restates upstream behavior in its `docs` field: live-surface scanning, retired identifier/path detection, M-token state-expression handling, and scanner I/O fail-closed/no-panic behavior are already owned by IN-03/IN-04/IN-05/CN-01. Per `knowledge/conventions/no-upstream-restatement.md`, catalogue docs should identify the changed symbol and cite anchors rather than reproduce the behavior contract.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `FsVerifyAdapter -> usecase::verify::VerifyPort` trait impl is declared `action: reference`, but this track requires that existing impl to gain the retention-gate delegation for the newly added `verify_retention_gate` port method. `reference` is for baseline entries the track does not modify, so this hides an adapter-side contract change that should be declared as a modified impl entry.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+              "line": 79,
+              "category": "action incoherent with the diff"
+            },
+            {
+              "message": "The `VerifyInteractor -> VerifyService` trait impl is declared `action: reference`, while `VerifyService` is modified to add `verify_retention_gate`; the existing interactor impl must add the corresponding delegation method. Keeping the impl as `reference` declares it unchanged and leaves the service-side implementation change outside the type contract.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+              "line": 8,
+              "category": "action incoherent with the diff"
+            }
+          ],
+          "hash": "rvw1:sha256:0268157e52d2170dfa228c6c1ea2606df5b615811b2dc3d5fbd413cbe726f242",
+          "at": "2026-07-09T00:13:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d93b103f52d395c644825df0dc4a31df0201a17c00ab8d3cc9130ba30b4cc771",
+          "at": "2026-07-09T00:18:44Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:12ee0ebf1ac92a7af8e725f99fdd8373b6027cb54d7355964c59b0b3260d332b",
+          "at": "2026-07-09T01:15:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:12ee0ebf1ac92a7af8e725f99fdd8373b6027cb54d7355964c59b0b3260d332b",
+          "at": "2026-07-09T01:30:04Z"
         }
       ]
     },
@@ -424,6 +420,24 @@
           "findings": [],
           "hash": "rvw1:sha256:66de2f0c794ccf85a1ea05975c3ad1c98a2e6fa75735741b1c2913da5544eb39",
           "at": "2026-07-09T01:30:07Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:223751d3aa8ac06015e1ff9dfd07e8805f0167a3497502090b4aa080c85bd063",
+          "at": "2026-07-08T23:16:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:223751d3aa8ac06015e1ff9dfd07e8805f0167a3497502090b4aa080c85bd063",
+          "at": "2026-07-08T23:18:54Z"
         }
       ]
     }

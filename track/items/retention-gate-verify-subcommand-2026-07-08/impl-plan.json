@@ -4,22 +4,26 @@
     {
       "id": "T001",
       "description": "libs/infrastructure/src/verify/retention_gate.rs and libs/infrastructure/src/verify/mod.rs — add infrastructure::verify::retention_gate::verify as declared in infrastructure-types.json, move the retention scanner from apps/cli/tests/retention_gate.rs into infrastructure production code, and add focused unit tests for the cited verifier/scanner anchors (IN-02, IN-03, IN-04, IN-05, CN-01, CN-04, CN-05, AC-02, AC-03, AC-04, AC-05, AC-06, AC-10).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3c53bae9a664582ef73b487c05f5ce41b9cd32dd"
     },
     {
       "id": "T002",
       "description": "libs/usecase/src/verify.rs and libs/infrastructure/src/verify_adapter.rs — add verify_retention_gate to VerifyPort, VerifyService, VerifyInteractor, and FsVerifyAdapter per usecase-types.json and infrastructure-types.json, and add usecase/adapter tests for the cited anchors (IN-02, CN-01, AC-02, AC-03, AC-06).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3c53bae9a664582ef73b487c05f5ce41b9cd32dd"
     },
     {
       "id": "T003",
       "description": "apps/cli-driver/src/verify.rs, apps/cli/src/commands/verify.rs, apps/cli/src/commands/verify_tests.rs, apps/cli/src/main.rs, and apps/cli-composition/src/verify.rs — add the RetentionGate route to VerifyInput, VerifyCommand, VerifyDriver, verify_command_gate_name, and composition dispatch per cli_driver-types.json and cli-types.json, and add CLI/driver/composition tests for the cited anchors (IN-02, CN-01, AC-02, AC-03, AC-06).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3c53bae9a664582ef73b487c05f5ce41b9cd32dd"
     },
     {
       "id": "T004",
       "description": "apps/cli/tests/retention_gate.rs, Makefile.toml, and overlay/Makefile.toml — delete the old integration test, add root maintainer Makefile task/CI wiring, and verify distribution-boundary anchors against overlay/export artifacts (IN-01, IN-06, OS-01, OS-02, OS-03, OS-04, OS-05, CN-02, CN-03, AC-01, AC-07, AC-08, AC-09, AC-10).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "3c53bae9a664582ef73b487c05f5ce41b9cd32dd"
     }
   ],
   "plan": {
