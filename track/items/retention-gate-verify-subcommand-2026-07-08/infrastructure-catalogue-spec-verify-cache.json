@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "15b58af2b2edf05c2c33364565cb345c23d1e85d3ab049aebd675dbc248934fb",
+      "evidence_hash": "7c695db81da5d823f9789f613efa488ba2d76227b564e6b2306ab1a7468676f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsVerifyAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b71e4a8a1a6e6dffc202a65c48d57959e481314dd8c03bed028f1528bf9607a",
+      "evidence_hash": "7c695db81da5d823f9789f613efa488ba2d76227b564e6b2306ab1a7468676f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::verify::retention_gate::verify"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b71e4a8a1a6e6dffc202a65c48d57959e481314dd8c03bed028f1528bf9607a",
+      "evidence_hash": "c8956a5b437e78b723411a5d636d233837194c33bef09afeae6599a4496453f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scan 対象は現行 gate の live surface と同等にし、root/pattern set は `CLAUDE.md`, `README.md`, `.claude/rules/**`, `.claude/commands/**`, `.claude/agents/**`, `.claude/skills/**`, `.harness/workflows/**`, `.harness/config/**`, `.harness/capabilities/**`, `Makefile.toml`, `libs/**`, `apps/**`, `knowledge/conventions/**` とする。これらの存在する root/pattern を存在ベースで scan し、存在しない root は violation ではなく absence として扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::verify::retention_gate::verify"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "scan 対象は現行 gate の live surface と同等にし、root/pattern set は `CLAUDE.md`, `README.md`, `.claude/rules/**`, `.claude/commands/**`, `.claude/agents/**`, `.claude/skills/**`, `.harness/workflows/**`, `.harness/config/**`, `.harness/capabilities/**`, `Makefile.toml`, `libs/**`, `apps/**`, `knowledge/conventions/**` とする。これらの存在する root/pattern を存在ベースで scan し、存在しない root は violation ではなく absence として扱う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b71e4a8a1a6e6dffc202a65c48d57959e481314dd8c03bed028f1528bf9607a",
+      "evidence_hash": "7e64bddd3fedd7c24abd896b0785cd346ca2a9514e31a7575b63a0e89bdcd7ff",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retired identifier / retired path 検出を維持する。対象には `verify-tech-stack`, `verify-tech-stack-local`, `verify tech-stack`, `VerifyCommand::TechStack`, `VerifyInput::TechStack`, `verify_tech_stack`, `TECH_STACK_FILE`, `verify::tech_stack`, `pub mod tech_stack;`, `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md` と同等の現行 forbidden surface が含まれる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::verify::retention_gate::verify"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "retired identifier / retired path 検出を維持する。対象には `verify-tech-stack`, `verify-tech-stack-local`, `verify tech-stack`, `VerifyCommand::TechStack`, `VerifyInput::TechStack`, `verify_tech_stack`, `TECH_STACK_FILE`, `verify::tech_stack`, `pub mod tech_stack;`, `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md` と同等の現行 forbidden surface が含まれる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b71e4a8a1a6e6dffc202a65c48d57959e481314dd8c03bed028f1528bf9607a",
+      "evidence_hash": "d7c53027be42c8af4ca65b2b07d1125ad292d4329c901d9084e79edc4461dc40",
+      "verdict": {
+        "kind": "pass",
+        "citation": "M token と readiness/blocking gate word が同一行に併存する state-expression 検出を維持する。M token が先に現れる行と gate word が先に現れる行のどちらも violation になり、gate word を伴わない plain M-token note は violation にならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::verify::retention_gate::verify"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "M token と readiness/blocking gate word が同一行に併存する state-expression 検出を維持する。M token が先に現れる行と gate word が先に現れる行のどちらも violation になり、gate word を伴わない plain M-token note は violation にならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b71e4a8a1a6e6dffc202a65c48d57959e481314dd8c03bed028f1528bf9607a",
+      "evidence_hash": "d618a011deadd58484669d5b11d4b819864d454d3d672ac5c087a52ab947a242",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scanner I/O problem は fail-closed とする。directory listing / file read / path traversal に失敗した場合、verifier は success として扱わず、library/usecase production code では panic ではなく `Result` error として伝搬し、CLI で non-zero exit に変換する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::verify::retention_gate::verify"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "scanner I/O problem は fail-closed とする。directory listing / file read / path traversal に失敗した場合、verifier は success として扱わず、library/usecase production code では panic ではなく `Result` error として伝搬し、CLI で non-zero exit に変換する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b71e4a8a1a6e6dffc202a65c48d57959e481314dd8c03bed028f1528bf9607a",
+      "evidence_hash": "4d3c032962b8c9b05bf5acf2999fa6eccbcb891ee3c9ea856736521bafbf4206",
+      "verdict": {
+        "kind": "pass",
+        "citation": "new verifier tests must cover both detection and non-detection behavior. Negative tests prove forbidden identifier/path injection and M-token state-expression injection fail the scanner; positive tests prove a clean synthetic live surface and an M-token note without readiness/blocking gate words pass."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::verify::retention_gate::verify"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "new verifier tests must cover both detection and non-detection behavior. Negative tests prove forbidden identifier/path injection and M-token state-expression injection fail the scanner; positive tests prove a clean synthetic live surface and an M-token note without readiness/blocking gate words pass."
+        }
+      }
+    },
+    {
+      "claim_hash": "6b71e4a8a1a6e6dffc202a65c48d57959e481314dd8c03bed028f1528bf9607a",
+      "evidence_hash": "58547dee0274ffca238879a4da7f7f1b49b1321221ee7a0a47fd7b6da73b1830",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Source inspection and `cargo make check-layers` show the execution path is wired through the established verify chain: infrastructure checker, usecase port/service, CLI-driver input, CLI subcommand, and composition root wiring. The CLI path invokes the usecase service through that chain rather than calling a scanner helper directly."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::verify::retention_gate::verify"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp verify --help` exposes a retention gate subcommand, and invoking that subcommand against the clean maintainer repository exits 0 with the same pass meaning as the removed integration test's clean-workspace assertion. Source inspection and `cargo make check-layers` show the execution path is wired through the established verify chain: infrastructure checker, usecase port/service, CLI-driver input, CLI subcommand, and composition root wiring. The CLI path invokes the usecase service through that chain rather than calling a scanner helper directly."
+        }
+      }
+    },
+    {
+      "claim_hash": "6b71e4a8a1a6e6dffc202a65c48d57959e481314dd8c03bed028f1528bf9607a",
+      "evidence_hash": "c4fd38020244adefe6f88efe6728db17b19d549425e057b8df3ae6a5ac6f0a09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"A deterministic scanner test asserts the configured live-surface root/pattern set equals IN-03. Injecting any retired identifier or retired path from IN-04 into a representative file for each IN-03 root/pattern that exists in the fixture causes the verifier/scanner to fail non-zero and report a finding that identifies the path, line, and retired token category.\""
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::verify::retention_gate::verify"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "A deterministic scanner test asserts the configured live-surface root/pattern set equals IN-03. Injecting any retired identifier or retired path from IN-04 into a representative file for each IN-03 root/pattern that exists in the fixture causes the verifier/scanner to fail non-zero and report a finding that identifies the path, line, and retired token category."
+        }
+      }
+    },
+    {
+      "claim_hash": "6b71e4a8a1a6e6dffc202a65c48d57959e481314dd8c03bed028f1528bf9607a",
+      "evidence_hash": "e684610246f3f52512c69ca1767cfc007fa031b62da3e156acdf13f521010fc3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Injecting an M-token state expression with a readiness/blocking gate word before the M token causes verifier failure, and injecting the reversed order on the same line also causes verifier failure."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::verify::retention_gate::verify"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "Injecting an M-token state expression with a readiness/blocking gate word before the M token causes verifier failure, and injecting the reversed order on the same line also causes verifier failure."
+        }
+      }
+    },
+    {
+      "claim_hash": "6b71e4a8a1a6e6dffc202a65c48d57959e481314dd8c03bed028f1528bf9607a",
+      "evidence_hash": "805a7e82283797d2cfc2851dbf624615ac363ffd043eeb9614a157bbad12f76b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "A clean synthetic live-surface layout passes the scanner, and a line containing an M token without any readiness/blocking gate word on the same line also passes. This verifies the gate detects state expressions rather than plain task notes."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::verify::retention_gate::verify"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "A clean synthetic live-surface layout passes the scanner, and a line containing an M token without any readiness/blocking gate word on the same line also passes. This verifies the gate detects state expressions rather than plain task notes."
+        }
+      }
+    },
+    {
+      "claim_hash": "6b71e4a8a1a6e6dffc202a65c48d57959e481314dd8c03bed028f1528bf9607a",
+      "evidence_hash": "e7508118cfec3e79a34d36a9eb6096569d7c213a4fa816a6f17e78b0c0349189",
+      "verdict": {
+        "kind": "pass",
+        "citation": "A scanner I/O failure scenario is covered by a test and produces an error result / non-zero verifier outcome rather than success, silent skip, or a production-code panic."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::verify::retention_gate::verify"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "A scanner I/O failure scenario is covered by a test and produces an error result / non-zero verifier outcome rather than success, silent skip, or a production-code panic."
+        }
+      }
+    }
+  ]
+}

@@ -1,6 +1,135 @@
 {
   "schema_version": 2,
   "scopes": {
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:988c16d686f98d110096d4d12b3365de7d7e36b6fc6ad52967f4d8c5882fc4d8",
+          "at": "2026-07-09T00:01:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 upstream restatement: task T001 goes beyond target + operation + anchors by restating the upstream scanner contract, including live-surface roots, retired identifier/path checks, M-token state-expression checks, fail-closed I/O behavior, and specific positive/negative test behaviors. `knowledge/conventions/no-upstream-restatement.md` requires task text to use target + operation + anchor cite instead.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "P1 upstream restatement: task T002 restates upstream behavior via `without changing the other verify methods`, `success, verifier-finding failure`, and `fail-closed error propagation`. Keep this as target + operation + anchor cite under `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "P1 upstream restatement: task T003 restates verifier behavior with `expose it in sotp verify help`, `clean outcome rendering`, and `non-zero verifier outcome rendering` instead of relying on the cited AC/CN anchors. This violates `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "P1 upstream restatement: task T004 repeats upstream distribution-boundary behavior (`leave overlay Makefile unconnected`, no boundary-manifest exclude or runtime opt-out, maintainer CI includes the gate while exported-template CI does not). Per `knowledge/conventions/no-upstream-restatement.md`, the task should cite the relevant anchors instead of restating the contract.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "P1 upstream restatement: section S1 repeats scanner semantics, live-surface traversal, fail-closed I/O handling, and positive/negative test behavior. Plan sections are covered by `knowledge/conventions/no-upstream-restatement.md` and should stay to ordering rationale plus anchors.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "P1 upstream restatement: section S2 repeats the secondary-port behavior and existing error-propagation shape. `knowledge/conventions/no-upstream-restatement.md` allows target + operation + anchor cite, not prose restatement of the contract.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/impl-plan.json",
+              "line": 52,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "P1 upstream restatement: section S3 repeats CLI-driver input, clap subcommand, composition dispatch, and route/rendering behavior already owned by the spec/type anchors. This should be reduced to ordering plus anchor cites under `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/impl-plan.json",
+              "line": 62,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "P1 upstream restatement: section S4 repeats the maintainer-only CI/export boundary contract, including overlay remaining unconnected and no manifest excludes or runtime switches. That is upstream behavior restatement forbidden by `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/impl-plan.json",
+              "line": 72,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:988c16d686f98d110096d4d12b3365de7d7e36b6fc6ad52967f4d8c5882fc4d8",
+          "at": "2026-07-09T00:09:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db9a3bcfac50533e5f663d47127bee4ac1a3710ca80669a81b94adf9e8366597",
+          "at": "2026-07-09T00:14:22Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0750c52a6b9012c352f9c459877444b8dccd23cf8331f6e35f2dd1d4b215cecf",
+          "at": "2026-07-09T00:00:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-03 says the live surface must be equivalent to the current gate, but then only requires scanning “at least” the listed roots. That leaves room to add more roots, while OS-04 explicitly declares live-surface expansion out of scope. Downstream implementers could satisfy IN-03 while violating OS-04, so the spec has a scope contradiction around scan semantics.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
+              "line": 71,
+              "category": "scope / acceptance_criteria contradiction"
+            },
+            {
+              "message": "GO-01 requires the retention gate to run through the established verify chain, including infrastructure checker, usecase port/service, CLI driver input, CLI subcommand, and composition wiring. The acceptance criteria only prove the old integration test is gone and that a CLI help/execution path exists; a direct CLI shortcut could satisfy AC-01/AC-02 while bypassing the required architecture. This leaves GO-01 without deterministic AC coverage for the stated verify-chain contract.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
+              "line": 8,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "GO-02 promises preservation of the live-surface scan semantics, and IN-03 lists the roots that define that surface, but no acceptance criterion proves the verifier actually scans each listed root. AC-03/AC-10 only require injection into one file under “the live surface,” so an implementation could omit roots such as `.claude/commands/**` or `.harness/capabilities/**` and still satisfy the AC text.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
+              "line": 18,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:0750c52a6b9012c352f9c459877444b8dccd23cf8331f6e35f2dd1d4b215cecf",
+          "at": "2026-07-09T00:07:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:afe3564946b57d50469b79a72b82629df639a3a646ab5c96f0e1d6c5c435a57a",
+          "at": "2026-07-09T00:13:00Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -34,6 +163,53 @@
           "findings": [],
           "hash": "rvw1:sha256:5131e4c85098f03e1881737b62585cda215132adffd68d722cb42a8d07697d83",
           "at": "2026-07-08T23:18:36Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0268157e52d2170dfa228c6c1ea2606df5b615811b2dc3d5fbd413cbe726f242",
+          "at": "2026-07-09T00:07:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::verify::retention_gate::verify` restates upstream behavior in its `docs` field: live-surface scanning, retired identifier/path detection, M-token state-expression handling, and scanner I/O fail-closed/no-panic behavior are already owned by IN-03/IN-04/IN-05/CN-01. Per `knowledge/conventions/no-upstream-restatement.md`, catalogue docs should identify the changed symbol and cite anchors rather than reproduce the behavior contract.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `FsVerifyAdapter -> usecase::verify::VerifyPort` trait impl is declared `action: reference`, but this track requires that existing impl to gain the retention-gate delegation for the newly added `verify_retention_gate` port method. `reference` is for baseline entries the track does not modify, so this hides an adapter-side contract change that should be declared as a modified impl entry.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+              "line": 79,
+              "category": "action incoherent with the diff"
+            },
+            {
+              "message": "The `VerifyInteractor -> VerifyService` trait impl is declared `action: reference`, while `VerifyService` is modified to add `verify_retention_gate`; the existing interactor impl must add the corresponding delegation method. Keeping the impl as `reference` declares it unchanged and leaves the service-side implementation change outside the type contract.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+              "line": 8,
+              "category": "action incoherent with the diff"
+            }
+          ],
+          "hash": "rvw1:sha256:0268157e52d2170dfa228c6c1ea2606df5b615811b2dc3d5fbd413cbe726f242",
+          "at": "2026-07-09T00:13:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d93b103f52d395c644825df0dc4a31df0201a17c00ab8d3cc9130ba30b4cc771",
+          "at": "2026-07-09T00:18:44Z"
         }
       ]
     }

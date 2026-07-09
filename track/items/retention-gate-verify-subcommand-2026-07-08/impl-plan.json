@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "libs/infrastructure/src/verify/retention_gate.rs and libs/infrastructure/src/verify/mod.rs — add infrastructure::verify::retention_gate::verify as declared in infrastructure-types.json, move the retention scanner from apps/cli/tests/retention_gate.rs into infrastructure production code, and add focused unit tests for the cited verifier/scanner anchors (IN-02, IN-03, IN-04, IN-05, CN-01, CN-04, CN-05, AC-02, AC-03, AC-04, AC-05, AC-06, AC-10).",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "libs/usecase/src/verify.rs and libs/infrastructure/src/verify_adapter.rs — add verify_retention_gate to VerifyPort, VerifyService, VerifyInteractor, and FsVerifyAdapter per usecase-types.json and infrastructure-types.json, and add usecase/adapter tests for the cited anchors (IN-02, CN-01, AC-02, AC-03, AC-06, AC-10).",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "apps/cli-driver/src/verify.rs, apps/cli/src/commands/verify.rs, and apps/cli-composition/src/verify.rs — add the RetentionGate route to VerifyInput, VerifyCommand, VerifyDriver, and composition dispatch per cli_driver-types.json and cli-types.json, and add CLI/driver/composition tests for the cited anchors (IN-02, CN-01, AC-02, AC-03, AC-06, AC-10).",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "apps/cli/tests/retention_gate.rs, Makefile.toml, and overlay/Makefile.toml — delete the old integration test, add root maintainer Makefile task/CI wiring, and verify distribution-boundary anchors against overlay/export artifacts (IN-01, IN-06, OS-01, OS-02, OS-03, OS-04, OS-05, CN-02, CN-03, AC-01, AC-07, AC-08, AC-09, AC-10).",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "T001: infrastructure retention verifier and focused scanner tests carry IN-02, IN-03, IN-04, IN-05, CN-01, CN-04, CN-05, AC-02, AC-03, AC-04, AC-05, AC-06, and AC-10.",
+      "T002: usecase VerifyPort/VerifyService plus FsVerifyAdapter wiring carries IN-02, CN-01, AC-02, AC-03, AC-06, and AC-10.",
+      "T003: CLI driver, CLI command, and composition wiring carries IN-02, CN-01, AC-02, AC-03, AC-06, and AC-10.",
+      "T004: integration-test deletion plus root Makefile and export verification carries IN-01, IN-06, OS-01, OS-02, OS-03, OS-04, OS-05, CN-02, CN-03, AC-01, AC-07, AC-08, AC-09, and AC-10.",
+      "Goal traceability: GO-01 -> T001/T002/T003/T004; GO-02 -> T001/T002/T003; GO-03 -> T004."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Infrastructure scanner and verifier tests",
+        "description": [
+          "Run T001 first so infrastructure::verify::retention_gate::verify and its unit tests exist before T002/T003 depend on them (IN-02, IN-03, IN-04, IN-05, CN-01, CN-04, CN-05, AC-02, AC-03, AC-04, AC-05, AC-06, AC-10)."
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Usecase port and filesystem adapter wiring",
+        "description": [
+          "Run T002 after T001 so VerifyPort, VerifyService, VerifyInteractor, and FsVerifyAdapter carry verify_retention_gate before T003 CLI routing (IN-02, CN-01, AC-02, AC-03, AC-06, AC-10)."
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "CLI route and composition dispatch",
+        "description": [
+          "Run T003 after T002 so VerifyInput, VerifyCommand, VerifyDriver, and composition dispatch carry the retention route before T004 Makefile wiring (IN-02, CN-01, AC-02, AC-03, AC-06, AC-10)."
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Maintainer CI wiring and distribution boundary",
+        "description": [
+          "Run T004 last so Makefile/export verification follows the T003 sotp verify route (IN-01, IN-06, OS-01, OS-02, OS-03, OS-04, OS-05, CN-02, CN-03, AC-01, AC-07, AC-08, AC-09, AC-10)."
+        ],
+        "task_ids": [
+          "T004"
+        ]
+      }
+    ]
+  }
+}

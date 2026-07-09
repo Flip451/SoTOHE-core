@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-09T00:22:16Z",
+  "declaration_hash": "715f8fe91cc01f88a171380b15e6af85f0bb8dcd7f5d76b5c19ffac84c5226ef",
+  "signals": [
+    {
+      "type_name": "VerifyCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueSpecRefsArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PlanArtifactRefsArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SpecVerifyArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerifyArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
