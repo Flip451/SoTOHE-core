@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-09T22:36:03Z",
-  "declaration_hash": "7552c1202c3a6f87cd61dfffbc86b6a93460b480ce54d70b6e59ccc605fcf0dd",
+  "generated_at": "2026-07-09T23:30:50Z",
+  "declaration_hash": "b438cc7f45b0f473cced83cb3aafa23171947bd483e70cc669fae48815cbbdb4",
   "signals": [
     {
       "type_name": "TestBindingsSkeletonHandler",

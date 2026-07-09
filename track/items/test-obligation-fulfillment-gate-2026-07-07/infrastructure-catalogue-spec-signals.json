@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "afce0a9d86b6b152b98d96d9f8f8fb100ea12261f41b22450325449a3e326484",
+  "catalogue_declaration_hash": "c5a46759641674372948f215388835b10aedc037afd893e6d21123066fa61f86",
   "signals": [
     {
       "type_name": "CatalogueEntryRefDto",
@@ -30,7 +30,7 @@
     {
       "type_name": "FsSpecDocumentLoader",
       "signal": "blue",
-      "entry_hash": "dacd7283df9e641c11d40331d0deac4efbcdb3bacc2133371332691d114ea4ce"
+      "entry_hash": "62184ab3df6ac7ffcc781f27b6f98aba737f28602dcd2ca1a00ba6c8a9b77fa4"
     },
     {
       "type_name": "FulfillmentFailCategoryDto",

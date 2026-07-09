@@ -1,5 +1,6 @@
 //! Primary adapter for `sotp test-obligation check`.
 
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use usecase::test_obligation::check::{
@@ -52,20 +53,32 @@ impl TestObligationCheckInput {
 /// Primary adapter for `test-obligation check`.
 pub struct TestObligationCheckHandler {
     pub service: Arc<dyn CheckTestObligationsApplicationService>,
+    /// Anchor used to make track-artifact paths (catalogue snapshots) absolute
+    /// so the handler is not sensitive to the process cwd.
+    workspace_root: PathBuf,
 }
 
 impl TestObligationCheckHandler {
-    /// Builds the handler over its application service.
+    /// Builds the handler over its application service and the discovered
+    /// workspace root. `workspace_root` is the anchor used when constructing
+    /// catalogue paths — pass the value the composition root obtained from
+    /// git worktree discovery.
     #[must_use]
-    pub fn new(service: Arc<dyn CheckTestObligationsApplicationService>) -> Self {
-        Self { service }
+    pub fn new(
+        service: Arc<dyn CheckTestObligationsApplicationService>,
+        workspace_root: PathBuf,
+    ) -> Self {
+        Self { service, workspace_root }
     }
 
     /// Handles one check command.
     #[must_use]
     pub fn handle(&self, input: TestObligationCheckInput) -> CommandOutcome {
-        let command_input = match catalogue_command_input(input.track_id(), input.current_branch())
-        {
+        let command_input = match catalogue_command_input(
+            &self.workspace_root,
+            input.track_id(),
+            input.current_branch(),
+        ) {
             Ok(input) => input,
             Err(message) => return CommandOutcome::failure(Some(message)),
         };
@@ -106,7 +119,8 @@ mod tests {
 
     #[test]
     fn test_check_handler_with_valid_input_returns_success() {
-        let handler = TestObligationCheckHandler::new(Arc::new(StubService));
+        let handler =
+            TestObligationCheckHandler::new(Arc::new(StubService), PathBuf::from("/repo"));
         let branch = DiagnosticMessage::try_new("track/test-track".to_owned()).unwrap();
 
         let outcome = handler.handle(TestObligationCheckInput::new(None, branch));

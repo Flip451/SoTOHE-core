@@ -1,5 +1,6 @@
 //! Primary adapter for `sotp test-obligation derive`.
 
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use usecase::test_obligation::derive::{
@@ -52,20 +53,32 @@ impl TestObligationDeriveInput {
 /// Primary adapter for `test-obligation derive`.
 pub struct TestObligationDeriveHandler {
     pub service: Arc<dyn DeriveTestObligationsApplicationService>,
+    /// Anchor used to make track-artifact paths (catalogue snapshots) absolute
+    /// so the handler is not sensitive to the process cwd.
+    workspace_root: PathBuf,
 }
 
 impl TestObligationDeriveHandler {
-    /// Builds the handler over its application service.
+    /// Builds the handler over its application service and the discovered
+    /// workspace root. `workspace_root` is the anchor used when constructing
+    /// catalogue paths — pass the value the composition root obtained from
+    /// git worktree discovery.
     #[must_use]
-    pub fn new(service: Arc<dyn DeriveTestObligationsApplicationService>) -> Self {
-        Self { service }
+    pub fn new(
+        service: Arc<dyn DeriveTestObligationsApplicationService>,
+        workspace_root: PathBuf,
+    ) -> Self {
+        Self { service, workspace_root }
     }
 
     /// Handles one derive command.
     #[must_use]
     pub fn handle(&self, input: TestObligationDeriveInput) -> CommandOutcome {
-        let command_input = match catalogue_command_input(input.track_id(), input.current_branch())
-        {
+        let command_input = match catalogue_command_input(
+            &self.workspace_root,
+            input.track_id(),
+            input.current_branch(),
+        ) {
             Ok(input) => input,
             Err(message) => return CommandOutcome::failure(Some(message)),
         };
@@ -109,7 +122,7 @@ mod tests {
     #[test]
     fn test_derive_handler_with_valid_input_invokes_service() {
         let service = Arc::new(StubService { calls: Mutex::new(0) });
-        let handler = TestObligationDeriveHandler::new(service.clone());
+        let handler = TestObligationDeriveHandler::new(service.clone(), PathBuf::from("/repo"));
 
         let outcome = handler.handle(TestObligationDeriveInput::new(None, branch()));
 

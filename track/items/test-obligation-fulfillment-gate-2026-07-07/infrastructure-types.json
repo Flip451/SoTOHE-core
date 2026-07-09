@@ -894,6 +894,10 @@
           "receiver": null,
           "params": [
             {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
               "name": "trusted_root",
               "ty": "std::path::PathBuf"
             }
@@ -903,11 +907,11 @@
           "generics": [],
           "has_default_impl": false,
           "where_predicates": [],
-          "docs": "Construct a filesystem spec document loader rooted at track/items."
+          "docs": "Construct a filesystem spec document loader; workspace_root anchors relative spec paths and trusted_root is the containment constraint."
         }
       ],
       "module_path": "spec::document_loader",
-      "docs": "Filesystem SpecDocumentLoaderPort adapter for parsed spec.json. See IN-07 / IN-08.",
+      "docs": "Filesystem SpecDocumentLoaderPort adapter for parsed spec.json, anchored at the discovered workspace root. See IN-07 / IN-08.",
       "spec_refs": [
         {
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",

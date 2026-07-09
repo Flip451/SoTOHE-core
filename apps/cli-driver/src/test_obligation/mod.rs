@@ -1,6 +1,6 @@
 //! Primary adapters for `sotp test-obligation`.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use usecase::test_obligation::TestObligationCatalogueCommandInput;
 use usecase::{DiagnosticMessage, TrackId};
@@ -40,8 +40,12 @@ pub(crate) fn resolve_track_id(
     TrackId::try_new(raw.to_owned()).map_err(|e| format!("invalid track id from branch: {e}"))
 }
 
-pub(crate) fn default_catalogue_paths(track_id: &TrackId) -> Vec<PathBuf> {
-    let dir = PathBuf::from("track").join("items").join(track_id.as_ref());
+/// Anchors the six TDDD-layer catalogue paths at `workspace_root` so the
+/// resulting inputs work identically regardless of the process cwd (the
+/// composition root discovers the git worktree, so we should never re-derive
+/// the anchor from `PathBuf::from("track")`, which would silently follow cwd).
+pub(crate) fn default_catalogue_paths(workspace_root: &Path, track_id: &TrackId) -> Vec<PathBuf> {
+    let dir = workspace_root.join("track").join("items").join(track_id.as_ref());
     [
         "domain-types.json",
         "usecase-types.json",
@@ -56,6 +60,7 @@ pub(crate) fn default_catalogue_paths(track_id: &TrackId) -> Vec<PathBuf> {
 }
 
 pub(crate) fn catalogue_command_input(
+    workspace_root: &Path,
     explicit_track_id: Option<&TrackId>,
     current_branch: &DiagnosticMessage,
 ) -> Result<TestObligationCatalogueCommandInput, String> {
@@ -63,7 +68,7 @@ pub(crate) fn catalogue_command_input(
     Ok(TestObligationCatalogueCommandInput::new(
         track_id.clone(),
         current_branch.as_str().to_owned(),
-        default_catalogue_paths(&track_id),
+        default_catalogue_paths(workspace_root, &track_id),
     ))
 }
 
@@ -92,9 +97,42 @@ mod tests {
     #[test]
     fn test_default_catalogue_paths_returns_all_tddd_layer_catalogues() {
         let track_id = TrackId::try_new("example").unwrap();
-        let paths = default_catalogue_paths(&track_id);
+        let workspace_root = PathBuf::from("/repo");
+        let paths = default_catalogue_paths(&workspace_root, &track_id);
         assert_eq!(paths.len(), 6);
         assert!(paths.iter().any(|p| p.ends_with("domain-types.json")));
         assert!(paths.iter().any(|p| p.ends_with("cli-types.json")));
+    }
+
+    #[test]
+    fn test_default_catalogue_paths_anchors_at_workspace_root() {
+        // Regression: paths must be rooted at the discovered workspace, not
+        // at whatever cwd happens to be when `sotp test-obligation` runs.
+        let track_id = TrackId::try_new("example").unwrap();
+        let workspace_root = PathBuf::from("/discovered/workspace");
+        let paths = default_catalogue_paths(&workspace_root, &track_id);
+        let expected_prefix = PathBuf::from("/discovered/workspace/track/items/example/");
+        for path in &paths {
+            assert!(
+                path.starts_with(&expected_prefix),
+                "expected {:?} to be anchored under {:?}",
+                path,
+                expected_prefix,
+            );
+        }
+    }
+
+    #[test]
+    fn test_catalogue_command_input_resolves_track_from_branch() {
+        // Cross-check that `catalogue_command_input` threads the workspace
+        // anchor through to `default_catalogue_paths` and resolves the track
+        // id from the branch. `catalogue_paths()` is crate-private on the
+        // usecase input, so the anchoring assertion lives in
+        // `test_default_catalogue_paths_anchors_at_workspace_root`; here we
+        // just verify the plumbing does not error.
+        let workspace_root = PathBuf::from("/discovered/workspace");
+        let branch = branch("track/example");
+        let result = catalogue_command_input(&workspace_root, None, &branch);
+        assert!(result.is_ok(), "expected Ok, got {result:?}");
     }
 }

@@ -7,11 +7,22 @@
 //! here so neither adapter re-implements it (ADR D7: share the semantic-verdict
 //! core rather than copy-pasting a third verifier).
 //!
-//! The default runner reuses the shared LLM subprocess pipeline
-//! ([`crate::ref_verify::make_ref_verifier_process_runner`]) — the same
+//! The default runners reuse the shared LLM subprocess pipeline
+//! ([`crate::ref_verify::process_runner::make_agent_process_runner`]) — the same
 //! "sotp CLI wrapper" mechanics every semantic verifier spawns. Only the OS-level
 //! subprocess plumbing is shared; the obligation-fulfillment verdict / cache
 //! types stay independent of ref-verify (ADR D6).
+//!
+//! Fulfillment and waiver differ in one dimension: the fulfillment verdict
+//! carries a D6 fail `category` while waiver's shape matches ref-verify.
+//! When codex is the routed provider, the two verifiers therefore need
+//! different structured-output schemas — [`default_fulfillment_verifier_runner`]
+//! uses [`crate::ref_verify::process_runner::CODEX_FULFILLMENT_OUTPUT_SCHEMA`],
+//! and [`default_waiver_verifier_runner`] uses the narrower
+//! [`crate::ref_verify::process_runner::CODEX_OUTPUT_SCHEMA`] shared with
+//! ref-verify. Without that split, codex would strip `category` and force every
+//! fulfillment fail into `central_unverified`, breaking the calibration probe
+//! whose contradiction / substitution category must round-trip.
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -91,17 +102,46 @@ pub(crate) fn extract_verdict_json<T: serde::de::DeserializeOwned>(
     })
 }
 
-/// Builds the production runner that spawns the configured provider subprocess.
+/// Builds the production obligation-fulfillment runner.
 ///
-/// Reuses [`crate::ref_verify::make_ref_verifier_process_runner`] (the shared
-/// claude / codex / gemini subprocess pipeline) and rewraps its failure into a
-/// [`SemanticVerifierError`] so the obligation gate never surfaces a ref-verify
-/// error type. The working directory is the process CWD (the workspace root when
-/// the gate runs); it is only used to spawn the provider and place transient
-/// provider output files.
-pub(crate) fn default_semantic_verifier_runner() -> Arc<SemanticVerifierRunner> {
+/// Wraps the shared LLM subprocess pipeline with the fulfillment-specific
+/// codex structured-output schema
+/// ([`crate::ref_verify::process_runner::CODEX_FULFILLMENT_OUTPUT_SCHEMA`]) so a
+/// codex-routed fulfillment verdict can carry its D6 `category` back through
+/// calibration instead of being flattened to `central_unverified` by the
+/// ref-verify schema.
+pub(crate) fn default_fulfillment_verifier_runner() -> Arc<SemanticVerifierRunner> {
+    build_semantic_verifier_runner(
+        crate::ref_verify::process_runner::CODEX_FULFILLMENT_OUTPUT_SCHEMA,
+    )
+}
+
+/// Builds the production waiver runner.
+///
+/// The waiver verdict has no fail category (D8); its wire shape matches
+/// ref-verify. Reuse the ref-verify codex schema unchanged so a codex-routed
+/// waiver run keeps its historical structural constraint.
+pub(crate) fn default_waiver_verifier_runner() -> Arc<SemanticVerifierRunner> {
+    build_semantic_verifier_runner(crate::ref_verify::process_runner::CODEX_OUTPUT_SCHEMA)
+}
+
+/// Shared constructor for the fulfillment / waiver production runners.
+///
+/// Reuses the shared claude / codex / gemini subprocess pipeline
+/// ([`crate::ref_verify::process_runner::make_agent_process_runner`]) with the
+/// caller-supplied codex structured-output schema, and rewraps
+/// [`RefVerifyError`] into [`SemanticVerifierError`] so the obligation gate
+/// never surfaces a ref-verify error type. The working directory is the
+/// process CWD (the workspace root when the gate runs); it is only used to
+/// spawn the provider and place transient provider output files.
+fn build_semantic_verifier_runner(
+    codex_output_schema: &'static str,
+) -> Arc<SemanticVerifierRunner> {
     let project_root = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-    let inner = crate::ref_verify::make_ref_verifier_process_runner(project_root);
+    let inner = crate::ref_verify::process_runner::make_agent_process_runner(
+        project_root,
+        codex_output_schema,
+    );
     Arc::new(move |resolved, prompt| {
         inner(resolved, prompt).map_err(|err| match err {
             RefVerifyError::VerifierPort { message } => semantic_verifier_error(&message),

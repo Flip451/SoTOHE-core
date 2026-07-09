@@ -105,7 +105,10 @@ impl TestObligationCompositionRoot {
             self.catalogue_loader(),
             RoleObligationItemsProjector::new(),
         ));
-        cli_driver::test_obligation::derive::TestObligationDeriveHandler::new(service)
+        cli_driver::test_obligation::derive::TestObligationDeriveHandler::new(
+            service,
+            self.workspace_root.clone(),
+        )
     }
 
     /// Wires the check handler.
@@ -121,7 +124,10 @@ impl TestObligationCompositionRoot {
             self.spec_loader(),
             self.catalogue_loader(),
         ));
-        cli_driver::test_obligation::check::TestObligationCheckHandler::new(service)
+        cli_driver::test_obligation::check::TestObligationCheckHandler::new(
+            service,
+            self.workspace_root.clone(),
+        )
     }
 
     /// Wires the bindings-skeleton handler.
@@ -152,7 +158,10 @@ impl TestObligationCompositionRoot {
             self.catalogue_loader(),
             Arc::new(Sha256ContentHasher::new()),
         ));
-        cli_driver::test_obligation::evaluate::TestObligationEvaluateHandler::new(service)
+        cli_driver::test_obligation::evaluate::TestObligationEvaluateHandler::new(
+            service,
+            self.workspace_root.clone(),
+        )
     }
 
     /// Wires the results handler.
@@ -215,7 +224,12 @@ impl TestObligationCompositionRoot {
     }
 
     fn spec_loader(&self) -> Arc<dyn domain::SpecDocumentLoaderPort + Send + Sync> {
-        Arc::new(FsSpecDocumentLoader::new(self.items_dir()))
+        // Pass the discovered workspace root as the resolution anchor so that
+        // relative spec paths — like the `track/items/<id>/spec.json` that the
+        // driver and interactors build from a `TrackId` — resolve against the
+        // repo root, not the process cwd. `items_dir()` remains the trusted
+        // containment root: no caller-supplied path can escape it.
+        Arc::new(FsSpecDocumentLoader::new(self.workspace_root.clone(), self.items_dir()))
     }
 
     fn catalogue_loader(&self) -> Arc<dyn CatalogueDocumentLoaderPort + Send + Sync> {
@@ -286,6 +300,7 @@ fn default_probe_config() -> SemanticCalibrationProbeConfig {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
 
@@ -296,6 +311,36 @@ mod tests {
             PathBuf::from("/repo/.harness/config/test-obligation-rules.json"),
         );
         assert_eq!(root.items_dir(), PathBuf::from("/repo/track/items"));
+    }
+
+    #[test]
+    fn test_spec_loader_resolves_relative_spec_path_against_workspace_root() {
+        // Regression: when the composition root discovers the workspace root
+        // from `git rev-parse`, the wired spec loader must anchor relative
+        // spec paths at that root — not at the process cwd. This is what
+        // makes `bin/sotp test-obligation ...` work from a repo subdirectory.
+        let tmp = tempfile::tempdir().unwrap();
+        let workspace_root = tmp.path().join("workspace");
+        let items_root = workspace_root.join("track").join("items");
+        std::fs::create_dir_all(items_root.join("example-track")).unwrap();
+        std::fs::write(items_root.join("example-track").join("spec.json"), "{ malformed").unwrap();
+
+        let root = TestObligationCompositionRoot::new(
+            workspace_root.clone(),
+            workspace_root.join(TEST_OBLIGATION_RULES_PATH),
+        );
+        let loader = root.spec_loader();
+        let relative = PathBuf::from("track").join("items").join("example-track").join("spec.json");
+
+        // Anchoring against workspace_root means the malformed body is
+        // reached and reported as JsonParse. Without the fix the loader
+        // would join against `current_dir()` (the cargo test cwd) and
+        // return NotFound.
+        let err = loader.load(&relative).unwrap_err();
+        assert!(
+            matches!(err, domain::SpecDocumentLoadError::JsonParse { .. }),
+            "expected JsonParse from workspace-anchored resolution, got: {err:?}"
+        );
     }
 
     #[test]

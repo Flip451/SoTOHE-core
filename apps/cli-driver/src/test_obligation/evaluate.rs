@@ -56,13 +56,23 @@ impl TestObligationEvaluateInput {
 /// Primary adapter for `test-obligation evaluate`.
 pub struct TestObligationEvaluateHandler {
     pub service: Arc<dyn EvaluateTestObligationsApplicationService>,
+    /// Anchor used to make track-artifact paths (catalogue snapshots and the
+    /// evaluate command's `spec_path`) absolute so the handler is not
+    /// sensitive to the process cwd.
+    workspace_root: PathBuf,
 }
 
 impl TestObligationEvaluateHandler {
-    /// Builds the handler over its application service.
+    /// Builds the handler over its application service and the discovered
+    /// workspace root. `workspace_root` is the anchor used when constructing
+    /// catalogue paths and the evaluate spec path — pass the value the
+    /// composition root obtained from git worktree discovery.
     #[must_use]
-    pub fn new(service: Arc<dyn EvaluateTestObligationsApplicationService>) -> Self {
-        Self { service }
+    pub fn new(
+        service: Arc<dyn EvaluateTestObligationsApplicationService>,
+        workspace_root: PathBuf,
+    ) -> Self {
+        Self { service, workspace_root }
     }
 
     /// Handles one evaluate command.
@@ -72,11 +82,17 @@ impl TestObligationEvaluateHandler {
             Ok(track_id) => track_id,
             Err(message) => return CommandOutcome::failure(Some(message)),
         };
+        let spec_path = self
+            .workspace_root
+            .join("track")
+            .join("items")
+            .join(track_id.as_ref())
+            .join("spec.json");
         let command = EvaluateTestObligationsCommand::new(
             track_id.clone(),
             input.current_branch().as_str().to_owned(),
-            default_catalogue_paths(&track_id),
-            PathBuf::from("track").join("items").join(track_id.as_ref()).join("spec.json"),
+            default_catalogue_paths(&self.workspace_root, &track_id),
+            spec_path,
         );
         match block_on(self.service.execute(&command)) {
             Ok(output) => CommandOutcome::success(Some(format!(
@@ -147,13 +163,64 @@ mod tests {
 
     #[test]
     fn test_evaluate_handler_with_valid_input_returns_success() {
-        let handler = TestObligationEvaluateHandler::new(Arc::new(StubService));
+        let handler =
+            TestObligationEvaluateHandler::new(Arc::new(StubService), PathBuf::from("/repo"));
         let branch = DiagnosticMessage::try_new("track/test-track".to_owned()).unwrap();
 
         let outcome = handler.handle(TestObligationEvaluateInput::new(None, branch));
 
         assert_eq!(outcome.exit_code, 0);
         assert!(outcome.stdout.unwrap().contains("pass=1"));
+    }
+
+    #[test]
+    fn test_evaluate_handler_anchors_command_paths_at_workspace_root() {
+        use std::sync::Mutex;
+        // Regression: the handler used to build `catalogue_paths` and
+        // `spec_path` from `PathBuf::from("track")`, which is cwd-relative
+        // and blew up when `bin/sotp test-obligation ...` was invoked from a
+        // repo subdirectory. Capture the command the service received and
+        // compare it whole-for-whole with the command built from the same
+        // absolute workspace anchor — command equality is the tightest
+        // available assertion (the usecase command's fields are private).
+        struct CapturingService {
+            captured: Mutex<Option<EvaluateTestObligationsCommand>>,
+        }
+
+        impl EvaluateTestObligationsApplicationService for CapturingService {
+            fn execute<'a>(
+                &'a self,
+                cmd: &'a EvaluateTestObligationsCommand,
+            ) -> EvaluateTestObligationsFuture<'a> {
+                *self.captured.lock().unwrap() = Some(cmd.clone());
+                Box::pin(async {
+                    Ok(EvaluateTestObligationsOutcome::new(
+                        0,
+                        0,
+                        0,
+                        usecase::DetectionRatePercent::try_new(100).unwrap(),
+                    ))
+                })
+            }
+        }
+
+        let service = Arc::new(CapturingService { captured: Mutex::new(None) });
+        let workspace_root = PathBuf::from("/discovered/workspace");
+        let handler = TestObligationEvaluateHandler::new(service.clone(), workspace_root.clone());
+        let branch = DiagnosticMessage::try_new("track/example".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationEvaluateInput::new(None, branch));
+
+        assert_eq!(outcome.exit_code, 0);
+        let captured = service.captured.lock().unwrap().clone().unwrap();
+        let track_id = usecase::TrackId::try_new("example").unwrap();
+        let expected = EvaluateTestObligationsCommand::new(
+            track_id.clone(),
+            "track/example".to_owned(),
+            default_catalogue_paths(&workspace_root, &track_id),
+            workspace_root.join("track").join("items").join(track_id.as_ref()).join("spec.json"),
+        );
+        assert_eq!(captured, expected);
     }
 
     #[test]

@@ -267,7 +267,7 @@
       }
     },
     {
-      "claim_hash": "dacd7283df9e641c11d40331d0deac4efbcdb3bacc2133371332691d114ea4ce",
+      "claim_hash": "62184ab3df6ac7ffcc781f27b6f98aba737f28602dcd2ca1a00ba6c8a9b77fa4",
       "evidence_hash": "a2ff16310f5a09e7ad71e5f6cd3792b8ff9ac3604f959f5dbb64ecab338904bf",
       "verdict": {
         "kind": "pass",
@@ -291,11 +291,11 @@
       }
     },
     {
-      "claim_hash": "dacd7283df9e641c11d40331d0deac4efbcdb3bacc2133371332691d114ea4ce",
+      "claim_hash": "62184ab3df6ac7ffcc781f27b6f98aba737f28602dcd2ca1a00ba6c8a9b77fa4",
       "evidence_hash": "1ea999f83a13693dee35ecc945798f7da95fa1a0cbcf08776195af19519ca901",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。"
+        "citation": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。… commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法."
       },
       "claim_origin": {
         "kind": "catalogue_entry",

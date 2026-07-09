@@ -25,7 +25,7 @@ use domain::tddd::test_obligation::vocab::FulfillmentFailCategory;
 use crate::agent_profiles::AgentProfiles;
 use crate::test_obligation::diagnostic;
 use crate::test_obligation::semantic_verifier::{
-    SemanticVerifierRunner, VerdictKindWire, default_semantic_verifier_runner,
+    SemanticVerifierRunner, VerdictKindWire, default_fulfillment_verifier_runner,
     extract_verdict_json, resolve_execution_or_err, semantic_verifier_error, tier_to_round_type,
 };
 
@@ -66,7 +66,7 @@ impl ObligationFulfillmentVerifierAdapter {
     /// verification.
     #[must_use]
     pub fn new(agent_profile: AgentProfiles) -> Self {
-        Self { agent_profile, runner: default_semantic_verifier_runner() }
+        Self { agent_profile, runner: default_fulfillment_verifier_runner() }
     }
 
     /// Test-only constructor injecting a stubbed provider runner so unit tests
@@ -120,9 +120,15 @@ impl ObligationFulfillmentVerifierPort for FailingObligationFulfillmentVerifier 
 
 /// Wire form of the obligation-fulfillment verdict returned by the provider.
 ///
-/// `category` is only meaningful on a `fail`; it is optional so a provider
-/// constrained to `{kind, citation, reason}` structured output still decodes,
-/// defaulting to `central_unverified` (the most conservative fail category).
+/// `category` is only meaningful on a `fail`; when the routed provider is
+/// codex, the fulfillment structured-output schema
+/// ([`crate::ref_verify::process_runner::CODEX_FULFILLMENT_OUTPUT_SCHEMA`])
+/// includes it explicitly so a real category is preserved through calibration.
+/// It is still declared optional here so a `pass` or `pending` verdict
+/// (which emits `category: null`) decodes, and so a provider constrained to a
+/// three-field schema still decodes with the conservative `central_unverified`
+/// fallback (the finding on PR #189 required the schema to admit categories,
+/// not that this fallback be removed).
 #[derive(serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct FulfillmentVerdictDto {

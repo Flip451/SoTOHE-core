@@ -23,8 +23,8 @@ use domain::tddd::test_obligation::verdict::WaiverVerdict;
 use crate::agent_profiles::AgentProfiles;
 use crate::test_obligation::diagnostic;
 use crate::test_obligation::semantic_verifier::{
-    SemanticVerifierRunner, VerdictKindWire, default_semantic_verifier_runner,
-    extract_verdict_json, resolve_execution_or_err, semantic_verifier_error, tier_to_round_type,
+    SemanticVerifierRunner, VerdictKindWire, default_waiver_verifier_runner, extract_verdict_json,
+    resolve_execution_or_err, semantic_verifier_error, tier_to_round_type,
 };
 
 /// Capability name resolved from `agent-profiles.json` for this verifier.
@@ -64,7 +64,7 @@ impl WaiverVerifierAdapter {
     /// verification.
     #[must_use]
     pub fn new(agent_profile: AgentProfiles) -> Self {
-        Self { agent_profile, runner: default_semantic_verifier_runner() }
+        Self { agent_profile, runner: default_waiver_verifier_runner() }
     }
 
     /// Test-only constructor injecting a stubbed provider runner so unit tests

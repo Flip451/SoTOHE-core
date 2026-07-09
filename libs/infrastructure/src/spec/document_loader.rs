@@ -10,16 +10,35 @@ use crate::track::symlink_guard::reject_symlinks_below;
 use crate::verify::path_safety::lexical_normalize;
 
 /// Filesystem adapter implementing [`SpecDocumentLoaderPort`].
+///
+/// Composition supplies two absolute paths:
+///
+/// * `workspace_root` — the anchor used to resolve **relative** `spec_path`
+///   arguments. This replaces `std::env::current_dir()` so the loader behaves
+///   identically regardless of the process cwd (subdirectory invocation, tests
+///   running from a nested crate, etc.).
+/// * `trusted_root` — the containment constraint the resolved path must sit
+///   under. This is intentionally narrower than `workspace_root` (typically
+///   `<workspace_root>/track/items`) so the loader can never be tricked into
+///   reading arbitrary files inside the repo via caller-supplied paths.
 #[derive(Debug, Clone)]
 pub struct FsSpecDocumentLoader {
+    workspace_root: PathBuf,
     trusted_root: PathBuf,
 }
 
 impl FsSpecDocumentLoader {
-    /// Builds a filesystem spec document loader rooted at `trusted_root`.
+    /// Builds a filesystem spec document loader.
+    ///
+    /// `workspace_root` is the resolution anchor for relative `spec_path`
+    /// arguments (typically the discovered git worktree root).
+    /// `trusted_root` is the containment constraint — the resolved path must
+    /// sit under it, or the load is rejected.
+    ///
+    /// Both should be absolute paths supplied by the composition root.
     #[must_use]
-    pub fn new(trusted_root: PathBuf) -> Self {
-        Self { trusted_root }
+    pub fn new(workspace_root: PathBuf, trusted_root: PathBuf) -> Self {
+        Self { workspace_root, trusted_root }
     }
 }
 
@@ -54,7 +73,7 @@ impl FsSpecDocumentLoader {
         let absolute_spec_path = if spec_path.is_absolute() {
             spec_path.to_path_buf()
         } else {
-            current_dir(spec_path)?.join(spec_path)
+            self.resolution_anchor(spec_path)?.join(spec_path)
         };
         let normalized_spec_path = lexical_normalize(&absolute_spec_path);
         if !normalized_spec_path.starts_with(&trusted_root) {
@@ -82,9 +101,23 @@ impl FsSpecDocumentLoader {
         let root = if self.trusted_root.is_absolute() {
             self.trusted_root.clone()
         } else {
-            current_dir(spec_path)?.join(&self.trusted_root)
+            self.resolution_anchor(spec_path)?.join(&self.trusted_root)
         };
         Ok(lexical_normalize(&root))
+    }
+
+    /// Base directory used to promote a relative `spec_path` (or a relative
+    /// `trusted_root`) to an absolute path. Uses the injected `workspace_root`
+    /// so the loader is not sensitive to the process cwd; falls back to
+    /// `std::env::current_dir()` only if `workspace_root` is itself relative
+    /// (defence in depth — composition passes an absolute path in practice).
+    fn resolution_anchor(&self, spec_path: &Path) -> Result<PathBuf, SpecDocumentLoadError> {
+        if self.workspace_root.is_absolute() {
+            Ok(self.workspace_root.clone())
+        } else {
+            let base = current_dir(spec_path)?;
+            Ok(base.join(&self.workspace_root))
+        }
     }
 }
 
@@ -180,7 +213,10 @@ mod tests {
     use super::*;
 
     fn loader_for(root: &Path) -> FsSpecDocumentLoader {
-        FsSpecDocumentLoader::new(root.to_path_buf())
+        // Existing tests pass absolute spec paths built from the tempdir root,
+        // so `workspace_root` never participates in resolution — using `root`
+        // for both parameters keeps the pre-existing behaviour verbatim.
+        FsSpecDocumentLoader::new(root.to_path_buf(), root.to_path_buf())
     }
 
     #[test]
@@ -341,6 +377,62 @@ mod tests {
                 assert!(reason.as_str().contains("symlinked trusted root component"));
             }
             other => panic!("expected symlinked root ancestor to map to Io error, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_fs_spec_document_loader_resolves_relative_spec_path_against_workspace_root() {
+        // Regression: caller supplies a workspace-relative spec path
+        // (e.g. `track/items/<track>/spec.json`, exactly what the driver and
+        // usecase interactors build). The loader must resolve it against the
+        // discovered workspace root instead of the process cwd, so
+        // `bin/sotp test-obligation ...` from a repo subdirectory sees the
+        // same spec file the composition root discovered.
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        let items_root = workspace_root.join("track").join("items");
+        let track_dir = items_root.join("example-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("spec.json"), "{").unwrap();
+
+        let loader = FsSpecDocumentLoader::new(workspace_root.clone(), items_root.clone());
+        let relative = PathBuf::from("track").join("items").join("example-track").join("spec.json");
+
+        // Anchoring against workspace_root means the malformed body is reached
+        // and reported (JsonParse). Without the fix, the loader would join
+        // against `current_dir()` — the cargo test cwd — and return NotFound.
+        let err = loader.load(&relative).unwrap_err();
+        assert!(
+            matches!(err, SpecDocumentLoadError::JsonParse { .. }),
+            "expected JsonParse from workspace-anchored resolution, got: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_fs_spec_document_loader_relative_workspace_root_falls_back_to_cwd() {
+        // Defence-in-depth: a relative `workspace_root` is unexpected in
+        // production (composition passes an absolute path), but if one is
+        // supplied the loader must still refuse to read outside the trusted
+        // root — the fallback anchor becomes cwd, and any resolved path that
+        // escapes `trusted_root` is still rejected.
+        let dir = tempfile::tempdir().unwrap();
+        let items_root = dir.path().join("items");
+        std::fs::create_dir_all(&items_root).unwrap();
+
+        // Non-absolute workspace_root; trusted_root is absolute so containment
+        // is well-defined regardless of cwd.
+        let loader = FsSpecDocumentLoader::new(PathBuf::from("relative-anchor"), items_root);
+        let relative = PathBuf::from("spec.json");
+
+        let err = loader.load(&relative).unwrap_err();
+        match err {
+            SpecDocumentLoadError::Io { reason, .. } => {
+                assert!(
+                    reason.as_str().contains("resolves outside trusted root"),
+                    "expected containment rejection, got reason: {reason:?}"
+                );
+            }
+            other => panic!("expected Io containment error, got {other:?}"),
         }
     }
 

@@ -222,7 +222,7 @@
     },
     "TestObligationCheckHandler": {
       "action": "add",
-      "docs": "Primary adapter for `test-obligation check`; see IN-08 / AC-04 / AC-10.",
+      "docs": "Primary adapter for `test-obligation check`, anchored at the discovered workspace root so catalogue paths are cwd-independent; see IN-08 / AC-04 / AC-10.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -233,7 +233,7 @@
               "ty": "std::sync::Arc<dyn usecase::test_obligation::check::CheckTestObligationsApplicationService>"
             }
           ],
-          "has_stripped_fields": false,
+          "has_stripped_fields": true,
           "kind": "plain"
         }
       },
@@ -246,6 +246,10 @@
             {
               "name": "service",
               "ty": "std::sync::Arc<dyn usecase::test_obligation::check::CheckTestObligationsApplicationService>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
             }
           ],
           "returns": "Self"
@@ -360,7 +364,7 @@
     },
     "TestObligationDeriveHandler": {
       "action": "add",
-      "docs": "Primary adapter for `test-obligation derive`; see IN-07 / AC-03.",
+      "docs": "Primary adapter for `test-obligation derive`, anchored at the discovered workspace root so catalogue paths are cwd-independent; see IN-07 / AC-03.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -371,7 +375,7 @@
               "ty": "std::sync::Arc<dyn usecase::test_obligation::derive::DeriveTestObligationsApplicationService>"
             }
           ],
-          "has_stripped_fields": false,
+          "has_stripped_fields": true,
           "kind": "plain"
         }
       },
@@ -384,6 +388,10 @@
             {
               "name": "service",
               "ty": "std::sync::Arc<dyn usecase::test_obligation::derive::DeriveTestObligationsApplicationService>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
             }
           ],
           "returns": "Self"
@@ -490,7 +498,7 @@
     },
     "TestObligationEvaluateHandler": {
       "action": "add",
-      "docs": "Primary adapter for `test-obligation evaluate`; see IN-09 / AC-06.",
+      "docs": "Primary adapter for `test-obligation evaluate`, anchored at the discovered workspace root so catalogue paths and the evaluate spec_path are cwd-independent; see IN-09 / AC-06.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -501,7 +509,7 @@
               "ty": "std::sync::Arc<dyn usecase::test_obligation::evaluate::EvaluateTestObligationsApplicationService>"
             }
           ],
-          "has_stripped_fields": false,
+          "has_stripped_fields": true,
           "kind": "plain"
         }
       },
@@ -514,6 +522,10 @@
             {
               "name": "service",
               "ty": "std::sync::Arc<dyn usecase::test_obligation::evaluate::EvaluateTestObligationsApplicationService>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
             }
           ],
           "returns": "Self"

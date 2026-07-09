@@ -55,12 +55,16 @@ use crate::agent_profiles::ResolvedExecution;
 use crate::codex_common::REVIEW_RUNTIME_DIR;
 use crate::ref_verify::AgentExecutionRunner;
 
-/// Codex structured-output JSON schema for [`VerdictResponseDto`].
+/// Codex structured-output JSON schema for the ref-verify [`VerdictResponseDto`].
 ///
 /// Modelled as a flat object with a `kind` discriminator + nullable
 /// `citation` / `reason` strings. OpenAI structured output rejects `oneOf`
 /// and requires all properties to appear in `required`.
-const CODEX_OUTPUT_SCHEMA: &str = r#"{
+///
+/// Exposed at `pub(crate)` so the shared semantic-verifier pipeline
+/// (`test_obligation::semantic_verifier`) can reuse this exact schema for the
+/// waiver verifier — whose verdict wire shape matches ref-verify's (D8).
+pub(crate) const CODEX_OUTPUT_SCHEMA: &str = r#"{
   "type": "object",
   "additionalProperties": false,
   "required": ["kind", "citation", "reason"],
@@ -68,6 +72,33 @@ const CODEX_OUTPUT_SCHEMA: &str = r#"{
     "kind": { "type": "string", "enum": ["pass", "fail", "pending"] },
     "citation": { "type": ["string", "null"] },
     "reason": { "type": ["string", "null"] }
+  }
+}
+"#;
+
+/// Codex structured-output JSON schema for the obligation-fulfillment verdict.
+///
+/// Extends [`CODEX_OUTPUT_SCHEMA`] with the D6 fail-taxonomy `category`
+/// (`contradiction` / `substitution` / `central_unverified`), so a `fail`
+/// verdict can propagate its real category to the calibration loop instead of
+/// being flattened to `central_unverified` by the ref-verify schema's default.
+///
+/// The category is nullable — a `pass` or `pending` verdict emits
+/// `"category": null`. Structured output requires every property in `required`
+/// and forbids `oneOf`; the enum lists the three snake_case fail categories
+/// alongside `null`, and the property `type` combines `string` with `null`.
+pub(crate) const CODEX_FULFILLMENT_OUTPUT_SCHEMA: &str = r#"{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "citation", "reason", "category"],
+  "properties": {
+    "kind": { "type": "string", "enum": ["pass", "fail", "pending"] },
+    "citation": { "type": ["string", "null"] },
+    "reason": { "type": ["string", "null"] },
+    "category": {
+      "type": ["string", "null"],
+      "enum": ["contradiction", "substitution", "central_unverified", null]
+    }
   }
 }
 "#;
@@ -81,16 +112,40 @@ const CODEX_OUTPUT_SCHEMA: &str = r#"{
 /// `tmp/reviewer-runtime/`.
 #[must_use]
 pub fn make_ref_verifier_process_runner(project_root: PathBuf) -> Arc<AgentExecutionRunner> {
+    make_agent_process_runner(project_root, CODEX_OUTPUT_SCHEMA)
+}
+
+/// Build an [`AgentExecutionRunner`] that shares the same subprocess pipeline
+/// as [`make_ref_verifier_process_runner`] but constrains the codex path with
+/// a caller-supplied structured-output schema.
+///
+/// The claude / gemini paths do not enforce structural constraints on model
+/// output (they pass the rendered prompt through unchanged), so the schema
+/// only affects the codex `exec --output-schema` argument. This lets the
+/// obligation-fulfillment verifier reach codex with a schema that admits its
+/// D6 fail `category` while ref-verify and the waiver verifier keep the
+/// narrower ref-verify schema.
+#[must_use]
+pub(crate) fn make_agent_process_runner(
+    project_root: PathBuf,
+    codex_output_schema: &'static str,
+) -> Arc<AgentExecutionRunner> {
     Arc::new(move |resolved: ResolvedExecution, prompt: String| {
-        run_ref_verifier_agent(&project_root, resolved, prompt)
+        run_ref_verifier_agent(&project_root, resolved, prompt, codex_output_schema)
     })
 }
 
 /// Provider-dispatching entry point — pure delegation to a per-provider runner.
+///
+/// `codex_output_schema` is the structured-output JSON schema forwarded to
+/// codex's `--output-schema` (see [`make_agent_process_runner`]). The claude
+/// and gemini paths ignore it: neither CLI enforces structural constraints on
+/// model output at this pipeline layer.
 fn run_ref_verifier_agent(
     project_root: &Path,
     resolved: ResolvedExecution,
     prompt: String,
+    codex_output_schema: &str,
 ) -> Result<String, RefVerifyError> {
     match resolved.provider.as_str() {
         "claude" => {
@@ -99,7 +154,7 @@ fn run_ref_verifier_agent(
         }
         "codex" => {
             let model = require_ref_verifier_model("codex", resolved.model.as_deref())?;
-            run_codex_ref_verifier(project_root, model, &prompt)
+            run_codex_ref_verifier(project_root, model, &prompt, codex_output_schema)
         }
         "gemini" => {
             let model = require_ref_verifier_model("gemini", resolved.model.as_deref())?;
@@ -193,12 +248,13 @@ fn run_codex_ref_verifier(
     project_root: &Path,
     model: &str,
     prompt: &str,
+    output_schema: &str,
 ) -> Result<String, RefVerifyError> {
     let schema = AutoCleanupFile::create(
         project_root,
         "codex-ref-verify-schema",
         "json",
-        CODEX_OUTPUT_SCHEMA.as_bytes(),
+        output_schema.as_bytes(),
     )?;
     let last_message = AutoCleanupFile::create(project_root, "codex-ref-verify-last", "txt", &[])?;
 
@@ -658,7 +714,9 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let resolved =
             ResolvedExecution { provider: "unsupported".to_owned(), model: Some("m".to_owned()) };
-        let err = run_ref_verifier_agent(dir.path(), resolved, "prompt".to_owned()).unwrap_err();
+        let err =
+            run_ref_verifier_agent(dir.path(), resolved, "prompt".to_owned(), CODEX_OUTPUT_SCHEMA)
+                .unwrap_err();
         let RefVerifyError::VerifierPort { message } = err else {
             panic!("expected VerifierPort, got {err:?}");
         };
@@ -669,11 +727,77 @@ mod tests {
     fn run_ref_verifier_agent_rejects_provider_without_model() {
         let dir = tempfile::tempdir().unwrap();
         let resolved = ResolvedExecution { provider: "claude".to_owned(), model: None };
-        let err = run_ref_verifier_agent(dir.path(), resolved, "prompt".to_owned()).unwrap_err();
+        let err =
+            run_ref_verifier_agent(dir.path(), resolved, "prompt".to_owned(), CODEX_OUTPUT_SCHEMA)
+                .unwrap_err();
         let RefVerifyError::VerifierPort { message } = err else {
             panic!("expected VerifierPort, got {err:?}");
         };
         assert!(message.contains("requires a configured model"));
+    }
+
+    // ── structured-output schema shape ────────────────────────────────────────
+
+    /// The ref-verify codex schema stays byte-identical to the historical
+    /// three-field contract: adding the fulfillment `category` here would
+    /// leak the D6 fail taxonomy into ref-verify's verdict wire shape.
+    #[test]
+    fn codex_output_schema_matches_ref_verify_three_field_contract() {
+        let schema: serde_json::Value = serde_json::from_str(CODEX_OUTPUT_SCHEMA).unwrap();
+        assert_eq!(schema.get("additionalProperties"), Some(&serde_json::Value::Bool(false)));
+        let required: Vec<&str> = schema
+            .get("required")
+            .and_then(serde_json::Value::as_array)
+            .unwrap()
+            .iter()
+            .filter_map(serde_json::Value::as_str)
+            .collect();
+        assert_eq!(required, vec!["kind", "citation", "reason"]);
+        assert!(
+            schema.get("properties").and_then(|p| p.get("category")).is_none(),
+            "ref-verify schema must not declare a category property"
+        );
+    }
+
+    /// The fulfillment codex schema must include the nullable `category`
+    /// alongside the three ref-verify fields, so codex's structured output can
+    /// carry a real fail taxonomy back through calibration. Every property
+    /// must appear in `required` and the enum must include `null` — those are
+    /// OpenAI structured-output constraints.
+    #[test]
+    fn codex_fulfillment_output_schema_declares_category_enum_with_null() {
+        let schema: serde_json::Value =
+            serde_json::from_str(CODEX_FULFILLMENT_OUTPUT_SCHEMA).unwrap();
+        assert_eq!(schema.get("additionalProperties"), Some(&serde_json::Value::Bool(false)));
+        let required: std::collections::BTreeSet<&str> = schema
+            .get("required")
+            .and_then(serde_json::Value::as_array)
+            .unwrap()
+            .iter()
+            .filter_map(serde_json::Value::as_str)
+            .collect();
+        for name in ["kind", "citation", "reason", "category"] {
+            assert!(required.contains(name), "required missing '{name}'");
+        }
+
+        let category =
+            schema.get("properties").and_then(|p| p.get("category")).expect("category property");
+        let ty = category.get("type").and_then(serde_json::Value::as_array).expect("type array");
+        let ty_variants: std::collections::BTreeSet<&str> =
+            ty.iter().filter_map(serde_json::Value::as_str).collect();
+        assert!(ty_variants.contains("string") && ty_variants.contains("null"));
+
+        let enum_vals =
+            category.get("enum").and_then(serde_json::Value::as_array).expect("category enum");
+        let string_variants: std::collections::BTreeSet<&str> =
+            enum_vals.iter().filter_map(serde_json::Value::as_str).collect();
+        for value in ["contradiction", "substitution", "central_unverified"] {
+            assert!(string_variants.contains(value), "category enum missing '{value}'");
+        }
+        assert!(
+            enum_vals.iter().any(serde_json::Value::is_null),
+            "category enum must include null for pass/pending verdicts"
+        );
     }
 
     // ── success-path subprocess tests ─────────────────────────────────────────
