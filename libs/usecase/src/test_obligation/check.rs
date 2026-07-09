@@ -22,16 +22,14 @@ use std::sync::Arc;
 
 use domain::ContentHash;
 use domain::TrackId;
-use domain::tddd::catalogue_v2::CatalogueDocument;
 use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort;
-use domain::tddd::semantic_verify::SpecSectionKind;
 use domain::tddd::test_obligation::binding::{
     TestBindingRecord, TestBindingsDocument, TestLocation,
 };
 use domain::tddd::test_obligation::drift::{NonEmptyDrifts, TestObligationDrift};
 use domain::tddd::test_obligation::errors::{ObligationCheckError, TestSourceScanError};
 use domain::tddd::test_obligation::ids::{
-    NonEmptyEdgeIds, TestObligationAnchorId, TestObligationEdgeId, TestObligationId, WaivedReason,
+    NonEmptyEdgeIds, TestObligationEdgeId, TestObligationId, WaivedReason,
 };
 use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
 use domain::tddd::test_obligation::ports::{
@@ -43,13 +41,19 @@ use domain::tddd::test_obligation::verdict::{
     ObligationFulfillmentCacheDocument, ObligationFulfillmentVerdict, WaiverCacheDocument,
     WaiverVerdict,
 };
-use domain::{SpecDocument, SpecElementId, SpecRequirement};
 
 use domain::SpecDocumentLoaderPort;
 
+use super::check_support::{
+    GateState, SpecElement, active_cited_edges_from_catalogues, anchor_text, anchor_texts,
+    compute_uncited_from, edge_is_derived, edge_is_known, fulfillment_tests,
+    spec_elements_from_document, synthetic_edge, synthetic_voluntary_obligation_id,
+    voluntary_tests, waived_reason,
+};
 use super::{
-    LoadedCatalogueDocument, TestObligationCatalogueCommandInput, cited_anchor_ids, diag,
-    obligation_declaration_text_from_loaded, sha256_content_hash,
+    LoadedCatalogueDocument, TestObligationCatalogueCommandInput, diag,
+    find_declaration_text_from_loaded, obligation_declaration_text_from_loaded,
+    sha256_content_hash,
 };
 
 /// Command input for [`CheckTestObligationsApplicationService`] (IN-08).
@@ -220,10 +224,7 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
 
         // Existence-based scope resolution (IN-14 / AC-10).
         let (obligations, bindings) = match (obligations, bindings) {
-            (None, None) => {
-                let uncited = self.compute_uncited(cmd)?;
-                return Ok(CheckTestObligationsOutcome::new_empty_scope(uncited));
-            }
+            (None, None) => return Ok(CheckTestObligationsOutcome::new_empty_scope(Vec::new())),
             (Some(_), None) => return Err(ObligationCheckError::BindingsAbsent),
             (None, Some(_)) => return Err(ObligationCheckError::ObligationsAbsent),
             (Some(obligations), Some(bindings)) => (obligations, bindings),
@@ -232,6 +233,7 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
         let catalogues = self.load_catalogues(cmd)?;
         let elements = self.spec_elements(cmd.input.track_id())?;
         let uncited = compute_uncited_from(&catalogues, &elements);
+        let cited_edges = active_cited_edges_from_catalogues(&catalogues)?;
         let spec_texts = anchor_texts(&elements);
 
         let fulfillment = self
@@ -248,10 +250,11 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
             .unwrap_or_else(|| WaiverCacheDocument::new(cmd.input.track_id().clone(), Vec::new()));
 
         let mut gate = GateState::default();
-        self.detect_orphaned(&obligations, &bindings, &mut gate);
+        self.detect_orphaned(&obligations, &bindings, &cited_edges, &mut gate);
         self.resolve_edges(
             &obligations,
             &bindings,
+            &cited_edges,
             &catalogues,
             &spec_texts,
             &fulfillment,
@@ -275,22 +278,13 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
 }
 
 impl CheckTestObligationsInteractor {
-    /// Computes uncited findings when there is no obligations artifact.
-    fn compute_uncited(
-        &self,
-        cmd: &CheckTestObligationsCommand,
-    ) -> Result<Vec<UncitedSpecElementFinding>, ObligationCheckError> {
-        let catalogues = self.load_catalogues(cmd)?;
-        let elements = self.spec_elements(cmd.input.track_id())?;
-        Ok(compute_uncited_from(&catalogues, &elements))
-    }
-
     /// Flags bindings whose obligation / edge is no longer derived
     /// (`orphaned` existence drift — CN-11).
     fn detect_orphaned(
         &self,
         obligations: &ObligationsDocument,
         bindings: &TestBindingsDocument,
+        cited_edges: &[TestObligationEdgeId],
         gate: &mut GateState,
     ) {
         for record in bindings.records() {
@@ -304,14 +298,21 @@ impl CheckTestObligationsInteractor {
                     }
                 }
                 TestBindingRecord::Waiver { edge_id, .. } => {
-                    if !edge_is_derived(obligations, edge_id) {
+                    if !edge_is_known(obligations, cited_edges, edge_id) {
                         gate.drifts.push(TestObligationDrift::orphaned_edge(
                             edge_id.clone(),
                             diag("waiver references an edge that is no longer derived"),
                         ));
                     }
                 }
-                TestBindingRecord::VoluntaryBinding { .. } => {}
+                TestBindingRecord::VoluntaryBinding { edge_id, .. } => {
+                    if !edge_is_known(obligations, cited_edges, edge_id) {
+                        gate.drifts.push(TestObligationDrift::orphaned_edge(
+                            edge_id.clone(),
+                            diag("voluntary binding references an edge that is no longer cited"),
+                        ));
+                    }
+                }
             }
         }
     }
@@ -322,6 +323,7 @@ impl CheckTestObligationsInteractor {
         &self,
         obligations: &ObligationsDocument,
         bindings: &TestBindingsDocument,
+        cited_edges: &[TestObligationEdgeId],
         catalogues: &[LoadedCatalogueDocument],
         spec_texts: &[(String, String)],
         fulfillment: &ObligationFulfillmentCacheDocument,
@@ -378,6 +380,27 @@ impl CheckTestObligationsInteractor {
                 }
             }
         }
+        for edge in cited_edges {
+            if edge_is_derived(obligations, edge) {
+                continue;
+            }
+            if let Some(reason) = waived_reason(bindings, edge) {
+                self.resolve_direct_waiver_edge(
+                    edge, &reason, catalogues, spec_texts, waiver, gate,
+                );
+            } else if let Some(tests) = voluntary_tests(bindings, edge) {
+                self.resolve_direct_fulfillment_edge(
+                    edge,
+                    tests,
+                    catalogues,
+                    spec_texts,
+                    fulfillment,
+                    gate,
+                )?;
+            } else {
+                gate.unresolved.push(edge.clone());
+            }
+        }
         Ok(())
     }
 
@@ -393,20 +416,66 @@ impl CheckTestObligationsInteractor {
         fulfillment: &ObligationFulfillmentCacheDocument,
         gate: &mut GateState,
     ) -> Result<(), ObligationCheckError> {
+        let declaration =
+            obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default();
+        self.resolve_fulfillment_cache_entry(
+            edge,
+            obligation.id(),
+            &declaration,
+            tests,
+            spec_texts,
+            fulfillment,
+            gate,
+        )
+    }
+
+    /// Resolves a direct voluntary-binding edge against the frozen verdict cache.
+    #[allow(clippy::too_many_arguments)]
+    fn resolve_direct_fulfillment_edge(
+        &self,
+        edge: &TestObligationEdgeId,
+        tests: &[TestLocation],
+        catalogues: &[LoadedCatalogueDocument],
+        spec_texts: &[(String, String)],
+        fulfillment: &ObligationFulfillmentCacheDocument,
+        gate: &mut GateState,
+    ) -> Result<(), ObligationCheckError> {
+        let obligation_id = synthetic_voluntary_obligation_id(edge);
+        let declaration = find_declaration_text_from_loaded(catalogues, edge.entry_key().as_str())
+            .unwrap_or_default();
+        self.resolve_fulfillment_cache_entry(
+            edge,
+            &obligation_id,
+            &declaration,
+            tests,
+            spec_texts,
+            fulfillment,
+            gate,
+        )
+    }
+
+    /// Resolves a fulfillment edge from its already-selected declaration text.
+    #[allow(clippy::too_many_arguments)]
+    fn resolve_fulfillment_cache_entry(
+        &self,
+        edge: &TestObligationEdgeId,
+        obligation_id: &TestObligationId,
+        declaration: &str,
+        tests: &[TestLocation],
+        spec_texts: &[(String, String)],
+        fulfillment: &ObligationFulfillmentCacheDocument,
+        gate: &mut GateState,
+    ) -> Result<(), ObligationCheckError> {
         let Some(entry) = fulfillment
             .entries()
             .iter()
-            .find(|e| e.edge_id() == edge && e.obligation_id() == obligation.id())
+            .find(|e| e.edge_id() == edge && e.obligation_id() == obligation_id)
         else {
             gate.stale.push(edge.clone());
             return Ok(());
         };
         let current_bound = self.current_bound_hash(tests)?;
-        let current_decl = sha256_content_hash(
-            obligation_declaration_text_from_loaded(catalogues, obligation)
-                .unwrap_or_default()
-                .as_bytes(),
-        );
+        let current_decl = sha256_content_hash(declaration.as_bytes());
         let current_anchor =
             sha256_content_hash(anchor_text(spec_texts, edge.anchor_id()).as_bytes());
         let key = entry.key();
@@ -445,16 +514,43 @@ impl CheckTestObligationsInteractor {
         waiver: &WaiverCacheDocument,
         gate: &mut GateState,
     ) {
+        let declaration =
+            obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default();
+        self.resolve_waiver_cache_entry(edge, reason, &declaration, spec_texts, waiver, gate);
+    }
+
+    /// Resolves a direct waived edge that has no derived obligation.
+    #[allow(clippy::too_many_arguments)]
+    fn resolve_direct_waiver_edge(
+        &self,
+        edge: &TestObligationEdgeId,
+        reason: &WaivedReason,
+        catalogues: &[LoadedCatalogueDocument],
+        spec_texts: &[(String, String)],
+        waiver: &WaiverCacheDocument,
+        gate: &mut GateState,
+    ) {
+        let declaration = find_declaration_text_from_loaded(catalogues, edge.entry_key().as_str())
+            .unwrap_or_default();
+        self.resolve_waiver_cache_entry(edge, reason, &declaration, spec_texts, waiver, gate);
+    }
+
+    /// Resolves a waiver edge from its already-selected declaration text.
+    fn resolve_waiver_cache_entry(
+        &self,
+        edge: &TestObligationEdgeId,
+        reason: &WaivedReason,
+        declaration: &str,
+        spec_texts: &[(String, String)],
+        waiver: &WaiverCacheDocument,
+        gate: &mut GateState,
+    ) {
         let Some(entry) = waiver.entries().iter().find(|e| e.edge_id() == edge) else {
             gate.stale.push(edge.clone());
             return;
         };
         let current_reason = sha256_content_hash(reason.as_str().as_bytes());
-        let current_decl = sha256_content_hash(
-            obligation_declaration_text_from_loaded(catalogues, obligation)
-                .unwrap_or_default()
-                .as_bytes(),
-        );
+        let current_decl = sha256_content_hash(declaration.as_bytes());
         let current_anchor =
             sha256_content_hash(anchor_text(spec_texts, edge.anchor_id()).as_bytes());
         let key = entry.key();
@@ -478,148 +574,6 @@ impl CheckTestObligationsInteractor {
         } else {
             gate.stale.push(edge.clone());
         }
-    }
-}
-
-/// Mutable accumulators for a single `check` run.
-#[derive(Default)]
-struct GateState {
-    drifts: Vec<TestObligationDrift>,
-    unresolved: Vec<TestObligationEdgeId>,
-    stale: Vec<TestObligationEdgeId>,
-    resolved: Vec<TestObligationEdgeId>,
-}
-
-/// A parsed spec element (id + section + anchor text).
-struct SpecElement {
-    id: String,
-    section: SpecSectionKind,
-    text: String,
-}
-
-/// Returns the bound tests for the obligation with `id`, if a `Fulfillment`
-/// binding exists.
-fn fulfillment_tests<'a>(
-    bindings: &'a TestBindingsDocument,
-    id: &TestObligationId,
-) -> Option<&'a [TestLocation]> {
-    bindings.records().iter().find_map(|record| match record {
-        TestBindingRecord::Fulfillment { obligation_id, tests } if obligation_id == id => {
-            Some(tests.as_slice())
-        }
-        _ => None,
-    })
-}
-
-/// Returns the bound tests for `edge`, if a `VoluntaryBinding` exists.
-fn voluntary_tests<'a>(
-    bindings: &'a TestBindingsDocument,
-    edge: &TestObligationEdgeId,
-) -> Option<&'a [TestLocation]> {
-    bindings.records().iter().find_map(|record| match record {
-        TestBindingRecord::VoluntaryBinding { edge_id, tests } if edge_id == edge => {
-            Some(tests.as_slice())
-        }
-        _ => None,
-    })
-}
-
-/// Returns the waived reason for `edge`, if a `Waiver` binding exists.
-fn waived_reason(
-    bindings: &TestBindingsDocument,
-    edge: &TestObligationEdgeId,
-) -> Option<WaivedReason> {
-    bindings.records().iter().find_map(|record| match record {
-        TestBindingRecord::Waiver { edge_id, reason } if edge_id == edge => Some(reason.clone()),
-        _ => None,
-    })
-}
-
-/// Returns whether `edge` is still produced by the current obligations.
-fn edge_is_derived(obligations: &ObligationsDocument, edge: &TestObligationEdgeId) -> bool {
-    obligations.obligations().iter().any(|obligation| {
-        obligation.id().entry_key() == edge.entry_key()
-            && obligation.spec_refs().iter().any(|anchor| anchor == edge.anchor_id())
-    })
-}
-
-/// Builds a synthetic edge id for an orphaned `Fulfillment` binding's drift.
-fn synthetic_edge(obligation_id: &TestObligationId) -> TestObligationEdgeId {
-    let mut element = format!("orphaned:{}", obligation_id.item_identifier().as_str());
-    let anchor = loop {
-        match TestObligationAnchorId::try_new("binding".to_owned(), element) {
-            Ok(anchor) => break anchor,
-            // Unreachable: the prefix guarantees non-empty; reset defensively.
-            Err(_) => element = "orphaned:edge".to_owned(),
-        }
-    };
-    TestObligationEdgeId::new(obligation_id.entry_key().clone(), anchor)
-}
-
-/// Returns the anchor text for `anchor`, or an empty string when unknown.
-fn anchor_text(spec_texts: &[(String, String)], anchor: &TestObligationAnchorId) -> String {
-    spec_texts
-        .iter()
-        .find(|(id, _)| id == anchor.element_id())
-        .map(|(_, text)| text.clone())
-        .unwrap_or_default()
-}
-
-/// Projects the parsed elements into `(element_id, text)` pairs.
-fn anchor_texts(elements: &[SpecElement]) -> Vec<(String, String)> {
-    elements.iter().map(|e| (e.id.clone(), e.text.clone())).collect()
-}
-
-/// Computes the uncited `AC` / `CN` findings from catalogues + spec elements.
-fn compute_uncited_from(
-    catalogues: &[LoadedCatalogueDocument],
-    elements: &[SpecElement],
-) -> Vec<UncitedSpecElementFinding> {
-    let documents: Vec<CatalogueDocument> =
-        catalogues.iter().map(|catalogue| catalogue.document().clone()).collect();
-    let cited = cited_anchor_ids(&documents);
-    let mut findings = Vec::new();
-    for element in elements {
-        let is_ac_or_cn = matches!(
-            element.section,
-            SpecSectionKind::AcceptanceCriteria | SpecSectionKind::Constraint
-        );
-        if is_ac_or_cn && !cited.iter().any(|c| c == &element.id) {
-            if let Ok(id) = SpecElementId::try_new(element.id.clone()) {
-                findings.push(UncitedSpecElementFinding::new(id, element.section.clone()));
-            }
-        }
-    }
-    findings
-}
-
-/// Projects parsed spec document sections into the local uncited-finding view.
-fn spec_elements_from_document(spec: &SpecDocument) -> Vec<SpecElement> {
-    let mut elements = Vec::new();
-    push_requirements(&mut elements, spec.goal(), SpecSectionKind::Goal);
-    push_requirements(&mut elements, spec.scope().in_scope(), SpecSectionKind::InScope);
-    push_requirements(&mut elements, spec.scope().out_of_scope(), SpecSectionKind::OutOfScope);
-    push_requirements(&mut elements, spec.constraints(), SpecSectionKind::Constraint);
-    push_requirements(
-        &mut elements,
-        spec.acceptance_criteria(),
-        SpecSectionKind::AcceptanceCriteria,
-    );
-    elements
-}
-
-/// Appends one parsed spec section to the local uncited-finding view.
-fn push_requirements(
-    elements: &mut Vec<SpecElement>,
-    requirements: &[SpecRequirement],
-    section: SpecSectionKind,
-) {
-    for requirement in requirements {
-        elements.push(SpecElement {
-            id: requirement.id().as_ref().to_owned(),
-            section: section.clone(),
-            text: requirement.text().to_owned(),
-        });
     }
 }
 

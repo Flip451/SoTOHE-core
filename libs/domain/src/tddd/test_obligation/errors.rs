@@ -146,6 +146,8 @@ pub enum ObligationCheckError {
     CatalogueLoad(CatalogueDocumentLoaderError),
     /// Loading and parsing the spec document failed.
     SpecLoad(SpecDocumentLoadError),
+    /// The catalogue was in a state the check gate cannot proceed from.
+    InvalidCatalogueState(DiagnosticMessage),
     /// Decoding an artifact failed.
     ArtifactCodec(ArtifactCodecError),
     /// Scanning a bound test's source failed.
@@ -342,11 +344,12 @@ mod tests {
             ObligationCheckError::UnresolvedEdges { edges: NonEmptyEdgeIds::new(edge(), vec![]) },
             ObligationCheckError::StaleVerdicts { edges: NonEmptyEdgeIds::new(edge(), vec![]) },
             ObligationCheckError::CatalogueLoad(catalogue_load_error()),
+            ObligationCheckError::InvalidCatalogueState(diag("empty spec ref")),
             ObligationCheckError::ArtifactCodec(ArtifactCodecError::MalformedJson(diag("bad"))),
             ObligationCheckError::SourceScan(TestSourceScanError::Io(diag("io"))),
             ObligationCheckError::CacheIo(VerifyCacheError::Io(diag("io"))),
         ];
-        assert_eq!(variants.len(), 9);
+        assert_eq!(variants.len(), 10);
         assert!(variants.iter().all(|v| !format!("{v:?}").is_empty()));
     }
 

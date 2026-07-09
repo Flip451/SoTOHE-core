@@ -73,7 +73,7 @@
 |------|------|--------|---------|--------|----------|
 | ArtifactCodecError | error_type | add | Io, MalformedJson, DomainInvariant | 🔵 | 🔵 |
 | CatalogueDocumentLoaderError | error_type | reference | — | 🔵 | 🔵 |
-| ObligationCheckError | error_type | add | ObligationsAbsent, BindingsAbsent, DriftsDetected, UnresolvedEdges, StaleVerdicts, CatalogueLoad, SpecLoad, ArtifactCodec, SourceScan, CacheIo | 🔵 | 🔵 |
+| ObligationCheckError | error_type | add | ObligationsAbsent, BindingsAbsent, DriftsDetected, UnresolvedEdges, StaleVerdicts, CatalogueLoad, SpecLoad, InvalidCatalogueState, ArtifactCodec, SourceScan, CacheIo | 🔵 | 🔵 |
 | ObligationDeriveError | error_type | add | RulesLoad, TrackNotActive, CatalogueLoad, SpecLoad, InvalidCatalogueState, ArtifactCodec, ArtifactWrite | 🔵 | 🔵 |
 | ObligationEvaluateError | error_type | add | TrackNotActive, CatalogueLoad, SpecLoad, ArtifactLoad, TestSourceScan, VerifierPort, CachePersistence, SemanticFailuresConfirmed, HumanEscalationRequired | 🔵 | 🔵 |
 | ObligationResultsError | error_type | add | IoError, MalformedArtifact | 🔵 | 🔵 |

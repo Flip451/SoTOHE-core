@@ -137,10 +137,24 @@ impl SpecDocumentLoaderPort for StubSpec {
     }
 }
 
+struct FailingSpec;
+impl SpecDocumentLoaderPort for FailingSpec {
+    fn load(&self, path: &Path) -> Result<SpecDocument, SpecDocumentLoadError> {
+        Err(SpecDocumentLoadError::NotFound { path: path.to_path_buf() })
+    }
+}
+
 struct StubCatalogue(CatalogueDocument);
 impl CatalogueDocumentLoaderPort for StubCatalogue {
     fn load(&self, _p: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
         Ok(self.0.clone())
+    }
+}
+
+struct FailingCatalogue;
+impl CatalogueDocumentLoaderPort for FailingCatalogue {
+    fn load(&self, path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
+        Err(CatalogueDocumentLoaderError::NotFound { path: path.to_path_buf() })
     }
 }
 
@@ -162,6 +176,10 @@ fn anchor() -> TestObligationAnchorId {
 
 fn edge() -> TestObligationEdgeId {
     TestObligationEdgeId::new(entry_key(), anchor())
+}
+
+fn unknown_edge() -> TestObligationEdgeId {
+    TestObligationEdgeId::new(CatalogueEntryKey::try_new("Ghost".to_owned()).unwrap(), anchor())
 }
 
 fn obligation() -> TestObligation {
@@ -249,8 +267,12 @@ fn fulfillment_binding_for(obligation: &TestObligation) -> TestBindingRecord {
 }
 
 fn waiver_binding() -> TestBindingRecord {
+    waiver_binding_for(edge())
+}
+
+fn waiver_binding_for(edge_id: TestObligationEdgeId) -> TestBindingRecord {
     TestBindingRecord::Waiver {
-        edge_id: edge(),
+        edge_id,
         reason: WaivedReason::try_new("covered elsewhere".to_owned()).unwrap(),
     }
 }
@@ -448,6 +470,19 @@ fn interactor_with_scanner(
     )
 }
 
+fn empty_scope_interactor_without_readers() -> CheckTestObligationsInteractor {
+    CheckTestObligationsInteractor::new(
+        Arc::new(StubRules),
+        Arc::new(StubObligations(None)),
+        Arc::new(StubBindings(None)),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(None)),
+        Arc::new(StubWaiverCache(None)),
+        Arc::new(FailingSpec),
+        Arc::new(FailingCatalogue),
+    )
+}
+
 fn command() -> CheckTestObligationsCommand {
     CheckTestObligationsCommand::new(TestObligationCatalogueCommandInput::new(
         track(),
@@ -461,12 +496,25 @@ fn command() -> CheckTestObligationsCommand {
 // ---------------------------------------------------------------------------
 
 #[test]
-fn test_empty_scope_passes_with_uncited_findings() {
-    // AC-10 / IN-14: both artifacts absent → zero pairs pass.
-    // AC-13 / IN-16: uncited AC / CN are surfaced; cited IN and goal are not.
-    // A deletion tombstone citation for AC-01 does not count as an active citation.
-    let outcome = interactor(None, None, None, None).execute(&command()).unwrap();
+fn test_empty_scope_passes_without_materialized_catalogue_or_spec() {
+    // AC-10 / IN-14: both artifacts absent → zero pairs pass by artifact
+    // existence alone, even before spec/catalogues are materialized.
+    let outcome = empty_scope_interactor_without_readers().execute(&command()).unwrap();
     assert!(outcome.resolved_edges().is_empty());
+    assert!(outcome.uncited_findings().is_empty());
+}
+
+#[test]
+fn test_materialized_scope_reports_uncited_findings() {
+    // AC-13 / IN-16: uncited AC / CN are surfaced in a materialized scope; cited
+    // IN and goal are not. A deletion tombstone citation for AC-01 does not
+    // count as an active citation.
+    let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+    let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+    let outcome =
+        interactor(Some(obligations), Some(bindings), Some(fresh_fulfillment_cache()), None)
+            .execute(&command())
+            .unwrap();
     assert!(outcome.uncited_findings().contains(&UncitedSpecElementFinding::new(
         SpecElementId::try_new("AC-01").unwrap(),
         SpecSectionKind::AcceptanceCriteria
@@ -589,9 +637,33 @@ fn test_orphaned_binding_is_a_drift() {
 fn test_orphaned_waiver_binding_is_a_drift() {
     // IN-13 / CN-11: a Waiver binding for a no-longer-derived edge is `orphaned`.
     let obligations = ObligationsDocument::new(track(), vec![]);
-    let bindings = TestBindingsDocument::new(track(), vec![waiver_binding()]);
+    let bindings = TestBindingsDocument::new(track(), vec![waiver_binding_for(unknown_edge())]);
     let result = interactor(Some(obligations), Some(bindings), None, None).execute(&command());
     assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));
+}
+
+#[test]
+fn test_zero_obligation_cited_edge_without_binding_is_unresolved() {
+    // CN-02 / AC-04: a cited active entry edge remains in the totality universe
+    // even when the decision table derives zero obligations for it.
+    let obligations = ObligationsDocument::new(track(), vec![]);
+    let bindings = TestBindingsDocument::new(track(), vec![]);
+    let result = interactor(Some(obligations), Some(bindings), None, None).execute(&command());
+    assert!(matches!(result, Err(ObligationCheckError::UnresolvedEdges { .. })));
+}
+
+#[test]
+fn test_zero_obligation_cited_edge_waiver_resolves() {
+    // D4 / CN-02: a zero-obligation edge is resolved by a fresh waived verdict.
+    let obligations = ObligationsDocument::new(track(), vec![]);
+    let bindings = TestBindingsDocument::new(track(), vec![waiver_binding()]);
+    let cache = fresh_waiver_cache_for(&obligation());
+
+    let outcome = interactor(Some(obligations), Some(bindings), None, Some(cache))
+        .execute(&command())
+        .unwrap();
+
+    assert_eq!(outcome.resolved_edges(), &[edge()]);
 }
 
 #[test]

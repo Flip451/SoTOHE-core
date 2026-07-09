@@ -2859,6 +2859,15 @@
             }
           },
           {
+            "name": "InvalidCatalogueState",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
             "name": "ArtifactCodec",
             "payload": {
               "fields": [

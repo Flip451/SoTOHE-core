@@ -795,7 +795,7 @@
       }
     },
     {
-      "claim_hash": "b1d7aebf3b75e0013de4b5bd94499bd067a5815cbd0b2ac1870a72e3a1b3f7c2",
+      "claim_hash": "1aee9d2a5748dd4ec82880a6916d73119d86b6ebe911a1a93b1fbeb14b8b80ff",
       "evidence_hash": "1ea999f83a13693dee35ecc945798f7da95fa1a0cbcf08776195af19519ca901",
       "verdict": {
         "kind": "pass",
@@ -819,11 +819,11 @@
       }
     },
     {
-      "claim_hash": "b1d7aebf3b75e0013de4b5bd94499bd067a5815cbd0b2ac1870a72e3a1b3f7c2",
+      "claim_hash": "1aee9d2a5748dd4ec82880a6916d73119d86b6ebe911a1a93b1fbeb14b8b80ff",
       "evidence_hash": "cefa7085744d1ef41b80d8a40c408aee4bf62c63ad441c41b3da72e0d91010a5",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) binding はあるが義務が導出されない（`orphaned`）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。"
+        "citation": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) binding はあるが義務が導出されない（`orphaned`）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -843,7 +843,7 @@
       }
     },
     {
-      "claim_hash": "b1d7aebf3b75e0013de4b5bd94499bd067a5815cbd0b2ac1870a72e3a1b3f7c2",
+      "claim_hash": "1aee9d2a5748dd4ec82880a6916d73119d86b6ebe911a1a93b1fbeb14b8b80ff",
       "evidence_hash": "af9a7f7100504ada88916a60d154927b26f264783646865441ad81b1888d3271",
       "verdict": {
         "kind": "pass",
@@ -867,7 +867,7 @@
       }
     },
     {
-      "claim_hash": "b1d7aebf3b75e0013de4b5bd94499bd067a5815cbd0b2ac1870a72e3a1b3f7c2",
+      "claim_hash": "1aee9d2a5748dd4ec82880a6916d73119d86b6ebe911a1a93b1fbeb14b8b80ff",
       "evidence_hash": "a1695352f9fc9f36de00c6324d18b569010d82c7a8dd448f68243d4cf0f825f0",
       "verdict": {
         "kind": "pass",
@@ -891,7 +891,7 @@
       }
     },
     {
-      "claim_hash": "b1d7aebf3b75e0013de4b5bd94499bd067a5815cbd0b2ac1870a72e3a1b3f7c2",
+      "claim_hash": "1aee9d2a5748dd4ec82880a6916d73119d86b6ebe911a1a93b1fbeb14b8b80ff",
       "evidence_hash": "f5b3a5ffaaa5a66b3145d0206b23ae2322d2754cb7336f4843509b4f3bc2c97a",
       "verdict": {
         "kind": "pass",

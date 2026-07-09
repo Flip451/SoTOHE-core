@@ -13,6 +13,8 @@
 //! catalogue declaration canonicalisation) live here so `derive` and `check`
 //! freeze and compare declaration hashes identically.
 
+mod check_support;
+
 pub mod check;
 pub mod derive;
 pub mod evaluate;
