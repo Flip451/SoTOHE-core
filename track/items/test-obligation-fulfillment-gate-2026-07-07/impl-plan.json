@@ -160,7 +160,8 @@
     {
       "id": "T027",
       "description": "Target libs/usecase test_obligation::bindings_skeleton, apps/cli-driver test_obligation::bindings_skeleton, apps/cli-composition test_obligation, and apps/cli commands::test_obligation. Add TestBindingsSkeletonCommand, TestBindingsSkeletonRecord, TestBindingsSkeletonOutcome, TestBindingsSkeletonError, TestBindingsSkeletonApplicationService (trait), TestBindingsSkeletonInteractor, TestBindingsSkeletonInput, TestBindingsSkeletonHandler, TestObligationCompositionRoot::bindings_skeleton_handler, TestObligationSubcommand::BindingsSkeleton, TestBindingsSkeletonArgs, execute_bindings_skeleton, command_root, current_branch, read_command_branch, and read_only_command_context (IN-06/CN-09/AC-14). Add unit tests covering those anchors.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "b98c91d482fde2f82a356675597105f0456884b5"
     }
   ],
   "plan": {

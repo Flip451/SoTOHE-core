@@ -1,1132 +1,86 @@
 {
   "schema_version": 2,
   "scopes": {
-    "adr": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
-          "at": "2026-07-07T08:38:10Z"
-        },
-        {
-          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "D9 makes `anchor id` part of the obligation id, but D2 explicitly says obligations are derived per entry and are not multiplied by cite count. Downstream derivation cannot know whether to emit one obligation per declaration item, reusing its test group across all cited anchors, or one obligation per `(entry, anchor, kind, item)`. That changes obligation counts, binding shape, and totality semantics, so the ADR needs one consistent identity model before spec/types can translate it.",
+              "message": "This composition root defines `FsSpecDocumentLoader` and implements `SpecDocumentLoaderPort` locally. Port implementations belong in `libs/infrastructure`; `cli_composition` should only wire the adapter.",
               "severity": "P1",
-              "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
-              "line": 224,
-              "category": "inconsistent_decisions"
-            }
-          ],
-          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
-          "at": "2026-07-07T08:41:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c597270bfdf492126d9a4038ef233eb9ae3cba96657c8f231b9aeac5a6914bd0",
-          "at": "2026-07-07T08:52:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D14 classifies `sotp test-obligation results` as part of the fail-closed gate, but the same decision later says it is informational, always exits 0, and that `check` alone owns pass/fail. That makes the ADR internally inconsistent on whether `results` is a gate or a viewer, so downstream CLI/spec implementers cannot derive one observable contract.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
-              "line": 347,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:769c3612aa307f33f5a470c522151275db7b773e437c8f2c198c3c94d78a86e4",
-          "at": "2026-07-09T21:15:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:59eef85e03fe007f92011e72a27610633a512e551dd5a837b6b275edfb35aa01",
-          "at": "2026-07-09T21:18:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D14 adds `sotp test-obligation bindings-skeleton` as another subcommand in the same `sotp test-obligation` group, but D11 still states that this group has exactly four subcommands. D14 later says the helper is not part of D11's four commands, yet it is still a same-group CLI subcommand, so downstream spec/type planning cannot tell whether the CLI surface is four commands or five with four gate commands plus one authoring helper. Update D11/D14 to consistently distinguish the four gate subcommands from the non-gate helper.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
-              "line": 347,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:59eef85e03fe007f92011e72a27610633a512e551dd5a837b6b275edfb35aa01",
-          "at": "2026-07-09T21:22:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e00ff421fb84c5de089be36d5215958da79d56377652a87224c1637da6d235b",
-          "at": "2026-07-09T21:24:42Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69f14b4393f0e49a8e5650a1baf701821f483d322973f8ee968bba24f18a9335",
-          "at": "2026-07-07T18:03:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SemanticEscalationDriverPort` is the shared escalation/cache port for concurrent semantic evaluation, but the trait leaves `P`, `K`, `V`, `E`, and the future produced by the public `async fn` unconstrained. A non-`Send`/non-`Sync` implementation can satisfy this usecase port, so later ref-verify or obligation-gate orchestration cannot safely fan out evaluations across workers despite the port contract being the concurrency boundary. Add the required `Send`/`Sync` bounds and use a `Send` future shape at the trait boundary instead of an unconstrained public `async fn`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/semantic_verdict_core/driver.rs",
-              "line": 21,
-              "category": "purity violation by trait or generic"
-            }
-          ],
-          "hash": "rvw1:sha256:69f14b4393f0e49a8e5650a1baf701821f483d322973f8ee968bba24f18a9335",
-          "at": "2026-07-07T18:07:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7febbedb200015d97b4887d237b8bdc37a49453d65756bb9c28b8a2deeb3a3f7",
-          "at": "2026-07-07T18:26:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:be3e439abe8fd795cb47dbf70e6943672a1c6d4db54f1ac8a5171f96fde985d9",
-          "at": "2026-07-08T01:59:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:be3e439abe8fd795cb47dbf70e6943672a1c6d4db54f1ac8a5171f96fde985d9",
-          "at": "2026-07-08T02:03:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This usecase re-parses raw `spec.json` locally instead of consuming the parsed `SpecDocument` boundary. That duplicates codec/schema logic in `check` and can drift from the canonical parser used elsewhere for uncited AC/CN detection.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
-              "line": 166,
-              "category": "business logic leak"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/test_obligation.rs",
+              "line": 265,
+              "category": "adapter defined here"
             },
             {
-              "message": "`current_bound_hash` here, and the same helper pattern in `evaluate.rs`, drop `TestSourceScanError`s and hash only the bodies that happened to load. A missing or unreadable test source therefore looks like a successful binding over partial evidence, so freshness checks can proceed on incomplete data.",
+              "message": "This composition root defines `FailingFulfillmentVerifier` and implements `ObligationFulfillmentVerifierPort` locally. That secondary adapter should live in `libs/infrastructure`, with the root only selecting and wiring it.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
-              "line": 177,
-              "category": "business logic leak"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/test_obligation.rs",
+              "line": 288,
+              "category": "adapter defined here"
             },
             {
-              "message": "In `execute`, catalogue / obligations / bindings / spec load failures are all returned as `CacheWrite`. That public error type says persistence failed even when the actual failure was reading inputs, so callers get the wrong remediation path.",
+              "message": "This composition root defines `FailingWaiverVerifier` and implements `WaiverVerifierPort` locally. That secondary adapter should live in `libs/infrastructure`, with the root only selecting and wiring it.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/evaluate.rs",
-              "line": 360,
-              "category": "error type confusion"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/test_obligation.rs",
+              "line": 304,
+              "category": "adapter defined here"
             }
           ],
-          "hash": "rvw1:sha256:71b7a4090f947d49bae4dab1c672bf9d29552edbd16ad43a31777af3bd085a2b",
-          "at": "2026-07-08T06:48:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:45cefda47683bebe9aa8d69c330722a82ab613ef0f1f163301155e18ff0cd536",
-          "at": "2026-07-08T06:59:48Z"
+          "hash": "rvw1:sha256:ae019e5954c0e4a1ecf6f4b2175140ff61220fc3870198a713321ddfeba200b1",
+          "at": "2026-07-09T07:10:24Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "When both obligations and bindings are absent, `execute` returns before rewriting the verdict caches. That leaves any previously materialized fulfillment/waiver cache files on disk, so a later `results` run can report stale verdicts for an empty scope.",
+              "message": "P1 invoke leak: `ref_verify_run` constructs `VerifySemanticRefsInteractor` and calls `interactor.execute(&cmd)` directly instead of routing through the `RefVerifyDriver`/infrastructure aggregate adapter. That bypasses the composition boundary the scope policy is trying to enforce, and it duplicates the hardened wiring that already exists in `FsRefVerifyRunAdapter` / `FsRefVerifyAggregateAdapter`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/evaluate.rs",
-              "line": 380,
-              "category": "state-consistency"
-            },
-            {
-              "message": "`detect_orphaned` only inspects `TestBindingRecord::Fulfillment`. Waiver bindings that survive after their edge is no longer derived are never marked orphaned, because `resolve_edges` only walks current obligations. That lets stale waiver records slip through a clean `check` run.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
-              "line": 289,
-              "category": "drift-detection"
-            },
-            {
-              "message": "`WaiverVerdict::Fail` is recorded as `EdgeResolutionOutcome::MissingBinding`. That misclassifies a rejected waiver as an absent binding, so the results output cannot distinguish the two failure modes.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/results.rs",
-              "line": 300,
-              "category": "output-correctness"
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/ref_verify.rs",
+              "line": 172,
+              "category": "invoke leak"
             }
           ],
-          "hash": "rvw1:sha256:744d4241dd9b83018b831068e7132f8337c4204b025f934ed82b83861ddc3a86",
-          "at": "2026-07-08T07:25:08Z"
+          "hash": "rvw1:sha256:1b311a9b33a34d44630b3500b44f96ec0a95769e1a11a6ed2e680a8d13a1e502",
+          "at": "2026-07-09T10:22:21Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fc7a09c8ecaf18d0ae0aac1eb886e2871ec980978cb28002e6cfd6601f2290fd",
-          "at": "2026-07-08T07:34:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fc7a09c8ecaf18d0ae0aac1eb886e2871ec980978cb28002e6cfd6601f2290fd",
-          "at": "2026-07-08T07:39:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`trait_impl` obligations are emitted with an empty anchor list. Both downstream gates derive edges exclusively from `obligation.spec_refs()`, and `evaluate_record` only calls the verifier inside that anchor loop, so a bound contract-conformance obligation can produce zero verifier calls/cache entries and still avoid unresolved-edge handling. This drops required trait-impl conformance coverage instead of resolving the implemented trait's spec anchors as the module comment describes.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/derive.rs",
-              "line": 325,
-              "category": "orchestration_correctness"
-            },
-            {
-              "message": "Fresh evaluation always calls the semantic verifier and overwrites cache entries without first loading/reusing an existing verdict whose three-hash key already matches. That breaks the frozen-cache contract: rerunning `evaluate` on unchanged inputs can replace a previously passing final verdict with a new fail/pending result from the external verifier, making the gate non-deterministic and defeating drift-based cache invalidation.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate.rs",
-              "line": 293,
-              "category": "orchestration_correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:51212c55f6975f8c113ad47e2f3398f92e0ab9a8ba3a84411f1421f7c21e8787",
-          "at": "2026-07-08T08:17:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`resolve_fulfillment_edge` selects a fulfillment cache entry by `edge_id` only, but fulfillment cache entries are keyed by both `edge_id` and `obligation_id`. Since an edge is only `(entry_key, anchor)`, multiple obligations for the same entry/anchor can share it; a fulfilled verdict for one obligation can therefore satisfy another obligation without its own verifier verdict if the hashes line up. Match the cache entry on the current `obligation.id()` as well before marking the edge resolved.",
-              "severity": "P0",
-              "file": "libs/usecase/src/test_obligation/check.rs",
-              "line": 376,
-              "category": "orchestration_correctness"
-            },
-            {
-              "message": "Trait-impl obligations use `impl_decl.for_type` as the obligation entry key while freezing the declaration hash from the `impl_decl` itself. Later evaluate/check resolve declarations only by that entry key through types/traits/functions, so a trait-impl obligation either gets the adapter type declaration or no declaration, not the impl declaration that was hashed. This makes trait-impl verification go pending or produce permanent `decl_changed` drift. Carry a resolvable trait-impl target/declaration, or teach declaration lookup to find the matching `trait_impls` declaration with the same canonical text.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/derive.rs",
-              "line": 326,
-              "category": "orchestration_correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:87ce6e7acb42e5320ca649a56dd07bca2a24384ebb8f7d507dcc77db8c2f2156",
-          "at": "2026-07-08T08:28:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Fulfillment evaluation resolves the current catalogue declaration text, but freezes and cache-matches the verdict with the stale `obligation.declaration_hash()` from the obligations artifact. If the catalogue declaration changes without changing the obligation id, `evaluate` can reuse an old cached verdict without re-verifying the new declaration, or write a cache entry that `check` immediately reports as `decl_changed`. The fulfillment key should hash the resolved `declaration` used for `verify_pair`, as the voluntary and waiver paths already do.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate.rs",
-              "line": 489,
-              "category": "orchestration correctness"
-            },
-            {
-              "message": "Waiver evaluation and freshness checking resolve declaration text from only `edge.entry_key()`. For trait-impl obligations the edge key is the implementer type, while the correct declaration is the specific `TraitImplDeclV2` identified by `trait_impl:<trait>` on the obligation. A waived trait-impl edge is therefore verified and cache-checked against the type declaration instead of the impl declaration, so changes to the impl can be missed and the verifier receives the wrong evidence.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate.rs",
-              "line": 547,
-              "category": "orchestration correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:138a06ee4d9516812c4203b51df66cc3b2e08b969bb67528c6d68738be586969",
-          "at": "2026-07-08T08:36:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1: `EvaluateTestObligationsInteractor` bypasses the shared semantic escalation core. The implementation hard-codes `fast -> final` by calling the verifier ports directly and never injects or calls `SemanticEscalationDriverPort`; as a result the configured calibration-probe injection, degradation threshold, parallelism, and human-escalation path required for the obligation gate are skipped, with final fail/pending verdicts merely cached and returned in an `Ok` outcome.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate.rs",
-              "line": 308,
-              "category": "orchestration correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:753d1b14a84c7f48edb2584fc89126398c7abf44e1110220297e34ae5a2c16b9",
-          "at": "2026-07-08T08:47:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute` only fails closed when `pending_records` is populated, but these unresolved-input branches only increment `tally.pending` and return `Ok(())`. A binding that references a missing obligation, missing declaration, or missing spec anchor therefore lets `evaluate` complete successfully with `pending_count > 0` and no human-escalation error, silently bypassing the fail-closed evaluation gate. Record a pending `EdgeVerdictRecord` or return a typed error for these resolution failures.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate.rs",
-              "line": 510,
-              "category": "missing error handling / fail-closed orchestration"
-            }
-          ],
-          "hash": "rvw1:sha256:f13ad3bf2a02d186a1a3df1736cdee4d9812bb6e53f7709728bcebe171c2c6c5",
-          "at": "2026-07-08T09:02:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6b901ef743ec12f45d4fdc1605dcac79c7ea2d67949cacc62b72b4a2931004cf",
-          "at": "2026-07-08T09:12:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`derive_trait_impl_obligations` resolves trait impls by passing the raw `trait_ref` through `simplify_trait_ref`, which strips both generics and all path qualifiers before matching against catalogue trait names. That means an external impl like `std::fmt::Display` will be treated as the local catalogue trait `Display` whenever one exists, so the code emits contract-conformance obligations instead of the required zero-obligation external-trait case. This is a usecase-level string decision on `TypeRef` identity that should be handled by the domain/catalogue resolution model, and it breaks IN-17/AC-16 for same-basename external traits.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/derive.rs",
-              "line": 318,
-              "category": "business_logic_leak"
-            }
-          ],
-          "hash": "rvw1:sha256:e75f8405abbee0a9546d535b55cc459c59ae7cac748e2e44e2a8a352df7e17f2",
-          "at": "2026-07-08T09:30:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`block_on` is a production usecase executor that repeatedly polls a `SemanticEscalationFuture` with a noop waker and spins on `Poll::Pending`. The `SemanticEscalationDriverPort` contract returns `Send` futures for worker fan-out; it does not promise ready-only futures, so this makes the usecase layer depend on an implicit runtime behavior and can hang the evaluate gate when a real async verifier adapter yields. Move future execution to the composition/runtime boundary, make this service async, or make the verifier port synchronous if usecase must stay sync.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/verify.rs",
-              "line": 27,
-              "category": "purity violation by trait or generic"
-            },
-            {
-              "message": "The new interactors store injected dependencies as bare `Arc<dyn ...>` trait objects, starting here with `rules_loader`; the same pattern appears in check/evaluate/results. The briefing requires injected Arc ports to be `Send + Sync`, and without those bounds a non-thread-safe infrastructure adapter can be wired into the usecase orchestrator, breaking the expected port contract and preventing safe sharing/fan-out of the application services. Add `+ Send + Sync` to the injected trait objects, or make the port traits themselves require those bounds.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/derive.rs",
-              "line": 67,
-              "category": "purity violation by trait or generic"
-            }
-          ],
-          "hash": "rvw1:sha256:25e59d9c1e8ebf0638c6092242b0368107fb87cd3deed9a2228bfbfb668835a1",
-          "at": "2026-07-08T09:37:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`input_load_error` wraps every read-side failure as `ObligationEvaluateError::CachePersistence(VerifyCacheError::Io(...))`, and it is used for catalogue loads, spec loads, and test-source scans, not just cache persistence. That re-exposes an infrastructure-shaped IO/cache error through the usecase API and collapses unrelated evaluation input failures into a cache error, so callers cannot route the failure at the usecase concept level. Add usecase-level input/source/artifact error variants or map these failures to existing non-cache concepts instead.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/cache.rs",
-              "line": 17,
-              "category": "error_type_confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:5c44c77571a7ab0da767e2c68cb955d217020a582d137f08df656ea4e4654494",
-          "at": "2026-07-08T09:51:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 error type confusion: `input_load_error` maps catalogue loads, spec loads, obligation/binding artifact loads, and test-source scan failures into `ObligationEvaluateError::CachePersistence(VerifyCacheError::Io(...))`. That means callers see non-cache input failures as verdict-cache I/O failures, which breaks the usecase error abstraction required by the usecase severity policy. Add usecase-level evaluate error variants for input/artifact/source/spec failures, or map each port failure to the existing conceptually correct variant instead of the cache persistence lane.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/cache.rs",
-              "line": 17,
-              "category": "error type confusion"
-            },
-            {
-              "message": "P1 error type confusion: catalogue and spec document loader failures are collapsed into `ObligationCheckError::ArtifactCodec(ArtifactCodecError::Io(...))`, even though `ArtifactCodecError` is documented for obligations/test-bindings artifacts and `SpecDocumentLoadError` distinguishes not-found, I/O, JSON parse, and invariant failures. This makes check callers report spec/catalogue input failures as generic artifact I/O and loses the usecase-level failure concept. Map these ports to dedicated check error variants or a non-artifact input-load error.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/check.rs",
-              "line": 162,
-              "category": "error type confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:5c44c77571a7ab0da767e2c68cb955d217020a582d137f08df656ea4e4654494",
-          "at": "2026-07-08T09:56:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:37e355605bd7e629cebf87c6c4853e9616f58d51d7be5ab8b0ac90a99ae29fce",
-          "at": "2026-07-08T10:22:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0f4aeee11c0994b2e46274d8714473ec1582995079ac0fed25aa1858bd4d9d2d",
-          "at": "2026-07-08T11:12:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The derive interactor parses `TraitImplDeclV2.trait_ref` as a raw string to decide whether an impl targets a local trait (`split('<')` plus `contains(\"::\")`). That is domain classification logic for the `TypeRef`/catalogue model, not usecase orchestration; if the domain encoding changes, the usecase can silently skip or emit obligations incorrectly. Move this behind a domain method/value-type API and have the interactor call that.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/derive.rs",
-              "line": 177,
-              "category": "business_logic_leak"
-            }
-          ],
-          "hash": "rvw1:sha256:b8a1b527a7e3e48e6040ce7f5f245d164d290cf2f47da2c9ff5656e11d6acc00",
-          "at": "2026-07-08T12:05:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecDocumentLoaderPort` is defined in the usecase layer even though it abstracts loading/parsing the persisted `SpecDocument` artifact, i.e. a domain document persistence boundary. Per `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules, ports for persistence/domain concepts belong in `domain` (as with the existing `CatalogueDocumentLoaderPort`), while usecase should only depend on them. Keeping this port here also forces `domain` to carry `SpecDocumentLoadError` for a usecase-owned trait. Move the port next to the spec domain types/error and inject that domain port into derive/check/evaluate.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/spec_loader.rs",
-              "line": 19,
-              "category": "port placement mistake"
-            }
-          ],
-          "hash": "rvw1:sha256:a19fb4fbf442dc3e897977b71e31eb324d34c541edd9c6dd1c13518d5a3d7f7f",
-          "at": "2026-07-08T12:35:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:987427dd1c99644fe7e19a49bc65f5ae85e299258e388de4b4015c8a44f5810f",
-          "at": "2026-07-08T13:02:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The derive interactor is making domain role decisions in the usecase layer: `data_role_items` and the helpers it dispatches to match on `DataRole`/`TypeKindV2` to decide which invariants, handles, events, typestate transitions, and methods produce obligation items. Per `hexagonal-architecture.md` §CLI as Composition Root / usecase purity, the usecase layer should orchestrate loaded catalogues/rules and delegate these domain-role semantics to domain types or a domain projector; otherwise role semantic changes can drift independently in usecase.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/derive.rs",
-              "line": 451,
-              "category": "business_logic_leak"
-            }
-          ],
-          "hash": "rvw1:sha256:af4352621c19b835db96fcd47cf9f6e72a1936dea762fcdfc3f3d393995853ba",
-          "at": "2026-07-08T14:36:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d2d80252dc34a1ea151b92a4a435f921def4a9ad95e63cfc63bcf87a1d5b103b",
-          "at": "2026-07-08T15:20:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98f85c3beb6946dda198cc8ebb3099bca028156531699bf00421c79304226e8b",
-          "at": "2026-07-08T22:24:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a22df8774231e1f7517aa7809d691f4e3823f765dcfde8d39c43d06347039694",
-          "at": "2026-07-08T22:36:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TestObligationResultsInteractor` maps both `ObligationsArtifactPort::load` and `TestBindingsArtifactPort::load` failures to `MalformedArtifact`, so a plain I/O failure is reported as corruption and the `IoError` branch on `ObligationResultsError` is never used here. Callers lose the retry-vs-corruption distinction for results loading.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/results.rs",
-              "line": 186,
-              "category": "error type confusion"
-            },
-            {
-              "message": "Workspace-qualified trait refs lose their `crate_name` here: `TraitRefScope::Workspace { crate_name, bare_name }` is collapsed to `bare_name`, then the first catalogue entry with that name wins. If two workspace crates expose the same trait name, `impl usecase::Foo for Bar` can be projected against the wrong role/anchors depending on catalogue order.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/derive.rs",
-              "line": 335,
-              "category": "business logic leak"
-            }
-          ],
-          "hash": "rvw1:sha256:d734e36d3bf1af699fa8c8a462257fa911f4aa9f7336cf952d69b88bb91ed2da",
-          "at": "2026-07-08T23:58:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cited_anchor_ids()` treats deletion tombstones as active citations because it walks `iter_catalogue_entries()` without checking `entry.action`. That means an `AC`/`CN` requirement cited only by a deleted catalogue entry will be suppressed instead of being reported as uncited. Filter out `ItemAction::Delete` entries here (or in the traversal helper) before building the cited set.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/mod.rs",
-              "line": 153,
-              "category": "business logic leak"
-            },
-            {
-              "message": "This branch maps `scan_test_body() == Ok(None)` to `TestSourceScanError::Parse`, but the scanner contract uses `None` for an absent test/file, not a parse failure. That misclassifies missing source as malformed source and makes `check`'s error surface inconsistent with `evaluate`, which treats the same condition as I/O-style absence. Map the `None` case to an absence/I-O path instead of `Parse`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
-              "line": 189,
-              "category": "error type confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:e8b9ac7a104ba2a2d794f3fd17e2091531c76126f55419d50536620fdb61285c",
-          "at": "2026-07-09T00:25:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Declaration lookup is keyed only by the bare entry name. If a type, trait, or function shares that name in another section, `find_declaration_text` can return the wrong declaration, so `check`/`evaluate` will freeze or verify against the wrong AST and report stale/fresh results incorrectly. The existing `CatalogueEntryRef.section_key` should be used to disambiguate.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/mod.rs",
-              "line": 104,
-              "category": "orchestration correctness"
-            },
-            {
-              "message": "`save_caches` writes the fulfillment cache before the waiver cache. If the second save fails, `evaluate` returns `Err` after mutating only one artifact, leaving the pair out of sync and allowing later `check`/`results` runs to observe a mixed-generation state. The cache writes need to be atomic or rolled back on failure.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/evaluate/mod.rs",
-              "line": 570,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:a6a18f8d9b09053fd60425193af6006ac24013fd4b2d4f127bb6629f5f6f6e81",
-          "at": "2026-07-09T00:36:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Voluntary bindings never migrate onto a newly derived obligation. `check` ignores `TestBindingRecord::VoluntaryBinding` when it looks for fulfillment bindings, and `evaluate` keeps freezing those records under a synthetic obligation id instead of resolving an existing obligation for the same edge. That breaks AC-12 inheritance: after a decision-table update creates a real obligation, the old voluntary binding is still reported as missing / workspace-only instead of counting as that obligation's fulfillment.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
-              "line": 295,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3e73e9816fb35568e93b64624a9a29ef8cfe27295912ecc49da20b78eeb978b7",
-          "at": "2026-07-09T00:51:22Z"
+          "hash": "rvw1:sha256:2d22a4ea1479cd089d33081d5ac0f47c3b1d7aa4250e05f4014388e569d5b53c",
+          "at": "2026-07-09T11:09:23Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f1221c60e68785baff276c4c78dd5200f288d0b97c877b3b7aa742e71b6d1089",
-          "at": "2026-07-09T01:02:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`derive_trait_impl_obligations` bypasses the domain `RoleObligationItemsProjector` for trait-impl rules by ignoring the rule's `per_axis` and always returning one `trait_impl:<trait>` item. Because `TestObligationRulesDocument` accepts arbitrary `TestObligationPerAxis` values in the `trait_impls` section, a config using `per: \"method\"` or another non-`trait_impl` axis would still generate contract-conformance obligations instead of projecting zero/failing through the domain rule interpreter. This keeps role/per-axis business projection logic in the usecase layer and can derive obligations the domain projector would not authorize.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/derive.rs",
-              "line": 387,
-              "category": "business_logic_leak"
-            }
-          ],
-          "hash": "rvw1:sha256:ac9da2b3f4b1ac1332502f94d1aa0778a2c844be05d8ef6032c8be224776df76",
-          "at": "2026-07-09T02:10:12Z"
+          "hash": "rvw1:sha256:a0fd8af94d98cd46279e1cc48ee91a5bf2b7913d2a3585a838fc2df23cea9fd8",
+          "at": "2026-07-09T13:15:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:36ac68608178052816aa0b68fbc480d08c75a81dadacc4d50a86741c5dbc4e3a",
-          "at": "2026-07-09T02:45:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute_inner` treats a half-materialised scope as a clean zero-pair run: if either `obligations` or `bindings` is `None`, it clears both verdict caches and returns `Ok(0, 0, 0)`. That silently masks a missing artifact instead of surfacing the incomplete scope.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/evaluate/mod.rs",
-              "line": 499,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:632c9021144632d03833d7f7adc148eb5390482194461402591105f6a7449e47",
-          "at": "2026-07-09T03:28:28Z"
+          "hash": "rvw1:sha256:a0fd8af94d98cd46279e1cc48ee91a5bf2b7913d2a3585a838fc2df23cea9fd8",
+          "at": "2026-07-09T13:29:57Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0aba51dfc54c97cc8d83d3507ec85956105ab20ff2cd84607971923230c0602a",
-          "at": "2026-07-09T03:35:17Z"
+          "hash": "rvw1:sha256:b269821e703264a5317071645798ba505a10c6485524c22300e6ba9d26d59191",
+          "at": "2026-07-09T19:56:08Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0aba51dfc54c97cc8d83d3507ec85956105ab20ff2cd84607971923230c0602a",
-          "at": "2026-07-09T03:40:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:84135aaac90d08f0969b46d323f7d43063f48b6bc829fd6f125c43b4e9cdd061",
-          "at": "2026-07-09T04:43:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:84135aaac90d08f0969b46d323f7d43063f48b6bc829fd6f125c43b4e9cdd061",
-          "at": "2026-07-09T04:49:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3c0a537f2a82314efa600e4d9410df955438f132c45460a843f61483e233d11",
-          "at": "2026-07-09T07:11:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f3c0a537f2a82314efa600e4d9410df955438f132c45460a843f61483e233d11",
-          "at": "2026-07-09T10:24:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`libs/usecase/src/ref_verify/interactor.rs:272-301` now finalizes fast non-pass production pairs inside `RefVerifierEscalationDriver`, then immediately re-runs the same pairs through `parallel_verify(..., ModelTier::Final, ...)` in the calibration-failure branch. That doubles Final-tier verifier calls for every fast Fail/Pending pair, so a transient second-call error or any side effect on the verifier can make this branch fail where the previous single Final evaluation would not.",
-              "severity": "P1",
-              "file": "libs/usecase/src/ref_verify/interactor.rs",
-              "line": 272,
-              "category": "behavior_regression"
-            }
-          ],
-          "hash": "rvw1:sha256:f3c0a537f2a82314efa600e4d9410df955438f132c45460a843f61483e233d11",
-          "at": "2026-07-09T11:08:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2b3cae8272817bb6ce9fce9c59aadb05c4e612b1b9caf79fab34ca7c41b4458e",
-          "at": "2026-07-09T12:18:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2b3cae8272817bb6ce9fce9c59aadb05c4e612b1b9caf79fab34ca7c41b4458e",
-          "at": "2026-07-09T13:13:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2b3cae8272817bb6ce9fce9c59aadb05c4e612b1b9caf79fab34ca7c41b4458e",
-          "at": "2026-07-09T13:31:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:24df1e275cfe3cbf91bc3197578316575ccf823151bcf5cecf617a7748d6a0b4",
-          "at": "2026-07-09T15:06:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:24df1e275cfe3cbf91bc3197578316575ccf823151bcf5cecf617a7748d6a0b4",
-          "at": "2026-07-09T15:11:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9ca679b76237ba8266935bbc886ff29a980e4fe1e6621daae36dfd83b8d715ee",
-          "at": "2026-07-09T15:39:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9ca679b76237ba8266935bbc886ff29a980e4fe1e6621daae36dfd83b8d715ee",
-          "at": "2026-07-09T15:44:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16bad97304aef372d93a128e62984fec3da98e670233aef94bd002229961f443",
-          "at": "2026-07-09T19:55:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16bad97304aef372d93a128e62984fec3da98e670233aef94bd002229961f443",
-          "at": "2026-07-09T20:00:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83086a40a099a3ad24dfe500c6c86de26ff3008bd0bb6fa8235fe49f6e19001a",
-          "at": "2026-07-09T20:47:34Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
-          "at": "2026-07-07T18:02:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TestObligationRulesLoaderPort` is a domain-owned trait for loading `.harness/config/test-obligation-rules.json` from a configured source and reporting I/O / malformed JSON failures. That abstracts an infrastructure/application capability, while `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules says ports for infrastructure functions belong in `usecase`, with domain ports reserved for domain concepts such as persistence/worktree state. Keeping this loader in `libs/domain` misplaces the port boundary for the derivation/check use cases.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/ports.rs",
-              "line": 17,
-              "category": "port misplaced"
-            }
-          ],
-          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
-          "at": "2026-07-07T18:07:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
-          "at": "2026-07-07T18:29:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TargetEntryRoleKind` does not make the role-section invariant unrepresentable: each section variant accepts the global `RoleKind`, so callers can construct invalid states such as `TargetEntryRoleKind::DataRole(RoleKind::Repository)` or `ContractRole(RoleKind::ValueObject)`. Because this is public domain API and there is no validating constructor or narrower per-section role type, downstream rule lookup can receive a target whose outer section and inner role disagree. This violates the domain enum/type-safety intent from `prefer-type-safe-abstractions.md` §Enum-first; use section-specific payloads or otherwise prevent mismatched construction.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/vocab.rs",
-              "line": 132,
-              "category": "enum-first violation"
-            }
-          ],
-          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
-          "at": "2026-07-07T18:33:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f1f3b6ec5a5828195fe15a0dfd8b619041583471af2be6b694649ec9f4a736c5",
-          "at": "2026-07-07T18:40:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:688b238bb25eac6e6e64ec87b00ee0e380b719eece7ec2043ab39769c6496da9",
-          "at": "2026-07-07T21:41:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TestBindingRecord::Fulfillment` and `VoluntaryBinding` expose raw `Vec<TestLocation>` fields, so callers can construct a binding with `tests: vec![]`. That makes an obligation look bound while carrying no executable test evidence, undermining IN-06/AC-04's fail-closed binding check. Use a non-empty test-location collection newtype or private variants plus validating constructors so empty bindings are unrepresentable.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/binding.rs",
-              "line": 64,
-              "category": "primitive obsession"
-            }
-          ],
-          "hash": "rvw1:sha256:688b238bb25eac6e6e64ec87b00ee0e380b719eece7ec2043ab39769c6496da9",
-          "at": "2026-07-07T21:45:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TestBindingRecord` stores bound tests as a raw `Vec<TestLocation>` for fulfillment/voluntary bindings, with no non-empty value object or fallible constructor. The variant docs define these records as binding tests, but the domain type can still represent an empty test set, so the obligation gate can no longer rely on the type to distinguish a real test binding from no evidence. Encode the non-empty bound-test-set invariant in the type or constructor.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/binding.rs",
-              "line": 68,
-              "category": "primitive obsession"
-            }
-          ],
-          "hash": "rvw1:sha256:32e0fa2f2ce907da1dfcb1104f6b3bde909b6345930c3b231127c6dfb6f9162e",
-          "at": "2026-07-07T21:59:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`NonEmptyTestLocations::first` uses production index access (`&self.0[0]`). The domain severity policy classifies index access outside `#[cfg(test)]` as panic-able library code under `coding-principles.md` §No Panics in Library Code; this method should avoid a panic-capable indexing operation even though constructors intend to preserve the non-empty invariant.",
-              "severity": "P0",
-              "file": "libs/domain/src/tddd/test_obligation/binding.rs",
-              "line": 96,
-              "category": "panic-able production code"
-            }
-          ],
-          "hash": "rvw1:sha256:b3c0a60fae3b44c9432526d15f641c77f488b9bc7cb7103e23958579a0e692ff",
-          "at": "2026-07-07T22:23:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6642d242b58593d1872147bac65e80f30b79bd8046cdb0000b5d73b18c68ff44",
-          "at": "2026-07-07T22:35:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:26d6cf663f3f09e1064d53c72b69d0558211f75bc3f8f16b63be2f8b9a36d68d",
-          "at": "2026-07-07T23:56:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:26d6cf663f3f09e1064d53c72b69d0558211f75bc3f8f16b63be2f8b9a36d68d",
-          "at": "2026-07-07T23:59:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80dca1c369538f4073480263327e0fad5a243cee72b133b3ca8bdcb90036c819",
-          "at": "2026-07-08T02:01:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80dca1c369538f4073480263327e0fad5a243cee72b133b3ca8bdcb90036c819",
-          "at": "2026-07-08T02:07:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 [port misplaced] `ContentHasherPort` is a hashing-service abstraction consumed by `EvaluateTestObligationsInteractor`, but it is defined in domain. Per `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules, application-service ports that abstract infrastructure functions belong in `usecase`, not the innermost domain layer. Keeping this trait in domain pulls an application dependency into the inner layer and makes the boundary inconsistent with the rest of the test-obligation ports.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/ports.rs",
-              "line": 181,
-              "category": "port misplaced"
-            },
-            {
-              "message": "P1 [enum-first / primitive obsession] `SpecDocumentLoadError(String)` collapses not-found, I/O, parse, and validation failures into a free-form string. That erases the failure kind the loader contract is supposed to preserve, so callers cannot safely distinguish or match the reason a `SpecDocument` load failed. Replace the string bag with a finite error enum that models the distinct failure classes.",
-              "severity": "P1",
-              "file": "libs/domain/src/spec_document_loader_port.rs",
-              "line": 19,
-              "category": "enum-first"
-            }
-          ],
-          "hash": "rvw1:sha256:093716b5f724b0ff7f117ff7673aff0324c13ee57c74fc5b3367195a64636849",
-          "at": "2026-07-08T06:43:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:11fb5d17539ac8172cc7a3adf75a9465fd140d3508c5e67302ff172db335d3df",
-          "at": "2026-07-08T06:53:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 [port misplaced] `ContentHasherPort` is a SHA-256 service abstraction used by the usecase interactor to avoid depending on `sha2`, but it is defined in the domain layer. Per `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules, infrastructure-function ports such as hashing belong in `usecase`, while domain ports should model domain persistence/aggregate concepts. Move this trait to the usecase boundary and let infrastructure implement it there.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/ports.rs",
-              "line": 189,
-              "category": "port misplaced"
-            }
-          ],
-          "hash": "rvw1:sha256:11fb5d17539ac8172cc7a3adf75a9465fd140d3508c5e67302ff172db335d3df",
-          "at": "2026-07-08T06:58:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1d7bf40be26877c0e9b18aca2506292e27541e9d0f3784f54e46efed119e4dc4",
-          "at": "2026-07-08T07:22:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "SpecDocumentLoadError stores Io/JsonParse/Invariant reasons as raw String, even though this track already defines DiagnosticMessage as the validated non-empty diagnostic newtype and the domain catalogue for these variants specifies DiagnosticMessage. This leaves those error states able to carry empty/whitespace diagnostics, violating the domain primitive-obsession rule for constrained strings; use DiagnosticMessage for the reason fields and validate at construction/mapping boundaries.",
-              "severity": "P1",
-              "file": "libs/domain/src/spec_document_loader_port.rs",
-              "line": 37,
-              "category": "primitive obsession"
-            }
-          ],
-          "hash": "rvw1:sha256:1d7bf40be26877c0e9b18aca2506292e27541e9d0f3784f54e46efed119e4dc4",
-          "at": "2026-07-08T07:25:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e47a5ec714273a64aa6d1fbd6a61f414c49b25685003cc4b858d53b8ae37e873",
-          "at": "2026-07-08T07:31:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SpecDocumentLoaderPort` is defined in the domain layer even though the trait abstracts an infrastructure operation: loading a filesystem path and decoding JSON for usecase interactors. The domain severity policy treats infrastructure-capability ports in domain as misplaced; per `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules, application-service infrastructure ports belong in `libs/usecase`, with only their adapters in infrastructure.",
-              "severity": "P1",
-              "file": "libs/domain/src/spec_document_loader_port.rs",
-              "line": 69,
-              "category": "port misplaced"
-            },
-            {
-              "message": "`SemanticFailuresConfirmed` and the sibling `HumanEscalationRequired` encode a documented \"one or more\" invariant as raw `usize`, so callers can construct `pair_count: 0` while still producing a failure/escalation error. Use a non-zero domain type or `NonZeroUsize` so the error state cannot represent zero failed/escalated pairs.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/errors.rs",
-              "line": 190,
-              "category": "primitive obsession"
-            }
-          ],
-          "hash": "rvw1:sha256:74cf16a2d7030855415e26d5ce72c68fc3c99994ba9062f1a0cccfd78445dfff",
-          "at": "2026-07-08T11:11:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9700ce016fd27454fc322f916ac9ed997bc84867cd03f1b3c7cc19aac1cf38b8",
-          "at": "2026-07-08T12:02:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5aa12a6829743e8784fc8a454686caab7368a35e4ff527017a58ace28c6d3239",
-          "at": "2026-07-08T12:33:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`PartialArtifactState(TestObligationScopePresence)` does not make the error state unrepresentable: the payload enum also admits `Both` and `Neither`, and it duplicates the two half-present states already represented by `ObligationsAbsent` / `BindingsAbsent`. This lets callers construct a check failure for a non-partial scope, so use a narrower domain enum/newtype for only invalid artifact-scope states per `prefer-type-safe-abstractions.md` §Enum-first.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/errors.rs",
-              "line": 132,
-              "category": "enum-first violation"
-            }
-          ],
-          "hash": "rvw1:sha256:22e7c550ccdc655a02b761f066efc563e6a758b11cb3af0bfde40c27be19d112",
-          "at": "2026-07-08T13:03:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1dd3e78be0f18a46dfd434d693d6f66d98f105e29432b389e8e3bccd0262ccf5",
-          "at": "2026-07-08T13:22:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c209cffeba919ca687ad2e9144056d0697e6192f10ad6d33d1af8d27d288aab5",
-          "at": "2026-07-08T13:34:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c209cffeba919ca687ad2e9144056d0697e6192f10ad6d33d1af8d27d288aab5",
-          "at": "2026-07-08T13:53:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`local_trait_name` treats every path-qualified `trait_ref` as external by returning `None` when the stripped base contains `::`. IN-17 requires trait-impl derivation to resolve workspace cross-layer port impls, such as infrastructure impls of `domain::...` or `usecase::...` catalogue traits, to their `TraitEntry`; this string discriminator silently skips those valid workspace-local refs and derives zero `contract_conformance` obligations. Model the trait-ref scope as parsed local/workspace/external data instead of a raw string discriminator per `prefer-type-safe-abstractions.md` §Enum-first.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_v2/traits.rs",
-              "line": 136,
-              "category": "enum-first violation"
-            }
-          ],
-          "hash": "rvw1:sha256:3ccce180bfdfe61d8feb518ab27f47c22f29e08133a55f60dccca0c068df55fe",
-          "at": "2026-07-08T14:07:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9d21a1b928f769486cc3e81339b934f38c8d374c449a160b438399c5364b78cc",
-          "at": "2026-07-08T14:30:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87c4399a7e467d7370edc6874cee9cb1e11f4eeac56f009378eb8b074704101e",
-          "at": "2026-07-08T15:19:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`WaiverPair::new` takes the waiver claim as a raw `String` even though the domain already has `WaivedReason`, a validated non-empty value object for this exact concept. This reopens an invalid state that `TestBindingRecord::Waiver` prevents: callers can construct a semantic waiver pair with an empty or whitespace-only reason, bypassing `WaivedReason::try_new` before the verifier/cache path. Per `knowledge/conventions/prefer-type-safe-abstractions.md` §Newtype, carry `WaivedReason` through this pair instead of downgrading it to `String`.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/pair.rs",
-              "line": 58,
-              "category": "primitive_obsession"
-            }
-          ],
-          "hash": "rvw1:sha256:4c5e3d94582571b9ab88cd5d8e0060baf863e5955054b597e877d224164882f2",
-          "at": "2026-07-08T22:24:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ObligationFulfillmentPair::new` still accepts the verifier payload as three positional `String`s (`tests_source`, `entry_declaration`, `anchor_text`), and `WaiverPair::new` does the same for the two evidence strings. That leaves the exact swap/empty-value class this value object is meant to remove: callers can construct a valid-looking pair with `entry_declaration` and `anchor_text` reversed, or with empty claim/evidence text, before the semantic verifier/cache path sees it. Per `knowledge/conventions/prefer-type-safe-abstractions.md` §Newtype, these distinct claim/evidence components need validated domain newtypes or another typed constructor shape so the invariant is enforced at construction.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/test_obligation/pair.rs",
-              "line": 26,
-              "category": "primitive_obsession"
-            }
-          ],
-          "hash": "rvw1:sha256:0022400b3b3d20dcf0cf5ba1f318589e5ea88f5d9dca1945f3cd9f48cc2df91f",
-          "at": "2026-07-08T22:38:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`trait_ref_scope()` strips trailing `::` before classification, so malformed `TypeRef`s like `Foo::` are treated as `SelfCrate` instead of failing closed to `External`. Because `TypeRef` only guarantees non-empty input, invalid trait refs can still reach this path and be resolved to the wrong catalogue trait.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/traits.rs",
-              "line": 193,
-              "category": "typestate / parse-don't-validate gap"
-            }
-          ],
-          "hash": "rvw1:sha256:3edf80064749b085cf4fa3e915a6f672d4b21db32200b0a8df4a4287cff5acee",
-          "at": "2026-07-08T23:58:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4d72e977263bb4c52439b031e27149664c28f44a397dc5cd0fc45f981cc9eeb",
-          "at": "2026-07-09T00:20:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e4d72e977263bb4c52439b031e27149664c28f44a397dc5cd0fc45f981cc9eeb",
-          "at": "2026-07-09T02:04:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:081a65de49e614f5668ef3e23e6edcf61de72eb7af10d2a928d9bd7b912041d8",
-          "at": "2026-07-09T02:46:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1e1476c1e9943aa248a91267a2b240e3d25520be47032e8f976a68117725f6e9",
-          "at": "2026-07-09T15:02:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1e1476c1e9943aa248a91267a2b240e3d25520be47032e8f976a68117725f6e9",
-          "at": "2026-07-09T15:06:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a5abce605d93eae19d37e6a0271b7a77db6608fae89b8b371c43d6e676c91a3a",
-          "at": "2026-07-09T19:56:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a5abce605d93eae19d37e6a0271b7a77db6608fae89b8b371c43d6e676c91a3a",
-          "at": "2026-07-09T20:00:42Z"
+          "hash": "rvw1:sha256:b269821e703264a5317071645798ba505a10c6485524c22300e6ba9d26d59191",
+          "at": "2026-07-09T20:00:50Z"
         }
       ]
     },
@@ -2837,70 +1791,490 @@
         }
       ]
     },
-    "cli": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:614833427a258f8100cd59a563724ff2ee93849f2b67c7e86fa968f6e365df31",
-          "at": "2026-07-09T07:08:38Z"
+          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
+          "at": "2026-07-07T08:38:10Z"
         },
         {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93b77146f225964a90516213d8419cec7ebca0c5385fb69af71d790ffaf15f39",
-          "at": "2026-07-09T10:20:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93b77146f225964a90516213d8419cec7ebca0c5385fb69af71d790ffaf15f39",
-          "at": "2026-07-09T11:08:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:93b77146f225964a90516213d8419cec7ebca0c5385fb69af71d790ffaf15f39",
-          "at": "2026-07-09T13:10:32Z"
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D9 makes `anchor id` part of the obligation id, but D2 explicitly says obligations are derived per entry and are not multiplied by cite count. Downstream derivation cannot know whether to emit one obligation per declaration item, reusing its test group across all cited anchors, or one obligation per `(entry, anchor, kind, item)`. That changes obligation counts, binding shape, and totality semantics, so the ADR needs one consistent identity model before spec/types can translate it.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+              "line": 224,
+              "category": "inconsistent_decisions"
+            }
+          ],
+          "hash": "rvw1:sha256:2bc64b9f58b9c4710696f36d1807aa28299c3ef207394ca315bb874c6a22c115",
+          "at": "2026-07-07T08:41:44Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:93b77146f225964a90516213d8419cec7ebca0c5385fb69af71d790ffaf15f39",
-          "at": "2026-07-09T13:30:56Z"
+          "hash": "rvw1:sha256:c597270bfdf492126d9a4038ef233eb9ae3cba96657c8f231b9aeac5a6914bd0",
+          "at": "2026-07-07T08:52:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D14 classifies `sotp test-obligation results` as part of the fail-closed gate, but the same decision later says it is informational, always exits 0, and that `check` alone owns pass/fail. That makes the ADR internally inconsistent on whether `results` is a gate or a viewer, so downstream CLI/spec implementers cannot derive one observable contract.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+              "line": 347,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:769c3612aa307f33f5a470c522151275db7b773e437c8f2c198c3c94d78a86e4",
+          "at": "2026-07-09T21:15:48Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9185dbec494ca672df906d081dce4c5b2bdf2fa9c7f08ec3d8bf09aca3fc011b",
-          "at": "2026-07-09T16:35:16Z"
+          "hash": "rvw1:sha256:59eef85e03fe007f92011e72a27610633a512e551dd5a837b6b275edfb35aa01",
+          "at": "2026-07-09T21:18:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D14 adds `sotp test-obligation bindings-skeleton` as another subcommand in the same `sotp test-obligation` group, but D11 still states that this group has exactly four subcommands. D14 later says the helper is not part of D11's four commands, yet it is still a same-group CLI subcommand, so downstream spec/type planning cannot tell whether the CLI surface is four commands or five with four gate commands plus one authoring helper. Update D11/D14 to consistently distinguish the four gate subcommands from the non-gate helper.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+              "line": 347,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:59eef85e03fe007f92011e72a27610633a512e551dd5a837b6b275edfb35aa01",
+          "at": "2026-07-09T21:22:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9185dbec494ca672df906d081dce4c5b2bdf2fa9c7f08ec3d8bf09aca3fc011b",
-          "at": "2026-07-09T16:38:50Z"
+          "hash": "rvw1:sha256:4e00ff421fb84c5de089be36d5215958da79d56377652a87224c1637da6d235b",
+          "at": "2026-07-09T21:24:42Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
+          "at": "2026-07-07T18:02:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TestObligationRulesLoaderPort` is a domain-owned trait for loading `.harness/config/test-obligation-rules.json` from a configured source and reporting I/O / malformed JSON failures. That abstracts an infrastructure/application capability, while `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules says ports for infrastructure functions belong in `usecase`, with domain ports reserved for domain concepts such as persistence/worktree state. Keeping this loader in `libs/domain` misplaces the port boundary for the derivation/check use cases.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/ports.rs",
+              "line": 17,
+              "category": "port misplaced"
+            }
+          ],
+          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
+          "at": "2026-07-07T18:07:00Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6aa49150d55192fe2edb904e985cc018b209e195ed3d3a4ee2d2cfaf3a014f43",
-          "at": "2026-07-09T19:57:49Z"
+          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
+          "at": "2026-07-07T18:29:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TargetEntryRoleKind` does not make the role-section invariant unrepresentable: each section variant accepts the global `RoleKind`, so callers can construct invalid states such as `TargetEntryRoleKind::DataRole(RoleKind::Repository)` or `ContractRole(RoleKind::ValueObject)`. Because this is public domain API and there is no validating constructor or narrower per-section role type, downstream rule lookup can receive a target whose outer section and inner role disagree. This violates the domain enum/type-safety intent from `prefer-type-safe-abstractions.md` §Enum-first; use section-specific payloads or otherwise prevent mismatched construction.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/vocab.rs",
+              "line": 132,
+              "category": "enum-first violation"
+            }
+          ],
+          "hash": "rvw1:sha256:882d1c1b6579f723fbe86dcecd992a43da36f1bf985771a45c5ab857cf7ea0fc",
+          "at": "2026-07-07T18:33:43Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6aa49150d55192fe2edb904e985cc018b209e195ed3d3a4ee2d2cfaf3a014f43",
-          "at": "2026-07-09T20:08:37Z"
+          "hash": "rvw1:sha256:f1f3b6ec5a5828195fe15a0dfd8b619041583471af2be6b694649ec9f4a736c5",
+          "at": "2026-07-07T18:40:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:688b238bb25eac6e6e64ec87b00ee0e380b719eece7ec2043ab39769c6496da9",
+          "at": "2026-07-07T21:41:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TestBindingRecord::Fulfillment` and `VoluntaryBinding` expose raw `Vec<TestLocation>` fields, so callers can construct a binding with `tests: vec![]`. That makes an obligation look bound while carrying no executable test evidence, undermining IN-06/AC-04's fail-closed binding check. Use a non-empty test-location collection newtype or private variants plus validating constructors so empty bindings are unrepresentable.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/binding.rs",
+              "line": 64,
+              "category": "primitive obsession"
+            }
+          ],
+          "hash": "rvw1:sha256:688b238bb25eac6e6e64ec87b00ee0e380b719eece7ec2043ab39769c6496da9",
+          "at": "2026-07-07T21:45:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TestBindingRecord` stores bound tests as a raw `Vec<TestLocation>` for fulfillment/voluntary bindings, with no non-empty value object or fallible constructor. The variant docs define these records as binding tests, but the domain type can still represent an empty test set, so the obligation gate can no longer rely on the type to distinguish a real test binding from no evidence. Encode the non-empty bound-test-set invariant in the type or constructor.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/binding.rs",
+              "line": 68,
+              "category": "primitive obsession"
+            }
+          ],
+          "hash": "rvw1:sha256:32e0fa2f2ce907da1dfcb1104f6b3bde909b6345930c3b231127c6dfb6f9162e",
+          "at": "2026-07-07T21:59:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`NonEmptyTestLocations::first` uses production index access (`&self.0[0]`). The domain severity policy classifies index access outside `#[cfg(test)]` as panic-able library code under `coding-principles.md` §No Panics in Library Code; this method should avoid a panic-capable indexing operation even though constructors intend to preserve the non-empty invariant.",
+              "severity": "P0",
+              "file": "libs/domain/src/tddd/test_obligation/binding.rs",
+              "line": 96,
+              "category": "panic-able production code"
+            }
+          ],
+          "hash": "rvw1:sha256:b3c0a60fae3b44c9432526d15f641c77f488b9bc7cb7103e23958579a0e692ff",
+          "at": "2026-07-07T22:23:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6642d242b58593d1872147bac65e80f30b79bd8046cdb0000b5d73b18c68ff44",
+          "at": "2026-07-07T22:35:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26d6cf663f3f09e1064d53c72b69d0558211f75bc3f8f16b63be2f8b9a36d68d",
+          "at": "2026-07-07T23:56:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26d6cf663f3f09e1064d53c72b69d0558211f75bc3f8f16b63be2f8b9a36d68d",
+          "at": "2026-07-07T23:59:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80dca1c369538f4073480263327e0fad5a243cee72b133b3ca8bdcb90036c819",
+          "at": "2026-07-08T02:01:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80dca1c369538f4073480263327e0fad5a243cee72b133b3ca8bdcb90036c819",
+          "at": "2026-07-08T02:07:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 [port misplaced] `ContentHasherPort` is a hashing-service abstraction consumed by `EvaluateTestObligationsInteractor`, but it is defined in domain. Per `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules, application-service ports that abstract infrastructure functions belong in `usecase`, not the innermost domain layer. Keeping this trait in domain pulls an application dependency into the inner layer and makes the boundary inconsistent with the rest of the test-obligation ports.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/ports.rs",
+              "line": 181,
+              "category": "port misplaced"
+            },
+            {
+              "message": "P1 [enum-first / primitive obsession] `SpecDocumentLoadError(String)` collapses not-found, I/O, parse, and validation failures into a free-form string. That erases the failure kind the loader contract is supposed to preserve, so callers cannot safely distinguish or match the reason a `SpecDocument` load failed. Replace the string bag with a finite error enum that models the distinct failure classes.",
+              "severity": "P1",
+              "file": "libs/domain/src/spec_document_loader_port.rs",
+              "line": 19,
+              "category": "enum-first"
+            }
+          ],
+          "hash": "rvw1:sha256:093716b5f724b0ff7f117ff7673aff0324c13ee57c74fc5b3367195a64636849",
+          "at": "2026-07-08T06:43:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11fb5d17539ac8172cc7a3adf75a9465fd140d3508c5e67302ff172db335d3df",
+          "at": "2026-07-08T06:53:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 [port misplaced] `ContentHasherPort` is a SHA-256 service abstraction used by the usecase interactor to avoid depending on `sha2`, but it is defined in the domain layer. Per `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules, infrastructure-function ports such as hashing belong in `usecase`, while domain ports should model domain persistence/aggregate concepts. Move this trait to the usecase boundary and let infrastructure implement it there.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/ports.rs",
+              "line": 189,
+              "category": "port misplaced"
+            }
+          ],
+          "hash": "rvw1:sha256:11fb5d17539ac8172cc7a3adf75a9465fd140d3508c5e67302ff172db335d3df",
+          "at": "2026-07-08T06:58:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d7bf40be26877c0e9b18aca2506292e27541e9d0f3784f54e46efed119e4dc4",
+          "at": "2026-07-08T07:22:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "SpecDocumentLoadError stores Io/JsonParse/Invariant reasons as raw String, even though this track already defines DiagnosticMessage as the validated non-empty diagnostic newtype and the domain catalogue for these variants specifies DiagnosticMessage. This leaves those error states able to carry empty/whitespace diagnostics, violating the domain primitive-obsession rule for constrained strings; use DiagnosticMessage for the reason fields and validate at construction/mapping boundaries.",
+              "severity": "P1",
+              "file": "libs/domain/src/spec_document_loader_port.rs",
+              "line": 37,
+              "category": "primitive obsession"
+            }
+          ],
+          "hash": "rvw1:sha256:1d7bf40be26877c0e9b18aca2506292e27541e9d0f3784f54e46efed119e4dc4",
+          "at": "2026-07-08T07:25:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e47a5ec714273a64aa6d1fbd6a61f414c49b25685003cc4b858d53b8ae37e873",
+          "at": "2026-07-08T07:31:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecDocumentLoaderPort` is defined in the domain layer even though the trait abstracts an infrastructure operation: loading a filesystem path and decoding JSON for usecase interactors. The domain severity policy treats infrastructure-capability ports in domain as misplaced; per `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules, application-service infrastructure ports belong in `libs/usecase`, with only their adapters in infrastructure.",
+              "severity": "P1",
+              "file": "libs/domain/src/spec_document_loader_port.rs",
+              "line": 69,
+              "category": "port misplaced"
+            },
+            {
+              "message": "`SemanticFailuresConfirmed` and the sibling `HumanEscalationRequired` encode a documented \"one or more\" invariant as raw `usize`, so callers can construct `pair_count: 0` while still producing a failure/escalation error. Use a non-zero domain type or `NonZeroUsize` so the error state cannot represent zero failed/escalated pairs.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/errors.rs",
+              "line": 190,
+              "category": "primitive obsession"
+            }
+          ],
+          "hash": "rvw1:sha256:74cf16a2d7030855415e26d5ce72c68fc3c99994ba9062f1a0cccfd78445dfff",
+          "at": "2026-07-08T11:11:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9700ce016fd27454fc322f916ac9ed997bc84867cd03f1b3c7cc19aac1cf38b8",
+          "at": "2026-07-08T12:02:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5aa12a6829743e8784fc8a454686caab7368a35e4ff527017a58ace28c6d3239",
+          "at": "2026-07-08T12:33:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PartialArtifactState(TestObligationScopePresence)` does not make the error state unrepresentable: the payload enum also admits `Both` and `Neither`, and it duplicates the two half-present states already represented by `ObligationsAbsent` / `BindingsAbsent`. This lets callers construct a check failure for a non-partial scope, so use a narrower domain enum/newtype for only invalid artifact-scope states per `prefer-type-safe-abstractions.md` §Enum-first.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/errors.rs",
+              "line": 132,
+              "category": "enum-first violation"
+            }
+          ],
+          "hash": "rvw1:sha256:22e7c550ccdc655a02b761f066efc563e6a758b11cb3af0bfde40c27be19d112",
+          "at": "2026-07-08T13:03:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1dd3e78be0f18a46dfd434d693d6f66d98f105e29432b389e8e3bccd0262ccf5",
+          "at": "2026-07-08T13:22:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c209cffeba919ca687ad2e9144056d0697e6192f10ad6d33d1af8d27d288aab5",
+          "at": "2026-07-08T13:34:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c209cffeba919ca687ad2e9144056d0697e6192f10ad6d33d1af8d27d288aab5",
+          "at": "2026-07-08T13:53:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`local_trait_name` treats every path-qualified `trait_ref` as external by returning `None` when the stripped base contains `::`. IN-17 requires trait-impl derivation to resolve workspace cross-layer port impls, such as infrastructure impls of `domain::...` or `usecase::...` catalogue traits, to their `TraitEntry`; this string discriminator silently skips those valid workspace-local refs and derives zero `contract_conformance` obligations. Model the trait-ref scope as parsed local/workspace/external data instead of a raw string discriminator per `prefer-type-safe-abstractions.md` §Enum-first.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_v2/traits.rs",
+              "line": 136,
+              "category": "enum-first violation"
+            }
+          ],
+          "hash": "rvw1:sha256:3ccce180bfdfe61d8feb518ab27f47c22f29e08133a55f60dccca0c068df55fe",
+          "at": "2026-07-08T14:07:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d21a1b928f769486cc3e81339b934f38c8d374c449a160b438399c5364b78cc",
+          "at": "2026-07-08T14:30:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87c4399a7e467d7370edc6874cee9cb1e11f4eeac56f009378eb8b074704101e",
+          "at": "2026-07-08T15:19:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`WaiverPair::new` takes the waiver claim as a raw `String` even though the domain already has `WaivedReason`, a validated non-empty value object for this exact concept. This reopens an invalid state that `TestBindingRecord::Waiver` prevents: callers can construct a semantic waiver pair with an empty or whitespace-only reason, bypassing `WaivedReason::try_new` before the verifier/cache path. Per `knowledge/conventions/prefer-type-safe-abstractions.md` §Newtype, carry `WaivedReason` through this pair instead of downgrading it to `String`.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/pair.rs",
+              "line": 58,
+              "category": "primitive_obsession"
+            }
+          ],
+          "hash": "rvw1:sha256:4c5e3d94582571b9ab88cd5d8e0060baf863e5955054b597e877d224164882f2",
+          "at": "2026-07-08T22:24:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ObligationFulfillmentPair::new` still accepts the verifier payload as three positional `String`s (`tests_source`, `entry_declaration`, `anchor_text`), and `WaiverPair::new` does the same for the two evidence strings. That leaves the exact swap/empty-value class this value object is meant to remove: callers can construct a valid-looking pair with `entry_declaration` and `anchor_text` reversed, or with empty claim/evidence text, before the semantic verifier/cache path sees it. Per `knowledge/conventions/prefer-type-safe-abstractions.md` §Newtype, these distinct claim/evidence components need validated domain newtypes or another typed constructor shape so the invariant is enforced at construction.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/pair.rs",
+              "line": 26,
+              "category": "primitive_obsession"
+            }
+          ],
+          "hash": "rvw1:sha256:0022400b3b3d20dcf0cf5ba1f318589e5ea88f5d9dca1945f3cd9f48cc2df91f",
+          "at": "2026-07-08T22:38:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`trait_ref_scope()` strips trailing `::` before classification, so malformed `TypeRef`s like `Foo::` are treated as `SelfCrate` instead of failing closed to `External`. Because `TypeRef` only guarantees non-empty input, invalid trait refs can still reach this path and be resolved to the wrong catalogue trait.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/traits.rs",
+              "line": 193,
+              "category": "typestate / parse-don't-validate gap"
+            }
+          ],
+          "hash": "rvw1:sha256:3edf80064749b085cf4fa3e915a6f672d4b21db32200b0a8df4a4287cff5acee",
+          "at": "2026-07-08T23:58:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4d72e977263bb4c52439b031e27149664c28f44a397dc5cd0fc45f981cc9eeb",
+          "at": "2026-07-09T00:20:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4d72e977263bb4c52439b031e27149664c28f44a397dc5cd0fc45f981cc9eeb",
+          "at": "2026-07-09T02:04:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:081a65de49e614f5668ef3e23e6edcf61de72eb7af10d2a928d9bd7b912041d8",
+          "at": "2026-07-09T02:46:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e1476c1e9943aa248a91267a2b240e3d25520be47032e8f976a68117725f6e9",
+          "at": "2026-07-09T15:02:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e1476c1e9943aa248a91267a2b240e3d25520be47032e8f976a68117725f6e9",
+          "at": "2026-07-09T15:06:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5abce605d93eae19d37e6a0271b7a77db6608fae89b8b371c43d6e676c91a3a",
+          "at": "2026-07-09T19:56:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5abce605d93eae19d37e6a0271b7a77db6608fae89b8b371c43d6e676c91a3a",
+          "at": "2026-07-09T20:00:42Z"
         }
       ]
     },
@@ -3929,89 +3303,13 @@
           "findings": [],
           "hash": "rvw1:sha256:398fee15fa8104855f8c467c1570a089ea6cc729bbbfedb0321330d6b20283c2",
           "at": "2026-07-09T20:26:12Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This composition root defines `FsSpecDocumentLoader` and implements `SpecDocumentLoaderPort` locally. Port implementations belong in `libs/infrastructure`; `cli_composition` should only wire the adapter.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/test_obligation.rs",
-              "line": 265,
-              "category": "adapter defined here"
-            },
-            {
-              "message": "This composition root defines `FailingFulfillmentVerifier` and implements `ObligationFulfillmentVerifierPort` locally. That secondary adapter should live in `libs/infrastructure`, with the root only selecting and wiring it.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/test_obligation.rs",
-              "line": 288,
-              "category": "adapter defined here"
-            },
-            {
-              "message": "This composition root defines `FailingWaiverVerifier` and implements `WaiverVerifierPort` locally. That secondary adapter should live in `libs/infrastructure`, with the root only selecting and wiring it.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/test_obligation.rs",
-              "line": 304,
-              "category": "adapter defined here"
-            }
-          ],
-          "hash": "rvw1:sha256:ae019e5954c0e4a1ecf6f4b2175140ff61220fc3870198a713321ddfeba200b1",
-          "at": "2026-07-09T07:10:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "P1 invoke leak: `ref_verify_run` constructs `VerifySemanticRefsInteractor` and calls `interactor.execute(&cmd)` directly instead of routing through the `RefVerifyDriver`/infrastructure aggregate adapter. That bypasses the composition boundary the scope policy is trying to enforce, and it duplicates the hardened wiring that already exists in `FsRefVerifyRunAdapter` / `FsRefVerifyAggregateAdapter`.",
-              "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/ref_verify.rs",
-              "line": 172,
-              "category": "invoke leak"
-            }
-          ],
-          "hash": "rvw1:sha256:1b311a9b33a34d44630b3500b44f96ec0a95769e1a11a6ed2e680a8d13a1e502",
-          "at": "2026-07-09T10:22:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2d22a4ea1479cd089d33081d5ac0f47c3b1d7aa4250e05f4014388e569d5b53c",
-          "at": "2026-07-09T11:09:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a0fd8af94d98cd46279e1cc48ee91a5bf2b7913d2a3585a838fc2df23cea9fd8",
-          "at": "2026-07-09T13:15:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a0fd8af94d98cd46279e1cc48ee91a5bf2b7913d2a3585a838fc2df23cea9fd8",
-          "at": "2026-07-09T13:29:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b269821e703264a5317071645798ba505a10c6485524c22300e6ba9d26d59191",
-          "at": "2026-07-09T19:56:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b269821e703264a5317071645798ba505a10c6485524c22300e6ba9d26d59191",
-          "at": "2026-07-09T20:00:50Z"
+          "hash": "rvw1:sha256:d6a0df4a407f15e9b32622908e703f11b2dd8f4ee0475fc5de43ac267d9045f7",
+          "at": "2026-07-09T21:45:59Z"
         }
       ]
     },
@@ -4498,6 +3796,715 @@
           "findings": [],
           "hash": "rvw1:sha256:eb1b6bf22f924e09473d86df3806dceb2bfc7132fa5b865c5732c890cc89e471",
           "at": "2026-07-09T20:08:38Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:614833427a258f8100cd59a563724ff2ee93849f2b67c7e86fa968f6e365df31",
+          "at": "2026-07-09T07:08:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93b77146f225964a90516213d8419cec7ebca0c5385fb69af71d790ffaf15f39",
+          "at": "2026-07-09T10:20:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93b77146f225964a90516213d8419cec7ebca0c5385fb69af71d790ffaf15f39",
+          "at": "2026-07-09T11:08:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93b77146f225964a90516213d8419cec7ebca0c5385fb69af71d790ffaf15f39",
+          "at": "2026-07-09T13:10:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:93b77146f225964a90516213d8419cec7ebca0c5385fb69af71d790ffaf15f39",
+          "at": "2026-07-09T13:30:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9185dbec494ca672df906d081dce4c5b2bdf2fa9c7f08ec3d8bf09aca3fc011b",
+          "at": "2026-07-09T16:35:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9185dbec494ca672df906d081dce4c5b2bdf2fa9c7f08ec3d8bf09aca3fc011b",
+          "at": "2026-07-09T16:38:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6aa49150d55192fe2edb904e985cc018b209e195ed3d3a4ee2d2cfaf3a014f43",
+          "at": "2026-07-09T19:57:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6aa49150d55192fe2edb904e985cc018b209e195ed3d3a4ee2d2cfaf3a014f43",
+          "at": "2026-07-09T20:08:37Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69f14b4393f0e49a8e5650a1baf701821f483d322973f8ee968bba24f18a9335",
+          "at": "2026-07-07T18:03:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SemanticEscalationDriverPort` is the shared escalation/cache port for concurrent semantic evaluation, but the trait leaves `P`, `K`, `V`, `E`, and the future produced by the public `async fn` unconstrained. A non-`Send`/non-`Sync` implementation can satisfy this usecase port, so later ref-verify or obligation-gate orchestration cannot safely fan out evaluations across workers despite the port contract being the concurrency boundary. Add the required `Send`/`Sync` bounds and use a `Send` future shape at the trait boundary instead of an unconstrained public `async fn`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/semantic_verdict_core/driver.rs",
+              "line": 21,
+              "category": "purity violation by trait or generic"
+            }
+          ],
+          "hash": "rvw1:sha256:69f14b4393f0e49a8e5650a1baf701821f483d322973f8ee968bba24f18a9335",
+          "at": "2026-07-07T18:07:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7febbedb200015d97b4887d237b8bdc37a49453d65756bb9c28b8a2deeb3a3f7",
+          "at": "2026-07-07T18:26:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be3e439abe8fd795cb47dbf70e6943672a1c6d4db54f1ac8a5171f96fde985d9",
+          "at": "2026-07-08T01:59:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be3e439abe8fd795cb47dbf70e6943672a1c6d4db54f1ac8a5171f96fde985d9",
+          "at": "2026-07-08T02:03:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This usecase re-parses raw `spec.json` locally instead of consuming the parsed `SpecDocument` boundary. That duplicates codec/schema logic in `check` and can drift from the canonical parser used elsewhere for uncited AC/CN detection.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
+              "line": 166,
+              "category": "business logic leak"
+            },
+            {
+              "message": "`current_bound_hash` here, and the same helper pattern in `evaluate.rs`, drop `TestSourceScanError`s and hash only the bodies that happened to load. A missing or unreadable test source therefore looks like a successful binding over partial evidence, so freshness checks can proceed on incomplete data.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
+              "line": 177,
+              "category": "business logic leak"
+            },
+            {
+              "message": "In `execute`, catalogue / obligations / bindings / spec load failures are all returned as `CacheWrite`. That public error type says persistence failed even when the actual failure was reading inputs, so callers get the wrong remediation path.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/evaluate.rs",
+              "line": 360,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:71b7a4090f947d49bae4dab1c672bf9d29552edbd16ad43a31777af3bd085a2b",
+          "at": "2026-07-08T06:48:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45cefda47683bebe9aa8d69c330722a82ab613ef0f1f163301155e18ff0cd536",
+          "at": "2026-07-08T06:59:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When both obligations and bindings are absent, `execute` returns before rewriting the verdict caches. That leaves any previously materialized fulfillment/waiver cache files on disk, so a later `results` run can report stale verdicts for an empty scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/evaluate.rs",
+              "line": 380,
+              "category": "state-consistency"
+            },
+            {
+              "message": "`detect_orphaned` only inspects `TestBindingRecord::Fulfillment`. Waiver bindings that survive after their edge is no longer derived are never marked orphaned, because `resolve_edges` only walks current obligations. That lets stale waiver records slip through a clean `check` run.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
+              "line": 289,
+              "category": "drift-detection"
+            },
+            {
+              "message": "`WaiverVerdict::Fail` is recorded as `EdgeResolutionOutcome::MissingBinding`. That misclassifies a rejected waiver as an absent binding, so the results output cannot distinguish the two failure modes.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/results.rs",
+              "line": 300,
+              "category": "output-correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:744d4241dd9b83018b831068e7132f8337c4204b025f934ed82b83861ddc3a86",
+          "at": "2026-07-08T07:25:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc7a09c8ecaf18d0ae0aac1eb886e2871ec980978cb28002e6cfd6601f2290fd",
+          "at": "2026-07-08T07:34:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc7a09c8ecaf18d0ae0aac1eb886e2871ec980978cb28002e6cfd6601f2290fd",
+          "at": "2026-07-08T07:39:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`trait_impl` obligations are emitted with an empty anchor list. Both downstream gates derive edges exclusively from `obligation.spec_refs()`, and `evaluate_record` only calls the verifier inside that anchor loop, so a bound contract-conformance obligation can produce zero verifier calls/cache entries and still avoid unresolved-edge handling. This drops required trait-impl conformance coverage instead of resolving the implemented trait's spec anchors as the module comment describes.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 325,
+              "category": "orchestration_correctness"
+            },
+            {
+              "message": "Fresh evaluation always calls the semantic verifier and overwrites cache entries without first loading/reusing an existing verdict whose three-hash key already matches. That breaks the frozen-cache contract: rerunning `evaluate` on unchanged inputs can replace a previously passing final verdict with a new fail/pending result from the external verifier, making the gate non-deterministic and defeating drift-based cache invalidation.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate.rs",
+              "line": 293,
+              "category": "orchestration_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:51212c55f6975f8c113ad47e2f3398f92e0ab9a8ba3a84411f1421f7c21e8787",
+          "at": "2026-07-08T08:17:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_fulfillment_edge` selects a fulfillment cache entry by `edge_id` only, but fulfillment cache entries are keyed by both `edge_id` and `obligation_id`. Since an edge is only `(entry_key, anchor)`, multiple obligations for the same entry/anchor can share it; a fulfilled verdict for one obligation can therefore satisfy another obligation without its own verifier verdict if the hashes line up. Match the cache entry on the current `obligation.id()` as well before marking the edge resolved.",
+              "severity": "P0",
+              "file": "libs/usecase/src/test_obligation/check.rs",
+              "line": 376,
+              "category": "orchestration_correctness"
+            },
+            {
+              "message": "Trait-impl obligations use `impl_decl.for_type` as the obligation entry key while freezing the declaration hash from the `impl_decl` itself. Later evaluate/check resolve declarations only by that entry key through types/traits/functions, so a trait-impl obligation either gets the adapter type declaration or no declaration, not the impl declaration that was hashed. This makes trait-impl verification go pending or produce permanent `decl_changed` drift. Carry a resolvable trait-impl target/declaration, or teach declaration lookup to find the matching `trait_impls` declaration with the same canonical text.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 326,
+              "category": "orchestration_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:87ce6e7acb42e5320ca649a56dd07bca2a24384ebb8f7d507dcc77db8c2f2156",
+          "at": "2026-07-08T08:28:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Fulfillment evaluation resolves the current catalogue declaration text, but freezes and cache-matches the verdict with the stale `obligation.declaration_hash()` from the obligations artifact. If the catalogue declaration changes without changing the obligation id, `evaluate` can reuse an old cached verdict without re-verifying the new declaration, or write a cache entry that `check` immediately reports as `decl_changed`. The fulfillment key should hash the resolved `declaration` used for `verify_pair`, as the voluntary and waiver paths already do.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate.rs",
+              "line": 489,
+              "category": "orchestration correctness"
+            },
+            {
+              "message": "Waiver evaluation and freshness checking resolve declaration text from only `edge.entry_key()`. For trait-impl obligations the edge key is the implementer type, while the correct declaration is the specific `TraitImplDeclV2` identified by `trait_impl:<trait>` on the obligation. A waived trait-impl edge is therefore verified and cache-checked against the type declaration instead of the impl declaration, so changes to the impl can be missed and the verifier receives the wrong evidence.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate.rs",
+              "line": 547,
+              "category": "orchestration correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:138a06ee4d9516812c4203b51df66cc3b2e08b969bb67528c6d68738be586969",
+          "at": "2026-07-08T08:36:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1: `EvaluateTestObligationsInteractor` bypasses the shared semantic escalation core. The implementation hard-codes `fast -> final` by calling the verifier ports directly and never injects or calls `SemanticEscalationDriverPort`; as a result the configured calibration-probe injection, degradation threshold, parallelism, and human-escalation path required for the obligation gate are skipped, with final fail/pending verdicts merely cached and returned in an `Ok` outcome.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate.rs",
+              "line": 308,
+              "category": "orchestration correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:753d1b14a84c7f48edb2584fc89126398c7abf44e1110220297e34ae5a2c16b9",
+          "at": "2026-07-08T08:47:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute` only fails closed when `pending_records` is populated, but these unresolved-input branches only increment `tally.pending` and return `Ok(())`. A binding that references a missing obligation, missing declaration, or missing spec anchor therefore lets `evaluate` complete successfully with `pending_count > 0` and no human-escalation error, silently bypassing the fail-closed evaluation gate. Record a pending `EdgeVerdictRecord` or return a typed error for these resolution failures.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate.rs",
+              "line": 510,
+              "category": "missing error handling / fail-closed orchestration"
+            }
+          ],
+          "hash": "rvw1:sha256:f13ad3bf2a02d186a1a3df1736cdee4d9812bb6e53f7709728bcebe171c2c6c5",
+          "at": "2026-07-08T09:02:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6b901ef743ec12f45d4fdc1605dcac79c7ea2d67949cacc62b72b4a2931004cf",
+          "at": "2026-07-08T09:12:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`derive_trait_impl_obligations` resolves trait impls by passing the raw `trait_ref` through `simplify_trait_ref`, which strips both generics and all path qualifiers before matching against catalogue trait names. That means an external impl like `std::fmt::Display` will be treated as the local catalogue trait `Display` whenever one exists, so the code emits contract-conformance obligations instead of the required zero-obligation external-trait case. This is a usecase-level string decision on `TypeRef` identity that should be handled by the domain/catalogue resolution model, and it breaks IN-17/AC-16 for same-basename external traits.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 318,
+              "category": "business_logic_leak"
+            }
+          ],
+          "hash": "rvw1:sha256:e75f8405abbee0a9546d535b55cc459c59ae7cac748e2e44e2a8a352df7e17f2",
+          "at": "2026-07-08T09:30:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`block_on` is a production usecase executor that repeatedly polls a `SemanticEscalationFuture` with a noop waker and spins on `Poll::Pending`. The `SemanticEscalationDriverPort` contract returns `Send` futures for worker fan-out; it does not promise ready-only futures, so this makes the usecase layer depend on an implicit runtime behavior and can hang the evaluate gate when a real async verifier adapter yields. Move future execution to the composition/runtime boundary, make this service async, or make the verifier port synchronous if usecase must stay sync.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/verify.rs",
+              "line": 27,
+              "category": "purity violation by trait or generic"
+            },
+            {
+              "message": "The new interactors store injected dependencies as bare `Arc<dyn ...>` trait objects, starting here with `rules_loader`; the same pattern appears in check/evaluate/results. The briefing requires injected Arc ports to be `Send + Sync`, and without those bounds a non-thread-safe infrastructure adapter can be wired into the usecase orchestrator, breaking the expected port contract and preventing safe sharing/fan-out of the application services. Add `+ Send + Sync` to the injected trait objects, or make the port traits themselves require those bounds.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 67,
+              "category": "purity violation by trait or generic"
+            }
+          ],
+          "hash": "rvw1:sha256:25e59d9c1e8ebf0638c6092242b0368107fb87cd3deed9a2228bfbfb668835a1",
+          "at": "2026-07-08T09:37:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`input_load_error` wraps every read-side failure as `ObligationEvaluateError::CachePersistence(VerifyCacheError::Io(...))`, and it is used for catalogue loads, spec loads, and test-source scans, not just cache persistence. That re-exposes an infrastructure-shaped IO/cache error through the usecase API and collapses unrelated evaluation input failures into a cache error, so callers cannot route the failure at the usecase concept level. Add usecase-level input/source/artifact error variants or map these failures to existing non-cache concepts instead.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/cache.rs",
+              "line": 17,
+              "category": "error_type_confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:5c44c77571a7ab0da767e2c68cb955d217020a582d137f08df656ea4e4654494",
+          "at": "2026-07-08T09:51:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 error type confusion: `input_load_error` maps catalogue loads, spec loads, obligation/binding artifact loads, and test-source scan failures into `ObligationEvaluateError::CachePersistence(VerifyCacheError::Io(...))`. That means callers see non-cache input failures as verdict-cache I/O failures, which breaks the usecase error abstraction required by the usecase severity policy. Add usecase-level evaluate error variants for input/artifact/source/spec failures, or map each port failure to the existing conceptually correct variant instead of the cache persistence lane.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/cache.rs",
+              "line": 17,
+              "category": "error type confusion"
+            },
+            {
+              "message": "P1 error type confusion: catalogue and spec document loader failures are collapsed into `ObligationCheckError::ArtifactCodec(ArtifactCodecError::Io(...))`, even though `ArtifactCodecError` is documented for obligations/test-bindings artifacts and `SpecDocumentLoadError` distinguishes not-found, I/O, JSON parse, and invariant failures. This makes check callers report spec/catalogue input failures as generic artifact I/O and loses the usecase-level failure concept. Map these ports to dedicated check error variants or a non-artifact input-load error.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/check.rs",
+              "line": 162,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:5c44c77571a7ab0da767e2c68cb955d217020a582d137f08df656ea4e4654494",
+          "at": "2026-07-08T09:56:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:37e355605bd7e629cebf87c6c4853e9616f58d51d7be5ab8b0ac90a99ae29fce",
+          "at": "2026-07-08T10:22:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f4aeee11c0994b2e46274d8714473ec1582995079ac0fed25aa1858bd4d9d2d",
+          "at": "2026-07-08T11:12:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The derive interactor parses `TraitImplDeclV2.trait_ref` as a raw string to decide whether an impl targets a local trait (`split('<')` plus `contains(\"::\")`). That is domain classification logic for the `TypeRef`/catalogue model, not usecase orchestration; if the domain encoding changes, the usecase can silently skip or emit obligations incorrectly. Move this behind a domain method/value-type API and have the interactor call that.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 177,
+              "category": "business_logic_leak"
+            }
+          ],
+          "hash": "rvw1:sha256:b8a1b527a7e3e48e6040ce7f5f245d164d290cf2f47da2c9ff5656e11d6acc00",
+          "at": "2026-07-08T12:05:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SpecDocumentLoaderPort` is defined in the usecase layer even though it abstracts loading/parsing the persisted `SpecDocument` artifact, i.e. a domain document persistence boundary. Per `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules, ports for persistence/domain concepts belong in `domain` (as with the existing `CatalogueDocumentLoaderPort`), while usecase should only depend on them. Keeping this port here also forces `domain` to carry `SpecDocumentLoadError` for a usecase-owned trait. Move the port next to the spec domain types/error and inject that domain port into derive/check/evaluate.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/spec_loader.rs",
+              "line": 19,
+              "category": "port placement mistake"
+            }
+          ],
+          "hash": "rvw1:sha256:a19fb4fbf442dc3e897977b71e31eb324d34c541edd9c6dd1c13518d5a3d7f7f",
+          "at": "2026-07-08T12:35:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:987427dd1c99644fe7e19a49bc65f5ae85e299258e388de4b4015c8a44f5810f",
+          "at": "2026-07-08T13:02:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The derive interactor is making domain role decisions in the usecase layer: `data_role_items` and the helpers it dispatches to match on `DataRole`/`TypeKindV2` to decide which invariants, handles, events, typestate transitions, and methods produce obligation items. Per `hexagonal-architecture.md` §CLI as Composition Root / usecase purity, the usecase layer should orchestrate loaded catalogues/rules and delegate these domain-role semantics to domain types or a domain projector; otherwise role semantic changes can drift independently in usecase.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 451,
+              "category": "business_logic_leak"
+            }
+          ],
+          "hash": "rvw1:sha256:af4352621c19b835db96fcd47cf9f6e72a1936dea762fcdfc3f3d393995853ba",
+          "at": "2026-07-08T14:36:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2d80252dc34a1ea151b92a4a435f921def4a9ad95e63cfc63bcf87a1d5b103b",
+          "at": "2026-07-08T15:20:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98f85c3beb6946dda198cc8ebb3099bca028156531699bf00421c79304226e8b",
+          "at": "2026-07-08T22:24:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a22df8774231e1f7517aa7809d691f4e3823f765dcfde8d39c43d06347039694",
+          "at": "2026-07-08T22:36:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TestObligationResultsInteractor` maps both `ObligationsArtifactPort::load` and `TestBindingsArtifactPort::load` failures to `MalformedArtifact`, so a plain I/O failure is reported as corruption and the `IoError` branch on `ObligationResultsError` is never used here. Callers lose the retry-vs-corruption distinction for results loading.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/results.rs",
+              "line": 186,
+              "category": "error type confusion"
+            },
+            {
+              "message": "Workspace-qualified trait refs lose their `crate_name` here: `TraitRefScope::Workspace { crate_name, bare_name }` is collapsed to `bare_name`, then the first catalogue entry with that name wins. If two workspace crates expose the same trait name, `impl usecase::Foo for Bar` can be projected against the wrong role/anchors depending on catalogue order.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/derive.rs",
+              "line": 335,
+              "category": "business logic leak"
+            }
+          ],
+          "hash": "rvw1:sha256:d734e36d3bf1af699fa8c8a462257fa911f4aa9f7336cf952d69b88bb91ed2da",
+          "at": "2026-07-08T23:58:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cited_anchor_ids()` treats deletion tombstones as active citations because it walks `iter_catalogue_entries()` without checking `entry.action`. That means an `AC`/`CN` requirement cited only by a deleted catalogue entry will be suppressed instead of being reported as uncited. Filter out `ItemAction::Delete` entries here (or in the traversal helper) before building the cited set.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/mod.rs",
+              "line": 153,
+              "category": "business logic leak"
+            },
+            {
+              "message": "This branch maps `scan_test_body() == Ok(None)` to `TestSourceScanError::Parse`, but the scanner contract uses `None` for an absent test/file, not a parse failure. That misclassifies missing source as malformed source and makes `check`'s error surface inconsistent with `evaluate`, which treats the same condition as I/O-style absence. Map the `None` case to an absence/I-O path instead of `Parse`.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
+              "line": 189,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:e8b9ac7a104ba2a2d794f3fd17e2091531c76126f55419d50536620fdb61285c",
+          "at": "2026-07-09T00:25:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Declaration lookup is keyed only by the bare entry name. If a type, trait, or function shares that name in another section, `find_declaration_text` can return the wrong declaration, so `check`/`evaluate` will freeze or verify against the wrong AST and report stale/fresh results incorrectly. The existing `CatalogueEntryRef.section_key` should be used to disambiguate.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/mod.rs",
+              "line": 104,
+              "category": "orchestration correctness"
+            },
+            {
+              "message": "`save_caches` writes the fulfillment cache before the waiver cache. If the second save fails, `evaluate` returns `Err` after mutating only one artifact, leaving the pair out of sync and allowing later `check`/`results` runs to observe a mixed-generation state. The cache writes need to be atomic or rolled back on failure.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/evaluate/mod.rs",
+              "line": 570,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:a6a18f8d9b09053fd60425193af6006ac24013fd4b2d4f127bb6629f5f6f6e81",
+          "at": "2026-07-09T00:36:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Voluntary bindings never migrate onto a newly derived obligation. `check` ignores `TestBindingRecord::VoluntaryBinding` when it looks for fulfillment bindings, and `evaluate` keeps freezing those records under a synthetic obligation id instead of resolving an existing obligation for the same edge. That breaks AC-12 inheritance: after a decision-table update creates a real obligation, the old voluntary binding is still reported as missing / workspace-only instead of counting as that obligation's fulfillment.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
+              "line": 295,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3e73e9816fb35568e93b64624a9a29ef8cfe27295912ecc49da20b78eeb978b7",
+          "at": "2026-07-09T00:51:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f1221c60e68785baff276c4c78dd5200f288d0b97c877b3b7aa742e71b6d1089",
+          "at": "2026-07-09T01:02:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`derive_trait_impl_obligations` bypasses the domain `RoleObligationItemsProjector` for trait-impl rules by ignoring the rule's `per_axis` and always returning one `trait_impl:<trait>` item. Because `TestObligationRulesDocument` accepts arbitrary `TestObligationPerAxis` values in the `trait_impls` section, a config using `per: \"method\"` or another non-`trait_impl` axis would still generate contract-conformance obligations instead of projecting zero/failing through the domain rule interpreter. This keeps role/per-axis business projection logic in the usecase layer and can derive obligations the domain projector would not authorize.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 387,
+              "category": "business_logic_leak"
+            }
+          ],
+          "hash": "rvw1:sha256:ac9da2b3f4b1ac1332502f94d1aa0778a2c844be05d8ef6032c8be224776df76",
+          "at": "2026-07-09T02:10:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36ac68608178052816aa0b68fbc480d08c75a81dadacc4d50a86741c5dbc4e3a",
+          "at": "2026-07-09T02:45:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_inner` treats a half-materialised scope as a clean zero-pair run: if either `obligations` or `bindings` is `None`, it clears both verdict caches and returns `Ok(0, 0, 0)`. That silently masks a missing artifact instead of surfacing the incomplete scope.",
+              "severity": "P1",
+              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/evaluate/mod.rs",
+              "line": 499,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:632c9021144632d03833d7f7adc148eb5390482194461402591105f6a7449e47",
+          "at": "2026-07-09T03:28:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0aba51dfc54c97cc8d83d3507ec85956105ab20ff2cd84607971923230c0602a",
+          "at": "2026-07-09T03:35:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0aba51dfc54c97cc8d83d3507ec85956105ab20ff2cd84607971923230c0602a",
+          "at": "2026-07-09T03:40:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84135aaac90d08f0969b46d323f7d43063f48b6bc829fd6f125c43b4e9cdd061",
+          "at": "2026-07-09T04:43:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84135aaac90d08f0969b46d323f7d43063f48b6bc829fd6f125c43b4e9cdd061",
+          "at": "2026-07-09T04:49:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3c0a537f2a82314efa600e4d9410df955438f132c45460a843f61483e233d11",
+          "at": "2026-07-09T07:11:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3c0a537f2a82314efa600e4d9410df955438f132c45460a843f61483e233d11",
+          "at": "2026-07-09T10:24:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`libs/usecase/src/ref_verify/interactor.rs:272-301` now finalizes fast non-pass production pairs inside `RefVerifierEscalationDriver`, then immediately re-runs the same pairs through `parallel_verify(..., ModelTier::Final, ...)` in the calibration-failure branch. That doubles Final-tier verifier calls for every fast Fail/Pending pair, so a transient second-call error or any side effect on the verifier can make this branch fail where the previous single Final evaluation would not.",
+              "severity": "P1",
+              "file": "libs/usecase/src/ref_verify/interactor.rs",
+              "line": 272,
+              "category": "behavior_regression"
+            }
+          ],
+          "hash": "rvw1:sha256:f3c0a537f2a82314efa600e4d9410df955438f132c45460a843f61483e233d11",
+          "at": "2026-07-09T11:08:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b3cae8272817bb6ce9fce9c59aadb05c4e612b1b9caf79fab34ca7c41b4458e",
+          "at": "2026-07-09T12:18:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b3cae8272817bb6ce9fce9c59aadb05c4e612b1b9caf79fab34ca7c41b4458e",
+          "at": "2026-07-09T13:13:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b3cae8272817bb6ce9fce9c59aadb05c4e612b1b9caf79fab34ca7c41b4458e",
+          "at": "2026-07-09T13:31:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24df1e275cfe3cbf91bc3197578316575ccf823151bcf5cecf617a7748d6a0b4",
+          "at": "2026-07-09T15:06:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24df1e275cfe3cbf91bc3197578316575ccf823151bcf5cecf617a7748d6a0b4",
+          "at": "2026-07-09T15:11:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ca679b76237ba8266935bbc886ff29a980e4fe1e6621daae36dfd83b8d715ee",
+          "at": "2026-07-09T15:39:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ca679b76237ba8266935bbc886ff29a980e4fe1e6621daae36dfd83b8d715ee",
+          "at": "2026-07-09T15:44:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16bad97304aef372d93a128e62984fec3da98e670233aef94bd002229961f443",
+          "at": "2026-07-09T19:55:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16bad97304aef372d93a128e62984fec3da98e670233aef94bd002229961f443",
+          "at": "2026-07-09T20:00:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83086a40a099a3ad24dfe500c6c86de26ff3008bd0bb6fa8235fe49f6e19001a",
+          "at": "2026-07-09T20:47:34Z"
         }
       ]
     },
