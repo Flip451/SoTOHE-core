@@ -10,7 +10,8 @@
     {
       "id": "T002",
       "description": "Target libs/usecase ref_verify chain-1 (spec-adr) and chain-2 (catalog-spec) drivers. Migrate their fast/final/human escalation, hash-frozen cache access, and calibration probe injection to consume SemanticEscalationDriverPort + SemanticCalibrationProbeConfig from tddd::semantic_verdict_core (IN-01/AC-15/OS-02). Keep existing ref-verify public API and existing test surface unchanged; adjust wiring/composition only.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "21398f63eaad1ddb19dac7fe519cd77c35f43294"
     },
     {
       "id": "T003",
@@ -117,37 +118,44 @@
     {
       "id": "T020",
       "description": "Target apps/cli-driver test_obligation::{derive,check,evaluate,results}. Add TestObligationDeriveInput, TestObligationCheckInput, TestObligationEvaluateInput, TestObligationResultsInput; add TestObligationDeriveHandler, TestObligationCheckHandler, TestObligationEvaluateHandler, TestObligationResultsHandler as thin primary adapters translating parsed args to the four application-service commands and mapping outcomes to CommandOutcome (IN-07/IN-08/IN-09/IN-10). Add unit tests against application-service doubles.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "21398f63eaad1ddb19dac7fe519cd77c35f43294"
     },
     {
       "id": "T021",
       "description": "Target apps/cli-composition test_obligation plus infrastructure spec_document_loader and test_obligation fallback verifier adapters. Add TestObligationCompositionRoot wiring JsonTestObligationRulesLoader, JsonObligationsCodec, JsonTestBindingsCodec, JsonObligationFulfillmentCacheCodec, JsonWaiverCacheCodec, SynTestSourceScanner, FsSpecDocumentLoader, Sha256ContentHasher, ObligationFulfillmentEscalationDriver (wraps ObligationFulfillmentVerifierAdapter or FailingObligationFulfillmentVerifier), WaiverEscalationDriver (wraps WaiverVerifierAdapter or FailingWaiverVerifier) → four Interactors → four Handlers (IN-07/IN-08/IN-09/IN-10). Add integration test exercising the composition root with test doubles for the LLM verifiers.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "21398f63eaad1ddb19dac7fe519cd77c35f43294"
     },
     {
       "id": "T022",
       "description": "Target apps/cli commands::test_obligation and apps/cli/src/main.rs. Add TestObligationSubcommand (Derive/Check/Evaluate/Results), TestObligationArgs, TestObligationDeriveArgs, TestObligationCheckArgs, TestObligationEvaluateArgs, TestObligationResultsArgs, dispatch through TestObligationCompositionRoot, and top-level `sotp test-obligation` registration (IN-07/IN-08/IN-09/IN-10/OS-10/CN-09/AC-09/AC-14). Add CLI integration tests covering those anchors.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "21398f63eaad1ddb19dac7fe519cd77c35f43294"
     },
     {
       "id": "T023",
       "description": "Target .harness/config/agent-profiles.json and the Rust-side capability registry used by resolve_execution. Register `obligation-fulfillment-verifier` and `waiver-verifier` capabilities (IN-11/CN-08/AC-07). Add unit tests covering those anchors.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "21398f63eaad1ddb19dac7fe519cd77c35f43294"
     },
     {
       "id": "T024",
       "description": "Target libs/infrastructure test_obligation::fulfillment_escalation_driver. Add ObligationFulfillmentEscalationDriver impl SemanticEscalationDriverPort<ObligationFulfillmentPair, ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, SemanticVerifierError> wrapping ObligationFulfillmentVerifierPort (IN-01/IN-09/AC-06/AC-15/OS-02). Add unit tests covering those anchors.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "21398f63eaad1ddb19dac7fe519cd77c35f43294"
     },
     {
       "id": "T025",
       "description": "Target libs/infrastructure test_obligation::waiver_escalation_driver. Add WaiverEscalationDriver impl SemanticEscalationDriverPort<WaiverPair, WaiverCacheKey, WaiverVerdict, SemanticVerifierError> wrapping WaiverVerifierPort (IN-01/IN-09/AC-06/AC-15/OS-02). Add unit tests covering those anchors.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "21398f63eaad1ddb19dac7fe519cd77c35f43294"
     },
     {
       "id": "T026",
       "description": "Target libs/infrastructure test_obligation::sha256_content_hasher. Add Sha256ContentHasher impl ContentHasherPort (IN-09/AC-06/CN-04). Add unit tests covering those anchors.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "21398f63eaad1ddb19dac7fe519cd77c35f43294"
     }
   ],
   "plan": {
