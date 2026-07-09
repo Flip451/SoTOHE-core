@@ -556,10 +556,10 @@
     },
     {
       "claim_hash": "f346d8f7fda64bce5a03673a9c6b3ddcae927318d86ebca5a1ad5c3dfe3b9117",
-      "evidence_hash": "6a850d5ddfa6be3169de984e6aeb5981870afc523de644661e8447beed8ae9ce",
+      "evidence_hash": "9a6d9a5c78d167563efc2fa0f047d43b24c810a1f92c44e6b7b733405635af7e",
       "verdict": {
         "kind": "pass",
-        "citation": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。... 走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。"
+        "citation": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -574,7 +574,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。"
+          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。`bin/sotp test-obligation bindings-skeleton` は obligations artifact を読み、`test-bindings.json` と同一 wire 形状の schema 準拠 draft（各導出義務 id を `fulfillment` レコードとして事前充填し、`layer` / `module_path` / `test_name` は TODO placeholder のまま）を stdout に、authoring guidance note（レコード件数、TODO 差し替え / waiver・voluntary_binding への転記の指示、brief と対象 entry は obligations.json 参照という pointer）を stderr に出す authoring helper であり、stdout を schema-pure に保つため fail-closed codec が受理する key のみを含む（利用者は stdout をそのまま `test-bindings.json` として保存し値だけ置換して仕上げる）。command は read-only で、`test-bindings.json` も verdict cache も書き換えず、TODO placeholder が残る間は fail-closed gate に受理されない。"
         }
       }
     },
@@ -1252,10 +1252,10 @@
     },
     {
       "claim_hash": "fe17d4b20b492b0450f6f3b21303f4767e2cca97b7448bcb5359f8be5a09ef03",
-      "evidence_hash": "6a850d5ddfa6be3169de984e6aeb5981870afc523de644661e8447beed8ae9ce",
+      "evidence_hash": "9a6d9a5c78d167563efc2fa0f047d43b24c810a1f92c44e6b7b733405635af7e",
       "verdict": {
         "kind": "pass",
-        "citation": "「走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して…（テストソースは素の Rust のままで異物構文を持たない）」"
+        "citation": "走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1270,7 +1270,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。"
+          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。`bin/sotp test-obligation bindings-skeleton` は obligations artifact を読み、`test-bindings.json` と同一 wire 形状の schema 準拠 draft（各導出義務 id を `fulfillment` レコードとして事前充填し、`layer` / `module_path` / `test_name` は TODO placeholder のまま）を stdout に、authoring guidance note（レコード件数、TODO 差し替え / waiver・voluntary_binding への転記の指示、brief と対象 entry は obligations.json 参照という pointer）を stderr に出す authoring helper であり、stdout を schema-pure に保つため fail-closed codec が受理する key のみを含む（利用者は stdout をそのまま `test-bindings.json` として保存し値だけ置換して仕上げる）。command は read-only で、`test-bindings.json` も verdict cache も書き換えず、TODO placeholder が残る間は fail-closed gate に受理されない。"
         }
       }
     },
@@ -1300,10 +1300,10 @@
     },
     {
       "claim_hash": "b921ea5420a137bad2e17e172fe6ea648daa507c2074e4dba52a494f06e8159b",
-      "evidence_hash": "6a850d5ddfa6be3169de984e6aeb5981870afc523de644661e8447beed8ae9ce",
+      "evidence_hash": "9a6d9a5c78d167563efc2fa0f047d43b24c810a1f92c44e6b7b733405635af7e",
       "verdict": {
         "kind": "pass",
-        "citation": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）."
+        "citation": "3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1318,16 +1318,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。"
+          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。`bin/sotp test-obligation bindings-skeleton` は obligations artifact を読み、`test-bindings.json` と同一 wire 形状の schema 準拠 draft（各導出義務 id を `fulfillment` レコードとして事前充填し、`layer` / `module_path` / `test_name` は TODO placeholder のまま）を stdout に、authoring guidance note（レコード件数、TODO 差し替え / waiver・voluntary_binding への転記の指示、brief と対象 entry は obligations.json 参照という pointer）を stderr に出す authoring helper であり、stdout を schema-pure に保つため fail-closed codec が受理する key のみを含む（利用者は stdout をそのまま `test-bindings.json` として保存し値だけ置換して仕上げる）。command は read-only で、`test-bindings.json` も verdict cache も書き換えず、TODO placeholder が残る間は fail-closed gate に受理されない。"
         }
       }
     },
     {
       "claim_hash": "4da411629121bf2f38f8909b4c862d9bb1f2fa30540234a46c018841ba111462",
-      "evidence_hash": "6a850d5ddfa6be3169de984e6aeb5981870afc523de644661e8447beed8ae9ce",
+      "evidence_hash": "9a6d9a5c78d167563efc2fa0f047d43b24c810a1f92c44e6b7b733405635af7e",
       "verdict": {
         "kind": "pass",
-        "citation": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。"
+        "citation": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。... stdout を schema-pure に保つため fail-closed codec が受理する key のみを含む"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1342,13 +1342,13 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。"
+          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。`bin/sotp test-obligation bindings-skeleton` は obligations artifact を読み、`test-bindings.json` と同一 wire 形状の schema 準拠 draft（各導出義務 id を `fulfillment` レコードとして事前充填し、`layer` / `module_path` / `test_name` は TODO placeholder のまま）を stdout に、authoring guidance note（レコード件数、TODO 差し替え / waiver・voluntary_binding への転記の指示、brief と対象 entry は obligations.json 参照という pointer）を stderr に出す authoring helper であり、stdout を schema-pure に保つため fail-closed codec が受理する key のみを含む（利用者は stdout をそのまま `test-bindings.json` として保存し値だけ置換して仕上げる）。command は read-only で、`test-bindings.json` も verdict cache も書き換えず、TODO placeholder が残る間は fail-closed gate に受理されない。"
         }
       }
     },
     {
       "claim_hash": "2a85738d6b388c4b6cf68e1495ed9ddf4ba5928abe5d5dfd1f4687d52305fd9e",
-      "evidence_hash": "6a850d5ddfa6be3169de984e6aeb5981870afc523de644661e8447beed8ae9ce",
+      "evidence_hash": "9a6d9a5c78d167563efc2fa0f047d43b24c810a1f92c44e6b7b733405635af7e",
       "verdict": {
         "kind": "pass",
         "citation": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。"
@@ -1366,16 +1366,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。"
+          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。`bin/sotp test-obligation bindings-skeleton` は obligations artifact を読み、`test-bindings.json` と同一 wire 形状の schema 準拠 draft（各導出義務 id を `fulfillment` レコードとして事前充填し、`layer` / `module_path` / `test_name` は TODO placeholder のまま）を stdout に、authoring guidance note（レコード件数、TODO 差し替え / waiver・voluntary_binding への転記の指示、brief と対象 entry は obligations.json 参照という pointer）を stderr に出す authoring helper であり、stdout を schema-pure に保つため fail-closed codec が受理する key のみを含む（利用者は stdout をそのまま `test-bindings.json` として保存し値だけ置換して仕上げる）。command は read-only で、`test-bindings.json` も verdict cache も書き換えず、TODO placeholder が残る間は fail-closed gate に受理されない。"
         }
       }
     },
     {
       "claim_hash": "3c105059581bef5dd2902589138c5a62c77f0bcb79c20b88fb6497c0661aa6ec",
-      "evidence_hash": "6a850d5ddfa6be3169de984e6aeb5981870afc523de644661e8447beed8ae9ce",
+      "evidence_hash": "9a6d9a5c78d167563efc2fa0f047d43b24c810a1f92c44e6b7b733405635af7e",
       "verdict": {
         "kind": "pass",
-        "citation": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`"
+        "citation": "edge id → `[{layer, module_path, test_name}]`"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1390,16 +1390,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。"
+          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。`bin/sotp test-obligation bindings-skeleton` は obligations artifact を読み、`test-bindings.json` と同一 wire 形状の schema 準拠 draft（各導出義務 id を `fulfillment` レコードとして事前充填し、`layer` / `module_path` / `test_name` は TODO placeholder のまま）を stdout に、authoring guidance note（レコード件数、TODO 差し替え / waiver・voluntary_binding への転記の指示、brief と対象 entry は obligations.json 参照という pointer）を stderr に出す authoring helper であり、stdout を schema-pure に保つため fail-closed codec が受理する key のみを含む（利用者は stdout をそのまま `test-bindings.json` として保存し値だけ置換して仕上げる）。command は read-only で、`test-bindings.json` も verdict cache も書き換えず、TODO placeholder が残る間は fail-closed gate に受理されない。"
         }
       }
     },
     {
       "claim_hash": "475de2e537678f2043135c4d29cbfbfaf56679ef8f609ea7bc6346c7fdff695a",
-      "evidence_hash": "6a850d5ddfa6be3169de984e6aeb5981870afc523de644661e8447beed8ae9ce",
+      "evidence_hash": "9a6d9a5c78d167563efc2fa0f047d43b24c810a1f92c44e6b7b733405635af7e",
       "verdict": {
         "kind": "pass",
-        "citation": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。"
+        "citation": "edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1414,7 +1414,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。"
+          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。`bin/sotp test-obligation bindings-skeleton` は obligations artifact を読み、`test-bindings.json` と同一 wire 形状の schema 準拠 draft（各導出義務 id を `fulfillment` レコードとして事前充填し、`layer` / `module_path` / `test_name` は TODO placeholder のまま）を stdout に、authoring guidance note（レコード件数、TODO 差し替え / waiver・voluntary_binding への転記の指示、brief と対象 entry は obligations.json 参照という pointer）を stderr に出す authoring helper であり、stdout を schema-pure に保つため fail-closed codec が受理する key のみを含む（利用者は stdout をそのまま `test-bindings.json` として保存し値だけ置換して仕上げる）。command は read-only で、`test-bindings.json` も verdict cache も書き換えず、TODO placeholder が残る間は fail-closed gate に受理されない。"
         }
       }
     },
@@ -1444,7 +1444,7 @@
     },
     {
       "claim_hash": "087b537f6105696287cde7042b244b26fe5374a63542e0f0cf612ebeb533f9dc",
-      "evidence_hash": "6a850d5ddfa6be3169de984e6aeb5981870afc523de644661e8447beed8ae9ce",
+      "evidence_hash": "9a6d9a5c78d167563efc2fa0f047d43b24c810a1f92c44e6b7b733405635af7e",
       "verdict": {
         "kind": "pass",
         "citation": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。"
@@ -1462,7 +1462,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。"
+          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。`bin/sotp test-obligation bindings-skeleton` は obligations artifact を読み、`test-bindings.json` と同一 wire 形状の schema 準拠 draft（各導出義務 id を `fulfillment` レコードとして事前充填し、`layer` / `module_path` / `test_name` は TODO placeholder のまま）を stdout に、authoring guidance note（レコード件数、TODO 差し替え / waiver・voluntary_binding への転記の指示、brief と対象 entry は obligations.json 参照という pointer）を stderr に出す authoring helper であり、stdout を schema-pure に保つため fail-closed codec が受理する key のみを含む（利用者は stdout をそのまま `test-bindings.json` として保存し値だけ置換して仕上げる）。command は read-only で、`test-bindings.json` も verdict cache も書き換えず、TODO placeholder が残る間は fail-closed gate に受理されない。"
         }
       }
     },

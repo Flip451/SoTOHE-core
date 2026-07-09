@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "57217f5618fbc066323e552b26e6dce1ec46ca061cc9fd4a5caa30002fc32528",
+  "catalogue_declaration_hash": "07bfd09d6aa97609836dc310a12b087662cffb64da06650e417f0653655c02ff",
   "signals": [
     {
       "type_name": "TestObligationCompositionRoot",
       "signal": "blue",
-      "entry_hash": "77ab4622ae7d77e7db9257b064fd8648605713dc14948b3f3f4ee82f4a6f2e6c"
+      "entry_hash": "fecd8ef9b2e2f7a82045878a30911588f08a02662552db69ea9d554cfe072aca"
     }
   ]
 }

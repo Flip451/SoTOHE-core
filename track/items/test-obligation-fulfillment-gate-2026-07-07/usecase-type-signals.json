@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-09T15:47:37Z",
-  "declaration_hash": "0a00980204d23c77f4c38c6b3b6d3af498fd549420816c1a523e9099e740676c",
+  "generated_at": "2026-07-09T21:41:41Z",
+  "declaration_hash": "a35f1e5085c1f6e10e956aa267d4d1bf079bd6f0b9cde4fb1460ccae11ecf29c",
   "signals": [
     {
       "type_name": "CheckTestObligationsApplicationService",
@@ -173,6 +173,66 @@
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "TestBindingsSkeletonApplicationService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TestBindingsSkeletonCommand",
+      "kind_tag": "command",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TestBindingsSkeletonError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TestBindingsSkeletonInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TestBindingsSkeletonApplicationService"
+      ]
+    },
+    {
+      "type_name": "TestBindingsSkeletonOutcome",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TestBindingsSkeletonRecord",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "TestObligationCatalogueCommandInput",

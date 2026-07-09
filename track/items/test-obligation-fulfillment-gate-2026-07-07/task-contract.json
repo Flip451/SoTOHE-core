@@ -226,6 +226,24 @@
     ],
     "T026": [
       { "layer": "infrastructure", "entry_key": "Sha256ContentHasher" }
+    ],
+    "T027": [
+      { "layer": "usecase", "entry_key": "TestBindingsSkeletonCommand" },
+      { "layer": "usecase", "entry_key": "TestBindingsSkeletonRecord" },
+      { "layer": "usecase", "entry_key": "TestBindingsSkeletonOutcome" },
+      { "layer": "usecase", "entry_key": "TestBindingsSkeletonError" },
+      { "layer": "usecase", "entry_key": "TestBindingsSkeletonApplicationService" },
+      { "layer": "usecase", "entry_key": "TestBindingsSkeletonInteractor" },
+      { "layer": "cli_driver", "entry_key": "TestBindingsSkeletonInput" },
+      { "layer": "cli_driver", "entry_key": "TestBindingsSkeletonHandler" },
+      { "layer": "cli_composition", "entry_key": "TestObligationCompositionRoot" },
+      { "layer": "cli", "entry_key": "TestBindingsSkeletonArgs" },
+      { "layer": "cli", "entry_key": "TestObligationSubcommand" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_bindings_skeleton" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::read_only_command_context" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::command_root" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::current_branch" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::read_command_branch" }
     ]
   }
 }

@@ -151,9 +151,10 @@ Stage **after** the final review round (`cargo make add-all` or selective `track
 then invoke the `commit` workflow (`.harness/workflows/track/commit.md`) once with a commit
 message naming the batch (e.g., "Batch A: T002-T004 …").
 
-The `commit` workflow enforces the DRY gate as a hard precondition via
-`cargo make track-commit-message` (which runs `sotp dry check-approved` before committing).
-A `blocked` DFP cannot be committed past.
+The `commit` workflow enforces the track-aware gates as hard preconditions via
+`cargo make track-commit-message` (including `cargo make ci-track`,
+`sotp test-obligation check`, and `sotp dry check-approved` before committing).
+A `blocked` DFP or failing test-obligation gate cannot be committed past.
 
 **Post-commit task hash recording**: after the commit succeeds, record the single commit hash
 on every task in this batch (including DonePending tasks) with:
@@ -192,7 +193,7 @@ Procedure (after Step 3 of the **last** batch):
       ```
       ops(track): backfill task commit hashes for batch <name>
       ```
-   3. Run `cargo make track-commit-message`. The wrapper runs CI + `bin/sotp review check-approved` + the DRY-gate precondition, then commits from the file and deletes it on success.
+   3. Run `cargo make track-commit-message`. The wrapper runs CI + `cargo make ci-track` + `bin/sotp review check-approved` + the test-obligation gate + the DRY-gate precondition, then commits from the file and deletes it on success.
    4. (Optional, recommended) Attach a git note via `cargo make track-note` (write `tmp/track-commit/note.md` first; the wrapper consumes that path).
 4. If no `impl-plan.json` / `plan.md` modifications were present in Step 1, skip this step.
 5. After Step 2, dirty files may include the two plan artifacts plus review-operational
@@ -220,7 +221,7 @@ Otherwise, skip (file absence = no observations).
 | 1 | Track branch and active tasks found | OK / stop |
 | 1c | DFP terminal state | skipped/completed → proceed; blocked/failed → halt |
 | 2 | Review `zero_findings` all required scopes | completed / blocked / failed |
-| 3 | `cargo make track-commit-message` (CI + DRY check) | OK / ERROR |
+| 3 | `cargo make track-commit-message` (CI + track-aware gates + DRY check) | OK / ERROR |
 | 4 | `git status --short` empty | OK / unexpected dirty state |
 
 ## Failure / recovery

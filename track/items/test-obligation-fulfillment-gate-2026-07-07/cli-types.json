@@ -3,7 +3,7 @@
   "functions": {
     "cli::commands::test_obligation::command_context": {
       "action": "add",
-      "docs": "Build the composition root and current branch context for test-obligation command handlers; see AC-14 / CN-09.",
+      "docs": "Build the test-obligation command context; see AC-14 / CN-09.",
       "informal_grounds": [],
       "is_async": false,
       "params": [],
@@ -12,6 +12,57 @@
       "spec_refs": [
         {
           "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "cli::commands::test_obligation::command_root": {
+      "action": "add",
+      "docs": "Discover the test-obligation composition root; see AC-14 / CN-09 / IN-06.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [],
+      "returns": "Result<cli_composition::TestObligationCompositionRoot, crate::CliError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "cli::commands::test_obligation::current_branch": {
+      "action": "add",
+      "docs": "Read the current branch for read-only test-obligation command context (branch fallback for check / results); see IN-08 / IN-10 / CN-09.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "root",
+          "ty": "&cli_composition::TestObligationCompositionRoot"
+        }
+      ],
+      "returns": "Result<String, crate::CliError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-10",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         },
         {
@@ -40,6 +91,34 @@
         },
         {
           "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "cli::commands::test_obligation::execute_bindings_skeleton": {
+      "action": "add",
+      "docs": "Execute `sotp test-obligation bindings-skeleton` through the composition root and cli-driver handler; see IN-06 / CN-09 / AC-14.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "&TestBindingsSkeletonArgs"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
@@ -176,6 +255,82 @@
       "spec_refs": [
         {
           "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "cli::commands::test_obligation::read_command_branch": {
+      "action": "add",
+      "docs": "Resolve branch context for read-only test-obligation commands; see IN-06 / IN-08 / IN-10 / CN-09 / AC-14.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "explicit_track_id",
+          "ty": "Option<&str>"
+        },
+        {
+          "name": "read_current_branch",
+          "ty": "impl FnOnce() -> Result<String, crate::CliError>"
+        }
+      ],
+      "returns": "Result<String, crate::CliError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "cli::commands::test_obligation::read_only_command_context": {
+      "action": "add",
+      "docs": "Build context for read-only test-obligation commands; see IN-06 / IN-08 / IN-10 / CN-09 / AC-14.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "explicit_track_id",
+          "ty": "Option<&str>"
+        }
+      ],
+      "returns": "Result<(cli_composition::TestObligationCompositionRoot, String), crate::CliError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
@@ -374,6 +529,30 @@
       "action": "reference",
       "for_type": "CliCommand",
       "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "for_type": "TestBindingsSkeletonArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TestBindingsSkeletonArgs",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TestBindingsSkeletonArgs",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TestBindingsSkeletonArgs",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TestBindingsSkeletonArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "for_type": "TestBindingsSkeletonArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
     }
   ],
   "traits": {},
@@ -685,6 +864,43 @@
         }
       ]
     },
+    "TestBindingsSkeletonArgs": {
+      "action": "add",
+      "docs": "Clap args for `sotp test-obligation bindings-skeleton`; see IN-06 / CN-09 / AC-14.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
     "TestObligationArgs": {
       "action": "add",
       "docs": "Top-level clap argument group for `sotp test-obligation`; see AC-14 / CN-09.",
@@ -869,7 +1085,7 @@
     },
     "TestObligationSubcommand": {
       "action": "add",
-      "docs": "Subcommand enum for `sotp test-obligation`; see AC-14 / CN-09.",
+      "docs": "Subcommand enum for `sotp test-obligation`; see AC-14 / CN-09 / IN-06.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -909,6 +1125,15 @@
               ],
               "kind": "tuple"
             }
+          },
+          {
+            "name": "BindingsSkeleton",
+            "payload": {
+              "fields": [
+                "TestBindingsSkeletonArgs"
+              ],
+              "kind": "tuple"
+            }
           }
         ]
       },
@@ -924,6 +1149,10 @@
         },
         {
           "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-06",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]

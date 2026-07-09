@@ -7,87 +7,219 @@
   "trait_impls": [
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationDeriveInput"
+      "for_type": "TestObligationDeriveInput",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationDeriveInput"
+      "for_type": "TestObligationDeriveInput",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationDeriveInput"
+      "for_type": "TestObligationDeriveInput",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationDeriveInput"
+      "for_type": "TestObligationDeriveInput",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationCheckInput"
+      "for_type": "TestObligationCheckInput",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationCheckInput"
+      "for_type": "TestObligationCheckInput",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationCheckInput"
+      "for_type": "TestObligationCheckInput",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationCheckInput"
+      "for_type": "TestObligationCheckInput",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationEvaluateInput"
+      "for_type": "TestObligationEvaluateInput",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationEvaluateInput"
+      "for_type": "TestObligationEvaluateInput",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationEvaluateInput"
+      "for_type": "TestObligationEvaluateInput",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationEvaluateInput"
+      "for_type": "TestObligationEvaluateInput",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationResultsInput"
+      "for_type": "TestObligationResultsInput",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationResultsInput"
+      "for_type": "TestObligationResultsInput",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationResultsInput"
+      "for_type": "TestObligationResultsInput",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationResultsInput"
+      "for_type": "TestObligationResultsInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TestBindingsSkeletonInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TestBindingsSkeletonInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TestBindingsSkeletonInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TestBindingsSkeletonInput",
+      "trait_ref": "core::cmp::Eq"
     }
   ],
   "traits": {},
   "types": {
+    "TestBindingsSkeletonHandler": {
+      "action": "add",
+      "docs": "Primary adapter for `test-obligation bindings-skeleton`; see IN-06 / CN-09 / AC-14.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::test_obligation::bindings_skeleton::TestBindingsSkeletonApplicationService>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::test_obligation::bindings_skeleton::TestBindingsSkeletonApplicationService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "TestBindingsSkeletonInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "test_obligation::bindings_skeleton",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestBindingsSkeletonInput": {
+      "action": "add",
+      "docs": "cli_driver-local DTO for `sotp test-obligation bindings-skeleton`; see IN-06 / CN-09 / AC-14.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "std::option::Option<domain::TrackId>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "std::option::Option<&domain::TrackId>"
+        }
+      ],
+      "module_path": "test_obligation::bindings_skeleton",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
     "TestObligationCheckHandler": {
       "action": "add",
       "docs": "Primary adapter for `test-obligation check`; see IN-08 / AC-04 / AC-10.",
@@ -158,15 +290,18 @@
       "kind": {
         "kind": "struct",
         "shape": {
-          "kind": "plain",
           "fields": [],
-          "has_stripped_fields": true
+          "has_stripped_fields": true,
+          "kind": "plain"
         }
       },
       "methods": [
         {
+          "docs": "Constructor for TestObligationCheckInput.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "new",
-          "receiver": null,
           "params": [
             {
               "name": "track_id",
@@ -177,34 +312,31 @@
               "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
             }
           ],
+          "receiver": null,
           "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Constructor for TestObligationCheckInput."
+          "where_predicates": []
         },
         {
+          "docs": "Return the optional track id.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "track_id",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "std::option::Option<&domain::TrackId>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the optional track id."
+          "where_predicates": []
         },
         {
-          "name": "current_branch",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&domain::tddd::test_obligation::ids::DiagnosticMessage",
-          "is_async": false,
+          "docs": "Return the caller's current git branch.",
           "generics": [],
           "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the caller's current git branch."
+          "is_async": false,
+          "name": "current_branch",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::tddd::test_obligation::ids::DiagnosticMessage",
+          "where_predicates": []
         }
       ],
       "module_path": "test_obligation::check",
@@ -292,15 +424,18 @@
       "kind": {
         "kind": "struct",
         "shape": {
-          "kind": "plain",
           "fields": [],
-          "has_stripped_fields": true
+          "has_stripped_fields": true,
+          "kind": "plain"
         }
       },
       "methods": [
         {
+          "docs": "Constructor for TestObligationDeriveInput.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "new",
-          "receiver": null,
           "params": [
             {
               "name": "track_id",
@@ -311,34 +446,31 @@
               "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
             }
           ],
+          "receiver": null,
           "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Constructor for TestObligationDeriveInput."
+          "where_predicates": []
         },
         {
+          "docs": "Return the optional track id.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "track_id",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "std::option::Option<&domain::TrackId>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the optional track id."
+          "where_predicates": []
         },
         {
-          "name": "current_branch",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&domain::tddd::test_obligation::ids::DiagnosticMessage",
-          "is_async": false,
+          "docs": "Return the caller's current git branch.",
           "generics": [],
           "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the caller's current git branch."
+          "is_async": false,
+          "name": "current_branch",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::tddd::test_obligation::ids::DiagnosticMessage",
+          "where_predicates": []
         }
       ],
       "module_path": "test_obligation::derive",
@@ -426,15 +558,18 @@
       "kind": {
         "kind": "struct",
         "shape": {
-          "kind": "plain",
           "fields": [],
-          "has_stripped_fields": true
+          "has_stripped_fields": true,
+          "kind": "plain"
         }
       },
       "methods": [
         {
+          "docs": "Constructor for TestObligationEvaluateInput.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "new",
-          "receiver": null,
           "params": [
             {
               "name": "track_id",
@@ -445,34 +580,31 @@
               "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
             }
           ],
+          "receiver": null,
           "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Constructor for TestObligationEvaluateInput."
+          "where_predicates": []
         },
         {
+          "docs": "Return the optional track id.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "track_id",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "std::option::Option<&domain::TrackId>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the optional track id."
+          "where_predicates": []
         },
         {
-          "name": "current_branch",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&domain::tddd::test_obligation::ids::DiagnosticMessage",
-          "is_async": false,
+          "docs": "Return the caller's current git branch.",
           "generics": [],
           "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the caller's current git branch."
+          "is_async": false,
+          "name": "current_branch",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::tddd::test_obligation::ids::DiagnosticMessage",
+          "where_predicates": []
         }
       ],
       "module_path": "test_obligation::evaluate",
@@ -556,38 +688,38 @@
       "kind": {
         "kind": "struct",
         "shape": {
-          "kind": "plain",
           "fields": [],
-          "has_stripped_fields": true
+          "has_stripped_fields": true,
+          "kind": "plain"
         }
       },
       "methods": [
         {
+          "docs": "Constructor for TestObligationResultsInput.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "new",
-          "receiver": null,
           "params": [
             {
               "name": "track_id",
               "ty": "std::option::Option<domain::TrackId>"
             }
           ],
+          "receiver": null,
           "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Constructor for TestObligationResultsInput."
+          "where_predicates": []
         },
         {
-          "name": "track_id",
-          "receiver": "&self",
-          "params": [],
-          "returns": "std::option::Option<&domain::TrackId>",
-          "is_async": false,
+          "docs": "Return the optional track id.",
           "generics": [],
           "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the optional track id."
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "std::option::Option<&domain::TrackId>",
+          "where_predicates": []
         }
       ],
       "module_path": "test_obligation::results",

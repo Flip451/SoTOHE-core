@@ -3,10 +3,10 @@
   "entries": [
     {
       "claim_hash": "429e819988f908c529909846fcde23c515165a092997a9557f43cb8f6a1ea540",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "本機能は次の**三段構え**である: **義務の導出**が必要なテストを列挙し（何を果たすべきか）、**存在検証**が義務に対する履行の試み＝テストの記述を検証し（試みがあるか）、**鮮度⇄fulfillment 検証**がその履行が現に・意味的に正しいことを検証する（正しく果たしたか）。"
+        "citation": "「存在検証（独立）」と「鮮度⇄fulfillment（不可分の対）」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -26,10 +26,10 @@
     },
     {
       "claim_hash": "429e819988f908c529909846fcde23c515165a092997a9557f43cb8f6a1ea540",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「本ゲートを既存 ref-verify の型（pair 型・chain filter・cache scope・verdict artifact）に組み込まない。理由は階数の違いによる構造差である。」／「ref-verify（一階）」と「obligation-fulfillment（二階）」"
+        "citation": "本ゲートを既存 ref-verify の型（pair 型・chain filter・cache scope・verdict artifact）に**組み込まない**。理由は階数の違いによる構造差である。| 観点 | ref-verify（一階） | obligation-fulfillment（二階） | ... | 検証対象 | SoT chain の隣接ノード間 citation | chain② の edge（約束）に対する witness（テスト）の履行 |"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -49,10 +49,10 @@
     },
     {
       "claim_hash": "ce7144b94c180d9f866d662cf370c01ced7ecc7e9d2c3a60e3871f92d2f2ce03",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「本機能は次の三段構えである」「Rust テストコード本文の自動生成は行わない」"
+        "citation": "「本機能は次の三段構えである: 義務の導出...存在検証...鮮度⇄fulfillment 検証」/「Rust テストコード本文の自動生成は行わない」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -72,10 +72,10 @@
     },
     {
       "claim_hash": "ce7144b94c180d9f866d662cf370c01ced7ecc7e9d2c3a60e3871f92d2f2ce03",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「テスト義務を、**entry 単位**の導出関数の出力として定義し、意味の会計は **edge 単位**で行う。」「2つの軸はそのまま D1 の検証2段に対応する: 件数と種類（＝義務一覧の充足）は**存在検証**（binding 走査、決定論）が検査し、意味は**鮮度⇄fulfillment 検証**（obligation-fulfillment verdict、hash はその失効トリガ）が検査する。」"
+        "citation": "「テスト義務を、**entry 単位**の導出関数の出力として定義し、意味の会計は **edge 単位**で行う。」「2つの軸はそのまま D1 の検証2段に対応する: 件数と種類（＝義務一覧の充足）は**存在検証**（binding 走査、決定論）が検査し、意味は**鮮度⇄fulfillment 検証**（obligation-fulfillment verdict、hash はその失効トリガ）が検査する。」「binding: 義務 → [test] // implementer が author。1義務に複数テスト可」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -95,10 +95,10 @@
     },
     {
       "claim_hash": "78adc02988a54acf713d43c2522cd34b78b76cbf4575e3f5ac296d021ea2fcec",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「よってコピペで3系統目を作らず、次の責務中立部品を core として抽出し、ref-verify と obligation-fulfillment の両方が乗る形を先行タスクとする」「検証器固有に残すのは: pair / 義務の型、対象集合の生成、スコープ解決、fail routing。」"
+        "citation": "よってコピペで3系統目を作らず、次の責務中立部品を core として抽出し、ref-verify と obligation-fulfillment の両方が乗る形を先行タスクとする:\n\n- verdict 語彙 + 裏付け引用必須の規律（だんまり通過禁止）\n- hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）\n- calibration probe の注入と劣化検出\n- fast → final → 人間 の段階引き上げドライバ\n- capability → provider 解決（既に共有済み）\n\n検証器固有に残すのは: pair / 義務の型、対象集合の生成（citation 走査 vs 決定表導出）、スコープ解決、fail routing。DRY 債務を増やす新規系統のコピペ実装は取らない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -118,10 +118,10 @@
     },
     {
       "claim_hash": "1aefd95a29ed07cce4e5153dcf10bf05c2c9d677a45a35657691f33ce22780c0",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "義務導出の決定表（role → 義務生成ルール）を sotp の Rust ソースに hard-code せず、`.harness/config/` 配下の config ファイル（例: `.harness/config/test-obligation-rules.json`）として持つ。SoTOHE は推奨 default を template として出荷し、利用者が自 repo の表を所有する——... 利用者側の config 編集で解決できる（責任境界: 表 = policy は利用者、導出エンジンと語彙 = mechanism は template）"
+        "citation": "責任境界: 表 = policy は利用者、導出エンジンと語彙 = mechanism は template；利用者が自 repo の表を所有する"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -141,10 +141,10 @@
     },
     {
       "claim_hash": "83c27079d95d7f58d8277d3d8dfd0e35f3092800fbe785b5db797b8e61dee4a9",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「よってコピペで3系統目を作らず、次の責務中立部品を core として抽出し、ref-verify と obligation-fulfillment の両方が乗る形を先行タスクとする:\n- verdict 語彙 + 裏付け引用必須の規律（だんまり通過禁止）\n- hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）\n- calibration probe の注入と劣化検出\n- fast → final → 人間 の段階引き上げドライバ\n- capability → provider 解決（既に共有済み）\n\n検証器固有に残すのは: pair / 義務の型、対象集合の生成（citation 走査 vs 決定表導出）、スコープ解決、fail routing。"
+        "citation": "責務中立部品を core として抽出し、ref-verify と obligation-fulfillment の両方が乗る形を先行タスク"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -164,10 +164,10 @@
     },
     {
       "claim_hash": "35fb29717e9ffa94f0bfd806ced282d59085c048292878dd57e3faa4bfaa57f9",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "`.harness/config/` 配下の config ファイル（例: `.harness/config/test-obligation-rules.json`）として持つ。"
+        "citation": "Rust ソースに hard-code せず、`.harness/config/` 配下の config ファイル（例: `.harness/config/test-obligation-rules.json`）として持つ。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -187,10 +187,10 @@
     },
     {
       "claim_hash": "cfbdf859f067aa096ceeaa5eae4f153125d927dbe16ee25db4a011953f4fa5a0",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "template が出荷する default の決定表 config は、全 role（DataRole 17種 / ContractRole / FunctionRole）の生成ルールを本機能の導入 track で一括して定義する。... role 段階導入はしない"
+        "citation": "template が出荷する default の決定表 config は、全 role（DataRole 17種 / ContractRole / FunctionRole）の生成ルールを本機能の導入 track で一括して定義する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -210,7 +210,7 @@
     },
     {
       "claim_hash": "cfbdf859f067aa096ceeaa5eae4f153125d927dbe16ee25db4a011953f4fa5a0",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
         "citation": "template が出荷する default config（D10）の初期内容を、config そのものの形で以下に定める"
@@ -233,10 +233,10 @@
     },
     {
       "claim_hash": "7f6eb1e2131b51fda5c2927db9f7ed7ce5f1174d0958cfc162a46d3d187aed70",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「derive / check はロード時に、config が全 role ... を被覆し、義務 0 件も \"obligations\": [] と明示していることを fail-closed で検証する。... 語彙の解釈器は Rust 側で per 軸への網羅 match として実装し」"
+        "citation": "「ロード時に、config が全 roleを被覆し、義務 0 件も \"obligations\": [] と明示していることを fail-closed で検証する」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -256,10 +256,10 @@
     },
     {
       "claim_hash": "7516033ef86a92980d248ae7b0fca34f257a3c13e0014e4ecf6d18e1b643090a",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "anchor / anchor hash は義務 id と義務一覧の同一性には含めず、現行 `spec_refs` から edge 会計側で解決する"
+        "citation": "- **obligations（導出物・ツールが書く）**: 義務一覧（義務 id・対象 entry・義務種別・宣言内項目識別子・brief・entry宣言 hash）。anchor / anchor hash は義務 id と義務一覧の同一性には含めず、現行 `spec_refs` から edge 会計側で解決する\n\n**id の安定性 — id は同一性から、鮮度は hash から**: 義務 id は (entry 識別子, 義務種別, 宣言内項目の識別子〔invariant 名・メソッド名・handles の型名等〕) のみから決定論的に構成し、edge id は (entry 識別子, anchor id) から構成する。**anchor id を義務 id に含めない**ため、... **内容 hash を id に含めず**、項目の識別に位置（index）を使わない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -278,18 +278,18 @@
       }
     },
     {
-      "claim_hash": "6a850d5ddfa6be3169de984e6aeb5981870afc523de644661e8447beed8ae9ce",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "claim_hash": "9a6d9a5c78d167563efc2fa0f047d43b24c810a1f92c44e6b7b733405635af7e",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「test-bindings（implementer が author）: 解決宣言の写像。3形態を持つ——義務 id → ... / edge id → {waived: ...} / edge id → ...」"
+        "citation": "test-bindings（implementer が author）: 解決宣言の写像。3形態を持つ——義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可。このテスト群は対象 entry の各 edge に対する fulfillment claim 候補になる）/ edge id → `{waived: \"理由の散文\"}`（免除）/ edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束。fulfillment 検証は導出義務の場合と同一・D4）。... 走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する。テストソースは素の Rust のままで異物構文を持たず ... edge id は (entry 識別子, anchor id) から構成する。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。"
+          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。`bin/sotp test-obligation bindings-skeleton` は obligations artifact を読み、`test-bindings.json` と同一 wire 形状の schema 準拠 draft（各導出義務 id を `fulfillment` レコードとして事前充填し、`layer` / `module_path` / `test_name` は TODO placeholder のまま）を stdout に、authoring guidance note（レコード件数、TODO 差し替え / waiver・voluntary_binding への転記の指示、brief と対象 entry は obligations.json 参照という pointer）を stderr に出す authoring helper であり、stdout を schema-pure に保つため fail-closed codec が受理する key のみを含む（利用者は stdout をそのまま `test-bindings.json` として保存し値だけ置換して仕上げる）。command は read-only で、`test-bindings.json` も verdict cache も書き換えず、TODO placeholder が残る間は fail-closed gate に受理されない。"
         }
       },
       "evidence_origin": {
@@ -301,18 +301,18 @@
       }
     },
     {
-      "claim_hash": "6a850d5ddfa6be3169de984e6aeb5981870afc523de644661e8447beed8ae9ce",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "claim_hash": "9a6d9a5c78d167563efc2fa0f047d43b24c810a1f92c44e6b7b733405635af7e",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "edge の解消 = (a) implementer が test を bind し、obligation-fulfillment 検証を pass する | (b) implementer が waived 理由（散文）を author し、waiver 検証を pass する"
+        "citation": "edge の解消 = (a) implementer が test を bind し、obligation-fulfillment 検証を pass する | (b) implementer が waived 理由（散文）を author し"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。"
+          "text_label": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。`bin/sotp test-obligation bindings-skeleton` は obligations artifact を読み、`test-bindings.json` と同一 wire 形状の schema 準拠 draft（各導出義務 id を `fulfillment` レコードとして事前充填し、`layer` / `module_path` / `test_name` は TODO placeholder のまま）を stdout に、authoring guidance note（レコード件数、TODO 差し替え / waiver・voluntary_binding への転記の指示、brief と対象 entry は obligations.json 参照という pointer）を stderr に出す authoring helper であり、stdout を schema-pure に保つため fail-closed codec が受理する key のみを含む（利用者は stdout をそのまま `test-bindings.json` として保存し値だけ置換して仕上げる）。command は read-only で、`test-bindings.json` も verdict cache も書き換えず、TODO placeholder が残る間は fail-closed gate に受理されない。"
         }
       },
       "evidence_origin": {
@@ -325,10 +325,10 @@
     },
     {
       "claim_hash": "a2ff16310f5a09e7ad71e5f6cd3792b8ff9ac3604f959f5dbb64ecab338904bf",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "テスト義務を、**entry 単位**の導出関数の出力として定義し、意味の会計は **edge 単位**で行う。... derive:  宣言 → [義務]           // entry 単位、0..n 件。件数は宣言のみの関数 ... **義務数は cite 数に乗算されない**。"
+        "citation": "「テスト義務を、entry 単位の導出関数の出力として定義し、意味の会計は edge 単位で行う。」「derive:  宣言 → [義務]           // entry 単位、0..n 件。件数は宣言のみの関数」「role 全種の生成数ルールは決定表 config（D10）として管理する」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -348,10 +348,10 @@
     },
     {
       "claim_hash": "a2ff16310f5a09e7ad71e5f6cd3792b8ff9ac3604f959f5dbb64ecab338904bf",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "| 義務導出（obligations artifact の書き込み） | `sotp test-obligation derive` | D2 の導出関数 `derive: 宣言 → [義務]` の形式語彙そのもの |"
+        "citation": "義務導出（obligations artifact の書き込み） | `sotp test-obligation derive` | D2 の導出関数 `derive: 宣言 → [義務]`"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -371,10 +371,10 @@
     },
     {
       "claim_hash": "a2ff16310f5a09e7ad71e5f6cd3792b8ff9ac3604f959f5dbb64ecab338904bf",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "義務は entry 単位で導出され（D2）、件数は宣言の内部構造のみの関数である。 ... `trait_ref` を track の層別カタログ中の TraitEntry に解決し、その ContractRole をキーとする。 ... 義務を導出するのは `Add` / `Modify` の entry のみ。 `Reference` は ... `Delete` は 0 件。"
+        "citation": "「義務は entry 単位で導出され（D2）、件数は宣言の内部構造のみの関数である。」\n\n「`trait_impls` セクションの適用は `trait_ref` を track の層別カタログ中の TraitEntry に解決し、その ContractRole をキーとする（…）。外部 trait（`From` / `Display` 等）などカタログに解決できない `trait_ref` の impl は**明示的に義務 0 件**とする」\n\n「ItemAction: 義務を導出するのは `Add` / `Modify` の entry のみ。`Reference` は『この track の変更面ではない』ため edge 宇宙の外とする… `Delete` は 0 件」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -394,10 +394,10 @@
     },
     {
       "claim_hash": "1ea999f83a13693dee35ecc945798f7da95fa1a0cbcf08776195af19519ca901",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「鮮度と verdict の結合（fail-closed）: verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点（= drift 鮮度系の `spec_changed` / `decl_changed` / `test_changed` / `reason_changed`・D9）で既存 verdict は無効となり『存在しない』ものとして扱う。`check` ゲートの合格条件は『全 edge が bindings 上で解決宣言され（tests または waived・D9）、現行 hash と一致する fulfilled / waived verdict が存在すること』であり、hash 再計算だけで鮮度を回復する経路はない——回復は再評価（`evaluate`）の pass のみで達成される。」"
+        "citation": "「check` ゲートの合格条件は「全 edge が bindings 上で解決宣言され（tests または waived・D9）、現行 hash と一致する fulfilled / waived verdict が存在すること」であり、hash 再計算だけで鮮度を回復する経路はない——回復は再評価（`evaluate`）の pass のみで達成される。\n\nスコープ解決は existence-based 原則に従う: obligations / test-bindings artifact（D9）が不在なら zero pairs で通過し、部分的・不整合な存在（binding だけ存在する等）は fail-closed とする。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -417,10 +417,10 @@
     },
     {
       "claim_hash": "1ea999f83a13693dee35ecc945798f7da95fa1a0cbcf08776195af19519ca901",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "| 被覆ゲート（obligation-coverage: 解決宣言の totality + 全 edge に現行 hash 一致の verdict が存在すること。pure-read、CI / commit gate 用） | `sotp test-obligation check` | 決定論の読み取りゲート（`task-contract check` / `signal check-*` と同じ用法） |"
+        "citation": "被覆ゲート（obligation-coverage: 解決宣言の totality + 全 edge に現行 hash 一致の verdict が存在すること。pure-read、CI / commit gate 用） | `sotp test-obligation check` | 決定論の読み取りゲート（`task-contract check` / `signal check-*` と同じ用法）"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -440,10 +440,10 @@
     },
     {
       "claim_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "cache key は test pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash) の三つ組"
+        "citation": "「test pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)」…「合格 verdict には evidence のどの記述が裏付けかの引用を必須とする」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -463,10 +463,10 @@
     },
     {
       "claim_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「履行の意味論検証の実行（test pair + waiver pair） | `sotp test-obligation evaluate`」"
+        "citation": "履行の意味論検証の実行（test pair + waiver pair）"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -486,10 +486,10 @@
     },
     {
       "claim_hash": "7666187f7f8164aa6a7221bf988b134ff59b59685ef6cd7ed171aa1339fe8dc1",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "| 履行の意味論検証の実行（test pair + waiver pair） | `sotp test-obligation evaluate` | ... |\n| verdict 閲覧 | `sotp test-obligation results` | `ref-verify results` と同じ用法 |"
+        "citation": "単一の `sotp test-obligation` グループに、義務ゲートの lifecycle を構成する4サブコマンド（導出 / 被覆ゲート / 意味論評価 / verdict 閲覧）を置く。\n\n| 役割 | コマンド | 命名根拠 |\n|---|---|---|\n| verdict 閲覧 | `sotp test-obligation results` | `ref-verify results` と同じ用法 |"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -509,10 +509,10 @@
     },
     {
       "claim_hash": "5da59f9485edd1ca1f266cac3333a0279d7012c6de1aca8feac7695c8aa44ea8",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "capability は問いの種類ごとに分離する: obligation-fulfillment 検証（「テスト群が anchor の約束を検証しているか」: コード→自然言語比較）と waiver 検証（「author された waived 理由がこの edge に対して成立しているか」: 自然言語→自然言語比較）は別 prompt / 別 capability とする（chain 別 prompt 分離と同じ論理）。"
+        "citation": "obligation-fulfillment 検証（「テスト群が anchor の約束を検証しているか」: コード→自然言語比較）と waiver 検証（「author された waived 理由がこの edge に対して成立しているか」: 自然言語→自然言語比較）は別 prompt / 別 capability とする"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -532,10 +532,10 @@
     },
     {
       "claim_hash": "bc201340ffc0bc5ada02adc1a43d77cd9569b01e38b8561b525ac4bc43d7ce34",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "fail 類型は「テストと anchor の意味的な関係」に応じて次の3つとする。… (c) の判定対象は、anchor 本文のうち「条件 → 観測可能な結果」の対として読める記述（振る舞いの主張）に限る。"
+        "citation": "fail 類型は「テストと anchor の意味的な関係」に応じて次の3つとする。以下の例は anchor が「全エントリ🔵なら pass / todo の🟡は無影響 / 🔴は常時 block」という3分岐を約束している場合。\n\n- **(a) 矛盾**: anchor の約束と逆のことを assert している。\n- **(b) すり替え**: anchor を cite しながら、無関係な内容を検証している。\n- **(c) 中心部の未検証**: 矛盾も無関係もないが、anchor が約束する中心的な振る舞いが検証されないまま残っている。\n\n(c) の判定対象は、anchor 本文のうち**「条件 → 観測可能な結果」の対として読める記述（振る舞いの主張）**に限る。... 境界例の判定に残るブレは、semantic-verdict core の規律——裏付け引用の必須化と calibration probe（既知の誤り例の注入）による較正——で統制する（D7）。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -555,10 +555,10 @@
     },
     {
       "claim_hash": "53f447d7b449d25f30c2c47acff3a12dd63b4b64d80671ac64a5b4ef82614642",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「テストの存在検証: binding artifact をキーにソースを走査し、義務に対応するテストが存在するか（missing / orphaned）を検出して CI ゲート化する（D9）。verdict の状態と独立に完結する決定論検査」「鮮度の乖離（evidence 側の `spec_changed` / `decl_changed`、claim 側の `test_changed` / `reason_changed`）は独立した検査ではなく、この verdict の失効という同一事象の表示名である」"
+        "citation": "- **テストの存在検証**: binding artifact をキーにソースを走査し、義務に対応するテストが存在するか（missing / orphaned）を検出して CI ゲート化する（D9）。verdict の状態と独立に完結する決定論検査\n- **鮮度の乖離検出 + obligation-fulfillment 検証**: ... 鮮度の乖離（evidence 側の `spec_changed` / `decl_changed`、claim 側の `test_changed` / `reason_changed`・D9）は独立した検査ではなく、この verdict の失効という同一事象の表示名である"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -578,10 +578,10 @@
     },
     {
       "claim_hash": "53f447d7b449d25f30c2c47acff3a12dd63b4b64d80671ac64a5b4ef82614642",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「drift 分類は次の6種で、2族に分かれる」 / 「鮮度更新でソースを編集しない」"
+        "citation": "「drift 分類は次の6種で、2族に分かれる」…「CI は書き換えなしに drift を検出できる」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -601,10 +601,10 @@
     },
     {
       "claim_hash": "f7daf64c6ace067653cb223ba50b49b87a88a2f34581aa784a0b53746951eb10",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "obligations / test-bindings artifact（D9）が不在なら zero pairs で通過し、部分的・不整合な存在（binding だけ存在する等）は fail-closed"
+        "citation": "obligations / test-bindings artifact が不在なら zero pairs で通過し、部分的・不整合な存在は fail-closed とする。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -624,10 +624,10 @@
     },
     {
       "claim_hash": "f7daf64c6ace067653cb223ba50b49b87a88a2f34581aa784a0b53746951eb10",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「スコープは existence-based に自動解決し、scope 指定フラグを持たない。...解決不能な義務・不整合は finding + 非零 exit」"
+        "citation": "「スコープは existence-based に自動解決し、scope 指定フラグを持たない。」「解決不能な義務・不整合は finding + 非零 exit」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -647,10 +647,10 @@
     },
     {
       "claim_hash": "b9ac0292f49fb44df91e308c5b88103d01064cf9a2e0f23b7d69a4c970b779b5",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "waiver 検証が reject した場合は implementer に差し戻す（理由を書き直すか、テストを書いて 自発的 binding で結ぶ）。上流の欠陥——cite している entry の宣言不足、カタログの被覆漏れ——が疑われる場合は、rollback-diagnoser と同型の back-and-forth routing で type-designer へ回す。"
+        "citation": "waiver 検証が reject した場合は implementer に差し戻す（理由を書き直すか、テストを書いて 自発的 binding で結ぶ）。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -670,10 +670,10 @@
     },
     {
       "claim_hash": "b9ac0292f49fb44df91e308c5b88103d01064cf9a2e0f23b7d69a4c970b779b5",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "テスト不備・理由不備→implementer / cite・宣言不備→type-designer / anchor 検証不能→spec-designer に分岐。決定表の欠陥は非ブロッカー"
+        "citation": "fail routing: テスト不備・理由不備→implementer / cite・宣言不備→type-designer / anchor 検証不能→spec-designer に分岐。決定表の欠陥は非ブロッカー（利用者所有の config の編集、または自発的 binding で解消・D4）"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -693,10 +693,10 @@
     },
     {
       "claim_hash": "d147d6780e9d0c0eb3bf2f6653e64e541c55596059ed9981e5496e2dfe9f3b8a",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "種別の用途は次の2つに限る: - **verdict の事前情報（prior）**: 種別を判定 prompt に供給する。... - **edge ゼロ警報の範囲**: どの entry からも cite されていない `AC` / `CN` は決定論的 finding とする... `GO` / `IN` の非引用は正常であり警報しない"
+        "citation": "「種別の用途は次の2つに限る: - verdict の事前情報（prior）: 種別を判定 prompt に供給する。」 / 「- edge ゼロ警報の範囲: どの entry からも cite されていない `AC` / `CN` は決定論的 finding とする ... `GO` / `IN` の非引用は正常であり警報しない」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -716,10 +716,10 @@
     },
     {
       "claim_hash": "c69bbbadc40cde7b502d17b6951b43eecf3ea508f28f15b4d77bc90a37c857a7",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "trait_impl entry は identity-only（role を持たない）なので、trait_impls セクションの適用は trait_ref を track の層別カタログ中の TraitEntry に解決し、その ContractRole をキーとする ... 外部 trait（From / Display 等）などカタログに解決できない trait_ref の impl は明示的に義務 0 件とする ... 契約適合義務の fulfillment 評価は実装対象 trait の edge（trait entry × その cite する anchor）を evidence に用いる"
+        "citation": "trait_impl entry は spec_refs を持たず自身の edge がないため、契約適合義務（`contract_conformance`）の fulfillment 評価は実装対象 trait の edge を evidence に用いる"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -739,10 +739,10 @@
     },
     {
       "claim_hash": "11fcbae6e75cf426ddd3f8b01d98a628d36484e76d48f8dacd4d95c1db2266b5",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「Rust テストコード本文の自動生成は**行わない**」"
+        "citation": "Rust テストコード本文の自動生成は行わない"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -762,10 +762,10 @@
     },
     {
       "claim_hash": "591b2f00c84d3aaafb2edbf5629b11deb56eb217321617b82fa7d62139da6d47",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "本ゲートを既存 ref-verify の型（pair 型・chain filter・cache scope・verdict artifact）に組み込まない。"
+        "citation": "本ゲートを既存 ref-verify の型（pair 型・chain filter・cache scope・verdict artifact）に組み込まない。独立の二階検証として設計する"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -785,10 +785,10 @@
     },
     {
       "claim_hash": "591b2f00c84d3aaafb2edbf5629b11deb56eb217321617b82fa7d62139da6d47",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「責務中立部品を core として抽出し、ref-verify と obligation-fulfillment の両方が乗る形」"
+        "citation": "「コピペで3系統目を作らず、次の責務中立部品を core として抽出し」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -808,10 +808,10 @@
     },
     {
       "claim_hash": "8c24f4c689dd045d2bf07b88994284312bf156031b6a3a214fed077a2faeabfb",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「role 段階導入はしない」「全 role を本機能の導入 track で一括して定義する」「\"obligations\": []（0 件）を置く＝嘘の導出」"
+        "citation": "「role 段階導入はしない」「default の決定表 config は、全 role ... を本機能の導入 track で一括して定義する」「一部 role だけ先に対応する」段階導入は、未対応 role に仮の \"obligations\": []（0 件）を置く＝嘘の導出を制度化することでしか実現できない"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -831,10 +831,10 @@
     },
     {
       "claim_hash": "bb7804c5e4ec2a311df55485e2469a6372f8b2df53fc532fc1ac79e7e71ab3c6",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "waiver を『implementer が author し LLM が検証する』分業に全面簡素化"
+        "citation": "waiver を『implementer が author し LLM が検証する』分業に全面簡素化（warrant 機構群を Rejected H へ）"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -854,10 +854,10 @@
     },
     {
       "claim_hash": "1c2b8e188beb83a19a44755056b73135e743ff345a0f91a0d3d1957d62f3e780",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「sotp の Rust ソースに hard-code せず、**`.harness/config/` 配下の config ファイル**として持つ」 / 「**利用者が自 repo の表を所有する**」 / 「**ロード時に** ... 検証し、... であることを fail-closed で検証する」"
+        "citation": "\"義務導出の決定表（role → 義務生成ルール）を sotp の Rust ソースに hard-code せず、.harness/config/ 配下の config ファイル... として持つ... 利用者が自 repo の表を所有する——表の欠陥や自プロジェクト向けの調整は、tooling の修正を待たず利用者側の config 編集で解決できる...\" / \"完全性保証: derive / check はロード時に、config が全 role... を被覆し、義務 0 件も \\\"obligations\\\": [] と明示していることを fail-closed で検証する...（コンパイル時網羅 match による保証の、config ロード時への移設）\""
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -877,10 +877,10 @@
     },
     {
       "claim_hash": "c41eb15afe4b294e2f26754bcddb8cdf3f5832dcc6428aafa5c00789797698b1",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「テストと義務の結び付けはソースコード内の marker コメントではなく、track artifact に記録する。」「テストソースは素の Rust のままで異物構文を持たず、hash 類はすべて artifact / verify cache 側に閉じる（鮮度更新でソースを編集しない）」"
+        "citation": "テストと義務の結び付けはソースコード内の marker コメントではなく、track artifact に記録する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -900,10 +900,10 @@
     },
     {
       "claim_hash": "0186f64b58f6f377105bf15b4ca35b06243d1e1afb36457e40b27ff3ceaff672",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「全 ref edge を評価対象とする」/「コストは edge 単位の hash 凍結で抑える」"
+        "citation": "「会計単位は edge（entry × cite 先 anchor、種別を問わない・D3）であり、全 ref edge を評価対象とする… 他の edge の結果を理由に edge の評価を省略してはならない（anchor 単位への縮約の却下は Rejected E）。… コストは edge 単位の hash 凍結（D6）で抑える。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -923,10 +923,10 @@
     },
     {
       "claim_hash": "0186f64b58f6f377105bf15b4ca35b06243d1e1afb36457e40b27ff3ceaff672",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "義務はすべて維持し、edge をまたぐ dedup は行わない。... 仮に dedup すれば「ある edge の義務が、別 entry を対象とするテストで解消された」ことになり、Rejected E と同型の silent-merge（別々の約束を1つの verdict に合流させる）が再発する。"
+        "citation": "「義務はすべて維持し、**edge をまたぐ dedup は行わない**。…別々の約束を1つの verdict に合流させる」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -946,10 +946,10 @@
     },
     {
       "claim_hash": "00bdc3c02bda6c9edbfea3b77ffda5557c0704548b9277124e57df0a8ce7a6e7",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「本機能は次の三段構えである: 義務の導出が必要なテストを列挙し（何を果たすべきか）、存在検証が義務に対する履行の試み＝テストの記述を検証し（試みがあるか）、鮮度⇄fulfillment 検証がその履行が現に・意味的に正しいことを検証する（正しく果たしたか）。Rust テストコード本文の自動生成は行わない。」"
+        "citation": "スコープは「義務の導出 + 検証」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -969,10 +969,10 @@
     },
     {
       "claim_hash": "588b9b06e3fcd077c2db821b647352476bf6f940d78d010cca260145057f3554",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「citation の完全性は保証しない」; 「Phase 2（type-designer）の責務領域」"
+        "citation": "「本ゲートが保証するのは『存在する edge の全数会計』と『anchor 単位の完全不参照（edge ゼロ）の検出』であり、『特定の entry が関連 anchor へ edge を伸ばしていない』という citation の完全性は保証しない——それは chain②（catalogue → spec）の執筆品質であり、Phase 2（type-designer）の責務領域である。この境界は fulfillment 判定の edge 局所性（D6）の帰結でもある。... つまり部分的に claim された anchor の、未 claim 部分は本ゲートの視界の外である（edge ゼロ警報は完全非引用の AC / CN しか拾わない）。この盲点の治療は citation 完全性の検証 ... 日常的には Phase 2（type-designer）の執筆品質と chain②（catalogue → spec）のレビューが担う。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -992,10 +992,10 @@
     },
     {
       "claim_hash": "588b9b06e3fcd077c2db821b647352476bf6f940d78d010cca260145057f3554",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "判定は edge 局所である: fulfillment 判定の対象は「anchor の約束のうち、当該 entry の宣言に関わる部分」であり、他の edge の存在・不在を前提にしない"
+        "citation": "判定は edge 局所である: fulfillment 判定の対象は「anchor の約束のうち、当該 entry の宣言に関わる部分」であり、他 entry の責務に属する部分の未検証を fail 理由にしない（それは当該他 entry の edge の問題であり、その edge が存在しない場合は D4 の保証境界の外）。判定器は他の edge の存在・不在を前提にしない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1015,10 +1015,10 @@
     },
     {
       "claim_hash": "d2e33582ffaa16a025532066cf952506f9f4a04a73cfcfe17b02c5a12075ae66",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "lenient / force 系フラグは採用しない — remove-lenient-and-force-flag-paths の既決方針に従い、解決不能な義務・不整合は finding + 非零 exit とし、治療は上流成果物（カタログ / spec / binding）側の修正で行う。スコープは existence-based に自動解決し、scope 指定フラグを持たない。"
+        "citation": "lenient / force 系フラグは採用しない — ... スコープは existence-based に自動解決し、scope 指定フラグを持たない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1038,10 +1038,10 @@
     },
     {
       "claim_hash": "289fcc380261f060160067405bc096e6cc786b701d90139df668c1e3fb996493",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "義務 id は同一性のみから構成（義務 id は entry/宣言項目、edge id は entry/anchor に分離し、内容 hash・index 不使用）"
+        "citation": "id は同一性から、鮮度は hash から"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1061,10 +1061,10 @@
     },
     {
       "claim_hash": "f18143697b2b9041bc773e1d86623e817e58c7a784e027d18c87e25db16d0595",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「edge 会計（D4）: (entry, cite 先 anchor) ごとに verdict {fulfilled / waived / fail} へ解決——」 / 「義務の有無を問わず、どの edge もいずれの verdict でも解消できる」"
+        "citation": "edge 会計（D4）: (entry, cite先anchor) ごとに verdict {fulfilled / waived / fail} へ解決"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1084,10 +1084,10 @@
     },
     {
       "claim_hash": "f18143697b2b9041bc773e1d86623e817e58c7a784e027d18c87e25db16d0595",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "黙って消える経路 = 存在しない（全 edge の解決宣言が bindings 上で必須 = totality を check が決定論検査）"
+        "citation": "黙って消える経路 = 存在しない（全 edge の解決宣言が bindings 上で必須 = totality を check が決定論検査） / waived は「0 件 entry 専用の別レーン」ではなく全 edge に共通の解消の一種である"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1107,10 +1107,10 @@
     },
     {
       "claim_hash": "71b4b6c698f79170229e9ff989badd0a9700f8b4c9cd433e7fcda38a6a8b8621",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「約束のうち E1 に関わる部分」は edge (E1, anchor) 自身の verdict でしか解消されない——他の edge の結果を理由に edge の評価を省略してはならない。... waiver 検証は ref-verify と同型の pair: claim = waived 理由の散文, evidence = edge... 判定は edge 局所"
+        "citation": "判定は edge 局所（「この edge の entry 関連部分について、テスト不要の正当化が成立するか」）である"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1130,7 +1130,7 @@
     },
     {
       "claim_hash": "71b4b6c698f79170229e9ff989badd0a9700f8b4c9cd433e7fcda38a6a8b8621",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
         "citation": "「判定は edge 局所である: fulfillment 判定の対象は『anchor の約束のうち、当該 entry の宣言に関わる部分』であり、他 entry の責務に属する部分の未検証を fail 理由にしない」"
@@ -1153,10 +1153,10 @@
     },
     {
       "claim_hash": "f5b3a5ffaaa5a66b3145d0206b23ae2322d2754cb7336f4843509b4f3bc2c97a",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点で既存 verdict は無効となり「存在しない」ものとして扱う。hash 再計算だけで鮮度を回復する経路はない"
+        "citation": "「verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点 ... 既存 verdict は無効となり『存在しない』ものとして扱う。... hash 再計算だけで鮮度を回復する経路はない——回復は再評価（`evaluate`）の pass のみで達成される。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1176,10 +1176,10 @@
     },
     {
       "claim_hash": "f2b42b4e71e0b7e94ee48a1ec4bdfd1165020bb0c8ffe728602bbb045cad9e64",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「config が全 role を被覆し、義務 0 件も \"obligations\": [] と明示していることを fail-closed で検証する」"
+        "citation": "「config が全 role ... を被覆し、義務 0 件も \"obligations\": [] と明示していることを fail-closed で検証する。sotp に新 role が追加されると既存 config は loud に fail し」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1199,10 +1199,10 @@
     },
     {
       "claim_hash": "f2b42b4e71e0b7e94ee48a1ec4bdfd1165020bb0c8ffe728602bbb045cad9e64",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "ロード時の totality 検証は全 role の明示宣言なしに derive / check を通さず"
+        "citation": "「ロード時の totality 検証は全 role の明示宣言なしに `derive` / `check` を通さず」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1222,10 +1222,10 @@
     },
     {
       "claim_hash": "105065ec463a9cec80ca2cb5533e23ec83aa1b546aa2c56b17ab4b9e9b007c86",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「obligations は (catalogue, spec) からの決定論的射影（導出物）であり」「reject の理由は routing 先への差し戻し brief に同梱するにとどめ」"
+        "citation": "waiver 検証の reject は義務を obligations に直接追加しない。obligations は (catalogue, spec) からの決定論的射影（導出物）であり、verdict 発の義務を注入すると再導出で消える幽霊義務になる"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1245,10 +1245,10 @@
     },
     {
       "claim_hash": "12ba19ac16b5748fe17fc6f79fd9f96b03a1a12c5d9eb1ef8b46f303a1f09915",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「種別を edge 宇宙のフィルタにしない。テスト可能性の判断は、edge ごとの verdict に属する。種別の用途は次の2つに限る: verdict の事前情報（prior）と edge ゼロ警報の範囲」"
+        "citation": "種別フィルタを廃止し、テスト可能性を edge ごとの verdict に委ねる形へ改訂（種別は prior と edge ゼロ警報範囲にのみ使用）"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1268,10 +1268,10 @@
     },
     {
       "claim_hash": "882603515a8b9c770aa90baacc2db9fcdc7b0777228c24af33c3645bd2707342",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "capability は問いの種類ごとに分離する: obligation-fulfillment 検証と waiver 検証は別 prompt / 別 capability とする"
+        "citation": "capability は問いの種類ごとに分離する: obligation-fulfillment 検証（「テスト群が anchor の約束を検証しているか」: コード→自然言語比較）と waiver 検証（「author された waived 理由がこの edge に対して成立しているか」: 自然言語→自然言語比較）は別 prompt / 別 capability とする"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1290,18 +1290,18 @@
       }
     },
     {
-      "claim_hash": "cd6500dd706114ac225855e87a9f2783be3deaf50eb4462eac3fdee194be39f2",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "claim_hash": "d8e51e6021c7a928e1d1ee5df5596a877ff2f4c778e0076cc96edfcd7eee57be",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「check ゲートの合格条件は ... fulfilled / waived verdict が存在すること」; 「スコープ解決は existence-based 原則に従う」"
+        "citation": "**鮮度と verdict の結合（fail-closed）**: verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点（= drift 鮮度系の `spec_changed` / `decl_changed` / `test_changed` / `reason_changed`・D9）で既存 verdict は無効となり「存在しない」ものとして扱う。`check` ゲートの合格条件は「全 edge が bindings 上で解決宣言され（tests または waived・D9）、現行 hash と一致する fulfilled / waived verdict が存在すること」であり、hash 再計算だけで鮮度を回復する経路はない——回復は再評価（`evaluate`）の pass のみで達成される。\n\nスコープ解決は existence-based 原則に従う: obligations / test-bindings artifact（D9）が不在なら zero pairs で通過し、部分的・不整合な存在（binding だけ存在する等）は fail-closed とする。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "constraint",
           "element_id": "CN-09",
-          "text_label": "CLI 4 サブコマンド（`derive` / `check` / `evaluate` / `results`）は fail-closed で、`--lenient` / `--force` 系フラグを持たず、scope 指定フラグも持たない。スコープは artifact 存在ベースで自動解決される。verdict gate は `check` の責務であり、`results` は informational（exit 常に 0）。"
+          "text_label": "CLI gate サブコマンド（`derive` / `check` / `evaluate` / `results`）は fail-closed で、`--lenient` / `--force` 系フラグを持たず、scope 指定フラグも持たない。スコープは artifact 存在ベースで自動解決される。verdict gate は `check` の責務であり、`results` は informational（exit 常に 0）。`bindings-skeleton` は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に、案内文は stderr に出すだけで、`test-bindings.json` も verdict cache も書き換えない（stdout は schema-pure に保たれ、利用者はそのまま保存して値だけ置換できる）。"
         }
       },
       "evidence_origin": {
@@ -1313,18 +1313,18 @@
       }
     },
     {
-      "claim_hash": "cd6500dd706114ac225855e87a9f2783be3deaf50eb4462eac3fdee194be39f2",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "claim_hash": "d8e51e6021c7a928e1d1ee5df5596a877ff2f4c778e0076cc96edfcd7eee57be",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "被覆ゲート ... pure-read、CI / commit gate 用; verdict 閲覧; lenient / force 系フラグは採用しない; スコープは existence-based に自動解決し、scope 指定フラグを持たない"
+        "citation": "「単一の `sotp test-obligation` グループに、義務ゲートの lifecycle を構成する4サブコマンド（導出 / 被覆ゲート / 意味論評価 / verdict 閲覧）を置く。ここで数える4件は pass/fail gate 面とその verdict 閲覧面のコマンドであり、D14 で追加する同グループの authoring helper `bindings-skeleton` はこの4件にも gate 面にも含めない。」 / 「被覆ゲート（obligation-coverage: 解決宣言の totality + 全 edge に現行 hash 一致の verdict が存在すること。pure-read、CI / commit gate 用）」 / 「lenient / force 系フラグは採用しない ... 解決不能な義務・不整合は finding + 非零 exit とし、治療は上流成果物（カタログ / spec / binding）側の修正で行う. スコープは existence-based に自動解決し, scope 指定フラグを持たない。」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "constraint",
           "element_id": "CN-09",
-          "text_label": "CLI 4 サブコマンド（`derive` / `check` / `evaluate` / `results`）は fail-closed で、`--lenient` / `--force` 系フラグを持たず、scope 指定フラグも持たない。スコープは artifact 存在ベースで自動解決される。verdict gate は `check` の責務であり、`results` は informational（exit 常に 0）。"
+          "text_label": "CLI gate サブコマンド（`derive` / `check` / `evaluate` / `results`）は fail-closed で、`--lenient` / `--force` 系フラグを持たず、scope 指定フラグも持たない。スコープは artifact 存在ベースで自動解決される。verdict gate は `check` の責務であり、`results` は informational（exit 常に 0）。`bindings-skeleton` は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に、案内文は stderr に出すだけで、`test-bindings.json` も verdict cache も書き換えない（stdout は schema-pure に保たれ、利用者はそのまま保存して値だけ置換できる）。"
         }
       },
       "evidence_origin": {
@@ -1337,10 +1337,10 @@
     },
     {
       "claim_hash": "13e7a53bb147a7abb93460ee1f98f692d0d5463c558c1cd6fad742c8deac0e4b",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "生成ルールは per 軸（`invariant` / `method` / `handles` / `reacts_to` / `transition` / `trait_method` / 定数——宣言 payload のフィールドに対応する閉集合）× 義務種別 × brief テンプレートで表現する。語彙の解釈器は Rust 側で per 軸への網羅 match として実装し、**語彙の拡張のみが template 上流の責務**となる。"
+        "citation": "「生成ルールは per 軸（`invariant` / `method` / `handles` / `reacts_to` / `transition` / `trait_method` / 定数——宣言 payload のフィールドに対応する閉集合）× 義務種別 × brief テンプレートで表現する。語彙の解釈器は Rust 側で per 軸への網羅 match として実装し、**語彙の拡張のみが template 上流の責務**となる。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1360,10 +1360,10 @@
     },
     {
       "claim_hash": "13e7a53bb147a7abb93460ee1f98f692d0d5463c558c1cd6fad742c8deac0e4b",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "template が出荷する default config（D10）の初期内容を、config そのものの形で以下に定める: `invariant` / `method` / `handles` / `reacts_to` / `transition` / `trait_method` / `entry` / `emits` / `trait_impl`"
+        "citation": "\"template が出荷する default config（D10）の初期内容を、config そのものの形で以下に定める\"; \"trait_impls も他セクションと同形の「trait role をキーにした map」であり、ContractRole 全 variant の明示が totality 検証で強制される。\""
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1383,10 +1383,10 @@
     },
     {
       "claim_hash": "0de24234b61cc461918088052763d6a766d67486845be981fb3cf907e5935243",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「義務を導出するのは `Add` / `Modify` の entry のみ。`Reference` は「この track の変更面ではない」ため edge 宇宙の外（定義上の境界であり silent drop ではない——referenced item の義務はそれを Add した track に属する）。`Delete` は 0 件で、binding の残骸は orphaned drift が掃除を要求する。」"
+        "citation": "「義務を導出するのは `Add` / `Modify` の entry のみ。`Reference` は「この track の変更面ではない」ため edge 宇宙の外とする（定義上の境界であり silent drop ではない——referenced item の義務はそれを Add した track に属する）。`Delete` は 0 件で、binding の残骸は orphaned drift が掃除を要求する」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1406,10 +1406,10 @@
     },
     {
       "claim_hash": "48025b51a4cc4fd638beb9b65bf996ed3bf707f1a56af1445c1d9c63fd7c4ef1",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「義務導出の決定表の欠陥は track のブロッカーにしない」「決定表は利用者所有の config」「自発的 binding」"
+        "citation": "義務導出の決定表の欠陥は track のブロッカーにしない。解決手段は2層あり、いずれも利用者側で完結する: (1) ルールレベル——決定表は利用者所有の config（D10）であり、表の漏れ・自プロジェクト向けの調整は config 編集で解決する（template default への還流報告は任意）。(2) 一回性の edge レベル——config を歪めたくない単発の事例では、義務が導出されていない edge にテストを直接結ぶ（自発的 binding・D9）。... 利用者の track が tooling 内部の修正でブロックされる routing は存在しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1429,10 +1429,10 @@
     },
     {
       "claim_hash": "48025b51a4cc4fd638beb9b65bf996ed3bf707f1a56af1445c1d9c63fd7c4ef1",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「表の欠陥や自プロジェクト向けの調整は、tooling の修正を待たず利用者側の config 編集で解決できる」"
+        "citation": "tooling の修正を待たず利用者側の config 編集で解決できる"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1452,10 +1452,10 @@
     },
     {
       "claim_hash": "5ee6bd3685891e39ca90a8249d4f79079b2661ee2f5d0883219d220894efbccc",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「edge をまたぐ dedup は行わない。義務の同一性には entry が含まれる」"
+        "citation": "「同じ anchor を複数の entry が cite し、それぞれから義務が立つ場合、義務はすべて維持し、edge をまたぐ dedup は行わない。義務の同一性には entry が含まれる」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1475,10 +1475,10 @@
     },
     {
       "claim_hash": "2146b18c0283d3868991d50e677943e5eb77cde332c31bf61f0ae32a9a166533",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「テスト本文の執筆は implementer capability（人/AI）が brief を元に行う。呼び出し部の機械的正確さは rustc が保証し、テストと義務の結び付けは binding artifact（D9）が担う。」"
+        "citation": "テスト本文の執筆は implementer capability（人/AI）が brief を元に行う。呼び出し部の機械的正確さは rustc が保証し、テストと義務の結び付けは binding artifact（D9）が担う。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1498,10 +1498,10 @@
     },
     {
       "claim_hash": "2146b18c0283d3868991d50e677943e5eb77cde332c31bf61f0ae32a9a166533",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「テストと義務の結び付けはソースコード内の marker コメントではなく、track artifact に記録する」および「テストソースは素の Rust のままで異物構文を持たず、hash 類はすべて artifact / verify cache 側に閉じる（鮮度更新でソースを編集しない）」、「走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する。」"
+        "citation": "「テストと義務の結び付けはソースコード内の marker コメントではなく、track artifact に記録する」「テストソースは素の Rust のままで異物構文を持たず、hash 類はすべて artifact / verify cache 側に閉じる（鮮度更新でソースを編集しない）」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1521,10 +1521,10 @@
     },
     {
       "claim_hash": "87791f5d16c7586bfbc87afeee493b1f699598d636a8f6c1d2e611ba375a8025",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「テスト義務を、entry 単位の導出関数の出力として定義し、意味の会計は edge 単位で行う。」「義務数は cite 数に乗算されない。」「1義務 = 1テストではなく、1義務 = 1テスト群」"
+        "citation": "「テスト義務を、entry 単位の導出関数の出力として定義し、意味の会計は edge 単位で行う。」「義務数は cite 数に乗算されない。」「binding: 義務 → [test] // implementer が author。1義務に複数テスト可（D9）」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1544,10 +1544,10 @@
     },
     {
       "claim_hash": "0920898e0eed78ddfb75b013703a570e28cf450acc56abebbdf3b854eca6d1d0",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「ValueObject ... invariants 宣言が非空なら invariant ごとに境界値テスト義務が立つ ... 空なら ... 0 件」「ErrorType ... 型としては 0 件」「role 別の生成数ルールは D13 の決定表に定める」"
+        "citation": "「宣言の軸の出力は『最低限作成すべきテスト義務の一覧』（下限集合）である」…「`ValueObject { invariants }`: invariants 宣言が非空なら invariant ごとに境界値テスト義務が立つ（n ≥ 1）。invariants が空なら…0 件」…「`ErrorType`: 型としては 0 件」…「`Command` / `Query` / `Dto` / `DomainEvent` / `CompositionRoot` / `PrimaryAdapter`: 0 件」…「role 全種の生成数ルールは決定表 config（D10）として管理する」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1567,10 +1567,10 @@
     },
     {
       "claim_hash": "0920898e0eed78ddfb75b013703a570e28cf450acc56abebbdf3b854eca6d1d0",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「件数は宣言の内部構造のみの関数である。」"
+        "citation": "「件数は宣言の内部構造のみの関数である」「ValueObject: invariants 非空なら invariant ごとの境界テスト…空なら実行時境界が存在せず…0 件」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1590,10 +1590,10 @@
     },
     {
       "claim_hash": "d0faf18c0a8c7116ccff5867e952d2aa881a7881e89ff2bb7ab64b22c640e747",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "義務 0 件も `\"obligations\": []` と**明示**していることを fail-closed で検証する"
+        "citation": "config が全 role を被覆し、義務 0 件も \"obligations\": [] と明示"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1613,10 +1613,10 @@
     },
     {
       "claim_hash": "d0faf18c0a8c7116ccff5867e952d2aa881a7881e89ff2bb7ab64b22c640e747",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "template が出荷する default の決定表 config は、全 role（DataRole 17種 / ContractRole / FunctionRole）の生成ルールを本機能の導入 track で一括して定義する。"
+        "citation": "template が出荷する default の決定表 config は、全 role（DataRole 17種 / ContractRole / FunctionRole）の生成ルールを本機能の導入 track で一括して定義する。... 大半の role は \"obligations\": [] として明示的に決着する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1636,10 +1636,10 @@
     },
     {
       "claim_hash": "d0faf18c0a8c7116ccff5867e952d2aa881a7881e89ff2bb7ab64b22c640e747",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "template が出荷する default config（D10）の初期内容を、config そのものの形で以下に定める"
+        "citation": "default config（D10）の初期内容を、config そのものの形で以下に定める / \"obligations\": []"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1659,10 +1659,10 @@
     },
     {
       "claim_hash": "ef6f2857019f904e7e3b92bb1cd22b0f0b2514f37b6680b61ba1bc6cb244ee81",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「derive / check はロード時に、config が全 role を被覆し、義務 0 件も \"obligations\": [] と明示していることを fail-closed で検証する」"
+        "citation": "完全性保証: `derive` / `check` はロード時に、config が全 role（DataRole 17種 / ContractRole / FunctionRole——role enum は Rust 側が SSoT）を被覆し、義務 0 件も `\"obligations\": []` と**明示**していることを fail-closed で検証する。sotp に新 role が追加されると既存 config は loud に fail し"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1682,10 +1682,10 @@
     },
     {
       "claim_hash": "0e53a91d4e7954aa4be967767cba56d07728c1b29c94232f7c9114be307d70e4",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "義務 id は (entry 識別子, 義務種別, 宣言内項目の識別子〔invariant 名・メソッド名・handles の型名等〕) のみから決定論的に構成し、...**内容 hash を id に含めず**、項目の識別に位置（index）を使わない。これにより、上流の内容変更（宣言の修正・anchor 本文の変更）は id を変えず——binding は生き残り——鮮度失効（`decl_changed` / `spec_changed`）として再検証だけを引き起こす。"
+        "citation": "「義務 id は (entry 識別子, 義務種別, 宣言内項目の識別子〔invariant 名・メソッド名・handles の型名等〕) のみから決定論的に構成し、... 内容 hash を id に含めず、項目の識別に位置（index）を使わない。これにより、上流の内容変更（宣言の修正・anchor 本文の変更）は id を変えず——binding は生き残り——鮮度失効（`decl_changed` / `spec_changed`）として再検証だけを引き起こす。】"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1705,10 +1705,10 @@
     },
     {
       "claim_hash": "0e53a91d4e7954aa4be967767cba56d07728c1b29c94232f7c9114be307d70e4",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "義務導出（obligations artifact の書き込み） | `sotp test-obligation derive`"
+        "citation": "義務導出（obligations artifact の書き込み） | `sotp test-obligation derive` | D2 の導出関数 `derive: 宣言 → [義務]` の形式語彙そのもの"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1728,10 +1728,10 @@
     },
     {
       "claim_hash": "cefa7085744d1ef41b80d8a40c408aee4bf62c63ad441c41b3da72e0d91010a5",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「`check` ゲートの合格条件は「全 edge が bindings 上で解決宣言され（tests または waived・D9）、現行 hash と一致する fulfilled / waived verdict が存在すること」であり、hash 再計算だけで鮮度を回復する経路はない——回復は再評価（`evaluate`）の pass のみで達成される。\n\nスコープ解決は existence-based 原則に従う: obligations / test-bindings artifact（D9）が不在なら zero pairs で通過し、部分的・不整合な存在（binding だけ存在する等）は fail-closed とする。」「verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点（= drift 鮮度系の `spec_changed` / `decl_changed` / `test_changed` / `reason_changed`・D9）で既存 verdict は無効となり「存在しない」ものとして扱う。"
+        "citation": "「check ゲートの合格条件は「全 edge が bindings 上で解決宣言され（tests または waived・D9）、現行 hash と一致する fulfilled / waived verdict が存在すること」」 / 「部分的・不整合な存在（binding だけ存在する等）は fail-closed とする」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1751,10 +1751,10 @@
     },
     {
       "claim_hash": "cefa7085744d1ef41b80d8a40c408aee4bf62c63ad441c41b3da72e0d91010a5",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "test-bindings（implementer が author）: 解決宣言の写像。3形態を持つ——義務 id → `[{layer, module_path, test_name}]` ... / edge id → `{waived: \"理由の散文\"}` ... / edge id → `[{layer, module_path, test_name}]` ... **全 edge がいずれかで解決宣言されていること（totality）を check が決定論的に検査する** ... drift 分類 ... `missing` ... / `orphaned` ... `spec_changed` ... `decl_changed` ... `test_changed` ... `reason_changed`"
+        "citation": "「存在系（独立の決定論検査）: `missing`（義務に binding がない、または binding の指すテストが存在しない — テストの rename もここで検出される）/ `orphaned`（binding はあるが義務が導出されない）」および「**全 edge がいずれかで解決宣言されていること（totality）を check が決定論的に検査する**」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1774,10 +1774,10 @@
     },
     {
       "claim_hash": "af9a7f7100504ada88916a60d154927b26f264783646865441ad81b1888d3271",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "drift 分類は次の6種で、2族に分かれる。... CI は書き換えなしに drift を検出できる。"
+        "citation": "drift 分類は次の6種で、**2族に分かれる**（D1 の結合構造に対応）:\n\n- **存在系**（独立の決定論検査）: `missing`（義務に binding がない、または binding の指すテストが存在しない — テストの rename もここで検出される）/ `orphaned`（binding はあるが義務が導出されない）\n- **鮮度系**（verdict の失効の表示名。キャッシュキーの各成分に対応する）: evidence 側の `spec_changed`（anchor 本文の hash 変化）/ `decl_changed`（entry 宣言の hash 変化）、claim 側の `test_changed`（bound test 本体の hash 変化）/ `reason_changed`（waived 理由散文の hash 変化）\n\nCI は書き換えなしに drift を検出できる。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1797,10 +1797,10 @@
     },
     {
       "claim_hash": "05cf2fcdde6a24ed77b505f6e97d70267bb3f578da05515dfc09ca9e048e4c08",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "判定の規律は既存の意味論検証と共通にする: 合格 verdict には evidence のどの記述が裏付けかの引用を必須とする。\n\nキャッシュキー | (claim_hash, evidence_hash) の対 | test pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash) の**三つ組**\n\n回復は再評価（`evaluate`）の pass のみで達成される。"
+        "citation": "合格 verdict には evidence のどの記述が裏付けかの引用を必須とする"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1820,10 +1820,10 @@
     },
     {
       "claim_hash": "05cf2fcdde6a24ed77b505f6e97d70267bb3f578da05515dfc09ca9e048e4c08",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "verdict 語彙 + 裏付け引用必須の規律（だんまり通過禁止）\n- hash 凍結キャッシュの機構\n- fast → final → 人間 の段階引き上げドライバ"
+        "citation": "verdict 語彙 + 裏付け引用必須の規律（だんまり通過禁止）\n- hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）\n- fast → final → 人間 の段階引き上げドライバ"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1843,10 +1843,10 @@
     },
     {
       "claim_hash": "f0b28a946964a66cfbfc5b2e1ccf6e196ab9d1ec9138f97837f09f8081d9ee66",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "capability は問いの種類ごとに分離する: obligation-fulfillment 検証 ... と waiver 検証 ... は別 prompt / 別 capability とする"
+        "citation": "「obligation-fulfillment 検証 ... と waiver 検証 ... は別 prompt / 別 capability とする」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1866,10 +1866,10 @@
     },
     {
       "claim_hash": "d1a7d4c97e9ef2affcb9610b4b2701b786e1b61192dd83ab8cb9cc501aec4c4b",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "fail類型は「テストと anchor の意味的な関係」に応じて次の3つとする。…「条件 → 観測可能な結果」の対として読める記述（振る舞いの主張）に限る。"
+        "citation": "「fail 類型は「テストと anchor の意味的な関係」に応じて次の3つとする。」「『条件 → 観測可能な結果』の対として読める記述（振る舞いの主張）」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1889,10 +1889,10 @@
     },
     {
       "claim_hash": "bc8ade098e87cb76c91a122047b9988d47717e992db217a1135a5b9dd4a591b3",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "| 被覆ゲート（obligation-coverage: 解決宣言の totality + 全 edge に現行 hash 一致の verdict が存在すること。pure-read、CI / commit gate 用） | `sotp test-obligation check` | 決定論の読み取りゲート\n| verdict 閲覧 | `sotp test-obligation results` | `ref-verify results` と同じ用法\n\nlenient / force 系フラグは採用しない — remove-lenient-and-force-flag-paths の既決方針に従い、解決不能な義務・不整合は finding + 非零 exit とし、治療は上流成果物（カタログ / spec / binding）側の修正で行う。スコープは existence-based に自動解決し、scope 指定フラグを持たない。"
+        "citation": "「verdict 閲覧 | `sotp test-obligation results` | `ref-verify results` と同じ用法」 / 「スコープは existence-based に自動解決し、scope 指定フラグを持たない」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1912,7 +1912,7 @@
     },
     {
       "claim_hash": "a1695352f9fc9f36de00c6324d18b569010d82c7a8dd448f68243d4cf0f825f0",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
         "citation": "スコープ解決は existence-based 原則に従う: obligations / test-bindings artifact（D9）が不在なら zero pairs で通過し、部分的・不整合な存在（binding だけ存在する等）は fail-closed とする。"
@@ -1935,10 +1935,10 @@
     },
     {
       "claim_hash": "a1695352f9fc9f36de00c6324d18b569010d82c7a8dd448f68243d4cf0f825f0",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "lenient / force 系フラグは採用しない — remove-lenient-and-force-flag-paths の既決方針に従い、解決不能な義務・不整合は finding + 非零 exit とし、治療は上流成果物（カタログ / spec / binding）側の修正で行う。スコープは existence-based に自動解決し、scope 指定フラグを持たない。"
+        "citation": "「解決不能な義務・不整合は finding + 非零 exit」「スコープは existence-based に自動解決し、scope 指定フラグを持たない」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1958,10 +1958,10 @@
     },
     {
       "claim_hash": "85de2adfae3a58696f8a51cef536889a482c7b6bd5e8e91890fad0733096db26",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "waiver 検証の reject は義務を obligations に直接追加しない。reject の理由は routing 先への差し戻し brief に同梱するにとどめ、義務そのものは上流成果物の修正後の再導出（`derive` 再実行）でのみ出現する"
+        "citation": "「reject の理由は routing 先への差し戻し brief に同梱するにとどめ、義務そのものは上流成果物の修正後の再導出でのみ出現する」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1981,10 +1981,10 @@
     },
     {
       "claim_hash": "709c75c370ed727ee582e8d79e90cbc41b677b83164ea2d0e105be7414ef197c",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「義務が導出されていない edge にテストを直接結ぶ（自発的 binding・D9）。検証は通常の fulfillment pair と同一機構で行われ、後に表が更新されて正規の義務が導出されれば、自発的 binding はその履行として引き継がれる。」"
+        "citation": "義務が導出されていない edge にテストを直接結ぶ（自発的 binding・D9）。検証は通常の fulfillment pair と同一機構で行われ、後に表が更新されて正規の義務が導出されれば、自発的 binding はその履行として引き継がれる。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2004,10 +2004,10 @@
     },
     {
       "claim_hash": "709c75c370ed727ee582e8d79e90cbc41b677b83164ea2d0e105be7414ef197c",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "「自発的 binding」…「fulfillment 検証は導出義務の場合と同一・D4」…「binding は生き残り」"
+        "citation": "「edge id → [{layer, module_path, test_name}]（自発的 binding: 義務が導出されていない edge への直接テスト結束。fulfillment 検証は導出義務の場合と同一・D4）」および「これにより、上流の内容変更（宣言の修正・anchor 本文の変更）は id を変えず——binding は生き残り——鮮度失効（`decl_changed` / `spec_changed`）として再検証だけを引き起こす。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2027,10 +2027,10 @@
     },
     {
       "claim_hash": "f47981b8de4dcb9b12998a0555fe64f5e9a77cfb13d8f724920126710ea8794e",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "どの entry からも cite されていない `AC` / `CN` は決定論的 finding とする... `GO` / `IN` の非引用は正常であり警報しない"
+        "citation": "「どの entry からも cite されていない `AC` / `CN` は決定論的 finding とする（受け入れ基準・制約が誰にも claim されていない状態は構造的に疑わしい）。`GO` / `IN` の非引用は正常であり警報しない」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2049,18 +2049,18 @@
       }
     },
     {
-      "claim_hash": "db08b121a20ec032b1c564b5769fcc4556839fe8a025eaf81f2fa68e032c3035",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "claim_hash": "aef9f9ec20654bb9e4d730b790b86644fed78a8012e6b6dd52d93aad50b1476d",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "lenient / force 系フラグは採用しない … scope 指定フラグを持たない。"
+        "citation": "単一の `sotp test-obligation` グループに、義務ゲートの lifecycle を構成する4サブコマンド（導出 / 被覆ゲート / 意味論評価 / verdict 閲覧）を置く ... D14 で追加する同グループの authoring helper `bindings-skeleton` はこの4件にも gate 面にも含めない ... lenient / force 系フラグは採用しない ... scope は existence-based に自動解決し、scope 指定フラグを持たない。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-14",
-          "text_label": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。CLI 引数 parser の定義および help text が本方針に一致することを検証するテストがある。"
+          "text_label": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。`sotp test-obligation bindings-skeleton` は obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id を `fulfillment` レコードとして事前充填し、テスト位置は TODO placeholder）を stdout に、authoring guidance note を stderr に出す authoring helper で、stdout は schema-pure に保たれ、`test-bindings.json` / verdict cache は書き換えない。CLI 引数 parser の定義および help text が本方針に一致することを検証するテストがある。"
         }
       },
       "evidence_origin": {
@@ -2073,10 +2073,10 @@
     },
     {
       "claim_hash": "3aa4c994fc692bb806ba6fd404d9fdeea2978cdb86cacf1dd67c3ee2022e8021",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "次の責務中立部品を core として抽出し、ref-verify と obligation-fulfillment の両方が乗る形を先行タスクとする: - verdict 語彙 + 裏付け引用必須の規律（だんまり通過禁止） - hash 凍結キャッシュの機構（キーの型は検証器ごとに定義） - calibration probe の注入と劣化検出 - fast → final → 人間 の段階引き上げドライバ - capability → provider 解決（既に共有済み）"
+        "citation": "「次の責務中立部品を core として抽出し、ref-verify と obligation-fulfillment の両方が乗る形を先行タスクとする:\n- verdict 語彙 + 裏付け引用必須の規律（だんまり通過禁止）\n- hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）\n- calibration probe の注入と劣化検出\n- fast → final → 人間 の段階引き上げドライバ\n- capability → provider 解決（既に共有済み）\n\n検証器固有に残すのは: pair / 義務の型、対象集合の生成（citation 走査 vs 決定表導出）、スコープ解決、fail routing。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2096,10 +2096,10 @@
     },
     {
       "claim_hash": "0228f3175d5d366b5d5db714d2e3d75eb952addb616fef048960c68d45bfe18a",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "trait_impls の rule 解決: trait_impl entry は identity-only ... 外部 trait（`From` / `Display` 等）などカタログに解決できない `trait_ref` の impl は**明示的に義務 0 件**とする / 契約適合義務の evidence: ... 実装対象 trait の edge（trait entry × その cite する anchor）を evidence に用いる / `trait_impls` も他セクションと同形の「trait role をキーにした map」であり、ContractRole 全 variant の明示が totality 検証で強制される。`ApplicationService` の impl を 0 件"
+        "citation": "「trait_impls の rule 解決: ... 外部 trait（From / Display 等）などカタログに解決できない trait_ref の impl は明示的に義務 0 件とする」「契約適合義務の evidence: trait_impl entry は spec_refs を持たず自身の edge がないため、... 実装対象 trait の edge ... を evidence に用いる」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2119,10 +2119,10 @@
     },
     {
       "claim_hash": "8919ddea622f295407ef4805fa84cbc988ee77699590a1eabacfa575bc3f4612",
-      "evidence_hash": "8269293fe4463f1f07af02357395546b8adfce66dfcb8f67efd354c778cdf7a0",
+      "evidence_hash": "11b14d692aa7a6eaca61aa6a7198728cd7b374984144e2f73d5a18f3ebc91f15",
       "verdict": {
         "kind": "pass",
-        "citation": "- **ItemAction**: 義務を導出するのは `Add` / `Modify` の entry のみ。`Reference` は「この track の変更面ではない」ため edge 宇宙の外とする（**定義上の境界**であり silent drop ではない——referenced item の義務はそれを Add した track に属する）。`Delete` は 0 件で、binding の残骸は orphaned drift が掃除を要求する"
+        "citation": "「義務を導出するのは `Add` / `Modify` の entry のみ。`Reference` は … edge 宇宙の外とする。`Delete` は 0 件で、binding の残骸は orphaned drift が掃除を要求する」"
       },
       "claim_origin": {
         "kind": "spec_element",

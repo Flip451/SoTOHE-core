@@ -20,6 +20,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| TestBindingsSkeletonError | error_type | add | ObligationsAbsent, ArtifactLoad | 🔵 | 🔵 |
 | TestObligationEvaluateConfigError | error_type | add | InvalidInjectionRate, InvalidDetectionThreshold, InvalidParallelism | 🔵 | 🔵 |
 
 ## Secondary Ports
@@ -37,6 +38,7 @@
 | CheckTestObligationsApplicationService | application_service | add | fn execute(&self, cmd: &CheckTestObligationsCommand) -> Result<CheckTestObligationsOutcome, domain::tddd::test_obligation::errors::ObligationCheckError> | 🔵 | 🔵 |
 | DeriveTestObligationsApplicationService | application_service | add | fn execute(&self, cmd: &DeriveTestObligationsCommand) -> Result<(), domain::tddd::test_obligation::errors::ObligationDeriveError> | 🔵 | 🔵 |
 | EvaluateTestObligationsApplicationService | application_service | add | fn execute(&self, cmd: &'a EvaluateTestObligationsCommand) -> EvaluateTestObligationsFuture<'a> | 🔵 | 🔵 |
+| TestBindingsSkeletonApplicationService | application_service | add | fn execute(&self, cmd: &TestBindingsSkeletonCommand) -> Result<TestBindingsSkeletonOutcome, TestBindingsSkeletonError> | 🔵 | 🔵 |
 | TestObligationResultsApplicationService | application_service | add | fn execute(&self, cmd: &TestObligationResultsCommand) -> Result<TestObligationResultsOutput, domain::tddd::test_obligation::errors::ObligationResultsError> | 🔵 | 🔵 |
 
 ## Interactors
@@ -46,6 +48,7 @@
 | CheckTestObligationsInteractor | interactor | add | — | 🔵 | 🔵 |
 | DeriveTestObligationsInteractor | interactor | add | — | 🔵 | 🔵 |
 | EvaluateTestObligationsInteractor | interactor | add | — | 🔵 | 🔵 |
+| TestBindingsSkeletonInteractor | interactor | add | — | 🔵 | 🔵 |
 | TestObligationResultsInteractor | interactor | add | — | 🔵 | 🔵 |
 
 ## DTOs
@@ -56,6 +59,8 @@
 | EvaluateTestObligationsFuture | dto | add | — | 🔵 | 🔵 |
 | EvaluateTestObligationsOutcome | dto | add | — | 🔵 | 🔵 |
 | SemanticEscalationFuture | dto | add | — | 🔵 | 🔵 |
+| TestBindingsSkeletonOutcome | dto | add | — | 🔵 | 🔵 |
+| TestBindingsSkeletonRecord | dto | add | — | 🔵 | 🔵 |
 | TestObligationLaneSummary | dto | add | — | 🔵 | 🔵 |
 | TestObligationResultsOutput | dto | add | — | 🔵 | 🔵 |
 
@@ -66,6 +71,7 @@
 | CheckTestObligationsCommand | command | add | — | 🔵 | 🔵 |
 | DeriveTestObligationsCommand | command | add | — | 🔵 | 🔵 |
 | EvaluateTestObligationsCommand | command | add | — | 🔵 | 🔵 |
+| TestBindingsSkeletonCommand | command | add | — | 🔵 | 🔵 |
 | TestObligationCatalogueCommandInput | command | add | — | 🔵 | 🔵 |
 | TestObligationResultsCommand | command | add | — | 🔵 | 🔵 |
 

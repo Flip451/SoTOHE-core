@@ -9,8 +9,9 @@
 
 Stage the working tree, create a guarded commit from the current track branch, and attach a
 structured git note for traceability. The commit is protected by the `cargo make track-commit-message`
-wrapper, which runs full CI (`cargo make ci`) before writing the commit. Commits from
-non-track branches are rejected (fail-closed). The canonical staging order is:
+wrapper, which runs full CI (`cargo make ci`), track-aware gates (`cargo make ci-track`),
+review/ref-verify approvals, the test-obligation fulfillment gate, and the DRY gate before
+writing the commit. Commits from non-track branches are rejected (fail-closed). The canonical staging order is:
 implement → review → stage → commit. Staging before the final review round silently omits the
 `review.json` delta from the commit, producing a stale artifact on disk.
 
@@ -25,6 +26,10 @@ implement → review → stage → commit. Staging before the final review round
   and must re-stage now.
 - **`bin/sotp review check-approved` exit 0** — required before the guarded commit wrapper
   proceeds (the wrapper enforces this gate internally via `cargo make track-commit-message`).
+- **`bin/sotp test-obligation check` exit 0** — required before the guarded commit wrapper
+  proceeds; missing bindings, unresolved edges, or stale verdicts block the commit.
+- **`bin/sotp dry check-approved` exit 0** — required before the guarded commit wrapper
+  proceeds.
 
 ## Sequence
 
@@ -59,8 +64,9 @@ Write the commit message to `tmp/track-commit/commit-message.txt`. Then run:
 cargo make track-commit-message
 ```
 
-This wrapper executes `cargo make ci` (full CI) followed by
-`git commit -F tmp/track-commit/commit-message.txt`. It deletes the scratch file on success.
+This wrapper executes `cargo make ci`, `cargo make ci-track`, review/ref-verify approval
+checks, `bin/sotp test-obligation check`, and `bin/sotp dry check-approved`, then commits
+from `tmp/track-commit/commit-message.txt`. It deletes the scratch file on success.
 If the commit fails (CI failure or git error), report the error and stop. Do not proceed to
 note generation.
 
@@ -103,7 +109,7 @@ skip note generation and mention this in the summary.
 |------|------|---------|
 | 1 | Staged diff non-empty and matches intent | OK / fix-staging |
 | 1 | Current branch matches `track/<id>` | OK / ERROR |
-| 2 | `cargo make track-commit-message` exits 0 (CI + commit) | OK / ERROR |
+| 2 | `cargo make track-commit-message` exits 0 (CI + track-aware gates + commit) | OK / ERROR |
 
 ## Failure / recovery
 
@@ -112,7 +118,8 @@ skip note generation and mention this in the summary.
   `cargo make track-add-paths`, then re-run the workflow.
 - **Non-track branch**: switch to the track branch and re-run.
 - **`cargo make track-commit-message` failure**:
-  - CI failure (fmt, clippy, test, deny, layers, verify-*): fix the failing gate and re-run.
+  - CI/gate failure (fmt, clippy, test, deny, layers, verify-*, track-aware gates,
+    test-obligation, DRY): fix the failing gate and re-run.
     Do not re-stage — the working tree is the same. Do not proceed to note generation.
   - git commit error: diagnose (index state, branch protection) and resolve before retrying.
 - **Note generation failure** (`cargo make track-note` non-zero): report the error. The commit

@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use usecase::test_obligation::TestObligationCatalogueCommandInput;
 use usecase::{DiagnosticMessage, TrackId};
 
+pub mod bindings_skeleton;
 pub mod check;
 pub mod derive;
 pub mod evaluate;

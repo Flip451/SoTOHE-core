@@ -110,7 +110,7 @@
       },
       {
         "id": "IN-06",
-        "text": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。",
+        "text": "test-bindings artifact（implementer が author）のスキーマ定義と codec 実装。3 形態を持つ: (a) 義務 id → `[{layer, module_path, test_name}]`（導出義務の履行。1義務に複数テスト可）、(b) edge id → `{waived: \"理由の散文\"}`（免除）、(c) edge id → `[{layer, module_path, test_name}]`（自発的 binding: 義務が導出されていない edge への直接テスト結束）。edge id は (entry 識別子, anchor id) から構成する。走査は binding をキーに対象 crate のテスト関数を特定し、本体を span 抽出して obligation-fulfillment 検証の claim に供する（テストソースは素の Rust のままで異物構文を持たない）。`bin/sotp test-obligation bindings-skeleton` は obligations artifact を読み、`test-bindings.json` と同一 wire 形状の schema 準拠 draft（各導出義務 id を `fulfillment` レコードとして事前充填し、`layer` / `module_path` / `test_name` は TODO placeholder のまま）を stdout に、authoring guidance note（レコード件数、TODO 差し替え / waiver・voluntary_binding への転記の指示、brief と対象 entry は obligations.json 参照という pointer）を stderr に出す authoring helper であり、stdout を schema-pure に保つため fail-closed codec が受理する key のみを含む（利用者は stdout をそのまま `test-bindings.json` として保存し値だけ置換して仕上げる）。command は read-only で、`test-bindings.json` も verdict cache も書き換えず、TODO placeholder が残る間は fail-closed gate に受理されない。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
@@ -471,7 +471,7 @@
     },
     {
       "id": "CN-09",
-      "text": "CLI 4 サブコマンド（`derive` / `check` / `evaluate` / `results`）は fail-closed で、`--lenient` / `--force` 系フラグを持たず、scope 指定フラグも持たない。スコープは artifact 存在ベースで自動解決される。verdict gate は `check` の責務であり、`results` は informational（exit 常に 0）。",
+      "text": "CLI gate サブコマンド（`derive` / `check` / `evaluate` / `results`）は fail-closed で、`--lenient` / `--force` 系フラグを持たず、scope 指定フラグも持たない。スコープは artifact 存在ベースで自動解決される。verdict gate は `check` の責務であり、`results` は informational（exit 常に 0）。`bindings-skeleton` は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に、案内文は stderr に出すだけで、`test-bindings.json` も verdict cache も書き換えない（stdout は schema-pure に保たれ、利用者はそのまま保存して値だけ置換できる）。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
@@ -731,7 +731,7 @@
     },
     {
       "id": "AC-14",
-      "text": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。CLI 引数 parser の定義および help text が本方針に一致することを検証するテストがある。",
+      "text": "`sotp test-obligation {derive,check,evaluate,results}` は `--lenient` / `--force` フラグを持たず、scope 指定フラグも持たない。`sotp test-obligation bindings-skeleton` は obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id を `fulfillment` レコードとして事前充填し、テスト位置は TODO placeholder）を stdout に、authoring guidance note を stderr に出す authoring helper で、stdout は schema-pure に保たれ、`test-bindings.json` / verdict cache は書き換えない。CLI 引数 parser の定義および help text が本方針に一致することを検証するテストがある。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",

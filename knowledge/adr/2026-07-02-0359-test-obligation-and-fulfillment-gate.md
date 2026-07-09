@@ -45,6 +45,9 @@ decisions:
   - id: D13
     user_decision_ref: "chat:session-86a37bf1:2026-07-04 裁定（Reference 除外に同意 / DomainService は per-メソッド確認）+ 2026-07-06 裁定（emits 一律生成: 指摘「anchor 不在は chain② で別途拒絶される」により空振り懸念が消滅し維持確定 / trait_impls 契約適合: 「含めておいて、不要ならテンプレート利用者ごとに config で無効化」で確定 / when_trait_role_in 条件式は map 形式へ統一 / config JSON を D13 に直接記載）"
     status: proposed
+  - id: D14
+    user_decision_ref: "chat:session-86a37bf1:2026-07-09/10 ユーザー直接指示「63 個の義務 id を implementer が手写する体制は現実的でない。`test-bindings.json` と同一 wire 形状の schema-pure draft を stdout に出す authoring helper を追加せよ。gate 面には含めず、副作用（`test-bindings.json` / verdict cache への write）は一切持たせない。`results` は informational（exit 常に 0、verdict gate は `check` の責務）である旨を明文化」"
+    status: proposed
 ---
 
 # テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成
@@ -252,7 +255,7 @@ CI は書き換えなしに drift を検出できる。
 
 ### D11: CLI surface — fail-closed、lenient / force 系フラグなし
 
-単一の `sotp test-obligation` グループに4サブコマンドを置く。命名は機能の直接表現とする（他コマンド群からの類推借用をしない）:
+単一の `sotp test-obligation` グループに、義務ゲートの lifecycle を構成する4サブコマンド（導出 / 被覆ゲート / 意味論評価 / verdict 閲覧）を置く。ここで数える4件は pass/fail gate 面とその verdict 閲覧面のコマンドであり、D14 で追加する同グループの authoring helper `bindings-skeleton` はこの4件にも gate 面にも含めない。命名は機能の直接表現とする（他コマンド群からの類推借用をしない）:
 
 | 役割 | コマンド | 命名根拠 |
 |---|---|---|
@@ -338,6 +341,28 @@ role 1つ分の実体は config の1エントリ + brief テンプレートで�
 - **契約適合義務の evidence**: trait_impl entry は spec_refs を持たず自身の edge がないため、契約適合義務（`contract_conformance`）の fulfillment 評価は**実装対象 trait の edge**（trait entry × その cite する anchor）を evidence に用いる
 - **メソッド単位 spec_refs がある場合**: 義務の粒度はメソッドへ精緻化されるが、anchor には乗算しない。メソッド単位の義務に bind されたテスト群を、そのメソッドから伸びる各 edge の fulfillment claim として edge ごとに評価する
 - **ItemAction**: 義務を導出するのは `Add` / `Modify` の entry のみ。`Reference` は「この track の変更面ではない」ため edge 宇宙の外とする（**定義上の境界**であり silent drop ではない——referenced item の義務はそれを Add した track に属する）。`Delete` は 0 件で、binding の残骸は orphaned drift が掃除を要求する
+
+### D14: `bindings-skeleton` 執筆補助サブコマンドの追加と `results` の informational 性質の明文化
+
+D11 が定めた4サブコマンド（`derive` / `check` / `evaluate` / `results`）は `sotp test-obligation` グループ内の義務ゲート lifecycle surface である。このうち `derive` / `evaluate` は gate が読む artifact / verdict を生成し、pass/fail gate としての判定は `check` が担い、`results` は下で明文化する通り informational な閲覧コマンドである。これに加えて、同じ CLI グループに5つ目のコマンドとして、pass/fail gate 面から独立した**執筆補助サブコマンド** `sotp test-obligation bindings-skeleton` を1つ設ける。
+
+**bindings-skeleton の契約**:
+
+- **入力**: track の `obligations.json`（`derive` の出力＝導出義務一覧）
+- **stdout**: `test-bindings.json` と**同一 wire 形状**の schema 準拠 draft を1度だけ出力する。各導出義務 id を `fulfillment` レコードとして事前充填し、テスト位置（`layer` / `module_path` / `test_name`）は TODO placeholder のまま。stdout は fail-closed codec が受理する key のみを含む **schema-pure** な形に保ち（`deny_unknown_fields` が未知 key を reject する）、利用者は stdout をそのまま `test-bindings.json` として materialize し値だけ置換して仕上げられる
+- **stderr**: 案内文（レコード件数、TODO 差し替え / waiver・自発的 binding への転記の指示、brief と対象 entry は `obligations.json` を参照するという pointer）を1度だけ出力する。stdout の schema-purity を汚染しないための stream 分離
+- **副作用の完全な不在**: `test-bindings.json` を書かない、verdict cache を書かない、`obligations.json` も含む repo file を書き換えない、gate verdict に影響しない。command は **read-only**
+- **fail-closed セマンティクスの不変性**: TODO placeholder が残る間は当該 binding が実在テスト関数を指せないため、`check` が missing drift として fail-closed で reject する。skeleton の生成は義務・履行・鮮度いずれの検証も肩代わりせず、D11 の fail-closed gate と D6 の鮮度 → verdict 結合を弱めない
+- **gate 面ではない**: `bindings-skeleton` は D11 の4サブコマンドにも pass/fail gate にも含まれない。CLI grouping としては同じ `sotp test-obligation` グループに置くが、gate ではない本コマンドは fail-closed verdict 判定の対象外である。CI からは呼ばれない
+
+**`results` の informational 性質の再確認**（D11 の該当行の明文化）: `sotp test-obligation results` は verdict 閲覧のみを目的とし、**exit は常に 0**（informational）である。verdict の合否判定＝ゲートとしての pass/fail は **`check` の責務**であり、`results` は結果の可視化に専念する（既存 `sotp ref-verify results` / `sotp review results` / `sotp dry results` と同じ用法）。verdict gate と閲覧の責務分離は、rerun 時の副作用不在（`results` の複数回実行は等価な出力を返すのみ）と、CI の pass/fail 経路の唯一性（gate は `check` のみ）を同時に保つための構造判断であり、`results` に非 0 exit を持たせない選択はこの構造の帰結である。
+
+**動機の grounding**:
+
+- **手写しコストの構造的解消**: 本ゲートが導出する義務 id 群は role 別導出ルール（D2 / D10）の出力であり、実装が AI 前提の本プロジェクトでも、義務 id 文字列そのものの機械的な複製（正確な区切り・エスケープ・全 id の網羅）を implementer に強いる合理性がない。skeleton は義務 id boilerplate の生成を機械化し、転記過誤（typo / 欠落 / 順序）を構造的に排除する
+- **implementer authored の binding 原則の保持**: D9 の binding は「implementer が author する」設計（テスト位置 / waived 理由 / 自発的 binding のいずれも人が書く）。skeleton は**空欄（TODO placeholder）だけを生成**し、テスト位置の意味的な決定は依然として implementer に委ねる——事前充填されるのは形（同一 wire 形状 + 網羅された義務 id）のみで、内容（どのテスト関数を bind するか）は空である。この分業は Rejected A（テスト本文自動生成）との境界を保つ: 呼び出し部・import・雛形は生成せず、生成対象は binding artifact の「空きスロット」の網羅にとどまる
+
+**位置づけの明確化**: bindings-skeleton は fail-closed gate 面（D11）でも意味論検証 core（D7）でもなく、**執筆補助レイヤ**である。D6 の鮮度 → verdict 結合と D11 の fail-closed セマンティクスは、この executable の存在によっても弱まらない（skeleton は draft を stdout に出すだけで、gate 面の pure-read verdict / hash 凍結キャッシュには一切触れない）。gate の完全性を担保するのは依然として `check` の decision（現行 hash と一致する verdict の全 edge 存在）であり、skeleton は**そこに至るための implementer 側の boilerplate コストを削減する装置**である。
 
 ## Rejected Alternatives
 

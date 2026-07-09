@@ -109,7 +109,7 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::ref_verify::RefVerifyCommand,
     },
-    /// Test-obligation gate: derive, check, evaluate, results.
+    /// Test-obligation gate and binding authoring helpers.
     TestObligation {
         #[command(subcommand)]
         cmd: commands::test_obligation::TestObligationSubcommand,

@@ -1,7 +1,17 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "13f2bd6f80c3f73e299c83c1957a55120e2ae5e915895f24840d5c93333c3717",
+  "catalogue_declaration_hash": "7552c1202c3a6f87cd61dfffbc86b6a93460b480ce54d70b6e59ccc605fcf0dd",
   "signals": [
+    {
+      "type_name": "TestBindingsSkeletonHandler",
+      "signal": "blue",
+      "entry_hash": "b4c10c15816953850426e3776bb96be450fff0d6c94fea70747d6319be506571"
+    },
+    {
+      "type_name": "TestBindingsSkeletonInput",
+      "signal": "blue",
+      "entry_hash": "d9fd8e716074debb445195027fd24059f5051142db6aa92bbbe90aa2e43a1e82"
+    },
     {
       "type_name": "TestObligationCheckHandler",
       "signal": "blue",

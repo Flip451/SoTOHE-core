@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "0a00980204d23c77f4c38c6b3b6d3af498fd549420816c1a523e9099e740676c",
+  "catalogue_declaration_hash": "a35f1e5085c1f6e10e956aa267d4d1bf079bd6f0b9cde4fb1460ccae11ecf29c",
   "signals": [
     {
       "type_name": "CheckTestObligationsCommand",
@@ -73,6 +73,31 @@
       "entry_hash": "0bda77b4510e84e7e13966a19dc8aeccd69e13f4dc22829f0f0274a418f02812"
     },
     {
+      "type_name": "TestBindingsSkeletonCommand",
+      "signal": "blue",
+      "entry_hash": "0b914d3efb5e2048e35b452561bccecf688eb1de52459d99cdbe7f4cb91387c6"
+    },
+    {
+      "type_name": "TestBindingsSkeletonError",
+      "signal": "blue",
+      "entry_hash": "f6812a477b1209afec0dc40cbce1dd3785a9bfb57eadad581d139c5fa9e9315e"
+    },
+    {
+      "type_name": "TestBindingsSkeletonInteractor",
+      "signal": "blue",
+      "entry_hash": "f66465af939b25571352bae4b7147791bbb512e806edb182cdcd1f116784ca6f"
+    },
+    {
+      "type_name": "TestBindingsSkeletonOutcome",
+      "signal": "blue",
+      "entry_hash": "f8b7ac82763b1468240c9c0113779020ae5127d0515b9e4f4cb2b88c0729ba25"
+    },
+    {
+      "type_name": "TestBindingsSkeletonRecord",
+      "signal": "blue",
+      "entry_hash": "a09f2f40150a2bdb2ebc4e72e91602457d1cdb0eb6628851c1179620fc1a0af8"
+    },
+    {
       "type_name": "TestObligationCatalogueCommandInput",
       "signal": "blue",
       "entry_hash": "b46799a3d1491d7f32beb0a89e05bb79de7b9becca1669d8646cd5cce5a44ba6"
@@ -141,6 +166,11 @@
       "type_name": "SemanticEscalationVerdictBridge",
       "signal": "blue",
       "entry_hash": "abcdbca1fd6c914ab7aad02cba9d9d54ccd452fbc345283ff40791346d0dab8f"
+    },
+    {
+      "type_name": "TestBindingsSkeletonApplicationService",
+      "signal": "blue",
+      "entry_hash": "e9a67b9ddb3b81f38a86c1436c4a83d2534b8709fc77528b390fa5690b0fac2d"
     },
     {
       "type_name": "TestObligationResultsApplicationService",

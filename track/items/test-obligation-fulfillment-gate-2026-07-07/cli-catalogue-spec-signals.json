@@ -1,11 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "e7e340f4c48d21d32bd37f2262d1398a4c21ca503872cf6f1290a4a9dc23e58a",
+  "catalogue_declaration_hash": "0e25077941a28dacf4355b9254c39d0a89df12b3d6c18fe455cfcbe27eaecf96",
   "signals": [
     {
       "type_name": "CliCommand",
       "signal": "blue",
       "entry_hash": "3372f773e921be6e9debb74a8f25e5ec289c3051b67f4f7ee2322b6f934f923d"
+    },
+    {
+      "type_name": "TestBindingsSkeletonArgs",
+      "signal": "blue",
+      "entry_hash": "18e1daa69e92d0f605b81bfeec204da8ad95f495e9bf674ed22f69bf6bfd3feb"
     },
     {
       "type_name": "TestObligationArgs",
@@ -35,17 +40,32 @@
     {
       "type_name": "TestObligationSubcommand",
       "signal": "blue",
-      "entry_hash": "b82f097e08a8f886d8e726cb1e3e330b4f67ae069e428e137d757bbccb246ec9"
+      "entry_hash": "1329ed5304b8a692875e6bd9a960138ff7eb7e7f47c465c8c29c9d6004b22479"
     },
     {
       "type_name": "cli::commands::test_obligation::command_context",
       "signal": "blue",
-      "entry_hash": "0713983b101168ef0d10e3d00fdf9b75c3012ab95e7c1d5e5391fdec11048a8e"
+      "entry_hash": "0a1981f3e1f308f05dd9a017b51c51b87e9142d6b09914096bc40ec21c21df31"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::command_root",
+      "signal": "blue",
+      "entry_hash": "39bf8214b6fce775d29886dd58283b26990d805da176d59e52a8e8968370e604"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::current_branch",
+      "signal": "blue",
+      "entry_hash": "f85a2a3113c1bf8195db49921058e6168b41a53f223fdc4e8606badca6760a64"
     },
     {
       "type_name": "cli::commands::test_obligation::execute",
       "signal": "blue",
       "entry_hash": "d704217d2e89a7c09f90b8d3c97f6370d553b7d4af60c3a2706406a95ba17268"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_bindings_skeleton",
+      "signal": "blue",
+      "entry_hash": "d1ed51e95f96e56c50f1bd278b7c1985eaedcd0674b8c22d4cbdf040d77fcfdd"
     },
     {
       "type_name": "cli::commands::test_obligation::execute_check",
@@ -71,6 +91,16 @@
       "type_name": "cli::commands::test_obligation::failure",
       "signal": "blue",
       "entry_hash": "b3b258cee22f62ce1430fc47138ae4db0e16524be0744bb3ba6b60d9163bc364"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::read_command_branch",
+      "signal": "blue",
+      "entry_hash": "445a9a08a76bed206c24ba3a4246e8df01b39bec7f51b4cf1ca80cee49d4df79"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::read_only_command_context",
+      "signal": "blue",
+      "entry_hash": "62e8f84f10c129867ef6708ee142ba1263adb51b1e1eff38a810d748002df0d7"
     }
   ]
 }

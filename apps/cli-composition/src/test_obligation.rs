@@ -32,6 +32,7 @@ use infrastructure::test_obligation::waiver_verifier::{
 };
 use usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort;
 use usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig;
+use usecase::test_obligation::bindings_skeleton::TestBindingsSkeletonInteractor;
 use usecase::test_obligation::check::CheckTestObligationsInteractor;
 use usecase::test_obligation::derive::DeriveTestObligationsInteractor;
 use usecase::test_obligation::evaluate::{
@@ -121,6 +122,15 @@ impl TestObligationCompositionRoot {
             self.catalogue_loader(),
         ));
         cli_driver::test_obligation::check::TestObligationCheckHandler::new(service)
+    }
+
+    /// Wires the bindings-skeleton handler.
+    #[must_use]
+    pub fn bindings_skeleton_handler(
+        &self,
+    ) -> cli_driver::test_obligation::bindings_skeleton::TestBindingsSkeletonHandler {
+        let service = Arc::new(TestBindingsSkeletonInteractor::new(self.obligations_codec()));
+        cli_driver::test_obligation::bindings_skeleton::TestBindingsSkeletonHandler::new(service)
     }
 
     /// Wires the evaluate handler.

@@ -63,6 +63,14 @@
         {
           "has_default_impl": false,
           "is_async": false,
+          "name": "bindings_skeleton_handler",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::test_obligation::bindings_skeleton::TestBindingsSkeletonHandler"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
           "name": "evaluate_handler",
           "params": [],
           "receiver": "&self",
@@ -88,6 +96,18 @@
         },
         {
           "anchor": "AC-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]

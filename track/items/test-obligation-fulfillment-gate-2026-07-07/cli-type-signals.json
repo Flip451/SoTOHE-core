@@ -1,13 +1,27 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-09T15:47:48Z",
-  "declaration_hash": "e7e340f4c48d21d32bd37f2262d1398a4c21ca503872cf6f1290a4a9dc23e58a",
+  "generated_at": "2026-07-09T21:41:49Z",
+  "declaration_hash": "0e25077941a28dacf4355b9254c39d0a89df12b3d6c18fe455cfcbe27eaecf96",
   "signals": [
     {
       "type_name": "CliCommand",
       "kind_tag": "enum",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "TestBindingsSkeletonArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::Args",
+        "clap_builder::derive::FromArgMatches",
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "TestObligationArgs",
@@ -100,7 +114,25 @@
       "found_type": true
     },
     {
+      "type_name": "cli::commands::test_obligation::command_root",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::test_obligation::current_branch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "cli::commands::test_obligation::execute",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_bindings_skeleton",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
@@ -131,6 +163,18 @@
     },
     {
       "type_name": "cli::commands::test_obligation::failure",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::test_obligation::read_command_branch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::test_obligation::read_only_command_context",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true

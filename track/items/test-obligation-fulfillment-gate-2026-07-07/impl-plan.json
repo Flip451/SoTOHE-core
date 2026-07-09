@@ -156,6 +156,11 @@
       "description": "Target libs/infrastructure test_obligation::sha256_content_hasher. Add Sha256ContentHasher impl ContentHasherPort (IN-09/AC-06/CN-04). Add unit tests covering those anchors.",
       "status": "done",
       "commit_hash": "21398f63eaad1ddb19dac7fe519cd77c35f43294"
+    },
+    {
+      "id": "T027",
+      "description": "Target libs/usecase test_obligation::bindings_skeleton, apps/cli-driver test_obligation::bindings_skeleton, apps/cli-composition test_obligation, and apps/cli commands::test_obligation. Add TestBindingsSkeletonCommand, TestBindingsSkeletonRecord, TestBindingsSkeletonOutcome, TestBindingsSkeletonError, TestBindingsSkeletonApplicationService (trait), TestBindingsSkeletonInteractor, TestBindingsSkeletonInput, TestBindingsSkeletonHandler, TestObligationCompositionRoot::bindings_skeleton_handler, TestObligationSubcommand::BindingsSkeleton, TestBindingsSkeletonArgs, execute_bindings_skeleton, command_root, current_branch, read_command_branch, and read_only_command_context (IN-06/CN-09/AC-14). Add unit tests covering those anchors.",
+      "status": "done"
     }
   ],
   "plan": {
@@ -241,6 +246,14 @@
         "description": [],
         "task_ids": [
           "T023"
+        ]
+      },
+      {
+        "id": "S9",
+        "title": "Bindings-skeleton authoring helper follow-up (usecase + presentation)",
+        "description": [],
+        "task_ids": [
+          "T027"
         ]
       }
     ]

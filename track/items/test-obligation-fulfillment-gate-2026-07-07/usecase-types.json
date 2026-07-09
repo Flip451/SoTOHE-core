@@ -354,6 +354,62 @@
       "action": "add",
       "for_type": "TestObligationEvaluateConfig",
       "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "TestBindingsSkeletonCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TestBindingsSkeletonCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TestBindingsSkeletonCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TestBindingsSkeletonCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TestBindingsSkeletonRecord",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TestBindingsSkeletonRecord",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TestBindingsSkeletonRecord",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TestBindingsSkeletonRecord",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TestBindingsSkeletonOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TestBindingsSkeletonOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TestBindingsSkeletonOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TestBindingsSkeletonOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TestBindingsSkeletonError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TestBindingsSkeletonInteractor",
+      "trait_ref": "TestBindingsSkeletonApplicationService"
     }
   ],
   "traits": {
@@ -651,6 +707,44 @@
         },
         {
           "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestBindingsSkeletonApplicationService": {
+      "action": "add",
+      "docs": "Primary port for `bin/sotp test-obligation bindings-skeleton`; see IN-06 / CN-09 / AC-14.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "&TestBindingsSkeletonCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TestBindingsSkeletonOutcome, TestBindingsSkeletonError>"
+        }
+      ],
+      "module_path": "test_obligation::bindings_skeleton",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
@@ -1582,6 +1676,290 @@
         },
         {
           "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestBindingsSkeletonCommand": {
+      "action": "add",
+      "docs": "Command input for TestBindingsSkeletonApplicationService; see IN-06 / CN-09 / AC-14.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::TrackId"
+        }
+      ],
+      "module_path": "test_obligation::bindings_skeleton",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestBindingsSkeletonError": {
+      "action": "add",
+      "docs": "Failure of `test-obligation bindings-skeleton` authoring helper; see IN-06 / CN-09 / AC-14.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ObligationsAbsent",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ArtifactLoad",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::errors::ArtifactCodecError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::bindings_skeleton",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestBindingsSkeletonInteractor": {
+      "action": "add",
+      "docs": "Interactor implementing TestBindingsSkeletonApplicationService; see IN-06 / CN-09 / AC-14.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::bindings_skeleton",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestBindingsSkeletonOutcome": {
+      "action": "add",
+      "docs": "Structured skeleton output of TestBindingsSkeletonInteractor; see IN-06 / CN-09 / AC-14.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "records",
+              "ty": "Vec<TestBindingsSkeletonRecord>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::TrackId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "records",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TestBindingsSkeletonRecord]"
+        }
+      ],
+      "module_path": "test_obligation::bindings_skeleton",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestBindingsSkeletonRecord": {
+      "action": "add",
+      "docs": "One bindings-skeleton fulfillment draft record; see IN-06 / CN-09 / AC-14.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "entry_key",
+              "ty": "String"
+            },
+            {
+              "name": "obligation_kind",
+              "ty": "String"
+            },
+            {
+              "name": "item_identifier",
+              "ty": "String"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entry_key",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "obligation_kind",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "item_identifier",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "test_obligation::bindings_skeleton",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-14",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]

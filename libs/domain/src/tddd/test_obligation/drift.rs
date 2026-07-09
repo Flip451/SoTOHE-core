@@ -274,6 +274,63 @@ mod tests {
         )
     }
 
+    fn drift() -> TestObligationDrift {
+        TestObligationDrift::missing_obligation(obligation_id(), detail("no binding"))
+    }
+
+    fn verdict_record() -> EdgeVerdictRecord {
+        EdgeVerdictRecord::new(edge_id(), EdgeResolutionOutcome::MissingBinding, Some(drift()))
+    }
+
+    #[test]
+    fn test_non_empty_drifts_new_exposes_entries() {
+        let first = drift();
+        let drifts = NonEmptyDrifts::new(first.clone(), vec![first.clone()]);
+
+        assert!(drifts.is_non_empty());
+        assert_eq!(drifts.as_slice().len(), 2);
+        assert_eq!(drifts.first(), &first);
+    }
+
+    #[test]
+    fn test_non_empty_drifts_try_new_accepts_non_empty() {
+        let drifts = NonEmptyDrifts::try_new(vec![drift()]).unwrap();
+
+        assert!(drifts.is_non_empty());
+        assert_eq!(drifts.as_slice().len(), 1);
+    }
+
+    #[test]
+    fn test_non_empty_drifts_try_new_rejects_empty() {
+        assert_eq!(NonEmptyDrifts::try_new(vec![]), Err(ConstructionError::EmptyCollection));
+    }
+
+    #[test]
+    fn test_non_empty_edge_verdict_records_new_exposes_entries() {
+        let first = verdict_record();
+        let records = NonEmptyEdgeVerdictRecords::new(first.clone(), vec![first.clone()]);
+
+        assert!(records.is_non_empty());
+        assert_eq!(records.as_slice().len(), 2);
+        assert_eq!(records.first(), &first);
+    }
+
+    #[test]
+    fn test_non_empty_edge_verdict_records_try_new_accepts_non_empty() {
+        let records = NonEmptyEdgeVerdictRecords::try_new(vec![verdict_record()]).unwrap();
+
+        assert!(records.is_non_empty());
+        assert_eq!(records.as_slice().len(), 1);
+    }
+
+    #[test]
+    fn test_non_empty_edge_verdict_records_try_new_rejects_empty() {
+        assert_eq!(
+            NonEmptyEdgeVerdictRecords::try_new(vec![]),
+            Err(ConstructionError::EmptyCollection)
+        );
+    }
+
     #[test]
     fn test_all_drift_constructors_produce_distinct_findings() {
         let drifts = [

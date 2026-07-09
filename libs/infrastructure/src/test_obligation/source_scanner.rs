@@ -184,22 +184,16 @@ fn guard_candidate_file(
 /// first.
 ///
 /// For `rest = [a, b]` under `src`, tries `a/b.rs`, `a/b/mod.rs`, `a.rs`,
-/// `a/mod.rs`, then the crate roots `lib.rs` / `main.rs`. A trailing `tests`
-/// segment (the conventional inline `#[cfg(test)] mod tests`) is dropped so the
-/// enclosing file is reached.
+/// `a/mod.rs`, then the crate roots `lib.rs` / `main.rs`. This intentionally
+/// tries both external `tests.rs` modules and inline `mod tests` blocks.
 struct CandidateFile {
     path: PathBuf,
     inline_modules: Vec<String>,
 }
 
 fn candidate_files(src_root: &Path, rest: &[&str]) -> Vec<CandidateFile> {
-    let trimmed_len = match rest.split_last() {
-        Some((&"tests", init)) => init.len(),
-        _ => rest.len(),
-    };
-
     let mut files = Vec::new();
-    for len in (1..=trimmed_len).rev() {
+    for len in (1..=rest.len()).rev() {
         let Some(prefix) = rest.get(..len) else {
             continue;
         };
@@ -439,6 +433,29 @@ mod tests {
             .unwrap()
             .unwrap();
         assert!(body.contains("assert!(true)"));
+    }
+
+    #[test]
+    fn resolves_external_tests_rs_module_before_inline_tests_fallback() {
+        let dir = write_lib_source(
+            "usecase",
+            "test_obligation/evaluate/tests.rs",
+            r#"#[test]
+fn test_external_module() {
+    assert_eq!("tests.rs", "tests.rs");
+}
+"#,
+        );
+        let scanner = SynTestSourceScanner::new(dir.path().to_path_buf());
+        let body = scanner
+            .scan_test_body(&location(
+                "usecase",
+                "usecase::test_obligation::evaluate::tests",
+                "test_external_module",
+            ))
+            .unwrap()
+            .unwrap();
+        assert!(body.contains(r#"assert_eq!("tests.rs", "tests.rs")"#));
     }
 
     #[test]

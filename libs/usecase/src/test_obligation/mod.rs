@@ -1,4 +1,5 @@
-//! Test-obligation gate use cases (`bin/sotp test-obligation {derive,check,evaluate,results}`).
+//! Test-obligation gate use cases (`bin/sotp test-obligation {derive,check,evaluate,results}`)
+//! plus authoring helpers.
 //!
 //! The four interactors form the SoT-chain third link (impl → catalogue) as an
 //! obligation-fulfillment gate (GO-01 / GO-02):
@@ -8,6 +9,7 @@
 //! * [`mod@evaluate`] — LLM-backed fulfillment / waiver semantic verification with a
 //!   three-hash frozen verdict cache.
 //! * [`mod@results`] — informational aggregation of the frozen verdict caches.
+//! * [`mod@bindings_skeleton`] — read-only skeleton generation for implementer-authored bindings.
 //!
 //! Shared, verifier-agnostic helpers (active-track guard, content hashing, and
 //! catalogue declaration canonicalisation) live here so `derive` and `check`
@@ -15,6 +17,7 @@
 
 mod check_support;
 
+pub mod bindings_skeleton;
 pub mod check;
 pub mod derive;
 pub mod evaluate;

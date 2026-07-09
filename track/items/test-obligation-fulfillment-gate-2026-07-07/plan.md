@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成
 
-## Tasks (26/26 resolved)
+## Tasks (27/27 resolved)
 
 ### S1 — Preceding shared foundation: semantic-verdict core & ref-verify migration
 
@@ -52,3 +52,7 @@
 ### S8 — agent-profiles capability registration
 
 - [x] **T023**: Target .harness/config/agent-profiles.json and the Rust-side capability registry used by resolve_execution. Register `obligation-fulfillment-verifier` and `waiver-verifier` capabilities (IN-11/CN-08/AC-07). Add unit tests covering those anchors. (`21398f63eaad1ddb19dac7fe519cd77c35f43294`)
+
+### S9 — Bindings-skeleton authoring helper follow-up (usecase + presentation)
+
+- [x] **T027**: Target libs/usecase test_obligation::bindings_skeleton, apps/cli-driver test_obligation::bindings_skeleton, apps/cli-composition test_obligation, and apps/cli commands::test_obligation. Add TestBindingsSkeletonCommand, TestBindingsSkeletonRecord, TestBindingsSkeletonOutcome, TestBindingsSkeletonError, TestBindingsSkeletonApplicationService (trait), TestBindingsSkeletonInteractor, TestBindingsSkeletonInput, TestBindingsSkeletonHandler, TestObligationCompositionRoot::bindings_skeleton_handler, TestObligationSubcommand::BindingsSkeleton, TestBindingsSkeletonArgs, execute_bindings_skeleton, command_root, current_branch, read_command_branch, and read_only_command_context (IN-06/CN-09/AC-14). Add unit tests covering those anchors.

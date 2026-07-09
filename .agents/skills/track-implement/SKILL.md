@@ -20,7 +20,7 @@ or failure-recovery procedures here.
 
 - Requires `--sandbox workspace-write`: the workflow writes Rust source files, updates
   `metadata.json` task states, and runs `cargo make ci` to verify correctness (matching
-  `.harness/workflows/track/implement.md` Step 4).
+  `.harness/workflows/track/implement.md` Step 5).
 - Do not run `git add` / `git commit` / `git push` directly; the commit step follows separately
   via `$track-commit`.
 
@@ -30,7 +30,7 @@ or failure-recovery procedures here.
   `.harness/config/agent-profiles.json` (default: Claude main-session / ad-hoc delegation
   per `.claude/agents/README.md`).
 - Task state transitions use `bin/sotp track transition <id> <state>`.
-- CI verification uses `cargo make ci` (full gate, matching `.harness/workflows/track/implement.md` Step 4).
+- CI verification uses `cargo make ci` (full gate, matching `.harness/workflows/track/implement.md` Step 5).
 
 ### (4) Reporting format
 

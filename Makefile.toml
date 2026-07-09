@@ -447,8 +447,8 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local
 
 [tasks.ci-track-local]
 private = true
-description = "[internal] Run track-aware CI gates (task-contract coverage + check liveness + signal chains spec/catalogue/impl). Assumes a track/<id> branch context — fails closed on base branch / non-track branches by design."
-dependencies = ["task-contract-coverage-local", "task-contract-check-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
+description = "[internal] Run track-aware CI gates (task-contract coverage + check liveness + signal chains spec/catalogue/impl + test-obligation check). Assumes a track/<id> branch context — fails closed on base branch / non-track branches by design."
+dependencies = ["task-contract-coverage-local", "task-contract-check-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local", "test-obligation-check-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
@@ -459,8 +459,8 @@ description = "[gate] Run repo-wide CI checks inside a pre-existing container (n
 dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
 
 [tasks.ci-track-container]
-description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + check liveness + spec/catalogue/impl signal chains). Skip on base branch / non-track CI runs."
-dependencies = ["task-contract-coverage-local", "task-contract-check-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local"]
+description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + check liveness + spec/catalogue/impl signal chains + test-obligation check). Skip on base branch / non-track CI runs."
+dependencies = ["task-contract-coverage-local", "task-contract-check-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local", "test-obligation-check-local"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -692,6 +692,11 @@ description = "[gate] Run the default-config catalogue lint (primitive-obsession
 command = "bin/sotp"
 args = ["catalogue-lint", "check-active-track"]
 
+[tasks.test-obligation-check]
+description = "[gate] Run the active track's pure-read test-obligation fulfillment gate. Active track auto-resolved from current git branch."
+command = "bin/sotp"
+args = ["test-obligation", "check"]
+
 [tasks.track-active-gate]
 private = true
 description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec → catalogue-lint check-active-track → catalog check → views sync. Both track-commit-message and review invocations depend on this shared task. Fail-closed: non-zero exit aborts the chain."
@@ -745,6 +750,12 @@ description = "[internal] Liveness gate (`sotp task-contract check`): verifies i
 command = "cargo"
 args = ["run", "--quiet", "-p", "cli", "--", "task-contract", "check"]
 
+[tasks.test-obligation-check-local]
+private = true
+description = "[internal] Pure-read test-obligation fulfillment gate. Active track auto-resolved by CLI. Uses cargo-run so CI containers exercise the current source tree without requiring a host-installed bin/sotp."
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "test-obligation", "check"]
+
 # Cargo-make dependencies run before task scripts, so pre-gate track/branch
 # guards must live outside these wrappers or inside the gate commands.
 [tasks.track-local-review]
@@ -776,7 +787,7 @@ command = "bin/sotp"
 args = ["git", "add-from-file", "tmp/track-commit/add-paths.txt", "--cleanup"]
 
 [tasks.track-commit-message]
-description = "[wrapper] Regenerate signals + views (via track-active-gate; that gate runs no ref-verify call), then run the strict commit gate: stage working tree, full cargo make ci, code-review gate (review not approved → BLOCK), semantic review refresh (`sotp ref-verify run` — the scope derives from track artifact existence, so pre-Phase-1 tracks pass with zero pairs; the only writing step, positioned after the code-review gate per CN-02 / IN-02), re-stage to capture verify-cache artifact writes, `sotp ref-verify check-approved` (non-Pass pairs → BLOCK; same existence-derived scope), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. The regen sequence is shared with review invocations via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + check-approved + semantic review + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
+description = "[wrapper] Regenerate signals + views (via track-active-gate; that gate runs no ref-verify call), then run the strict commit gate: stage working tree, full cargo make ci, track-aware cargo make ci-track, code-review gate (review not approved → BLOCK), semantic review refresh (`sotp ref-verify run` — the scope derives from track artifact existence, so pre-Phase-1 tracks pass with zero pairs; the only writing step, positioned after the code-review gate per CN-02 / IN-02), re-stage to capture verify-cache artifact writes, `sotp ref-verify check-approved` (non-Pass pairs → BLOCK; same existence-derived scope), test-obligation fulfillment gate (`sotp test-obligation check`; missing bindings / unresolved edges / stale verdicts → BLOCK), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. The regen sequence is shared with review invocations via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + ci-track + check-approved + semantic review + test-obligation + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
 dependencies = ["track-active-gate"]
 script_runner = "@shell"
 script = ['''
@@ -787,6 +798,7 @@ bin/sotp review check-approved && \
 bin/sotp ref-verify run && \
 bin/sotp git add-all && \
 bin/sotp ref-verify check-approved && \
+bin/sotp test-obligation check && \
 bin/sotp dry check-approved && \
 bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup && \
 bin/sotp track set-commit-hash
