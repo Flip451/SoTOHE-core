@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-09T00:22:12Z",
+  "generated_at": "2026-07-09T02:07:56Z",
   "declaration_hash": "c9d2276c51ecfe27084109238a980d65848f1a642a09ef1820bb83464e09e7f8",
   "signals": [
     {
       "type_name": "infrastructure::verify::retention_gate::verify",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "FsVerifyAdapter",

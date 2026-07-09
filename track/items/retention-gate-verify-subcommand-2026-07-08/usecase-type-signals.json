@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-09T00:22:07Z",
+  "generated_at": "2026-07-09T02:07:50Z",
   "declaration_hash": "082d8d68b2cd7ffec000d816c93a2e1c647f911dbab2fd1544a63991e7a1bcae",
   "signals": [
     {
       "type_name": "VerifyPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "VerifyService",
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {

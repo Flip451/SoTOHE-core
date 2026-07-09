@@ -443,6 +443,7 @@ fn verify_command_gate_name(cmd: &commands::verify::VerifyCommand) -> &'static s
     use commands::verify::VerifyCommand;
     match cmd {
         VerifyCommand::LatestTrack(_) => "verify-latest-track",
+        VerifyCommand::RetentionGate(_) => "verify-retention-gate",
         VerifyCommand::ArchDocs(_) => "verify-arch-docs",
         VerifyCommand::Layers(_) => "verify-layers",
         VerifyCommand::HooksPath(_) => "verify-hooks-path",
@@ -974,25 +975,23 @@ mod tests {
 
     // ── verify_command_gate_name coverage ────────────────────────────────────
 
-    /// Each `VerifyCommand` variant parsed from CLI args must map to a stable
-    /// gate name starting with "verify-".
+    /// Each sampled `VerifyCommand` variant parsed from CLI args must map to its
+    /// stable gate name.
     #[test]
-    fn test_verify_command_gate_name_uses_verify_prefix() {
+    fn test_verify_command_gate_name_uses_expected_labels() {
         use super::verify_command_gate_name;
 
         let subcommands = [
-            ["sotp", "verify", "latest-track"],
-            ["sotp", "verify", "arch-docs"],
-            ["sotp", "verify", "layers"],
+            (["sotp", "verify", "latest-track"], "verify-latest-track"),
+            (["sotp", "verify", "retention-gate"], "verify-retention-gate"),
+            (["sotp", "verify", "arch-docs"], "verify-arch-docs"),
+            (["sotp", "verify", "layers"], "verify-layers"),
         ];
-        for args in &subcommands {
-            let cli = Cli::try_parse_from(*args).unwrap();
+        for (args, expected_gate_name) in &subcommands {
+            let cli = Cli::try_parse_from(args).unwrap();
             if let Some(CliCommand::Verify { cmd }) = cli.command {
                 let name = verify_command_gate_name(&cmd);
-                assert!(
-                    name.starts_with("verify-"),
-                    "gate name '{name}' does not start with 'verify-'"
-                );
+                assert_eq!(name, *expected_gate_name);
             }
         }
     }

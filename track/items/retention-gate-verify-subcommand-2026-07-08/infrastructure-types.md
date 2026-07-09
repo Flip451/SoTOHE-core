@@ -10,5 +10,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| infrastructure::verify::retention_gate::verify | free_function | add | fn(root: &std::path::Path) -> domain::verify::VerifyOutcome | 🟡 | 🔵 |
+| infrastructure::verify::retention_gate::verify | free_function | add | fn(root: &std::path::Path) -> domain::verify::VerifyOutcome | 🔵 | 🔵 |
 

@@ -21,6 +21,11 @@ pub enum VerifyInput {
         /// Project root directory.
         project_root: PathBuf,
     },
+    /// Check the retention live surface for retired gate/document identifiers.
+    RetentionGate {
+        /// Project root directory.
+        project_root: PathBuf,
+    },
     /// Check architecture docs synchronization and text patterns.
     ArchDocs {
         /// Project root directory.
@@ -127,6 +132,9 @@ impl VerifyDriver {
             VerifyInput::LatestTrack { project_root } => {
                 map_result(self.service.verify_latest_track(project_root))
             }
+            VerifyInput::RetentionGate { project_root } => {
+                map_result(self.service.verify_retention_gate(project_root))
+            }
             VerifyInput::ArchDocs { project_root } => {
                 map_result(self.service.verify_arch_docs(project_root))
             }
@@ -195,5 +203,105 @@ fn map_result(
             exit_code: outcome.exit_code,
         },
         Err(e) => CommandOutcome { stdout: None, stderr: Some(e.to_string()), exit_code: 1 },
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use std::sync::{Arc, Mutex};
+
+    use usecase::verify::{VerifyOutcome, VerifyPortError};
+
+    use super::*;
+
+    #[derive(Default)]
+    struct RecordingService {
+        retention_root: Mutex<Option<PathBuf>>,
+        fail: bool,
+    }
+
+    impl RecordingService {
+        fn unused(&self) -> Result<VerifyOutcome, VerifyPortError> {
+            Err(VerifyPortError::Unavailable("unused test route".to_owned()))
+        }
+    }
+
+    macro_rules! unused_pathbuf_method {
+        ($name:ident) => {
+            fn $name(&self, _: PathBuf) -> Result<VerifyOutcome, VerifyPortError> {
+                self.unused()
+            }
+        };
+    }
+
+    impl VerifyService for RecordingService {
+        unused_pathbuf_method!(verify_latest_track);
+        unused_pathbuf_method!(verify_arch_docs);
+        unused_pathbuf_method!(verify_layers);
+        unused_pathbuf_method!(verify_hooks_path);
+        unused_pathbuf_method!(verify_spec_attribution);
+        unused_pathbuf_method!(verify_spec_frontmatter);
+        unused_pathbuf_method!(verify_canonical_modules);
+        unused_pathbuf_method!(verify_module_size);
+        unused_pathbuf_method!(verify_domain_purity);
+        unused_pathbuf_method!(verify_domain_strings);
+        unused_pathbuf_method!(verify_usecase_purity);
+        unused_pathbuf_method!(verify_doc_links);
+        unused_pathbuf_method!(verify_view_freshness);
+        unused_pathbuf_method!(verify_spec_signals);
+
+        fn verify_retention_gate(
+            &self,
+            project_root: PathBuf,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            *self.retention_root.lock().unwrap() = Some(project_root);
+            if self.fail {
+                Ok(VerifyOutcome::failure(Some("finding".to_owned())))
+            } else {
+                Ok(VerifyOutcome::success(Some("ok".to_owned())))
+            }
+        }
+
+        fn verify_plan_artifact_refs(
+            &self,
+            _: Option<PathBuf>,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            self.unused()
+        }
+
+        fn verify_catalogue_spec_refs(
+            &self,
+            _: Option<String>,
+            _: PathBuf,
+            _: PathBuf,
+            _: bool,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            self.unused()
+        }
+    }
+
+    #[test]
+    fn test_verify_driver_retention_gate_routes_to_service() {
+        let service = Arc::new(RecordingService::default());
+        let driver = VerifyDriver::new(service.clone());
+        let root = PathBuf::from("workspace-root");
+
+        let outcome = driver.handle(VerifyInput::RetentionGate { project_root: root.clone() });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(service.retention_root.lock().unwrap().as_deref(), Some(root.as_path()));
+    }
+
+    #[test]
+    fn test_verify_driver_retention_gate_preserves_failure_outcome() {
+        let service = Arc::new(RecordingService { retention_root: Mutex::new(None), fail: true });
+        let driver = VerifyDriver::new(service);
+
+        let outcome =
+            driver.handle(VerifyInput::RetentionGate { project_root: PathBuf::from(".") });
+
+        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(outcome.stderr.as_deref(), Some("finding"));
     }
 }

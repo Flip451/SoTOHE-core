@@ -305,6 +305,12 @@ description = "[internal] Verify latest track has spec.md (or spec.json) and pla
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- verify latest-track']
 
+[tasks.verify-retention-gate-local]
+private = true
+description = "[internal] Verify retention live surface excludes retired gate/document identifiers"
+script_runner = "@shell"
+script = ['cargo run --quiet -p cli -- verify retention-gate']
+
 [tasks.verify-plan-artifact-refs-local]
 private = true
 description = "[internal] Verify plan artifact refs + task-coverage integrity (active-track auto-resolved from branch)"
@@ -441,7 +447,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local repo-wide CI checks. Track-aware gates live in ci-track-local."
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
 
 [tasks.ci-track-local]
 private = true
@@ -454,7 +460,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run repo-wide CI checks inside a pre-existing container (no docker compose). Track-aware gates that require an active track/<id> branch are in ci-track-container."
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
 
 [tasks.ci-track-container]
 description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + check liveness + spec/catalogue/impl signal chains). Skip on base branch / non-track CI runs."
@@ -591,6 +597,11 @@ args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "
 description = "[gate] Verify latest track files (host, no docker; uses bash/find only)"
 command = "cargo"
 args = ["make", "--allow-private", "verify-latest-track-local"]
+
+[tasks.verify-retention-gate]
+description = "[gate] Verify retention live surface (host, no docker)"
+command = "cargo"
+args = ["make", "--allow-private", "verify-retention-gate-local"]
 
 [tasks.verify-plan-artifact-refs]
 description = "[gate] Verify plan artifact refs + task-coverage integrity (docker compose)"

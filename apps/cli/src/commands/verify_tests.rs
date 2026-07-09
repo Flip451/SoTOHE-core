@@ -39,6 +39,45 @@ fn test_latest_track_subcommand_returns_success_with_no_tracks() {
 }
 
 #[test]
+fn test_retention_gate_clap_parses_project_root_flag() {
+    let tmp = TempDir::new().unwrap();
+    let cli = TestCli::try_parse_from([
+        "sotp",
+        "retention-gate",
+        "--project-root",
+        tmp.path().to_str().unwrap(),
+    ])
+    .unwrap();
+
+    match cli.cmd {
+        VerifyCommand::RetentionGate(args) => assert_eq!(args.project_root, tmp.path()),
+        _ => panic!("expected RetentionGate variant"),
+    }
+}
+
+#[test]
+fn test_retention_gate_subcommand_returns_success_for_clean_surface() {
+    let tmp = TempDir::new().unwrap();
+    write_file(tmp.path(), "README.md", "# Clean\n");
+
+    let exit = execute(VerifyCommand::RetentionGate(make_args(tmp.path())));
+
+    assert_eq!(exit, ExitCode::SUCCESS);
+}
+
+#[test]
+fn test_retention_gate_subcommand_returns_failure_for_retired_token() {
+    let tmp = TempDir::new().unwrap();
+    let kebab = ["tech", "stack"].join("-");
+    let token = format!("verify-{kebab}");
+    write_file(tmp.path(), "README.md", &format!("{token}\n"));
+
+    let exit = execute(VerifyCommand::RetentionGate(make_args(tmp.path())));
+
+    assert_eq!(exit, ExitCode::FAILURE);
+}
+
+#[test]
 fn test_arch_docs_subcommand_returns_failure_for_missing_rules() {
     let tmp = TempDir::new().unwrap();
     let exit = execute(VerifyCommand::ArchDocs(make_args(tmp.path())));
