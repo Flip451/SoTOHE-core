@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-09T05:17:02Z",
-  "declaration_hash": "e32cb7594801cf493650a85241da3cf7b3d12d2795e651a872018067bf27dbdf",
+  "generated_at": "2026-07-09T14:05:05Z",
+  "declaration_hash": "0a00980204d23c77f4c38c6b3b6d3af498fd549420816c1a523e9099e740676c",
   "signals": [
     {
       "type_name": "CheckTestObligationsApplicationService",
@@ -121,6 +121,30 @@
       ]
     },
     {
+      "type_name": "RefVerifyCacheKey",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "RefVerifyConfig",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RefVerifyPercent",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "SemanticCalibrationProbeConfig",
       "kind_tag": "value_object",
       "signal": "blue",
@@ -183,6 +207,7 @@
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
+        "core::default::Default",
         "core::fmt::Debug"
       ]
     },

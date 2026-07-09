@@ -26,6 +26,18 @@ impl SemanticCalibrationProbeConfig {
     pub fn new(injection: NonZeroU8, threshold: NonZeroU8) -> Self {
         Self { injection, threshold }
     }
+
+    /// Returns the configured known-bad probe injection count/rate.
+    #[must_use]
+    pub fn injection(&self) -> NonZeroU8 {
+        self.injection
+    }
+
+    /// Returns the configured known-bad detection threshold.
+    #[must_use]
+    pub fn threshold(&self) -> NonZeroU8 {
+        self.threshold
+    }
 }
 
 #[cfg(test)]
@@ -39,6 +51,8 @@ mod tests {
         let threshold = NonZeroU8::new(2).unwrap();
         let config = SemanticCalibrationProbeConfig::new(injection, threshold);
         assert_eq!(config, SemanticCalibrationProbeConfig::new(injection, threshold));
+        assert_eq!(config.injection(), injection);
+        assert_eq!(config.threshold(), threshold);
     }
 
     #[test]

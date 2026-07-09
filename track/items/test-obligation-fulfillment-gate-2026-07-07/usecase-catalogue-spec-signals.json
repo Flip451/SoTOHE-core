@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "e32cb7594801cf493650a85241da3cf7b3d12d2795e651a872018067bf27dbdf",
+  "catalogue_declaration_hash": "0a00980204d23c77f4c38c6b3b6d3af498fd549420816c1a523e9099e740676c",
   "signals": [
     {
       "type_name": "CheckTestObligationsCommand",
@@ -48,9 +48,24 @@
       "entry_hash": "d959d07a3b8d5009cebbac9e5d608bf769348067d9f60473574ad2ff2ebb3aa1"
     },
     {
+      "type_name": "RefVerifyCacheKey",
+      "signal": "blue",
+      "entry_hash": "ee5512c323174577609e4ff87285211d98c7c06f6004dd97a4811d8021a6b135"
+    },
+    {
+      "type_name": "RefVerifyConfig",
+      "signal": "blue",
+      "entry_hash": "94bc65eb45e3317d193def38a2791812555fcb3167cb7e4d50d5c5e727e490ec"
+    },
+    {
+      "type_name": "RefVerifyPercent",
+      "signal": "blue",
+      "entry_hash": "198b80541a91ad86ae8296f211a7acf96cffb34da8a4740f82a84aa756308a3a"
+    },
+    {
       "type_name": "SemanticCalibrationProbeConfig",
       "signal": "blue",
-      "entry_hash": "82f33e44746636c08c24eaaa609a79de1e7c60094f6f0ef46152a97784622ac6"
+      "entry_hash": "28c360c63142590fc66bbb397458afeb336af3ef5f9b5a87de83f2e5fc8d2f01"
     },
     {
       "type_name": "SemanticEscalationFuture",
@@ -90,7 +105,7 @@
     {
       "type_name": "TestObligationResultsInteractor",
       "signal": "blue",
-      "entry_hash": "1229b67fafed8f676f1865a49351712236ae31b4e36c5d8f3ea4119305916be1"
+      "entry_hash": "0d55122a189837928b909f6b3e01d91108b2a27b1fc50c6236364ee39794e10d"
     },
     {
       "type_name": "TestObligationResultsOutput",

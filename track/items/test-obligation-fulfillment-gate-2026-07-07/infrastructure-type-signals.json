@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-09T05:17:07Z",
-  "declaration_hash": "a7aad6ef03593a77d6867176861c25d724a0e473aaaa442f8d03257d38823971",
+  "generated_at": "2026-07-09T14:05:11Z",
+  "declaration_hash": "afce0a9d86b6b152b98d96d9f8f8fb100ea12261f41b22450325449a3e326484",
   "signals": [
     {
       "type_name": "CatalogueEntryRefDto",
@@ -38,6 +38,39 @@
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FailingObligationFulfillmentVerifier",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ObligationFulfillmentVerifierPort",
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FailingWaiverVerifier",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "WaiverVerifierPort",
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "FsSpecDocumentLoader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SpecDocumentLoaderPort",
+        "core::clone::Clone",
         "core::fmt::Debug"
       ]
     },
@@ -153,9 +186,9 @@
     {
       "type_name": "ObligationFulfillmentEscalationDriver",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "SemanticEscalationDriverPort<ObligationFulfillmentPair, ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, SemanticVerifierError>",
         "core::clone::Clone",
         "core::fmt::Debug"
@@ -232,11 +265,12 @@
     {
       "type_name": "Sha256ContentHasher",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "ContentHasherPort",
         "core::clone::Clone",
+        "core::default::Default",
         "core::fmt::Debug"
       ]
     },
@@ -437,9 +471,9 @@
     {
       "type_name": "WaiverEscalationDriver",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "SemanticEscalationDriverPort<WaiverPair, WaiverCacheKey, WaiverVerdict, SemanticVerifierError>",
         "core::clone::Clone",
         "core::fmt::Debug"

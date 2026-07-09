@@ -39,6 +39,51 @@
     },
     {
       "action": "add",
+      "for_type": "FailingObligationFulfillmentVerifier",
+      "trait_ref": "domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort"
+    },
+    {
+      "action": "add",
+      "for_type": "FailingObligationFulfillmentVerifier",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "FailingObligationFulfillmentVerifier",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "FailingWaiverVerifier",
+      "trait_ref": "domain::tddd::test_obligation::ports::WaiverVerifierPort"
+    },
+    {
+      "action": "add",
+      "for_type": "FailingWaiverVerifier",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "FailingWaiverVerifier",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "FsSpecDocumentLoader",
+      "trait_ref": "domain::spec_document_loader_port::SpecDocumentLoaderPort"
+    },
+    {
+      "action": "add",
+      "for_type": "FsSpecDocumentLoader",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "FsSpecDocumentLoader",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
       "trait_ref": "core::fmt::Debug",
       "for_type": "ContractRoleKey"
     },
@@ -819,12 +864,62 @@
     },
     {
       "action": "add",
+      "trait_ref": "core::default::Default",
+      "for_type": "Sha256ContentHasher"
+    },
+    {
+      "action": "add",
       "trait_ref": "usecase::test_obligation::hasher::ContentHasherPort",
       "for_type": "Sha256ContentHasher"
     }
   ],
   "traits": {},
   "types": {
+    "FsSpecDocumentLoader": {
+      "action": "add",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "trusted_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a filesystem spec document loader rooted at track/items."
+        }
+      ],
+      "module_path": "spec::document_loader",
+      "docs": "Filesystem SpecDocumentLoaderPort adapter for parsed spec.json. See IN-07 / IN-08.",
+      "spec_refs": [
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "IN-07"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "IN-08"
+        }
+      ],
+      "informal_grounds": []
+    },
     "ContractRoleKey": {
       "action": "add",
       "docs": "Serde-map key DTO for domain ContractRole; see IN-03 / CN-05.",
@@ -1454,6 +1549,63 @@
         },
         {
           "anchor": "IN-11",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "FailingObligationFulfillmentVerifier": {
+      "action": "add",
+      "docs": "Fail-closed ObligationFulfillmentVerifierPort adapter for configuration-load failures. See IN-09 / AC-07 / CN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "message",
+              "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_message",
+          "params": [
+            {
+              "name": "message",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::fulfillment_verifier",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         },
         {
@@ -2274,6 +2426,63 @@
         },
         {
           "anchor": "IN-11",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "FailingWaiverVerifier": {
+      "action": "add",
+      "docs": "Fail-closed WaiverVerifierPort adapter for configuration-load failures. See IN-09 / AC-07 / CN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "message",
+              "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_message",
+          "params": [
+            {
+              "name": "message",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::waiver_verifier",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         },
         {

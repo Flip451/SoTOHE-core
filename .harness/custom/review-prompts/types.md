@@ -1,10 +1,15 @@
 # Type Catalogue Review: Severity Policy
 
 The reviewer's role is **type-design soundness review** of the per-layer type
-catalogues `track/items/<track-id>/<layer>-types.json` (Phase 2 SSoT) and the
-integrated mermaid view `contract-map.md`. The catalogue is the *interface
-contract* of each layer — it declares which types / traits / functions are added
-or modified, and how they relate to spec elements (`spec_refs[]`).
+catalogues `track/items/<track-id>/<layer>-types.json` (Phase 2 SSoT). The
+catalogue is the *interface contract* of each layer — it declares which types /
+traits / functions are added or modified, and how they relate to spec elements
+(`spec_refs[]`).
+
+Generated rendered views such as `contract-map.md` and `*-types.md` are
+read-only human reference outputs. They are not review targets and not fix
+targets for this scope; report catalogue JSON issues, not view-only or renderer
+issues.
 
 This briefing layers **two reading lenses**:
 
@@ -38,6 +43,11 @@ spec_refs/role/action mismatch.
   references a type already present in the rustdoc baseline, or `action: modify`
   on a method whose signature is identical to baseline — the catalogue's action
   declaration should match the actual change being introduced.
+  Use the rustdoc baseline / impl-catalog signal semantics for this judgement,
+  not the previous committed catalogue JSON or a prior review diff. If
+  `bin/sotp signal calc-impl-catalog` accepts `action: add` because the item is
+  absent from the rustdoc baseline, do not report it merely because the entry
+  existed in an earlier catalogue revision.
 - **spec_refs missing or off-topic**: an entry whose `spec_refs[]` is empty
   (Chain2 would flag this 🔴) — call it out if it's load-bearing, OR an entry
   whose `spec_refs[].anchor` cites a spec element whose intent is plainly

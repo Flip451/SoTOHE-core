@@ -706,6 +706,64 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
+    // T023 tests: test-obligation semantic verifier capabilities.
+    // -----------------------------------------------------------------------
+
+    const TEST_OBLIGATION_VERIFIER_CONFIG: &str = r#"{
+        "schema_version": 1,
+        "providers": {
+            "codex": { "label": "Codex CLI" }
+        },
+        "capabilities": {
+            "obligation-fulfillment-verifier": {
+                "provider": "codex",
+                "model": "gpt-5.5",
+                "fast_provider": "codex",
+                "fast_model": "gpt-5.4-mini"
+            },
+            "waiver-verifier": {
+                "provider": "codex",
+                "model": "gpt-5.5",
+                "fast_provider": "codex",
+                "fast_model": "gpt-5.4-mini"
+            }
+        }
+    }"#;
+
+    #[test]
+    fn test_resolve_test_obligation_verifier_capabilities_fast_and_final() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_json(dir.path(), TEST_OBLIGATION_VERIFIER_CONFIG);
+        let profiles = AgentProfiles::load(&path).unwrap();
+
+        for capability in ["obligation-fulfillment-verifier", "waiver-verifier"] {
+            let fast = profiles.resolve_execution(capability, RoundType::Fast).unwrap();
+            assert_eq!(fast.provider, "codex");
+            assert_eq!(fast.model.as_deref(), Some("gpt-5.4-mini"));
+
+            let final_exec = profiles.resolve_execution(capability, RoundType::Final).unwrap();
+            assert_eq!(final_exec.provider, "codex");
+            assert_eq!(final_exec.model.as_deref(), Some("gpt-5.5"));
+        }
+    }
+
+    #[test]
+    fn test_default_agent_profiles_register_test_obligation_verifiers() {
+        let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let workspace_root = manifest_dir
+            .parent()
+            .and_then(std::path::Path::parent)
+            .expect("infrastructure crate must live under libs/infrastructure");
+        let profiles = AgentProfiles::load(&workspace_root.join(AGENT_PROFILES_PATH)).unwrap();
+
+        for capability in ["obligation-fulfillment-verifier", "waiver-verifier"] {
+            assert!(profiles.resolve_capability(capability).is_some());
+            assert!(profiles.resolve_execution(capability, RoundType::Fast).is_some());
+            assert!(profiles.resolve_execution(capability, RoundType::Final).is_some());
+        }
+    }
+
+    // -----------------------------------------------------------------------
     // T011 / T013 / T015 tests: dry-checker capability with fast_model and
     // reasoning_effort fields (D4 / IN-04 / IN-08).
     // -----------------------------------------------------------------------

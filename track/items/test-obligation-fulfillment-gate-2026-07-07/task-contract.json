@@ -8,7 +8,11 @@
       { "layer": "usecase", "entry_key": "SemanticCalibrationProbeConfig" },
       { "layer": "usecase", "entry_key": "SemanticEscalationFuture" }
     ],
-    "T002": [],
+    "T002": [
+      { "layer": "usecase", "entry_key": "RefVerifyConfig" },
+      { "layer": "usecase", "entry_key": "RefVerifyCacheKey" },
+      { "layer": "usecase", "entry_key": "RefVerifyPercent" }
+    ],
     "T003": [
       { "layer": "domain", "entry_key": "RoleObligationRules" },
       { "layer": "domain", "entry_key": "TestObligationRule" },
@@ -192,15 +196,26 @@
       { "layer": "cli_driver", "entry_key": "TestObligationResultsInput" }
     ],
     "T021": [
-      { "layer": "cli_composition", "entry_key": "TestObligationCompositionRoot" }
+      { "layer": "cli_composition", "entry_key": "TestObligationCompositionRoot" },
+      { "layer": "infrastructure", "entry_key": "FsSpecDocumentLoader" },
+      { "layer": "infrastructure", "entry_key": "FailingObligationFulfillmentVerifier" },
+      { "layer": "infrastructure", "entry_key": "FailingWaiverVerifier" }
     ],
     "T022": [
+      { "layer": "cli", "entry_key": "CliCommand" },
       { "layer": "cli", "entry_key": "TestObligationSubcommand" },
       { "layer": "cli", "entry_key": "TestObligationArgs" },
       { "layer": "cli", "entry_key": "TestObligationDeriveArgs" },
       { "layer": "cli", "entry_key": "TestObligationCheckArgs" },
       { "layer": "cli", "entry_key": "TestObligationEvaluateArgs" },
-      { "layer": "cli", "entry_key": "TestObligationResultsArgs" }
+      { "layer": "cli", "entry_key": "TestObligationResultsArgs" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_derive" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_check" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_evaluate" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_results" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::command_context" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::failure" }
     ],
     "T023": [],
     "T024": [

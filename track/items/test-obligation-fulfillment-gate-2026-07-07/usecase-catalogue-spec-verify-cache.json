@@ -387,11 +387,155 @@
       }
     },
     {
-      "claim_hash": "82f33e44746636c08c24eaaa609a79de1e7c60094f6f0ef46152a97784622ac6",
+      "claim_hash": "ee5512c323174577609e4ff87285211d98c7c06f6004dd97a4811d8021a6b135",
       "evidence_hash": "83c27079d95d7f58d8277d3d8dfd0e35f3092800fbe785b5db797b8e61dee4a9",
       "verdict": {
         "kind": "pass",
-        "citation": "core は次を含む: (3) calibration probe（既知の誤り例）の注入と劣化検出"
+        "citation": "core は次を含む: (1) verdict 語彙 + 裏付け引用必須の規律（だんまり通過禁止）、(2) hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）,... 検証器固有に残すのは pair / 義務の型、対象集合の生成（citation 走査 vs 決定表導出）、スコープ解決、fail routing。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyCacheKey"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "責務中立な semantic-verdict core の抽出を先行タスクとして実装する。core は次を含む: (1) verdict 語彙 + 裏付け引用必須の規律（だんまり通過禁止）、(2) hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）、(3) calibration probe（既知の誤り例）の注入と劣化検出、(4) fast → final → 人間 の段階引き上げドライバ、(5) capability → provider 解決（既に共有済み）。検証器固有に残すのは pair / 義務の型、対象集合の生成（citation 走査 vs 決定表導出）、スコープ解決、fail routing。既存 ref-verify（chain1 / chain2）を本 core に載せ替える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ee5512c323174577609e4ff87285211d98c7c06f6004dd97a4811d8021a6b135",
+      "evidence_hash": "3aa4c994fc692bb806ba6fd404d9fdeea2978cdb86cacf1dd67c3ee2022e8021",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(2) hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）、... 検証器固有部分（pair / 義務の型、対象集合の生成、スコープ解決、fail routing）は各検証器に残る。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyCacheKey"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-15",
+          "text_label": "責務中立 semantic-verdict core が抽出されており、既存 ref-verify（chain1 / chain2）が本 core に相乗りするようリファクタされている。core は (1) verdict 語彙 + 裏付け引用必須の規律、(2) hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）、(3) calibration probe の注入と劣化検出、(4) fast → final → 人間 の段階引き上げドライバ、(5) capability → provider 解決 を含む。検証器固有部分（pair / 義務の型、対象集合の生成、スコープ解決、fail routing）は各検証器に残る。ref-verify の既存挙動にリグレッションがないことを既存テスト群で検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "94bc65eb45e3317d193def38a2791812555fcb3167cb7e4d50d5c5e727e490ec",
+      "evidence_hash": "83c27079d95d7f58d8277d3d8dfd0e35f3092800fbe785b5db797b8e61dee4a9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "core は次を含む: (3) calibration probe（既知の誤り例）の注入と劣化検出, (4) fast → final → 人間 の段階引き上げドライバ, (5) capability → provider 解決（既に共有済み）。検証器固有に残すのは pair / 義務の型、対象集合の生成（citation 走査 vs 決定表導出）、スコープ解決、fail routing。既存 ref-verify（chain1 / chain2）を本 core に載せ替える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyConfig"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "責務中立な semantic-verdict core の抽出を先行タスクとして実装する。core は次を含む: (1) verdict 語彙 + 裏付け引用必須の規律（だんまり通過禁止）、(2) hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）、(3) calibration probe（既知の誤り例）の注入と劣化検出、(4) fast → final → 人間 の段階引き上げドライバ、(5) capability → provider 解決（既に共有済み）。検証器固有に残すのは pair / 義務の型、対象集合の生成（citation 走査 vs 決定表導出）、スコープ解決、fail routing。既存 ref-verify（chain1 / chain2）を本 core に載せ替える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "94bc65eb45e3317d193def38a2791812555fcb3167cb7e4d50d5c5e727e490ec",
+      "evidence_hash": "3aa4c994fc692bb806ba6fd404d9fdeea2978cdb86cacf1dd67c3ee2022e8021",
+      "verdict": {
+        "kind": "pass",
+        "citation": "core は (1) verdict 語彙 + 裏付け引用必須の規律、(2) hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）、(3) calibration probe の注入と劣化検出、(4) fast → final → 人間 の段階引き上げドライバ、(5) capability → provider 解決 を含む。検証器固有部分（pair / 義務の型、対象集合の生成、スコープ解決、fail routing）は各検証器に残る。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyConfig"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-15",
+          "text_label": "責務中立 semantic-verdict core が抽出されており、既存 ref-verify（chain1 / chain2）が本 core に相乗りするようリファクタされている。core は (1) verdict 語彙 + 裏付け引用必須の規律、(2) hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）、(3) calibration probe の注入と劣化検出、(4) fast → final → 人間 の段階引き上げドライバ、(5) capability → provider 解決 を含む。検証器固有部分（pair / 義務の型、対象集合の生成、スコープ解決、fail routing）は各検証器に残る。ref-verify の既存挙動にリグレッションがないことを既存テスト群で検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "198b80541a91ad86ae8296f211a7acf96cffb34da8a4740f82a84aa756308a3a",
+      "evidence_hash": "83c27079d95d7f58d8277d3d8dfd0e35f3092800fbe785b5db797b8e61dee4a9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(3) calibration probe（既知の誤り例）の注入と劣化検出"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyPercent"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "責務中立な semantic-verdict core の抽出を先行タスクとして実装する。core は次を含む: (1) verdict 語彙 + 裏付け引用必須の規律（だんまり通過禁止）、(2) hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）、(3) calibration probe（既知の誤り例）の注入と劣化検出、(4) fast → final → 人間 の段階引き上げドライバ、(5) capability → provider 解決（既に共有済み）。検証器固有に残すのは pair / 義務の型、対象集合の生成（citation 走査 vs 決定表導出）、スコープ解決、fail routing。既存 ref-verify（chain1 / chain2）を本 core に載せ替える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "198b80541a91ad86ae8296f211a7acf96cffb34da8a4740f82a84aa756308a3a",
+      "evidence_hash": "3aa4c994fc692bb806ba6fd404d9fdeea2978cdb86cacf1dd67c3ee2022e8021",
+      "verdict": {
+        "kind": "pass",
+        "citation": "core は (1) verdict 語彙 + 裏付け引用必須の規律、(2) hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）、(3) calibration probe の注入と劣化検出、(4) fast → final → 人間 の段階引き上げドライバ、(5) capability → provider 解決 を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "RefVerifyPercent"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-15",
+          "text_label": "責務中立 semantic-verdict core が抽出されており、既存 ref-verify（chain1 / chain2）が本 core に相乗りするようリファクタされている。core は (1) verdict 語彙 + 裏付け引用必須の規律、(2) hash 凍結キャッシュの機構（キーの型は検証器ごとに定義）、(3) calibration probe の注入と劣化検出、(4) fast → final → 人間 の段階引き上げドライバ、(5) capability → provider 解決 を含む。検証器固有部分（pair / 義務の型、対象集合の生成、スコープ解決、fail routing）は各検証器に残る。ref-verify の既存挙動にリグレッションがないことを既存テスト群で検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "28c360c63142590fc66bbb397458afeb336af3ef5f9b5a87de83f2e5fc8d2f01",
+      "evidence_hash": "83c27079d95d7f58d8277d3d8dfd0e35f3092800fbe785b5db797b8e61dee4a9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "(3) calibration probe（既知の誤り例）の注入と劣化検出"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -411,7 +555,7 @@
       }
     },
     {
-      "claim_hash": "82f33e44746636c08c24eaaa609a79de1e7c60094f6f0ef46152a97784622ac6",
+      "claim_hash": "28c360c63142590fc66bbb397458afeb336af3ef5f9b5a87de83f2e5fc8d2f01",
       "evidence_hash": "3aa4c994fc692bb806ba6fd404d9fdeea2978cdb86cacf1dd67c3ee2022e8021",
       "verdict": {
         "kind": "pass",
@@ -771,11 +915,11 @@
       }
     },
     {
-      "claim_hash": "1229b67fafed8f676f1865a49351712236ae31b4e36c5d8f3ea4119305916be1",
+      "claim_hash": "0d55122a189837928b909f6b3e01d91108b2a27b1fc50c6236364ee39794e10d",
       "evidence_hash": "7666187f7f8164aa6a7221bf988b134ff59b59685ef6cd7ed171aa1339fe8dc1",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation results` の実装（verdict 閲覧）。`bin/sotp ref-verify results` / `bin/sotp review results` / `bin/sotp dry results` と対称の CLI 面。"
+        "citation": "`bin/sotp test-obligation results` の実装（verdict 閲覧）。`bin/sotp ref-verify results` / `bin/sotp review results` / `bin/sotp dry results` と対称の CLI 面。default 出力: (1) 先頭ブロック: chain × layer 集計を `pass=N fail=N pending=N` 形式で 1 行/lane 表示, (2) レコードブロック: fail/pending の義務 / edge の詳細（義務 id / edge id / claim source / evidence source / verdict / reason / drift 種別）, (3) 末尾: summary 行。exit は常に 0（informational、verdict gate は `check` の責務）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -791,6 +935,30 @@
           "section": "in_scope",
           "element_id": "IN-10",
           "text_label": "`bin/sotp test-obligation results` の実装（verdict 閲覧）。`bin/sotp ref-verify results` / `bin/sotp review results` / `bin/sotp dry results` と対称の CLI 面。default 出力: (1) 先頭ブロック: chain × layer 集計を `pass=N fail=N pending=N` 形式で 1 行/lane 表示、(2) レコードブロック: fail/pending の義務 / edge の詳細（義務 id / edge id / claim source / evidence source / verdict / reason / drift 種別）、(3) 末尾: summary 行。exit は常に 0（informational、verdict gate は `check` の責務）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0d55122a189837928b909f6b3e01d91108b2a27b1fc50c6236364ee39794e10d",
+      "evidence_hash": "bc8ade098e87cb76c91a122047b9988d47717e992db217a1135a5b9dd4a591b3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp test-obligation results` が既存 `bin/sotp ref-verify results` と対称の出力面を提供する: (1) 集計ブロック（chain × layer で `pass=N fail=N pending=N` を 1 行 / lane）、(2) fail/pending の詳細（義務 id / edge id / claim source / evidence source / verdict / reason / drift 種別）、(3) summary 行。exit は常に 0（informational）で、verdict gate は `check` の責務であることが help text に明記される。`--track-id` は省略時に現在ブランチから自動解決される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationResultsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "`bin/sotp test-obligation results` が既存 `bin/sotp ref-verify results` と対称の出力面を提供する: (1) 集計ブロック（chain × layer で `pass=N fail=N pending=N` を 1 行 / lane）、(2) fail/pending の詳細（義務 id / edge id / claim source / evidence source / verdict / reason / drift 種別）、(3) summary 行。exit は常に 0（informational）で、verdict gate は `check` の責務であることが help text に明記される。`--track-id` は省略時に現在ブランチから自動解決される。"
         }
       }
     },

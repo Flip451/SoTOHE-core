@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TestObligationCompositionRoot | composition_root | add | — | 🟡 | 🔵 |
+| TestObligationCompositionRoot | composition_root | add | — | 🔵 | 🔵 |
 

@@ -1,11 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f136d2eae4ae0ddb42789c2d59b63a3c5f15f1d3182220f39d599dd5f0cec3ff",
+  "catalogue_declaration_hash": "e7e340f4c48d21d32bd37f2262d1398a4c21ca503872cf6f1290a4a9dc23e58a",
   "signals": [
+    {
+      "type_name": "CliCommand",
+      "signal": "blue",
+      "entry_hash": "3372f773e921be6e9debb74a8f25e5ec289c3051b67f4f7ee2322b6f934f923d"
+    },
     {
       "type_name": "TestObligationArgs",
       "signal": "blue",
-      "entry_hash": "bbd657139b85e87a7c7cade9aa1bedc02c41a67de772e38ad53fc962cc045b50"
+      "entry_hash": "40cdb868909c3d6df13f365b3363a0d6ed6ab59fa876893f64874cc1056fd9eb"
     },
     {
       "type_name": "TestObligationCheckArgs",
@@ -31,6 +36,41 @@
       "type_name": "TestObligationSubcommand",
       "signal": "blue",
       "entry_hash": "b82f097e08a8f886d8e726cb1e3e330b4f67ae069e428e137d757bbccb246ec9"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::command_context",
+      "signal": "blue",
+      "entry_hash": "0713983b101168ef0d10e3d00fdf9b75c3012ab95e7c1d5e5391fdec11048a8e"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute",
+      "signal": "blue",
+      "entry_hash": "d704217d2e89a7c09f90b8d3c97f6370d553b7d4af60c3a2706406a95ba17268"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_check",
+      "signal": "blue",
+      "entry_hash": "4cc17f41c42f91819223f6b81bf0a66eb0e9198edafb46b8c9c2bbe1f7599ab6"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_derive",
+      "signal": "blue",
+      "entry_hash": "b7e951bd113a5f3646592ee36d1b3d05acefb28077038c122988547bcd8de100"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_evaluate",
+      "signal": "blue",
+      "entry_hash": "af3b23ade586f35627b5ed77f56400247ccd5ea37ec2fa52b26046fe6f3d98a8"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_results",
+      "signal": "blue",
+      "entry_hash": "5e83ecf2c55ce23c0e9735a2ae00ef529ad70f704c58c33d88ddc3feb35c032c"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::failure",
+      "signal": "blue",
+      "entry_hash": "b3b258cee22f62ce1430fc47138ae4db0e16524be0744bb3ba6b60d9163bc364"
     }
   ]
 }

@@ -2,13 +2,22 @@
 //! [`super::RefVerifyApplicationService`].
 
 use std::collections::HashMap;
+use std::future::Future;
+use std::pin::pin;
 use std::sync::Arc;
+use std::task::{Context, Poll, Waker};
 
 use domain::tddd::semantic_verify::{ModelTier, SemanticVerdict, SemanticVerifyEntry};
 
+use crate::semantic_verdict_core::driver::{
+    SemanticEscalationDriverPort, SemanticEscalationFuture,
+};
+use crate::semantic_verdict_core::probe::SemanticCalibrationProbeConfig;
+
 use super::{
-    RefVerifierPort, RefVerifyApplicationService, RefVerifyCachePort, RefVerifyCacheScope,
-    RefVerifyCommand, RefVerifyConfig, RefVerifyError, RefVerifyPair, RefVerifyPairSourcePort,
+    RefVerifierPort, RefVerifyApplicationService, RefVerifyCacheKey, RefVerifyCachePort,
+    RefVerifyCacheScope, RefVerifyCommand, RefVerifyConfig, RefVerifyError, RefVerifyPair,
+    RefVerifyPairSourcePort,
 };
 
 // ── VerifySemanticRefsInteractor ──────────────────────────────────────────────
@@ -21,8 +30,17 @@ use super::{
 pub struct VerifySemanticRefsInteractor {
     pair_source: Arc<dyn RefVerifyPairSourcePort>,
     cache: Arc<dyn RefVerifyCachePort>,
-    verifier: Arc<dyn RefVerifierPort>,
+    driver: Arc<
+        dyn SemanticEscalationDriverPort<
+                RefVerifyPair,
+                RefVerifyCacheKey,
+                SemanticVerdict,
+                RefVerifyError,
+            > + Send
+            + Sync,
+    >,
     config: RefVerifyConfig,
+    probe_config: SemanticCalibrationProbeConfig,
 }
 
 impl VerifySemanticRefsInteractor {
@@ -34,7 +52,54 @@ impl VerifySemanticRefsInteractor {
         verifier: Arc<dyn RefVerifierPort>,
         config: RefVerifyConfig,
     ) -> Self {
-        Self { pair_source, cache, verifier, config }
+        let probe_config = config.semantic_probe_config();
+        let driver = Arc::new(RefVerifierEscalationDriver::new(verifier)) as Arc<_>;
+        Self { pair_source, cache, driver, config, probe_config }
+    }
+}
+
+/// Compatibility driver that lets the existing ref-verifier port ride the
+/// shared semantic-verdict escalation port without changing the public
+/// `VerifySemanticRefsInteractor::new` signature.
+struct RefVerifierEscalationDriver {
+    verifier: Arc<dyn RefVerifierPort>,
+}
+
+impl RefVerifierEscalationDriver {
+    fn new(verifier: Arc<dyn RefVerifierPort>) -> Self {
+        Self { verifier }
+    }
+}
+
+impl SemanticEscalationDriverPort<RefVerifyPair, RefVerifyCacheKey, SemanticVerdict, RefVerifyError>
+    for RefVerifierEscalationDriver
+{
+    fn evaluate_with_escalation<'a>(
+        &'a self,
+        pair: &'a RefVerifyPair,
+        key: &'a RefVerifyCacheKey,
+        initial_tier: ModelTier,
+    ) -> SemanticEscalationFuture<'a, SemanticVerdict, RefVerifyError> {
+        Box::pin(async move {
+            let verdict = self.verifier.verify_pair(
+                pair.claim.clone(),
+                pair.evidence.clone(),
+                key.cache_scope(),
+                initial_tier.clone(),
+            )?;
+            if !pair.known_bad
+                && matches!(initial_tier, ModelTier::Fast)
+                && !matches!(verdict, SemanticVerdict::Pass { .. })
+            {
+                return self.verifier.verify_pair(
+                    pair.claim.clone(),
+                    pair.evidence.clone(),
+                    key.cache_scope(),
+                    ModelTier::Final,
+                );
+            }
+            Ok(verdict)
+        })
     }
 }
 
@@ -53,15 +118,13 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
     ///    3b. D12: when production pairs exist and **all** of them are cache
     ///    hits, skip known-bad probe evaluation entirely (no fresh production
     ///    work → nothing to calibrate) and gate on the frozen verdicts alone.
-    /// 4. Evaluate all remaining production pairs **and** all known-bad probes
-    ///    at `ModelTier::Fast`.
+    /// 4. Evaluate all known-bad probes at `ModelTier::Fast`.
     /// 5. Check known-bad detection rate:
-    ///    - If >= threshold → calibration healthy; fast Pass production pairs
-    ///      are trusted and will be cached (AC-08).
-    ///    - If < threshold → calibration failure; re-evaluate known-bad probes
-    ///      AND all fast-evaluated production pairs (including fast Passes) at
-    ///      `ModelTier::Final` (AC-09).
-    /// 6. Escalate remaining production Fail/Pending to `ModelTier::Final`.
+    ///    - If >= threshold → calibration healthy; evaluate remaining
+    ///      production pairs through the shared Fast→Final escalation driver.
+    ///      Fast Pass production pairs are trusted and cached (AC-08).
+    ///    - If < threshold → calibration failure; evaluate known-bad probes
+    ///      AND all remaining production pairs at `ModelTier::Final` (AC-09).
     /// 7. After final-tier re-evaluation:
     ///    - Persistent Fail → collect for `SemanticFailuresConfirmed`.
     ///    - Persistent Pending → collect for `HumanEscalationRequired`.
@@ -150,9 +213,9 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
             })
             .collect();
 
-        // Step 4: evaluate cache-miss production pairs and all known-bad probes at Fast tier,
+        // Step 4: evaluate all known-bad probes at Fast tier,
         // with parallelism bounded by max_parallelism (CN-05).
-        let max_par = self.config.max_parallelism.as_usize();
+        let max_par = self.config.max_parallelism().as_usize();
 
         // Convert &[&RefVerifyPair] to owned Vec<RefVerifyPair> for parallel_verify.
         let cache_miss_owned: Vec<RefVerifyPair> =
@@ -204,53 +267,34 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
             return Ok(());
         }
 
-        let fast_production_verdicts: Vec<(RefVerifyPair, SemanticVerdict)> =
-            parallel_verify(&self.verifier, &cache_miss_owned, ModelTier::Fast, max_par)?;
-
         let fast_known_bad_verdicts: Vec<(RefVerifyPair, SemanticVerdict)> =
-            parallel_verify(&self.verifier, &known_bad_probes, ModelTier::Fast, max_par)?;
+            parallel_verify(&self.driver, &known_bad_probes, ModelTier::Fast, max_par)?;
 
         // Step 5: check known-bad detection rate at fast tier.
         let fast_detection_rate = compute_detection_rate_owned(&fast_known_bad_verdicts);
-        let threshold = self.config.known_bad_detection_threshold_percent.as_u8();
+        let threshold = self.probe_config.threshold().get();
         let fast_calibration_healthy = fast_detection_rate >= threshold;
 
         // Step 6/7: escalation logic.
         // final_production_verdicts accumulates freshly-evaluated verdicts (cache misses only).
         let (fresh_final_production_verdicts, final_known_bad_verdicts) =
             if fast_calibration_healthy {
-                // Healthy calibration: trusted fast Pass production pairs are cached as-is.
-                // Only Fail/Pending are escalated to Final tier.
-                let (fast_pass, fast_not_pass): (Vec<_>, Vec<_>) = fast_production_verdicts
-                    .into_iter()
-                    .partition(|(_, v)| matches!(v, SemanticVerdict::Pass { .. }));
-
-                // Escalate Fail and Pending to Final tier.
-                let escalation_verdicts = parallel_verify(
-                    &self.verifier,
-                    &fast_not_pass_pairs(&fast_not_pass),
-                    ModelTier::Final,
-                    max_par,
-                )?;
-
-                // Trusted fast Passes + escalated verdicts = final fresh production verdicts.
-                let mut prod = fast_pass;
-                prod.extend(escalation_verdicts);
-
-                // known-bad probes were evaluated at Fast; no final re-evaluation needed.
-                (prod, fast_known_bad_verdicts)
+                // Healthy calibration: the shared escalation driver already
+                // raised production Fail/Pending cache misses to Final.
+                let production_verdicts =
+                    parallel_verify(&self.driver, &cache_miss_owned, ModelTier::Fast, max_par)?;
+                (production_verdicts, fast_known_bad_verdicts)
             } else {
-                // Calibration failure: re-evaluate known-bad probes AND all fast production
-                // pairs (including fast Passes) at Final tier (AC-09).
-                let re_evaluated_production = parallel_verify(
-                    &self.verifier,
-                    &all_miss_pairs(&fast_production_verdicts),
-                    ModelTier::Final,
-                    max_par,
-                )?;
+                // Calibration failure: evaluate known-bad probes AND all
+                // production cache misses directly at Final tier (AC-09).
+                // Do not route production through Fast first here: the shared
+                // driver would already escalate fast Fail/Pending pairs, and
+                // this branch would otherwise duplicate Final calls.
+                let re_evaluated_production =
+                    parallel_verify(&self.driver, &cache_miss_owned, ModelTier::Final, max_par)?;
 
                 let re_evaluated_probes =
-                    parallel_verify(&self.verifier, &known_bad_probes, ModelTier::Final, max_par)?;
+                    parallel_verify(&self.driver, &known_bad_probes, ModelTier::Final, max_par)?;
 
                 (re_evaluated_production, re_evaluated_probes)
             };
@@ -385,7 +429,15 @@ impl RefVerifyApplicationService for VerifySemanticRefsInteractor {
 /// as the input slice.  The `max_par` bound is honoured by chunking: up to `max_par`
 /// threads are spawned per chunk so the verifier adapter is never overwhelmed (CN-05).
 fn parallel_verify(
-    verifier: &Arc<dyn RefVerifierPort>,
+    driver: &Arc<
+        dyn SemanticEscalationDriverPort<
+                RefVerifyPair,
+                RefVerifyCacheKey,
+                SemanticVerdict,
+                RefVerifyError,
+            > + Send
+            + Sync,
+    >,
     pairs: &[RefVerifyPair],
     tier: ModelTier,
     max_par: usize,
@@ -402,17 +454,11 @@ fn parallel_verify(
         let mut handles = Vec::with_capacity(chunk.len());
         for pair in chunk {
             let pair_owned = pair.clone();
-            let verifier_ref = Arc::clone(verifier);
+            let driver_ref = Arc::clone(driver);
             let tier_copy = tier.clone();
             let handle = std::thread::spawn(move || {
-                let cache_scope = pair_owned.cache_scope.clone();
-                verifier_ref
-                    .verify_pair(
-                        pair_owned.claim.clone(),
-                        pair_owned.evidence.clone(),
-                        &cache_scope,
-                        tier_copy,
-                    )
+                let key = RefVerifyCacheKey::from_pair(&pair_owned);
+                block_on(driver_ref.evaluate_with_escalation(&pair_owned, &key, tier_copy))
                     .map(|verdict| (pair_owned, verdict))
             });
             handles.push(handle);
@@ -448,14 +494,15 @@ fn parallel_verify(
     Ok(results)
 }
 
-/// Extract the `RefVerifyPair` values from `fast_not_pass` verdicts for re-evaluation.
-fn fast_not_pass_pairs(fast_not_pass: &[(RefVerifyPair, SemanticVerdict)]) -> Vec<RefVerifyPair> {
-    fast_not_pass.iter().map(|(p, _)| p.clone()).collect()
-}
-
-/// Extract the `RefVerifyPair` values from any `(RefVerifyPair, SemanticVerdict)` slice.
-fn all_miss_pairs(verdicts: &[(RefVerifyPair, SemanticVerdict)]) -> Vec<RefVerifyPair> {
-    verdicts.iter().map(|(p, _)| p.clone()).collect()
+fn block_on<F: Future>(future: F) -> F::Output {
+    let mut future = pin!(future);
+    let mut cx = Context::from_waker(Waker::noop());
+    loop {
+        match future.as_mut().poll(&mut cx) {
+            Poll::Ready(output) => return output,
+            Poll::Pending => continue,
+        }
+    }
 }
 
 /// Compute the detection rate percentage (0..=100) of known-bad probes (owned-pair variant):
@@ -770,9 +817,9 @@ mod tests {
     #[test]
     fn ref_verify_config_try_new_with_valid_values_succeeds() {
         let cfg = RefVerifyConfig::try_new(10, 90, 4).unwrap();
-        assert_eq!(cfg.known_bad_injection_rate_percent.as_u8(), 10);
-        assert_eq!(cfg.known_bad_detection_threshold_percent.as_u8(), 90);
-        assert_eq!(cfg.max_parallelism.as_usize(), 4);
+        assert_eq!(cfg.known_bad_injection_rate_percent().as_u8(), 10);
+        assert_eq!(cfg.known_bad_detection_threshold_percent().as_u8(), 90);
+        assert_eq!(cfg.max_parallelism().as_usize(), 4);
     }
 
     #[test]
@@ -796,9 +843,9 @@ mod tests {
     #[test]
     fn ref_verify_config_default_supplies_10_90_and_nonzero_parallelism() {
         let cfg = RefVerifyConfig::default();
-        assert_eq!(cfg.known_bad_injection_rate_percent.as_u8(), 10);
-        assert_eq!(cfg.known_bad_detection_threshold_percent.as_u8(), 90);
-        assert!(cfg.max_parallelism.as_usize() > 0);
+        assert_eq!(cfg.known_bad_injection_rate_percent().as_u8(), 10);
+        assert_eq!(cfg.known_bad_detection_threshold_percent().as_u8(), 90);
+        assert!(cfg.max_parallelism().as_usize() > 0);
     }
 
     // ── VerifySemanticRefsInteractor ──────────────────────────────────────────
@@ -1034,9 +1081,9 @@ mod tests {
     }
 
     #[test]
-    fn known_bad_below_threshold_at_fast_triggers_full_final_reevaluation() {
+    fn known_bad_below_threshold_at_fast_triggers_direct_final_evaluation() {
         // All known-bad probes return Pass at Fast (so detection = 0% < 90%).
-        // This should trigger final re-evaluation of all production pairs (including fast Pass).
+        // This should trigger direct final evaluation of all production cache misses.
         let pair = production_pair(0x20, 0x21);
         let probe = known_bad_pair();
         let source: Arc<dyn RefVerifyPairSourcePort> =
@@ -1044,7 +1091,7 @@ mod tests {
         let cache: Arc<StubCache> = Arc::new(StubCache::empty());
 
         // Production pairs get Pass; known-bad get Pass (simulating bad detector).
-        // After final re-evaluation with same verdict: known-bad still Pass → still below threshold.
+        // After final evaluation with same verdict: known-bad still Pass → still below threshold.
         let spy: Arc<SpyVerifier> = Arc::new(SpyVerifier::new(pass_verdict(), pass_verdict()));
         let cfg = RefVerifyConfig::default(); // threshold = 90%
 
@@ -1062,14 +1109,15 @@ mod tests {
             "expected HumanEscalationRequired when known-bad detection fails, got: {result:?}"
         );
 
-        // Production pair must have been evaluated at both Fast AND Final.
-        let calls = spy.calls();
+        // Production pair must go straight to Final after calibration fails so
+        // the shared Fast→Final driver cannot duplicate Final calls.
         let production_calls: Vec<_> =
-            calls.iter().filter(|(claim, _)| !claim.starts_with("known-bad")).collect();
-        let has_fast = production_calls.iter().any(|(_, tier)| matches!(tier, ModelTier::Fast));
-        let has_final = production_calls.iter().any(|(_, tier)| matches!(tier, ModelTier::Final));
-        assert!(has_fast, "production pair must be evaluated at Fast tier");
-        assert!(has_final, "calibration failure: production pair must be re-evaluated at Final");
+            spy.calls().into_iter().filter(|(claim, _)| !claim.starts_with("known-bad")).collect();
+        assert_eq!(
+            production_calls,
+            vec![(format!("claim-{}", 0x20u8), ModelTier::Final)],
+            "calibration failure: production pair must have exactly one Final call"
+        );
     }
 
     #[test]

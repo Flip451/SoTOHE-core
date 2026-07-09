@@ -4,6 +4,358 @@
   "inherent_impls": [],
   "layer": "usecase",
   "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "add",
+      "for_type": "CheckTestObligationsCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CheckTestObligationsCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CheckTestObligationsCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CheckTestObligationsCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CheckTestObligationsOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CheckTestObligationsOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CheckTestObligationsOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CheckTestObligationsOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "DeriveTestObligationsCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "DeriveTestObligationsCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "DeriveTestObligationsCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "DeriveTestObligationsCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationCatalogueCommandInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationCatalogueCommandInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationCatalogueCommandInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationCatalogueCommandInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "EvaluateTestObligationsCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "EvaluateTestObligationsCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "EvaluateTestObligationsCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "EvaluateTestObligationsCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "EvaluateTestObligationsOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "EvaluateTestObligationsOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "EvaluateTestObligationsOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "EvaluateTestObligationsOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "SemanticCalibrationProbeConfig",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "SemanticCalibrationProbeConfig",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "SemanticCalibrationProbeConfig",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "SemanticCalibrationProbeConfig",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationChainLabel",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationChainLabel",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationChainLabel",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationChainLabel",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEvaluateConfig",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEvaluateConfig",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEvaluateConfig",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEvaluateConfig",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationLaneSummary",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationLaneSummary",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationLaneSummary",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationLaneSummary",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationResultsCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationResultsCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationResultsCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationResultsCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationResultsOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationResultsOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationResultsOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationResultsOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "DeriveTestObligationsInteractor",
+      "trait_ref": "DeriveTestObligationsApplicationService"
+    },
+    {
+      "action": "add",
+      "for_type": "CheckTestObligationsInteractor",
+      "trait_ref": "CheckTestObligationsApplicationService"
+    },
+    {
+      "action": "add",
+      "for_type": "EvaluateTestObligationsInteractor",
+      "trait_ref": "EvaluateTestObligationsApplicationService"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationResultsInteractor",
+      "trait_ref": "TestObligationResultsApplicationService"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEvaluateConfigError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEvaluateConfigError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEvaluateConfigError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "RefVerifyCacheKey",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "RefVerifyCacheKey",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "RefVerifyCacheKey",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "RefVerifyCacheKey",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyConfig",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyConfig",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyConfig",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyConfig",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyConfig",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyPercent",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyPercent",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyPercent",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyPercent",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyPercent",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEvaluateConfig",
+      "trait_ref": "core::default::Default"
+    }
+  ],
   "traits": {
     "CheckTestObligationsApplicationService": {
       "action": "add",
@@ -41,6 +393,51 @@
           "anchor": "AC-10",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
+      ]
+    },
+    "ContentHasherPort": {
+      "action": "add",
+      "docs": "Content-hasher secondary port. See IN-09 / AC-06.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "docs": "Compute a SHA-256 ContentHash over `bytes`. See IN-09 / AC-06.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "sha256",
+          "params": [
+            {
+              "name": "bytes",
+              "ty": "&[u8]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "domain::ContentHash",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "test_obligation::hasher",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
       ]
     },
     "DeriveTestObligationsApplicationService": {
@@ -83,20 +480,20 @@
       "informal_grounds": [],
       "methods": [
         {
+          "docs": "See IN-09 / AC-06.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "execute",
-          "receiver": "&self",
           "params": [
             {
               "name": "cmd",
               "ty": "&'a EvaluateTestObligationsCommand"
             }
           ],
+          "receiver": "&self",
           "returns": "EvaluateTestObligationsFuture<'a>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "See IN-09 / AC-06."
+          "where_predicates": []
         }
       ],
       "module_path": "test_obligation::evaluate",
@@ -142,6 +539,8 @@
       "informal_grounds": [],
       "methods": [
         {
+          "docs": "Caller-owned neutral core error type for the driver boundary.",
+          "generics": [],
           "has_default_impl": false,
           "is_async": false,
           "name": "evaluate_with_escalation",
@@ -160,9 +559,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "SemanticEscalationFuture<'a, V, E>",
-          "docs": "Caller-owned neutral core error type for the driver boundary.",
-          "generics": []
+          "returns": "SemanticEscalationFuture<'a, V, E>"
         }
       ],
       "module_path": "semantic_verdict_core::driver",
@@ -186,35 +583,35 @@
       "where_predicates": [
         {
           "lhs": "P",
+          "operator": "Bound",
           "rhs": [
             "Send",
             "Sync"
-          ],
-          "operator": "Bound"
+          ]
         },
         {
           "lhs": "K",
+          "operator": "Bound",
           "rhs": [
             "Send",
             "Sync"
-          ],
-          "operator": "Bound"
+          ]
         },
         {
           "lhs": "V",
+          "operator": "Bound",
           "rhs": [
             "Send",
             "Sync"
-          ],
-          "operator": "Bound"
+          ]
         },
         {
           "lhs": "E",
+          "operator": "Bound",
           "rhs": [
             "Send",
             "Sync"
-          ],
-          "operator": "Bound"
+          ]
         }
       ]
     },
@@ -291,51 +688,6 @@
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
-    },
-    "ContentHasherPort": {
-      "action": "add",
-      "role": {
-        "SecondaryPort": {}
-      },
-      "methods": [
-        {
-          "name": "sha256",
-          "receiver": "&self",
-          "params": [
-            {
-              "name": "bytes",
-              "ty": "&[u8]"
-            }
-          ],
-          "returns": "domain::ContentHash",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Compute a SHA-256 ContentHash over `bytes`. See IN-09 / AC-06."
-        }
-      ],
-      "supertrait_bounds": [
-        "Send",
-        "Sync"
-      ],
-      "module_path": "test_obligation::hasher",
-      "docs": "Content-hasher secondary port. See IN-09 / AC-06.",
-      "spec_refs": [
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "IN-09"
-        },
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "AC-06"
-        },
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "CN-04"
-        }
-      ],
-      "informal_grounds": []
     }
   },
   "types": {
@@ -455,8 +807,11 @@
       },
       "methods": [
         {
+          "docs": "See IN-08 / AC-04 / AC-10.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "new_verified_scope",
-          "receiver": null,
           "params": [
             {
               "name": "resolved_edges",
@@ -467,50 +822,47 @@
               "ty": "Vec<domain::tddd::test_obligation::scope::UncitedSpecElementFinding>"
             }
           ],
+          "receiver": null,
           "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "See IN-08 / AC-04 / AC-10."
+          "where_predicates": []
         },
         {
+          "docs": "See AC-10.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "new_empty_scope",
-          "receiver": null,
           "params": [
             {
               "name": "uncited_findings",
               "ty": "Vec<domain::tddd::test_obligation::scope::UncitedSpecElementFinding>"
             }
           ],
+          "receiver": null,
           "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "See AC-10."
+          "where_predicates": []
         },
         {
+          "docs": "Return the edges resolved by a fresh fulfilled / waived verdict.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "resolved_edges",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "&[domain::tddd::test_obligation::ids::TestObligationEdgeId]",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the edges resolved by a fresh fulfilled / waived verdict."
+          "where_predicates": []
         },
         {
-          "name": "uncited_findings",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&[domain::tddd::test_obligation::scope::UncitedSpecElementFinding]",
-          "is_async": false,
+          "docs": "Return the uncited AC/CN spec-element findings.",
           "generics": [],
           "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the uncited AC/CN spec-element findings."
+          "is_async": false,
+          "name": "uncited_findings",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[domain::tddd::test_obligation::scope::UncitedSpecElementFinding]",
+          "where_predicates": []
         }
       ],
       "module_path": "test_obligation::check",
@@ -573,55 +925,6 @@
       "spec_refs": [
         {
           "anchor": "IN-07",
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
-        }
-      ]
-    },
-    "TestObligationCatalogueCommandInput": {
-      "action": "add",
-      "docs": "Shared catalogue snapshot command input for derive/check commands; see IN-07 / IN-08.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "track_id",
-              "ty": "domain::TrackId"
-            },
-            {
-              "name": "current_branch",
-              "ty": "String"
-            },
-            {
-              "name": "catalogue_paths",
-              "ty": "Vec<std::path::PathBuf>"
-            }
-          ],
-          "returns": "Self"
-        }
-      ],
-      "module_path": "test_obligation",
-      "role": {
-        "Command": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-07",
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
-        },
-        {
-          "anchor": "IN-08",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
@@ -728,6 +1031,35 @@
         }
       ]
     },
+    "EvaluateTestObligationsFuture": {
+      "action": "add",
+      "docs": "Future alias returned by EvaluateTestObligationsApplicationService::execute; see IN-09 / AC-06 / AC-07.",
+      "generics": [],
+      "informal_grounds": [],
+      "kind": {
+        "kind": "type_alias",
+        "target": "std::pin::Pin<std::boxed::Box<dyn core::future::Future<Output = Result<EvaluateTestObligationsOutcome, domain::tddd::test_obligation::errors::ObligationEvaluateError>> + Send + 'a>>"
+      },
+      "methods": [],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
     "EvaluateTestObligationsInteractor": {
       "action": "add",
       "docs": "Interactor implementing EvaluateTestObligationsApplicationService; see IN-09 / AC-06 / AC-07.",
@@ -819,8 +1151,11 @@
       },
       "methods": [
         {
+          "docs": "Build an evaluate outcome. See IN-09 / AC-06.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "new",
-          "receiver": null,
           "params": [
             {
               "name": "pass_count",
@@ -839,56 +1174,53 @@
               "ty": "domain::tddd::test_obligation::verdict::DetectionRatePercent"
             }
           ],
+          "receiver": null,
           "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Build an evaluate outcome. See IN-09 / AC-06."
+          "where_predicates": []
         },
         {
+          "docs": "Return the count of passing verdicts.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "pass_count",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "usize",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the count of passing verdicts."
+          "where_predicates": []
         },
         {
+          "docs": "Return the count of failing verdicts.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "fail_count",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "usize",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the count of failing verdicts."
+          "where_predicates": []
         },
         {
+          "docs": "Return the count of pending verdicts.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "pending_count",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "usize",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the count of pending verdicts."
+          "where_predicates": []
         },
         {
-          "name": "known_bad_detection_rate",
-          "receiver": "&self",
-          "params": [],
-          "returns": "domain::tddd::test_obligation::verdict::DetectionRatePercent",
-          "is_async": false,
+          "docs": "Return the known-bad calibration-probe detection rate.",
           "generics": [],
           "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the known-bad calibration-probe detection rate."
+          "is_async": false,
+          "name": "known_bad_detection_rate",
+          "params": [],
+          "receiver": "&self",
+          "returns": "domain::tddd::test_obligation::verdict::DetectionRatePercent",
+          "where_predicates": []
         }
       ],
       "module_path": "test_obligation::evaluate",
@@ -902,6 +1234,259 @@
         },
         {
           "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "RefVerifyCacheKey": {
+      "action": "add",
+      "docs": "Full hash-frozen cache key for one ref-verify pair; see IN-01 / AC-15.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_pair",
+          "params": [
+            {
+              "name": "pair",
+              "ty": "&RefVerifyPair"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "cache_scope",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&RefVerifyCacheScope"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "claim_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::ContentHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "evidence_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::ContentHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "claim_origin",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::VerifyOriginRef"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "evidence_origin",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::VerifyOriginRef"
+        }
+      ],
+      "module_path": "ref_verify",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "RefVerifyConfig": {
+      "action": "modify",
+      "docs": "Usecase configuration for ref-verify calibration and parallelism; see IN-01 / AC-15.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "known_bad_injection_rate_percent",
+              "ty": "u8"
+            },
+            {
+              "name": "known_bad_detection_threshold_percent",
+              "ty": "u8"
+            },
+            {
+              "name": "max_parallelism",
+              "ty": "usize"
+            }
+          ],
+          "returns": "Result<Self, RefVerifyError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "semantic_probe_config",
+          "params": [],
+          "receiver": "&self",
+          "returns": "SemanticCalibrationProbeConfig"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "known_bad_injection_rate_percent",
+          "params": [],
+          "receiver": "&self",
+          "returns": "RefVerifyPercent"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "known_bad_detection_threshold_percent",
+          "params": [],
+          "receiver": "&self",
+          "returns": "RefVerifyPercent"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "max_parallelism",
+          "params": [],
+          "receiver": "&self",
+          "returns": "RefVerifyParallelism"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_valid",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "module_path": "ref_verify",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            {
+              "name": "valid_probe_and_parallelism",
+              "predicate": {
+                "SelfMethod": "is_valid"
+              }
+            }
+          ]
+        }
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "RefVerifyPercent": {
+      "action": "modify",
+      "docs": "Validated nonzero percentage value object for ref-verify health-check config; see IN-01 / AC-15.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "u8"
+            }
+          ],
+          "returns": "Result<Self, RefVerifyError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_u8",
+          "params": [],
+          "receiver": "self",
+          "returns": "u8"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_non_zero_u8",
+          "params": [],
+          "receiver": "self",
+          "returns": "std::num::NonZeroU8"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_valid",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "module_path": "ref_verify",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            {
+              "name": "percent_in_1_to_100",
+              "predicate": {
+                "SelfMethod": "is_valid"
+              }
+            }
+          ]
+        }
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
@@ -934,6 +1519,22 @@
             }
           ],
           "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "injection",
+          "params": [],
+          "receiver": "&self",
+          "returns": "std::num::NonZeroU8"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "threshold",
+          "params": [],
+          "receiver": "&self",
+          "returns": "std::num::NonZeroU8"
         }
       ],
       "module_path": "semantic_verdict_core::probe",
@@ -947,6 +1548,89 @@
         },
         {
           "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "SemanticEscalationFuture": {
+      "action": "add",
+      "docs": "Schema note: target carries lifetime `'a`; generics lists V/E type parameters only. See IN-01 / AC-15.",
+      "generics": [
+        {
+          "bounds": [],
+          "name": "V"
+        },
+        {
+          "bounds": [],
+          "name": "E"
+        }
+      ],
+      "informal_grounds": [],
+      "kind": {
+        "kind": "type_alias",
+        "target": "std::pin::Pin<std::boxed::Box<dyn core::future::Future<Output = Result<V, E>> + Send + 'a>>"
+      },
+      "methods": [],
+      "module_path": "semantic_verdict_core::driver",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationCatalogueCommandInput": {
+      "action": "add",
+      "docs": "Shared catalogue snapshot command input for derive/check commands; see IN-07 / IN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "current_branch",
+              "ty": "String"
+            },
+            {
+              "name": "catalogue_paths",
+              "ty": "Vec<std::path::PathBuf>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-08",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
@@ -1002,8 +1686,11 @@
       },
       "methods": [
         {
+          "docs": "Validate the raw config values. See IN-01 / AC-15.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "try_new",
-          "receiver": null,
           "params": [
             {
               "name": "injection_rate",
@@ -1018,50 +1705,102 @@
               "ty": "usize"
             }
           ],
+          "receiver": null,
           "returns": "Result<Self, TestObligationEvaluateConfigError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Validate the raw config values. See IN-01 / AC-15."
+          "where_predicates": []
         },
         {
+          "docs": "Return the known-bad injection rate (percent).",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "injection_rate",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "u8",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the known-bad injection rate (percent)."
+          "where_predicates": []
         },
         {
+          "docs": "Return the known-bad detection threshold (percent, non-zero by construction).",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "detection_threshold",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "std::num::NonZeroU8",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the known-bad detection threshold (percent, non-zero by construction)."
+          "where_predicates": []
         },
         {
-          "name": "parallelism",
-          "receiver": "&self",
-          "params": [],
-          "returns": "usize",
-          "is_async": false,
+          "docs": "Return the configured worker parallelism.",
           "generics": [],
           "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the configured worker parallelism."
+          "is_async": false,
+          "name": "parallelism",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize",
+          "where_predicates": []
         }
       ],
       "module_path": "test_obligation::evaluate",
       "role": {
         "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationEvaluateConfigError": {
+      "action": "add",
+      "docs": "Narrow config-validation error surfaced only by TestObligationEvaluateConfig::try_new (IN-01 / AC-15). See T009 port-error-precision precedent.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidInjectionRate",
+            "payload": {
+              "fields": [
+                {
+                  "name": "value",
+                  "ty": "u8"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidDetectionThreshold",
+            "payload": {
+              "fields": [
+                {
+                  "name": "value",
+                  "ty": "u8"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidParallelism",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "ErrorType": {}
       },
       "spec_refs": [
         {
@@ -1088,8 +1827,11 @@
       },
       "methods": [
         {
+          "docs": "Build a chain × layer lane summary row. See IN-10 / AC-09.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "new",
-          "receiver": null,
           "params": [
             {
               "name": "chain_name",
@@ -1112,67 +1854,64 @@
               "ty": "usize"
             }
           ],
+          "receiver": null,
           "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Build a chain × layer lane summary row. See IN-10 / AC-09."
+          "where_predicates": []
         },
         {
+          "docs": "Return the chain this lane summarises.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "chain_name",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "&TestObligationChainLabel",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the chain this lane summarises."
+          "where_predicates": []
         },
         {
+          "docs": "Return the layer this lane summarises.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "layer",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "&domain::tddd::LayerId",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the layer this lane summarises."
+          "where_predicates": []
         },
         {
+          "docs": "Return the pass count for this lane.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "pass_count",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "usize",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the pass count for this lane."
+          "where_predicates": []
         },
         {
+          "docs": "Return the fail count for this lane.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "fail_count",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "usize",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the fail count for this lane."
+          "where_predicates": []
         },
         {
-          "name": "pending_count",
-          "receiver": "&self",
-          "params": [],
-          "returns": "usize",
-          "is_async": false,
+          "docs": "Return the pending count for this lane.",
           "generics": [],
           "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the pending count for this lane."
+          "is_async": false,
+          "name": "pending_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize",
+          "where_predicates": []
         }
       ],
       "module_path": "test_obligation::results",
@@ -1277,6 +2016,10 @@
         {
           "anchor": "IN-10",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
     },
@@ -1294,8 +2037,11 @@
       },
       "methods": [
         {
+          "docs": "Build a structured results output. See IN-10 / AC-09.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "new",
-          "receiver": null,
           "params": [
             {
               "name": "lane_summaries",
@@ -1310,45 +2056,42 @@
               "ty": "Vec<domain::tddd::test_obligation::scope::UncitedSpecElementFinding>"
             }
           ],
+          "receiver": null,
           "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Build a structured results output. See IN-10 / AC-09."
+          "where_predicates": []
         },
         {
+          "docs": "Return the chain × layer lane summaries.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "lane_summaries",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "&[TestObligationLaneSummary]",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the chain × layer lane summaries."
+          "where_predicates": []
         },
         {
+          "docs": "Return the per-edge records for the failing / pending edges.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "records",
-          "receiver": "&self",
           "params": [],
+          "receiver": "&self",
           "returns": "&[domain::tddd::test_obligation::drift::EdgeVerdictRecord]",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the per-edge records for the failing / pending edges."
+          "where_predicates": []
         },
         {
-          "name": "uncited_findings",
-          "receiver": "&self",
-          "params": [],
-          "returns": "&[domain::tddd::test_obligation::scope::UncitedSpecElementFinding]",
-          "is_async": false,
+          "docs": "Return the uncited AC/CN findings carried through the output.",
           "generics": [],
           "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Return the uncited AC/CN findings carried through the output."
+          "is_async": false,
+          "name": "uncited_findings",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[domain::tddd::test_obligation::scope::UncitedSpecElementFinding]",
+          "where_predicates": []
         }
       ],
       "module_path": "test_obligation::results",
@@ -1365,401 +2108,6 @@
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
-    },
-    "SemanticEscalationFuture": {
-      "action": "add",
-      "role": {
-        "Dto": {}
-      },
-      "kind": {
-        "kind": "type_alias",
-        "target": "std::pin::Pin<std::boxed::Box<dyn core::future::Future<Output = Result<V, E>> + Send + 'a>>"
-      },
-      "methods": [],
-      "module_path": "semantic_verdict_core::driver",
-      "docs": "Schema note: target carries lifetime `'a`; generics lists V/E type parameters only. See IN-01 / AC-15.",
-      "spec_refs": [
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "IN-01"
-        },
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "AC-15"
-        }
-      ],
-      "informal_grounds": [],
-      "generics": [
-        {
-          "name": "V",
-          "bounds": []
-        },
-        {
-          "name": "E",
-          "bounds": []
-        }
-      ]
-    },
-    "EvaluateTestObligationsFuture": {
-      "action": "add",
-      "role": {
-        "Dto": {}
-      },
-      "kind": {
-        "kind": "type_alias",
-        "target": "std::pin::Pin<std::boxed::Box<dyn core::future::Future<Output = Result<EvaluateTestObligationsOutcome, domain::tddd::test_obligation::errors::ObligationEvaluateError>> + Send + 'a>>"
-      },
-      "methods": [],
-      "module_path": "test_obligation::evaluate",
-      "docs": "Future alias returned by EvaluateTestObligationsApplicationService::execute; see IN-09 / AC-06 / AC-07.",
-      "spec_refs": [
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "IN-09"
-        },
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "AC-06"
-        },
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "AC-07"
-        }
-      ],
-      "informal_grounds": [],
-      "generics": []
-    },
-    "TestObligationEvaluateConfigError": {
-      "action": "add",
-      "role": {
-        "ErrorType": {}
-      },
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "InvalidInjectionRate",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                {
-                  "name": "value",
-                  "ty": "u8"
-                }
-              ]
-            }
-          },
-          {
-            "name": "InvalidDetectionThreshold",
-            "payload": {
-              "kind": "struct",
-              "fields": [
-                {
-                  "name": "value",
-                  "ty": "u8"
-                }
-              ]
-            }
-          },
-          {
-            "name": "InvalidParallelism",
-            "payload": {
-              "kind": "unit"
-            }
-          }
-        ]
-      },
-      "methods": [],
-      "module_path": "test_obligation::evaluate",
-      "docs": "Narrow config-validation error surfaced only by TestObligationEvaluateConfig::try_new (IN-01 / AC-15). See T009 port-error-precision precedent.",
-      "spec_refs": [
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "IN-01"
-        },
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "AC-15"
-        }
-      ],
-      "informal_grounds": []
     }
-  },
-  "trait_impls": [
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "CheckTestObligationsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "CheckTestObligationsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "CheckTestObligationsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "CheckTestObligationsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "CheckTestObligationsOutcome"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "CheckTestObligationsOutcome"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "CheckTestObligationsOutcome"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "CheckTestObligationsOutcome"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "DeriveTestObligationsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "DeriveTestObligationsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "DeriveTestObligationsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "DeriveTestObligationsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationCatalogueCommandInput"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationCatalogueCommandInput"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationCatalogueCommandInput"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationCatalogueCommandInput"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "EvaluateTestObligationsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "EvaluateTestObligationsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "EvaluateTestObligationsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "EvaluateTestObligationsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "EvaluateTestObligationsOutcome"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "EvaluateTestObligationsOutcome"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "EvaluateTestObligationsOutcome"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "EvaluateTestObligationsOutcome"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "SemanticCalibrationProbeConfig"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "SemanticCalibrationProbeConfig"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "SemanticCalibrationProbeConfig"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "SemanticCalibrationProbeConfig"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationChainLabel"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationChainLabel"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationChainLabel"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationChainLabel"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationEvaluateConfig"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationEvaluateConfig"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationEvaluateConfig"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationEvaluateConfig"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationLaneSummary"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationLaneSummary"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationLaneSummary"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationLaneSummary"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationResultsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationResultsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationResultsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationResultsCommand"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationResultsOutput"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationResultsOutput"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationResultsOutput"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationResultsOutput"
-    },
-    {
-      "action": "add",
-      "trait_ref": "DeriveTestObligationsApplicationService",
-      "for_type": "DeriveTestObligationsInteractor"
-    },
-    {
-      "action": "add",
-      "trait_ref": "CheckTestObligationsApplicationService",
-      "for_type": "CheckTestObligationsInteractor"
-    },
-    {
-      "action": "add",
-      "trait_ref": "EvaluateTestObligationsApplicationService",
-      "for_type": "EvaluateTestObligationsInteractor"
-    },
-    {
-      "action": "add",
-      "trait_ref": "TestObligationResultsApplicationService",
-      "for_type": "TestObligationResultsInteractor"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationEvaluateConfigError"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::fmt::Display",
-      "for_type": "TestObligationEvaluateConfigError"
-    },
-    {
-      "action": "add",
-      "trait_ref": "core::error::Error",
-      "for_type": "TestObligationEvaluateConfigError"
-    }
-  ]
+  }
 }

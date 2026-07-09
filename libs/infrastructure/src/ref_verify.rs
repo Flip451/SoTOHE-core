@@ -83,7 +83,7 @@ impl RefVerifyPairSourcePort for RefVerifyPairSourceAdapter {
             }
             usecase::ref_verify::RefVerifyScope::Chain1 => {}
         }
-        let injection_rate = config.known_bad_injection_rate_percent.as_u8();
+        let injection_rate = config.semantic_probe_config().injection().get();
         let probe_count = pair_source::calculate_probe_count(pairs.len(), injection_rate);
 
         // For All-scope runs, alternate Chain1/Chain2 probes only when Chain-2 pairs were

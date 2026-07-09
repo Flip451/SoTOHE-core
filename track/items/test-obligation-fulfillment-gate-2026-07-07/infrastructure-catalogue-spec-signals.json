@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a7aad6ef03593a77d6867176861c25d724a0e473aaaa442f8d03257d38823971",
+  "catalogue_declaration_hash": "afce0a9d86b6b152b98d96d9f8f8fb100ea12261f41b22450325449a3e326484",
   "signals": [
     {
       "type_name": "CatalogueEntryRefDto",
@@ -16,6 +16,21 @@
       "type_name": "DataRoleKey",
       "signal": "blue",
       "entry_hash": "fbd518f7a308952461525b7b78152cf2c97184cdb900d1beb7fef2fafbdba2ba"
+    },
+    {
+      "type_name": "FailingObligationFulfillmentVerifier",
+      "signal": "blue",
+      "entry_hash": "9152cc38b0cd8bd211b97d7588a97342062464da5937f4a49298bd285b851146"
+    },
+    {
+      "type_name": "FailingWaiverVerifier",
+      "signal": "blue",
+      "entry_hash": "88fcfc282d08cfa5ee04b2ce0d6cf9ceb61aa2b7852ada3f0508f02df6228965"
+    },
+    {
+      "type_name": "FsSpecDocumentLoader",
+      "signal": "blue",
+      "entry_hash": "dacd7283df9e641c11d40331d0deac4efbcdb3bacc2133371332691d114ea4ce"
     },
     {
       "type_name": "FulfillmentFailCategoryDto",

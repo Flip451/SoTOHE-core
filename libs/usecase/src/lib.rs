@@ -6,6 +6,8 @@
 // depending on `domain` directly (architecture-rules.json: cli may_depend_on
 // [infrastructure, usecase]).
 pub use domain::tddd::LayerId;
+pub use domain::tddd::test_obligation::ids::DiagnosticMessage;
+pub use domain::tddd::test_obligation::verdict::DetectionRatePercent;
 pub use domain::{TrackId, ValidationError};
 
 pub mod arch;

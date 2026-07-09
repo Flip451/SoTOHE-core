@@ -159,6 +159,16 @@ impl TestObligationEvaluateConfig {
     }
 }
 
+impl Default for TestObligationEvaluateConfig {
+    fn default() -> Self {
+        const DEFAULT_THRESHOLD: NonZeroU8 = match NonZeroU8::new(90) {
+            Some(value) => value,
+            None => NonZeroU8::MIN,
+        };
+        Self { injection_rate: 10, detection_threshold: DEFAULT_THRESHOLD, parallelism: 4 }
+    }
+}
+
 /// Structured output of [`EvaluateTestObligationsInteractor`] (IN-09 / AC-06).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EvaluateTestObligationsOutcome {

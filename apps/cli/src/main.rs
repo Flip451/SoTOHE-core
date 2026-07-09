@@ -109,6 +109,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::ref_verify::RefVerifyCommand,
     },
+    /// Test-obligation gate: derive, check, evaluate, results.
+    TestObligation {
+        #[command(subcommand)]
+        cmd: commands::test_obligation::TestObligationSubcommand,
+    },
     /// Signal evaluation commands: calc-*/check-* for all 4 SoT Chain chains.
     Signal {
         #[command(subcommand)]
@@ -135,6 +140,7 @@ enum CliCommand {
         cmd: commands::template::TemplateCommand,
     },
     /// Run the example track state machine demo.
+    #[cfg(not(doc))]
     Demo,
 }
 
@@ -174,12 +180,27 @@ fn run_cli_with(
         Some(CliCommand::Telemetry { cmd }) => commands::telemetry::execute(cmd),
         Some(CliCommand::Dry { cmd }) => dry_execute(cmd),
         Some(CliCommand::RefVerify { cmd }) => ref_verify_execute(cmd),
+        Some(CliCommand::TestObligation { cmd }) => commands::test_obligation::execute(
+            commands::test_obligation::TestObligationArgs::new(cmd),
+        ),
         Some(CliCommand::Signal { cmd }) => commands::signal::execute(cmd),
         Some(CliCommand::TaskContract { cmd }) => commands::task_contract::execute(cmd),
         Some(CliCommand::Catalog { cmd }) => commands::catalog::execute(cmd),
         Some(CliCommand::CatalogueLint { cmd }) => commands::catalogue_lint::execute(cmd),
         Some(CliCommand::Template { cmd }) => commands::template::execute(cmd),
+        #[cfg(not(doc))]
         Some(CliCommand::Demo) | None => {
+            let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
+            if let Some(msg) = outcome.stdout {
+                println!("{msg}");
+            }
+            if let Some(msg) = outcome.stderr {
+                eprintln!("{msg}");
+            }
+            ExitCode::from(outcome.exit_code)
+        }
+        #[cfg(doc)]
+        None => {
             let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
             if let Some(msg) = outcome.stdout {
                 println!("{msg}");

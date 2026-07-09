@@ -16,6 +16,7 @@ use std::sync::Arc;
 use domain::EvidenceCitation;
 use domain::ModelTier;
 use domain::tddd::test_obligation::errors::SemanticVerifierError;
+use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::test_obligation::ports::WaiverVerifierPort;
 use domain::tddd::test_obligation::verdict::WaiverVerdict;
 
@@ -80,6 +81,38 @@ impl WaiverVerifierAdapter {
              ## Anchor promise\n{anchor_text}\n\n\
              ## Waiver reason\n{waived_reason}\n"
         )
+    }
+}
+
+/// Fail-closed verifier used when the configured waiver capability cannot load.
+#[derive(Debug, Clone)]
+pub struct FailingWaiverVerifier {
+    message: DiagnosticMessage,
+}
+
+impl FailingWaiverVerifier {
+    /// Builds a verifier that always returns the supplied adapter failure.
+    #[must_use]
+    pub fn new(message: DiagnosticMessage) -> Self {
+        Self { message }
+    }
+
+    /// Builds a verifier failure from text, substituting a bounded diagnostic if needed.
+    #[must_use]
+    pub fn from_message(message: &str) -> Self {
+        Self::new(diagnostic(message))
+    }
+}
+
+impl WaiverVerifierPort for FailingWaiverVerifier {
+    fn verify_pair(
+        &self,
+        _waived_reason: &str,
+        _entry_declaration: &str,
+        _anchor_text: &str,
+        _tier: ModelTier,
+    ) -> Result<WaiverVerdict, SemanticVerifierError> {
+        Err(SemanticVerifierError::VerifierPort(self.message.clone()))
     }
 }
 
@@ -166,6 +199,16 @@ mod tests {
 
     fn adapter(output: &'static str) -> WaiverVerifierAdapter {
         WaiverVerifierAdapter::with_runner(profiles(), stub_runner(output))
+    }
+
+    #[test]
+    fn failing_verifier_returns_verifier_port_error() {
+        let verifier = FailingWaiverVerifier::from_message("profile missing");
+
+        let err = verifier.verify_pair("reason", "entry", "anchor", ModelTier::Fast).unwrap_err();
+
+        let SemanticVerifierError::VerifierPort(message) = err;
+        assert_eq!(message.as_str(), "profile missing");
     }
 
     #[test]

@@ -10,6 +10,9 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| RefVerifyCacheKey | value_object | add | — | 🔵 | 🔵 |
+| RefVerifyConfig | value_object | modify | — | 🔵 | 🔵 |
+| RefVerifyPercent | value_object | modify | — | 🔵 | 🔵 |
 | SemanticCalibrationProbeConfig | value_object | add | — | 🔵 | 🔵 |
 | TestObligationEvaluateConfig | value_object | add | — | 🔵 | 🔵 |
 

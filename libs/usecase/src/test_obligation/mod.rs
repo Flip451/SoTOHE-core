@@ -19,6 +19,8 @@ pub mod evaluate;
 pub mod hasher;
 pub mod results;
 
+pub use domain::tddd::test_obligation::errors;
+
 use std::path::{Component, Path, PathBuf};
 
 use domain::ContentHash;

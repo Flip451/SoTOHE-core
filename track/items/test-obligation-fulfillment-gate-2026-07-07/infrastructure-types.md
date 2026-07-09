@@ -46,15 +46,18 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| FailingObligationFulfillmentVerifier | secondary_adapter | add | impl ObligationFulfillmentVerifierPort, impl Debug, impl Clone | 🔵 | 🔵 |
+| FailingWaiverVerifier | secondary_adapter | add | impl WaiverVerifierPort, impl Debug, impl Clone | 🔵 | 🔵 |
+| FsSpecDocumentLoader | secondary_adapter | add | impl SpecDocumentLoaderPort, impl Debug, impl Clone | 🔵 | 🔵 |
 | JsonObligationFulfillmentCacheCodec | secondary_adapter | add | impl ObligationFulfillmentCachePort, impl Debug, impl Clone | 🔵 | 🔵 |
 | JsonObligationsCodec | secondary_adapter | add | impl ObligationsArtifactPort, impl Debug, impl Clone | 🔵 | 🔵 |
 | JsonTestBindingsCodec | secondary_adapter | add | impl TestBindingsArtifactPort, impl Debug, impl Clone | 🔵 | 🔵 |
 | JsonTestObligationRulesLoader | secondary_adapter | add | impl TestObligationRulesLoaderPort, impl Debug, impl Clone | 🔵 | 🔵 |
 | JsonWaiverCacheCodec | secondary_adapter | add | impl WaiverCachePort, impl Debug, impl Clone | 🔵 | 🔵 |
-| ObligationFulfillmentEscalationDriver | secondary_adapter | add | impl Debug, impl Clone, impl SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::ObligationFulfillmentPair, domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey, domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> | 🟡 | 🔵 |
+| ObligationFulfillmentEscalationDriver | secondary_adapter | add | impl Debug, impl Clone, impl SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::ObligationFulfillmentPair, domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey, domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> | 🔵 | 🔵 |
 | ObligationFulfillmentVerifierAdapter | secondary_adapter | add | impl ObligationFulfillmentVerifierPort | 🔵 | 🔵 |
-| Sha256ContentHasher | secondary_adapter | add | impl Debug, impl Clone, impl ContentHasherPort | 🟡 | 🔵 |
+| Sha256ContentHasher | secondary_adapter | add | impl Debug, impl Clone, impl Default, impl ContentHasherPort | 🔵 | 🔵 |
 | SynTestSourceScanner | secondary_adapter | add | impl TestSourceScannerPort | 🔵 | 🔵 |
-| WaiverEscalationDriver | secondary_adapter | add | impl Debug, impl Clone, impl SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> | 🟡 | 🔵 |
+| WaiverEscalationDriver | secondary_adapter | add | impl Debug, impl Clone, impl SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> | 🔵 | 🔵 |
 | WaiverVerifierAdapter | secondary_adapter | add | impl WaiverVerifierPort | 🔵 | 🔵 |
 

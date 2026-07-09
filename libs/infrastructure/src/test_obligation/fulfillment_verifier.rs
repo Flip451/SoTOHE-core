@@ -17,6 +17,7 @@ use std::sync::Arc;
 use domain::EvidenceCitation;
 use domain::ModelTier;
 use domain::tddd::test_obligation::errors::SemanticVerifierError;
+use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort;
 use domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict;
 use domain::tddd::test_obligation::vocab::FulfillmentFailCategory;
@@ -82,6 +83,38 @@ impl ObligationFulfillmentVerifierAdapter {
              ## Anchor promise\n{anchor_text}\n\n\
              ## Bound test source\n{tests_source}\n"
         )
+    }
+}
+
+/// Fail-closed verifier used when the configured fulfillment capability cannot load.
+#[derive(Debug, Clone)]
+pub struct FailingObligationFulfillmentVerifier {
+    message: DiagnosticMessage,
+}
+
+impl FailingObligationFulfillmentVerifier {
+    /// Builds a verifier that always returns the supplied adapter failure.
+    #[must_use]
+    pub fn new(message: DiagnosticMessage) -> Self {
+        Self { message }
+    }
+
+    /// Builds a verifier failure from text, substituting a bounded diagnostic if needed.
+    #[must_use]
+    pub fn from_message(message: &str) -> Self {
+        Self::new(diagnostic(message))
+    }
+}
+
+impl ObligationFulfillmentVerifierPort for FailingObligationFulfillmentVerifier {
+    fn verify_pair(
+        &self,
+        _tests_source: &str,
+        _entry_declaration: &str,
+        _anchor_text: &str,
+        _tier: ModelTier,
+    ) -> Result<ObligationFulfillmentVerdict, SemanticVerifierError> {
+        Err(SemanticVerifierError::VerifierPort(self.message.clone()))
     }
 }
 
@@ -198,6 +231,16 @@ mod tests {
 
     fn adapter(output: &'static str) -> ObligationFulfillmentVerifierAdapter {
         ObligationFulfillmentVerifierAdapter::with_runner(profiles(), stub_runner(output))
+    }
+
+    #[test]
+    fn failing_verifier_returns_verifier_port_error() {
+        let verifier = FailingObligationFulfillmentVerifier::from_message("profile missing");
+
+        let err = verifier.verify_pair("tests", "entry", "anchor", ModelTier::Fast).unwrap_err();
+
+        let SemanticVerifierError::VerifierPort(message) = err;
+        assert_eq!(message.as_str(), "profile missing");
     }
 
     #[test]

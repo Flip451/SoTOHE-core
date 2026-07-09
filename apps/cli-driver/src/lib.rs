@@ -30,6 +30,7 @@ pub mod signal;
 pub mod task_contract;
 pub mod telemetry;
 pub mod template_export;
+pub mod test_obligation;
 pub mod track;
 pub mod verify;
 

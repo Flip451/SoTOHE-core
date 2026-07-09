@@ -19,12 +19,15 @@
 
 pub mod bindings_codec;
 pub mod fulfillment_cache_codec;
+pub mod fulfillment_escalation_driver;
 pub mod fulfillment_verifier;
 pub mod obligations_codec;
 pub mod rules_codec;
 mod semantic_verifier;
+pub mod sha256_content_hasher;
 pub mod source_scanner;
 pub mod waiver_cache_codec;
+pub mod waiver_escalation_driver;
 pub mod waiver_verifier;
 
 use std::path::Path;
