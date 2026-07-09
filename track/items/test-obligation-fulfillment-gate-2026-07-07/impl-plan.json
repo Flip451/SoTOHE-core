@@ -93,22 +93,26 @@
     {
       "id": "T016",
       "description": "Target libs/usecase test_obligation::{derive,hasher,spec_loader}, libs/domain spec_document_loader_port, libs/domain tddd::catalogue_v2::traits, libs/domain tddd::catalogue_v2::identifiers, and libs/domain tddd::test_obligation::projection. Add ContentHasherPort, SpecDocumentLoaderPort, SpecDocumentLoadError, TraitRefScope, TraitImplDeclV2::trait_ref_scope, RoleObligationItemsProjector; reference TraitName, CrateName, CatalogueDocumentLoaderPort, and CatalogueDocumentLoaderError; add TestObligationCatalogueCommandInput, DeriveTestObligationsCommand, DeriveTestObligationsApplicationService (trait), and DeriveTestObligationsInteractor using catalogue snapshot, spec.json, and TestObligationRulesDocument inputs (IN-04/IN-05/IN-07/IN-17/CN-06/CN-10/CN-11/CN-13/CN-15/CN-16/AC-03/AC-12/AC-16/AC-17/OS-05/OS-09). Add unit tests covering those anchors.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "0fa9e8ab45a79884b356c654f14efaad93a94cdf"
     },
     {
       "id": "T017",
       "description": "Target libs/usecase test_obligation::check and libs/domain tddd::test_obligation::drift. Reuse TestObligationCatalogueCommandInput; add CheckTestObligationsCommand, CheckTestObligationsOutcome, CheckTestObligationsApplicationService (trait), CheckTestObligationsInteractor, and NonEmptyDrifts using ObligationsDocument and TestBindingsDocument inputs (IN-08/IN-13/IN-14/IN-16/OS-08/OS-10/CN-02/CN-04/CN-07/CN-09/AC-04/AC-05/AC-10/AC-12/AC-13/AC-17). Add unit tests covering those anchors.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "0fa9e8ab45a79884b356c654f14efaad93a94cdf"
     },
     {
       "id": "T018",
       "description": "Target libs/usecase test_obligation::evaluate, libs/domain test_obligation::ids, libs/domain test_obligation::drift, libs/domain test_obligation::errors, libs/domain test_obligation::pair, and libs/domain test_obligation::verdict. Add EvaluateTestObligationsCommand, EvaluateTestObligationsOutcome, TestObligationEvaluateConfig, TestObligationEvaluateConfigError, EvaluateTestObligationsFuture, EvaluateTestObligationsApplicationService (trait), EvaluateTestObligationsInteractor, NonEmptyEdgeIds (ids module, non-empty tuple struct wrapping Vec<TestObligationEdgeId>), NonEmptyEdgeVerdictRecords (drift module — libs/domain/src/tddd/test_obligation/drift.rs — non-empty tuple struct wrapping Vec<EdgeVerdictRecord>), ObligationFulfillmentPair, WaiverPair, TestsSource, EntryDeclaration, AnchorText, and DetectionRatePercent; modify ObligationEvaluateError variants/payloads. Use SemanticEscalationDriverPort, ObligationFulfillmentVerifierPort, WaiverVerifierPort, SpecDocumentLoaderPort/SpecDocumentLoadError, and ContentHasherPort (IN-09/IN-11/IN-12/IN-15/OS-01/OS-04/OS-07/CN-03/CN-04/CN-08/CN-12/AC-06/AC-11/AC-12/AC-16). Add unit tests covering those anchors.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "0fa9e8ab45a79884b356c654f14efaad93a94cdf"
     },
     {
       "id": "T019",
       "description": "Target libs/usecase test_obligation::results. Add TestObligationResultsCommand, TestObligationResultsOutput, TestObligationLaneSummary, TestObligationChainLabel, TestObligationResultsApplicationService (trait), TestObligationResultsInteractor using ObligationFulfillmentCacheDocument, WaiverCacheDocument, and drift inputs (IN-10/CN-09/AC-09). Add unit tests covering those anchors.",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "0fa9e8ab45a79884b356c654f14efaad93a94cdf"
     },
     {
       "id": "T020",
