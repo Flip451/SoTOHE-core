@@ -17,7 +17,7 @@ use std::path::{Component, Path, PathBuf};
 
 use proc_macro2::LineColumn;
 use sha2::Digest as _;
-use syn::visit::Visit;
+use syn::Item;
 
 use domain::ContentHash;
 use domain::tddd::test_obligation::binding::TestLocation;
@@ -187,26 +187,46 @@ fn guard_candidate_file(
 /// `a/mod.rs`, then the crate roots `lib.rs` / `main.rs`. A trailing `tests`
 /// segment (the conventional inline `#[cfg(test)] mod tests`) is dropped so the
 /// enclosing file is reached.
-fn candidate_files(src_root: &Path, rest: &[&str]) -> Vec<PathBuf> {
-    let trimmed: &[&str] = match rest.split_last() {
-        Some((&"tests", init)) => init,
-        _ => rest,
+struct CandidateFile {
+    path: PathBuf,
+    inline_modules: Vec<String>,
+}
+
+fn candidate_files(src_root: &Path, rest: &[&str]) -> Vec<CandidateFile> {
+    let trimmed_len = match rest.split_last() {
+        Some((&"tests", init)) => init.len(),
+        _ => rest.len(),
     };
 
     let mut files = Vec::new();
-    for len in (1..=trimmed.len()).rev() {
-        let Some(prefix) = trimmed.get(..len) else {
+    for len in (1..=trimmed_len).rev() {
+        let Some(prefix) = rest.get(..len) else {
             continue;
         };
         let mut base = src_root.to_path_buf();
         for seg in prefix {
             base.push(seg);
         }
-        files.push(base.with_extension("rs"));
-        files.push(base.join("mod.rs"));
+        let inline_modules: Vec<String> = match rest.get(len..) {
+            Some(tail) => tail.iter().map(|segment| (*segment).to_owned()).collect(),
+            None => Vec::new(),
+        };
+        files.push(CandidateFile {
+            path: base.with_extension("rs"),
+            inline_modules: inline_modules.clone(),
+        });
+        files.push(CandidateFile { path: base.join("mod.rs"), inline_modules });
     }
-    files.push(src_root.join("lib.rs"));
-    files.push(src_root.join("main.rs"));
+    let root_inline_modules: Vec<String> =
+        rest.iter().map(|segment| (*segment).to_owned()).collect();
+    files.push(CandidateFile {
+        path: src_root.join("lib.rs"),
+        inline_modules: root_inline_modules.clone(),
+    });
+    files.push(CandidateFile {
+        path: src_root.join("main.rs"),
+        inline_modules: root_inline_modules,
+    });
     files
 }
 
@@ -218,25 +238,39 @@ fn has_test_attr(attrs: &[syn::Attribute]) -> bool {
         .any(|attr| attr.path().segments.last().is_some_and(|segment| segment.ident == "test"))
 }
 
-/// Visitor that captures the body span of the first `#[test]` function named
-/// `target`, recursing through nested modules.
-struct TestFnFinder<'a> {
-    target: &'a str,
-    span: Option<(LineColumn, LineColumn)>,
-}
-
-impl<'ast> Visit<'ast> for TestFnFinder<'_> {
-    fn visit_item_fn(&mut self, node: &'ast syn::ItemFn) {
-        if self.span.is_some() {
-            return;
+fn find_test_span_in_items(
+    items: &[Item],
+    target: &str,
+    inline_modules: &[String],
+) -> Option<(LineColumn, LineColumn)> {
+    if let Some((head, tail)) = inline_modules.split_first() {
+        for item in items {
+            let Item::Mod(module) = item else {
+                continue;
+            };
+            if module.ident != head.as_str() {
+                continue;
+            }
+            let Some((_, nested_items)) = &module.content else {
+                continue;
+            };
+            if let Some(span) = find_test_span_in_items(nested_items, target, tail) {
+                return Some(span);
+            }
         }
-        if node.sig.ident == self.target && has_test_attr(&node.attrs) {
-            let delim = node.block.brace_token.span;
-            self.span = Some((delim.open().start(), delim.close().end()));
-            return;
-        }
-        syn::visit::visit_item_fn(self, node);
+        return None;
     }
+
+    for item in items {
+        let Item::Fn(function) = item else {
+            continue;
+        };
+        if function.sig.ident == target && has_test_attr(&function.attrs) {
+            let delim = function.block.brace_token.span;
+            return Some((delim.open().start(), delim.close().end()));
+        }
+    }
+    None
 }
 
 /// Byte offsets of the first character of each 1-based line in `content`.
@@ -280,13 +314,16 @@ fn slice_span(content: &str, start: LineColumn, end: LineColumn) -> Option<Strin
 /// # Errors
 ///
 /// Returns [`TestSourceScanError::Parse`] when `content` is not parseable Rust.
-fn scan_body_in_file(content: &str, target: &str) -> Result<Option<String>, TestSourceScanError> {
+fn scan_body_in_file(
+    content: &str,
+    target: &str,
+    inline_modules: &[String],
+) -> Result<Option<String>, TestSourceScanError> {
     let file = syn::parse_file(content).map_err(|e| {
         TestSourceScanError::Parse(diagnostic(&format!("cannot parse test source: {e}")))
     })?;
-    let mut finder = TestFnFinder { target, span: None };
-    finder.visit_file(&file);
-    Ok(finder.span.and_then(|(start, end)| slice_span(content, start, end)))
+    Ok(find_test_span_in_items(&file.items, target, inline_modules)
+        .and_then(|(start, end)| slice_span(content, start, end)))
 }
 
 impl TestSourceScannerPort for SynTestSourceScanner {
@@ -303,8 +340,8 @@ impl TestSourceScannerPort for SynTestSourceScanner {
         let test_name = location.test_name().as_str();
 
         for src_root in Self::crate_src_roots(&workspace_root, crate_name) {
-            for file in candidate_files(&src_root, rest) {
-                let Some(file) = guard_candidate_file(&file, &workspace_root)? else {
+            for candidate in candidate_files(&src_root, rest) {
+                let Some(file) = guard_candidate_file(&candidate.path, &workspace_root)? else {
                     continue;
                 };
                 let content = match std::fs::read_to_string(&file) {
@@ -316,7 +353,9 @@ impl TestSourceScannerPort for SynTestSourceScanner {
                         ))));
                     }
                 };
-                if let Some(body) = scan_body_in_file(&content, test_name)? {
+                if let Some(body) =
+                    scan_body_in_file(&content, test_name, &candidate.inline_modules)?
+                {
                     return Ok(Some(body));
                 }
             }
@@ -420,6 +459,26 @@ mod tests {
             .scan_test_body(&location("domain", "domain::nothing::tests", "test_x"))
             .unwrap();
         assert!(result.is_none());
+    }
+
+    #[test]
+    fn fallback_root_requires_matching_inline_module_path() {
+        let source = r#"pub mod other {
+    #[cfg(test)]
+    mod tests {
+        #[test]
+        fn test_x() {
+            assert!(false);
+        }
+    }
+}
+"#;
+        let dir = write_lib_source("domain", "lib.rs", source);
+        let scanner = SynTestSourceScanner::new(dir.path().to_path_buf());
+        let result = scanner
+            .scan_test_body(&location("domain", "domain::missing::tests", "test_x"))
+            .unwrap();
+        assert!(result.is_none(), "same-named tests in other modules must not match");
     }
 
     #[test]

@@ -19,7 +19,7 @@ pub mod evaluate;
 pub mod hasher;
 pub mod results;
 
-use std::path::PathBuf;
+use std::path::{Component, Path, PathBuf};
 
 use domain::ContentHash;
 use domain::TrackId;
@@ -28,6 +28,35 @@ use domain::tddd::semantic_verify::{CatalogueEntryRef, CatalogueSectionKey};
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::test_obligation::obligations::TestObligation;
 use domain::tddd::test_obligation::vocab::TargetEntryRoleKind;
+
+/// A loaded catalogue paired with the command path that produced it.
+#[derive(Debug, Clone)]
+pub(crate) struct LoadedCatalogueDocument {
+    file_path: String,
+    normalized_file_path: String,
+    document: CatalogueDocument,
+}
+
+impl LoadedCatalogueDocument {
+    /// Builds a loaded catalogue record from a command path and parsed document.
+    #[must_use]
+    pub(crate) fn new(path: &Path, document: CatalogueDocument) -> Self {
+        let file_path = path.display().to_string();
+        let normalized_file_path = normalize_catalogue_path(&file_path);
+        Self { file_path, normalized_file_path, document }
+    }
+
+    /// Returns the parsed catalogue document.
+    #[must_use]
+    pub(crate) fn document(&self) -> &CatalogueDocument {
+        &self.document
+    }
+
+    fn matches_file_path(&self, file_path: &str) -> bool {
+        self.file_path == file_path
+            || self.normalized_file_path == normalize_catalogue_path(file_path)
+    }
+}
 
 /// Shared input for commands that read catalogue snapshots for a track.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -132,6 +161,7 @@ pub(crate) fn entry_declaration_text(
 /// Voluntary / unresolved edges carry only a bare entry key. If that key appears
 /// in more than one catalogue section, return `None` so callers escalate rather
 /// than verifying against the wrong declaration.
+#[cfg(test)]
 #[must_use]
 pub(crate) fn find_declaration_text(catalogues: &[CatalogueDocument], key: &str) -> Option<String> {
     let mut found = None;
@@ -152,12 +182,37 @@ pub(crate) fn find_declaration_text(catalogues: &[CatalogueDocument], key: &str)
     found
 }
 
+/// Searches every loaded catalogue for an unambiguous declaration named `key`.
+#[must_use]
+pub(crate) fn find_declaration_text_from_loaded(
+    catalogues: &[LoadedCatalogueDocument],
+    key: &str,
+) -> Option<String> {
+    let mut found = None;
+    for catalogue in catalogues {
+        for section in [
+            CatalogueSectionKey::Types,
+            CatalogueSectionKey::Traits,
+            CatalogueSectionKey::Functions,
+        ] {
+            if let Some(text) = entry_declaration_text(catalogue.document(), &section, key) {
+                if found.is_some() {
+                    return None;
+                }
+                found = Some(text);
+            }
+        }
+    }
+    found
+}
+
 /// Resolves the declaration text for a derived obligation.
 ///
 /// Trait-impl obligations use the implementer type as their entry key but freeze
 /// the actual `TraitImplDeclV2`; use the item identifier (`trait_impl:<trait>`)
 /// to re-resolve that same impl declaration instead of falling back to a type
 /// declaration with the same key.
+#[cfg(test)]
 #[must_use]
 pub(crate) fn obligation_declaration_text(
     catalogues: &[CatalogueDocument],
@@ -169,8 +224,33 @@ pub(crate) fn obligation_declaration_text(
     target_entry_declaration_text(catalogues, obligation.target_entry())
 }
 
+/// Resolves the declaration text for a derived obligation from its recorded
+/// catalogue file.
+#[must_use]
+pub(crate) fn obligation_declaration_text_from_loaded(
+    catalogues: &[LoadedCatalogueDocument],
+    obligation: &TestObligation,
+) -> Option<String> {
+    let matching = catalogues
+        .iter()
+        .filter(|catalogue| catalogue.matches_file_path(&obligation.target_entry().file_path))
+        .map(LoadedCatalogueDocument::document);
+    if matches!(obligation.target_role(), TargetEntryRoleKind::TraitImpl(_)) {
+        return trait_impl_declaration_text_in(matching, obligation);
+    }
+    target_entry_declaration_text_in(matching, obligation.target_entry())
+}
+
+#[cfg(test)]
 fn target_entry_declaration_text(
     catalogues: &[CatalogueDocument],
+    target: &CatalogueEntryRef,
+) -> Option<String> {
+    target_entry_declaration_text_in(catalogues.iter(), target)
+}
+
+fn target_entry_declaration_text_in<'a>(
+    catalogues: impl IntoIterator<Item = &'a CatalogueDocument>,
     target: &CatalogueEntryRef,
 ) -> Option<String> {
     for catalogue in catalogues {
@@ -183,8 +263,16 @@ fn target_entry_declaration_text(
     None
 }
 
+#[cfg(test)]
 fn trait_impl_declaration_text(
     catalogues: &[CatalogueDocument],
+    obligation: &TestObligation,
+) -> Option<String> {
+    trait_impl_declaration_text_in(catalogues.iter(), obligation)
+}
+
+fn trait_impl_declaration_text_in<'a>(
+    catalogues: impl IntoIterator<Item = &'a CatalogueDocument>,
     obligation: &TestObligation,
 ) -> Option<String> {
     let trait_ref = obligation.id().item_identifier().as_str().strip_prefix("trait_impl:")?;
@@ -199,6 +287,20 @@ fn trait_impl_declaration_text(
         }
     }
     None
+}
+
+fn normalize_catalogue_path(path: &str) -> String {
+    let mut normalized = PathBuf::new();
+    for component in Path::new(path).components() {
+        match component {
+            Component::CurDir => {}
+            Component::Normal(part) => normalized.push(part),
+            Component::ParentDir => normalized.push(".."),
+            Component::RootDir | Component::Prefix(_) => normalized.push(component.as_os_str()),
+        }
+    }
+    let text = normalized.display().to_string();
+    if text.is_empty() { path.to_owned() } else { text }
 }
 
 /// Collects the spec-anchor element ids cited by every catalogue entry across

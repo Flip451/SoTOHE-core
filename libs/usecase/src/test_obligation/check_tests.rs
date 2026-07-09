@@ -57,7 +57,8 @@ use super::{
     CheckTestObligationsInteractor,
 };
 use crate::test_obligation::{
-    TestObligationCatalogueCommandInput, obligation_declaration_text, sha256_content_hash,
+    LoadedCatalogueDocument, TestObligationCatalogueCommandInput, obligation_declaration_text,
+    obligation_declaration_text_from_loaded, sha256_content_hash,
 };
 
 const BODY: &str = "assert!(money.is_positive());";
@@ -301,6 +302,33 @@ fn money_catalogue() -> CatalogueDocument {
     doc
 }
 
+fn money_catalogue_with_role(role: DataRole) -> CatalogueDocument {
+    let mut doc = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    doc.insert_type(
+        TypeName::new("Money").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            role,
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![SpecRef::new(
+                PathBuf::from("spec.json"),
+                SpecElementId::try_new("IN-05").unwrap(),
+            )],
+            vec![],
+        ),
+    );
+    doc
+}
+
 fn trait_entry(role: ContractRole) -> TraitEntry {
     TraitEntry::new(
         ItemAction::Add,
@@ -478,6 +506,42 @@ fn test_obligation_declaration_text_uses_target_section_for_same_key() {
 
     assert!(declaration.contains("SecondaryPort"));
     assert!(!declaration.contains("ValueObject"));
+}
+
+#[test]
+fn test_obligation_declaration_text_uses_recorded_catalogue_path() {
+    let entry_key = entry_key();
+    let obligation = TestObligation::new(
+        TestObligationId::new(
+            entry_key.clone(),
+            TestObligationKind::Boundary,
+            TestObligationItemIdentifier::try_new("invariant:positive".to_owned()).unwrap(),
+        ),
+        CatalogueEntryRef::new(
+            "usecase-types.json".to_owned(),
+            CatalogueSectionKey::Types,
+            entry_key,
+        ),
+        TargetEntryRoleKind::DataRole(DataRole::value_object()),
+        TestObligationBrief::try_new("cover positivity".to_owned()).unwrap(),
+        DeclarationHash::new(ContentHash::from_bytes([0u8; 32])),
+        vec![anchor()],
+    );
+    let catalogues = vec![
+        LoadedCatalogueDocument::new(
+            Path::new("domain-types.json"),
+            money_catalogue_with_role(DataRole::entity().unwrap()),
+        ),
+        LoadedCatalogueDocument::new(
+            Path::new("usecase-types.json"),
+            money_catalogue_with_role(DataRole::value_object()),
+        ),
+    ];
+
+    let declaration = obligation_declaration_text_from_loaded(&catalogues, &obligation).unwrap();
+
+    assert!(declaration.contains("ValueObject"));
+    assert!(!declaration.contains("Entity"));
 }
 
 #[test]

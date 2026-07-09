@@ -48,8 +48,8 @@ use domain::{SpecDocument, SpecElementId, SpecRequirement};
 use domain::SpecDocumentLoaderPort;
 
 use super::{
-    TestObligationCatalogueCommandInput, cited_anchor_ids, diag, obligation_declaration_text,
-    sha256_content_hash,
+    LoadedCatalogueDocument, TestObligationCatalogueCommandInput, cited_anchor_ids, diag,
+    obligation_declaration_text_from_loaded, sha256_content_hash,
 };
 
 /// Command input for [`CheckTestObligationsApplicationService`] (IN-08).
@@ -161,12 +161,12 @@ impl CheckTestObligationsInteractor {
     fn load_catalogues(
         &self,
         cmd: &CheckTestObligationsCommand,
-    ) -> Result<Vec<CatalogueDocument>, ObligationCheckError> {
+    ) -> Result<Vec<LoadedCatalogueDocument>, ObligationCheckError> {
         let mut catalogues = Vec::with_capacity(cmd.input.catalogue_paths().len());
         for path in cmd.input.catalogue_paths() {
             let doc =
                 self.catalogue_reader.load(path).map_err(ObligationCheckError::CatalogueLoad)?;
-            catalogues.push(doc);
+            catalogues.push(LoadedCatalogueDocument::new(path, doc));
         }
         Ok(catalogues)
     }
@@ -322,7 +322,7 @@ impl CheckTestObligationsInteractor {
         &self,
         obligations: &ObligationsDocument,
         bindings: &TestBindingsDocument,
-        catalogues: &[CatalogueDocument],
+        catalogues: &[LoadedCatalogueDocument],
         spec_texts: &[(String, String)],
         fulfillment: &ObligationFulfillmentCacheDocument,
         waiver: &WaiverCacheDocument,
@@ -388,7 +388,7 @@ impl CheckTestObligationsInteractor {
         edge: &TestObligationEdgeId,
         obligation: &TestObligation,
         tests: &[TestLocation],
-        catalogues: &[CatalogueDocument],
+        catalogues: &[LoadedCatalogueDocument],
         spec_texts: &[(String, String)],
         fulfillment: &ObligationFulfillmentCacheDocument,
         gate: &mut GateState,
@@ -403,7 +403,9 @@ impl CheckTestObligationsInteractor {
         };
         let current_bound = self.current_bound_hash(tests)?;
         let current_decl = sha256_content_hash(
-            obligation_declaration_text(catalogues, obligation).unwrap_or_default().as_bytes(),
+            obligation_declaration_text_from_loaded(catalogues, obligation)
+                .unwrap_or_default()
+                .as_bytes(),
         );
         let current_anchor =
             sha256_content_hash(anchor_text(spec_texts, edge.anchor_id()).as_bytes());
@@ -438,7 +440,7 @@ impl CheckTestObligationsInteractor {
         edge: &TestObligationEdgeId,
         obligation: &TestObligation,
         reason: &WaivedReason,
-        catalogues: &[CatalogueDocument],
+        catalogues: &[LoadedCatalogueDocument],
         spec_texts: &[(String, String)],
         waiver: &WaiverCacheDocument,
         gate: &mut GateState,
@@ -449,7 +451,9 @@ impl CheckTestObligationsInteractor {
         };
         let current_reason = sha256_content_hash(reason.as_str().as_bytes());
         let current_decl = sha256_content_hash(
-            obligation_declaration_text(catalogues, obligation).unwrap_or_default().as_bytes(),
+            obligation_declaration_text_from_loaded(catalogues, obligation)
+                .unwrap_or_default()
+                .as_bytes(),
         );
         let current_anchor =
             sha256_content_hash(anchor_text(spec_texts, edge.anchor_id()).as_bytes());
@@ -568,10 +572,12 @@ fn anchor_texts(elements: &[SpecElement]) -> Vec<(String, String)> {
 
 /// Computes the uncited `AC` / `CN` findings from catalogues + spec elements.
 fn compute_uncited_from(
-    catalogues: &[CatalogueDocument],
+    catalogues: &[LoadedCatalogueDocument],
     elements: &[SpecElement],
 ) -> Vec<UncitedSpecElementFinding> {
-    let cited = cited_anchor_ids(catalogues);
+    let documents: Vec<CatalogueDocument> =
+        catalogues.iter().map(|catalogue| catalogue.document().clone()).collect();
+    let cited = cited_anchor_ids(&documents);
     let mut findings = Vec::new();
     for element in elements {
         let is_ac_or_cn = matches!(

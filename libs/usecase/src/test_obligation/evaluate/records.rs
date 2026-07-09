@@ -1,6 +1,5 @@
 //! Binding-record dispatch and cache persistence for evaluate.
 
-use domain::tddd::catalogue_v2::CatalogueDocument;
 use domain::tddd::test_obligation::binding::TestBindingRecord;
 use domain::tddd::test_obligation::errors::{ObligationEvaluateError, VerifyCacheError};
 use domain::tddd::test_obligation::hashes::DeclarationHash;
@@ -19,7 +18,10 @@ use super::verify::{
     record_pending_edge, record_pending_obligation_edges, record_pending_obligation_id,
 };
 use super::{EvaluateTestObligationsInteractor, Tally};
-use crate::test_obligation::{diag, find_declaration_text, obligation_declaration_text};
+use crate::test_obligation::{
+    LoadedCatalogueDocument, diag, find_declaration_text_from_loaded,
+    obligation_declaration_text_from_loaded,
+};
 
 impl EvaluateTestObligationsInteractor {
     /// Persists both verdict cache documents for the evaluated scope.
@@ -64,7 +66,7 @@ impl EvaluateTestObligationsInteractor {
         &self,
         record: &TestBindingRecord,
         obligations: &ObligationsDocument,
-        catalogues: &[CatalogueDocument],
+        catalogues: &[LoadedCatalogueDocument],
         spec: &SpecDocument,
         existing_fulfillment_cache: Option<&ObligationFulfillmentCacheDocument>,
         existing_waiver_cache: Option<&WaiverCacheDocument>,
@@ -78,7 +80,9 @@ impl EvaluateTestObligationsInteractor {
                     record_pending_obligation_id(obligation_id, tally);
                     return Ok(());
                 };
-                let Some(declaration) = obligation_declaration_text(catalogues, obligation) else {
+                let Some(declaration) =
+                    obligation_declaration_text_from_loaded(catalogues, obligation)
+                else {
                     record_pending_obligation_edges(obligation, tally);
                     return Ok(());
                 };
@@ -110,7 +114,8 @@ impl EvaluateTestObligationsInteractor {
             }
             TestBindingRecord::VoluntaryBinding { edge_id, tests } => {
                 if let Some(obligation) = find_obligation_for_edge(obligations, edge_id) {
-                    let Some(declaration) = obligation_declaration_text(catalogues, obligation)
+                    let Some(declaration) =
+                        obligation_declaration_text_from_loaded(catalogues, obligation)
                     else {
                         record_pending_edge(edge_id.clone(), tally);
                         return Ok(());
@@ -185,11 +190,11 @@ impl EvaluateTestObligationsInteractor {
         &self,
         edge_id: &TestObligationEdgeId,
         obligations: &ObligationsDocument,
-        catalogues: &[CatalogueDocument],
+        catalogues: &[LoadedCatalogueDocument],
         spec: &SpecDocument,
     ) -> Option<(String, String, DeclarationHash)> {
         if let Some(obligation) = find_obligation_for_edge(obligations, edge_id) {
-            let declaration = obligation_declaration_text(catalogues, obligation)?;
+            let declaration = obligation_declaration_text_from_loaded(catalogues, obligation)?;
             let anchor_text = resolve_anchor_text(spec, edge_id.anchor_id().element_id())?;
             let declaration_hash = DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
             return Some((declaration, anchor_text, declaration_hash));
@@ -202,10 +207,11 @@ impl EvaluateTestObligationsInteractor {
     fn resolve_edge(
         &self,
         edge_id: &TestObligationEdgeId,
-        catalogues: &[CatalogueDocument],
+        catalogues: &[LoadedCatalogueDocument],
         spec: &SpecDocument,
     ) -> Option<(String, String, DeclarationHash)> {
-        let declaration = find_declaration_text(catalogues, edge_id.entry_key().as_str())?;
+        let declaration =
+            find_declaration_text_from_loaded(catalogues, edge_id.entry_key().as_str())?;
         let anchor_text = resolve_anchor_text(spec, edge_id.anchor_id().element_id())?;
         let declaration_hash = DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
         Some((declaration, anchor_text, declaration_hash))

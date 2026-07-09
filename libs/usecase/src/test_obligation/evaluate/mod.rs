@@ -20,10 +20,11 @@ use std::path::PathBuf;
 use std::pin::Pin;
 use std::sync::Arc;
 
-use domain::tddd::catalogue_v2::CatalogueDocument;
 use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort;
 use domain::tddd::semantic_verify::ModelTier;
-use domain::tddd::test_obligation::binding::TestLocation;
+use domain::tddd::test_obligation::binding::{
+    TestBindingRecord, TestBindingsDocument, TestLocation,
+};
 use domain::tddd::test_obligation::drift::{EdgeVerdictRecord, NonEmptyEdgeVerdictRecords};
 use domain::tddd::test_obligation::errors::{
     ArtifactCodecError, ObligationEvaluateError, SemanticVerifierError, TestSourceScanError,
@@ -32,6 +33,7 @@ use domain::tddd::test_obligation::hashes::{
     AnchorTextHash, BoundTestsSetHash, DeclarationHash, WaivedReasonHash,
 };
 use domain::tddd::test_obligation::ids::{TestObligationEdgeId, TestObligationId, WaivedReason};
+use domain::tddd::test_obligation::obligations::ObligationsDocument;
 use domain::tddd::test_obligation::pair::{
     AnchorText, EntryDeclaration, ObligationFulfillmentPair, TestsSource, WaiverPair,
 };
@@ -49,7 +51,7 @@ use domain::{SpecDocumentLoaderPort, TrackId};
 use crate::semantic_verdict_core::driver::SemanticEscalationDriverPort;
 
 use super::hasher::ContentHasherPort;
-use super::{diag, is_active_branch};
+use super::{LoadedCatalogueDocument, diag, is_active_branch};
 
 mod cache;
 mod edges;
@@ -322,14 +324,61 @@ impl EvaluateTestObligationsInteractor {
     fn load_catalogues(
         &self,
         cmd: &EvaluateTestObligationsCommand,
-    ) -> Result<Vec<CatalogueDocument>, ObligationEvaluateError> {
+    ) -> Result<Vec<LoadedCatalogueDocument>, ObligationEvaluateError> {
         let mut catalogues = Vec::with_capacity(cmd.catalogue_paths.len());
         for path in &cmd.catalogue_paths {
             let doc =
                 self.catalogue_reader.load(path).map_err(ObligationEvaluateError::CatalogueLoad)?;
-            catalogues.push(doc);
+            catalogues.push(LoadedCatalogueDocument::new(path, doc));
         }
         Ok(catalogues)
+    }
+
+    async fn known_bad_detection_rate(
+        &self,
+        production_pair_count: usize,
+    ) -> Result<DetectionRatePercent, ObligationEvaluateError> {
+        let probe_count =
+            calibration_probe_count(production_pair_count, self.config.injection_rate());
+        if probe_count == 0 {
+            return DetectionRatePercent::try_new(100)
+                .map_err(|_| invalid_input_error("known_bad_detection_rate"));
+        }
+
+        let mut detected = 0usize;
+        for index in 0..probe_count {
+            let tests_source = known_bad_tests_source(index);
+            let key = ObligationFulfillmentCacheKey::new(
+                BoundTestsSetHash::new(self.hasher.sha256(tests_source.as_bytes())),
+                DeclarationHash::new(self.hasher.sha256(KNOWN_BAD_DECLARATION.as_bytes())),
+                AnchorTextHash::new(self.hasher.sha256(KNOWN_BAD_ANCHOR_TEXT.as_bytes())),
+            );
+            let verdict = self
+                .fulfillment_verdict(
+                    &tests_source,
+                    KNOWN_BAD_DECLARATION,
+                    KNOWN_BAD_ANCHOR_TEXT,
+                    &key,
+                )
+                .await?;
+            if matches!(verdict, ObligationFulfillmentVerdict::Fail { .. }) {
+                detected += 1;
+            }
+        }
+
+        let rate = ((detected * 100) / probe_count) as u8;
+        let detection_rate = DetectionRatePercent::try_new(rate)
+            .map_err(|_| invalid_input_error("known_bad_detection_rate"))?;
+        if detection_rate.value() < self.config.detection_threshold().get() {
+            return Err(ObligationEvaluateError::VerifierPort(
+                SemanticVerifierError::VerifierPort(diag(&format!(
+                    "known-bad detection rate {} below threshold {}",
+                    detection_rate.value(),
+                    self.config.detection_threshold().get()
+                ))),
+            ));
+        }
+        Ok(detection_rate)
     }
 
     /// Concatenates and hashes the bound test bodies (claim side of the pair).
@@ -471,6 +520,48 @@ fn half_materialized_scope_error(missing: &str) -> ObligationEvaluateError {
     ))))
 }
 
+const KNOWN_BAD_DECLARATION: &str = "KnownBadGateRule { red_signal: \"must block the gate\" }";
+const KNOWN_BAD_ANCHOR_TEXT: &str = "A red signal must always block the gate.";
+
+fn known_bad_tests_source(index: usize) -> String {
+    format!(
+        "#[test]\nfn known_bad_calibration_probe_{index}() {{\n    assert!(gate_passes_when_red_signal_exists());\n}}\n"
+    )
+}
+
+fn calibration_probe_count(production_pair_count: usize, injection_rate: u8) -> usize {
+    if injection_rate == 0 {
+        return 0;
+    }
+    let scaled = production_pair_count.saturating_mul(usize::from(injection_rate));
+    let count = scaled.saturating_add(99) / 100;
+    count.max(1)
+}
+
+fn production_pair_count(
+    obligations: &ObligationsDocument,
+    bindings: &TestBindingsDocument,
+) -> usize {
+    let mut count = 0usize;
+    for record in bindings.records() {
+        match record {
+            TestBindingRecord::Fulfillment { obligation_id, .. } => {
+                let edge_count = obligations
+                    .obligations()
+                    .iter()
+                    .find(|obligation| obligation.id() == obligation_id)
+                    .map(|obligation| obligation.spec_refs().len())
+                    .unwrap_or(1);
+                count = count.saturating_add(edge_count.max(1));
+            }
+            TestBindingRecord::VoluntaryBinding { .. } | TestBindingRecord::Waiver { .. } => {
+                count = count.saturating_add(1);
+            }
+        }
+    }
+    count
+}
+
 impl EvaluateTestObligationsApplicationService for EvaluateTestObligationsInteractor {
     fn execute<'a>(
         &'a self,
@@ -490,8 +581,6 @@ impl EvaluateTestObligationsInteractor {
                 branch: diag(&cmd.current_branch),
             });
         }
-        let detection_rate = DetectionRatePercent::try_new(self.config.detection_threshold().get())
-            .map_err(|_| invalid_input_error("known_bad_detection_rate"))?;
 
         let obligations = self
             .obligations_port
@@ -504,6 +593,7 @@ impl EvaluateTestObligationsInteractor {
 
         let (obligations, bindings) = match (obligations, bindings) {
             (None, None) => {
+                let detection_rate = self.known_bad_detection_rate(0).await?;
                 // Existence-based scope: no materialized scope to evaluate
                 // (IN-14). Rewrite caches to empty documents so `results` cannot
                 // report verdicts from a previous materialized scope.
@@ -515,6 +605,8 @@ impl EvaluateTestObligationsInteractor {
             (Some(_), None) => return Err(half_materialized_scope_error("test-bindings")),
         };
 
+        let detection_rate =
+            self.known_bad_detection_rate(production_pair_count(&obligations, &bindings)).await?;
         let catalogues = self.load_catalogues(cmd)?;
         let spec =
             self.spec_reader.load(&cmd.spec_path).map_err(ObligationEvaluateError::SpecLoad)?;

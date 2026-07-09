@@ -114,6 +114,8 @@ impl TestSourceScannerPort for StubScanner {
 struct ScriptedFulfillment {
     fast: ObligationFulfillmentVerdict,
     last: ObligationFulfillmentVerdict,
+    calibration: Mutex<ObligationFulfillmentVerdict>,
+    calibration_calls: Mutex<usize>,
     tiers: Mutex<Vec<ModelTier>>,
     declarations: Mutex<Vec<String>>,
 }
@@ -132,6 +134,10 @@ impl
         initial_tier: ModelTier,
     ) -> SemanticEscalationFuture<'a, ObligationFulfillmentVerdict, SemanticVerifierError> {
         Box::pin(async move {
+            if pair.tests_source().as_str().contains("known_bad_calibration_probe") {
+                *self.calibration_calls.lock().unwrap() += 1;
+                return Ok(self.calibration.lock().unwrap().clone());
+            }
             self.tiers.lock().unwrap().push(initial_tier);
             self.declarations.lock().unwrap().push(pair.entry_declaration().as_str().to_owned());
             if matches!(self.fast, ObligationFulfillmentVerdict::Fulfilled { .. }) {
@@ -515,6 +521,8 @@ fn harness_with_read_models(
     let fulfillment_driver = Arc::new(ScriptedFulfillment {
         fast,
         last,
+        calibration: Mutex::new(fulfillment_fail()),
+        calibration_calls: Mutex::new(0),
         tiers: Mutex::new(Vec::new()),
         declarations: Mutex::new(Vec::new()),
     });
@@ -646,10 +654,34 @@ fn test_fulfilled_on_fast_counts_pass_without_escalation() {
     let outcome = run(h.interactor.execute(&command())).unwrap();
     assert_eq!(outcome.pass_count(), 1);
     assert_eq!(outcome.fail_count(), 0);
-    assert_eq!(outcome.known_bad_detection_rate().value(), 90);
+    assert_eq!(outcome.known_bad_detection_rate().value(), 100);
+    assert_eq!(*h.fulfillment_driver.calibration_calls.lock().unwrap(), 1);
     assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);
     // The verdict is frozen in the fulfillment cache.
     assert_eq!(h.fulfillment_cache.saved.lock().unwrap().clone().unwrap().entries().len(), 1);
+}
+
+#[test]
+fn test_known_bad_probe_below_threshold_fails_closed_without_cache_save() {
+    let h = harness(
+        Some(obligations_doc()),
+        Some(fulfillment_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Pending,
+    );
+    *h.fulfillment_driver.calibration.lock().unwrap() = fulfilled();
+
+    let result = run(h.interactor.execute(&command()));
+
+    assert!(matches!(
+        result,
+        Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message)))
+            if message.as_str().contains("known-bad detection rate 0 below threshold 90")
+    ));
+    assert_eq!(*h.fulfillment_driver.calibration_calls.lock().unwrap(), 1);
+    assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());
+    assert!(h.waiver_cache.saved.lock().unwrap().is_none());
 }
 
 #[test]
