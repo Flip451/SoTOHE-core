@@ -93,13 +93,27 @@ impl TestObligationEvaluateHandler {
     }
 }
 
+/// Drives `future` to completion on the current thread, parking between polls so pending futures do not busy-spin.
 fn block_on<F: Future>(future: F) -> F::Output {
+    struct ThreadWaker(std::thread::Thread);
+
+    impl std::task::Wake for ThreadWaker {
+        fn wake(self: Arc<Self>) {
+            self.0.unpark();
+        }
+
+        fn wake_by_ref(self: &Arc<Self>) {
+            self.0.unpark();
+        }
+    }
+
     let mut future = pin!(future);
-    let mut cx = Context::from_waker(Waker::noop());
+    let waker = Waker::from(Arc::new(ThreadWaker(std::thread::current())));
+    let mut cx = Context::from_waker(&waker);
     loop {
         match future.as_mut().poll(&mut cx) {
             Poll::Ready(output) => return output,
-            Poll::Pending => continue,
+            Poll::Pending => std::thread::park(),
         }
     }
 }
@@ -140,5 +154,31 @@ mod tests {
 
         assert_eq!(outcome.exit_code, 0);
         assert!(outcome.stdout.unwrap().contains("pass=1"));
+    }
+
+    #[test]
+    fn test_block_on_completes_self_waking_pending_future() {
+        use std::pin::Pin;
+        use std::sync::atomic::{AtomicBool, Ordering};
+
+        struct SelfWakingOnce {
+            polled: AtomicBool,
+        }
+
+        impl Future for SelfWakingOnce {
+            type Output = u32;
+
+            fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+                if self.polled.swap(true, Ordering::SeqCst) {
+                    Poll::Ready(42)
+                } else {
+                    cx.waker().wake_by_ref();
+                    Poll::Pending
+                }
+            }
+        }
+
+        let result = block_on(SelfWakingOnce { polled: AtomicBool::new(false) });
+        assert_eq!(result, 42);
     }
 }

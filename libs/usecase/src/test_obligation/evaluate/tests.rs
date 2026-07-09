@@ -114,8 +114,18 @@ impl TestSourceScannerPort for StubScanner {
 struct ScriptedFulfillment {
     fast: ObligationFulfillmentVerdict,
     last: ObligationFulfillmentVerdict,
-    calibration: Mutex<ObligationFulfillmentVerdict>,
+    // AC-08: optional calibration overrides. Per-category slots take
+    // precedence; the global slot forces one verdict for every shape. With no
+    // override, the stub returns a `Fail` whose category matches the probe
+    // marker embedded in `known_bad_calibration_probe_<category>_<index>`.
+    calibration: Mutex<Option<ObligationFulfillmentVerdict>>,
+    calibration_contradiction: Mutex<Option<ObligationFulfillmentVerdict>>,
+    calibration_substitution: Mutex<Option<ObligationFulfillmentVerdict>>,
+    calibration_central_unverified: Mutex<Option<ObligationFulfillmentVerdict>>,
     calibration_calls: Mutex<usize>,
+    /// Records the `tests_source` seen for every calibration probe so
+    /// tests can assert per-category shape distribution (AC-08).
+    calibration_probe_sources: Mutex<Vec<String>>,
     tiers: Mutex<Vec<ModelTier>>,
     declarations: Mutex<Vec<String>>,
 }
@@ -134,9 +144,41 @@ impl
         initial_tier: ModelTier,
     ) -> SemanticEscalationFuture<'a, ObligationFulfillmentVerdict, SemanticVerifierError> {
         Box::pin(async move {
-            if pair.tests_source().as_str().contains("known_bad_calibration_probe") {
+            let source = pair.tests_source().as_str();
+            if source.contains("known_bad_calibration_probe") {
                 *self.calibration_calls.lock().unwrap() += 1;
-                return Ok(self.calibration.lock().unwrap().clone());
+                self.calibration_probe_sources.lock().unwrap().push(source.to_owned());
+                if source.contains("_contradiction_")
+                    && let Some(v) = self.calibration_contradiction.lock().unwrap().clone()
+                {
+                    return Ok(v);
+                }
+                if source.contains("_substitution_")
+                    && let Some(v) = self.calibration_substitution.lock().unwrap().clone()
+                {
+                    return Ok(v);
+                }
+                if source.contains("_central_unverified_")
+                    && let Some(v) = self.calibration_central_unverified.lock().unwrap().clone()
+                {
+                    return Ok(v);
+                }
+                if let Some(v) = self.calibration.lock().unwrap().clone() {
+                    return Ok(v);
+                }
+                if source.contains("_contradiction_") {
+                    return Ok(fulfillment_fail_for_category(
+                        FulfillmentFailCategory::Contradiction,
+                    ));
+                }
+                if source.contains("_substitution_") {
+                    return Ok(fulfillment_fail_for_category(
+                        FulfillmentFailCategory::Substitution,
+                    ));
+                }
+                return Ok(fulfillment_fail_for_category(
+                    FulfillmentFailCategory::CentralUnverified,
+                ));
             }
             self.tiers.lock().unwrap().push(initial_tier);
             self.declarations.lock().unwrap().push(pair.entry_declaration().as_str().to_owned());
@@ -249,6 +291,12 @@ fn config() -> TestObligationEvaluateConfig {
     TestObligationEvaluateConfig::try_new(10, 90, 4).unwrap()
 }
 
+/// Config variant with a caller-supplied injection rate; used by AC-08
+/// tests that need `probe_count >= 3`.
+fn config_with_rate(rate: u8) -> TestObligationEvaluateConfig {
+    TestObligationEvaluateConfig::try_new(rate, 90, 4).unwrap()
+}
+
 fn anchor() -> TestObligationAnchorId {
     TestObligationAnchorId::try_new("spec.json".to_owned(), "IN-05".to_owned()).unwrap()
 }
@@ -351,6 +399,21 @@ fn waiver_bindings() -> TestBindingsDocument {
     TestBindingsDocument::new(
         track(),
         vec![TestBindingRecord::Waiver { edge_id: edge(), reason: waiver_reason() }],
+    )
+}
+
+/// Three waiver records sharing the same edge — the calibration probe
+/// count only depends on the record count, so this yields
+/// `production_pair_count = 3` (one AC-08 category per probe when paired
+/// with `config_with_rate(100)`).
+fn triple_waiver_bindings() -> TestBindingsDocument {
+    TestBindingsDocument::new(
+        track(),
+        vec![
+            TestBindingRecord::Waiver { edge_id: edge(), reason: waiver_reason() },
+            TestBindingRecord::Waiver { edge_id: edge(), reason: waiver_reason() },
+            TestBindingRecord::Waiver { edge_id: edge(), reason: waiver_reason() },
+        ],
     )
 }
 
@@ -518,11 +581,44 @@ fn harness_with_read_models(
     spec: SpecDocument,
     catalogue: CatalogueDocument,
 ) -> Harness {
+    harness_with_read_models_and_config(
+        obligations,
+        bindings,
+        fast,
+        last,
+        waiver,
+        scanner,
+        existing_fulfillment,
+        existing_waiver,
+        spec,
+        catalogue,
+        config(),
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn harness_with_read_models_and_config(
+    obligations: Option<ObligationsDocument>,
+    bindings: Option<TestBindingsDocument>,
+    fast: ObligationFulfillmentVerdict,
+    last: ObligationFulfillmentVerdict,
+    waiver: WaiverVerdict,
+    scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
+    existing_fulfillment: Option<ObligationFulfillmentCacheDocument>,
+    existing_waiver: Option<WaiverCacheDocument>,
+    spec: SpecDocument,
+    catalogue: CatalogueDocument,
+    cfg: TestObligationEvaluateConfig,
+) -> Harness {
     let fulfillment_driver = Arc::new(ScriptedFulfillment {
         fast,
         last,
-        calibration: Mutex::new(fulfillment_fail()),
+        calibration: Mutex::new(None),
+        calibration_contradiction: Mutex::new(None),
+        calibration_substitution: Mutex::new(None),
+        calibration_central_unverified: Mutex::new(None),
         calibration_calls: Mutex::new(0),
+        calibration_probe_sources: Mutex::new(Vec::new()),
         tiers: Mutex::new(Vec::new()),
         declarations: Mutex::new(Vec::new()),
     });
@@ -565,7 +661,7 @@ fn harness_with_read_models(
             >,
         Arc::clone(&fulfillment_cache) as Arc<dyn ObligationFulfillmentCachePort + Send + Sync>,
         Arc::clone(&waiver_cache) as Arc<dyn WaiverCachePort + Send + Sync>,
-        config(),
+        cfg,
         Arc::new(StubSpec(spec)),
         Arc::new(StubCatalogue(catalogue)),
         Arc::new(SumHasher),
@@ -589,9 +685,16 @@ fn fulfilled() -> ObligationFulfillmentVerdict {
 }
 
 fn fulfillment_fail() -> ObligationFulfillmentVerdict {
+    fulfillment_fail_for_category(FulfillmentFailCategory::CentralUnverified)
+}
+
+fn fulfillment_fail_for_category(
+    category: FulfillmentFailCategory,
+) -> ObligationFulfillmentVerdict {
+    let category_name = category.as_kebab();
     ObligationFulfillmentVerdict::Fail {
-        category: FulfillmentFailCategory::CentralUnverified,
-        reason: DiagnosticMessage::try_new("central behaviour unverified".to_owned()).unwrap(),
+        category,
+        reason: DiagnosticMessage::try_new(format!("{category_name} calibration failure")).unwrap(),
     }
 }
 
@@ -662,7 +765,12 @@ fn test_fulfilled_on_fast_counts_pass_without_escalation() {
 }
 
 #[test]
-fn test_known_bad_probe_below_threshold_fails_closed_without_cache_save() {
+fn test_known_bad_probe_undetected_category_fails_closed_without_cache_save() {
+    // AC-08: with the default 10% injection rate against a single production
+    // pair, the calibration issues exactly one probe (the contradiction
+    // shape, index 0). If the verifier fails to detect it, the per-category
+    // gate fires before the aggregate threshold check, names the missed
+    // category, and prevents the caches from being saved.
     let h = harness(
         Some(obligations_doc()),
         Some(fulfillment_bindings()),
@@ -670,16 +778,147 @@ fn test_known_bad_probe_below_threshold_fails_closed_without_cache_save() {
         fulfilled(),
         WaiverVerdict::Pending,
     );
-    *h.fulfillment_driver.calibration.lock().unwrap() = fulfilled();
+    *h.fulfillment_driver.calibration.lock().unwrap() = Some(fulfilled());
 
     let result = run(h.interactor.execute(&command()));
 
-    assert!(matches!(
-        result,
-        Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message)))
-            if message.as_str().contains("known-bad detection rate 0 below threshold 90")
-    ));
+    assert!(
+        matches!(
+            &result,
+            Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message)))
+                if message.as_str().contains("known-bad calibration detected 0 probes for categories")
+                    && message.as_str().contains("contradiction")
+        ),
+        "unexpected result: {result:?}"
+    );
     assert_eq!(*h.fulfillment_driver.calibration_calls.lock().unwrap(), 1);
+    assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());
+    assert!(h.waiver_cache.saved.lock().unwrap().is_none());
+}
+
+#[test]
+fn test_calibration_probes_exercise_all_three_ac08_categories() {
+    // AC-08: any calibration run with `probe_count >= 3` must issue at
+    // least one probe per fulfillment-fail category — (a) contradiction,
+    // (b) substitution, (c) central-unverified — so the verifier's health
+    // signal reflects detection across the whole failure taxonomy.
+    //
+    // Three waiver bindings + injection_rate = 100 yields probe_count = 3,
+    // one per category (deterministic `index % 3` assignment).
+    let h = harness_with_read_models_and_config(
+        Some(obligations_doc()),
+        Some(triple_waiver_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Waived { citation: EvidenceCitation::try_new("stub".to_owned()).unwrap() },
+        Arc::new(StubScanner),
+        None,
+        None,
+        spec_doc(),
+        money_catalogue(),
+        config_with_rate(100),
+    );
+
+    let _ = run(h.interactor.execute(&command()));
+
+    let probes = h.fulfillment_driver.calibration_probe_sources.lock().unwrap().clone();
+    assert_eq!(probes.len(), 3, "unexpected probe count: {probes:?}");
+    assert!(
+        probes.iter().any(|s| s.contains("known_bad_calibration_probe_contradiction_")),
+        "contradiction probe missing: {probes:?}"
+    );
+    assert!(
+        probes.iter().any(|s| s.contains("known_bad_calibration_probe_substitution_")),
+        "substitution probe missing: {probes:?}"
+    );
+    assert!(
+        probes.iter().any(|s| s.contains("known_bad_calibration_probe_central_unverified_")),
+        "central-unverified probe missing: {probes:?}"
+    );
+}
+
+#[test]
+fn test_calibration_fails_when_one_category_detects_zero_probes() {
+    // AC-08: if the verifier flags contradiction and central-unverified
+    // probes but fails to catch the substitution shape, aggregate detection
+    // may sit at 2/3 (66%) — below the 90 threshold — but the per-category
+    // gate fires first with a message that names the missed category so the
+    // operator sees which shape the prompt regressed on.
+    let h = harness_with_read_models_and_config(
+        Some(obligations_doc()),
+        Some(triple_waiver_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Waived { citation: EvidenceCitation::try_new("stub".to_owned()).unwrap() },
+        Arc::new(StubScanner),
+        None,
+        None,
+        spec_doc(),
+        money_catalogue(),
+        config_with_rate(100),
+    );
+    // Substitution probes will be reported as fulfilled (not detected);
+    // the other two categories keep the default `fulfillment_fail`.
+    *h.fulfillment_driver.calibration_substitution.lock().unwrap() = Some(fulfilled());
+
+    let result = run(h.interactor.execute(&command()));
+
+    assert!(
+        matches!(
+            &result,
+            Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message)))
+                if message.as_str().contains("known-bad calibration detected 0 probes for categories")
+                    && message.as_str().contains("substitution")
+                    && !message.as_str().contains("contradiction")
+                    && !message.as_str().contains("central_unverified")
+        ),
+        "unexpected result: {result:?}"
+    );
+    // All three probes were issued before the gate rejected the run.
+    assert_eq!(*h.fulfillment_driver.calibration_calls.lock().unwrap(), 3);
+    // Calibration failure short-circuits before any production evaluation
+    // or cache save (matches the pre-existing single-category failure path).
+    assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());
+    assert!(h.waiver_cache.saved.lock().unwrap().is_none());
+}
+
+#[test]
+fn test_calibration_fails_when_verifier_reports_wrong_category_for_shape() {
+    // AC-08 requires each issued shape to be detected as its corresponding
+    // fail category. A verifier that returns `Fail(Contradiction)` for every
+    // known-bad probe is still blind to substitution and central-unverified
+    // failures, even though the aggregate fail count is 3/3.
+    let h = harness_with_read_models_and_config(
+        Some(obligations_doc()),
+        Some(triple_waiver_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Waived { citation: EvidenceCitation::try_new("stub".to_owned()).unwrap() },
+        Arc::new(StubScanner),
+        None,
+        None,
+        spec_doc(),
+        money_catalogue(),
+        config_with_rate(100),
+    );
+    let contradiction = fulfillment_fail_for_category(FulfillmentFailCategory::Contradiction);
+    *h.fulfillment_driver.calibration_substitution.lock().unwrap() = Some(contradiction.clone());
+    *h.fulfillment_driver.calibration_central_unverified.lock().unwrap() = Some(contradiction);
+
+    let result = run(h.interactor.execute(&command()));
+
+    assert!(
+        matches!(
+            &result,
+            Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message)))
+                if message.as_str().contains("known-bad calibration detected 0 probes for categories")
+                    && message.as_str().contains("substitution")
+                    && message.as_str().contains("central_unverified")
+                    && !message.as_str().contains("contradiction")
+        ),
+        "unexpected result: {result:?}"
+    );
+    assert_eq!(*h.fulfillment_driver.calibration_calls.lock().unwrap(), 3);
     assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());
     assert!(h.waiver_cache.saved.lock().unwrap().is_none());
 }

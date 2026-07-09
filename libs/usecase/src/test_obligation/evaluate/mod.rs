@@ -54,11 +54,13 @@ use super::hasher::ContentHasherPort;
 use super::{LoadedCatalogueDocument, diag, is_active_branch};
 
 mod cache;
+mod calibration;
 mod edges;
 mod records;
 mod verify;
 
 use cache::{cached_fulfillment_verdict, cached_waiver_verdict};
+use calibration::{CategoryTally, calibration_probe_count, probe_shape_for};
 use verify::{map_verifier_error, record_fulfillment, record_waiver};
 
 /// Command input for [`EvaluateTestObligationsApplicationService`] (IN-09).
@@ -355,25 +357,48 @@ impl EvaluateTestObligationsInteractor {
                 .map_err(|_| invalid_input_error("known_bad_detection_rate"));
         }
 
+        // AC-08 distributes probes across the three fulfillment-fail
+        // categories (a/b/c) via `index % 3`; track per-category counts so
+        // the healthy-verifier gate below refuses an aggregate rate that
+        // masks a category the verifier never flags.
+        let mut category_tally = CategoryTally::default();
         let mut detected = 0usize;
         for index in 0..probe_count {
-            let tests_source = known_bad_tests_source(index);
+            let shape = probe_shape_for(index);
+            category_tally.record_issued(&shape.category);
             let key = ObligationFulfillmentCacheKey::new(
-                BoundTestsSetHash::new(self.hasher.sha256(tests_source.as_bytes())),
-                DeclarationHash::new(self.hasher.sha256(KNOWN_BAD_DECLARATION.as_bytes())),
-                AnchorTextHash::new(self.hasher.sha256(KNOWN_BAD_ANCHOR_TEXT.as_bytes())),
+                BoundTestsSetHash::new(self.hasher.sha256(shape.tests_source.as_bytes())),
+                DeclarationHash::new(self.hasher.sha256(shape.declaration.as_bytes())),
+                AnchorTextHash::new(self.hasher.sha256(shape.anchor_text.as_bytes())),
             );
             let verdict = self
                 .fulfillment_verdict(
-                    &tests_source,
-                    KNOWN_BAD_DECLARATION,
-                    KNOWN_BAD_ANCHOR_TEXT,
+                    &shape.tests_source,
+                    shape.declaration,
+                    shape.anchor_text,
                     &key,
                 )
                 .await?;
-            if matches!(verdict, ObligationFulfillmentVerdict::Fail { .. }) {
+            if let ObligationFulfillmentVerdict::Fail { category, .. } = verdict
+                && category == shape.category
+            {
                 detected += 1;
+                category_tally.record_detected(&shape.category);
             }
+        }
+
+        // Per-category gate (AC-08): any exercised category that ends with
+        // zero detected probes fails the calibration through the same
+        // `VerifierPort` path as the threshold breach, but with a message
+        // that names the missed category.
+        let undetected = category_tally.undetected_categories();
+        if !undetected.is_empty() {
+            return Err(ObligationEvaluateError::VerifierPort(
+                SemanticVerifierError::VerifierPort(diag(&format!(
+                    "known-bad calibration detected 0 probes for categories: {}",
+                    undetected.join(", ")
+                ))),
+            ));
         }
 
         let rate = ((detected * 100) / probe_count) as u8;
@@ -528,24 +553,6 @@ fn half_materialized_scope_error(missing: &str) -> ObligationEvaluateError {
     ObligationEvaluateError::ArtifactLoad(ArtifactCodecError::DomainInvariant(diag(&format!(
         "test-obligation scope is half-materialized: {missing} artifact is absent"
     ))))
-}
-
-const KNOWN_BAD_DECLARATION: &str = "KnownBadGateRule { red_signal: \"must block the gate\" }";
-const KNOWN_BAD_ANCHOR_TEXT: &str = "A red signal must always block the gate.";
-
-fn known_bad_tests_source(index: usize) -> String {
-    format!(
-        "#[test]\nfn known_bad_calibration_probe_{index}() {{\n    assert!(gate_passes_when_red_signal_exists());\n}}\n"
-    )
-}
-
-fn calibration_probe_count(production_pair_count: usize, injection_rate: u8) -> usize {
-    if injection_rate == 0 {
-        return 0;
-    }
-    let scaled = production_pair_count.saturating_mul(usize::from(injection_rate));
-    let count = scaled.saturating_add(99) / 100;
-    count.max(1)
 }
 
 fn production_pair_count(
