@@ -48,6 +48,9 @@ pub trait VerifyPort: Send + Sync {
     /// Check latest track artifacts for completeness.
     fn verify_latest_track(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
+    /// Check the retention live surface for retired gate/document identifiers.
+    fn verify_retention_gate(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
+
     /// Check architecture docs synchronization and text patterns.
     fn verify_arch_docs(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
@@ -118,6 +121,12 @@ pub trait VerifyPort: Send + Sync {
 pub trait VerifyService: Send + Sync {
     /// Check latest track artifacts for completeness.
     fn verify_latest_track(&self, project_root: PathBuf) -> Result<VerifyOutcome, VerifyPortError>;
+
+    /// Check the retention live surface for retired gate/document identifiers.
+    fn verify_retention_gate(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check architecture docs synchronization and text patterns.
     fn verify_arch_docs(&self, project_root: PathBuf) -> Result<VerifyOutcome, VerifyPortError>;
@@ -204,6 +213,13 @@ impl VerifyInteractor {
 impl VerifyService for VerifyInteractor {
     fn verify_latest_track(&self, project_root: PathBuf) -> Result<VerifyOutcome, VerifyPortError> {
         self.port.verify_latest_track(project_root.as_path())
+    }
+
+    fn verify_retention_gate(
+        &self,
+        project_root: PathBuf,
+    ) -> Result<VerifyOutcome, VerifyPortError> {
+        self.port.verify_retention_gate(project_root.as_path())
     }
 
     fn verify_arch_docs(&self, project_root: PathBuf) -> Result<VerifyOutcome, VerifyPortError> {
@@ -299,5 +315,87 @@ impl VerifyService for VerifyInteractor {
             workspace_root.as_path(),
             skip_stale,
         )
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use std::sync::{Arc, Mutex};
+
+    use super::*;
+
+    #[derive(Default)]
+    struct RecordingPort {
+        retention_root: Mutex<Option<PathBuf>>,
+    }
+
+    impl RecordingPort {
+        fn unused(&self) -> Result<VerifyOutcome, VerifyPortError> {
+            Err(VerifyPortError::Unavailable("unused test route".to_owned()))
+        }
+    }
+
+    macro_rules! unused_path_method {
+        ($name:ident) => {
+            fn $name(&self, _: &Path) -> Result<VerifyOutcome, VerifyPortError> {
+                self.unused()
+            }
+        };
+    }
+
+    impl VerifyPort for RecordingPort {
+        unused_path_method!(verify_latest_track);
+        unused_path_method!(verify_arch_docs);
+        unused_path_method!(verify_layers);
+        unused_path_method!(verify_hooks_path);
+        unused_path_method!(verify_spec_attribution);
+        unused_path_method!(verify_spec_frontmatter);
+        unused_path_method!(verify_canonical_modules);
+        unused_path_method!(verify_module_size);
+        unused_path_method!(verify_domain_purity);
+        unused_path_method!(verify_domain_strings);
+        unused_path_method!(verify_usecase_purity);
+        unused_path_method!(verify_doc_links);
+        unused_path_method!(verify_view_freshness);
+        unused_path_method!(verify_spec_signals);
+
+        fn verify_retention_gate(
+            &self,
+            project_root: &Path,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            *self.retention_root.lock().unwrap() = Some(project_root.to_path_buf());
+            Ok(VerifyOutcome::success(Some("ok".to_owned())))
+        }
+
+        fn verify_plan_artifact_refs(
+            &self,
+            _: Option<&Path>,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            self.unused()
+        }
+
+        fn verify_catalogue_spec_refs(
+            &self,
+            _: Option<&str>,
+            _: &Path,
+            _: &Path,
+            _: bool,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            self.unused()
+        }
+    }
+
+    #[test]
+    fn test_verify_interactor_retention_gate_delegates_project_root() {
+        let port = Arc::new(RecordingPort::default());
+        let service_port: Arc<dyn VerifyPort> = port.clone();
+        let interactor = VerifyInteractor::new(service_port);
+        let root = PathBuf::from("workspace-root");
+
+        let outcome = interactor.verify_retention_gate(root.clone()).unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(port.retention_root.lock().unwrap().as_deref(), Some(root.as_path()));
     }
 }

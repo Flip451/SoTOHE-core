@@ -22,6 +22,8 @@ pub struct SpecVerifyArgs {
 pub enum VerifyCommand {
     /// Check latest track artifacts for completeness.
     LatestTrack(VerifyArgs),
+    /// Check the retention live surface for retired gate/document identifiers.
+    RetentionGate(VerifyArgs),
     /// Check architecture docs synchronization and text patterns.
     ArchDocs(VerifyArgs),
     /// Check workspace layer dependency rules via cargo metadata.
@@ -109,6 +111,7 @@ impl VerifyCommand {
         match self {
             // Project-root–based commands: derive items_dir from project_root.
             VerifyCommand::LatestTrack(a)
+            | VerifyCommand::RetentionGate(a)
             | VerifyCommand::ArchDocs(a)
             | VerifyCommand::Layers(a)
             | VerifyCommand::HooksPath(a)
@@ -177,6 +180,9 @@ fn dispatch_to_outcome(driver: &VerifyDriver, cmd: VerifyCommand) -> cli_driver:
     match cmd {
         VerifyCommand::LatestTrack(args) => {
             driver.handle(VerifyInput::LatestTrack { project_root: args.project_root })
+        }
+        VerifyCommand::RetentionGate(args) => {
+            driver.handle(VerifyInput::RetentionGate { project_root: args.project_root })
         }
         VerifyCommand::ArchDocs(args) => {
             driver.handle(VerifyInput::ArchDocs { project_root: args.project_root })

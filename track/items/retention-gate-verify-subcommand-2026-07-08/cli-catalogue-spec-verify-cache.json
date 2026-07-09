@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "345ba32c0b88199c22df89bc7530c57adf8873886282e599714fca37c9f39de1",
+      "evidence_hash": "7c695db81da5d823f9789f613efa488ba2d76227b564e6b2306ab1a7468676f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueSpecRefsArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "be41bc795cde5a2b986b214ab809b5b2f5b78c7b466baa0da5a254f4e4bb3dc4",
+      "evidence_hash": "7c695db81da5d823f9789f613efa488ba2d76227b564e6b2306ab1a7468676f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/cli-types.json",
+          "section_key": "types",
+          "entry_key": "PlanArtifactRefsArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "91fc70db9006bf93a3b604b55427d96b04ea52a71a2ee2c45c7e523c32efc8cc",
+      "evidence_hash": "7c695db81da5d823f9789f613efa488ba2d76227b564e6b2306ab1a7468676f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/cli-types.json",
+          "section_key": "types",
+          "entry_key": "SpecVerifyArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "31fd32344750663cd886132e15c852a365eb23e3da0db0bc094f771621aee27a",
+      "evidence_hash": "7c695db81da5d823f9789f613efa488ba2d76227b564e6b2306ab1a7468676f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/cli-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "46f039a1ca35381caa46561b627c09800251c53354729c44f11765e8d974c7b1",
+      "evidence_hash": "7c695db81da5d823f9789f613efa488ba2d76227b564e6b2306ab1a7468676f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/cli-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "46f039a1ca35381caa46561b627c09800251c53354729c44f11765e8d974c7b1",
+      "evidence_hash": "58547dee0274ffca238879a4da7f7f1b49b1321221ee7a0a47fd7b6da73b1830",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp verify --help` exposes a retention gate subcommand, and invoking that subcommand against the clean maintainer repository exits 0 with the same pass meaning as the removed integration test's clean-workspace assertion."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/cli-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp verify --help` exposes a retention gate subcommand, and invoking that subcommand against the clean maintainer repository exits 0 with the same pass meaning as the removed integration test's clean-workspace assertion. Source inspection and `cargo make check-layers` show the execution path is wired through the established verify chain: infrastructure checker, usecase port/service, CLI-driver input, CLI subcommand, and composition root wiring. The CLI path invokes the usecase service through that chain rather than calling a scanner helper directly."
+        }
+      }
+    },
+    {
+      "claim_hash": "46f039a1ca35381caa46561b627c09800251c53354729c44f11765e8d974c7b1",
+      "evidence_hash": "c4fd38020244adefe6f88efe6728db17b19d549425e057b8df3ae6a5ac6f0a09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Injecting any retired identifier or retired path from IN-04 into a representative file for each IN-03 root/pattern that exists in the fixture causes the verifier/scanner to fail non-zero and report a finding that identifies the path, line, and retired token category."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/cli-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "A deterministic scanner test asserts the configured live-surface root/pattern set equals IN-03. Injecting any retired identifier or retired path from IN-04 into a representative file for each IN-03 root/pattern that exists in the fixture causes the verifier/scanner to fail non-zero and report a finding that identifies the path, line, and retired token category."
+        }
+      }
+    },
+    {
+      "claim_hash": "46f039a1ca35381caa46561b627c09800251c53354729c44f11765e8d974c7b1",
+      "evidence_hash": "e684610246f3f52512c69ca1767cfc007fa031b62da3e156acdf13f521010fc3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Injecting an M-token state expression with a readiness/blocking gate word before the M token causes verifier failure, and injecting the reversed order on the same line also causes verifier failure."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/cli-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "Injecting an M-token state expression with a readiness/blocking gate word before the M token causes verifier failure, and injecting the reversed order on the same line also causes verifier failure."
+        }
+      }
+    },
+    {
+      "claim_hash": "46f039a1ca35381caa46561b627c09800251c53354729c44f11765e8d974c7b1",
+      "evidence_hash": "805a7e82283797d2cfc2851dbf624615ac363ffd043eeb9614a157bbad12f76b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "A clean synthetic live-surface layout passes the scanner, and a line containing an M token without any readiness/blocking gate word on the same line also passes. This verifies the gate detects state expressions rather than plain task notes."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/cli-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "A clean synthetic live-surface layout passes the scanner, and a line containing an M token without any readiness/blocking gate word on the same line also passes. This verifies the gate detects state expressions rather than plain task notes."
+        }
+      }
+    }
+  ]
+}

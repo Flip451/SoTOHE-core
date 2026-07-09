@@ -27,6 +27,7 @@ pub mod merge_gate_adapter;
 pub mod module_size;
 pub(crate) mod path_safety;
 pub mod plan_artifact_refs;
+pub mod retention_gate;
 pub mod signal_gates_config;
 pub mod spec_attribution;
 pub mod spec_frontmatter;

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "c9d2276c51ecfe27084109238a980d65848f1a642a09ef1820bb83464e09e7f8",
+  "signals": [
+    {
+      "type_name": "FsVerifyAdapter",
+      "signal": "blue",
+      "entry_hash": "15b58af2b2edf05c2c33364565cb345c23d1e85d3ab049aebd675dbc248934fb"
+    },
+    {
+      "type_name": "infrastructure::verify::retention_gate::verify",
+      "signal": "blue",
+      "entry_hash": "6b71e4a8a1a6e6dffc202a65c48d57959e481314dd8c03bed028f1528bf9607a"
+    }
+  ]
+}

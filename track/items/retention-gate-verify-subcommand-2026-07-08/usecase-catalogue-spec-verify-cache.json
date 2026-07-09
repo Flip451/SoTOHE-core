@@ -1,0 +1,366 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "2c05776349bd278064a3cd2aa9d93b0db4507c0bf6781bbc9bd473bab740a039",
+      "evidence_hash": "7c695db81da5d823f9789f613efa488ba2d76227b564e6b2306ab1a7468676f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "42b144849df242c138f19e7a1e425bee8912e0cef366d245518fd7209144718f",
+      "evidence_hash": "7c695db81da5d823f9789f613efa488ba2d76227b564e6b2306ab1a7468676f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5fc07c3c82b051a52d997e7c78e396d97e01aebc9c60f162f12b51a4e700b07a",
+      "evidence_hash": "7c695db81da5d823f9789f613efa488ba2d76227b564e6b2306ab1a7468676f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5fc07c3c82b051a52d997e7c78e396d97e01aebc9c60f162f12b51a4e700b07a",
+      "evidence_hash": "d618a011deadd58484669d5b11d4b819864d454d3d672ac5c087a52ab947a242",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scanner I/O problem は fail-closed とする。directory listing / file read / path traversal に失敗した場合、verifier は success として扱わず、library/usecase production code では panic ではなく `Result` error として伝搬し、CLI で non-zero exit に変換する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "scanner I/O problem は fail-closed とする。directory listing / file read / path traversal に失敗した場合、verifier は success として扱わず、library/usecase production code では panic ではなく `Result` error として伝搬し、CLI で non-zero exit に変換する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5fc07c3c82b051a52d997e7c78e396d97e01aebc9c60f162f12b51a4e700b07a",
+      "evidence_hash": "e7508118cfec3e79a34d36a9eb6096569d7c213a4fa816a6f17e78b0c0349189",
+      "verdict": {
+        "kind": "pass",
+        "citation": "A scanner I/O failure scenario is covered by a test and produces an error result / non-zero verifier outcome rather than success, silent skip, or a production-code panic."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "A scanner I/O failure scenario is covered by a test and produces an error result / non-zero verifier outcome rather than success, silent skip, or a production-code panic."
+        }
+      }
+    },
+    {
+      "claim_hash": "a2c88079da3023fc63c3cb99f0a0ea29d2704f694be4f0f069310cd28ed28629",
+      "evidence_hash": "7c695db81da5d823f9789f613efa488ba2d76227b564e6b2306ab1a7468676f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "VerifyPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a2c88079da3023fc63c3cb99f0a0ea29d2704f694be4f0f069310cd28ed28629",
+      "evidence_hash": "d618a011deadd58484669d5b11d4b819864d454d3d672ac5c087a52ab947a242",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scanner I/O problem は fail-closed とする。directory listing / file read / path traversal に失敗した場合、verifier は success として扱わず、library/usecase production code では panic ではなく `Result` error として伝搬し、CLI で non-zero exit に変換する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "VerifyPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "scanner I/O problem は fail-closed とする。directory listing / file read / path traversal に失敗した場合、verifier は success として扱わず、library/usecase production code では panic ではなく `Result` error として伝搬し、CLI で non-zero exit に変換する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a2c88079da3023fc63c3cb99f0a0ea29d2704f694be4f0f069310cd28ed28629",
+      "evidence_hash": "58547dee0274ffca238879a4da7f7f1b49b1321221ee7a0a47fd7b6da73b1830",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Sotp verify --help` exposes a retention gate subcommand, and invoking that subcommand against the clean maintainer repository exits 0 with the same pass meaning as the removed integration test's clean-workspace assertion. Source inspection and `cargo make check-layers` show the execution path is wired through the established verify chain: infrastructure checker, usecase port/service, CLI-driver input, CLI subcommand, and composition root wiring."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "VerifyPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp verify --help` exposes a retention gate subcommand, and invoking that subcommand against the clean maintainer repository exits 0 with the same pass meaning as the removed integration test's clean-workspace assertion. Source inspection and `cargo make check-layers` show the execution path is wired through the established verify chain: infrastructure checker, usecase port/service, CLI-driver input, CLI subcommand, and composition root wiring. The CLI path invokes the usecase service through that chain rather than calling a scanner helper directly."
+        }
+      }
+    },
+    {
+      "claim_hash": "a2c88079da3023fc63c3cb99f0a0ea29d2704f694be4f0f069310cd28ed28629",
+      "evidence_hash": "c4fd38020244adefe6f88efe6728db17b19d549425e057b8df3ae6a5ac6f0a09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "A deterministic scanner test asserts the configured live-surface root/pattern set equals IN-03. Injecting any retired identifier or retired path from IN-04 into a representative file for each IN-03 root/pattern that exists in the fixture causes the verifier/scanner to fail non-zero and report a finding that identifies the path, line, and retired token category."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "VerifyPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "A deterministic scanner test asserts the configured live-surface root/pattern set equals IN-03. Injecting any retired identifier or retired path from IN-04 into a representative file for each IN-03 root/pattern that exists in the fixture causes the verifier/scanner to fail non-zero and report a finding that identifies the path, line, and retired token category."
+        }
+      }
+    },
+    {
+      "claim_hash": "a2c88079da3023fc63c3cb99f0a0ea29d2704f694be4f0f069310cd28ed28629",
+      "evidence_hash": "e7508118cfec3e79a34d36a9eb6096569d7c213a4fa816a6f17e78b0c0349189",
+      "verdict": {
+        "kind": "pass",
+        "citation": "A scanner I/O failure scenario is covered by a test and produces an error result / non-zero verifier outcome rather than success, silent skip, or a production-code panic."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "VerifyPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "A scanner I/O failure scenario is covered by a test and produces an error result / non-zero verifier outcome rather than success, silent skip, or a production-code panic."
+        }
+      }
+    },
+    {
+      "claim_hash": "2bf9b5aeabcc49373463abb979cc82d5197c41f4bdb53a1b14a05602760fa9eb",
+      "evidence_hash": "7c695db81da5d823f9789f613efa488ba2d76227b564e6b2306ab1a7468676f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "VerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2bf9b5aeabcc49373463abb979cc82d5197c41f4bdb53a1b14a05602760fa9eb",
+      "evidence_hash": "d618a011deadd58484669d5b11d4b819864d454d3d672ac5c087a52ab947a242",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scanner I/O problem は fail-closed とする。directory listing / file read / path traversal に失敗した場合、verifier は success として扱わず、library/usecase production code では panic ではなく `Result` error として伝搬し、CLI で non-zero exit に変換する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "VerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "scanner I/O problem は fail-closed とする。directory listing / file read / path traversal に失敗した場合、verifier は success として扱わず、library/usecase production code では panic ではなく `Result` error として伝搬し、CLI で non-zero exit に変換する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2bf9b5aeabcc49373463abb979cc82d5197c41f4bdb53a1b14a05602760fa9eb",
+      "evidence_hash": "58547dee0274ffca238879a4da7f7f1b49b1321221ee7a0a47fd7b6da73b1830",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Source inspection and `cargo make check-layers` show the execution path is wired through the established verify chain: infrastructure checker, usecase port/service, CLI-driver input, CLI subcommand, and composition root wiring. The CLI path invokes the usecase service through that chain rather than calling a scanner helper directly."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "VerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp verify --help` exposes a retention gate subcommand, and invoking that subcommand against the clean maintainer repository exits 0 with the same pass meaning as the removed integration test's clean-workspace assertion. Source inspection and `cargo make check-layers` show the execution path is wired through the established verify chain: infrastructure checker, usecase port/service, CLI-driver input, CLI subcommand, and composition root wiring. The CLI path invokes the usecase service through that chain rather than calling a scanner helper directly."
+        }
+      }
+    },
+    {
+      "claim_hash": "2bf9b5aeabcc49373463abb979cc82d5197c41f4bdb53a1b14a05602760fa9eb",
+      "evidence_hash": "c4fd38020244adefe6f88efe6728db17b19d549425e057b8df3ae6a5ac6f0a09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Injecting any retired identifier or retired path from IN-04 into a representative file for each IN-03 root/pattern that exists in the fixture causes the verifier/scanner to fail non-zero and report a finding that identifies the path, line, and retired token category."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "VerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "A deterministic scanner test asserts the configured live-surface root/pattern set equals IN-03. Injecting any retired identifier or retired path from IN-04 into a representative file for each IN-03 root/pattern that exists in the fixture causes the verifier/scanner to fail non-zero and report a finding that identifies the path, line, and retired token category."
+        }
+      }
+    },
+    {
+      "claim_hash": "2bf9b5aeabcc49373463abb979cc82d5197c41f4bdb53a1b14a05602760fa9eb",
+      "evidence_hash": "e7508118cfec3e79a34d36a9eb6096569d7c213a4fa816a6f17e78b0c0349189",
+      "verdict": {
+        "kind": "pass",
+        "citation": "A scanner I/O failure scenario is covered by a test and produces an error result / non-zero verifier outcome rather than success, silent skip, or a production-code panic."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "VerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "A scanner I/O failure scenario is covered by a test and produces an error result / non-zero verifier outcome rather than success, silent skip, or a production-code panic."
+        }
+      }
+    }
+  ]
+}
