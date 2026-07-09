@@ -108,6 +108,8 @@ pub enum ValidationError {
     EmptyDecisionGroundRef,
     #[error("test-obligation minimum '{0}' must be at least 1")]
     InvalidObligationMinimum(usize),
+    #[error("detection rate '{0}' must be a percentage in 0..=100")]
+    InvalidDetectionRate(u8),
 }
 
 /// Errors from invalid task state transitions.

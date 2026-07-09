@@ -17,6 +17,7 @@
 //!   (IN-05 / IN-06 / CN-01).
 
 use crate::ValidationError;
+use crate::tddd::catalogue_v2::roles::ConstructionError;
 use crate::tddd::semantic_verify::CatalogueEntryKey;
 use crate::tddd::test_obligation::vocab::TestObligationKind;
 
@@ -351,6 +352,60 @@ impl WaivedReason {
     }
 }
 
+/// Validated non-empty set of [`TestObligationEdgeId`] entries.
+///
+/// Carries the failing / escalation edge identities in
+/// [`ObligationEvaluateError`](crate::tddd::test_obligation::errors::ObligationEvaluateError)
+/// so a confirmed-failure / human-escalation error can never be raised with an
+/// empty edge set. Mirrors the
+/// [`NonEmptyTestLocations`](crate::tddd::test_obligation::binding::NonEmptyTestLocations)
+/// pattern: [`try_new`](Self::try_new) rejects empty vectors via
+/// [`ConstructionError::EmptyCollection`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NonEmptyEdgeIds((TestObligationEdgeId, Vec<TestObligationEdgeId>));
+
+impl NonEmptyEdgeIds {
+    /// Builds a [`NonEmptyEdgeIds`] from a required first element and the
+    /// remaining (possibly empty) elements; the invariant holds by construction.
+    #[must_use]
+    pub fn new(first: TestObligationEdgeId, rest: Vec<TestObligationEdgeId>) -> Self {
+        let mut values = Vec::with_capacity(rest.len() + 1);
+        values.push(first.clone());
+        values.extend(rest);
+        Self((first, values))
+    }
+
+    /// Validates and wraps `values`, rejecting an empty vector.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ConstructionError::EmptyCollection`] when `values` is empty.
+    pub fn try_new(values: Vec<TestObligationEdgeId>) -> Result<Self, ConstructionError> {
+        let Some(first) = values.first().cloned() else {
+            return Err(ConstructionError::EmptyCollection);
+        };
+        Ok(Self((first, values)))
+    }
+
+    /// Returns the edge ids as a slice, guaranteed non-empty.
+    #[must_use]
+    pub fn as_slice(&self) -> &[TestObligationEdgeId] {
+        self.0.1.as_slice()
+    }
+
+    /// Returns the first edge id, always present by invariant.
+    #[must_use]
+    pub fn first(&self) -> &TestObligationEdgeId {
+        &self.0.0
+    }
+
+    /// Structural predicate backing the `non_empty` invariant declaration.
+    #[must_use]
+    pub fn is_non_empty(&self) -> bool {
+        true
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
@@ -504,5 +559,31 @@ mod tests {
     #[test]
     fn test_waived_reason_rejects_blank() {
         assert_eq!(WaivedReason::try_new(String::new()), Err(ValidationError::EmptyString));
+    }
+
+    fn sample_edge_id() -> TestObligationEdgeId {
+        let anchor =
+            TestObligationAnchorId::try_new("spec.json".to_owned(), "IN-09".to_owned()).unwrap();
+        TestObligationEdgeId::new(entry_key("domain::User"), anchor)
+    }
+
+    #[test]
+    fn test_non_empty_edge_ids_new_exposes_entries() {
+        let edge = sample_edge_id();
+        let edges = NonEmptyEdgeIds::new(edge.clone(), vec![edge.clone()]);
+        assert!(edges.is_non_empty());
+        assert_eq!(edges.as_slice().len(), 2);
+        assert_eq!(edges.first(), &edge);
+    }
+
+    #[test]
+    fn test_non_empty_edge_ids_try_new_accepts_non_empty() {
+        let edges = NonEmptyEdgeIds::try_new(vec![sample_edge_id()]).unwrap();
+        assert_eq!(edges.as_slice().len(), 1);
+    }
+
+    #[test]
+    fn test_non_empty_edge_ids_try_new_rejects_empty() {
+        assert_eq!(NonEmptyEdgeIds::try_new(vec![]), Err(ConstructionError::EmptyCollection));
     }
 }

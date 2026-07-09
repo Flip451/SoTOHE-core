@@ -3572,11 +3572,13 @@ mod tests {
         );
 
         // Only a Delete-marked PartialEq impl exists — must be treated as absent.
-        let mut deleted_impl = TraitImplDeclV2::new(
+        let deleted_impl = TraitImplDeclV2::from_parts(
+            ItemAction::Delete,
             TypeRef::new("PartialEq").unwrap(),
             TypeRef::new("MyValue").unwrap(),
+            vec![],
+            vec![],
         );
-        deleted_impl.action = ItemAction::Delete;
         doc.push_trait_impl(deleted_impl);
 
         let violations = run_rule(

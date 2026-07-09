@@ -6,6 +6,7 @@
 //! edge resolved, and [`EdgeVerdictRecord`] ties an edge to its outcome and any
 //! drift the `check` gate detected (IN-13 / CN-04 / AC-05).
 
+use crate::tddd::catalogue_v2::roles::ConstructionError;
 use crate::tddd::test_obligation::ids::{
     DiagnosticMessage, TestObligationEdgeId, TestObligationId,
 };
@@ -135,6 +136,114 @@ impl EdgeVerdictRecord {
         drift: Option<TestObligationDrift>,
     ) -> Self {
         Self { edge_id, outcome, drift }
+    }
+}
+
+/// Validated non-empty set of [`TestObligationDrift`] findings.
+///
+/// Carries the detected drifts in
+/// [`ObligationCheckError::DriftsDetected`](crate::tddd::test_obligation::errors::ObligationCheckError::DriftsDetected)
+/// so the drift error can never be raised with an empty finding set. Mirrors the
+/// [`NonEmptyEdgeIds`](crate::tddd::test_obligation::ids::NonEmptyEdgeIds) /
+/// [`NonEmptyTestLocations`](crate::tddd::test_obligation::binding::NonEmptyTestLocations)
+/// pattern: [`try_new`](Self::try_new) rejects empty vectors via
+/// [`ConstructionError::EmptyCollection`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NonEmptyDrifts((TestObligationDrift, Vec<TestObligationDrift>));
+
+impl NonEmptyDrifts {
+    /// Builds a [`NonEmptyDrifts`] from a required first element and the
+    /// remaining (possibly empty) elements; the invariant holds by construction.
+    #[must_use]
+    pub fn new(first: TestObligationDrift, rest: Vec<TestObligationDrift>) -> Self {
+        let mut values = Vec::with_capacity(rest.len() + 1);
+        values.push(first.clone());
+        values.extend(rest);
+        Self((first, values))
+    }
+
+    /// Validates and wraps `values`, rejecting an empty vector.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ConstructionError::EmptyCollection`] when `values` is empty.
+    pub fn try_new(values: Vec<TestObligationDrift>) -> Result<Self, ConstructionError> {
+        let Some(first) = values.first().cloned() else {
+            return Err(ConstructionError::EmptyCollection);
+        };
+        Ok(Self((first, values)))
+    }
+
+    /// Returns the drifts as a slice, guaranteed non-empty.
+    #[must_use]
+    pub fn as_slice(&self) -> &[TestObligationDrift] {
+        self.0.1.as_slice()
+    }
+
+    /// Returns the first drift, always present by invariant.
+    #[must_use]
+    pub fn first(&self) -> &TestObligationDrift {
+        &self.0.0
+    }
+
+    /// Structural predicate backing the `non_empty` invariant declaration.
+    #[must_use]
+    pub fn is_non_empty(&self) -> bool {
+        true
+    }
+}
+
+/// Validated non-empty set of [`EdgeVerdictRecord`] entries.
+///
+/// Carries the per-edge failure / escalation records in
+/// [`ObligationEvaluateError::SemanticFailuresConfirmed`](crate::tddd::test_obligation::errors::ObligationEvaluateError::SemanticFailuresConfirmed)
+/// / [`HumanEscalationRequired`](crate::tddd::test_obligation::errors::ObligationEvaluateError::HumanEscalationRequired)
+/// so those errors can never be raised with an empty record set. Mirrors the
+/// [`NonEmptyDrifts`] / [`NonEmptyEdgeIds`](crate::tddd::test_obligation::ids::NonEmptyEdgeIds)
+/// pattern: [`try_new`](Self::try_new) rejects empty vectors via
+/// [`ConstructionError::EmptyCollection`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NonEmptyEdgeVerdictRecords((EdgeVerdictRecord, Vec<EdgeVerdictRecord>));
+
+impl NonEmptyEdgeVerdictRecords {
+    /// Builds a [`NonEmptyEdgeVerdictRecords`] from a required first element and
+    /// the remaining (possibly empty) elements; the invariant holds by construction.
+    #[must_use]
+    pub fn new(first: EdgeVerdictRecord, rest: Vec<EdgeVerdictRecord>) -> Self {
+        let mut values = Vec::with_capacity(rest.len() + 1);
+        values.push(first.clone());
+        values.extend(rest);
+        Self((first, values))
+    }
+
+    /// Validates and wraps `values`, rejecting an empty vector.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ConstructionError::EmptyCollection`] when `values` is empty.
+    pub fn try_new(values: Vec<EdgeVerdictRecord>) -> Result<Self, ConstructionError> {
+        let Some(first) = values.first().cloned() else {
+            return Err(ConstructionError::EmptyCollection);
+        };
+        Ok(Self((first, values)))
+    }
+
+    /// Returns the records as a slice, guaranteed non-empty.
+    #[must_use]
+    pub fn as_slice(&self) -> &[EdgeVerdictRecord] {
+        self.0.1.as_slice()
+    }
+
+    /// Returns the first record, always present by invariant.
+    #[must_use]
+    pub fn first(&self) -> &EdgeVerdictRecord {
+        &self.0.0
+    }
+
+    /// Structural predicate backing the `non_empty` invariant declaration.
+    #[must_use]
+    pub fn is_non_empty(&self) -> bool {
+        true
     }
 }
 

@@ -12,8 +12,10 @@
 
 use thiserror::Error;
 
-use crate::tddd::test_obligation::drift::{EdgeVerdictRecord, TestObligationDrift};
-use crate::tddd::test_obligation::ids::{DiagnosticMessage, RoleName, TestObligationEdgeId};
+use crate::SpecDocumentLoadError;
+use crate::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderError;
+use crate::tddd::test_obligation::drift::{NonEmptyDrifts, NonEmptyEdgeVerdictRecords};
+use crate::tddd::test_obligation::ids::{DiagnosticMessage, NonEmptyEdgeIds, RoleName};
 
 /// Error raised while loading and validating the test-obligation rules config.
 ///
@@ -104,10 +106,10 @@ pub enum ObligationDeriveError {
         /// The branch the command was invoked on.
         branch: DiagnosticMessage,
     },
-    /// The catalogue could not be loaded.
-    CatalogueLoad(DiagnosticMessage),
-    /// The spec could not be loaded.
-    SpecLoad(DiagnosticMessage),
+    /// Loading a per-layer catalogue document failed.
+    CatalogueLoad(CatalogueDocumentLoaderError),
+    /// Loading and parsing the spec document failed.
+    SpecLoad(SpecDocumentLoadError),
     /// The catalogue was in a state derivation cannot proceed from.
     InvalidCatalogueState(DiagnosticMessage),
     /// Encoding the derived obligations artifact failed.
@@ -119,30 +121,31 @@ pub enum ObligationDeriveError {
 /// Failure of `test-obligation check` (IN-08 / AC-04 / AC-10).
 #[derive(Debug)]
 pub enum ObligationCheckError {
-    /// Only the obligations artifact is present (partial, fail-closed scope).
-    ObligationsOnly,
-    /// Only the test-bindings artifact is present (partial, fail-closed scope).
-    BindingsOnly,
-    /// The command ran off a non-active track branch.
-    TrackNotActive {
-        /// The branch the command was invoked on.
-        branch: DiagnosticMessage,
-    },
+    /// The obligations artifact is absent while the test-bindings artifact is
+    /// present (half-materialised scope, fail-closed — AC-10).
+    ObligationsAbsent,
+    /// The test-bindings artifact is absent while the obligations artifact is
+    /// present (half-materialised scope, fail-closed — AC-10).
+    BindingsAbsent,
     /// One or more drifts were detected.
     DriftsDetected {
-        /// The detected drifts.
-        drifts: Vec<TestObligationDrift>,
+        /// The detected drifts (non-empty by construction).
+        drifts: NonEmptyDrifts,
     },
     /// One or more edges were not resolved by any binding.
     UnresolvedEdges {
-        /// The unresolved edges.
-        edges: Vec<TestObligationEdgeId>,
+        /// The unresolved edges (non-empty by construction).
+        edges: NonEmptyEdgeIds,
     },
     /// One or more edges have a stale (hash-mismatched) verdict.
     StaleVerdicts {
-        /// The edges whose verdicts are stale.
-        edges: Vec<TestObligationEdgeId>,
+        /// The edges whose verdicts are stale (non-empty by construction).
+        edges: NonEmptyEdgeIds,
     },
+    /// Loading a per-layer catalogue document failed.
+    CatalogueLoad(CatalogueDocumentLoaderError),
+    /// Loading and parsing the spec document failed.
+    SpecLoad(SpecDocumentLoadError),
     /// Decoding an artifact failed.
     ArtifactCodec(ArtifactCodecError),
     /// Scanning a bound test's source failed.
@@ -154,31 +157,32 @@ pub enum ObligationCheckError {
 /// Failure of `test-obligation evaluate` (IN-09 / IN-12 / AC-06 / AC-07).
 #[derive(Debug)]
 pub enum ObligationEvaluateError {
-    /// The evaluate configuration was invalid.
-    InvalidConfig {
-        /// Detail describing the invalid configuration.
-        message: DiagnosticMessage,
-    },
     /// The command ran off a non-active track branch.
     TrackNotActive {
         /// The branch the command was invoked on.
         branch: DiagnosticMessage,
     },
+    /// Loading a per-layer catalogue document failed.
+    CatalogueLoad(CatalogueDocumentLoaderError),
+    /// Loading and parsing the spec document failed.
+    SpecLoad(SpecDocumentLoadError),
+    /// Loading an obligations / test-bindings artifact failed.
+    ArtifactLoad(ArtifactCodecError),
+    /// Scanning a bound test's source failed.
+    TestSourceScan(TestSourceScanError),
     /// A semantic-verifier port invocation failed.
     VerifierPort(SemanticVerifierError),
-    /// Loading a verdict cache failed.
+    /// Loading or persisting a verdict cache failed.
     CachePersistence(VerifyCacheError),
-    /// Writing a verdict cache failed.
-    CacheWrite(DiagnosticMessage),
     /// Evaluation confirmed one or more semantic failures.
     SemanticFailuresConfirmed {
-        /// The per-edge records that failed.
-        records: Vec<EdgeVerdictRecord>,
+        /// The per-edge records that failed (non-empty by construction).
+        records: NonEmptyEdgeVerdictRecords,
     },
     /// Evaluation could not confirm and requires human escalation.
     HumanEscalationRequired {
-        /// The per-edge records requiring escalation.
-        records: Vec<EdgeVerdictRecord>,
+        /// The per-edge records requiring escalation (non-empty by construction).
+        records: NonEmptyEdgeVerdictRecords,
     },
 }
 
@@ -232,10 +236,16 @@ mod tests {
         assert!(format!("{err:?}").contains("MalformedJson"));
     }
 
+    use std::path::PathBuf;
+
+    use crate::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderError;
     use crate::tddd::semantic_verify::CatalogueEntryKey;
-    use crate::tddd::test_obligation::drift::EdgeResolutionOutcome;
+    use crate::tddd::test_obligation::drift::{
+        EdgeResolutionOutcome, EdgeVerdictRecord, TestObligationDrift,
+    };
     use crate::tddd::test_obligation::ids::{
-        TestObligationAnchorId, TestObligationId, TestObligationItemIdentifier,
+        TestObligationAnchorId, TestObligationEdgeId, TestObligationId,
+        TestObligationItemIdentifier,
     };
     use crate::tddd::test_obligation::vocab::TestObligationKind;
 
@@ -264,6 +274,10 @@ mod tests {
 
     fn record() -> EdgeVerdictRecord {
         EdgeVerdictRecord::new(edge(), EdgeResolutionOutcome::Pending, None)
+    }
+
+    fn catalogue_load_error() -> CatalogueDocumentLoaderError {
+        CatalogueDocumentLoaderError::NotFound { path: PathBuf::from("missing-types.json") }
     }
 
     #[test]
@@ -305,8 +319,10 @@ mod tests {
                 role_name: RoleName::try_new("ValueObject".to_owned()).unwrap(),
             }),
             ObligationDeriveError::TrackNotActive { branch: diag("main") },
-            ObligationDeriveError::CatalogueLoad(diag("no catalogue")),
-            ObligationDeriveError::SpecLoad(diag("no spec")),
+            ObligationDeriveError::CatalogueLoad(catalogue_load_error()),
+            ObligationDeriveError::SpecLoad(SpecDocumentLoadError::NotFound {
+                path: PathBuf::from("spec.json"),
+            }),
             ObligationDeriveError::InvalidCatalogueState(diag("baseline pending")),
             ObligationDeriveError::ArtifactCodec(ArtifactCodecError::Io(diag("io"))),
             ObligationDeriveError::ArtifactWrite(diag("write failed")),
@@ -317,13 +333,15 @@ mod tests {
 
     #[test]
     fn test_obligation_check_error_all_variants_debuggable() {
+        // `SpecLoad(SpecDocumentLoadError)` is omitted: the error's field is
+        // private to its own module and cannot be constructed here.
         let variants: Vec<ObligationCheckError> = vec![
-            ObligationCheckError::ObligationsOnly,
-            ObligationCheckError::BindingsOnly,
-            ObligationCheckError::TrackNotActive { branch: diag("main") },
-            ObligationCheckError::DriftsDetected { drifts: vec![drift()] },
-            ObligationCheckError::UnresolvedEdges { edges: vec![edge()] },
-            ObligationCheckError::StaleVerdicts { edges: vec![edge()] },
+            ObligationCheckError::ObligationsAbsent,
+            ObligationCheckError::BindingsAbsent,
+            ObligationCheckError::DriftsDetected { drifts: NonEmptyDrifts::new(drift(), vec![]) },
+            ObligationCheckError::UnresolvedEdges { edges: NonEmptyEdgeIds::new(edge(), vec![]) },
+            ObligationCheckError::StaleVerdicts { edges: NonEmptyEdgeIds::new(edge(), vec![]) },
+            ObligationCheckError::CatalogueLoad(catalogue_load_error()),
             ObligationCheckError::ArtifactCodec(ArtifactCodecError::MalformedJson(diag("bad"))),
             ObligationCheckError::SourceScan(TestSourceScanError::Io(diag("io"))),
             ObligationCheckError::CacheIo(VerifyCacheError::Io(diag("io"))),
@@ -334,16 +352,23 @@ mod tests {
 
     #[test]
     fn test_obligation_evaluate_error_all_variants_debuggable() {
+        // `SpecLoad(SpecDocumentLoadError)` is omitted: the error's field is
+        // private to its own module and cannot be constructed here.
         let variants: Vec<ObligationEvaluateError> = vec![
-            ObligationEvaluateError::InvalidConfig { message: diag("bad tier") },
             ObligationEvaluateError::TrackNotActive { branch: diag("main") },
+            ObligationEvaluateError::CatalogueLoad(catalogue_load_error()),
+            ObligationEvaluateError::ArtifactLoad(ArtifactCodecError::Io(diag("io"))),
+            ObligationEvaluateError::TestSourceScan(TestSourceScanError::Io(diag("io"))),
             ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(diag("x"))),
             ObligationEvaluateError::CachePersistence(VerifyCacheError::Io(diag("io"))),
-            ObligationEvaluateError::CacheWrite(diag("write failed")),
-            ObligationEvaluateError::SemanticFailuresConfirmed { records: vec![record()] },
-            ObligationEvaluateError::HumanEscalationRequired { records: vec![record()] },
+            ObligationEvaluateError::SemanticFailuresConfirmed {
+                records: NonEmptyEdgeVerdictRecords::new(record(), vec![]),
+            },
+            ObligationEvaluateError::HumanEscalationRequired {
+                records: NonEmptyEdgeVerdictRecords::new(record(), vec![]),
+            },
         ];
-        assert_eq!(variants.len(), 7);
+        assert_eq!(variants.len(), 8);
         assert!(variants.iter().all(|v| !format!("{v:?}").is_empty()));
     }
 

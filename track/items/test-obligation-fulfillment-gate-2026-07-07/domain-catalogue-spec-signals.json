@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "07e40686fad06bb4c90cb1ee1da105a31533b4725a4d27e77df773d7ecaf445a",
+  "catalogue_declaration_hash": "8393ef9673018698583d75b0913edabb3f167f4cea50530d2caa0f4a394347d3",
   "signals": [
+    {
+      "type_name": "AnchorText",
+      "signal": "blue",
+      "entry_hash": "ccc60c428ad84ff8599b75e89d6734ce48f8444c15f311592f151e71924f8e5c"
+    },
     {
       "type_name": "AnchorTextHash",
       "signal": "blue",
@@ -18,9 +23,24 @@
       "entry_hash": "376271bac8783e70c939e8e05b5adab46d3481647c450c46649c5e2b407cb36d"
     },
     {
+      "type_name": "CatalogueDocumentLoaderError",
+      "signal": "blue",
+      "entry_hash": "1dd663885b7f1f640f869bbac7254683fcb11725787980cd9b910e02493e6603"
+    },
+    {
+      "type_name": "CrateName",
+      "signal": "blue",
+      "entry_hash": "e97cd0bc3315b9fd89ba214d179be945a8d115b6f63927c64c9243cac9779d6b"
+    },
+    {
       "type_name": "DeclarationHash",
       "signal": "blue",
       "entry_hash": "7ab676bdae6f3e5fecbb4e616cac60742f399991b4367ac33d4c1b241f82ee17"
+    },
+    {
+      "type_name": "DetectionRatePercent",
+      "signal": "blue",
+      "entry_hash": "9f93443fa9e2d7ccb82fd6d3c8f83f3dc445b8fe9e199412a45bec4c6fe9e5b4"
     },
     {
       "type_name": "DiagnosticMessage",
@@ -38,9 +58,29 @@
       "entry_hash": "995afa7c8eada5a2866bcb22410595f593aace1de763b26a05096a234e4f1fdd"
     },
     {
+      "type_name": "EntryDeclaration",
+      "signal": "blue",
+      "entry_hash": "3cdca375b6a3c6dfed94910167b8566aedfe1d22554323e0fa41d7b8b14b8cad"
+    },
+    {
       "type_name": "FulfillmentFailCategory",
       "signal": "blue",
       "entry_hash": "79f2c3b4bfec5e40295d27002bccfbd2878e5a16f07694284bfef477e63406cb"
+    },
+    {
+      "type_name": "NonEmptyDrifts",
+      "signal": "blue",
+      "entry_hash": "b5146969e6a6968477ebcf6a4078fafed127ce1cd1b5660501af12ec5823444b"
+    },
+    {
+      "type_name": "NonEmptyEdgeIds",
+      "signal": "blue",
+      "entry_hash": "029869eccd3f4bc5ea933de500549e1dda22b6315245464fce71c8277d8020cc"
+    },
+    {
+      "type_name": "NonEmptyEdgeVerdictRecords",
+      "signal": "blue",
+      "entry_hash": "a50c561918c6d4cac20b2982f4eacc1f445421eb0b37ebf5a68669235194e676"
     },
     {
       "type_name": "NonEmptyTestLocations",
@@ -50,17 +90,17 @@
     {
       "type_name": "ObligationCheckError",
       "signal": "blue",
-      "entry_hash": "29ad6de7c803ec0d28a00d9b4d0023fa5a780f24e1357b77236830429d89677b"
+      "entry_hash": "b1d7aebf3b75e0013de4b5bd94499bd067a5815cbd0b2ac1870a72e3a1b3f7c2"
     },
     {
       "type_name": "ObligationDeriveError",
       "signal": "blue",
-      "entry_hash": "78d04ba5fb887b75575151f2a59354b8c79e78f42317acc1e717b8fdaec85124"
+      "entry_hash": "0b9b3c0af6c60db1345647ca1ecc5683cdf05ebf018bb157f31e0439d8a54102"
     },
     {
       "type_name": "ObligationEvaluateError",
       "signal": "blue",
-      "entry_hash": "d838c8a929f9a207d397214ac6a6f422ebcb5c863cce487888f813e24639534f"
+      "entry_hash": "70877167f4f9dc6d595bd5e6b469db60f6ae1d07204a4f5997b895ec08cd4b1b"
     },
     {
       "type_name": "ObligationFulfillmentCacheDocument",
@@ -76,6 +116,11 @@
       "type_name": "ObligationFulfillmentCacheKey",
       "signal": "blue",
       "entry_hash": "87ed44e95d7b9a198f2cfc723700a531d0b6a8fdd9722194448e396f1b8ab26d"
+    },
+    {
+      "type_name": "ObligationFulfillmentPair",
+      "signal": "blue",
+      "entry_hash": "feb95855a1961e9ddc05d0c00ba5833fa099012ef641a40f0b1966d9786c9fc1"
     },
     {
       "type_name": "ObligationFulfillmentVerdict",
@@ -98,6 +143,11 @@
       "entry_hash": "c029b7de2e80bbcf6abc3b26d08b177fa2849516f8e9ec77df2a778c50aa31d3"
     },
     {
+      "type_name": "RoleObligationItemsProjector",
+      "signal": "blue",
+      "entry_hash": "8b107af14b492d650d6db1b8001b405f936352faf17c1d6d6484405dadd61f00"
+    },
+    {
       "type_name": "RoleObligationRules",
       "signal": "blue",
       "entry_hash": "d584ba1fa0c2f2f91e57e13ead53c0d2f5f48150142273775185739386a76ee6"
@@ -106,6 +156,11 @@
       "type_name": "SemanticVerifierError",
       "signal": "blue",
       "entry_hash": "cc883ef90fe47606c6b33a8cd0001ebdf22f97339dd099267aa9ac6195c907e4"
+    },
+    {
+      "type_name": "SpecDocumentLoadError",
+      "signal": "blue",
+      "entry_hash": "82bacac41925302ef58d21f523624d1146c91390518970ea318513295ad9c1ed"
     },
     {
       "type_name": "TargetEntryRoleKind",
@@ -223,14 +278,29 @@
       "entry_hash": "aaa750340a171c7f6a8ad55072344caf93d4d2629490b5ebce8425dea6133d21"
     },
     {
-      "type_name": "TestObligationScopePresence",
-      "signal": "blue",
-      "entry_hash": "709769cc192fa2632d69e874ef396a543a9d3f57401e346b8718cfd80a68e73e"
-    },
-    {
       "type_name": "TestSourceScanError",
       "signal": "blue",
       "entry_hash": "dd41859f200a8371d4c3604769ef77547a76db18b306430247d09e5bd9c7431d"
+    },
+    {
+      "type_name": "TestsSource",
+      "signal": "blue",
+      "entry_hash": "44d7992c04998b2e576994f4b8dda0c4106d0163844090b23233945aebbff99a"
+    },
+    {
+      "type_name": "TraitImplDeclV2",
+      "signal": "blue",
+      "entry_hash": "04dbaa4c3adbec752cb239bbd6b4dbc25d4b479f27cca1b5e19a1d68d0b5b271"
+    },
+    {
+      "type_name": "TraitName",
+      "signal": "blue",
+      "entry_hash": "49e16afc22aa5cf06040fa903dc613ad54f44b77c1296ffea9d9f35715ca3600"
+    },
+    {
+      "type_name": "TraitRefScope",
+      "signal": "blue",
+      "entry_hash": "c15782c04e57c314f675e74ea12dc0b17c0915b850230c5e21abec7d5053863d"
     },
     {
       "type_name": "UncitedSpecElementFinding",
@@ -240,7 +310,7 @@
     {
       "type_name": "ValidationError",
       "signal": "blue",
-      "entry_hash": "194cf08d7a5ae378498fc03a94993ffdd2be80a9280e598d0768386a51bc0155"
+      "entry_hash": "4451e82dcea9327628f440214b4ecbcff7315d503ffacea68dd54b43dff521ba"
     },
     {
       "type_name": "VerifyCacheError",
@@ -273,9 +343,19 @@
       "entry_hash": "657b74d4cc16615bb83be9e676dd384607409b4a607a7a8a448502eb3e68ea22"
     },
     {
+      "type_name": "WaiverPair",
+      "signal": "blue",
+      "entry_hash": "bcd9b61364e684f1fb5bf85a2cfd30abd9d34c17feeeb7fcf8a9d04c16779558"
+    },
+    {
       "type_name": "WaiverVerdict",
       "signal": "blue",
       "entry_hash": "66cf8151090f59dffcba295e45ffdf44d146c579db4c4f8c72c3bceeac95d997"
+    },
+    {
+      "type_name": "CatalogueDocumentLoaderPort",
+      "signal": "blue",
+      "entry_hash": "775c62c0511c94c960932b03c3b1df5481f45d75eb5c5de464430b5ee9cc6656"
     },
     {
       "type_name": "ObligationFulfillmentCachePort",
@@ -291,6 +371,11 @@
       "type_name": "ObligationsArtifactPort",
       "signal": "blue",
       "entry_hash": "f9d66a7ca0de96453a7e57dbffc84c4b24631f29c3b1fe9ffc3d80f9f09dc787"
+    },
+    {
+      "type_name": "SpecDocumentLoaderPort",
+      "signal": "blue",
+      "entry_hash": "a8a87b1e2e6a5c80439f1015b48ac40b6a104db005b209f78a4cb6dc45123555"
     },
     {
       "type_name": "TestBindingsArtifactPort",

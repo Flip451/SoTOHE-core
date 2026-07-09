@@ -13,32 +13,32 @@
   },
   "capabilities": {
     "orchestrator": {
-      "provider": "claude",
-      "model": "claude-opus-4-8"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "spec-designer": {
-      "provider": "claude",
-      "model": "claude-opus-4-8"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "impl-planner": {
-      "provider": "claude",
-      "model": "claude-opus-4-8"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "type-designer": {
-      "provider": "claude",
-      "model": "claude-opus-4-8"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "adr-editor": {
-      "provider": "claude",
-      "model": "claude-opus-4-8"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "rollback-diagnoser": {
-      "provider": "claude",
-      "model": "claude-opus-4-8"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "implementer": {
-      "provider": "claude",
-      "model": "claude-opus-4-8"
+      "provider": "codex",
+      "model": "gpt-5.5"
     },
     "reviewer": {
       "provider": "codex",
@@ -81,16 +81,16 @@
       "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md"
     },
     "obligation-fulfillment-verifier": {
-      "provider": "claude",
-      "model": "claude-opus-4-8",
-      "fast_provider": "claude",
-      "fast_model": "claude-haiku-4-5"
+      "provider": "codex",
+      "model": "gpt-5.5",
+      "fast_provider": "codex",
+      "fast_model": "gpt-5.4-mini"
     },
     "waiver-verifier": {
-      "provider": "claude",
-      "model": "claude-opus-4-8",
-      "fast_provider": "claude",
-      "fast_model": "claude-haiku-4-5"
+      "provider": "codex",
+      "model": "gpt-5.5",
+      "fast_provider": "codex",
+      "fast_model": "gpt-5.4-mini"
     }
   }
 }

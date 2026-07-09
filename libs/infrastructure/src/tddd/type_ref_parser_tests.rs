@@ -447,10 +447,13 @@ fn test_trait_impl_decl_for_type_generic_param_encodes_type_generic() {
         ),
     );
 
-    let mut trait_impl =
-        TraitImplDeclV2::new(TypeRef::new("MyTrait").unwrap(), TypeRef::new("T").unwrap());
-    trait_impl.impl_generics =
-        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
+    let trait_impl = TraitImplDeclV2::from_parts(
+        domain::tddd::catalogue_v2::ItemAction::Add,
+        TypeRef::new("MyTrait").unwrap(),
+        TypeRef::new("T").unwrap(),
+        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+        vec![],
+    );
     doc.push_trait_impl(trait_impl);
 
     let encoded = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();

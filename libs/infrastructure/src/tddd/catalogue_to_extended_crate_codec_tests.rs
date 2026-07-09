@@ -2095,20 +2095,21 @@ fn test_trait_impl_block_generics_encoded_correctly() {
 
     let mut doc = make_doc("domain");
     // ADR `2026-05-20-0048` D1/D2: top-level trait_impls; new API: (trait_ref, for_type).
-    let mut trait_impl = TraitImplDeclV2::new(
+    let trait_impl = TraitImplDeclV2::from_parts(
+        domain::tddd::catalogue_v2::ItemAction::Add,
         TypeRef::new("std::marker::Send").unwrap(),
         TypeRef::new("Foo").unwrap(),
+        vec![MethodGenericParam {
+            name: ParamName::new("T").unwrap(),
+            bounds: vec![TypeRef::new("Clone").unwrap()],
+        }],
+        // impl_where_predicates: T: Send (explicit where predicate)
+        vec![domain::tddd::catalogue_v2::WherePredicateDecl {
+            lhs: TypeRef::new("T").unwrap(),
+            operator: domain::tddd::catalogue_v2::BoundOp::Bound,
+            rhs: vec![TypeRef::new("Send").unwrap()],
+        }],
     );
-    trait_impl.impl_generics = vec![MethodGenericParam {
-        name: ParamName::new("T").unwrap(),
-        bounds: vec![TypeRef::new("Clone").unwrap()],
-    }];
-    // impl_where_predicates: T: Send (explicit where predicate)
-    trait_impl.impl_where_predicates = vec![domain::tddd::catalogue_v2::WherePredicateDecl {
-        lhs: TypeRef::new("T").unwrap(),
-        operator: domain::tddd::catalogue_v2::BoundOp::Bound,
-        rhs: vec![TypeRef::new("Send").unwrap()],
-    }];
 
     doc.insert_type(
         TypeName::new("Foo").unwrap(),
@@ -2208,10 +2209,13 @@ fn test_trait_impl_for_type_generic_shadows_same_named_local_type() {
         ),
     );
 
-    let mut trait_impl =
-        TraitImplDeclV2::new(TypeRef::new("Port").unwrap(), TypeRef::new("T").unwrap());
-    trait_impl.impl_generics =
-        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }];
+    let trait_impl = TraitImplDeclV2::from_parts(
+        domain::tddd::catalogue_v2::ItemAction::Add,
+        TypeRef::new("Port").unwrap(),
+        TypeRef::new("T").unwrap(),
+        vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+        vec![],
+    );
     doc.push_trait_impl(trait_impl);
 
     let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();

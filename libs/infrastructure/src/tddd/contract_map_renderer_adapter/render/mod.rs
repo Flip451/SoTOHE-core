@@ -294,11 +294,11 @@ pub(super) fn render_mermaid(
             let crate_str = doc.crate_name().as_str();
             for trait_impl in doc.trait_impls() {
                 use domain::tddd::catalogue_v2::roles::ItemAction;
-                if trait_impl.action == ItemAction::Delete {
+                if trait_impl.action() == ItemAction::Delete {
                     continue; // deleted trait impls must not appear in the rendered map
                 }
-                let for_type_str = trait_impl.for_type.as_str();
-                let trait_ref_str = trait_impl.trait_ref.as_str();
+                let for_type_str = trait_impl.for_type().as_str();
+                let trait_ref_str = trait_impl.trait_ref().as_str();
 
                 // Resolve for_type to a node_id via the global node index.
                 // Workspace-internal cross-crate for_type (e.g. "domain::MyType") is

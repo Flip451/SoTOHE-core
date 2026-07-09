@@ -780,32 +780,47 @@
     {
       "action": "add",
       "trait_ref": "core::fmt::Debug",
-      "for_type": "ObligationCatalogueEntryRefDto"
+      "for_type": "ObligationFulfillmentEscalationDriver"
     },
     {
       "action": "add",
       "trait_ref": "core::clone::Clone",
-      "for_type": "ObligationCatalogueEntryRefDto"
+      "for_type": "ObligationFulfillmentEscalationDriver"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "ObligationCatalogueEntryRefDto"
+      "trait_ref": "usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::ObligationFulfillmentPair, domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey, domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError>",
+      "for_type": "ObligationFulfillmentEscalationDriver"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "ObligationCatalogueEntryRefDto"
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "WaiverEscalationDriver"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "ObligationCatalogueEntryRefDto"
+      "trait_ref": "core::clone::Clone",
+      "for_type": "WaiverEscalationDriver"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "ObligationCatalogueEntryRefDto"
+      "trait_ref": "usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError>",
+      "for_type": "WaiverEscalationDriver"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "Sha256ContentHasher"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "Sha256ContentHasher"
+    },
+    {
+      "action": "add",
+      "trait_ref": "usecase::test_obligation::hasher::ContentHasherPort",
+      "for_type": "Sha256ContentHasher"
     }
   ],
   "traits": {},
@@ -2271,58 +2286,6 @@
         }
       ]
     },
-    "ObligationCatalogueEntryRefDto": {
-      "action": "add",
-      "docs": "Obligations codec catalogue-entry DTO with its local section-key wire vocabulary; see IN-05.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": true
-        }
-      },
-      "methods": [
-        {
-          "name": "from_domain",
-          "receiver": null,
-          "params": [
-            {
-              "name": "entry",
-              "ty": "&domain::tddd::semantic_verify::CatalogueEntryRef"
-            }
-          ],
-          "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Projects CatalogueEntryRef through the obligations-codec section-key wire vocabulary; see IN-05."
-        },
-        {
-          "name": "into_domain",
-          "receiver": "self",
-          "params": [],
-          "returns": "Result<domain::tddd::semantic_verify::CatalogueEntryRef, domain::ValidationError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Reconstructs through the obligations-codec section-key wire vocabulary. Only ValidationError::EmptyString is reachable from CatalogueEntryKey::try_new; the shared ValidationError return type matches the domain constructor boundary."
-        }
-      ],
-      "module_path": "test_obligation::obligations_codec",
-      "role": {
-        "Dto": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-05",
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
-        }
-      ]
-    },
     "CatalogueEntryRefDto": {
       "action": "add",
       "role": {
@@ -2371,6 +2334,156 @@
         {
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
           "anchor": "IN-05"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "ObligationFulfillmentEscalationDriver": {
+      "action": "add",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "verifier",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort + Send + Sync>"
+            },
+            {
+              "name": "probe_config",
+              "ty": "usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Wire the concrete fulfillment escalation driver over the injected verifier port and probe config."
+        }
+      ],
+      "module_path": "test_obligation::fulfillment_escalation_driver",
+      "docs": "Concrete SemanticEscalationDriverPort impl for the obligation-fulfillment verifier lane. See IN-01 / AC-15 / OS-02.",
+      "spec_refs": [
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "IN-01"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "AC-15"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "OS-02"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "WaiverEscalationDriver": {
+      "action": "add",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [
+            {
+              "name": "verifier",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverVerifierPort + Send + Sync>"
+            },
+            {
+              "name": "probe_config",
+              "ty": "usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig"
+            }
+          ],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Wire the concrete waiver escalation driver over the injected verifier port and probe config."
+        }
+      ],
+      "module_path": "test_obligation::waiver_escalation_driver",
+      "docs": "Concrete SemanticEscalationDriverPort impl for the waiver verifier lane. See IN-01 / AC-15 / OS-02.",
+      "spec_refs": [
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "IN-01"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "AC-15"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "OS-02"
+        }
+      ],
+      "informal_grounds": []
+    },
+    "Sha256ContentHasher": {
+      "action": "add",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "plain",
+          "fields": [],
+          "has_stripped_fields": true
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "receiver": null,
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Construct a Sha256 backed content hasher."
+        }
+      ],
+      "module_path": "test_obligation::sha256_content_hasher",
+      "docs": "Concrete ContentHasherPort impl over sha2. See IN-09 / AC-06 / CN-04.",
+      "spec_refs": [
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "AC-06"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "CN-04"
         }
       ],
       "informal_grounds": []

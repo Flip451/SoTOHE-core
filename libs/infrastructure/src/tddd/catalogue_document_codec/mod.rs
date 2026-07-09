@@ -1224,16 +1224,16 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
         assert_eq!(doc.trait_impls().len(), 3);
         assert_eq!(
-            doc.trait_impls()[0].trait_ref.as_str(),
+            doc.trait_impls()[0].trait_ref().as_str(),
             "core::convert::From<CatalogueLoaderError>"
         );
         assert_eq!(
-            doc.trait_impls()[1].trait_ref.as_str(),
+            doc.trait_impls()[1].trait_ref().as_str(),
             "core::convert::From<ContractMapWriterError>"
         );
-        assert_eq!(doc.trait_impls()[2].trait_ref.as_str(), "core::fmt::Display");
+        assert_eq!(doc.trait_impls()[2].trait_ref().as_str(), "core::fmt::Display");
         for ti in doc.trait_impls() {
-            assert_eq!(ti.for_type.as_str(), "RenderContractMapError");
+            assert_eq!(ti.for_type().as_str(), "RenderContractMapError");
         }
     }
 
@@ -1259,8 +1259,8 @@ mod tests {
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         assert_eq!(doc.trait_impls().len(), 1);
-        assert_eq!(doc.trait_impls()[0].trait_ref.as_str(), "core::convert::From");
-        assert_eq!(doc.trait_impls()[0].for_type.as_str(), "MyType");
+        assert_eq!(doc.trait_impls()[0].trait_ref().as_str(), "core::convert::From");
+        assert_eq!(doc.trait_impls()[0].for_type().as_str(), "MyType");
     }
 
     #[test]
@@ -1287,8 +1287,8 @@ mod tests {
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
         assert_eq!(doc, doc2);
-        assert_eq!(doc2.trait_impls()[0].trait_ref.as_str(), "core::convert::From<IoError>");
-        assert_eq!(doc2.trait_impls()[1].trait_ref.as_str(), "core::fmt::Display");
+        assert_eq!(doc2.trait_impls()[0].trait_ref().as_str(), "core::convert::From<IoError>");
+        assert_eq!(doc2.trait_impls()[1].trait_ref().as_str(), "core::fmt::Display");
     }
 
     #[test]
@@ -1351,8 +1351,8 @@ mod tests {
   ]
 }"#;
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
-        assert_eq!(doc.trait_impls()[0].trait_ref.as_str(), "?Sized");
-        assert_eq!(doc.trait_impls()[0].for_type.as_str(), "'a");
+        assert_eq!(doc.trait_impls()[0].trait_ref().as_str(), "?Sized");
+        assert_eq!(doc.trait_impls()[0].for_type().as_str(), "'a");
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
@@ -2755,15 +2755,15 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         assert_eq!(doc.trait_impls().len(), 1);
         let impl_decl = &doc.trait_impls()[0];
-        assert_eq!(impl_decl.trait_ref.as_str(), "MyTrait");
-        assert_eq!(impl_decl.for_type.as_str(), "Foo");
-        assert_eq!(impl_decl.impl_generics.len(), 3);
-        assert_eq!(impl_decl.impl_generics[0].name.as_str(), "L");
-        assert_eq!(impl_decl.impl_generics[1].name.as_str(), "R");
-        assert_eq!(impl_decl.impl_generics[2].name.as_str(), "W");
-        assert_eq!(impl_decl.impl_where_predicates.len(), 1);
-        assert_eq!(impl_decl.impl_where_predicates[0].lhs.as_str(), "L");
-        assert_eq!(impl_decl.impl_where_predicates[0].rhs[0].as_str(), "Send");
+        assert_eq!(impl_decl.trait_ref().as_str(), "MyTrait");
+        assert_eq!(impl_decl.for_type().as_str(), "Foo");
+        assert_eq!(impl_decl.impl_generics().len(), 3);
+        assert_eq!(impl_decl.impl_generics()[0].name.as_str(), "L");
+        assert_eq!(impl_decl.impl_generics()[1].name.as_str(), "R");
+        assert_eq!(impl_decl.impl_generics()[2].name.as_str(), "W");
+        assert_eq!(impl_decl.impl_where_predicates().len(), 1);
+        assert_eq!(impl_decl.impl_where_predicates()[0].lhs.as_str(), "L");
+        assert_eq!(impl_decl.impl_where_predicates()[0].rhs[0].as_str(), "Send");
     }
 
     #[test]
@@ -2783,11 +2783,11 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
         let impl_decl = &doc.trait_impls()[0];
         assert!(
-            impl_decl.impl_generics.is_empty(),
+            impl_decl.impl_generics().is_empty(),
             "omitted impl_generics must default to empty Vec"
         );
         assert!(
-            impl_decl.impl_where_predicates.is_empty(),
+            impl_decl.impl_where_predicates().is_empty(),
             "omitted impl_where_predicates must default to empty Vec"
         );
     }
@@ -2835,21 +2835,21 @@ mod tests {
         assert_eq!(doc, doc2, "encode-decode round-trip must be stable for impl_generics/where");
 
         let generic_impl = &doc2.trait_impls()[0];
-        assert_eq!(generic_impl.trait_ref.as_str(), "MyTrait");
-        assert_eq!(generic_impl.for_type.as_str(), "Foo");
-        assert_eq!(generic_impl.impl_generics.len(), 2);
-        assert_eq!(generic_impl.impl_generics[0].name.as_str(), "L");
-        assert_eq!(generic_impl.impl_generics[0].bounds[0].as_str(), "Send");
-        assert_eq!(generic_impl.impl_generics[1].name.as_str(), "R");
-        assert_eq!(generic_impl.impl_where_predicates.len(), 1);
-        assert_eq!(generic_impl.impl_where_predicates[0].lhs.as_str(), "L");
-        assert_eq!(generic_impl.impl_where_predicates[0].rhs[0].as_str(), "Clone");
-        assert_eq!(generic_impl.impl_where_predicates[0].operator, BoundOp::Bound);
+        assert_eq!(generic_impl.trait_ref().as_str(), "MyTrait");
+        assert_eq!(generic_impl.for_type().as_str(), "Foo");
+        assert_eq!(generic_impl.impl_generics().len(), 2);
+        assert_eq!(generic_impl.impl_generics()[0].name.as_str(), "L");
+        assert_eq!(generic_impl.impl_generics()[0].bounds[0].as_str(), "Send");
+        assert_eq!(generic_impl.impl_generics()[1].name.as_str(), "R");
+        assert_eq!(generic_impl.impl_where_predicates().len(), 1);
+        assert_eq!(generic_impl.impl_where_predicates()[0].lhs.as_str(), "L");
+        assert_eq!(generic_impl.impl_where_predicates()[0].rhs[0].as_str(), "Clone");
+        assert_eq!(generic_impl.impl_where_predicates()[0].operator, BoundOp::Bound);
 
         // The second trait impl (Display) must have empty impl_generics/where_predicates.
         let display_impl = &doc2.trait_impls()[1];
-        assert!(display_impl.impl_generics.is_empty());
-        assert!(display_impl.impl_where_predicates.is_empty());
+        assert!(display_impl.impl_generics().is_empty());
+        assert!(display_impl.impl_where_predicates().is_empty());
     }
 
     #[test]

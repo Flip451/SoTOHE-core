@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "294dadf38c30efc185f5b5b40b814ac54a073cbd9cd7d920e920ea2d4a9c0142",
+  "catalogue_declaration_hash": "a7aad6ef03593a77d6867176861c25d724a0e473aaaa442f8d03257d38823971",
   "signals": [
     {
       "type_name": "CatalogueEntryRefDto",
@@ -53,11 +53,6 @@
       "entry_hash": "341b7c4c1f02f2a95ada747bb6e475572ab556559d36d00d1732094ffc6e79c6"
     },
     {
-      "type_name": "ObligationCatalogueEntryRefDto",
-      "signal": "blue",
-      "entry_hash": "2f3625eb2fdf24d37eb731a7d191f12ab64db496d51f56fe5603b53974c126be"
-    },
-    {
       "type_name": "ObligationFulfillmentCacheDocumentDto",
       "signal": "blue",
       "entry_hash": "8d7a6de8b6caa82daa065233c8159b2954860392307712824cdbf1d2f4f40eca"
@@ -66,6 +61,11 @@
       "type_name": "ObligationFulfillmentCacheEntryDto",
       "signal": "blue",
       "entry_hash": "69334e364047819d3f906158430a135836a54e88dfa4d3f76dfa79a886a44534"
+    },
+    {
+      "type_name": "ObligationFulfillmentEscalationDriver",
+      "signal": "blue",
+      "entry_hash": "16c8dbcc2f6974fcf7e7e8ce65adb4b7d93762e93ac17a070f7fba50b3ade174"
     },
     {
       "type_name": "ObligationFulfillmentVerdictDto",
@@ -96,6 +96,11 @@
       "type_name": "RoleObligationRulesDto",
       "signal": "blue",
       "entry_hash": "a9d80136bdcd8b0bb2be6009727b0e1ab382db02db9462bb0970dfed3014a224"
+    },
+    {
+      "type_name": "Sha256ContentHasher",
+      "signal": "blue",
+      "entry_hash": "6ecbca4f65a839e542828b1eab03ddb6207e4533d8a74074e179bbfc604766c1"
     },
     {
       "type_name": "SynTestSourceScanner",
@@ -171,6 +176,11 @@
       "type_name": "WaiverCacheEntryDto",
       "signal": "blue",
       "entry_hash": "1e13b279f967710e1d140450c5b7e8f2eb31a0e1353aa025f1e8117e9cf4d7ed"
+    },
+    {
+      "type_name": "WaiverEscalationDriver",
+      "signal": "blue",
+      "entry_hash": "9aa70b6a91bb887bdc869bc5e25c10f7cce3fa1a0ac7eb95fa86b783d7d36118"
     },
     {
       "type_name": "WaiverVerdictDto",

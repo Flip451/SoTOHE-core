@@ -386,15 +386,15 @@ fn method_generic_params_to_dtos(generics: &[MethodGenericParam]) -> Vec<MethodG
 /// schema's `TypeRef` slots.
 fn trait_impl_to_dto(t: &TraitImplDeclV2) -> Result<TraitImplDto, CatalogueDocumentCodecError> {
     let impl_where_predicates = t
-        .impl_where_predicates
+        .impl_where_predicates()
         .iter()
         .map(where_predicate_decl_to_dto)
         .collect::<Result<Vec<_>, _>>()?;
     Ok(TraitImplDto {
-        action: t.action.to_string(),
-        trait_ref: t.trait_ref.as_str().to_owned(),
-        for_type: t.for_type.as_str().to_owned(),
-        impl_generics: method_generic_params_to_dtos(&t.impl_generics),
+        action: t.action().to_string(),
+        trait_ref: t.trait_ref().as_str().to_owned(),
+        for_type: t.for_type().as_str().to_owned(),
+        impl_generics: method_generic_params_to_dtos(t.impl_generics()),
         impl_where_predicates,
     })
 }

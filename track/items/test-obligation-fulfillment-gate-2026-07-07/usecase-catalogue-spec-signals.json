@@ -1,46 +1,51 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "6e2d70cffb8812ac6a73fa153b9391a57b8c8d83d13882545ff5d8f0b4793806",
+  "catalogue_declaration_hash": "e32cb7594801cf493650a85241da3cf7b3d12d2795e651a872018067bf27dbdf",
   "signals": [
     {
       "type_name": "CheckTestObligationsCommand",
       "signal": "blue",
-      "entry_hash": "95b0dc9663050eac882c9c7abeefc603551494f954b7cc4f8a069793c2b16bc0"
+      "entry_hash": "7b0cf8df3153c20a97755010eacfdcd881969df909a2e83be4120c5ee23172cc"
     },
     {
       "type_name": "CheckTestObligationsInteractor",
       "signal": "blue",
-      "entry_hash": "ce345a0b7b57c39f09de57e022b8e704189b8e832263c58f816d97d55e42fba4"
+      "entry_hash": "2d06ab5b28b148825cd81dc0a560537b60e89c872f607e10c5ecacd138ef101c"
     },
     {
       "type_name": "CheckTestObligationsOutcome",
       "signal": "blue",
-      "entry_hash": "dda90589f99997c8cbf5819343cc62e02922e184dbdde203d2efec07206ddf6c"
+      "entry_hash": "f9d63391d33d9780d884d6f6c45f6da280e520a2045616079cf03de27ca5fcd7"
     },
     {
       "type_name": "DeriveTestObligationsCommand",
       "signal": "blue",
-      "entry_hash": "2ed83dcf57b919a572001629c5b7a73f82ff0e93e7a3e4777e362e34ec3e13a4"
+      "entry_hash": "62661557b0be80a838bc391658ec7af8cbefee549cf7098c4b0582f33163a4d0"
     },
     {
       "type_name": "DeriveTestObligationsInteractor",
       "signal": "blue",
-      "entry_hash": "1e81225cae34575b3bc7d65a8947b3c073cc2acc280288ab492780fe2055615f"
+      "entry_hash": "8a9cc792615b753540d48bf56b7f97c4881bad585f8d19a64054f039846ef06d"
     },
     {
       "type_name": "EvaluateTestObligationsCommand",
       "signal": "blue",
-      "entry_hash": "cc84dbee2c11ecf1f2bc94d3f8fab4805a134c3a3fa3ce282d2ec216de72dda9"
+      "entry_hash": "048ed227673266e1bedb35b8e8bca3ef2e2e691cce41f3dd4c45503c2402ebf4"
+    },
+    {
+      "type_name": "EvaluateTestObligationsFuture",
+      "signal": "blue",
+      "entry_hash": "51f33aee77d3ef1ae56575a1c509c4e78386dda1d9528080a4c4334937d95d95"
     },
     {
       "type_name": "EvaluateTestObligationsInteractor",
       "signal": "blue",
-      "entry_hash": "7e77a2efa35e333b1c27a74cef82777ac2067f36704d172aaebe48aeb79a9269"
+      "entry_hash": "ba0c397779256a41a2f15b581162d43323b7eb5e9ed44fa65a2dd2b2092856c7"
     },
     {
       "type_name": "EvaluateTestObligationsOutcome",
       "signal": "blue",
-      "entry_hash": "78f197ad35f3be19bf62b0baa9130091151369315e56b396f163b79ed14f489e"
+      "entry_hash": "d959d07a3b8d5009cebbac9e5d608bf769348067d9f60473574ad2ff2ebb3aa1"
     },
     {
       "type_name": "SemanticCalibrationProbeConfig",
@@ -53,6 +58,11 @@
       "entry_hash": "0bda77b4510e84e7e13966a19dc8aeccd69e13f4dc22829f0f0274a418f02812"
     },
     {
+      "type_name": "TestObligationCatalogueCommandInput",
+      "signal": "blue",
+      "entry_hash": "b46799a3d1491d7f32beb0a89e05bb79de7b9becca1669d8646cd5cce5a44ba6"
+    },
+    {
       "type_name": "TestObligationChainLabel",
       "signal": "blue",
       "entry_hash": "fc1dbaaca953db2b96cedd33ad0ec8ece8bc00fd5690f4bd93fbdd34e77434c7"
@@ -60,12 +70,17 @@
     {
       "type_name": "TestObligationEvaluateConfig",
       "signal": "blue",
-      "entry_hash": "8d658f0afb7d234d2e6302cf887ec1a30e9f4f97ba5de7259194e7bf78c78525"
+      "entry_hash": "2f51e2c742ee3141ac14176452e348bc42fb465b8fc7e5b2841ec835900445c3"
+    },
+    {
+      "type_name": "TestObligationEvaluateConfigError",
+      "signal": "blue",
+      "entry_hash": "452bf28cbc642238b69b77c378eb68063b7750076877cbcc788b6682176bae52"
     },
     {
       "type_name": "TestObligationLaneSummary",
       "signal": "blue",
-      "entry_hash": "a3669a91c64d40d445144ac67aa278a112a2bcf4c5e24256dcd6eba0ac145e97"
+      "entry_hash": "965456bc8a3b2100ce1dc1314ae05641191a291beaafc0f9230cfae3792f3bb3"
     },
     {
       "type_name": "TestObligationResultsCommand",
@@ -75,17 +90,22 @@
     {
       "type_name": "TestObligationResultsInteractor",
       "signal": "blue",
-      "entry_hash": "ebb892a40745485e7d1562f1bbabe9f145fad38749b18a3a6d42de68071daeec"
+      "entry_hash": "1229b67fafed8f676f1865a49351712236ae31b4e36c5d8f3ea4119305916be1"
     },
     {
       "type_name": "TestObligationResultsOutput",
       "signal": "blue",
-      "entry_hash": "6d161640a19e8bf21033317f281662ddd5c8443fb1d7f8ba972cbde4503da35d"
+      "entry_hash": "950a8000ac1f82d7a2f3f54e87df983efa76a00c925e1ea22f43f13e3250e989"
     },
     {
       "type_name": "CheckTestObligationsApplicationService",
       "signal": "blue",
       "entry_hash": "4d09d2fbfc6d2c983cd85cb3507bdc2ec55599f091df2a0c08bf2d355226dee9"
+    },
+    {
+      "type_name": "ContentHasherPort",
+      "signal": "blue",
+      "entry_hash": "e91f7962250d055f5ac01b1887e24f222f8122d7591dee56b63e4a3715cf4190"
     },
     {
       "type_name": "DeriveTestObligationsApplicationService",
@@ -95,7 +115,7 @@
     {
       "type_name": "EvaluateTestObligationsApplicationService",
       "signal": "blue",
-      "entry_hash": "46cec8960d5cddd0be86d7917f0cd84cae2cb7299ae24e1249999fdb9920349c"
+      "entry_hash": "e763bba9dcaf9ceb5ca68823331e5984364725bc8c2ee060ce8b87b42b7e95f7"
     },
     {
       "type_name": "SemanticEscalationDriverPort",

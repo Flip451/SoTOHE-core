@@ -70,10 +70,33 @@ subgraph domain["domain"]
     T29_domain_domain_ValidationError_MultiLineInformalGroundSummary[MultiLineInformalGroundSummary]
     T29_domain_domain_ValidationError_EmptyDecisionGroundRef[EmptyDecisionGroundRef]
     T29_domain_domain_ValidationError_InvalidObligationMinimum[InvalidObligationMinimum]
+    T29_domain_domain_ValidationError_InvalidDetectionRate[InvalidDetectionRate]
+  end
+  end
+  subgraph domain_domain_module_spec_document_loader_port["domain::spec_document_loader_port"]
+    direction TB
+  subgraph T35_domain_domain_SpecDocumentLoadError["spec_document_loader_port::SpecDocumentLoadError"]
+    direction TB
+    T35_domain_domain_SpecDocumentLoadError__self[SpecDocumentLoadError]
+    T35_domain_domain_SpecDocumentLoadError_NotFound[NotFound]
+    T35_domain_domain_SpecDocumentLoadError_Io[Io]
+    T35_domain_domain_SpecDocumentLoadError_JsonParse[JsonParse]
+    T35_domain_domain_SpecDocumentLoadError_Invariant[Invariant]
+  end
+  subgraph R36_domain_domain_SpecDocumentLoaderPort["spec_document_loader_port::SpecDocumentLoaderPort"]
+    direction TB
+    R36_domain_domain_SpecDocumentLoaderPort__self[SpecDocumentLoaderPort]
+    R36_domain_domain_SpecDocumentLoaderPort_load([load])
   end
   end
   subgraph domain_domain_module_tddd["domain::tddd"]
     direction TB
+  subgraph T24_domain_domain_AnchorText["tddd::test_obligation::pair::AnchorText"]
+    direction TB
+    T24_domain_domain_AnchorText__self[AnchorText]
+    T24_domain_domain_AnchorText_try_new([try_new])
+    T24_domain_domain_AnchorText_as_str([as_str])
+  end
   subgraph T28_domain_domain_AnchorTextHash["tddd::test_obligation::hashes::AnchorTextHash"]
     direction TB
     T28_domain_domain_AnchorTextHash__self[AnchorTextHash]
@@ -93,11 +116,25 @@ subgraph domain["domain"]
     T31_domain_domain_BoundTestsSetHash_new([new])
     T31_domain_domain_BoundTestsSetHash_as_hash([as_hash])
   end
+  subgraph T42_domain_domain_CatalogueDocumentLoaderError["tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderError"]
+    direction TB
+    T42_domain_domain_CatalogueDocumentLoaderError__self[CatalogueDocumentLoaderError]
+  end
+  subgraph T23_domain_domain_CrateName["tddd::catalogue_v2::identifiers::CrateName"]
+    direction TB
+    T23_domain_domain_CrateName__self[CrateName]
+  end
   subgraph T29_domain_domain_DeclarationHash["tddd::test_obligation::hashes::DeclarationHash"]
     direction TB
     T29_domain_domain_DeclarationHash__self[DeclarationHash]
     T29_domain_domain_DeclarationHash_new([new])
     T29_domain_domain_DeclarationHash_as_hash([as_hash])
+  end
+  subgraph T34_domain_domain_DetectionRatePercent["tddd::test_obligation::verdict::DetectionRatePercent"]
+    direction TB
+    T34_domain_domain_DetectionRatePercent__self[DetectionRatePercent]
+    T34_domain_domain_DetectionRatePercent_try_new([try_new])
+    T34_domain_domain_DetectionRatePercent_value([value])
   end
   subgraph T31_domain_domain_DiagnosticMessage["tddd::test_obligation::ids::DiagnosticMessage"]
     direction TB
@@ -119,6 +156,12 @@ subgraph domain["domain"]
     T31_domain_domain_EdgeVerdictRecord__self[EdgeVerdictRecord]
     T31_domain_domain_EdgeVerdictRecord_new([new])
   end
+  subgraph T30_domain_domain_EntryDeclaration["tddd::test_obligation::pair::EntryDeclaration"]
+    direction TB
+    T30_domain_domain_EntryDeclaration__self[EntryDeclaration]
+    T30_domain_domain_EntryDeclaration_try_new([try_new])
+    T30_domain_domain_EntryDeclaration_as_str([as_str])
+  end
   subgraph T37_domain_domain_FulfillmentFailCategory["tddd::test_obligation::vocab::FulfillmentFailCategory"]
     direction TB
     T37_domain_domain_FulfillmentFailCategory__self[FulfillmentFailCategory]
@@ -126,6 +169,33 @@ subgraph domain["domain"]
     T37_domain_domain_FulfillmentFailCategory_Substitution[Substitution]
     T37_domain_domain_FulfillmentFailCategory_CentralUnverified[CentralUnverified]
     T37_domain_domain_FulfillmentFailCategory_as_kebab([as_kebab])
+  end
+  subgraph T28_domain_domain_NonEmptyDrifts["tddd::test_obligation::drift::NonEmptyDrifts"]
+    direction TB
+    T28_domain_domain_NonEmptyDrifts__self[NonEmptyDrifts]
+    T28_domain_domain_NonEmptyDrifts_new([new])
+    T28_domain_domain_NonEmptyDrifts_try_new([try_new])
+    T28_domain_domain_NonEmptyDrifts_as_slice([as_slice])
+    T28_domain_domain_NonEmptyDrifts_first([first])
+    T28_domain_domain_NonEmptyDrifts_is_non_empty([is_non_empty])
+  end
+  subgraph T29_domain_domain_NonEmptyEdgeIds["tddd::test_obligation::ids::NonEmptyEdgeIds"]
+    direction TB
+    T29_domain_domain_NonEmptyEdgeIds__self[NonEmptyEdgeIds]
+    T29_domain_domain_NonEmptyEdgeIds_new([new])
+    T29_domain_domain_NonEmptyEdgeIds_try_new([try_new])
+    T29_domain_domain_NonEmptyEdgeIds_as_slice([as_slice])
+    T29_domain_domain_NonEmptyEdgeIds_first([first])
+    T29_domain_domain_NonEmptyEdgeIds_is_non_empty([is_non_empty])
+  end
+  subgraph T40_domain_domain_NonEmptyEdgeVerdictRecords["tddd::test_obligation::drift::NonEmptyEdgeVerdictRecords"]
+    direction TB
+    T40_domain_domain_NonEmptyEdgeVerdictRecords__self[NonEmptyEdgeVerdictRecords]
+    T40_domain_domain_NonEmptyEdgeVerdictRecords_new([new])
+    T40_domain_domain_NonEmptyEdgeVerdictRecords_try_new([try_new])
+    T40_domain_domain_NonEmptyEdgeVerdictRecords_as_slice([as_slice])
+    T40_domain_domain_NonEmptyEdgeVerdictRecords_first([first])
+    T40_domain_domain_NonEmptyEdgeVerdictRecords_is_non_empty([is_non_empty])
   end
   subgraph T35_domain_domain_NonEmptyTestLocations["tddd::test_obligation::binding::NonEmptyTestLocations"]
     direction TB
@@ -139,12 +209,13 @@ subgraph domain["domain"]
   subgraph T34_domain_domain_ObligationCheckError["tddd::test_obligation::errors::ObligationCheckError"]
     direction TB
     T34_domain_domain_ObligationCheckError__self[ObligationCheckError]
-    T34_domain_domain_ObligationCheckError_ObligationsOnly[ObligationsOnly]
-    T34_domain_domain_ObligationCheckError_BindingsOnly[BindingsOnly]
-    T34_domain_domain_ObligationCheckError_TrackNotActive[TrackNotActive]
+    T34_domain_domain_ObligationCheckError_ObligationsAbsent[ObligationsAbsent]
+    T34_domain_domain_ObligationCheckError_BindingsAbsent[BindingsAbsent]
     T34_domain_domain_ObligationCheckError_DriftsDetected[DriftsDetected]
     T34_domain_domain_ObligationCheckError_UnresolvedEdges[UnresolvedEdges]
     T34_domain_domain_ObligationCheckError_StaleVerdicts[StaleVerdicts]
+    T34_domain_domain_ObligationCheckError_CatalogueLoad[CatalogueLoad]
+    T34_domain_domain_ObligationCheckError_SpecLoad[SpecLoad]
     T34_domain_domain_ObligationCheckError_ArtifactCodec[ArtifactCodec]
     T34_domain_domain_ObligationCheckError_SourceScan[SourceScan]
     T34_domain_domain_ObligationCheckError_CacheIo[CacheIo]
@@ -163,11 +234,13 @@ subgraph domain["domain"]
   subgraph T37_domain_domain_ObligationEvaluateError["tddd::test_obligation::errors::ObligationEvaluateError"]
     direction TB
     T37_domain_domain_ObligationEvaluateError__self[ObligationEvaluateError]
-    T37_domain_domain_ObligationEvaluateError_InvalidConfig[InvalidConfig]
     T37_domain_domain_ObligationEvaluateError_TrackNotActive[TrackNotActive]
+    T37_domain_domain_ObligationEvaluateError_CatalogueLoad[CatalogueLoad]
+    T37_domain_domain_ObligationEvaluateError_SpecLoad[SpecLoad]
+    T37_domain_domain_ObligationEvaluateError_ArtifactLoad[ArtifactLoad]
+    T37_domain_domain_ObligationEvaluateError_TestSourceScan[TestSourceScan]
     T37_domain_domain_ObligationEvaluateError_VerifierPort[VerifierPort]
     T37_domain_domain_ObligationEvaluateError_CachePersistence[CachePersistence]
-    T37_domain_domain_ObligationEvaluateError_CacheWrite[CacheWrite]
     T37_domain_domain_ObligationEvaluateError_SemanticFailuresConfirmed[SemanticFailuresConfirmed]
     T37_domain_domain_ObligationEvaluateError_HumanEscalationRequired[HumanEscalationRequired]
   end
@@ -195,6 +268,14 @@ subgraph domain["domain"]
     T43_domain_domain_ObligationFulfillmentCacheKey_declaration_hash([declaration_hash])
     T43_domain_domain_ObligationFulfillmentCacheKey_anchor_text_hash([anchor_text_hash])
   end
+  subgraph T39_domain_domain_ObligationFulfillmentPair["tddd::test_obligation::pair::ObligationFulfillmentPair"]
+    direction TB
+    T39_domain_domain_ObligationFulfillmentPair__self[ObligationFulfillmentPair]
+    T39_domain_domain_ObligationFulfillmentPair_new([new])
+    T39_domain_domain_ObligationFulfillmentPair_tests_source([tests_source])
+    T39_domain_domain_ObligationFulfillmentPair_entry_declaration([entry_declaration])
+    T39_domain_domain_ObligationFulfillmentPair_anchor_text([anchor_text])
+  end
   subgraph T42_domain_domain_ObligationFulfillmentVerdict["tddd::test_obligation::verdict::ObligationFulfillmentVerdict"]
     direction TB
     T42_domain_domain_ObligationFulfillmentVerdict__self[ObligationFulfillmentVerdict]
@@ -220,6 +301,17 @@ subgraph domain["domain"]
     T22_domain_domain_RoleName__self[RoleName]
     T22_domain_domain_RoleName_try_new([try_new])
     T22_domain_domain_RoleName_as_str([as_str])
+  end
+  subgraph T42_domain_domain_RoleObligationItemsProjector["tddd::test_obligation::projection::RoleObligationItemsProjector"]
+    direction TB
+    T42_domain_domain_RoleObligationItemsProjector__self[RoleObligationItemsProjector]
+    T42_domain_domain_RoleObligationItemsProjector_new([new])
+    T42_domain_domain_RoleObligationItemsProjector_data_role_items([data_role_items])
+    T42_domain_domain_RoleObligationItemsProjector_trait_impl_items([trait_impl_items])
+    T42_domain_domain_RoleObligationItemsProjector_contract_role_items([contract_role_items])
+    T42_domain_domain_RoleObligationItemsProjector_function_role_items([function_role_items])
+    T42_domain_domain_RoleObligationItemsProjector_typestate_items([typestate_items])
+    T42_domain_domain_RoleObligationItemsProjector_type_has_typestate([type_has_typestate])
   end
   subgraph T33_domain_domain_RoleObligationRules["tddd::test_obligation::rules::RoleObligationRules"]
     direction TB
@@ -426,19 +518,40 @@ subgraph domain["domain"]
     T42_domain_domain_TestObligationRulesLoadError_IoError[IoError]
     T42_domain_domain_TestObligationRulesLoadError_MalformedJson[MalformedJson]
   end
-  subgraph T41_domain_domain_TestObligationScopePresence["tddd::test_obligation::scope::TestObligationScopePresence"]
-    direction TB
-    T41_domain_domain_TestObligationScopePresence__self[TestObligationScopePresence]
-    T41_domain_domain_TestObligationScopePresence_Both[Both]
-    T41_domain_domain_TestObligationScopePresence_Neither[Neither]
-    T41_domain_domain_TestObligationScopePresence_ObligationsOnly[ObligationsOnly]
-    T41_domain_domain_TestObligationScopePresence_BindingsOnly[BindingsOnly]
-  end
   subgraph T33_domain_domain_TestSourceScanError["tddd::test_obligation::errors::TestSourceScanError"]
     direction TB
     T33_domain_domain_TestSourceScanError__self[TestSourceScanError]
     T33_domain_domain_TestSourceScanError_Io[Io]
     T33_domain_domain_TestSourceScanError_Parse[Parse]
+  end
+  subgraph T25_domain_domain_TestsSource["tddd::test_obligation::pair::TestsSource"]
+    direction TB
+    T25_domain_domain_TestsSource__self[TestsSource]
+    T25_domain_domain_TestsSource_try_new([try_new])
+    T25_domain_domain_TestsSource_as_str([as_str])
+  end
+  subgraph T29_domain_domain_TraitImplDeclV2["tddd::catalogue_v2::traits::TraitImplDeclV2"]
+    direction TB
+    T29_domain_domain_TraitImplDeclV2__self[TraitImplDeclV2]
+    T29_domain_domain_TraitImplDeclV2_from_parts([from_parts])
+    T29_domain_domain_TraitImplDeclV2_new([new])
+    T29_domain_domain_TraitImplDeclV2_action([action])
+    T29_domain_domain_TraitImplDeclV2_trait_ref([trait_ref])
+    T29_domain_domain_TraitImplDeclV2_for_type([for_type])
+    T29_domain_domain_TraitImplDeclV2_impl_generics([impl_generics])
+    T29_domain_domain_TraitImplDeclV2_impl_where_predicates([impl_where_predicates])
+    T29_domain_domain_TraitImplDeclV2_trait_ref_scope([trait_ref_scope])
+  end
+  subgraph T23_domain_domain_TraitName["tddd::catalogue_v2::identifiers::TraitName"]
+    direction TB
+    T23_domain_domain_TraitName__self[TraitName]
+  end
+  subgraph T27_domain_domain_TraitRefScope["tddd::catalogue_v2::traits::TraitRefScope"]
+    direction TB
+    T27_domain_domain_TraitRefScope__self[TraitRefScope]
+    T27_domain_domain_TraitRefScope_SelfCrate[SelfCrate]
+    T27_domain_domain_TraitRefScope_Workspace[Workspace]
+    T27_domain_domain_TraitRefScope_External[External]
   end
   subgraph T39_domain_domain_UncitedSpecElementFinding["tddd::test_obligation::scope::UncitedSpecElementFinding"]
     direction TB
@@ -486,12 +599,24 @@ subgraph domain["domain"]
     T28_domain_domain_WaiverCacheKey_declaration_hash([declaration_hash])
     T28_domain_domain_WaiverCacheKey_anchor_text_hash([anchor_text_hash])
   end
+  subgraph T24_domain_domain_WaiverPair["tddd::test_obligation::pair::WaiverPair"]
+    direction TB
+    T24_domain_domain_WaiverPair__self[WaiverPair]
+    T24_domain_domain_WaiverPair_new([new])
+    T24_domain_domain_WaiverPair_waived_reason([waived_reason])
+    T24_domain_domain_WaiverPair_entry_declaration([entry_declaration])
+    T24_domain_domain_WaiverPair_anchor_text([anchor_text])
+  end
   subgraph T27_domain_domain_WaiverVerdict["tddd::test_obligation::verdict::WaiverVerdict"]
     direction TB
     T27_domain_domain_WaiverVerdict__self[WaiverVerdict]
     T27_domain_domain_WaiverVerdict_Waived[Waived]
     T27_domain_domain_WaiverVerdict_Fail[Fail]
     T27_domain_domain_WaiverVerdict_Pending[Pending]
+  end
+  subgraph R41_domain_domain_CatalogueDocumentLoaderPort["tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort"]
+    direction TB
+    R41_domain_domain_CatalogueDocumentLoaderPort__self[CatalogueDocumentLoaderPort]
   end
   subgraph R44_domain_domain_ObligationFulfillmentCachePort["tddd::test_obligation::ports::ObligationFulfillmentCachePort"]
     direction TB
@@ -581,6 +706,8 @@ subgraph usecase["usecase"]
     T43_usecase_usecase_CheckTestObligationsOutcome__self[CheckTestObligationsOutcome]
     T43_usecase_usecase_CheckTestObligationsOutcome_new_verified_scope([new_verified_scope])
     T43_usecase_usecase_CheckTestObligationsOutcome_new_empty_scope([new_empty_scope])
+    T43_usecase_usecase_CheckTestObligationsOutcome_resolved_edges([resolved_edges])
+    T43_usecase_usecase_CheckTestObligationsOutcome_uncited_findings([uncited_findings])
   end
   subgraph T44_usecase_usecase_DeriveTestObligationsCommand["test_obligation::derive::DeriveTestObligationsCommand"]
     direction TB
@@ -597,6 +724,10 @@ subgraph usecase["usecase"]
     T46_usecase_usecase_EvaluateTestObligationsCommand__self[EvaluateTestObligationsCommand]
     T46_usecase_usecase_EvaluateTestObligationsCommand_new([new])
   end
+  subgraph T45_usecase_usecase_EvaluateTestObligationsFuture["test_obligation::evaluate::EvaluateTestObligationsFuture"]
+    direction TB
+    T45_usecase_usecase_EvaluateTestObligationsFuture__self[EvaluateTestObligationsFuture]
+  end
   subgraph T49_usecase_usecase_EvaluateTestObligationsInteractor["test_obligation::evaluate::EvaluateTestObligationsInteractor"]
     direction TB
     T49_usecase_usecase_EvaluateTestObligationsInteractor__self[EvaluateTestObligationsInteractor]
@@ -606,6 +737,15 @@ subgraph usecase["usecase"]
     direction TB
     T46_usecase_usecase_EvaluateTestObligationsOutcome__self[EvaluateTestObligationsOutcome]
     T46_usecase_usecase_EvaluateTestObligationsOutcome_new([new])
+    T46_usecase_usecase_EvaluateTestObligationsOutcome_pass_count([pass_count])
+    T46_usecase_usecase_EvaluateTestObligationsOutcome_fail_count([fail_count])
+    T46_usecase_usecase_EvaluateTestObligationsOutcome_pending_count([pending_count])
+    T46_usecase_usecase_EvaluateTestObligationsOutcome_known_bad_detection_rate([known_bad_detection_rate])
+  end
+  subgraph T51_usecase_usecase_TestObligationCatalogueCommandInput["test_obligation::TestObligationCatalogueCommandInput"]
+    direction TB
+    T51_usecase_usecase_TestObligationCatalogueCommandInput__self[TestObligationCatalogueCommandInput]
+    T51_usecase_usecase_TestObligationCatalogueCommandInput_new([new])
   end
   subgraph T40_usecase_usecase_TestObligationChainLabel["test_obligation::results::TestObligationChainLabel"]
     direction TB
@@ -617,11 +757,26 @@ subgraph usecase["usecase"]
     direction TB
     T44_usecase_usecase_TestObligationEvaluateConfig__self[TestObligationEvaluateConfig]
     T44_usecase_usecase_TestObligationEvaluateConfig_try_new([try_new])
+    T44_usecase_usecase_TestObligationEvaluateConfig_injection_rate([injection_rate])
+    T44_usecase_usecase_TestObligationEvaluateConfig_detection_threshold([detection_threshold])
+    T44_usecase_usecase_TestObligationEvaluateConfig_parallelism([parallelism])
+  end
+  subgraph T49_usecase_usecase_TestObligationEvaluateConfigError["test_obligation::evaluate::TestObligationEvaluateConfigError"]
+    direction TB
+    T49_usecase_usecase_TestObligationEvaluateConfigError__self[TestObligationEvaluateConfigError]
+    T49_usecase_usecase_TestObligationEvaluateConfigError_InvalidInjectionRate[InvalidInjectionRate]
+    T49_usecase_usecase_TestObligationEvaluateConfigError_InvalidDetectionThreshold[InvalidDetectionThreshold]
+    T49_usecase_usecase_TestObligationEvaluateConfigError_InvalidParallelism[InvalidParallelism]
   end
   subgraph T41_usecase_usecase_TestObligationLaneSummary["test_obligation::results::TestObligationLaneSummary"]
     direction TB
     T41_usecase_usecase_TestObligationLaneSummary__self[TestObligationLaneSummary]
     T41_usecase_usecase_TestObligationLaneSummary_new([new])
+    T41_usecase_usecase_TestObligationLaneSummary_chain_name([chain_name])
+    T41_usecase_usecase_TestObligationLaneSummary_layer([layer])
+    T41_usecase_usecase_TestObligationLaneSummary_pass_count([pass_count])
+    T41_usecase_usecase_TestObligationLaneSummary_fail_count([fail_count])
+    T41_usecase_usecase_TestObligationLaneSummary_pending_count([pending_count])
   end
   subgraph T44_usecase_usecase_TestObligationResultsCommand["test_obligation::results::TestObligationResultsCommand"]
     direction TB
@@ -637,11 +792,19 @@ subgraph usecase["usecase"]
     direction TB
     T43_usecase_usecase_TestObligationResultsOutput__self[TestObligationResultsOutput]
     T43_usecase_usecase_TestObligationResultsOutput_new([new])
+    T43_usecase_usecase_TestObligationResultsOutput_lane_summaries([lane_summaries])
+    T43_usecase_usecase_TestObligationResultsOutput_records([records])
+    T43_usecase_usecase_TestObligationResultsOutput_uncited_findings([uncited_findings])
   end
   subgraph R54_usecase_usecase_CheckTestObligationsApplicationService["test_obligation::check::CheckTestObligationsApplicationService"]
     direction TB
     R54_usecase_usecase_CheckTestObligationsApplicationService__self[CheckTestObligationsApplicationService]
     R54_usecase_usecase_CheckTestObligationsApplicationService_execute([execute])
+  end
+  subgraph R33_usecase_usecase_ContentHasherPort["test_obligation::hasher::ContentHasherPort"]
+    direction TB
+    R33_usecase_usecase_ContentHasherPort__self[ContentHasherPort]
+    R33_usecase_usecase_ContentHasherPort_sha256([sha256])
   end
   subgraph R55_usecase_usecase_DeriveTestObligationsApplicationService["test_obligation::derive::DeriveTestObligationsApplicationService"]
     direction TB
@@ -740,12 +903,6 @@ subgraph infrastructure["infrastructure"]
     T50_infrastructure_infrastructure_JsonWaiverCacheCodec__self[JsonWaiverCacheCodec]
     T50_infrastructure_infrastructure_JsonWaiverCacheCodec_new([new])
   end
-  subgraph T60_infrastructure_infrastructure_ObligationCatalogueEntryRefDto["test_obligation::obligations_codec::ObligationCatalogueEntryRefDto"]
-    direction TB
-    T60_infrastructure_infrastructure_ObligationCatalogueEntryRefDto__self[ObligationCatalogueEntryRefDto]
-    T60_infrastructure_infrastructure_ObligationCatalogueEntryRefDto_from_domain([from_domain])
-    T60_infrastructure_infrastructure_ObligationCatalogueEntryRefDto_into_domain([into_domain])
-  end
   subgraph T67_infrastructure_infrastructure_ObligationFulfillmentCacheDocumentDto["test_obligation::fulfillment_cache_codec::ObligationFulfillmentCacheDocumentDto"]
     direction TB
     T67_infrastructure_infrastructure_ObligationFulfillmentCacheDocumentDto__self[ObligationFulfillmentCacheDocumentDto]
@@ -753,6 +910,11 @@ subgraph infrastructure["infrastructure"]
   subgraph T64_infrastructure_infrastructure_ObligationFulfillmentCacheEntryDto["test_obligation::fulfillment_cache_codec::ObligationFulfillmentCacheEntryDto"]
     direction TB
     T64_infrastructure_infrastructure_ObligationFulfillmentCacheEntryDto__self[ObligationFulfillmentCacheEntryDto]
+  end
+  subgraph T67_infrastructure_infrastructure_ObligationFulfillmentEscalationDriver["test_obligation::fulfillment_escalation_driver::ObligationFulfillmentEscalationDriver"]
+    direction TB
+    T67_infrastructure_infrastructure_ObligationFulfillmentEscalationDriver__self[ObligationFulfillmentEscalationDriver]
+    T67_infrastructure_infrastructure_ObligationFulfillmentEscalationDriver_new([new])
   end
   subgraph T61_infrastructure_infrastructure_ObligationFulfillmentVerdictDto["test_obligation::fulfillment_cache_codec::ObligationFulfillmentVerdictDto"]
     direction TB
@@ -784,6 +946,11 @@ subgraph infrastructure["infrastructure"]
   subgraph T52_infrastructure_infrastructure_RoleObligationRulesDto["test_obligation::rules_codec::RoleObligationRulesDto"]
     direction TB
     T52_infrastructure_infrastructure_RoleObligationRulesDto__self[RoleObligationRulesDto]
+  end
+  subgraph T49_infrastructure_infrastructure_Sha256ContentHasher["test_obligation::sha256_content_hasher::Sha256ContentHasher"]
+    direction TB
+    T49_infrastructure_infrastructure_Sha256ContentHasher__self[Sha256ContentHasher]
+    T49_infrastructure_infrastructure_Sha256ContentHasher_new([new])
   end
   subgraph T50_infrastructure_infrastructure_SynTestSourceScanner["test_obligation::source_scanner::SynTestSourceScanner"]
     direction TB
@@ -872,6 +1039,11 @@ subgraph infrastructure["infrastructure"]
   subgraph T49_infrastructure_infrastructure_WaiverCacheEntryDto["test_obligation::waiver_cache_codec::WaiverCacheEntryDto"]
     direction TB
     T49_infrastructure_infrastructure_WaiverCacheEntryDto__self[WaiverCacheEntryDto]
+  end
+  subgraph T52_infrastructure_infrastructure_WaiverEscalationDriver["test_obligation::waiver_escalation_driver::WaiverEscalationDriver"]
+    direction TB
+    T52_infrastructure_infrastructure_WaiverEscalationDriver__self[WaiverEscalationDriver]
+    T52_infrastructure_infrastructure_WaiverEscalationDriver_new([new])
   end
   subgraph T46_infrastructure_infrastructure_WaiverVerdictDto["test_obligation::waiver_cache_codec::WaiverVerdictDto"]
     direction TB
@@ -1021,12 +1193,20 @@ T29_domain_domain_ValidationError_DuplicateElementId --o T31_domain_domain_Diagn
 T29_domain_domain_ValidationError_InvalidLayerId --o T31_domain_domain_DiagnosticMessage__self
 T29_domain_domain_ValidationError_InvalidSpecElementId --o T31_domain_domain_DiagnosticMessage__self
 T29_domain_domain_ValidationError_InvalidContentHash --o T31_domain_domain_DiagnosticMessage__self
+T35_domain_domain_SpecDocumentLoadError_Io --o|reason| T31_domain_domain_DiagnosticMessage__self
+T35_domain_domain_SpecDocumentLoadError_JsonParse --o|reason| T31_domain_domain_DiagnosticMessage__self
+T35_domain_domain_SpecDocumentLoadError_Invariant --o|reason| T31_domain_domain_DiagnosticMessage__self
+R36_domain_domain_SpecDocumentLoaderPort_load --> T35_domain_domain_SpecDocumentLoadError__self
+T24_domain_domain_AnchorText_try_new --> T24_domain_domain_AnchorText__self
+T24_domain_domain_AnchorText_try_new --> T29_domain_domain_ValidationError__self
 T28_domain_domain_AnchorTextHash_new --> T28_domain_domain_AnchorTextHash__self
 T32_domain_domain_ArtifactCodecError_Io --o T31_domain_domain_DiagnosticMessage__self
 T32_domain_domain_ArtifactCodecError_MalformedJson --o T31_domain_domain_DiagnosticMessage__self
 T32_domain_domain_ArtifactCodecError_DomainInvariant --o T31_domain_domain_DiagnosticMessage__self
 T31_domain_domain_BoundTestsSetHash_new --> T31_domain_domain_BoundTestsSetHash__self
 T29_domain_domain_DeclarationHash_new --> T29_domain_domain_DeclarationHash__self
+T34_domain_domain_DetectionRatePercent_try_new --> T34_domain_domain_DetectionRatePercent__self
+T34_domain_domain_DetectionRatePercent_try_new --> T29_domain_domain_ValidationError__self
 T31_domain_domain_DiagnosticMessage_try_new --> T31_domain_domain_DiagnosticMessage__self
 T31_domain_domain_DiagnosticMessage_try_new --> T29_domain_domain_ValidationError__self
 T35_domain_domain_EdgeResolutionOutcome_Fail --o T37_domain_domain_FulfillmentFailCategory__self
@@ -1034,6 +1214,29 @@ T31_domain_domain_EdgeVerdictRecord_new --o T34_domain_domain_TestObligationEdge
 T31_domain_domain_EdgeVerdictRecord_new --o T35_domain_domain_EdgeResolutionOutcome__self
 T31_domain_domain_EdgeVerdictRecord_new --o T33_domain_domain_TestObligationDrift__self
 T31_domain_domain_EdgeVerdictRecord_new --> T31_domain_domain_EdgeVerdictRecord__self
+T30_domain_domain_EntryDeclaration_try_new --> T30_domain_domain_EntryDeclaration__self
+T30_domain_domain_EntryDeclaration_try_new --> T29_domain_domain_ValidationError__self
+T28_domain_domain_NonEmptyDrifts_new --o T33_domain_domain_TestObligationDrift__self
+T28_domain_domain_NonEmptyDrifts_new --o T33_domain_domain_TestObligationDrift__self
+T28_domain_domain_NonEmptyDrifts_new --> T28_domain_domain_NonEmptyDrifts__self
+T28_domain_domain_NonEmptyDrifts_try_new --o T33_domain_domain_TestObligationDrift__self
+T28_domain_domain_NonEmptyDrifts_try_new --> T28_domain_domain_NonEmptyDrifts__self
+T28_domain_domain_NonEmptyDrifts_as_slice --> T33_domain_domain_TestObligationDrift__self
+T28_domain_domain_NonEmptyDrifts_first --> T33_domain_domain_TestObligationDrift__self
+T29_domain_domain_NonEmptyEdgeIds_new --o T34_domain_domain_TestObligationEdgeId__self
+T29_domain_domain_NonEmptyEdgeIds_new --o T34_domain_domain_TestObligationEdgeId__self
+T29_domain_domain_NonEmptyEdgeIds_new --> T29_domain_domain_NonEmptyEdgeIds__self
+T29_domain_domain_NonEmptyEdgeIds_try_new --o T34_domain_domain_TestObligationEdgeId__self
+T29_domain_domain_NonEmptyEdgeIds_try_new --> T29_domain_domain_NonEmptyEdgeIds__self
+T29_domain_domain_NonEmptyEdgeIds_as_slice --> T34_domain_domain_TestObligationEdgeId__self
+T29_domain_domain_NonEmptyEdgeIds_first --> T34_domain_domain_TestObligationEdgeId__self
+T40_domain_domain_NonEmptyEdgeVerdictRecords_new --o T31_domain_domain_EdgeVerdictRecord__self
+T40_domain_domain_NonEmptyEdgeVerdictRecords_new --o T31_domain_domain_EdgeVerdictRecord__self
+T40_domain_domain_NonEmptyEdgeVerdictRecords_new --> T40_domain_domain_NonEmptyEdgeVerdictRecords__self
+T40_domain_domain_NonEmptyEdgeVerdictRecords_try_new --o T31_domain_domain_EdgeVerdictRecord__self
+T40_domain_domain_NonEmptyEdgeVerdictRecords_try_new --> T40_domain_domain_NonEmptyEdgeVerdictRecords__self
+T40_domain_domain_NonEmptyEdgeVerdictRecords_as_slice --> T31_domain_domain_EdgeVerdictRecord__self
+T40_domain_domain_NonEmptyEdgeVerdictRecords_first --> T31_domain_domain_EdgeVerdictRecord__self
 T35_domain_domain_NonEmptyTestLocations_new --o T26_domain_domain_TestLocation__self
 T35_domain_domain_NonEmptyTestLocations_new --o T26_domain_domain_TestLocation__self
 T35_domain_domain_NonEmptyTestLocations_new --> T35_domain_domain_NonEmptyTestLocations__self
@@ -1041,27 +1244,30 @@ T35_domain_domain_NonEmptyTestLocations_try_new --o T26_domain_domain_TestLocati
 T35_domain_domain_NonEmptyTestLocations_try_new --> T35_domain_domain_NonEmptyTestLocations__self
 T35_domain_domain_NonEmptyTestLocations_as_slice --> T26_domain_domain_TestLocation__self
 T35_domain_domain_NonEmptyTestLocations_first --> T26_domain_domain_TestLocation__self
-T34_domain_domain_ObligationCheckError_TrackNotActive --o|branch| T31_domain_domain_DiagnosticMessage__self
-T34_domain_domain_ObligationCheckError_DriftsDetected --o|drifts| T33_domain_domain_TestObligationDrift__self
-T34_domain_domain_ObligationCheckError_UnresolvedEdges --o|edges| T34_domain_domain_TestObligationEdgeId__self
-T34_domain_domain_ObligationCheckError_StaleVerdicts --o|edges| T34_domain_domain_TestObligationEdgeId__self
+T34_domain_domain_ObligationCheckError_DriftsDetected --o|drifts| T28_domain_domain_NonEmptyDrifts__self
+T34_domain_domain_ObligationCheckError_UnresolvedEdges --o|edges| T29_domain_domain_NonEmptyEdgeIds__self
+T34_domain_domain_ObligationCheckError_StaleVerdicts --o|edges| T29_domain_domain_NonEmptyEdgeIds__self
+T34_domain_domain_ObligationCheckError_CatalogueLoad --o T42_domain_domain_CatalogueDocumentLoaderError__self
+T34_domain_domain_ObligationCheckError_SpecLoad --o T35_domain_domain_SpecDocumentLoadError__self
 T34_domain_domain_ObligationCheckError_ArtifactCodec --o T32_domain_domain_ArtifactCodecError__self
 T34_domain_domain_ObligationCheckError_SourceScan --o T33_domain_domain_TestSourceScanError__self
 T34_domain_domain_ObligationCheckError_CacheIo --o T30_domain_domain_VerifyCacheError__self
 T35_domain_domain_ObligationDeriveError_RulesLoad --o T42_domain_domain_TestObligationRulesLoadError__self
 T35_domain_domain_ObligationDeriveError_TrackNotActive --o|branch| T31_domain_domain_DiagnosticMessage__self
-T35_domain_domain_ObligationDeriveError_CatalogueLoad --o T31_domain_domain_DiagnosticMessage__self
-T35_domain_domain_ObligationDeriveError_SpecLoad --o T31_domain_domain_DiagnosticMessage__self
+T35_domain_domain_ObligationDeriveError_CatalogueLoad --o T42_domain_domain_CatalogueDocumentLoaderError__self
+T35_domain_domain_ObligationDeriveError_SpecLoad --o T35_domain_domain_SpecDocumentLoadError__self
 T35_domain_domain_ObligationDeriveError_InvalidCatalogueState --o T31_domain_domain_DiagnosticMessage__self
 T35_domain_domain_ObligationDeriveError_ArtifactCodec --o T32_domain_domain_ArtifactCodecError__self
 T35_domain_domain_ObligationDeriveError_ArtifactWrite --o T31_domain_domain_DiagnosticMessage__self
-T37_domain_domain_ObligationEvaluateError_InvalidConfig --o|message| T31_domain_domain_DiagnosticMessage__self
 T37_domain_domain_ObligationEvaluateError_TrackNotActive --o|branch| T31_domain_domain_DiagnosticMessage__self
+T37_domain_domain_ObligationEvaluateError_CatalogueLoad --o T42_domain_domain_CatalogueDocumentLoaderError__self
+T37_domain_domain_ObligationEvaluateError_SpecLoad --o T35_domain_domain_SpecDocumentLoadError__self
+T37_domain_domain_ObligationEvaluateError_ArtifactLoad --o T32_domain_domain_ArtifactCodecError__self
+T37_domain_domain_ObligationEvaluateError_TestSourceScan --o T33_domain_domain_TestSourceScanError__self
 T37_domain_domain_ObligationEvaluateError_VerifierPort --o T35_domain_domain_SemanticVerifierError__self
 T37_domain_domain_ObligationEvaluateError_CachePersistence --o T30_domain_domain_VerifyCacheError__self
-T37_domain_domain_ObligationEvaluateError_CacheWrite --o T31_domain_domain_DiagnosticMessage__self
-T37_domain_domain_ObligationEvaluateError_SemanticFailuresConfirmed --o|records| T31_domain_domain_EdgeVerdictRecord__self
-T37_domain_domain_ObligationEvaluateError_HumanEscalationRequired --o|records| T31_domain_domain_EdgeVerdictRecord__self
+T37_domain_domain_ObligationEvaluateError_SemanticFailuresConfirmed --o|records| T40_domain_domain_NonEmptyEdgeVerdictRecords__self
+T37_domain_domain_ObligationEvaluateError_HumanEscalationRequired --o|records| T40_domain_domain_NonEmptyEdgeVerdictRecords__self
 T48_domain_domain_ObligationFulfillmentCacheDocument_new --o T45_domain_domain_ObligationFulfillmentCacheEntry__self
 T48_domain_domain_ObligationFulfillmentCacheDocument_new --> T48_domain_domain_ObligationFulfillmentCacheDocument__self
 T48_domain_domain_ObligationFulfillmentCacheDocument_entries --> T45_domain_domain_ObligationFulfillmentCacheEntry__self
@@ -1081,6 +1287,13 @@ T43_domain_domain_ObligationFulfillmentCacheKey_new --> T43_domain_domain_Obliga
 T43_domain_domain_ObligationFulfillmentCacheKey_bound_tests_set_hash --> T31_domain_domain_BoundTestsSetHash__self
 T43_domain_domain_ObligationFulfillmentCacheKey_declaration_hash --> T29_domain_domain_DeclarationHash__self
 T43_domain_domain_ObligationFulfillmentCacheKey_anchor_text_hash --> T28_domain_domain_AnchorTextHash__self
+T39_domain_domain_ObligationFulfillmentPair_new --o T25_domain_domain_TestsSource__self
+T39_domain_domain_ObligationFulfillmentPair_new --o T30_domain_domain_EntryDeclaration__self
+T39_domain_domain_ObligationFulfillmentPair_new --o T24_domain_domain_AnchorText__self
+T39_domain_domain_ObligationFulfillmentPair_new --> T39_domain_domain_ObligationFulfillmentPair__self
+T39_domain_domain_ObligationFulfillmentPair_tests_source --> T25_domain_domain_TestsSource__self
+T39_domain_domain_ObligationFulfillmentPair_entry_declaration --> T30_domain_domain_EntryDeclaration__self
+T39_domain_domain_ObligationFulfillmentPair_anchor_text --> T24_domain_domain_AnchorText__self
 T42_domain_domain_ObligationFulfillmentVerdict_Fail --o|category| T37_domain_domain_FulfillmentFailCategory__self
 T42_domain_domain_ObligationFulfillmentVerdict_Fail --o|reason| T31_domain_domain_DiagnosticMessage__self
 T36_domain_domain_ObligationResultsError_IoError --o T31_domain_domain_DiagnosticMessage__self
@@ -1090,6 +1303,17 @@ T33_domain_domain_ObligationsDocument_new --> T33_domain_domain_ObligationsDocum
 T33_domain_domain_ObligationsDocument_obligations --> T28_domain_domain_TestObligation__self
 T22_domain_domain_RoleName_try_new --> T22_domain_domain_RoleName__self
 T22_domain_domain_RoleName_try_new --> T29_domain_domain_ValidationError__self
+T42_domain_domain_RoleObligationItemsProjector_new --> T42_domain_domain_RoleObligationItemsProjector__self
+T42_domain_domain_RoleObligationItemsProjector_data_role_items --o T35_domain_domain_TestObligationPerAxis__self
+T42_domain_domain_RoleObligationItemsProjector_data_role_items --> T42_domain_domain_TestObligationItemIdentifier__self
+T42_domain_domain_RoleObligationItemsProjector_trait_impl_items --o T35_domain_domain_TestObligationPerAxis__self
+T42_domain_domain_RoleObligationItemsProjector_trait_impl_items --> T42_domain_domain_TestObligationItemIdentifier__self
+T42_domain_domain_RoleObligationItemsProjector_contract_role_items --o T35_domain_domain_TestObligationPerAxis__self
+T42_domain_domain_RoleObligationItemsProjector_contract_role_items --> T42_domain_domain_TestObligationItemIdentifier__self
+T42_domain_domain_RoleObligationItemsProjector_function_role_items --o T35_domain_domain_TestObligationPerAxis__self
+T42_domain_domain_RoleObligationItemsProjector_function_role_items --> T42_domain_domain_TestObligationItemIdentifier__self
+T42_domain_domain_RoleObligationItemsProjector_typestate_items --o T35_domain_domain_TestObligationPerAxis__self
+T42_domain_domain_RoleObligationItemsProjector_typestate_items --> T42_domain_domain_TestObligationItemIdentifier__self
 T33_domain_domain_RoleObligationRules_new --o T32_domain_domain_TestObligationRule__self
 T33_domain_domain_RoleObligationRules_new --> T33_domain_domain_RoleObligationRules__self
 T33_domain_domain_RoleObligationRules_obligations --> T32_domain_domain_TestObligationRule__self
@@ -1192,6 +1416,14 @@ T42_domain_domain_TestObligationRulesLoadError_IoError --o T31_domain_domain_Dia
 T42_domain_domain_TestObligationRulesLoadError_MalformedJson --o T31_domain_domain_DiagnosticMessage__self
 T33_domain_domain_TestSourceScanError_Io --o T31_domain_domain_DiagnosticMessage__self
 T33_domain_domain_TestSourceScanError_Parse --o T31_domain_domain_DiagnosticMessage__self
+T25_domain_domain_TestsSource_try_new --> T25_domain_domain_TestsSource__self
+T25_domain_domain_TestsSource_try_new --> T29_domain_domain_ValidationError__self
+T29_domain_domain_TraitImplDeclV2_from_parts --> T29_domain_domain_TraitImplDeclV2__self
+T29_domain_domain_TraitImplDeclV2_new --> T29_domain_domain_TraitImplDeclV2__self
+T29_domain_domain_TraitImplDeclV2_trait_ref_scope --> T27_domain_domain_TraitRefScope__self
+T27_domain_domain_TraitRefScope_SelfCrate --o|bare_name| T23_domain_domain_TraitName__self
+T27_domain_domain_TraitRefScope_Workspace --o|crate_name| T23_domain_domain_CrateName__self
+T27_domain_domain_TraitRefScope_Workspace --o|bare_name| T23_domain_domain_TraitName__self
 T39_domain_domain_UncitedSpecElementFinding_new --> T39_domain_domain_UncitedSpecElementFinding__self
 T30_domain_domain_VerifyCacheError_Io --o T31_domain_domain_DiagnosticMessage__self
 T30_domain_domain_VerifyCacheError_MalformedJson --o T31_domain_domain_DiagnosticMessage__self
@@ -1215,6 +1447,13 @@ T28_domain_domain_WaiverCacheKey_new --> T28_domain_domain_WaiverCacheKey__self
 T28_domain_domain_WaiverCacheKey_waived_reason_hash --> T30_domain_domain_WaivedReasonHash__self
 T28_domain_domain_WaiverCacheKey_declaration_hash --> T29_domain_domain_DeclarationHash__self
 T28_domain_domain_WaiverCacheKey_anchor_text_hash --> T28_domain_domain_AnchorTextHash__self
+T24_domain_domain_WaiverPair_new --o T26_domain_domain_WaivedReason__self
+T24_domain_domain_WaiverPair_new --o T30_domain_domain_EntryDeclaration__self
+T24_domain_domain_WaiverPair_new --o T24_domain_domain_AnchorText__self
+T24_domain_domain_WaiverPair_new --> T24_domain_domain_WaiverPair__self
+T24_domain_domain_WaiverPair_waived_reason --> T26_domain_domain_WaivedReason__self
+T24_domain_domain_WaiverPair_entry_declaration --> T30_domain_domain_EntryDeclaration__self
+T24_domain_domain_WaiverPair_anchor_text --> T24_domain_domain_AnchorText__self
 T27_domain_domain_WaiverVerdict_Fail --o|reason| T31_domain_domain_DiagnosticMessage__self
 R44_domain_domain_ObligationFulfillmentCachePort_load --> T48_domain_domain_ObligationFulfillmentCacheDocument__self
 R44_domain_domain_ObligationFulfillmentCachePort_load --> T30_domain_domain_VerifyCacheError__self
@@ -1243,6 +1482,7 @@ R32_domain_domain_WaiverVerifierPort_verify_pair --> T35_domain_domain_SemanticV
 R32_domain_domain_WaiverVerifierPort_verify_pair --> T27_domain_domain_WaiverVerdict__self
 T46_usecase_usecase_SemanticCalibrationProbeConfig_new --> T46_usecase_usecase_SemanticCalibrationProbeConfig__self
 R44_usecase_usecase_SemanticEscalationDriverPort_evaluate_with_escalation --> T40_usecase_usecase_SemanticEscalationFuture__self
+T43_usecase_usecase_CheckTestObligationsCommand_new --o T51_usecase_usecase_TestObligationCatalogueCommandInput__self
 T43_usecase_usecase_CheckTestObligationsCommand_new --> T43_usecase_usecase_CheckTestObligationsCommand__self
 T46_usecase_usecase_CheckTestObligationsInteractor_new --> T46_usecase_usecase_CheckTestObligationsInteractor__self
 T43_usecase_usecase_CheckTestObligationsOutcome_new_verified_scope --o T34_domain_domain_TestObligationEdgeId__self
@@ -1250,33 +1490,47 @@ T43_usecase_usecase_CheckTestObligationsOutcome_new_verified_scope --o T39_domai
 T43_usecase_usecase_CheckTestObligationsOutcome_new_verified_scope --> T43_usecase_usecase_CheckTestObligationsOutcome__self
 T43_usecase_usecase_CheckTestObligationsOutcome_new_empty_scope --o T39_domain_domain_UncitedSpecElementFinding__self
 T43_usecase_usecase_CheckTestObligationsOutcome_new_empty_scope --> T43_usecase_usecase_CheckTestObligationsOutcome__self
+T43_usecase_usecase_CheckTestObligationsOutcome_resolved_edges --> T34_domain_domain_TestObligationEdgeId__self
+T43_usecase_usecase_CheckTestObligationsOutcome_uncited_findings --> T39_domain_domain_UncitedSpecElementFinding__self
+T44_usecase_usecase_DeriveTestObligationsCommand_new --o T51_usecase_usecase_TestObligationCatalogueCommandInput__self
 T44_usecase_usecase_DeriveTestObligationsCommand_new --> T44_usecase_usecase_DeriveTestObligationsCommand__self
+T47_usecase_usecase_DeriveTestObligationsInteractor_new --o T42_domain_domain_RoleObligationItemsProjector__self
 T47_usecase_usecase_DeriveTestObligationsInteractor_new --> T47_usecase_usecase_DeriveTestObligationsInteractor__self
 T46_usecase_usecase_EvaluateTestObligationsCommand_new --> T46_usecase_usecase_EvaluateTestObligationsCommand__self
 T49_usecase_usecase_EvaluateTestObligationsInteractor_new --o T44_usecase_usecase_TestObligationEvaluateConfig__self
 T49_usecase_usecase_EvaluateTestObligationsInteractor_new --> T49_usecase_usecase_EvaluateTestObligationsInteractor__self
+T46_usecase_usecase_EvaluateTestObligationsOutcome_new --o T34_domain_domain_DetectionRatePercent__self
 T46_usecase_usecase_EvaluateTestObligationsOutcome_new --> T46_usecase_usecase_EvaluateTestObligationsOutcome__self
+T46_usecase_usecase_EvaluateTestObligationsOutcome_known_bad_detection_rate --> T34_domain_domain_DetectionRatePercent__self
+T51_usecase_usecase_TestObligationCatalogueCommandInput_new --> T51_usecase_usecase_TestObligationCatalogueCommandInput__self
 T44_usecase_usecase_TestObligationEvaluateConfig_try_new --> T44_usecase_usecase_TestObligationEvaluateConfig__self
-T44_usecase_usecase_TestObligationEvaluateConfig_try_new --> T37_domain_domain_ObligationEvaluateError__self
+T44_usecase_usecase_TestObligationEvaluateConfig_try_new --> T49_usecase_usecase_TestObligationEvaluateConfigError__self
 T41_usecase_usecase_TestObligationLaneSummary_new --o T40_usecase_usecase_TestObligationChainLabel__self
 T41_usecase_usecase_TestObligationLaneSummary_new --> T41_usecase_usecase_TestObligationLaneSummary__self
+T41_usecase_usecase_TestObligationLaneSummary_chain_name --> T40_usecase_usecase_TestObligationChainLabel__self
 T44_usecase_usecase_TestObligationResultsCommand_new --> T44_usecase_usecase_TestObligationResultsCommand__self
 T47_usecase_usecase_TestObligationResultsInteractor_new --> T47_usecase_usecase_TestObligationResultsInteractor__self
 T43_usecase_usecase_TestObligationResultsOutput_new --o T41_usecase_usecase_TestObligationLaneSummary__self
 T43_usecase_usecase_TestObligationResultsOutput_new --o T31_domain_domain_EdgeVerdictRecord__self
 T43_usecase_usecase_TestObligationResultsOutput_new --o T39_domain_domain_UncitedSpecElementFinding__self
 T43_usecase_usecase_TestObligationResultsOutput_new --> T43_usecase_usecase_TestObligationResultsOutput__self
+T43_usecase_usecase_TestObligationResultsOutput_lane_summaries --> T41_usecase_usecase_TestObligationLaneSummary__self
+T43_usecase_usecase_TestObligationResultsOutput_records --> T31_domain_domain_EdgeVerdictRecord__self
+T43_usecase_usecase_TestObligationResultsOutput_uncited_findings --> T39_domain_domain_UncitedSpecElementFinding__self
 R54_usecase_usecase_CheckTestObligationsApplicationService_execute --o T43_usecase_usecase_CheckTestObligationsCommand__self
 R54_usecase_usecase_CheckTestObligationsApplicationService_execute --> T43_usecase_usecase_CheckTestObligationsOutcome__self
 R54_usecase_usecase_CheckTestObligationsApplicationService_execute --> T34_domain_domain_ObligationCheckError__self
 R55_usecase_usecase_DeriveTestObligationsApplicationService_execute --o T44_usecase_usecase_DeriveTestObligationsCommand__self
 R55_usecase_usecase_DeriveTestObligationsApplicationService_execute --> T35_domain_domain_ObligationDeriveError__self
 R57_usecase_usecase_EvaluateTestObligationsApplicationService_execute --o T46_usecase_usecase_EvaluateTestObligationsCommand__self
-R57_usecase_usecase_EvaluateTestObligationsApplicationService_execute --> T46_usecase_usecase_EvaluateTestObligationsOutcome__self
-R57_usecase_usecase_EvaluateTestObligationsApplicationService_execute --> T37_domain_domain_ObligationEvaluateError__self
+R57_usecase_usecase_EvaluateTestObligationsApplicationService_execute --> T45_usecase_usecase_EvaluateTestObligationsFuture__self
 R55_usecase_usecase_TestObligationResultsApplicationService_execute --o T44_usecase_usecase_TestObligationResultsCommand__self
 R55_usecase_usecase_TestObligationResultsApplicationService_execute --> T43_usecase_usecase_TestObligationResultsOutput__self
 R55_usecase_usecase_TestObligationResultsApplicationService_execute --> T36_domain_domain_ObligationResultsError__self
+T47_usecase_usecase_DeriveTestObligationsInteractor__self -.impl.-> R55_usecase_usecase_DeriveTestObligationsApplicationService__self
+T46_usecase_usecase_CheckTestObligationsInteractor__self -.impl.-> R54_usecase_usecase_CheckTestObligationsApplicationService__self
+T49_usecase_usecase_EvaluateTestObligationsInteractor__self -.impl.-> R57_usecase_usecase_EvaluateTestObligationsApplicationService__self
+T47_usecase_usecase_TestObligationResultsInteractor__self -.impl.-> R55_usecase_usecase_TestObligationResultsApplicationService__self
 T50_infrastructure_infrastructure_CatalogueEntryRefDto_from_domain --> T50_infrastructure_infrastructure_CatalogueEntryRefDto__self
 T50_infrastructure_infrastructure_CatalogueEntryRefDto_into_domain --> T29_domain_domain_ValidationError__self
 T65_infrastructure_infrastructure_JsonObligationFulfillmentCacheCodec_new --> T65_infrastructure_infrastructure_JsonObligationFulfillmentCacheCodec__self
@@ -1284,8 +1538,8 @@ T50_infrastructure_infrastructure_JsonObligationsCodec_new --> T50_infrastructur
 T51_infrastructure_infrastructure_JsonTestBindingsCodec_new --> T51_infrastructure_infrastructure_JsonTestBindingsCodec__self
 T59_infrastructure_infrastructure_JsonTestObligationRulesLoader_new --> T59_infrastructure_infrastructure_JsonTestObligationRulesLoader__self
 T50_infrastructure_infrastructure_JsonWaiverCacheCodec_new --> T50_infrastructure_infrastructure_JsonWaiverCacheCodec__self
-T60_infrastructure_infrastructure_ObligationCatalogueEntryRefDto_from_domain --> T60_infrastructure_infrastructure_ObligationCatalogueEntryRefDto__self
-T60_infrastructure_infrastructure_ObligationCatalogueEntryRefDto_into_domain --> T29_domain_domain_ValidationError__self
+T67_infrastructure_infrastructure_ObligationFulfillmentEscalationDriver_new --o T46_usecase_usecase_SemanticCalibrationProbeConfig__self
+T67_infrastructure_infrastructure_ObligationFulfillmentEscalationDriver_new --> T67_infrastructure_infrastructure_ObligationFulfillmentEscalationDriver__self
 T61_infrastructure_infrastructure_ObligationFulfillmentVerdictDto_Fail --o|category| T56_infrastructure_infrastructure_FulfillmentFailCategoryDto__self
 T66_infrastructure_infrastructure_ObligationFulfillmentVerifierAdapter_new --> T66_infrastructure_infrastructure_ObligationFulfillmentVerifierAdapter__self
 T51_infrastructure_infrastructure_ObligationsCodecError__self ---|alias_of| T32_domain_domain_ArtifactCodecError__self
@@ -1293,6 +1547,7 @@ T52_infrastructure_infrastructure_ObligationsDocumentDto_from_domain --o T33_dom
 T52_infrastructure_infrastructure_ObligationsDocumentDto_from_domain --> T52_infrastructure_infrastructure_ObligationsDocumentDto__self
 T52_infrastructure_infrastructure_ObligationsDocumentDto_into_domain --> T51_infrastructure_infrastructure_ObligationsCodecError__self
 T52_infrastructure_infrastructure_ObligationsDocumentDto_into_domain --> T33_domain_domain_ObligationsDocument__self
+T49_infrastructure_infrastructure_Sha256ContentHasher_new --> T49_infrastructure_infrastructure_Sha256ContentHasher__self
 T50_infrastructure_infrastructure_SynTestSourceScanner_new --> T50_infrastructure_infrastructure_SynTestSourceScanner__self
 T50_infrastructure_infrastructure_TestBindingRecordDto_Fulfillment --o|obligation_id| T49_infrastructure_infrastructure_TestObligationIdDto__self
 T50_infrastructure_infrastructure_TestBindingRecordDto_Fulfillment --o|tests| T45_infrastructure_infrastructure_TestLocationDto__self
@@ -1306,6 +1561,8 @@ T53_infrastructure_infrastructure_TestBindingsDocumentDto_into_domain --> T52_in
 T53_infrastructure_infrastructure_TestBindingsDocumentDto_into_domain --> T34_domain_domain_TestBindingsDocument__self
 T60_infrastructure_infrastructure_TestObligationRulesDocumentDto_into_domain --> T42_domain_domain_TestObligationRulesLoadError__self
 T60_infrastructure_infrastructure_TestObligationRulesDocumentDto_into_domain --> T41_domain_domain_TestObligationRulesDocument__self
+T52_infrastructure_infrastructure_WaiverEscalationDriver_new --o T46_usecase_usecase_SemanticCalibrationProbeConfig__self
+T52_infrastructure_infrastructure_WaiverEscalationDriver_new --> T52_infrastructure_infrastructure_WaiverEscalationDriver__self
 T51_infrastructure_infrastructure_WaiverVerifierAdapter_new --> T51_infrastructure_infrastructure_WaiverVerifierAdapter__self
 T59_infrastructure_infrastructure_JsonTestObligationRulesLoader__self -.impl.-> R43_domain_domain_TestObligationRulesLoaderPort__self
 T50_infrastructure_infrastructure_JsonObligationsCodec__self -.impl.-> R37_domain_domain_ObligationsArtifactPort__self
@@ -1315,6 +1572,9 @@ T50_infrastructure_infrastructure_JsonWaiverCacheCodec__self -.impl.-> R29_domai
 T50_infrastructure_infrastructure_SynTestSourceScanner__self -.impl.-> R35_domain_domain_TestSourceScannerPort__self
 T66_infrastructure_infrastructure_ObligationFulfillmentVerifierAdapter__self -.impl.-> R47_domain_domain_ObligationFulfillmentVerifierPort__self
 T51_infrastructure_infrastructure_WaiverVerifierAdapter__self -.impl.-> R32_domain_domain_WaiverVerifierPort__self
+T67_infrastructure_infrastructure_ObligationFulfillmentEscalationDriver__self -.impl.-> R44_usecase_usecase_SemanticEscalationDriverPort__self
+T52_infrastructure_infrastructure_WaiverEscalationDriver__self -.impl.-> R44_usecase_usecase_SemanticEscalationDriverPort__self
+T49_infrastructure_infrastructure_Sha256ContentHasher__self -.impl.-> R33_usecase_usecase_ContentHasherPort__self
 T48_cli_driver_cli_driver_TestObligationCheckHandler_new --> T48_cli_driver_cli_driver_TestObligationCheckHandler__self
 T48_cli_driver_cli_driver_TestObligationCheckHandler_handle --o T46_cli_driver_cli_driver_TestObligationCheckInput__self
 T46_cli_driver_cli_driver_TestObligationCheckInput_new --o T31_domain_domain_DiagnosticMessage__self
@@ -1381,7 +1641,18 @@ class T29_domain_domain_ValidationError_EmptyInformalGroundSummary variant_node
 class T29_domain_domain_ValidationError_MultiLineInformalGroundSummary variant_node
 class T29_domain_domain_ValidationError_EmptyDecisionGroundRef variant_node
 class T29_domain_domain_ValidationError_InvalidObligationMinimum variant_node
+class T29_domain_domain_ValidationError_InvalidDetectionRate variant_node
 class T29_domain_domain_ValidationError__self error_type
+class T35_domain_domain_SpecDocumentLoadError_NotFound variant_node
+class T35_domain_domain_SpecDocumentLoadError_Io variant_node
+class T35_domain_domain_SpecDocumentLoadError_JsonParse variant_node
+class T35_domain_domain_SpecDocumentLoadError_Invariant variant_node
+class T35_domain_domain_SpecDocumentLoadError__self error_type
+class R36_domain_domain_SpecDocumentLoaderPort_load method_node
+class R36_domain_domain_SpecDocumentLoaderPort__self secondary_port
+class T24_domain_domain_AnchorText_try_new method_node
+class T24_domain_domain_AnchorText_as_str method_node
+class T24_domain_domain_AnchorText__self value_object
 class T28_domain_domain_AnchorTextHash_new method_node
 class T28_domain_domain_AnchorTextHash_as_hash method_node
 class T28_domain_domain_AnchorTextHash__self value_object
@@ -1392,9 +1663,14 @@ class T32_domain_domain_ArtifactCodecError__self error_type
 class T31_domain_domain_BoundTestsSetHash_new method_node
 class T31_domain_domain_BoundTestsSetHash_as_hash method_node
 class T31_domain_domain_BoundTestsSetHash__self value_object
+class T42_domain_domain_CatalogueDocumentLoaderError__self error_type
+class T23_domain_domain_CrateName__self value_object
 class T29_domain_domain_DeclarationHash_new method_node
 class T29_domain_domain_DeclarationHash_as_hash method_node
 class T29_domain_domain_DeclarationHash__self value_object
+class T34_domain_domain_DetectionRatePercent_try_new method_node
+class T34_domain_domain_DetectionRatePercent_value method_node
+class T34_domain_domain_DetectionRatePercent__self value_object
 class T31_domain_domain_DiagnosticMessage_try_new method_node
 class T31_domain_domain_DiagnosticMessage_as_str method_node
 class T31_domain_domain_DiagnosticMessage__self value_object
@@ -1406,23 +1682,45 @@ class T35_domain_domain_EdgeResolutionOutcome_MissingBinding variant_node
 class T35_domain_domain_EdgeResolutionOutcome__self value_object
 class T31_domain_domain_EdgeVerdictRecord_new method_node
 class T31_domain_domain_EdgeVerdictRecord__self value_object
+class T30_domain_domain_EntryDeclaration_try_new method_node
+class T30_domain_domain_EntryDeclaration_as_str method_node
+class T30_domain_domain_EntryDeclaration__self value_object
 class T37_domain_domain_FulfillmentFailCategory_Contradiction variant_node
 class T37_domain_domain_FulfillmentFailCategory_Substitution variant_node
 class T37_domain_domain_FulfillmentFailCategory_CentralUnverified variant_node
 class T37_domain_domain_FulfillmentFailCategory_as_kebab method_node
 class T37_domain_domain_FulfillmentFailCategory__self value_object
+class T28_domain_domain_NonEmptyDrifts_new method_node
+class T28_domain_domain_NonEmptyDrifts_try_new method_node
+class T28_domain_domain_NonEmptyDrifts_as_slice method_node
+class T28_domain_domain_NonEmptyDrifts_first method_node
+class T28_domain_domain_NonEmptyDrifts_is_non_empty method_node
+class T28_domain_domain_NonEmptyDrifts__self value_object
+class T29_domain_domain_NonEmptyEdgeIds_new method_node
+class T29_domain_domain_NonEmptyEdgeIds_try_new method_node
+class T29_domain_domain_NonEmptyEdgeIds_as_slice method_node
+class T29_domain_domain_NonEmptyEdgeIds_first method_node
+class T29_domain_domain_NonEmptyEdgeIds_is_non_empty method_node
+class T29_domain_domain_NonEmptyEdgeIds__self value_object
+class T40_domain_domain_NonEmptyEdgeVerdictRecords_new method_node
+class T40_domain_domain_NonEmptyEdgeVerdictRecords_try_new method_node
+class T40_domain_domain_NonEmptyEdgeVerdictRecords_as_slice method_node
+class T40_domain_domain_NonEmptyEdgeVerdictRecords_first method_node
+class T40_domain_domain_NonEmptyEdgeVerdictRecords_is_non_empty method_node
+class T40_domain_domain_NonEmptyEdgeVerdictRecords__self value_object
 class T35_domain_domain_NonEmptyTestLocations_new method_node
 class T35_domain_domain_NonEmptyTestLocations_try_new method_node
 class T35_domain_domain_NonEmptyTestLocations_as_slice method_node
 class T35_domain_domain_NonEmptyTestLocations_first method_node
 class T35_domain_domain_NonEmptyTestLocations_is_non_empty method_node
 class T35_domain_domain_NonEmptyTestLocations__self value_object
-class T34_domain_domain_ObligationCheckError_ObligationsOnly variant_node
-class T34_domain_domain_ObligationCheckError_BindingsOnly variant_node
-class T34_domain_domain_ObligationCheckError_TrackNotActive variant_node
+class T34_domain_domain_ObligationCheckError_ObligationsAbsent variant_node
+class T34_domain_domain_ObligationCheckError_BindingsAbsent variant_node
 class T34_domain_domain_ObligationCheckError_DriftsDetected variant_node
 class T34_domain_domain_ObligationCheckError_UnresolvedEdges variant_node
 class T34_domain_domain_ObligationCheckError_StaleVerdicts variant_node
+class T34_domain_domain_ObligationCheckError_CatalogueLoad variant_node
+class T34_domain_domain_ObligationCheckError_SpecLoad variant_node
 class T34_domain_domain_ObligationCheckError_ArtifactCodec variant_node
 class T34_domain_domain_ObligationCheckError_SourceScan variant_node
 class T34_domain_domain_ObligationCheckError_CacheIo variant_node
@@ -1435,11 +1733,13 @@ class T35_domain_domain_ObligationDeriveError_InvalidCatalogueState variant_node
 class T35_domain_domain_ObligationDeriveError_ArtifactCodec variant_node
 class T35_domain_domain_ObligationDeriveError_ArtifactWrite variant_node
 class T35_domain_domain_ObligationDeriveError__self error_type
-class T37_domain_domain_ObligationEvaluateError_InvalidConfig variant_node
 class T37_domain_domain_ObligationEvaluateError_TrackNotActive variant_node
+class T37_domain_domain_ObligationEvaluateError_CatalogueLoad variant_node
+class T37_domain_domain_ObligationEvaluateError_SpecLoad variant_node
+class T37_domain_domain_ObligationEvaluateError_ArtifactLoad variant_node
+class T37_domain_domain_ObligationEvaluateError_TestSourceScan variant_node
 class T37_domain_domain_ObligationEvaluateError_VerifierPort variant_node
 class T37_domain_domain_ObligationEvaluateError_CachePersistence variant_node
-class T37_domain_domain_ObligationEvaluateError_CacheWrite variant_node
 class T37_domain_domain_ObligationEvaluateError_SemanticFailuresConfirmed variant_node
 class T37_domain_domain_ObligationEvaluateError_HumanEscalationRequired variant_node
 class T37_domain_domain_ObligationEvaluateError__self error_type
@@ -1458,6 +1758,11 @@ class T43_domain_domain_ObligationFulfillmentCacheKey_bound_tests_set_hash metho
 class T43_domain_domain_ObligationFulfillmentCacheKey_declaration_hash method_node
 class T43_domain_domain_ObligationFulfillmentCacheKey_anchor_text_hash method_node
 class T43_domain_domain_ObligationFulfillmentCacheKey__self value_object
+class T39_domain_domain_ObligationFulfillmentPair_new method_node
+class T39_domain_domain_ObligationFulfillmentPair_tests_source method_node
+class T39_domain_domain_ObligationFulfillmentPair_entry_declaration method_node
+class T39_domain_domain_ObligationFulfillmentPair_anchor_text method_node
+class T39_domain_domain_ObligationFulfillmentPair__self value_object
 class T42_domain_domain_ObligationFulfillmentVerdict_Fulfilled variant_node
 class T42_domain_domain_ObligationFulfillmentVerdict_Fail variant_node
 class T42_domain_domain_ObligationFulfillmentVerdict_Pending variant_node
@@ -1472,6 +1777,14 @@ class T33_domain_domain_ObligationsDocument__self value_object
 class T22_domain_domain_RoleName_try_new method_node
 class T22_domain_domain_RoleName_as_str method_node
 class T22_domain_domain_RoleName__self value_object
+class T42_domain_domain_RoleObligationItemsProjector_new method_node
+class T42_domain_domain_RoleObligationItemsProjector_data_role_items method_node
+class T42_domain_domain_RoleObligationItemsProjector_trait_impl_items method_node
+class T42_domain_domain_RoleObligationItemsProjector_contract_role_items method_node
+class T42_domain_domain_RoleObligationItemsProjector_function_role_items method_node
+class T42_domain_domain_RoleObligationItemsProjector_typestate_items method_node
+class T42_domain_domain_RoleObligationItemsProjector_type_has_typestate method_node
+class T42_domain_domain_RoleObligationItemsProjector__self domain_service
 class T33_domain_domain_RoleObligationRules_new method_node
 class T33_domain_domain_RoleObligationRules_obligations method_node
 class T33_domain_domain_RoleObligationRules_is_empty_explicitly method_node
@@ -1602,14 +1915,26 @@ class T42_domain_domain_TestObligationRulesLoadError_InvalidRuleValue variant_no
 class T42_domain_domain_TestObligationRulesLoadError_IoError variant_node
 class T42_domain_domain_TestObligationRulesLoadError_MalformedJson variant_node
 class T42_domain_domain_TestObligationRulesLoadError__self error_type
-class T41_domain_domain_TestObligationScopePresence_Both variant_node
-class T41_domain_domain_TestObligationScopePresence_Neither variant_node
-class T41_domain_domain_TestObligationScopePresence_ObligationsOnly variant_node
-class T41_domain_domain_TestObligationScopePresence_BindingsOnly variant_node
-class T41_domain_domain_TestObligationScopePresence__self value_object
 class T33_domain_domain_TestSourceScanError_Io variant_node
 class T33_domain_domain_TestSourceScanError_Parse variant_node
 class T33_domain_domain_TestSourceScanError__self error_type
+class T25_domain_domain_TestsSource_try_new method_node
+class T25_domain_domain_TestsSource_as_str method_node
+class T25_domain_domain_TestsSource__self value_object
+class T29_domain_domain_TraitImplDeclV2_from_parts method_node
+class T29_domain_domain_TraitImplDeclV2_new method_node
+class T29_domain_domain_TraitImplDeclV2_action method_node
+class T29_domain_domain_TraitImplDeclV2_trait_ref method_node
+class T29_domain_domain_TraitImplDeclV2_for_type method_node
+class T29_domain_domain_TraitImplDeclV2_impl_generics method_node
+class T29_domain_domain_TraitImplDeclV2_impl_where_predicates method_node
+class T29_domain_domain_TraitImplDeclV2_trait_ref_scope method_node
+class T29_domain_domain_TraitImplDeclV2__self value_object
+class T23_domain_domain_TraitName__self value_object
+class T27_domain_domain_TraitRefScope_SelfCrate variant_node
+class T27_domain_domain_TraitRefScope_Workspace variant_node
+class T27_domain_domain_TraitRefScope_External variant_node
+class T27_domain_domain_TraitRefScope__self value_object
 class T39_domain_domain_UncitedSpecElementFinding_new method_node
 class T39_domain_domain_UncitedSpecElementFinding__self value_object
 class T30_domain_domain_VerifyCacheError_Io variant_node
@@ -1635,10 +1960,16 @@ class T28_domain_domain_WaiverCacheKey_waived_reason_hash method_node
 class T28_domain_domain_WaiverCacheKey_declaration_hash method_node
 class T28_domain_domain_WaiverCacheKey_anchor_text_hash method_node
 class T28_domain_domain_WaiverCacheKey__self value_object
+class T24_domain_domain_WaiverPair_new method_node
+class T24_domain_domain_WaiverPair_waived_reason method_node
+class T24_domain_domain_WaiverPair_entry_declaration method_node
+class T24_domain_domain_WaiverPair_anchor_text method_node
+class T24_domain_domain_WaiverPair__self value_object
 class T27_domain_domain_WaiverVerdict_Waived variant_node
 class T27_domain_domain_WaiverVerdict_Fail variant_node
 class T27_domain_domain_WaiverVerdict_Pending variant_node
 class T27_domain_domain_WaiverVerdict__self value_object
+class R41_domain_domain_CatalogueDocumentLoaderPort__self secondary_port
 class R44_domain_domain_ObligationFulfillmentCachePort_load method_node
 class R44_domain_domain_ObligationFulfillmentCachePort_save method_node
 class R44_domain_domain_ObligationFulfillmentCachePort__self secondary_port
@@ -1673,6 +2004,8 @@ class T46_usecase_usecase_CheckTestObligationsInteractor_new method_node
 class T46_usecase_usecase_CheckTestObligationsInteractor__self interactor
 class T43_usecase_usecase_CheckTestObligationsOutcome_new_verified_scope method_node
 class T43_usecase_usecase_CheckTestObligationsOutcome_new_empty_scope method_node
+class T43_usecase_usecase_CheckTestObligationsOutcome_resolved_edges method_node
+class T43_usecase_usecase_CheckTestObligationsOutcome_uncited_findings method_node
 class T43_usecase_usecase_CheckTestObligationsOutcome__self dto
 class T44_usecase_usecase_DeriveTestObligationsCommand_new method_node
 class T44_usecase_usecase_DeriveTestObligationsCommand__self command
@@ -1680,25 +2013,49 @@ class T47_usecase_usecase_DeriveTestObligationsInteractor_new method_node
 class T47_usecase_usecase_DeriveTestObligationsInteractor__self interactor
 class T46_usecase_usecase_EvaluateTestObligationsCommand_new method_node
 class T46_usecase_usecase_EvaluateTestObligationsCommand__self command
+class T45_usecase_usecase_EvaluateTestObligationsFuture__self dto
 class T49_usecase_usecase_EvaluateTestObligationsInteractor_new method_node
 class T49_usecase_usecase_EvaluateTestObligationsInteractor__self interactor
 class T46_usecase_usecase_EvaluateTestObligationsOutcome_new method_node
+class T46_usecase_usecase_EvaluateTestObligationsOutcome_pass_count method_node
+class T46_usecase_usecase_EvaluateTestObligationsOutcome_fail_count method_node
+class T46_usecase_usecase_EvaluateTestObligationsOutcome_pending_count method_node
+class T46_usecase_usecase_EvaluateTestObligationsOutcome_known_bad_detection_rate method_node
 class T46_usecase_usecase_EvaluateTestObligationsOutcome__self dto
+class T51_usecase_usecase_TestObligationCatalogueCommandInput_new method_node
+class T51_usecase_usecase_TestObligationCatalogueCommandInput__self command
 class T40_usecase_usecase_TestObligationChainLabel_Fulfillment variant_node
 class T40_usecase_usecase_TestObligationChainLabel_Waiver variant_node
 class T40_usecase_usecase_TestObligationChainLabel__self dto
 class T44_usecase_usecase_TestObligationEvaluateConfig_try_new method_node
+class T44_usecase_usecase_TestObligationEvaluateConfig_injection_rate method_node
+class T44_usecase_usecase_TestObligationEvaluateConfig_detection_threshold method_node
+class T44_usecase_usecase_TestObligationEvaluateConfig_parallelism method_node
 class T44_usecase_usecase_TestObligationEvaluateConfig__self value_object
+class T49_usecase_usecase_TestObligationEvaluateConfigError_InvalidInjectionRate variant_node
+class T49_usecase_usecase_TestObligationEvaluateConfigError_InvalidDetectionThreshold variant_node
+class T49_usecase_usecase_TestObligationEvaluateConfigError_InvalidParallelism variant_node
+class T49_usecase_usecase_TestObligationEvaluateConfigError__self error_type
 class T41_usecase_usecase_TestObligationLaneSummary_new method_node
+class T41_usecase_usecase_TestObligationLaneSummary_chain_name method_node
+class T41_usecase_usecase_TestObligationLaneSummary_layer method_node
+class T41_usecase_usecase_TestObligationLaneSummary_pass_count method_node
+class T41_usecase_usecase_TestObligationLaneSummary_fail_count method_node
+class T41_usecase_usecase_TestObligationLaneSummary_pending_count method_node
 class T41_usecase_usecase_TestObligationLaneSummary__self dto
 class T44_usecase_usecase_TestObligationResultsCommand_new method_node
 class T44_usecase_usecase_TestObligationResultsCommand__self command
 class T47_usecase_usecase_TestObligationResultsInteractor_new method_node
 class T47_usecase_usecase_TestObligationResultsInteractor__self interactor
 class T43_usecase_usecase_TestObligationResultsOutput_new method_node
+class T43_usecase_usecase_TestObligationResultsOutput_lane_summaries method_node
+class T43_usecase_usecase_TestObligationResultsOutput_records method_node
+class T43_usecase_usecase_TestObligationResultsOutput_uncited_findings method_node
 class T43_usecase_usecase_TestObligationResultsOutput__self dto
 class R54_usecase_usecase_CheckTestObligationsApplicationService_execute method_node
 class R54_usecase_usecase_CheckTestObligationsApplicationService__self app_service
+class R33_usecase_usecase_ContentHasherPort_sha256 method_node
+class R33_usecase_usecase_ContentHasherPort__self secondary_port
 class R55_usecase_usecase_DeriveTestObligationsApplicationService_execute method_node
 class R55_usecase_usecase_DeriveTestObligationsApplicationService__self app_service
 class R57_usecase_usecase_EvaluateTestObligationsApplicationService_execute method_node
@@ -1748,11 +2105,10 @@ class T59_infrastructure_infrastructure_JsonTestObligationRulesLoader_new method
 class T59_infrastructure_infrastructure_JsonTestObligationRulesLoader__self secondary_adapter
 class T50_infrastructure_infrastructure_JsonWaiverCacheCodec_new method_node
 class T50_infrastructure_infrastructure_JsonWaiverCacheCodec__self secondary_adapter
-class T60_infrastructure_infrastructure_ObligationCatalogueEntryRefDto_from_domain method_node
-class T60_infrastructure_infrastructure_ObligationCatalogueEntryRefDto_into_domain method_node
-class T60_infrastructure_infrastructure_ObligationCatalogueEntryRefDto__self dto
 class T67_infrastructure_infrastructure_ObligationFulfillmentCacheDocumentDto__self dto
 class T64_infrastructure_infrastructure_ObligationFulfillmentCacheEntryDto__self dto
+class T67_infrastructure_infrastructure_ObligationFulfillmentEscalationDriver_new method_node
+class T67_infrastructure_infrastructure_ObligationFulfillmentEscalationDriver__self secondary_adapter
 class T61_infrastructure_infrastructure_ObligationFulfillmentVerdictDto_Fulfilled variant_node
 class T61_infrastructure_infrastructure_ObligationFulfillmentVerdictDto_Fail variant_node
 class T61_infrastructure_infrastructure_ObligationFulfillmentVerdictDto_Pending variant_node
@@ -1766,6 +2122,8 @@ class T52_infrastructure_infrastructure_ObligationsDocumentDto__self dto
 class T40_infrastructure_infrastructure_PatternKey_Typestate variant_node
 class T40_infrastructure_infrastructure_PatternKey__self dto
 class T52_infrastructure_infrastructure_RoleObligationRulesDto__self dto
+class T49_infrastructure_infrastructure_Sha256ContentHasher_new method_node
+class T49_infrastructure_infrastructure_Sha256ContentHasher__self secondary_adapter
 class T50_infrastructure_infrastructure_SynTestSourceScanner_new method_node
 class T50_infrastructure_infrastructure_SynTestSourceScanner__self secondary_adapter
 class T50_infrastructure_infrastructure_TestBindingRecordDto_Fulfillment variant_node
@@ -1809,6 +2167,8 @@ class T60_infrastructure_infrastructure_TestObligationRulesDocumentDto_into_doma
 class T60_infrastructure_infrastructure_TestObligationRulesDocumentDto__self dto
 class T52_infrastructure_infrastructure_WaiverCacheDocumentDto__self dto
 class T49_infrastructure_infrastructure_WaiverCacheEntryDto__self dto
+class T52_infrastructure_infrastructure_WaiverEscalationDriver_new method_node
+class T52_infrastructure_infrastructure_WaiverEscalationDriver__self secondary_adapter
 class T46_infrastructure_infrastructure_WaiverVerdictDto_Waived variant_node
 class T46_infrastructure_infrastructure_WaiverVerdictDto_Fail variant_node
 class T46_infrastructure_infrastructure_WaiverVerdictDto_Pending variant_node

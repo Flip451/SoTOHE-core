@@ -1,8 +1,20 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-08T04:40:16Z",
-  "declaration_hash": "07e40686fad06bb4c90cb1ee1da105a31533b4725a4d27e77df773d7ecaf445a",
+  "generated_at": "2026-07-09T04:08:35Z",
+  "declaration_hash": "8393ef9673018698583d75b0913edabb3f167f4cea50530d2caa0f4a394347d3",
   "signals": [
+    {
+      "type_name": "AnchorText",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
     {
       "type_name": "AnchorTextHash",
       "kind_tag": "value_object",
@@ -51,6 +63,18 @@
       ]
     },
     {
+      "type_name": "DetectionRatePercent",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
       "type_name": "DiagnosticMessage",
       "kind_tag": "value_object",
       "signal": "blue",
@@ -88,8 +112,56 @@
       ]
     },
     {
+      "type_name": "EntryDeclaration",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
       "type_name": "FulfillmentFailCategory",
       "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "NonEmptyDrifts",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "NonEmptyEdgeIds",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "NonEmptyEdgeVerdictRecords",
+      "kind_tag": "value_object",
       "signal": "blue",
       "found_type": true,
       "found_items": [
@@ -181,6 +253,18 @@
       "found_type": true
     },
     {
+      "type_name": "ObligationFulfillmentPair",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
       "type_name": "ObligationFulfillmentVerdict",
       "kind_tag": "enum",
       "signal": "blue",
@@ -239,6 +323,16 @@
       ]
     },
     {
+      "type_name": "RoleObligationItemsProjector",
+      "kind_tag": "domain_service",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::fmt::Debug"
+      ]
+    },
+    {
       "type_name": "RoleObligationRules",
       "kind_tag": "value_object",
       "signal": "blue",
@@ -260,6 +354,23 @@
         "core::fmt::Debug",
         "core::fmt::Display"
       ]
+    },
+    {
+      "type_name": "SpecDocumentLoadError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "SpecDocumentLoaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TargetEntryRoleKind",
@@ -547,18 +658,6 @@
       "found_type": true
     },
     {
-      "type_name": "TestObligationScopePresence",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
-      ]
-    },
-    {
       "type_name": "TestSourceScanError",
       "kind_tag": "error_type",
       "signal": "blue",
@@ -574,6 +673,42 @@
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "TestsSource",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TraitImplDeclV2",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TraitRefScope",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
     },
     {
       "type_name": "UncitedSpecElementFinding",
@@ -679,6 +814,18 @@
       "found_type": true
     },
     {
+      "type_name": "WaiverPair",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
       "type_name": "WaiverVerdict",
       "kind_tag": "enum",
       "signal": "blue",
@@ -693,6 +840,30 @@
     {
       "type_name": "WaiverVerifierPort",
       "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueDocumentLoaderError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueDocumentLoaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CrateName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TraitName",
+      "kind_tag": "value_object",
       "signal": "blue",
       "found_type": true
     }

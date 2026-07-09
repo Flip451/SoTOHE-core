@@ -140,10 +140,10 @@ pub(super) fn v3_type_entry_details(
             let impls: Vec<String> = doc_trait_impls
                 .iter()
                 .filter(|ti| {
-                    for_type_local_bare_name(ti.for_type.as_str(), self_crate_name)
+                    for_type_local_bare_name(ti.for_type().as_str(), self_crate_name)
                         == Some(type_name)
                 })
-                .map(|ti| format!("impl {}", trait_ref_short_name(ti.trait_ref.as_str())))
+                .map(|ti| format!("impl {}", trait_ref_short_name(ti.trait_ref().as_str())))
                 .collect();
             if impls.is_empty() {
                 "\u{2014}".to_owned() // —

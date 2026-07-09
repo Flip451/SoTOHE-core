@@ -27,7 +27,6 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CatalogueEntryRefDto | dto | add | — | 🔵 | 🔵 |
-| ObligationCatalogueEntryRefDto | dto | add | — | 🔵 | 🔵 |
 | ObligationFulfillmentCacheDocumentDto | dto | add | — | 🔵 | 🔵 |
 | ObligationFulfillmentCacheEntryDto | dto | add | — | 🔵 | 🔵 |
 | ObligationsDocumentDto | dto | add | — | 🔵 | 🔵 |
@@ -52,7 +51,10 @@
 | JsonTestBindingsCodec | secondary_adapter | add | impl TestBindingsArtifactPort, impl Debug, impl Clone | 🔵 | 🔵 |
 | JsonTestObligationRulesLoader | secondary_adapter | add | impl TestObligationRulesLoaderPort, impl Debug, impl Clone | 🔵 | 🔵 |
 | JsonWaiverCacheCodec | secondary_adapter | add | impl WaiverCachePort, impl Debug, impl Clone | 🔵 | 🔵 |
+| ObligationFulfillmentEscalationDriver | secondary_adapter | add | impl Debug, impl Clone, impl SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::ObligationFulfillmentPair, domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey, domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> | 🟡 | 🔵 |
 | ObligationFulfillmentVerifierAdapter | secondary_adapter | add | impl ObligationFulfillmentVerifierPort | 🔵 | 🔵 |
+| Sha256ContentHasher | secondary_adapter | add | impl Debug, impl Clone, impl ContentHasherPort | 🟡 | 🔵 |
 | SynTestSourceScanner | secondary_adapter | add | impl TestSourceScannerPort | 🔵 | 🔵 |
+| WaiverEscalationDriver | secondary_adapter | add | impl Debug, impl Clone, impl SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> | 🟡 | 🔵 |
 | WaiverVerifierAdapter | secondary_adapter | add | impl WaiverVerifierPort | 🔵 | 🔵 |
 

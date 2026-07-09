@@ -16,7 +16,36 @@ use crate::tddd::test_obligation::ids::{
     DiagnosticMessage, TestObligationEdgeId, TestObligationId,
 };
 use crate::tddd::test_obligation::vocab::FulfillmentFailCategory;
-use crate::{EvidenceCitation, TrackId};
+use crate::{EvidenceCitation, TrackId, ValidationError};
+
+/// Validated known-bad calibration-probe detection rate as a `0..=100` percentage.
+///
+/// Replaces a raw `NonZeroU8`, which wrongly rejected a legitimate `0%` detection
+/// rate; this newtype admits the full `0..=100` range and rejects only `> 100`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DetectionRatePercent {
+    value: u8,
+}
+
+impl DetectionRatePercent {
+    /// Validates and wraps `value` as a [`DetectionRatePercent`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ValidationError::InvalidDetectionRate`] when `value` exceeds 100.
+    pub fn try_new(value: u8) -> Result<Self, ValidationError> {
+        if value > 100 {
+            return Err(ValidationError::InvalidDetectionRate(value));
+        }
+        Ok(Self { value })
+    }
+
+    /// Returns the inner percentage value (`0..=100`).
+    #[must_use]
+    pub fn value(&self) -> u8 {
+        self.value
+    }
+}
 
 /// Outcome of semantically reviewing the tests bound to an obligation.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -280,6 +309,20 @@ mod tests {
     use crate::tddd::semantic_verify::CatalogueEntryKey;
     use crate::tddd::test_obligation::ids::{TestObligationAnchorId, TestObligationItemIdentifier};
     use crate::tddd::test_obligation::vocab::TestObligationKind;
+
+    #[test]
+    fn detection_rate_accepts_full_percentage_range() {
+        assert_eq!(DetectionRatePercent::try_new(0).unwrap().value(), 0);
+        assert_eq!(DetectionRatePercent::try_new(100).unwrap().value(), 100);
+    }
+
+    #[test]
+    fn detection_rate_rejects_above_hundred() {
+        assert_eq!(
+            DetectionRatePercent::try_new(101),
+            Err(ValidationError::InvalidDetectionRate(101))
+        );
+    }
 
     fn citation(text: &str) -> EvidenceCitation {
         EvidenceCitation::try_new(text.to_owned()).unwrap()

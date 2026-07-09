@@ -575,11 +575,13 @@ fn trait_impl_from_dto(dto: TraitImplDto) -> Result<TraitImplDeclV2, CatalogueDo
     let impl_generics = method_generics_from_dtos(&entry_name, dto.impl_generics)?;
     let impl_where_predicates = where_predicates_from_dtos(&entry_name, dto.impl_where_predicates)?;
 
-    let mut decl = TraitImplDeclV2::new(trait_ref, for_type);
-    decl.action = action;
-    decl.impl_generics = impl_generics;
-    decl.impl_where_predicates = impl_where_predicates;
-    Ok(decl)
+    Ok(TraitImplDeclV2::from_parts(
+        action,
+        trait_ref,
+        for_type,
+        impl_generics,
+        impl_where_predicates,
+    ))
 }
 
 pub(super) fn trait_entry_from_dto(

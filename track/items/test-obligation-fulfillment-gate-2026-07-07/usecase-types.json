@@ -83,17 +83,20 @@
       "informal_grounds": [],
       "methods": [
         {
-          "has_default_impl": false,
-          "is_async": false,
           "name": "execute",
+          "receiver": "&self",
           "params": [
             {
               "name": "cmd",
-              "ty": "&EvaluateTestObligationsCommand"
+              "ty": "&'a EvaluateTestObligationsCommand"
             }
           ],
-          "receiver": "&self",
-          "returns": "Result<EvaluateTestObligationsOutcome, domain::tddd::test_obligation::errors::ObligationEvaluateError>"
+          "returns": "EvaluateTestObligationsFuture<'a>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "See IN-09 / AC-06."
         }
       ],
       "module_path": "test_obligation::evaluate",
@@ -288,6 +291,51 @@
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
+    },
+    "ContentHasherPort": {
+      "action": "add",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "methods": [
+        {
+          "name": "sha256",
+          "receiver": "&self",
+          "params": [
+            {
+              "name": "bytes",
+              "ty": "&[u8]"
+            }
+          ],
+          "returns": "domain::ContentHash",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Compute a SHA-256 ContentHash over `bytes`. See IN-09 / AC-06."
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ],
+      "module_path": "test_obligation::hasher",
+      "docs": "Content-hasher secondary port. See IN-09 / AC-06.",
+      "spec_refs": [
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "AC-06"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "CN-04"
+        }
+      ],
+      "informal_grounds": []
     }
   },
   "types": {
@@ -310,12 +358,8 @@
           "name": "new",
           "params": [
             {
-              "name": "track_id",
-              "ty": "domain::TrackId"
-            },
-            {
-              "name": "current_branch",
-              "ty": "String"
+              "name": "input",
+              "ty": "TestObligationCatalogueCommandInput"
             }
           ],
           "returns": "Self"
@@ -352,35 +396,35 @@
           "params": [
             {
               "name": "rules_loader",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort + Send + Sync>"
             },
             {
               "name": "obligations_port",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
             },
             {
               "name": "bindings_port",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync>"
             },
             {
               "name": "source_scanner",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync>"
             },
             {
               "name": "fulfillment_cache",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort + Send + Sync>"
             },
             {
               "name": "waiver_cache",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
             },
             {
               "name": "spec_reader",
-              "ty": "std::sync::Arc<dyn domain::SpecFileLoaderPort>"
+              "ty": "std::sync::Arc<dyn domain::spec_document_loader_port::SpecDocumentLoaderPort + Send + Sync>"
             },
             {
               "name": "catalogue_reader",
-              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::CatalogueDocumentReaderPort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort + Send + Sync>"
             }
           ],
           "returns": "Self"
@@ -411,9 +455,8 @@
       },
       "methods": [
         {
-          "has_default_impl": false,
-          "is_async": false,
           "name": "new_verified_scope",
+          "receiver": null,
           "params": [
             {
               "name": "resolved_edges",
@@ -425,12 +468,15 @@
             }
           ],
           "returns": "Self",
-          "docs": "Constructor for a verified-scope check outcome."
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "See IN-08 / AC-04 / AC-10."
         },
         {
-          "has_default_impl": false,
-          "is_async": false,
           "name": "new_empty_scope",
+          "receiver": null,
           "params": [
             {
               "name": "uncited_findings",
@@ -438,7 +484,33 @@
             }
           ],
           "returns": "Self",
-          "docs": "Constructor for an empty-scope check outcome."
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "See AC-10."
+        },
+        {
+          "name": "resolved_edges",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[domain::tddd::test_obligation::ids::TestObligationEdgeId]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the edges resolved by a fresh fulfilled / waived verdict."
+        },
+        {
+          "name": "uncited_findings",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[domain::tddd::test_obligation::scope::UncitedSpecElementFinding]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the uncited AC/CN spec-element findings."
         }
       ],
       "module_path": "test_obligation::check",
@@ -487,12 +559,8 @@
           "name": "new",
           "params": [
             {
-              "name": "track_id",
-              "ty": "domain::TrackId"
-            },
-            {
-              "name": "current_branch",
-              "ty": "String"
+              "name": "input",
+              "ty": "TestObligationCatalogueCommandInput"
             }
           ],
           "returns": "Self"
@@ -505,6 +573,55 @@
       "spec_refs": [
         {
           "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationCatalogueCommandInput": {
+      "action": "add",
+      "docs": "Shared catalogue snapshot command input for derive/check commands; see IN-07 / IN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "current_branch",
+              "ty": "String"
+            },
+            {
+              "name": "catalogue_paths",
+              "ty": "Vec<std::path::PathBuf>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-08",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
@@ -529,19 +646,23 @@
           "params": [
             {
               "name": "rules_loader",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort + Send + Sync>"
             },
             {
               "name": "obligations_port",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
             },
             {
               "name": "spec_reader",
-              "ty": "std::sync::Arc<dyn domain::SpecFileLoaderPort>"
+              "ty": "std::sync::Arc<dyn domain::spec_document_loader_port::SpecDocumentLoaderPort + Send + Sync>"
             },
             {
               "name": "catalogue_reader",
-              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::CatalogueDocumentReaderPort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "projector",
+              "ty": "domain::tddd::test_obligation::projection::RoleObligationItemsProjector"
             }
           ],
           "returns": "Self"
@@ -583,6 +704,14 @@
             {
               "name": "current_branch",
               "ty": "String"
+            },
+            {
+              "name": "catalogue_paths",
+              "ty": "Vec<std::path::PathBuf>"
+            },
+            {
+              "name": "spec_path",
+              "ty": "std::path::PathBuf"
             }
           ],
           "returns": "Self"
@@ -619,35 +748,47 @@
           "params": [
             {
               "name": "obligations_port",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
             },
             {
               "name": "bindings_port",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync>"
             },
             {
               "name": "source_scanner",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync>"
             },
             {
-              "name": "fulfillment_verifier",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort>"
+              "name": "fulfillment_driver",
+              "ty": "std::sync::Arc<dyn SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::ObligationFulfillmentPair, domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey, domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> + Send + Sync>"
             },
             {
-              "name": "waiver_verifier",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverVerifierPort>"
+              "name": "waiver_driver",
+              "ty": "std::sync::Arc<dyn SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> + Send + Sync>"
             },
             {
               "name": "fulfillment_cache",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort + Send + Sync>"
             },
             {
               "name": "waiver_cache",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
             },
             {
               "name": "config",
               "ty": "TestObligationEvaluateConfig"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "std::sync::Arc<dyn domain::spec_document_loader_port::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "hasher",
+              "ty": "std::sync::Arc<dyn ContentHasherPort + Send + Sync>"
             }
           ],
           "returns": "Self"
@@ -678,9 +819,8 @@
       },
       "methods": [
         {
-          "has_default_impl": false,
-          "is_async": false,
           "name": "new",
+          "receiver": null,
           "params": [
             {
               "name": "pass_count",
@@ -696,10 +836,59 @@
             },
             {
               "name": "known_bad_detection_rate",
-              "ty": "std::num::NonZeroU8"
+              "ty": "domain::tddd::test_obligation::verdict::DetectionRatePercent"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Build an evaluate outcome. See IN-09 / AC-06."
+        },
+        {
+          "name": "pass_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the count of passing verdicts."
+        },
+        {
+          "name": "fail_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the count of failing verdicts."
+        },
+        {
+          "name": "pending_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the count of pending verdicts."
+        },
+        {
+          "name": "known_bad_detection_rate",
+          "receiver": "&self",
+          "params": [],
+          "returns": "domain::tddd::test_obligation::verdict::DetectionRatePercent",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the known-bad calibration-probe detection rate."
         }
       ],
       "module_path": "test_obligation::evaluate",
@@ -813,9 +1002,8 @@
       },
       "methods": [
         {
-          "has_default_impl": false,
-          "is_async": false,
           "name": "try_new",
+          "receiver": null,
           "params": [
             {
               "name": "injection_rate",
@@ -830,8 +1018,45 @@
               "ty": "usize"
             }
           ],
-          "returns": "Result<Self, domain::tddd::test_obligation::errors::ObligationEvaluateError>",
-          "docs": "Producible variant: ObligationEvaluateError::InvalidConfig."
+          "returns": "Result<Self, TestObligationEvaluateConfigError>",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Validate the raw config values. See IN-01 / AC-15."
+        },
+        {
+          "name": "injection_rate",
+          "receiver": "&self",
+          "params": [],
+          "returns": "u8",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the known-bad injection rate (percent)."
+        },
+        {
+          "name": "detection_threshold",
+          "receiver": "&self",
+          "params": [],
+          "returns": "std::num::NonZeroU8",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the known-bad detection threshold (percent, non-zero by construction)."
+        },
+        {
+          "name": "parallelism",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the configured worker parallelism."
         }
       ],
       "module_path": "test_obligation::evaluate",
@@ -863,9 +1088,8 @@
       },
       "methods": [
         {
-          "has_default_impl": false,
-          "is_async": false,
           "name": "new",
+          "receiver": null,
           "params": [
             {
               "name": "chain_name",
@@ -888,7 +1112,67 @@
               "ty": "usize"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Build a chain × layer lane summary row. See IN-10 / AC-09."
+        },
+        {
+          "name": "chain_name",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&TestObligationChainLabel",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the chain this lane summarises."
+        },
+        {
+          "name": "layer",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&domain::tddd::LayerId",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the layer this lane summarises."
+        },
+        {
+          "name": "pass_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the pass count for this lane."
+        },
+        {
+          "name": "fail_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the fail count for this lane."
+        },
+        {
+          "name": "pending_count",
+          "receiver": "&self",
+          "params": [],
+          "returns": "usize",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the pending count for this lane."
         }
       ],
       "module_path": "test_obligation::results",
@@ -967,19 +1251,19 @@
           "params": [
             {
               "name": "obligations_port",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
             },
             {
               "name": "bindings_port",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync>"
             },
             {
               "name": "fulfillment_cache",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort + Send + Sync>"
             },
             {
               "name": "waiver_cache",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort>"
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
             }
           ],
           "returns": "Self"
@@ -1010,9 +1294,8 @@
       },
       "methods": [
         {
-          "has_default_impl": false,
-          "is_async": false,
           "name": "new",
+          "receiver": null,
           "params": [
             {
               "name": "lane_summaries",
@@ -1027,7 +1310,45 @@
               "ty": "Vec<domain::tddd::test_obligation::scope::UncitedSpecElementFinding>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Build a structured results output. See IN-10 / AC-09."
+        },
+        {
+          "name": "lane_summaries",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[TestObligationLaneSummary]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the chain × layer lane summaries."
+        },
+        {
+          "name": "records",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[domain::tddd::test_obligation::drift::EdgeVerdictRecord]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the per-edge records for the failing / pending edges."
+        },
+        {
+          "name": "uncited_findings",
+          "receiver": "&self",
+          "params": [],
+          "returns": "&[domain::tddd::test_obligation::scope::UncitedSpecElementFinding]",
+          "is_async": false,
+          "generics": [],
+          "has_default_impl": false,
+          "where_predicates": [],
+          "docs": "Return the uncited AC/CN findings carried through the output."
         }
       ],
       "module_path": "test_obligation::results",
@@ -1078,6 +1399,90 @@
           "bounds": []
         }
       ]
+    },
+    "EvaluateTestObligationsFuture": {
+      "action": "add",
+      "role": {
+        "Dto": {}
+      },
+      "kind": {
+        "kind": "type_alias",
+        "target": "std::pin::Pin<std::boxed::Box<dyn core::future::Future<Output = Result<EvaluateTestObligationsOutcome, domain::tddd::test_obligation::errors::ObligationEvaluateError>> + Send + 'a>>"
+      },
+      "methods": [],
+      "module_path": "test_obligation::evaluate",
+      "docs": "Future alias returned by EvaluateTestObligationsApplicationService::execute; see IN-09 / AC-06 / AC-07.",
+      "spec_refs": [
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "IN-09"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "AC-06"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "AC-07"
+        }
+      ],
+      "informal_grounds": [],
+      "generics": []
+    },
+    "TestObligationEvaluateConfigError": {
+      "action": "add",
+      "role": {
+        "ErrorType": {}
+      },
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidInjectionRate",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "value",
+                  "ty": "u8"
+                }
+              ]
+            }
+          },
+          {
+            "name": "InvalidDetectionThreshold",
+            "payload": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "value",
+                  "ty": "u8"
+                }
+              ]
+            }
+          },
+          {
+            "name": "InvalidParallelism",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::evaluate",
+      "docs": "Narrow config-validation error surfaced only by TestObligationEvaluateConfig::try_new (IN-01 / AC-15). See T009 port-error-precision precedent.",
+      "spec_refs": [
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "IN-01"
+        },
+        {
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "anchor": "AC-15"
+        }
+      ],
+      "informal_grounds": []
     }
   },
   "trait_impls": [
@@ -1144,6 +1549,26 @@
     {
       "action": "add",
       "trait_ref": "core::fmt::Debug",
+      "for_type": "TestObligationCatalogueCommandInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "TestObligationCatalogueCommandInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::PartialEq",
+      "for_type": "TestObligationCatalogueCommandInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::cmp::Eq",
+      "for_type": "TestObligationCatalogueCommandInput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
       "for_type": "EvaluateTestObligationsCommand"
     },
     {
@@ -1300,6 +1725,41 @@
       "action": "add",
       "trait_ref": "core::cmp::Eq",
       "for_type": "TestObligationResultsOutput"
+    },
+    {
+      "action": "add",
+      "trait_ref": "DeriveTestObligationsApplicationService",
+      "for_type": "DeriveTestObligationsInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "CheckTestObligationsApplicationService",
+      "for_type": "CheckTestObligationsInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "EvaluateTestObligationsApplicationService",
+      "for_type": "EvaluateTestObligationsInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "TestObligationResultsApplicationService",
+      "for_type": "TestObligationResultsInteractor"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "TestObligationEvaluateConfigError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::fmt::Display",
+      "for_type": "TestObligationEvaluateConfigError"
+    },
+    {
+      "action": "add",
+      "trait_ref": "core::error::Error",
+      "for_type": "TestObligationEvaluateConfigError"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-08T04:40:23Z",
-  "declaration_hash": "294dadf38c30efc185f5b5b40b814ac54a073cbd9cd7d920e920ea2d4a9c0142",
+  "generated_at": "2026-07-09T04:08:42Z",
+  "declaration_hash": "a7aad6ef03593a77d6867176861c25d724a0e473aaaa442f8d03257d38823971",
   "signals": [
     {
       "type_name": "CatalogueEntryRefDto",
@@ -123,20 +123,6 @@
       ]
     },
     {
-      "type_name": "ObligationCatalogueEntryRefDto",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug",
-        "serde_core::de::Deserialize<'de>",
-        "serde_core::ser::Serialize"
-      ]
-    },
-    {
       "type_name": "ObligationFulfillmentCacheDocumentDto",
       "kind_tag": "dto",
       "signal": "blue",
@@ -162,6 +148,17 @@
         "core::fmt::Debug",
         "serde_core::de::Deserialize<'de>",
         "serde_core::ser::Serialize"
+      ]
+    },
+    {
+      "type_name": "ObligationFulfillmentEscalationDriver",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "SemanticEscalationDriverPort<ObligationFulfillmentPair, ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, SemanticVerifierError>",
+        "core::clone::Clone",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -230,6 +227,17 @@
         "core::cmp::PartialEq",
         "core::fmt::Debug",
         "serde_core::de::Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "Sha256ContentHasher",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "ContentHasherPort",
+        "core::clone::Clone",
+        "core::fmt::Debug"
       ]
     },
     {
@@ -424,6 +432,17 @@
         "core::fmt::Debug",
         "serde_core::de::Deserialize<'de>",
         "serde_core::ser::Serialize"
+      ]
+    },
+    {
+      "type_name": "WaiverEscalationDriver",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "SemanticEscalationDriverPort<WaiverPair, WaiverCacheKey, WaiverVerdict, SemanticVerifierError>",
+        "core::clone::Clone",
+        "core::fmt::Debug"
       ]
     },
     {
