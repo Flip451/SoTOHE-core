@@ -1,45 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5131e4c85098f03e1881737b62585cda215132adffd68d722cb42a8d07697d83",
-          "at": "2026-07-08T23:15:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5131e4c85098f03e1881737b62585cda215132adffd68d722cb42a8d07697d83",
-          "at": "2026-07-08T23:18:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d55f096cecbea886496ac8a123c983c2bfba1d94b596a204e2ef2150897461f0",
-          "at": "2026-07-09T01:15:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d55f096cecbea886496ac8a123c983c2bfba1d94b596a204e2ef2150897461f0",
-          "at": "2026-07-09T01:31:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d55f096cecbea886496ac8a123c983c2bfba1d94b596a204e2ef2150897461f0",
-          "at": "2026-07-09T02:05:10Z"
-        }
-      ]
-    },
     "impl-plan": {
       "rounds": [
         {
@@ -194,50 +155,50 @@
         }
       ]
     },
-    "spec": {
+    "types": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0750c52a6b9012c352f9c459877444b8dccd23cf8331f6e35f2dd1d4b215cecf",
-          "at": "2026-07-09T00:00:27Z"
+          "hash": "rvw1:sha256:0268157e52d2170dfa228c6c1ea2606df5b615811b2dc3d5fbd413cbe726f242",
+          "at": "2026-07-09T00:07:26Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "IN-03 says the live surface must be equivalent to the current gate, but then only requires scanning “at least” the listed roots. That leaves room to add more roots, while OS-04 explicitly declares live-surface expansion out of scope. Downstream implementers could satisfy IN-03 while violating OS-04, so the spec has a scope contradiction around scan semantics.",
+              "message": "`infrastructure::verify::retention_gate::verify` restates upstream behavior in its `docs` field: live-surface scanning, retired identifier/path detection, M-token state-expression handling, and scanner I/O fail-closed/no-panic behavior are already owned by IN-03/IN-04/IN-05/CN-01. Per `knowledge/conventions/no-upstream-restatement.md`, catalogue docs should identify the changed symbol and cite anchors rather than reproduce the behavior contract.",
               "severity": "P1",
-              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
-              "line": 71,
-              "category": "scope / acceptance_criteria contradiction"
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+              "line": 6,
+              "category": "upstream restatement"
             },
             {
-              "message": "GO-01 requires the retention gate to run through the established verify chain, including infrastructure checker, usecase port/service, CLI driver input, CLI subcommand, and composition wiring. The acceptance criteria only prove the old integration test is gone and that a CLI help/execution path exists; a direct CLI shortcut could satisfy AC-01/AC-02 while bypassing the required architecture. This leaves GO-01 without deterministic AC coverage for the stated verify-chain contract.",
+              "message": "The `FsVerifyAdapter -> usecase::verify::VerifyPort` trait impl is declared `action: reference`, but this track requires that existing impl to gain the retention-gate delegation for the newly added `verify_retention_gate` port method. `reference` is for baseline entries the track does not modify, so this hides an adapter-side contract change that should be declared as a modified impl entry.",
               "severity": "P1",
-              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
+              "line": 79,
+              "category": "action incoherent with the diff"
+            },
+            {
+              "message": "The `VerifyInteractor -> VerifyService` trait impl is declared `action: reference`, while `VerifyService` is modified to add `verify_retention_gate`; the existing interactor impl must add the corresponding delegation method. Keeping the impl as `reference` declares it unchanged and leaves the service-side implementation change outside the type contract.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
               "line": 8,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "GO-02 promises preservation of the live-surface scan semantics, and IN-03 lists the roots that define that surface, but no acceptance criterion proves the verifier actually scans each listed root. AC-03/AC-10 only require injection into one file under “the live surface,” so an implementation could omit roots such as `.claude/commands/**` or `.harness/capabilities/**` and still satisfy the AC text.",
-              "severity": "P1",
-              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
-              "line": 18,
-              "category": "missing AC coverage for a stated goal"
+              "category": "action incoherent with the diff"
             }
           ],
-          "hash": "rvw1:sha256:0750c52a6b9012c352f9c459877444b8dccd23cf8331f6e35f2dd1d4b215cecf",
-          "at": "2026-07-09T00:07:38Z"
+          "hash": "rvw1:sha256:0268157e52d2170dfa228c6c1ea2606df5b615811b2dc3d5fbd413cbe726f242",
+          "at": "2026-07-09T00:13:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:afe3564946b57d50469b79a72b82629df639a3a646ab5c96f0e1d6c5c435a57a",
-          "at": "2026-07-09T00:13:00Z"
+          "hash": "rvw1:sha256:d93b103f52d395c644825df0dc4a31df0201a17c00ab8d3cc9130ba30b4cc771",
+          "at": "2026-07-09T00:18:44Z"
         }
       ]
     },
@@ -304,6 +265,34 @@
           "findings": [],
           "hash": "rvw1:sha256:26bfc0bc18da706b4e452d4e8ff1b99c43509d54d4e0376a05c6e5da7c53f99e",
           "at": "2026-07-09T01:53:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:452c6fc575f478b9929a7bc6a93f159c9d6ee082fc91153bba46b28efbcbdde1",
+          "at": "2026-07-09T02:32:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:452c6fc575f478b9929a7bc6a93f159c9d6ee082fc91153bba46b28efbcbdde1",
+          "at": "2026-07-09T02:36:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2260565a02368783bc7b88e1717064fac844a54a9a6642f84124e99a535c3275",
+          "at": "2026-07-09T02:43:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2260565a02368783bc7b88e1717064fac844a54a9a6642f84124e99a535c3275",
+          "at": "2026-07-09T02:47:52Z"
         }
       ]
     },
@@ -340,50 +329,60 @@
         }
       ]
     },
-    "types": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0268157e52d2170dfa228c6c1ea2606df5b615811b2dc3d5fbd413cbe726f242",
-          "at": "2026-07-09T00:07:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`infrastructure::verify::retention_gate::verify` restates upstream behavior in its `docs` field: live-surface scanning, retired identifier/path detection, M-token state-expression handling, and scanner I/O fail-closed/no-panic behavior are already owned by IN-03/IN-04/IN-05/CN-01. Per `knowledge/conventions/no-upstream-restatement.md`, catalogue docs should identify the changed symbol and cite anchors rather than reproduce the behavior contract.",
-              "severity": "P1",
-              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The `FsVerifyAdapter -> usecase::verify::VerifyPort` trait impl is declared `action: reference`, but this track requires that existing impl to gain the retention-gate delegation for the newly added `verify_retention_gate` port method. `reference` is for baseline entries the track does not modify, so this hides an adapter-side contract change that should be declared as a modified impl entry.",
-              "severity": "P1",
-              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/infrastructure-types.json",
-              "line": 79,
-              "category": "action incoherent with the diff"
-            },
-            {
-              "message": "The `VerifyInteractor -> VerifyService` trait impl is declared `action: reference`, while `VerifyService` is modified to add `verify_retention_gate`; the existing interactor impl must add the corresponding delegation method. Keeping the impl as `reference` declares it unchanged and leaves the service-side implementation change outside the type contract.",
-              "severity": "P1",
-              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/usecase-types.json",
-              "line": 8,
-              "category": "action incoherent with the diff"
-            }
-          ],
-          "hash": "rvw1:sha256:0268157e52d2170dfa228c6c1ea2606df5b615811b2dc3d5fbd413cbe726f242",
-          "at": "2026-07-09T00:13:14Z"
+          "hash": "rvw1:sha256:5131e4c85098f03e1881737b62585cda215132adffd68d722cb42a8d07697d83",
+          "at": "2026-07-08T23:15:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d93b103f52d395c644825df0dc4a31df0201a17c00ab8d3cc9130ba30b4cc771",
-          "at": "2026-07-09T00:18:44Z"
+          "hash": "rvw1:sha256:5131e4c85098f03e1881737b62585cda215132adffd68d722cb42a8d07697d83",
+          "at": "2026-07-08T23:18:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d55f096cecbea886496ac8a123c983c2bfba1d94b596a204e2ef2150897461f0",
+          "at": "2026-07-09T01:15:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d55f096cecbea886496ac8a123c983c2bfba1d94b596a204e2ef2150897461f0",
+          "at": "2026-07-09T01:31:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d55f096cecbea886496ac8a123c983c2bfba1d94b596a204e2ef2150897461f0",
+          "at": "2026-07-09T02:05:10Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:223751d3aa8ac06015e1ff9dfd07e8805f0167a3497502090b4aa080c85bd063",
+          "at": "2026-07-08T23:16:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:223751d3aa8ac06015e1ff9dfd07e8805f0167a3497502090b4aa080c85bd063",
+          "at": "2026-07-08T23:18:54Z"
         }
       ]
     },
@@ -423,21 +422,50 @@
         }
       ]
     },
-    "adr": {
+    "spec": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:223751d3aa8ac06015e1ff9dfd07e8805f0167a3497502090b4aa080c85bd063",
-          "at": "2026-07-08T23:16:22Z"
+          "hash": "rvw1:sha256:0750c52a6b9012c352f9c459877444b8dccd23cf8331f6e35f2dd1d4b215cecf",
+          "at": "2026-07-09T00:00:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-03 says the live surface must be equivalent to the current gate, but then only requires scanning “at least” the listed roots. That leaves room to add more roots, while OS-04 explicitly declares live-surface expansion out of scope. Downstream implementers could satisfy IN-03 while violating OS-04, so the spec has a scope contradiction around scan semantics.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
+              "line": 71,
+              "category": "scope / acceptance_criteria contradiction"
+            },
+            {
+              "message": "GO-01 requires the retention gate to run through the established verify chain, including infrastructure checker, usecase port/service, CLI driver input, CLI subcommand, and composition wiring. The acceptance criteria only prove the old integration test is gone and that a CLI help/execution path exists; a direct CLI shortcut could satisfy AC-01/AC-02 while bypassing the required architecture. This leaves GO-01 without deterministic AC coverage for the stated verify-chain contract.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
+              "line": 8,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "GO-02 promises preservation of the live-surface scan semantics, and IN-03 lists the roots that define that surface, but no acceptance criterion proves the verifier actually scans each listed root. AC-03/AC-10 only require injection into one file under “the live surface,” so an implementation could omit roots such as `.claude/commands/**` or `.harness/capabilities/**` and still satisfy the AC text.",
+              "severity": "P1",
+              "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json",
+              "line": 18,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:0750c52a6b9012c352f9c459877444b8dccd23cf8331f6e35f2dd1d4b215cecf",
+          "at": "2026-07-09T00:07:38Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:223751d3aa8ac06015e1ff9dfd07e8805f0167a3497502090b4aa080c85bd063",
-          "at": "2026-07-08T23:18:54Z"
+          "hash": "rvw1:sha256:afe3564946b57d50469b79a72b82629df639a3a646ab5c96f0e1d6c5c435a57a",
+          "at": "2026-07-09T00:13:00Z"
         }
       ]
     }

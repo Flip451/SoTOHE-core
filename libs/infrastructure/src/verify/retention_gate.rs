@@ -201,14 +201,6 @@ fn has_gate_word(line: &str) -> bool {
 mod tests {
     use super::*;
 
-    fn workspace_root() -> PathBuf {
-        Path::new(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .and_then(Path::parent)
-            .expect("infrastructure crate must live below workspace root")
-            .to_path_buf()
-    }
-
     fn write(root: &Path, rel: &str, content: &str) {
         let path = root.join(rel);
         if let Some(parent) = path.parent() {
@@ -253,21 +245,6 @@ mod tests {
                 "apps",
                 "knowledge/conventions",
             ]
-        );
-    }
-
-    #[test]
-    fn test_retention_gate_real_workspace_live_surface_passes() {
-        let outcome = verify(workspace_root().as_path());
-        assert!(
-            outcome.is_ok(),
-            "workspace live surface must pass:\n{}",
-            outcome
-                .findings()
-                .iter()
-                .map(|finding| finding.message())
-                .collect::<Vec<_>>()
-                .join("\n")
         );
     }
 
@@ -363,23 +340,19 @@ mod tests {
         );
     }
 
-    #[cfg(unix)]
     #[test]
-    fn test_retention_gate_unreadable_file_fails_closed() {
-        use std::os::unix::fs::PermissionsExt;
-
+    fn test_retention_gate_file_open_error_fails_closed() {
         let tmp = tempfile::tempdir().unwrap();
-        synthetic_layout(tmp.path());
-        let path = tmp.path().join("README.md");
-        let original = std::fs::metadata(path.as_path()).unwrap().permissions();
-        let mut unreadable = original.clone();
-        unreadable.set_mode(0o000);
-        std::fs::set_permissions(path.as_path(), unreadable).unwrap();
+        let path = tmp.path().join("missing.md");
+        let mut findings = Vec::new();
 
-        let outcome = verify(tmp.path());
+        scan_file(path.as_path(), &forbidden_tokens(), m_token().as_str(), &mut findings);
 
-        std::fs::set_permissions(path, original).unwrap();
-        assert!(outcome.has_errors(), "I/O failure must fail closed");
+        assert_eq!(findings.len(), 1);
+        assert!(
+            findings.iter().any(|finding| finding.contains("I/O error reading file")),
+            "expected read error finding, got: {findings:?}"
+        );
     }
 
     #[cfg(unix)]
