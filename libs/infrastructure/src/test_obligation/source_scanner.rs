@@ -13,6 +13,7 @@
 //! are derived from the remaining segments, most-specific first, and each is
 //! parsed with `syn` to find a `#[test]`-attributed function of the given name.
 
+use std::io::ErrorKind;
 use std::path::{Component, Path, PathBuf};
 
 use proc_macro2::LineColumn;
@@ -340,6 +341,10 @@ impl TestSourceScannerPort for SynTestSourceScanner {
                 };
                 let content = match std::fs::read_to_string(&file) {
                     Ok(content) => content,
+                    // A candidate can disappear between the symlink check and
+                    // the read. It is still only a speculative path, so allow
+                    // the remaining candidates to provide the bound test.
+                    Err(e) if e.kind() == ErrorKind::NotFound => continue,
                     Err(e) => {
                         return Err(TestSourceScanError::Io(diagnostic(&format!(
                             "cannot read test source '{}': {e}",
@@ -476,6 +481,23 @@ fn test_external_module() {
             .scan_test_body(&location("domain", "domain::nothing::tests", "test_x"))
             .unwrap();
         assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_candidate_probe_non_not_found_read_error_aborts_before_fallback() {
+        let dir = write_lib_source("domain", "user.rs", SOURCE_WITH_TESTS);
+        let unreadable_candidate = dir.path().join("libs/domain/src/user/tests.rs");
+        std::fs::create_dir_all(&unreadable_candidate).unwrap();
+
+        let scanner = SynTestSourceScanner::new(dir.path().to_path_buf());
+        let err = scanner
+            .scan_test_body(&location("domain", "domain::user::tests", "test_rejects_empty"))
+            .unwrap_err();
+
+        let TestSourceScanError::Io(message) = err else {
+            panic!("expected read failure");
+        };
+        assert!(message.as_str().contains("cannot read test source"));
     }
 
     #[test]
