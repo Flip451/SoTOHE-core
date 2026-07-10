@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-10T21:46:12Z",
-  "declaration_hash": "9d0fc308f407aee807d7704549bb48721b129413f3fe6a4ffb0720f888c4cbb1",
+  "generated_at": "2026-07-10T22:34:29Z",
+  "declaration_hash": "2fa176ffe80ebdb4a00e244c62bc2c816b1f87282794738e9255e7f7a809096e",
   "signals": [
     {
       "type_name": "CatalogueEntryRefDto",

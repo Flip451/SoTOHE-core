@@ -125,12 +125,8 @@
     "T013": [
       { "layer": "infrastructure", "entry_key": "SynTestSourceScanner" }
     ],
-    "T014": [
-      { "layer": "infrastructure", "entry_key": "ObligationFulfillmentVerifierAdapter" }
-    ],
-    "T015": [
-      { "layer": "infrastructure", "entry_key": "WaiverVerifierAdapter" }
-    ],
+    "T014": [],
+    "T015": [],
     "T016": [
       { "layer": "usecase", "entry_key": "TestObligationCatalogueCommandInput" },
       { "layer": "usecase", "entry_key": "DeriveTestObligationsCommand" },
@@ -262,6 +258,10 @@
     ],
     "T031": [
       { "layer": "domain", "entry_key": "ObligationsDocument" }
+    ],
+    "T032": [
+      { "layer": "infrastructure", "entry_key": "ObligationFulfillmentVerifierAdapter" },
+      { "layer": "infrastructure", "entry_key": "WaiverVerifierAdapter" }
     ]
   }
 }

@@ -274,14 +274,19 @@ impl TestObligationCompositionRoot {
 
     fn fulfillment_verifier(&self) -> Arc<dyn ObligationFulfillmentVerifierPort + Send + Sync> {
         match self.agent_profiles() {
-            Ok(profiles) => Arc::new(ObligationFulfillmentVerifierAdapter::new(profiles)),
+            Ok(profiles) => Arc::new(ObligationFulfillmentVerifierAdapter::new(
+                profiles,
+                self.workspace_root.clone(),
+            )),
             Err(message) => Arc::new(FailingObligationFulfillmentVerifier::from_message(&message)),
         }
     }
 
     fn waiver_verifier(&self) -> Arc<dyn WaiverVerifierPort + Send + Sync> {
         match self.agent_profiles() {
-            Ok(profiles) => Arc::new(WaiverVerifierAdapter::new(profiles)),
+            Ok(profiles) => {
+                Arc::new(WaiverVerifierAdapter::new(profiles, self.workspace_root.clone()))
+            }
             Err(message) => Arc::new(FailingWaiverVerifier::from_message(&message)),
         }
     }

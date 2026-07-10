@@ -12,6 +12,7 @@
 //! impossible (AC-07). A `pending` verdict is preserved and treated as fail at
 //! the gate by the caller.
 
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use domain::EvidenceCitation;
@@ -80,10 +81,10 @@ pub struct ObligationFulfillmentVerifierAdapter {
 
 impl ObligationFulfillmentVerifierAdapter {
     /// Builds an adapter that spawns the configured provider subprocess for each
-    /// verification.
+    /// verification, anchored at `workspace_root`.
     #[must_use]
-    pub fn new(agent_profile: AgentProfiles) -> Self {
-        Self { agent_profile, runner: default_fulfillment_verifier_runner() }
+    pub fn new(agent_profile: AgentProfiles, workspace_root: PathBuf) -> Self {
+        Self { agent_profile, runner: default_fulfillment_verifier_runner(workspace_root) }
     }
 
     /// Test-only constructor injecting a stubbed provider runner so unit tests
@@ -248,12 +249,46 @@ mod tests {
         AgentProfiles::load(&path).unwrap()
     }
 
+    fn codex_profiles() -> AgentProfiles {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("agent-profiles.json");
+        std::fs::write(
+            &path,
+            r#"{
+                "schema_version": 1,
+                "providers": { "codex": { "label": "Codex" } },
+                "capabilities": {
+                    "obligation-fulfillment-verifier": {
+                        "provider": "codex",
+                        "model": "gpt-5"
+                    }
+                }
+            }"#,
+        )
+        .unwrap();
+        AgentProfiles::load(&path).unwrap()
+    }
+
     fn stub_runner(output: &'static str) -> Arc<SemanticVerifierRunner> {
         Arc::new(move |_resolved, _prompt| Ok(output.to_owned()))
     }
 
     fn adapter(output: &'static str) -> ObligationFulfillmentVerifierAdapter {
         ObligationFulfillmentVerifierAdapter::with_runner(profiles(), stub_runner(output))
+    }
+
+    #[test]
+    fn test_fulfillment_verifier_new_missing_workspace_root_threads_root_to_runner() {
+        let tempdir = tempfile::tempdir().unwrap();
+        let workspace_root = tempdir.path().join("missing-workspace-root");
+        let verifier =
+            ObligationFulfillmentVerifierAdapter::new(codex_profiles(), workspace_root.clone());
+
+        let err = verifier.verify_pair("tests", "entry", "anchor", ModelTier::Final).unwrap_err();
+
+        let SemanticVerifierError::VerifierPort(message) = err;
+        assert!(message.as_str().contains("cannot canonicalize project root"));
+        assert!(message.as_str().contains(&workspace_root.display().to_string()));
     }
 
     #[test]

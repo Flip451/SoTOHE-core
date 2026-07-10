@@ -18,20 +18,13 @@
 //! no safe primitive here for cancelling a running subprocess.
 //!
 //! Purity: the multiplexer is a private, dependency-free helper — it reads
-//! no env vars, no config, and takes the concurrency ceiling as a parameter.
-//! Every caller in `evaluate` passes [`MAX_IN_FLIGHT`], the module-local
-//! default.
+//! no env vars or config and takes the concurrency ceiling as a parameter.
+//! Every caller in `evaluate` supplies the validated bound from
+//! `TestObligationEvaluateConfig`.
 
 use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
-
-/// Maximum verdict futures driven concurrently by
-/// [`drive_bounded_in_order`] in the evaluate lane.
-///
-/// Kept as a private const rather than a config surface so the usecase layer
-/// stays pure and the ceiling cannot drift per invocation.
-pub(super) const MAX_IN_FLIGHT: usize = 8;
 
 /// Drives `futures` under a concurrency ceiling of `limit`, returning the
 /// per-future outputs in input order.

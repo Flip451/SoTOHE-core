@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "9d0fc308f407aee807d7704549bb48721b129413f3fe6a4ffb0720f888c4cbb1",
+  "catalogue_declaration_hash": "2fa176ffe80ebdb4a00e244c62bc2c816b1f87282794738e9255e7f7a809096e",
   "signals": [
     {
       "type_name": "CatalogueEntryRefDto",
@@ -90,7 +90,7 @@
     {
       "type_name": "ObligationFulfillmentVerifierAdapter",
       "signal": "blue",
-      "entry_hash": "97acadf41ddd37045b96f7b114903350d2212aebb17de1591b76bacc0910a79f"
+      "entry_hash": "7fbdfff49f93a6deca5fb5d76afcb00b1b0a1f24b2bdcc632fcd4d0351162539"
     },
     {
       "type_name": "ObligationsCodecError",
@@ -205,7 +205,7 @@
     {
       "type_name": "WaiverVerifierAdapter",
       "signal": "blue",
-      "entry_hash": "a40d0579a81afccbe5a3bf776ac733c1caad03abcc005f1bfc358779ca986d6b"
+      "entry_hash": "e9ed08d944c88fdafcf7925fb6628f66b4c6d76b8dabad9cff1bcb492206c157"
     },
     {
       "type_name": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint",

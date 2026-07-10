@@ -4,7 +4,8 @@
 
 use std::future::Future;
 use std::path::{Path, PathBuf};
-use std::pin::pin;
+use std::pin::{Pin, pin};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll, Waker};
 
@@ -225,6 +226,134 @@ impl SemanticEscalationDriverPort<WaiverPair, WaiverCacheKey, WaiverVerdict, Sem
     }
 }
 
+/// Shared peak-concurrency probe for the evaluator fan-out tests.
+#[derive(Clone)]
+struct DispatchTracker {
+    in_flight: Arc<AtomicUsize>,
+    peak: Arc<AtomicUsize>,
+}
+
+impl DispatchTracker {
+    fn new() -> Self {
+        Self { in_flight: Arc::new(AtomicUsize::new(0)), peak: Arc::new(AtomicUsize::new(0)) }
+    }
+
+    fn record_start(&self) {
+        let current = self.in_flight.fetch_add(1, Ordering::SeqCst) + 1;
+        let mut peak = self.peak.load(Ordering::SeqCst);
+        while current > peak {
+            match self.peak.compare_exchange(peak, current, Ordering::SeqCst, Ordering::SeqCst) {
+                Ok(_) => break,
+                Err(actual) => peak = actual,
+            }
+        }
+    }
+
+    fn record_finish(&self) {
+        self.in_flight.fetch_sub(1, Ordering::SeqCst);
+    }
+
+    fn peak(&self) -> usize {
+        self.peak.load(Ordering::SeqCst)
+    }
+}
+
+/// A verifier result that first pends so the multiplexer has observable
+/// in-flight work to bound.
+struct TrackedVerdictFuture<T> {
+    verdict: Option<T>,
+    tracker: DispatchTracker,
+    registered: bool,
+    pended: bool,
+    completed: bool,
+}
+
+impl<T> TrackedVerdictFuture<T> {
+    fn new(verdict: T, tracker: DispatchTracker) -> Self {
+        Self { verdict: Some(verdict), tracker, registered: false, pended: false, completed: false }
+    }
+}
+
+impl<T: Unpin> Future for TrackedVerdictFuture<T> {
+    type Output = Result<T, SemanticVerifierError>;
+
+    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+        let this = self.get_mut();
+        if !this.registered {
+            this.tracker.record_start();
+            this.registered = true;
+        }
+        if !this.pended {
+            this.pended = true;
+            cx.waker().wake_by_ref();
+            return Poll::Pending;
+        }
+        this.completed = true;
+        this.tracker.record_finish();
+        Poll::Ready(Ok(this.verdict.take().expect("tracked verdict is returned once")))
+    }
+}
+
+impl<T> Drop for TrackedVerdictFuture<T> {
+    fn drop(&mut self) {
+        if self.registered && !self.completed {
+            self.tracker.record_finish();
+        }
+    }
+}
+
+struct BoundedFulfillmentDriver {
+    tracker: DispatchTracker,
+}
+
+impl
+    SemanticEscalationDriverPort<
+        ObligationFulfillmentPair,
+        ObligationFulfillmentCacheKey,
+        ObligationFulfillmentVerdict,
+        SemanticVerifierError,
+    > for BoundedFulfillmentDriver
+{
+    fn evaluate_with_escalation<'a>(
+        &'a self,
+        pair: &'a ObligationFulfillmentPair,
+        _key: &'a ObligationFulfillmentCacheKey,
+        _initial_tier: ModelTier,
+    ) -> SemanticEscalationFuture<'a, ObligationFulfillmentVerdict, SemanticVerifierError> {
+        let source = pair.tests_source().as_str();
+        let verdict = if source.contains("_contradiction_") {
+            fulfillment_fail_for_category(FulfillmentFailCategory::Contradiction)
+        } else if source.contains("_substitution_") {
+            fulfillment_fail_for_category(FulfillmentFailCategory::Substitution)
+        } else if source.contains("_central_unverified_") {
+            fulfillment_fail_for_category(FulfillmentFailCategory::CentralUnverified)
+        } else {
+            fulfilled()
+        };
+        Box::pin(TrackedVerdictFuture::new(verdict, self.tracker.clone()))
+    }
+}
+
+struct BoundedWaiverDriver {
+    tracker: DispatchTracker,
+}
+
+impl SemanticEscalationDriverPort<WaiverPair, WaiverCacheKey, WaiverVerdict, SemanticVerifierError>
+    for BoundedWaiverDriver
+{
+    fn evaluate_with_escalation<'a>(
+        &'a self,
+        _pair: &'a WaiverPair,
+        _key: &'a WaiverCacheKey,
+        _initial_tier: ModelTier,
+    ) -> SemanticEscalationFuture<'a, WaiverVerdict, SemanticVerifierError> {
+        let verdict = WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("bounded waiver coverage".to_owned()).unwrap(),
+        };
+        Box::pin(TrackedVerdictFuture::new(verdict, self.tracker.clone()))
+    }
+}
+
 #[derive(Default)]
 struct CapFulfillmentCache {
     loaded: Mutex<Option<ObligationFulfillmentCacheDocument>>,
@@ -428,6 +557,20 @@ fn triple_waiver_bindings() -> TestBindingsDocument {
             TestBindingRecord::Waiver { edge_id: edge(), reason: waiver_reason() },
         ],
     )
+}
+
+/// Repeated fulfillment and waiver records provide enough pending verifier
+/// futures to expose the evaluator's configured fan-out ceiling.
+fn repeated_lane_bindings(repetitions: usize) -> TestBindingsDocument {
+    let mut records = Vec::with_capacity(repetitions.saturating_mul(2));
+    for _ in 0..repetitions {
+        records.push(TestBindingRecord::Fulfillment {
+            obligation_id: obligation().id().clone(),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        });
+        records.push(TestBindingRecord::Waiver { edge_id: edge(), reason: waiver_reason() });
+    }
+    TestBindingsDocument::new(track(), records)
 }
 
 fn spec_doc() -> SpecDocument {
@@ -685,6 +828,47 @@ fn harness_with_read_models_and_config(
     Harness { fulfillment_driver, waiver_driver, fulfillment_cache, waiver_cache, interactor }
 }
 
+fn interactor_with_bounded_drivers(
+    bindings: TestBindingsDocument,
+    config: TestObligationEvaluateConfig,
+    fulfillment_driver: Arc<BoundedFulfillmentDriver>,
+    waiver_driver: Arc<BoundedWaiverDriver>,
+) -> EvaluateTestObligationsInteractor {
+    EvaluateTestObligationsInteractor::new(
+        Arc::new(StubObligations(Some(obligations_doc()))),
+        Arc::new(StubBindings(Some(bindings))),
+        Arc::new(StubScanner),
+        fulfillment_driver
+            as Arc<
+                dyn SemanticEscalationDriverPort<
+                        ObligationFulfillmentPair,
+                        ObligationFulfillmentCacheKey,
+                        ObligationFulfillmentVerdict,
+                        SemanticVerifierError,
+                    > + Send
+                    + Sync,
+            >,
+        waiver_driver
+            as Arc<
+                dyn SemanticEscalationDriverPort<
+                        WaiverPair,
+                        WaiverCacheKey,
+                        WaiverVerdict,
+                        SemanticVerifierError,
+                    > + Send
+                    + Sync,
+            >,
+        Arc::new(CapFulfillmentCache::default()),
+        Arc::new(CapWaiverCache::default()),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        config,
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+        Arc::new(SumHasher),
+    )
+}
+
 fn command() -> EvaluateTestObligationsCommand {
     EvaluateTestObligationsCommand::new(
         track(),
@@ -790,6 +974,39 @@ fn test_config_exposes_validated_calibration_bounds() {
     assert_eq!(config.injection_rate(), 10);
     assert_eq!(config.detection_threshold().get(), 90);
     assert_eq!(config.parallelism(), 4);
+}
+
+fn assert_evaluator_fan_out_bound(config: TestObligationEvaluateConfig, expected_bound: usize) {
+    // 16 records in each lane make both production fan-outs exceed the
+    // default bound. The 32 total records also produce four calibration
+    // probes, so that fan-out exceeds a three-worker bound as well.
+    let fulfillment_tracker = DispatchTracker::new();
+    let waiver_tracker = DispatchTracker::new();
+    let interactor = interactor_with_bounded_drivers(
+        repeated_lane_bindings(16),
+        config,
+        Arc::new(BoundedFulfillmentDriver { tracker: fulfillment_tracker.clone() }),
+        Arc::new(BoundedWaiverDriver { tracker: waiver_tracker.clone() }),
+    );
+
+    let outcome = run(interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 32);
+    assert_eq!(fulfillment_tracker.peak(), expected_bound);
+    assert_eq!(waiver_tracker.peak(), expected_bound);
+}
+
+#[test]
+fn test_config_parallelism_one_serializes_all_evaluation_fan_outs() {
+    assert_evaluator_fan_out_bound(TestObligationEvaluateConfig::try_new(10, 90, 1).unwrap(), 1);
+}
+
+#[test]
+fn test_default_config_parallelism_bounds_all_evaluation_fan_outs() {
+    let config = TestObligationEvaluateConfig::default();
+    assert_eq!(config.parallelism(), 4);
+
+    assert_evaluator_fan_out_bound(config.clone(), config.parallelism());
 }
 
 #[test]

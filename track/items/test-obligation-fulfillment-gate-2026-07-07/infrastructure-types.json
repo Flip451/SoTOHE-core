@@ -1791,6 +1791,10 @@
             {
               "name": "agent_profile",
               "ty": "infrastructure::agent_profiles::AgentProfiles"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
             }
           ],
           "returns": "Self"
@@ -2708,6 +2712,10 @@
             {
               "name": "agent_profile",
               "ty": "infrastructure::agent_profiles::AgentProfiles"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
             }
           ],
           "returns": "Self"

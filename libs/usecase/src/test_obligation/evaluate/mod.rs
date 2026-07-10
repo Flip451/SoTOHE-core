@@ -59,7 +59,7 @@ mod records;
 mod verify;
 
 use calibration::{CategoryTally, calibration_probe_count, probe_shape_for};
-use concurrency::{MAX_IN_FLIGHT, drive_bounded_in_order};
+use concurrency::drive_bounded_in_order;
 use plan::PlannedAction;
 use verify::map_verifier_error;
 
@@ -163,11 +163,18 @@ impl TestObligationEvaluateConfig {
 
 impl Default for TestObligationEvaluateConfig {
     fn default() -> Self {
+        // This is the sole default concurrency bound for every evaluation
+        // fan-out (calibration, fulfillment, and waiver).
+        const DEFAULT_PARALLELISM: usize = 4;
         const DEFAULT_THRESHOLD: NonZeroU8 = match NonZeroU8::new(90) {
             Some(value) => value,
             None => NonZeroU8::MIN,
         };
-        Self { injection_rate: 10, detection_threshold: DEFAULT_THRESHOLD, parallelism: 4 }
+        Self {
+            injection_rate: 10,
+            detection_threshold: DEFAULT_THRESHOLD,
+            parallelism: DEFAULT_PARALLELISM,
+        }
     }
 }
 
@@ -379,9 +386,9 @@ impl EvaluateTestObligationsInteractor {
             probe_futures.push(self.calibration_probe_future(shape));
         }
 
-        // Fan out the probe verdicts under the module-local concurrency
-        // ceiling; results come back in `probe_index` order.
-        let verdicts = drive_bounded_in_order(probe_futures, MAX_IN_FLIGHT).await?;
+        // Fan out the probe verdicts under the configured concurrency ceiling;
+        // results come back in `probe_index` order.
+        let verdicts = drive_bounded_in_order(probe_futures, self.config.parallelism()).await?;
 
         let mut detected = 0usize;
         for (verdict, expected_category) in verdicts.into_iter().zip(probe_categories.into_iter()) {
@@ -594,8 +601,9 @@ impl EvaluateTestObligationsInteractor {
             }
         }
         let fulfillment_verdicts =
-            drive_bounded_in_order(fulfillment_futures, MAX_IN_FLIGHT).await?;
-        let waiver_verdicts = drive_bounded_in_order(waiver_futures, MAX_IN_FLIGHT).await?;
+            drive_bounded_in_order(fulfillment_futures, self.config.parallelism()).await?;
+        let waiver_verdicts =
+            drive_bounded_in_order(waiver_futures, self.config.parallelism()).await?;
 
         self.apply_planned(
             plan,

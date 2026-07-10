@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成
 
-## Tasks (29/31 resolved)
+## Tasks (30/32 resolved)
 
 ### S1 — Preceding shared foundation: semantic-verdict core & ref-verify migration
 
@@ -34,6 +34,7 @@
 - [x] **T013**: Target libs/infrastructure test_obligation::source_scanner. Add SynTestSourceScanner impl TestSourceScannerPort (IN-06/OS-06/CN-14/AC-04). Add unit tests covering those anchors. (`5899451a`)
 - [x] **T014**: Target libs/infrastructure test_obligation::fulfillment_verifier. Add ObligationFulfillmentVerifierAdapter impl ObligationFulfillmentVerifierPort with obligation-fulfillment-verifier provider wiring (IN-09/IN-12/CN-03/CN-08/AC-06/AC-08/OS-01). Add unit tests with a stubbed provider covering those anchors. (`5899451a`)
 - [x] **T015**: Target libs/infrastructure test_obligation::waiver_verifier. Add WaiverVerifierAdapter impl WaiverVerifierPort with waiver-verifier provider wiring (IN-09/IN-15/CN-03/CN-08/OS-01/OS-04). Add unit tests with a stubbed provider covering those anchors. (`5899451a`)
+- [x] **T032**: Target libs/infrastructure test_obligation::{fulfillment_verifier,waiver_verifier}. Extend ObligationFulfillmentVerifierAdapter and WaiverVerifierAdapter constructors to retain the discovered workspace root and anchor every verifier subprocess there (IN-09/IN-11/CN-08). Add unit tests covering both verifier lanes.
 
 ### S6 — Usecase interactors + adapters riding pair VOs: derive, check, evaluate, results, sha256, escalation drivers
 

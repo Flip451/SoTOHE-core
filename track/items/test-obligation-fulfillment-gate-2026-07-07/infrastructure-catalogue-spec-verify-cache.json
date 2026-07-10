@@ -915,7 +915,7 @@
       }
     },
     {
-      "claim_hash": "97acadf41ddd37045b96f7b114903350d2212aebb17de1591b76bacc0910a79f",
+      "claim_hash": "7fbdfff49f93a6deca5fb5d76afcb00b1b0a1f24b2bdcc632fcd4d0351162539",
       "evidence_hash": "ea8420d96fcd552a8f15e1f8c612852de8bd59ed60ab9408f6ac884af9c3f099",
       "verdict": {
         "kind": "pass",
@@ -939,7 +939,7 @@
       }
     },
     {
-      "claim_hash": "97acadf41ddd37045b96f7b114903350d2212aebb17de1591b76bacc0910a79f",
+      "claim_hash": "7fbdfff49f93a6deca5fb5d76afcb00b1b0a1f24b2bdcc632fcd4d0351162539",
       "evidence_hash": "b820521ae5792f52d05b746286fce4be6385e80cdc5cb4384a759dcbd4cb7558",
       "verdict": {
         "kind": "pass",
@@ -963,11 +963,11 @@
       }
     },
     {
-      "claim_hash": "97acadf41ddd37045b96f7b114903350d2212aebb17de1591b76bacc0910a79f",
+      "claim_hash": "7fbdfff49f93a6deca5fb5d76afcb00b1b0a1f24b2bdcc632fcd4d0351162539",
       "evidence_hash": "f0b28a946964a66cfbfc5b2e1ccf6e196ab9d1ec9138f97837f09f8081d9ee66",
       "verdict": {
         "kind": "pass",
-        "citation": "obligation-fulfillment 検証 capability と waiver 検証 capability が `.harness/config/agent-profiles.json` に別 capability として登録されており、各 capability について fast / final の provider / model を独立に指定できる。`resolve_execution` が `RoundType::Fast` に対して `fast_provider ?? provider` / `fast_model ?? model` を解決し、`RoundType::Final` に対して `provider` / `model` を返すことを検証するテストがある。"
+        "citation": "obligation-fulfillment 検証 capability と waiver 検証 capability が `.harness/config/agent-profiles.json` に別 capability として登録されており、各 capability について fast / final の provider / model を独立に指定できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -987,11 +987,11 @@
       }
     },
     {
-      "claim_hash": "97acadf41ddd37045b96f7b114903350d2212aebb17de1591b76bacc0910a79f",
+      "claim_hash": "7fbdfff49f93a6deca5fb5d76afcb00b1b0a1f24b2bdcc632fcd4d0351162539",
       "evidence_hash": "882603515a8b9c770aa90baacc2db9fcdc7b0777228c24af33c3645bd2707342",
       "verdict": {
         "kind": "pass",
-        "citation": "fulfillment 検証と waiver 検証は別 prompt / 別 capability を用いる。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較"
+        "citation": "fulfillment 検証と waiver 検証は別 prompt / 別 capability を用いる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1875,11 +1875,11 @@
       }
     },
     {
-      "claim_hash": "a40d0579a81afccbe5a3bf776ac733c1caad03abcc005f1bfc358779ca986d6b",
+      "claim_hash": "e9ed08d944c88fdafcf7925fb6628f66b4c6d76b8dabad9cff1bcb492206c157",
       "evidence_hash": "ea8420d96fcd552a8f15e1f8c612852de8bd59ed60ab9408f6ac884af9c3f099",
       "verdict": {
         "kind": "pass",
-        "citation": "waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）を評価し、verdict をキャッシュキーの三つ組で凍結する"
+        "citation": "waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）を評価し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1899,11 +1899,11 @@
       }
     },
     {
-      "claim_hash": "a40d0579a81afccbe5a3bf776ac733c1caad03abcc005f1bfc358779ca986d6b",
+      "claim_hash": "e9ed08d944c88fdafcf7925fb6628f66b4c6d76b8dabad9cff1bcb492206c157",
       "evidence_hash": "b820521ae5792f52d05b746286fce4be6385e80cdc5cb4384a759dcbd4cb7558",
       "verdict": {
         "kind": "pass",
-        "citation": "さらに、各検証 capability の解決が設定読込失敗または capability 解決不能で失敗した場合、composition root は capability ごとに独立した fail-closed stand-in adapter（obligation-fulfillment 用と waiver 用は別個）を接続する。"
+        "citation": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1923,11 +1923,11 @@
       }
     },
     {
-      "claim_hash": "a40d0579a81afccbe5a3bf776ac733c1caad03abcc005f1bfc358779ca986d6b",
+      "claim_hash": "e9ed08d944c88fdafcf7925fb6628f66b4c6d76b8dabad9cff1bcb492206c157",
       "evidence_hash": "f0b28a946964a66cfbfc5b2e1ccf6e196ab9d1ec9138f97837f09f8081d9ee66",
       "verdict": {
         "kind": "pass",
-        "citation": "obligation-fulfillment 検証 capability と waiver 検証 capability が `.harness/config/agent-profiles.json` に別 capability として登録されており、各 capability について fast / final の provider / model を独立に指定できる。"
+        "citation": "obligation-fulfillment 検証 capability と waiver 検証 capability が `.harness/config/agent-profiles.json` に別 capability として登録されており"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1947,11 +1947,11 @@
       }
     },
     {
-      "claim_hash": "a40d0579a81afccbe5a3bf776ac733c1caad03abcc005f1bfc358779ca986d6b",
+      "claim_hash": "e9ed08d944c88fdafcf7925fb6628f66b4c6d76b8dabad9cff1bcb492206c157",
       "evidence_hash": "882603515a8b9c770aa90baacc2db9fcdc7b0777228c24af33c3645bd2707342",
       "verdict": {
         "kind": "pass",
-        "citation": "fulfillment 検証と waiver 検証は別 prompt / 別 capability を用いる。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・許容すべき翻訳ギャップの種類・モデルへの指示が異なる。"
+        "citation": "後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・許容すべき翻訳ギャップの種類・モデルへの指示が異なる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

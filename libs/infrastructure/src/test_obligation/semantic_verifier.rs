@@ -110,8 +110,11 @@ pub(crate) fn extract_verdict_json<T: serde::de::DeserializeOwned>(
 /// codex-routed fulfillment verdict can carry its D6 `category` back through
 /// calibration instead of being flattened to `central_unverified` by the
 /// ref-verify schema.
-pub(crate) fn default_fulfillment_verifier_runner() -> Arc<SemanticVerifierRunner> {
+pub(crate) fn default_fulfillment_verifier_runner(
+    workspace_root: PathBuf,
+) -> Arc<SemanticVerifierRunner> {
     build_semantic_verifier_runner(
+        workspace_root,
         crate::ref_verify::process_runner::CODEX_FULFILLMENT_OUTPUT_SCHEMA,
     )
 }
@@ -121,8 +124,13 @@ pub(crate) fn default_fulfillment_verifier_runner() -> Arc<SemanticVerifierRunne
 /// The waiver verdict has no fail category (D8); its wire shape matches
 /// ref-verify. Reuse the ref-verify codex schema unchanged so a codex-routed
 /// waiver run keeps its historical structural constraint.
-pub(crate) fn default_waiver_verifier_runner() -> Arc<SemanticVerifierRunner> {
-    build_semantic_verifier_runner(crate::ref_verify::process_runner::CODEX_OUTPUT_SCHEMA)
+pub(crate) fn default_waiver_verifier_runner(
+    workspace_root: PathBuf,
+) -> Arc<SemanticVerifierRunner> {
+    build_semantic_verifier_runner(
+        workspace_root,
+        crate::ref_verify::process_runner::CODEX_OUTPUT_SCHEMA,
+    )
 }
 
 /// Shared constructor for the fulfillment / waiver production runners.
@@ -131,15 +139,15 @@ pub(crate) fn default_waiver_verifier_runner() -> Arc<SemanticVerifierRunner> {
 /// ([`crate::ref_verify::process_runner::make_agent_process_runner`]) with the
 /// caller-supplied codex structured-output schema, and rewraps
 /// [`RefVerifyError`] into [`SemanticVerifierError`] so the obligation gate
-/// never surfaces a ref-verify error type. The working directory is the
-/// process CWD (the workspace root when the gate runs); it is only used to
-/// spawn the provider and place transient provider output files.
+/// never surfaces a ref-verify error type. `workspace_root` anchors provider
+/// subprocesses and transient provider output files independently of the
+/// process CWD.
 fn build_semantic_verifier_runner(
+    workspace_root: PathBuf,
     codex_output_schema: &'static str,
 ) -> Arc<SemanticVerifierRunner> {
-    let project_root = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
     let inner = crate::ref_verify::process_runner::make_agent_process_runner(
-        project_root,
+        workspace_root,
         codex_output_schema,
     );
     Arc::new(move |resolved, prompt| {

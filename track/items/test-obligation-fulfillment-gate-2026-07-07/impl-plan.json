@@ -182,6 +182,11 @@
       "id": "T031",
       "description": "`domain::ObligationsDocument` に `owning_obligation` メソッドを追加し、results の provenance 解決を domain 所有にする (IN-10)",
       "status": "done"
+    },
+    {
+      "id": "T032",
+      "description": "Target libs/infrastructure test_obligation::{fulfillment_verifier,waiver_verifier}. Extend ObligationFulfillmentVerifierAdapter and WaiverVerifierAdapter constructors to retain the discovered workspace root and anchor every verifier subprocess there (IN-09/IN-11/CN-08). Add unit tests covering both verifier lanes.",
+      "status": "done"
     }
   ],
   "plan": {
@@ -236,7 +241,8 @@
         "task_ids": [
           "T013",
           "T014",
-          "T015"
+          "T015",
+          "T032"
         ]
       },
       {
