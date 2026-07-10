@@ -128,15 +128,19 @@ fn central_unverified_probe_source(index: usize) -> String {
     )
 }
 
-/// Percentage-scaled probe count (AC-08 / IN-01): rounds up so any
-/// non-zero `injection_rate` yields at least one probe.
+/// Percentage-scaled probe count (AC-08 / IN-01).
+///
+/// A non-zero production run with calibration enabled must exercise every
+/// fulfillment-fail category before the verifier can be declared healthy.
+/// The percentage-derived count therefore has a floor of three probes; once
+/// the rate-derived count exceeds that floor, its normal scaling is preserved.
 pub(super) fn calibration_probe_count(production_pair_count: usize, injection_rate: u8) -> usize {
-    if injection_rate == 0 {
+    if production_pair_count == 0 || injection_rate == 0 {
         return 0;
     }
     let scaled = production_pair_count.saturating_mul(usize::from(injection_rate));
     let count = scaled.saturating_add(99) / 100;
-    count.max(1)
+    count.max(3)
 }
 
 /// Per-category detection tally for the calibration loop (AC-08).

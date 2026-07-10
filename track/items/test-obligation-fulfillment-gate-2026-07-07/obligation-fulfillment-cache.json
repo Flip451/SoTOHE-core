@@ -1433,11 +1433,11 @@
       "key": {
         "bound_tests_set_hash": "b73327453a456d434d13c305a27e234ed17e85ed082c717d9bd253f96fb5440a",
         "declaration_hash": "f98d534c451f6e02d975e55affccfd6baaf70dc25a869ba736caf00722f6cfd7",
-        "anchor_text_hash": "515b2ea9b6c7910f0fb748e2da17a06bb8c0422ea13910fed69ca64720c382ca"
+        "anchor_text_hash": "f83f1646466c9682bb5240a9fd45fb0c10813f726738a25eb0d607531953c07d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(prompt.contains(\"provided test source actually verifies the behaviour\"));\nassert!(prompt.contains(\"cited anchor promises for the given catalogue entry\"));\nassert!(prompt.contains(\"obligation-fulfillment verifier\"));\nassert!(!prompt.contains(\"implementer-authored waiver reason\"));"
+        "citation": "assert!(prompt.contains(\"the tests cite the anchor but verify content unrelated to the entry-relevant promise part\"));\nassert!(prompt.contains(\"the central, entry-relevant part of the anchor's promise is left unverified; do NOT demand from this edge promise parts belonging to other entries' responsibilities\"));\nassert!(prompt.contains(\"If the tests fully verify the promise as restricted to this entry, return pass even when the anchor promises more for other entries\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2151,13 +2151,13 @@
         "item_identifier": "trait_method:verify_pair"
       },
       "key": {
-        "bound_tests_set_hash": "aa328940cf4f35269fc136c9a4996ca8ebdf11c0fa774ea40cf22fa3c67c08d9",
+        "bound_tests_set_hash": "24cc33e53479bc66558ec941fa12379cc4e250405f3ffff5dc47ce1f3ed8a589",
         "declaration_hash": "eec2fdc56e06ae9b41ff6d10f471905c6da1dec77b37c953a2610f0dda598000",
         "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "adapter.verify_pair(\"tests\", \"decl\", \"anchor\", ModelTier::Fast).unwrap(); / adapter.verify_pair(\"reason\", \"decl\", \"anchor\", ModelTier::Fast).unwrap(); / assert!(message.as_str().contains(\"citation\")); / assert!(prompt.contains(\"TEST_BODY_MARKER\")); assert!(prompt.contains(\"DECL_MARKER\")); assert!(prompt.contains(\"ANCHOR_MARKER\"));"
+        "citation": "let err = adapter(r#\"{\"kind\":\"pass\",\"citation\":null,\"reason\":null}\"#)\n            .verify_pair(\"reason\", \"decl\", \"anchor\", ModelTier::Final)\n            .unwrap_err();\n        let SemanticVerifierError::VerifierPort(message) = err;\n        assert!(message.as_str().contains(\"citation\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2175,13 +2175,13 @@
         "item_identifier": "trait_method:verify_pair"
       },
       "key": {
-        "bound_tests_set_hash": "aa328940cf4f35269fc136c9a4996ca8ebdf11c0fa774ea40cf22fa3c67c08d9",
+        "bound_tests_set_hash": "24cc33e53479bc66558ec941fa12379cc4e250405f3ffff5dc47ce1f3ed8a589",
         "declaration_hash": "eec2fdc56e06ae9b41ff6d10f471905c6da1dec77b37c953a2610f0dda598000",
-        "anchor_text_hash": "515b2ea9b6c7910f0fb748e2da17a06bb8c0422ea13910fed69ca64720c382ca"
+        "anchor_text_hash": "f83f1646466c9682bb5240a9fd45fb0c10813f726738a25eb0d607531953c07d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(prompt.contains(\"implementer-authored waiver reason justifies\"));\nassert!(prompt.contains(\"cited anchor as it relates to the given catalogue entry\"));\nassert!(prompt.contains(\"reason must be self-contained\"));\nassert!(!prompt.contains(\"obligation-fulfillment verifier\"));"
+        "citation": "let prompt = WaiverVerifierAdapter::render_prompt(\"reason\", \"entry\", \"anchor\");\n\n        assert!(prompt.contains(\"implementer-authored waiver reason justifies\"));\n        assert!(prompt.contains(\"cited anchor as it relates to the given catalogue entry\"));\n        assert!(prompt.contains(\"reason must be self-contained\"));\n        assert!(!prompt.contains(\"obligation-fulfillment verifier\"));\n\nlet waiver_error = root\n            .waiver_verifier()\n            .verify_pair(\"reason\", \"entry\", \"anchor\", ModelTier::Fast)\n            .unwrap_err();\n\n        assert!(matches!(waiver_error, SemanticVerifierError::VerifierPort(_)));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2199,13 +2199,13 @@
         "item_identifier": "trait_method:verify_pair"
       },
       "key": {
-        "bound_tests_set_hash": "aa328940cf4f35269fc136c9a4996ca8ebdf11c0fa774ea40cf22fa3c67c08d9",
+        "bound_tests_set_hash": "24cc33e53479bc66558ec941fa12379cc4e250405f3ffff5dc47ce1f3ed8a589",
         "declaration_hash": "eec2fdc56e06ae9b41ff6d10f471905c6da1dec77b37c953a2610f0dda598000",
         "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let verdict = adapter(\n            r#\"{\"kind\":\"pass\",\"citation\":\"the anchor states this is a design goal\",\"reason\":null}\"#,\n        )\n        .verify_pair(\n            \"this anchor is a design goal with no verifiable behaviour\",\n            \"struct Foo\",\n            \"GO: state the purpose\",\n            ModelTier::Final,\n        )\n        .unwrap();"
+        "citation": "let err = adapter(r#\"{\"kind\":\"pass\",\"citation\":null,\"reason\":null}\"#)\n            .verify_pair(\"reason\", \"decl\", \"anchor\", ModelTier::Final)\n            .unwrap_err();\n        let SemanticVerifierError::VerifierPort(message) = err;\n        assert!(message.as_str().contains(\"citation\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2223,7 +2223,7 @@
         "item_identifier": "trait_method:verify_pair"
       },
       "key": {
-        "bound_tests_set_hash": "aa328940cf4f35269fc136c9a4996ca8ebdf11c0fa774ea40cf22fa3c67c08d9",
+        "bound_tests_set_hash": "24cc33e53479bc66558ec941fa12379cc4e250405f3ffff5dc47ce1f3ed8a589",
         "declaration_hash": "eec2fdc56e06ae9b41ff6d10f471905c6da1dec77b37c953a2610f0dda598000",
         "anchor_text_hash": "a9d2ea6b1e87b023912bfa00993f079cbecf95652ea9045af495c650513c8edd"
       },
@@ -2247,13 +2247,13 @@
         "item_identifier": "trait_method:verify_pair"
       },
       "key": {
-        "bound_tests_set_hash": "aa328940cf4f35269fc136c9a4996ca8ebdf11c0fa774ea40cf22fa3c67c08d9",
+        "bound_tests_set_hash": "24cc33e53479bc66558ec941fa12379cc4e250405f3ffff5dc47ce1f3ed8a589",
         "declaration_hash": "eec2fdc56e06ae9b41ff6d10f471905c6da1dec77b37c953a2610f0dda598000",
         "anchor_text_hash": "b39c474de068f9e08e65ef079df13752e21eb7f3461749aada4f70c9a23331aa"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(prompt.contains(\"cited anchor as it relates to the given catalogue entry\"));\nassert!(prompt.contains(\"reason must be self-contained\"));\nassert!(!prompt.contains(\"obligation-fulfillment verifier\"));"
+        "citation": "assert!(prompt.contains(\"implementer-authored waiver reason justifies\"));\nassert!(prompt.contains(\"cited anchor as it relates to the given catalogue entry\"));\nassert!(prompt.contains(\"reason must be self-contained\"));\nassert!(!prompt.contains(\"obligation-fulfillment verifier\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2343,13 +2343,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "c8519b60cfc347e2d04e7089f73119d4a4290a0f281f5b987d523c43c9e93bd8",
+        "bound_tests_set_hash": "5c418b51cee135a2d5aea5c51c5473ed7ac99d34f6bd89633e5e042c607fd0cf",
         "declaration_hash": "f2e102cbdf60d2429a1ec48c1949e413823df03cd8a16bbd3e533ec0adaeca9c",
         "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let outcome = run(interactor.execute(&command())).unwrap();\n\nassert_eq!(outcome.pass_count(), 1);\nassert_eq!(fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);\nassert_eq!(fulfillment_cache.saved.lock().unwrap().as_ref().unwrap().entries().len(), 1);"
+        "citation": "let interactor = EvaluateTestObligationsInteractor::new(\n        Arc::new(StubObligations(Some(obligations_doc()))),\n        Arc::new(StubBindings(Some(fulfillment_bindings()))),\n        Arc::new(StubScanner),\n        Arc::clone(&fulfillment_driver)\n            as Arc<\n                dyn SemanticEscalationDriverPort<\n                        ObligationFulfillmentPair,\n                        ObligationFulfillmentCacheKey,\n                        ObligationFulfillmentVerdict,\n                        SemanticVerifierError,\n                    >,\n            >,\n        ...\n        fulfillment_verifier_fingerprint(),\n        waiver_verifier_fingerprint(),\n        config(),\n        Arc::new(StubSpec(spec_doc())),\n        Arc::new(StubCatalogue(money_catalogue())),\n        Arc::new(SumHasher),\n    );\n\n    let outcome = run(interactor.execute(&command())).unwrap();\n\n    assert_eq!(outcome.pass_count(), 1);\n    assert_eq!(fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);\n    assert_eq!(fulfillment_cache.saved.lock().unwrap().as_ref().unwrap().entries().len(), 1);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2367,13 +2367,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "c8519b60cfc347e2d04e7089f73119d4a4290a0f281f5b987d523c43c9e93bd8",
+        "bound_tests_set_hash": "5c418b51cee135a2d5aea5c51c5473ed7ac99d34f6bd89633e5e042c607fd0cf",
         "declaration_hash": "f2e102cbdf60d2429a1ec48c1949e413823df03cd8a16bbd3e533ec0adaeca9c",
         "anchor_text_hash": "4802b74415a134607211305c91ff4d591a481cc1ae3e15a6cb105a84ca3d96ec"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_ne!(base, different_tests);\n        assert_ne!(base, different_declaration);\n        assert_ne!(base, different_anchor); ... assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. }))); ... assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);\n    let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();\n    assert_eq!(\n        saved.entries()[0].verifier_fingerprint(),\n        Some(&fulfillment_verifier_fingerprint())\n    ); ... assert_eq!(outcome.pass_count(), 1);\n    assert_eq!(fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);\n    assert_eq!(fulfillment_cache.saved.lock().unwrap().as_ref().unwrap().entries().len(), 1);"
+        "citation": "assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);\nlet saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();\nassert_eq!(\n    saved.entries()[0].verifier_fingerprint(),\n    Some(&fulfillment_verifier_fingerprint())\n);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2799,13 +2799,13 @@
         "item_identifier": "trait_method:execute"
       },
       "key": {
-        "bound_tests_set_hash": "a8a7231ccf515c6cea59eb803b9165a983bc3dd1086c06d2363015b19a35e698",
+        "bound_tests_set_hash": "bf31eec37b657a073c1447a81662a102530fff41069adda637820b65f1ccd530",
         "declaration_hash": "3f25aaf85b3f7a760a35e2410f42c3ddad4e16a2faa77ee2b747bb014f699605",
         "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(outcome.pass_count(), 1);\nassert_eq!(h.fulfillment_cache.saved.lock().unwrap().clone().unwrap().entries().len(), 1);\nassert_eq!(outcome.pass_count(), 1);\nassert_eq!(*h.waiver_driver.calls.lock().unwrap(), 1);\nassert_ne!(base, different_tests);\nassert_ne!(base, different_declaration);\nassert_ne!(base, different_anchor);\nassert!(message.as_str().contains(\"citation\"));\nassert_eq!(saved.entries()[0].verifier_fingerprint(), Some(&fulfillment_verifier_fingerprint()));"
+        "citation": "let outcome = run(h.interactor.execute(&command())).unwrap();\nassert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);\n// The verdict is frozen in the fulfillment cache.\nassert_eq!(h.fulfillment_cache.saved.lock().unwrap().clone().unwrap().entries().len(), 1);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2823,13 +2823,13 @@
         "item_identifier": "trait_method:execute"
       },
       "key": {
-        "bound_tests_set_hash": "a8a7231ccf515c6cea59eb803b9165a983bc3dd1086c06d2363015b19a35e698",
+        "bound_tests_set_hash": "bf31eec37b657a073c1447a81662a102530fff41069adda637820b65f1ccd530",
         "declaration_hash": "3f25aaf85b3f7a760a35e2410f42c3ddad4e16a2faa77ee2b747bb014f699605",
         "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let err = adapter(r#\"{\"kind\":\"pass\",\"citation\":null,\"reason\":null,\"category\":null}\"#)\n            .verify_pair(\"tests\", \"decl\", \"anchor\", ModelTier::Final)\n            .unwrap_err();\n        let SemanticVerifierError::VerifierPort(message) = err;\n        assert!(message.as_str().contains(\"citation\"));\n\n    assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast, ModelTier::Final]);\n\n        assert!(matches!(\n            result,\n            Err(ObligationEvaluateError::HumanEscalationRequired { records })\n                if records.as_slice().len() == 1\n        ));\n\n        assert!(matches!(fulfillment_error, SemanticVerifierError::VerifierPort(_)));\n        assert!(matches!(waiver_error, SemanticVerifierError::VerifierPort(_)));"
+        "citation": "let err = adapter(r#\"{\"kind\":\"pass\",\"citation\":null,\"reason\":null,\"category\":null}\"#)\n            .verify_pair(\"tests\", \"decl\", \"anchor\", ModelTier::Final)\n            .unwrap_err();\n        let SemanticVerifierError::VerifierPort(message) = err;\n        assert!(message.as_str().contains(\"citation\"));\n\nassert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast, ModelTier::Final]);\nassert!(matches!(\n        result,\n        Err(ObligationEvaluateError::HumanEscalationRequired { records })\n            if records.as_slice().len() == 1\n    ));\n\nassert_eq!(h.fulfillment_cache.saved.lock().unwrap().clone().unwrap().entries().len(), 1);\n\nassert!(matches!(fulfillment_error, SemanticVerifierError::VerifierPort(_)));\nassert!(matches!(waiver_error, SemanticVerifierError::VerifierPort(_)));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2847,7 +2847,7 @@
         "item_identifier": "trait_method:execute"
       },
       "key": {
-        "bound_tests_set_hash": "a8a7231ccf515c6cea59eb803b9165a983bc3dd1086c06d2363015b19a35e698",
+        "bound_tests_set_hash": "bf31eec37b657a073c1447a81662a102530fff41069adda637820b65f1ccd530",
         "declaration_hash": "3f25aaf85b3f7a760a35e2410f42c3ddad4e16a2faa77ee2b747bb014f699605",
         "anchor_text_hash": "a9d2ea6b1e87b023912bfa00993f079cbecf95652ea9045af495c650513c8edd"
       },
@@ -3521,11 +3521,11 @@
       "key": {
         "bound_tests_set_hash": "bb2d2c2e540d8c305b69dc1a4a24582f603c1259b354699dabc6facc16ef3007",
         "declaration_hash": "fdb2a307e8c30af4eb5093af4abd404635e506e17adec65cf9a8f000df499e8c",
-        "anchor_text_hash": "515b2ea9b6c7910f0fb748e2da17a06bb8c0422ea13910fed69ca64720c382ca"
+        "anchor_text_hash": "f83f1646466c9682bb5240a9fd45fb0c10813f726738a25eb0d607531953c07d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(prompt.contains(\"provided test source actually verifies the behaviour\")); assert!(prompt.contains(\"cited anchor promises for the given catalogue entry\")); assert!(prompt.contains(\"obligation-fulfillment verifier\"));"
+        "citation": "assert!(prompt.contains(\"the tests cite the anchor but verify content unrelated to the entry-relevant promise part\")); assert!(prompt.contains(\"the central, entry-relevant part of the anchor's promise is left unverified; do NOT demand from this edge promise parts belonging to other entries' responsibilities\")); assert!(prompt.contains(\"If the tests fully verify the promise as restricted to this entry, return pass even when the anchor promises more for other entries\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -3641,11 +3641,11 @@
       "key": {
         "bound_tests_set_hash": "8cb18428f419d5ebd08a14bc315c8be806b4d95a62ce9a4e777907459521bdb0",
         "declaration_hash": "05f377f118fc98e5fc3601a4dc77cfb42328696ca396240291c5db4b7c469eeb",
-        "anchor_text_hash": "515b2ea9b6c7910f0fb748e2da17a06bb8c0422ea13910fed69ca64720c382ca"
+        "anchor_text_hash": "f83f1646466c9682bb5240a9fd45fb0c10813f726738a25eb0d607531953c07d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "for capability in [\"obligation-fulfillment-verifier\", \"waiver-verifier\"] {\n            let fast = profiles.resolve_execution(capability, RoundType::Fast).unwrap();\n            assert_eq!(fast.provider, \"codex\");\n            assert_eq!(fast.model.as_deref(), Some(\"gpt-5.4-mini\"));\n\n            let final_exec = profiles.resolve_execution(capability, RoundType::Final).unwrap();\n            assert_eq!(final_exec.provider, \"codex\");\n            assert_eq!(final_exec.model.as_deref(), Some(\"gpt-5.5\"));\n        }"
+        "citation": "assert!(prompt.contains(\"implementer-authored waiver reason justifies\"));\nassert!(prompt.contains(\"cited anchor as it relates to the given catalogue entry\"));\nassert!(!prompt.contains(\"obligation-fulfillment verifier\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -3759,13 +3759,13 @@
         "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort"
       },
       "key": {
-        "bound_tests_set_hash": "04ad420ea808f8c0527c9eef9052c5abe301d7f4788d33712f6c891677466f3e",
+        "bound_tests_set_hash": "1c2660fbfc0ebbafd82bc1b6ebf91e673397c780ee303b355a0aa147a6f838ca",
         "declaration_hash": "d7dc358624609ed519af7a5ef7e0e1900d5300f3ff2430c1bc5bf9794e549e76",
-        "anchor_text_hash": "515b2ea9b6c7910f0fb748e2da17a06bb8c0422ea13910fed69ca64720c382ca"
+        "anchor_text_hash": "f83f1646466c9682bb5240a9fd45fb0c10813f726738a25eb0d607531953c07d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "for capability in [\"obligation-fulfillment-verifier\", \"waiver-verifier\"] {\n            let fast = profiles.resolve_execution(capability, RoundType::Fast).unwrap();\n            assert_eq!(fast.model.as_deref(), Some(\"gpt-5.4-mini\"));\n\n            let final_exec = profiles.resolve_execution(capability, RoundType::Final).unwrap();\n            assert_eq!(final_exec.model.as_deref(), Some(\"gpt-5.5\"));\n        }"
+        "citation": "let err = verifier\n                .verify_pair(tests_source, entry_declaration, anchor_text, tier)\n                .unwrap_err();\n\n            let SemanticVerifierError::VerifierPort(message) = err;\n            assert_eq!(message.as_str(), \"profile unavailable\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -3783,13 +3783,13 @@
         "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort"
       },
       "key": {
-        "bound_tests_set_hash": "04ad420ea808f8c0527c9eef9052c5abe301d7f4788d33712f6c891677466f3e",
+        "bound_tests_set_hash": "294d16b1a8f83428cf75312300e440212adc52c24be1182d452ca364eae1733f",
         "declaration_hash": "d7dc358624609ed519af7a5ef7e0e1900d5300f3ff2430c1bc5bf9794e549e76",
         "anchor_text_hash": "a9d2ea6b1e87b023912bfa00993f079cbecf95652ea9045af495c650513c8edd"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "for capability in [\"obligation-fulfillment-verifier\", \"waiver-verifier\"] {\n            assert!(profiles.resolve_capability(capability).is_some());\n            assert_eq!(\n                profiles.resolve_model(capability, RoundType::Fast).as_deref(),\n                Some(\"gpt-5.6-luna\")\n            );\n            assert_eq!(\n                profiles.resolve_model(capability, RoundType::Final).as_deref(),\n                Some(\"gpt-5.6-terra\")\n            );\n        }\n\nfor capability in [\"obligation-fulfillment-verifier\", \"waiver-verifier\"] {\n            let fast = profiles.resolve_execution(capability, RoundType::Fast).unwrap();\n            assert_eq!(fast.provider, \"codex\");\n            assert_eq!(fast.model.as_deref(), Some(\"gpt-5.4-mini\"));\n\n            let final_exec = profiles.resolve_execution(capability, RoundType::Final).unwrap();\n            assert_eq!(final_exec.provider, \"codex\");\n            assert_eq!(final_exec.model.as_deref(), Some(\"gpt-5.5\"));\n        }"
+        "citation": "let err = verifier.verify_pair(\"tests\", \"entry\", \"anchor\", ModelTier::Fast).unwrap_err();"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -3807,13 +3807,13 @@
         "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort"
       },
       "key": {
-        "bound_tests_set_hash": "64287d84176668d5c31f1e6fcfc9bea04d450bcb24fbe275724cb1e7b5ff24f8",
+        "bound_tests_set_hash": "f89ea5b6c171ba9fd216a1fb4e459e7d7f005220bdd4e6c1dc490294e2a4633e",
         "declaration_hash": "d7dc358624609ed519af7a5ef7e0e1900d5300f3ff2430c1bc5bf9794e549e76",
         "anchor_text_hash": "b39c474de068f9e08e65ef079df13752e21eb7f3461749aada4f70c9a23331aa"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(prompt.contains(\"obligation-fulfillment verifier\"));\n        assert!(prompt.contains(\"assert_eq!(actual, expected);\"));\n        assert!(prompt.contains(\"struct Entry\"));\n        assert!(prompt.contains(\"the operation returns the expected value\"));"
+        "citation": "assert!(prompt.contains(\"provided test source actually verifies the behaviour\")); assert!(prompt.contains(\"cited anchor promises for the given catalogue entry\")); assert!(prompt.contains(\"obligation-fulfillment verifier\")); assert!(!prompt.contains(\"implementer-authored waiver reason\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -3855,13 +3855,13 @@
         "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort"
       },
       "key": {
-        "bound_tests_set_hash": "260afe626e363e1db18b61649e44c4bdd2595abc831e0cd276fa4136f71383c8",
+        "bound_tests_set_hash": "0cdae99a54a3a66efb807a61c36785b83f44a6797bc094c316ec3e0fd8bdf3ed",
         "declaration_hash": "1f6f86c72ac431bd94ec7d4638c3e19bb71aafaa10192919fc09ca701ddb061e",
-        "anchor_text_hash": "515b2ea9b6c7910f0fb748e2da17a06bb8c0422ea13910fed69ca64720c382ca"
+        "anchor_text_hash": "f83f1646466c9682bb5240a9fd45fb0c10813f726738a25eb0d607531953c07d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let err = verifier.verify_pair(\"reason\", \"entry\", \"anchor\", ModelTier::Fast).unwrap_err();\n\n        let SemanticVerifierError::VerifierPort(message) = err;\n        assert_eq!(message.as_str(), \"profile missing\");"
+        "citation": "let err = verifier.verify_pair(\"reason\", \"entry\", \"anchor\", ModelTier::Fast).unwrap_err(); ... let SemanticVerifierError::VerifierPort(message) = err;"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4599,13 +4599,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "e2889391ab99bdf6f7c6b42fb23b3f3fb05500e86f94d1a1f65da6872487c067",
+        "bound_tests_set_hash": "af23b4d9f7bfed68d059144c4ff9566b469c02eb41dd580b9dd6036e9272c1a1",
         "declaration_hash": "ec5daf540cd3f474b4c66d370680b334c1eada0e57b9a9ed4b0b46c04aa02955",
         "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let exit = execute_evaluate_with(\n            &TestObligationEvaluateArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },\n            || Ok((root, format!(\"track/{OBLIGATION_TRACK_ID}\"))),\n            |root, input| {\n                assert_eq!(root.workspace_root, PathBuf::from(\"/workspace\"));\n                assert_eq!(\n                    input.track_id().map(|track_id| track_id.as_ref()),\n                    Some(OBLIGATION_TRACK_ID)\n                );\n                assert_eq!(input.current_branch().as_str(), format!(\"track/{OBLIGATION_TRACK_ID}\"));\n                ExitCode::SUCCESS\n            },\n        );\n\n        assert_eq!(exit, ExitCode::SUCCESS);"
+        "citation": "let exit = execute_evaluate_with(\n            &TestObligationEvaluateArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },\n            || Ok((root, format!(\"track/{OBLIGATION_TRACK_ID}\"))),"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4623,13 +4623,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "e2889391ab99bdf6f7c6b42fb23b3f3fb05500e86f94d1a1f65da6872487c067",
+        "bound_tests_set_hash": "af23b4d9f7bfed68d059144c4ff9566b469c02eb41dd580b9dd6036e9272c1a1",
         "declaration_hash": "ec5daf540cd3f474b4c66d370680b334c1eada0e57b9a9ed4b0b46c04aa02955",
         "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let exit = execute_evaluate_with(\n            &TestObligationEvaluateArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },\n            || Ok((root, format!(\"track/{OBLIGATION_TRACK_ID}\"))),\n            |root, input| {\n                assert_eq!(root.workspace_root, PathBuf::from(\"/workspace\"));\n                assert_eq!(\n                    input.track_id().map(|track_id| track_id.as_ref()),\n                    Some(OBLIGATION_TRACK_ID)\n                );\n                assert_eq!(input.current_branch().as_str(), format!(\"track/{OBLIGATION_TRACK_ID}\"));\n                ExitCode::SUCCESS\n            },\n        );\n\n        assert_eq!(exit, ExitCode::SUCCESS);"
+        "citation": "assert_eq!(root.workspace_root, PathBuf::from(\"/workspace\"));\n                assert_eq!(\n                    input.track_id().map(|track_id| track_id.as_ref()),\n                    Some(OBLIGATION_TRACK_ID)\n                );\n                assert_eq!(input.current_branch().as_str(), format!(\"track/{OBLIGATION_TRACK_ID}\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4647,13 +4647,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "e2889391ab99bdf6f7c6b42fb23b3f3fb05500e86f94d1a1f65da6872487c067",
+        "bound_tests_set_hash": "af23b4d9f7bfed68d059144c4ff9566b469c02eb41dd580b9dd6036e9272c1a1",
         "declaration_hash": "ec5daf540cd3f474b4c66d370680b334c1eada0e57b9a9ed4b0b46c04aa02955",
         "anchor_text_hash": "5f1a57e5aada23c582a8e9638363a9efaed8d2498241bc14fd56e96bacce4af6"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let exit = execute_evaluate_with(\n            &TestObligationEvaluateArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },\n            || Ok((root, format!(\"track/{OBLIGATION_TRACK_ID}\"))),\n            |root, input| {\n                assert_eq!(root.workspace_root, PathBuf::from(\"/workspace\"));\n                assert_eq!(\n                    input.track_id().map(|track_id| track_id.as_ref()),\n                    Some(OBLIGATION_TRACK_ID)\n                );\n                assert_eq!(input.current_branch().as_str(), format!(\"track/{OBLIGATION_TRACK_ID}\"));\n                ExitCode::SUCCESS\n            },\n        );\n\n        assert_eq!(exit, ExitCode::SUCCESS);"
+        "citation": "let exit = execute_evaluate_with(\n    &TestObligationEvaluateArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },\n    || Ok((root, format!(\"track/{OBLIGATION_TRACK_ID}\"))),\n    |root, input| {\n        assert_eq!(root.workspace_root, PathBuf::from(\"/workspace\"));\n        assert_eq!(\n            input.track_id().map(|track_id| track_id.as_ref()),\n            Some(OBLIGATION_TRACK_ID)\n        );\n        assert_eq!(input.current_branch().as_str(), format!(\"track/{OBLIGATION_TRACK_ID}\"));\n        ExitCode::SUCCESS\n    },\n);\n\nassert_eq!(exit, ExitCode::SUCCESS);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4971,6 +4971,30 @@
     },
     {
       "edge_id": {
+        "entry_key": "SemanticVerifierError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SemanticVerifierError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "cffc213c291f54938928e0697f7612964bf56b6df07f4be54ea97bc5ee1d51ce",
+        "declaration_hash": "f2d73940fa4797fb93ee730dbd59fa6577ac7b18d34151760a8a5075e24fe933",
+        "anchor_text_hash": "f83f1646466c9682bb5240a9fd45fb0c10813f726738a25eb0d607531953c07d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(fulfillment_error, SemanticVerifierError::VerifierPort(_)));\\n        assert!(matches!(waiver_error, SemanticVerifierError::VerifierPort(_)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
         "entry_key": "TestObligationCompositionRoot",
         "anchor_id": {
           "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
@@ -4983,13 +5007,13 @@
         "item_identifier": "voluntary:IN-11"
       },
       "key": {
-        "bound_tests_set_hash": "a3645443b4c1e773c6d79d7d1a2341a89ecf499092a1090004fe590b16d83282",
+        "bound_tests_set_hash": "6e6634e7d106bf7e952c60ee0749fb6263727f673908cec7e28281d73760159e",
         "declaration_hash": "ca6e2041415aef69717e41b77f49b8e0ed011a3c4f5775091d35a20da348ed7c",
-        "anchor_text_hash": "515b2ea9b6c7910f0fb748e2da17a06bb8c0422ea13910fed69ca64720c382ca"
+        "anchor_text_hash": "f83f1646466c9682bb5240a9fd45fb0c10813f726738a25eb0d607531953c07d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "for capability in [\"obligation-fulfillment-verifier\", \"waiver-verifier\"] {\n            assert!(profiles.resolve_capability(capability).is_some());\n            assert_eq!(\n                profiles.resolve_model(capability, RoundType::Fast).as_deref(),\n                Some(\"gpt-5.6-luna\")\n            );\n            assert_eq!(\n                profiles.resolve_model(capability, RoundType::Final).as_deref(),\n                Some(\"gpt-5.6-terra\")\n            );\n        }"
+        "citation": "for capability in [\"obligation-fulfillment-verifier\", \"waiver-verifier\"] { ... assert_eq!(profiles.resolve_model(capability, RoundType::Fast).as_deref(), Some(\"gpt-5.6-luna\")); ... assert_eq!(profiles.resolve_model(capability, RoundType::Final).as_deref(), Some(\"gpt-5.6-terra\")); ... } ... assert!(matches!(fulfillment_error, SemanticVerifierError::VerifierPort(_))); ... assert!(matches!(waiver_error, SemanticVerifierError::VerifierPort(_)));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -7263,7 +7287,7 @@
         "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort"
       },
       "key": {
-        "bound_tests_set_hash": "b38e359071ac336a102378789d3eb159d01f68bb2516a8b453c8f11570e77694",
+        "bound_tests_set_hash": "bddd4f26c45c8980259f574dbfa54490c0db96452da034cc5c060c72b1904a34",
         "declaration_hash": "d7dc358624609ed519af7a5ef7e0e1900d5300f3ff2430c1bc5bf9794e549e76",
         "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
       },

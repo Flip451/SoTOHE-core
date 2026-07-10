@@ -494,4 +494,42 @@ mod tests {
         assert!(matches!(fulfillment_error, SemanticVerifierError::VerifierPort(_)));
         assert!(matches!(waiver_error, SemanticVerifierError::VerifierPort(_)));
     }
+
+    #[test]
+    fn test_composition_root_wires_distinct_fallbacks_when_capabilities_unresolvable() {
+        let workspace_root = tempfile::tempdir().unwrap();
+        let profiles_path = workspace_root.path().join(AGENT_PROFILES_PATH);
+        std::fs::create_dir_all(profiles_path.parent().unwrap()).unwrap();
+        std::fs::write(
+            &profiles_path,
+            r#"{
+                "schema_version": 1,
+                "providers": { "codex": { "label": "Codex" } },
+                "capabilities": {
+                    "unrelated-capability": { "provider": "codex", "model": "unrelated" }
+                }
+            }"#,
+        )
+        .unwrap();
+        let root = TestObligationCompositionRoot::new(
+            workspace_root.path().to_path_buf(),
+            workspace_root.path().join(TEST_OBLIGATION_RULES_PATH),
+        );
+
+        let profiles = root.agent_profiles().unwrap();
+        assert!(profiles.resolve_capability("obligation-fulfillment-verifier").is_none());
+        assert!(profiles.resolve_capability("waiver-verifier").is_none());
+
+        let fulfillment_error = root
+            .fulfillment_verifier()
+            .verify_pair("assert!(covered)", "entry", "anchor", ModelTier::Fast)
+            .unwrap_err();
+        let waiver_error = root
+            .waiver_verifier()
+            .verify_pair("reason", "entry", "anchor", ModelTier::Fast)
+            .unwrap_err();
+
+        assert!(matches!(fulfillment_error, SemanticVerifierError::VerifierPort(_)));
+        assert!(matches!(waiver_error, SemanticVerifierError::VerifierPort(_)));
+    }
 }

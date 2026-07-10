@@ -192,11 +192,23 @@
       },
       {
         "id": "IN-11",
-        "text": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・prompt が異なるため（chain 別 prompt 分離と同じ論理）。各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。",
+        "text": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・prompt が異なるため（chain 別 prompt 分離と同じ論理）。各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。さらに、各検証 capability の解決が設定読込失敗または capability 解決不能で失敗した場合、composition root は capability ごとに独立した fail-closed stand-in adapter（obligation-fulfillment 用と waiver 用は別個）を接続する。各 stand-in は全呼出しで `VerifierPort` error を返して verdict を生成せず、判定基準・prompt の分離は fallback 経路でも維持する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
             "anchor": "D8"
+          },
+          {
+            "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+            "anchor": "D6"
+          },
+          {
+            "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+            "anchor": "D7"
+          },
+          {
+            "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+            "anchor": "D11"
           }
         ]
       },

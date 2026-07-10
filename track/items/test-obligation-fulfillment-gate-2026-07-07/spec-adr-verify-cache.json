@@ -577,7 +577,7 @@
       }
     },
     {
-      "claim_hash": "5da59f9485edd1ca1f266cac3333a0279d7012c6de1aca8feac7695c8aa44ea8",
+      "claim_hash": "b820521ae5792f52d05b746286fce4be6385e80cdc5cb4384a759dcbd4cb7558",
       "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
       "verdict": {
         "kind": "pass",
@@ -588,7 +588,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-11",
-          "text_label": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・prompt が異なるため（chain 別 prompt 分離と同じ論理）。各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。"
+          "text_label": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・prompt が異なるため（chain 別 prompt 分離と同じ論理）。各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。さらに、各検証 capability の解決が設定読込失敗または capability 解決不能で失敗した場合、composition root は capability ごとに独立した fail-closed stand-in adapter（obligation-fulfillment 用と waiver 用は別個）を接続する。各 stand-in は全呼出しで `VerifierPort` error を返して verdict を生成せず、判定基準・prompt の分離は fallback 経路でも維持する。"
         }
       },
       "evidence_origin": {
@@ -596,6 +596,75 @@
         "data": {
           "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
           "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "b820521ae5792f52d05b746286fce4be6385e80cdc5cb4384a759dcbd4cb7558",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「本ゲートを既存 ref-verify の型（pair 型・chain filter・cache scope・verdict artifact）に組み込まない」および「test pair は bind されたテスト関数本体の集合、waiver pair は author された waived 理由散文」／「verifier provider が設定読込失敗・capability 解決不能で解決されない場合、composition root は fail-closed stand-in adapter を接続し、評価呼出しは常に VerifierPort error に倒れる」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・prompt が異なるため（chain 別 prompt 分離と同じ論理）。各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。さらに、各検証 capability の解決が設定読込失敗または capability 解決不能で失敗した場合、composition root は capability ごとに独立した fail-closed stand-in adapter（obligation-fulfillment 用と waiver 用は別個）を接続する。各 stand-in は全呼出しで `VerifierPort` error を返して verdict を生成せず、判定基準・prompt の分離は fallback 経路でも維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "b820521ae5792f52d05b746286fce4be6385e80cdc5cb4384a759dcbd4cb7558",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- fast → final → 人間 の段階引き上げドライバ\n- capability → provider 解決（既に共有済み）\n\n検証器固有に残すのは: pair / 義務の型、対象集合の生成（citation 走査 vs 決定表導出）、スコープ解決、fail routing。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・prompt が異なるため（chain 別 prompt 分離と同じ論理）。各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。さらに、各検証 capability の解決が設定読込失敗または capability 解決不能で失敗した場合、composition root は capability ごとに独立した fail-closed stand-in adapter（obligation-fulfillment 用と waiver 用は別個）を接続する。各 stand-in は全呼出しで `VerifierPort` error を返して verdict を生成せず、判定基準・prompt の分離は fallback 経路でも維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "b820521ae5792f52d05b746286fce4be6385e80cdc5cb4384a759dcbd4cb7558",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "履行の意味論検証の実行（test pair + waiver pair）\n\nlenient / force 系フラグは採用しない — remove-lenient-and-force-flag-paths の既決方針に従い、解決不能な義務・不整合は finding + 非零 exit とし"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・prompt が異なるため（chain 別 prompt 分離と同じ論理）。各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。さらに、各検証 capability の解決が設定読込失敗または capability 解決不能で失敗した場合、composition root は capability ごとに独立した fail-closed stand-in adapter（obligation-fulfillment 用と waiver 用は別個）を接続する。各 stand-in は全呼出しで `VerifierPort` error を返して verdict を生成せず、判定基準・prompt の分離は fallback 経路でも維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D11"
         }
       }
     },

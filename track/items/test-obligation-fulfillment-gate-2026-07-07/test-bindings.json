@@ -1621,11 +1621,6 @@
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
-          "test_name": "render_prompt_embeds_all_three_pair_components"
-        },
-        {
-          "layer": "infrastructure",
           "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
           "test_name": "fast_tier_resolves_fast_model"
         },
@@ -1633,6 +1628,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
           "test_name": "pass_verdict_decodes_to_waived_with_citation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "fail_verdict_decodes_with_reason"
         },
         {
           "layer": "infrastructure",
@@ -1648,6 +1648,11 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::evaluate::tests",
           "test_name": "test_matching_waiver_cache_reuses_frozen_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_waiver_binding_uses_waiver_lane"
         },
         {
           "layer": "usecase",
@@ -1678,6 +1683,26 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
           "test_name": "test_waiver_verifier_fingerprint_hashes_prompt_preamble_only"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::test_obligation::tests",
+          "test_name": "test_composition_root_fails_closed_with_distinct_verifier_fallbacks"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::test_obligation::tests",
+          "test_name": "test_composition_root_wires_distinct_fallbacks_when_capabilities_unresolvable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "failing_verifier_returns_verifier_port_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "test_failing_waiver_verifier_for_each_pair_returns_fail_closed_port_error"
         }
       ]
     },
@@ -2976,6 +3001,16 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "test_failing_fulfillment_verifier_for_each_pair_returns_fail_closed_port_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "failing_verifier_never_emits_pass_verdict_so_no_uncited_pass_can_exist"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
           "test_name": "failing_verifier_returns_verifier_port_error"
         },
         {
@@ -3042,6 +3077,11 @@
           "layer": "cli_composition",
           "module_path": "cli_composition::test_obligation::tests",
           "test_name": "test_composition_root_fails_closed_with_distinct_verifier_fallbacks"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::test_obligation::tests",
+          "test_name": "test_composition_root_wires_distinct_fallbacks_when_capabilities_unresolvable"
         }
       ]
     },
@@ -3355,6 +3395,11 @@
           "layer": "cli_composition",
           "module_path": "cli_composition::test_obligation::tests",
           "test_name": "test_composition_root_fails_closed_with_distinct_verifier_fallbacks"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::test_obligation::tests",
+          "test_name": "test_composition_root_wires_distinct_fallbacks_when_capabilities_unresolvable"
         }
       ]
     },
@@ -5182,7 +5227,7 @@
       "reason": "At SemanticVerifierError × IN-09, this data carrier only provides type-level carriage and traceability; it makes no condition-to-observable-result promise. Process behavior is owned by CheckTestObligationsInteractor, DeriveTestObligationsInteractor, EvaluateTestObligationsInteractor, their handlers, and their adapters."
     },
     {
-      "kind": "waiver",
+      "kind": "voluntary_binding",
       "edge_id": {
         "entry_key": "SemanticVerifierError",
         "anchor_id": {
@@ -5190,7 +5235,33 @@
           "element_id": "IN-11"
         }
       },
-      "reason": "At SemanticVerifierError × IN-11, this data carrier only provides type-level carriage and traceability; it makes no condition-to-observable-result promise. Process behavior is owned by CheckTestObligationsInteractor, DeriveTestObligationsInteractor, EvaluateTestObligationsInteractor, their handlers, and their adapters."
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "failing_verifier_returns_verifier_port_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_verifier::tests",
+          "test_name": "failing_verifier_returns_verifier_port_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
+          "test_name": "failing_verifier_never_emits_pass_verdict_so_no_uncited_pass_can_exist"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::test_obligation::tests",
+          "test_name": "test_composition_root_fails_closed_with_distinct_verifier_fallbacks"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::test_obligation::tests",
+          "test_name": "test_composition_root_wires_distinct_fallbacks_when_capabilities_unresolvable"
+        }
+      ]
     },
     {
       "kind": "waiver",
@@ -5525,6 +5596,16 @@
           "layer": "cli_composition",
           "module_path": "cli_composition::test_obligation::tests",
           "test_name": "test_composition_root_resolves_separate_verifier_capabilities_for_each_tier"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::test_obligation::tests",
+          "test_name": "test_composition_root_fails_closed_with_distinct_verifier_fallbacks"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::test_obligation::tests",
+          "test_name": "test_composition_root_wires_distinct_fallbacks_when_capabilities_unresolvable"
         }
       ]
     },
@@ -9257,6 +9338,11 @@
         "layer": "cli_composition",
         "module_path": "cli_composition::test_obligation::tests",
         "test_name": "test_composition_root_fails_closed_with_distinct_verifier_fallbacks"
+      },
+      {
+        "layer": "cli_composition",
+        "module_path": "cli_composition::test_obligation::tests",
+        "test_name": "test_composition_root_wires_distinct_fallbacks_when_capabilities_unresolvable"
       },
       {
         "layer": "infrastructure",

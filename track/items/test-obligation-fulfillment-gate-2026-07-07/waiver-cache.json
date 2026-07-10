@@ -1124,25 +1124,6 @@
     },
     {
       "edge_id": {
-        "entry_key": "SemanticVerifierError",
-        "anchor_id": {
-          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "element_id": "IN-11"
-        }
-      },
-      "key": {
-        "waived_reason_hash": "7574119aa2128f852a55d6fdb9eaae6fee27ee66d11706d14eca3349c6812ced",
-        "declaration_hash": "f2d73940fa4797fb93ee730dbd59fa6577ac7b18d34151760a8a5075e24fe933",
-        "anchor_text_hash": "515b2ea9b6c7910f0fb748e2da17a06bb8c0422ea13910fed69ca64720c382ca"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "methods: [], generics: [], where_predicates: []"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
         "entry_key": "SpecDocumentLoadError",
         "anchor_id": {
           "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",

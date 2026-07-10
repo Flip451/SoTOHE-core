@@ -869,7 +869,7 @@ fn test_fulfilled_on_fast_counts_pass_without_escalation() {
     assert_eq!(outcome.pass_count(), 1);
     assert_eq!(outcome.fail_count(), 0);
     assert_eq!(outcome.known_bad_detection_rate().value(), 100);
-    assert_eq!(*h.fulfillment_driver.calibration_calls.lock().unwrap(), 1);
+    assert_eq!(*h.fulfillment_driver.calibration_calls.lock().unwrap(), 3);
     assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);
     // The verdict is frozen in the fulfillment cache.
     assert_eq!(h.fulfillment_cache.saved.lock().unwrap().clone().unwrap().entries().len(), 1);
@@ -900,10 +900,9 @@ fn test_stand_in_verifier_port_error_fails_closed_without_pass_verdict() {
 #[test]
 fn test_known_bad_probe_undetected_category_fails_closed_without_cache_save() {
     // AC-08: with the default 10% injection rate against a single production
-    // pair, the calibration issues exactly one probe (the contradiction
-    // shape, index 0). If the verifier fails to detect it, the per-category
-    // gate fires before the aggregate threshold check, names the missed
-    // category, and prevents the caches from being saved.
+    // pair, calibration issues all three category probes. If the verifier
+    // fails to detect any of them, the per-category gate fires before the
+    // aggregate threshold check and prevents the caches from being saved.
     let h = harness(
         Some(obligations_doc()),
         Some(fulfillment_bindings()),
@@ -921,35 +920,27 @@ fn test_known_bad_probe_undetected_category_fails_closed_without_cache_save() {
             Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message)))
                 if message.as_str().contains("known-bad calibration detected 0 probes for categories")
                     && message.as_str().contains("contradiction")
+                    && message.as_str().contains("substitution")
+                    && message.as_str().contains("central_unverified")
         ),
         "unexpected result: {result:?}"
     );
-    assert_eq!(*h.fulfillment_driver.calibration_calls.lock().unwrap(), 1);
+    assert_eq!(*h.fulfillment_driver.calibration_calls.lock().unwrap(), 3);
     assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());
     assert!(h.waiver_cache.saved.lock().unwrap().is_none());
 }
 
 #[test]
 fn test_calibration_probes_exercise_all_three_ac08_categories() {
-    // AC-08: any calibration run with `probe_count >= 3` must issue at
-    // least one probe per fulfillment-fail category — (a) contradiction,
-    // (b) substitution, (c) central-unverified — so the verifier's health
-    // signal reflects detection across the whole failure taxonomy.
-    //
-    // Three waiver bindings + injection_rate = 100 yields probe_count = 3,
-    // one per category (deterministic `index % 3` assignment).
-    let h = harness_with_read_models_and_config(
+    // AC-08: a one-production-pair run at the default 10% injection rate
+    // still issues at least one deterministic probe for each fulfillment-fail
+    // category before the verifier can be declared healthy.
+    let h = harness(
         Some(obligations_doc()),
-        Some(triple_waiver_bindings()),
+        Some(fulfillment_bindings()),
         fulfilled(),
         fulfilled(),
-        WaiverVerdict::Waived { citation: EvidenceCitation::try_new("stub".to_owned()).unwrap() },
-        Arc::new(StubScanner),
-        None,
-        None,
-        spec_doc(),
-        money_catalogue(),
-        config_with_rate(100),
+        WaiverVerdict::Pending,
     );
 
     let _ = run(h.interactor.execute(&command()));
@@ -1447,6 +1438,7 @@ fn test_absent_artifacts_yield_zero_pairs() {
     assert_eq!(outcome.pass_count(), 0);
     assert_eq!(outcome.fail_count(), 0);
     assert_eq!(outcome.pending_count(), 0);
+    assert_eq!(*h.fulfillment_driver.calibration_calls.lock().unwrap(), 0);
     assert!(h.fulfillment_cache.saved.lock().unwrap().clone().unwrap().entries().is_empty());
     assert!(h.waiver_cache.saved.lock().unwrap().clone().unwrap().entries().is_empty());
 }

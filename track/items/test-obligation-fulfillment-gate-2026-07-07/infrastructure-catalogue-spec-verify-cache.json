@@ -940,10 +940,10 @@
     },
     {
       "claim_hash": "97acadf41ddd37045b96f7b114903350d2212aebb17de1591b76bacc0910a79f",
-      "evidence_hash": "5da59f9485edd1ca1f266cac3333a0279d7012c6de1aca8feac7695c8aa44ea8",
+      "evidence_hash": "b820521ae5792f52d05b746286fce4be6385e80cdc5cb4384a759dcbd4cb7558",
       "verdict": {
         "kind": "pass",
-        "citation": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。... 各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。"
+        "citation": "さらに、各検証 capability の解決が設定読込失敗または capability 解決不能で失敗した場合、composition root は capability ごとに独立した fail-closed stand-in adapter（obligation-fulfillment 用と waiver 用は別個）を接続する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -958,7 +958,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-11",
-          "text_label": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・prompt が異なるため（chain 別 prompt 分離と同じ論理）。各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。"
+          "text_label": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・prompt が異なるため（chain 別 prompt 分離と同じ論理）。各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。さらに、各検証 capability の解決が設定読込失敗または capability 解決不能で失敗した場合、composition root は capability ごとに独立した fail-closed stand-in adapter（obligation-fulfillment 用と waiver 用は別個）を接続する。各 stand-in は全呼出しで `VerifierPort` error を返して verdict を生成せず、判定基準・prompt の分離は fallback 経路でも維持する。"
         }
       }
     },
@@ -1900,10 +1900,10 @@
     },
     {
       "claim_hash": "a40d0579a81afccbe5a3bf776ac733c1caad03abcc005f1bfc358779ca986d6b",
-      "evidence_hash": "5da59f9485edd1ca1f266cac3333a0279d7012c6de1aca8feac7695c8aa44ea8",
+      "evidence_hash": "b820521ae5792f52d05b746286fce4be6385e80cdc5cb4384a759dcbd4cb7558",
       "verdict": {
         "kind": "pass",
-        "citation": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。... `agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。"
+        "citation": "さらに、各検証 capability の解決が設定読込失敗または capability 解決不能で失敗した場合、composition root は capability ごとに独立した fail-closed stand-in adapter（obligation-fulfillment 用と waiver 用は別個）を接続する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1918,7 +1918,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-11",
-          "text_label": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・prompt が異なるため（chain 別 prompt 分離と同じ論理）。各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。"
+          "text_label": "obligation-fulfillment 検証 capability と waiver 検証 capability を `.harness/config/agent-profiles.json` に別 capability として新設する。前者はコード（テスト関数本体） → 自然言語（anchor 本文）の意味論比較、後者は自然言語（waived 理由） → 自然言語（anchor 本文 × entry 宣言）の意味論比較で、判定基準・prompt が異なるため（chain 別 prompt 分離と同じ論理）。各 capability は fast/final の段階引き上げ設定を独立に持ち、`agent-profiles.json` の `resolve_execution` 経路（既存機構）を再利用する。さらに、各検証 capability の解決が設定読込失敗または capability 解決不能で失敗した場合、composition root は capability ごとに独立した fail-closed stand-in adapter（obligation-fulfillment 用と waiver 用は別個）を接続する。各 stand-in は全呼出しで `VerifierPort` error を返して verdict を生成せず、判定基準・prompt の分離は fallback 経路でも維持する。"
         }
       }
     },
