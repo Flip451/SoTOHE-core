@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "df80f494c529be7d7248ca5c9ac7bb57c3428bad6b76513ed149823afabb70de",
+  "catalogue_declaration_hash": "ae35171e8d9e6a28302d3d889c9e863825adfddb6a83221d7579b19257b9f8d6",
   "signals": [
     {
       "type_name": "AnchorText",
@@ -90,7 +90,7 @@
     {
       "type_name": "ObligationCheckError",
       "signal": "blue",
-      "entry_hash": "1aee9d2a5748dd4ec82880a6916d73119d86b6ebe911a1a93b1fbeb14b8b80ff"
+      "entry_hash": "b2148561d7f49d8f377cffa9dad109efdfd9a0614e29182ae0f2a367241bb862"
     },
     {
       "type_name": "ObligationDeriveError",

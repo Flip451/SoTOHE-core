@@ -9,7 +9,7 @@ use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
     CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
 };
-use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
+use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
 use domain::tddd::catalogue_v2::{
     CatalogueDocument, CrateName, DeletionRecord, ModulePath, StructKind, StructShape, TraitEntry,
     TraitImplDeclV2, TraitName, TypeEntry, TypeKindV2, TypeName, TypeRef,
@@ -37,14 +37,16 @@ use domain::tddd::test_obligation::ports::{
     ObligationFulfillmentCachePort, ObligationsArtifactPort, TestBindingsArtifactPort,
     TestObligationRulesLoaderPort, TestSourceScannerPort, WaiverCachePort,
 };
-use domain::tddd::test_obligation::rules::TestObligationRulesDocument;
+use domain::tddd::test_obligation::rules::{RoleObligationRules, TestObligationRulesDocument};
 use domain::tddd::test_obligation::scope::UncitedSpecElementFinding;
 use domain::tddd::test_obligation::verdict::{
     ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheEntry,
     ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, WaiverCacheDocument,
     WaiverCacheEntry, WaiverCacheKey, WaiverVerdict,
 };
-use domain::tddd::test_obligation::vocab::{TargetEntryRoleKind, TestObligationKind};
+use domain::tddd::test_obligation::vocab::{
+    TargetEntryRoleKind, TestObligationKind, TestObligationPatternKind,
+};
 use domain::{
     ContentHash, EvidenceCitation, SpecDocument, SpecDocumentLoadError, SpecElementId, SpecRef,
     SpecRequirement, SpecScope, TrackId,
@@ -67,12 +69,28 @@ const BODY: &str = "assert!(money.is_positive());";
 // Test doubles
 // ---------------------------------------------------------------------------
 
-struct StubRules;
+struct StubRules {
+    doc: TestObligationRulesDocument,
+}
+impl StubRules {
+    fn valid() -> Self {
+        Self { doc: rules_doc() }
+    }
+}
 impl TestObligationRulesLoaderPort for StubRules {
     fn load(&self) -> Result<TestObligationRulesDocument, TestObligationRulesLoadError> {
-        // `check` never invokes the rules loader; a loud error surfaces misuse.
+        // IN-08: `check` loads-and-validates the rules doc; the drift / totality
+        // / freshness lanes downstream are rule-content-independent, so a valid
+        // doc is enough for the existing test fixtures.
+        Ok(self.doc.clone())
+    }
+}
+
+struct FailingRules;
+impl TestObligationRulesLoaderPort for FailingRules {
+    fn load(&self) -> Result<TestObligationRulesDocument, TestObligationRulesLoadError> {
         Err(TestObligationRulesLoadError::RoleNotCovered {
-            role_name: RoleName::try_new("unused".to_owned()).unwrap(),
+            role_name: RoleName::try_new("ValueObject".to_owned()).unwrap(),
         })
     }
 }
@@ -161,6 +179,61 @@ impl CatalogueDocumentLoaderPort for FailingCatalogue {
 // ---------------------------------------------------------------------------
 // Fixtures
 // ---------------------------------------------------------------------------
+
+/// Canonical `DataRole` variant names the rules document must cover.
+///
+/// Kept in-sync with `EXPECTED_DATA_ROLE_NAMES` in
+/// `domain::tddd::test_obligation::rules`. A totality gap here surfaces as a
+/// `RoleNotCovered` load error, so the fixture stays load-valid without
+/// implying any obligation-derivation content (the check gate's rules-load
+/// contract is load-and-validate only — IN-08).
+const DATA_ROLE_NAMES: &[&str] = &[
+    "ValueObject",
+    "Entity",
+    "AggregateRoot",
+    "DomainService",
+    "Specification",
+    "Factory",
+    "UseCase",
+    "Interactor",
+    "Command",
+    "Query",
+    "Dto",
+    "ErrorType",
+    "SecondaryAdapter",
+    "EventPolicy",
+    "DomainEvent",
+    "CompositionRoot",
+    "PrimaryAdapter",
+];
+
+/// Canonical `ContractRole` variant names the rules document must cover.
+const CONTRACT_ROLE_NAMES: &[&str] =
+    &["SpecificationPort", "ApplicationService", "SecondaryPort", "Repository"];
+
+/// Minimal valid rules document: every role covered with an explicitly empty
+/// rule list. The check gate's rules-load contract is load-and-validate only
+/// (IN-08); no downstream lane inspects the rules content.
+fn rules_doc() -> TestObligationRulesDocument {
+    let empty = || RoleObligationRules::new(vec![]);
+    let data_roles: Vec<(DataRole, RoleObligationRules)> =
+        DATA_ROLE_NAMES.iter().map(|n| (n.parse::<DataRole>().unwrap(), empty())).collect();
+    let contract_roles: Vec<(ContractRole, RoleObligationRules)> =
+        CONTRACT_ROLE_NAMES.iter().map(|n| (n.parse::<ContractRole>().unwrap(), empty())).collect();
+    let function_roles =
+        vec![(FunctionRole::FreeFunction, empty()), (FunctionRole::UseCaseFunction, empty())];
+    let patterns = vec![(TestObligationPatternKind::Typestate, empty())];
+    let trait_impls: Vec<(ContractRole, RoleObligationRules)> =
+        CONTRACT_ROLE_NAMES.iter().map(|n| (n.parse::<ContractRole>().unwrap(), empty())).collect();
+    TestObligationRulesDocument::try_new(
+        data_roles,
+        contract_roles,
+        function_roles,
+        patterns,
+        trait_impls,
+    )
+    .unwrap()
+}
 
 fn track() -> TrackId {
     TrackId::try_new("my-track").unwrap()
@@ -459,7 +532,7 @@ fn interactor_with_scanner(
     scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
 ) -> CheckTestObligationsInteractor {
     CheckTestObligationsInteractor::new(
-        Arc::new(StubRules),
+        Arc::new(StubRules::valid()),
         Arc::new(StubObligations(obligations)),
         Arc::new(StubBindings(bindings)),
         scanner,
@@ -470,9 +543,24 @@ fn interactor_with_scanner(
     )
 }
 
+fn interactor_with_rules_loader(
+    rules_loader: Arc<dyn TestObligationRulesLoaderPort + Send + Sync>,
+) -> CheckTestObligationsInteractor {
+    CheckTestObligationsInteractor::new(
+        rules_loader,
+        Arc::new(StubObligations(None)),
+        Arc::new(StubBindings(None)),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(None)),
+        Arc::new(StubWaiverCache(None)),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+    )
+}
+
 fn empty_scope_interactor_without_readers() -> CheckTestObligationsInteractor {
     CheckTestObligationsInteractor::new(
-        Arc::new(StubRules),
+        Arc::new(StubRules::valid()),
         Arc::new(StubObligations(None)),
         Arc::new(StubBindings(None)),
         Arc::new(StubScanner),
@@ -838,4 +926,18 @@ fn test_runs_regardless_of_branch() {
     ));
     let outcome = interactor(None, None, None, None).execute(&cmd).unwrap();
     assert!(outcome.resolved_edges().is_empty());
+}
+
+#[test]
+fn test_rules_load_failure_fails_closed_before_any_stage() {
+    // IN-08: a malformed / role-incomplete rules config aborts `check` up front
+    // so a stale obligations / bindings / cache set can never silently pass.
+    // The downstream stages must not be reached — the fail-closed load runs
+    // before the artifact-existence scope resolution and any drift / totality
+    // / freshness gate below.
+    let result = interactor_with_rules_loader(Arc::new(FailingRules)).execute(&command());
+    assert!(matches!(
+        result,
+        Err(ObligationCheckError::RulesLoad(TestObligationRulesLoadError::RoleNotCovered { .. }))
+    ));
 }

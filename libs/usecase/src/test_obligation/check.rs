@@ -1,15 +1,18 @@
 //! `bin/sotp test-obligation check` — pure-read totality + drift gate.
 //!
-//! [`CheckTestObligationsInteractor`] deterministically verifies (IN-08): every
-//! derived obligation is bound and its tests exist (`missing` / `orphaned`
-//! existence drift — IN-13), every ref edge resolves to a fulfilled / waived
-//! verdict (totality — CN-02), and every resolving verdict is fresh against the
-//! current three-hash key (`spec_changed` / `decl_changed` / `test_changed` /
-//! `reason_changed` freshness drift — CN-04 / AC-04). Scope is resolved by
-//! artifact existence (IN-14 / AC-10): both absent passes with zero pairs, a
-//! half-materialised scope is fail-closed. Uncited `AC` / `CN` spec elements are
-//! surfaced as findings (IN-16 / AC-13). The gate never recomputes freshness
-//! from source alone — recovery is `evaluate`'s job (CN-04).
+//! [`CheckTestObligationsInteractor`] deterministically verifies (IN-08): the
+//! decision-table config loads and validates (fail-closed on malformed /
+//! role-incomplete `.harness/config/test-obligation-rules.json` so `check`
+//! cannot silently pass on stale obligations / bindings / caches — IN-08),
+//! every derived obligation is bound and its tests exist (`missing` /
+//! `orphaned` existence drift — IN-13), every ref edge resolves to a fulfilled
+//! / waived verdict (totality — CN-02), and every resolving verdict is fresh
+//! against the current three-hash key (`spec_changed` / `decl_changed` /
+//! `test_changed` / `reason_changed` freshness drift — CN-04 / AC-04). Scope is
+//! resolved by artifact existence (IN-14 / AC-10): both absent passes with zero
+//! pairs, a half-materialised scope is fail-closed. Uncited `AC` / `CN` spec
+//! elements are surfaced as findings (IN-16 / AC-13). The gate never recomputes
+//! freshness from source alone — recovery is `evaluate`'s job (CN-04).
 
 // `ObligationCheckError` carries unboxed non-empty payloads (`NonEmptyDrifts` /
 // `NonEmptyEdgeIds`) per the catalogue contract, which makes the `Err` variant
@@ -123,8 +126,6 @@ pub trait CheckTestObligationsApplicationService {
 
 /// Interactor implementing [`CheckTestObligationsApplicationService`] (IN-08).
 pub struct CheckTestObligationsInteractor {
-    #[allow(dead_code)]
-    // reserved for role-aware drift messaging; the gate is rule-independent today
     rules_loader: Arc<dyn TestObligationRulesLoaderPort + Send + Sync>,
     obligations_port: Arc<dyn ObligationsArtifactPort + Send + Sync>,
     bindings_port: Arc<dyn TestBindingsArtifactPort + Send + Sync>,
@@ -213,6 +214,16 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
         // `check` is pure-read (IN-08) and carries no active-branch guard: it may
         // run on any branch (e.g. CI on a detached HEAD), unlike the write-side
         // `derive` / `evaluate` commands.
+
+        // Fail-closed rules-load gate (IN-08): the decision-table config must
+        // load and validate before any downstream stage runs, so a malformed or
+        // role-incomplete `.harness/config/test-obligation-rules.json` cannot let
+        // the gate silently pass on stale obligations / bindings / caches. The
+        // loaded document is intentionally not consumed further — the check
+        // gate's contract addition is load-and-validate only; drift / totality
+        // / freshness lanes below remain rules-content-independent.
+        let _rules_document = self.rules_loader.load().map_err(ObligationCheckError::RulesLoad)?;
+
         let obligations = self
             .obligations_port
             .load(cmd.input.track_id())

@@ -152,7 +152,9 @@ waiver は **implementer が author し、LLM が検証する**——spec / cata
 
 waiver 検証が reject した場合は implementer に差し戻す（理由を書き直すか、テストを書いて 自発的 binding で結ぶ）。上流の欠陥——cite している entry の宣言不足、カタログの被覆漏れ——が疑われる場合は、rollback-diagnoser と同型の back-and-forth routing で type-designer へ回す。
 
-**義務導出の決定表の欠陥は track のブロッカーにしない**。解決手段は2層あり、いずれも利用者側で完結する: (1) **ルールレベル**——決定表は利用者所有の config（D10）であり、表の漏れ・自プロジェクト向けの調整は config 編集で解決する（template default への還流報告は任意）。(2) **一回性の edge レベル**——config を歪めたくない単発の事例では、義務が導出されていない edge にテストを直接結ぶ（**自発的 binding**・D9）。検証は通常の fulfillment pair と同一機構で行われ、後に表が更新されて正規の義務が導出されれば、自発的 binding はその履行として引き継がれる。利用者の track が tooling 内部の修正でブロックされる routing は存在しない。
+**義務導出の決定表の内容レベルの欠陥（表の漏れ・自プロジェクト向けの調整必要性など、design axis）は track のブロッカーにしない**。解決手段は2層あり、いずれも利用者側で完結する: (1) **ルールレベル**——決定表は利用者所有の config（D10）であり、表の漏れ・自プロジェクト向けの調整は config 編集で解決する（template default への還流報告は任意）。(2) **一回性の edge レベル**——config を歪めたくない単発の事例では、義務が導出されていない edge にテストを直接結ぶ（**自発的 binding**・D9）。検証は通常の fulfillment pair と同一機構で行われ、後に表が更新されて正規の義務が導出されれば、自発的 binding はその履行として引き継がれる。利用者の track が tooling 内部の修正でブロックされる routing は存在しない。
+
+**config 自体の構造的破綻は別 axis で fail-closed に block する**——本項の非ブロッカー扱いは決定表の**内容**（policy の設計判断）を対象とする話であって、D10 が定める config の **load-time 構造検証**（未知 role・欠落 role、malformed JSON、per 軸語彙違反、domain newtype 構築失敗など、structural axis）を弱めない。structural axis の失敗は「表の内容以前に、config を義務導出関数に食わせられない」状態であり、`derive` / `check` は fail-closed で reject する（軸の切り分けは D10 に定める）。
 
 **会計単位は edge（entry × cite 先 anchor、種別を問わない・D3）であり、全 ref edge を評価対象とする**。各 edge は必ず verdict {fulfilled / waived / fail} のいずれかに解決される（D2 の edge 会計）。waived は「0 件 entry 専用の別レーン」ではなく全 edge に共通の解消の一種である。義務を持つ entry でも、その全 edge がテストで解消されるとは限らない: 例えば UseCase entry が、result 義務の対象である AC に加えて、この機能の目的を述べる GO も cite している場合、AC への edge は fulfilled（テストで解消）を要するが、GO への edge は implementer が author した waived 理由（「この anchor は設計目的の記述であり、この edge に検証すべき振る舞いの約束は含まれない」）が waiver 検証を pass して解消されうる。waived が成立するかは種別ではなく、author された理由に対する verdict の判断による（D3 / D4）。1つの anchor の約束は、cite する entry ごとに関わる部分が異なり得る（例: 「拒否し、かつ記録する」という anchor に対し、guard entry に関わるのは拒否、telemetry entry に関わるのは記録）。したがって、anchor が entry E2 の edge で fulfilled になっていても、それは「約束のうち E2 に関わる部分が E2 のテストで検証された」ことしか意味しない。別の entry E1 が同じ anchor を cite しているなら、「約束のうち E1 に関わる部分」は edge (E1, anchor) 自身の verdict でしか解消されない——他の edge の結果を理由に edge の評価を省略してはならない（anchor 単位への縮約の却下は Rejected E）。どの entry からも cite されていない `AC` / `CN` は「edge ゼロ」として決定論的 finding とする（範囲の根拠は D3）。コストは edge 単位の hash 凍結（D6）で抑える。
 
@@ -175,7 +177,7 @@ waiver 検証が reject した場合は implementer に差し戻す（理由を�
 | evidence | SoT ノード断片 | **edge**（entry 宣言 × anchor 本文の対） |
 | 対象集合 | 人が author した citation | 決定表から**導出**された義務集合（entry 単位） + edge 会計の totality（D4） |
 | キャッシュキー | (claim_hash, evidence_hash) の対 | test pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash) の**三つ組** |
-| fail routing | claim ノードの writer へ一意に差し戻し | テスト不備・理由不備→implementer / cite・宣言不備→type-designer / anchor 検証不能→spec-designer に分岐。決定表の欠陥は非ブロッカー（利用者所有の config の編集、または自発的 binding で解消・D4） |
+| fail routing | claim ノードの writer へ一意に差し戻し | テスト不備・理由不備→implementer / cite・宣言不備→type-designer / anchor 検証不能→spec-designer に分岐。決定表の**内容**欠陥（漏れ・調整）は非ブロッカー（利用者所有の config の編集、または自発的 binding で解消・D4）。決定表の**構造**欠陥（malformed JSON / role-totality 違反等の load-time 検証、D10）は本 routing の対象外で、`derive` / `check` が fail-closed に block する |
 
 **判定は edge 局所である**: fulfillment 判定の対象は「anchor の約束のうち、当該 entry の宣言に関わる部分」であり、他 entry の責務に属する部分の未検証を fail 理由にしない（それは当該他 entry の edge の問題であり、その edge が存在しない場合は D4 の保証境界の外）。判定器は他の edge の存在・不在を前提にしない（waiver 検証も同様: waived 理由は edge 局所で自己完結していることが求められる・D4）。
 

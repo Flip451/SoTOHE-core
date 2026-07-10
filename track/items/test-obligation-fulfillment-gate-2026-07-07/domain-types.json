@@ -2787,11 +2787,20 @@
     },
     "ObligationCheckError": {
       "action": "add",
-      "docs": "Failure modes of `sotp test-obligation check` (D11 / IN-08 / AC-04 / AC-05 / AC-10 / CN-04).",
+      "docs": "Rules-load and artifact / freshness failure modes for `sotp test-obligation check` (D11 / IN-08 / AC-04 / AC-05 / AC-10 / CN-04).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
         "variants": [
+          {
+            "name": "RulesLoad",
+            "payload": {
+              "fields": [
+                "TestObligationRulesLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
           {
             "name": "ObligationsAbsent",
             "payload": {

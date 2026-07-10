@@ -121,6 +121,11 @@ pub enum ObligationDeriveError {
 /// Failure of `test-obligation check` (IN-08 / AC-04 / AC-10).
 #[derive(Debug)]
 pub enum ObligationCheckError {
+    /// The decision-table config failed load-time validation. `check` loads and
+    /// validates the rules document up front so a malformed or role-incomplete
+    /// `.harness/config/test-obligation-rules.json` fails closed instead of
+    /// silently passing on stale obligations / bindings / caches (IN-08).
+    RulesLoad(TestObligationRulesLoadError),
     /// The obligations artifact is absent while the test-bindings artifact is
     /// present (half-materialised scope, fail-closed — AC-10).
     ObligationsAbsent,
@@ -338,6 +343,9 @@ mod tests {
         // `SpecLoad(SpecDocumentLoadError)` is omitted: the error's field is
         // private to its own module and cannot be constructed here.
         let variants: Vec<ObligationCheckError> = vec![
+            ObligationCheckError::RulesLoad(TestObligationRulesLoadError::RoleNotCovered {
+                role_name: RoleName::try_new("ValueObject".to_owned()).unwrap(),
+            }),
             ObligationCheckError::ObligationsAbsent,
             ObligationCheckError::BindingsAbsent,
             ObligationCheckError::DriftsDetected { drifts: NonEmptyDrifts::new(drift(), vec![]) },
@@ -349,7 +357,7 @@ mod tests {
             ObligationCheckError::SourceScan(TestSourceScanError::Io(diag("io"))),
             ObligationCheckError::CacheIo(VerifyCacheError::Io(diag("io"))),
         ];
-        assert_eq!(variants.len(), 10);
+        assert_eq!(variants.len(), 11);
         assert!(variants.iter().all(|v| !format!("{v:?}").is_empty()));
     }
 
