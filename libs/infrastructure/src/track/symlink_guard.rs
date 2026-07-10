@@ -5,6 +5,46 @@
 
 use std::path::Path;
 
+/// Rejects symlinks at the given path AND every ancestor above it, walking up to
+/// the filesystem root (or to the empty tail for a relative path).
+///
+/// Unlike [`reject_symlinks_below`], this helper has no trusted root: a symlink at
+/// any ancestor would silently redirect the anchor to an untrusted location, so
+/// every component from the leaf to the top of the path must be verified. Missing
+/// components (leaf or ancestor) are treated as OK so a downstream save may still
+/// create the directory. Intended for validating a "trusted anchor" directory
+/// (e.g., a track-items root) before it is used as the base of subsequent
+/// [`reject_symlinks_below`] checks.
+///
+/// Returns `Ok(())` when no component is a symlink,
+/// `Err` if any component is a symlink or cannot be inspected.
+pub(crate) fn reject_symlinks_up_to_root(path: &Path) -> Result<(), std::io::Error> {
+    for ancestor in path.ancestors() {
+        if ancestor.as_os_str().is_empty() {
+            break;
+        }
+        match ancestor.symlink_metadata() {
+            Ok(meta) if meta.file_type().is_symlink() => {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::InvalidInput,
+                    format!("refusing to follow symlink: {}", ancestor.display()),
+                ));
+            }
+            Ok(_) => {}
+            // Missing components are OK — the caller may create them later, and a
+            // still-unmaterialised ancestor cannot yet be a symlink.
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+            Err(e) => {
+                return Err(std::io::Error::new(
+                    e.kind(),
+                    format!("failed to stat {}: {e}", ancestor.display()),
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
 /// Rejects symlinks at the leaf path and every ancestor up to (but not including) the root.
 ///
 /// `trusted_root` is assumed safe (e.g., CLI composition root). Only components
@@ -138,5 +178,51 @@ mod tests {
 
         let result = reject_symlinks_below(&link.join("deep/test.json"), dir.path());
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_up_to_root_regular_leaf_accepted() {
+        let dir = tempfile::tempdir().unwrap();
+        let leaf = dir.path().join("real-leaf");
+        std::fs::create_dir_all(&leaf).unwrap();
+
+        assert!(reject_symlinks_up_to_root(&leaf).is_ok());
+    }
+
+    #[test]
+    fn test_up_to_root_missing_leaf_accepted() {
+        let dir = tempfile::tempdir().unwrap();
+        let missing = dir.path().join("does-not-exist");
+
+        assert!(reject_symlinks_up_to_root(&missing).is_ok());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_up_to_root_symlinked_leaf_rejected() {
+        let dir = tempfile::tempdir().unwrap();
+        let real = dir.path().join("real");
+        let link = dir.path().join("link");
+        std::fs::create_dir_all(&real).unwrap();
+        std::os::unix::fs::symlink(&real, &link).unwrap();
+
+        let err = reject_symlinks_up_to_root(&link).unwrap_err();
+        assert!(err.to_string().contains("refusing to follow symlink"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_up_to_root_symlinked_parent_rejected() {
+        let dir = tempfile::tempdir().unwrap();
+        let real_parent = dir.path().join("real-parent");
+        std::fs::create_dir_all(real_parent.join("child")).unwrap();
+        let link_parent = dir.path().join("link-parent");
+        std::os::unix::fs::symlink(&real_parent, &link_parent).unwrap();
+
+        // Leaf resolves to a real dir via the symlinked parent, but the ancestor
+        // walk still detects the parent-level symlink.
+        let leaf = link_parent.join("child");
+        let err = reject_symlinks_up_to_root(&leaf).unwrap_err();
+        assert!(err.to_string().contains("refusing to follow symlink"));
     }
 }

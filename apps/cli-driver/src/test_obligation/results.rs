@@ -76,6 +76,9 @@ impl TestObligationResultsHandler {
                         lane.pending_count()
                     ));
                 }
+                for record in output.records() {
+                    text.push_str(&format!("record={record:?}\n"));
+                }
                 text.push_str(&format!(
                     "records={} uncited_findings={}",
                     output.records().len(),
@@ -93,7 +96,13 @@ impl TestObligationResultsHandler {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use usecase::test_obligation::results::TestObligationResultsOutput;
+    use usecase::DiagnosticMessage;
+    use usecase::LayerId;
+    use usecase::test_obligation::results::{
+        CatalogueEntryKey, EdgeResolutionOutcome, EdgeVerdictRecord, FulfillmentFailCategory,
+        TestObligationAnchorId, TestObligationDrift, TestObligationEdgeId, TestObligationId,
+        TestObligationItemIdentifier, TestObligationKind, TestObligationResultsOutput,
+    };
 
     use super::*;
 
@@ -121,5 +130,178 @@ mod tests {
 
         assert_eq!(outcome.exit_code, 0);
         assert!(outcome.stdout.unwrap().contains("records=0"));
+    }
+
+    #[test]
+    fn test_results_handler_renders_per_lane_counts() {
+        struct DetailedStubService;
+
+        impl TestObligationResultsApplicationService for DetailedStubService {
+            fn execute(
+                &self,
+                _cmd: &TestObligationResultsCommand,
+            ) -> Result<
+                TestObligationResultsOutput,
+                usecase::test_obligation::errors::ObligationResultsError,
+            > {
+                Ok(TestObligationResultsOutput::new(
+                    vec![usecase::test_obligation::results::TestObligationLaneSummary::new(
+                        usecase::test_obligation::results::TestObligationChainLabel::Fulfillment,
+                        LayerId::try_new("infrastructure".to_owned()).unwrap(),
+                        1,
+                        1,
+                        0,
+                    )],
+                    Vec::new(),
+                    Vec::new(),
+                ))
+            }
+        }
+
+        let handler = TestObligationResultsHandler::new(Arc::new(DetailedStubService));
+        let input = TestObligationResultsInput::new(Some(TrackId::try_new("test-track").unwrap()));
+
+        let outcome = handler.handle(input);
+
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.unwrap();
+        assert!(stdout.contains("Fulfillment:infrastructure pass=1 fail=1 pending=0"));
+        assert!(stdout.ends_with("records=0 uncited_findings=0"));
+    }
+
+    #[test]
+    fn test_results_handler_renders_failing_record_detail() {
+        struct DetailedStubService;
+
+        impl TestObligationResultsApplicationService for DetailedStubService {
+            fn execute(
+                &self,
+                _cmd: &TestObligationResultsCommand,
+            ) -> Result<
+                TestObligationResultsOutput,
+                usecase::test_obligation::errors::ObligationResultsError,
+            > {
+                let edge = TestObligationEdgeId::new(
+                    CatalogueEntryKey::try_new("domain::Money".to_owned()).unwrap(),
+                    TestObligationAnchorId::try_new("spec.json".to_owned(), "AC-09".to_owned())
+                        .unwrap(),
+                );
+                let drift = TestObligationDrift::reason_changed_edge(
+                    edge.clone(),
+                    DiagnosticMessage::try_new("changed waiver reason".to_owned()).unwrap(),
+                );
+                Ok(TestObligationResultsOutput::new(
+                    Vec::new(),
+                    vec![EdgeVerdictRecord::new(
+                        None,
+                        edge,
+                        None,
+                        None,
+                        EdgeResolutionOutcome::Fail(FulfillmentFailCategory::Contradiction),
+                        None,
+                        Some(drift),
+                    )],
+                    Vec::new(),
+                ))
+            }
+        }
+
+        let handler = TestObligationResultsHandler::new(Arc::new(DetailedStubService));
+        let input = TestObligationResultsInput::new(Some(TrackId::try_new("test-track").unwrap()));
+
+        let outcome = handler.handle(input);
+
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.unwrap();
+        assert!(stdout.contains("record=EdgeVerdictRecord"));
+        assert!(stdout.contains("domain::Money"));
+        assert!(stdout.contains("AC-09"));
+        assert!(stdout.contains("Fail(Contradiction)"));
+        assert!(stdout.contains("ReasonChanged"));
+        assert!(stdout.contains("changed waiver reason"));
+    }
+
+    #[test]
+    fn test_results_handler_renders_record_claim_evidence_verdict_and_reason() {
+        struct DetailedStubService;
+
+        impl TestObligationResultsApplicationService for DetailedStubService {
+            fn execute(
+                &self,
+                _cmd: &TestObligationResultsCommand,
+            ) -> Result<
+                TestObligationResultsOutput,
+                usecase::test_obligation::errors::ObligationResultsError,
+            > {
+                let edge = TestObligationEdgeId::new(
+                    CatalogueEntryKey::try_new("domain::Invoice".to_owned()).unwrap(),
+                    TestObligationAnchorId::try_new(
+                        "track/spec.json".to_owned(),
+                        "AC-09".to_owned(),
+                    )
+                    .unwrap(),
+                );
+                let drift = TestObligationDrift::reason_changed_edge(
+                    edge.clone(),
+                    DiagnosticMessage::try_new("evidence no longer matches the claim".to_owned())
+                        .unwrap(),
+                );
+                let obligation_id = TestObligationId::new(
+                    CatalogueEntryKey::try_new("domain::Invoice".to_owned()).unwrap(),
+                    TestObligationKind::Boundary,
+                    TestObligationItemIdentifier::try_new("invariant:non_empty".to_owned())
+                        .unwrap(),
+                );
+                Ok(TestObligationResultsOutput::new(
+                    Vec::new(),
+                    vec![EdgeVerdictRecord::new(
+                        Some(obligation_id),
+                        edge,
+                        Some(
+                            DiagnosticMessage::try_new("fulfillment binding".to_owned()).unwrap(),
+                        ),
+                        Some(
+                            DiagnosticMessage::try_new(
+                                "cli_driver::test_obligation::results::tests::test_results_handler_renders_record_claim_evidence_verdict_and_reason"
+                                    .to_owned(),
+                            )
+                            .unwrap(),
+                        ),
+                        EdgeResolutionOutcome::Fail(FulfillmentFailCategory::CentralUnverified),
+                        Some(
+                            DiagnosticMessage::try_new(
+                                "entry-relevant proof is missing".to_owned(),
+                            )
+                            .unwrap(),
+                        ),
+                        Some(drift),
+                    )],
+                    Vec::new(),
+                ))
+            }
+        }
+
+        let handler = TestObligationResultsHandler::new(Arc::new(DetailedStubService));
+        let input = TestObligationResultsInput::new(Some(TrackId::try_new("test-track").unwrap()));
+
+        let outcome = handler.handle(input);
+
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.unwrap();
+        assert!(stdout.contains("entry_key: CatalogueEntryKey(\"domain::Invoice\")"));
+        assert!(stdout.contains("invariant:non_empty"));
+        assert!(stdout.contains("file_path: \"track/spec.json\""));
+        assert!(stdout.contains("element_id: \"AC-09\""));
+        assert!(stdout.contains("claim_source: Some(DiagnosticMessage(\"fulfillment binding\"))"));
+        assert!(stdout.contains(
+            "evidence_source: Some(DiagnosticMessage(\"cli_driver::test_obligation::results::tests::test_results_handler_renders_record_claim_evidence_verdict_and_reason\"))"
+        ));
+        assert!(stdout.contains("outcome: Fail(CentralUnverified)"));
+        assert!(stdout.contains(
+            "verdict_reason: Some(DiagnosticMessage(\"entry-relevant proof is missing\"))"
+        ));
+        assert!(
+            stdout.contains("detail: DiagnosticMessage(\"evidence no longer matches the claim\")")
+        );
     }
 }

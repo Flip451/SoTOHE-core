@@ -209,7 +209,18 @@ impl ObligationsArtifactPort for JsonObligationsCodec {
         })?;
         let dto: ObligationsDocumentDto = serde_json::from_str(&content)
             .map_err(|e| ArtifactCodecError::MalformedJson(diagnostic(&e.to_string())))?;
-        Ok(Some(dto.into_domain()?))
+        let doc = dto.into_domain()?;
+        // Fail closed when the on-disk artifact was copied from another track: a
+        // matching filename is not proof of matching content, and the caller
+        // trusts a `load(track_id)` result to describe exactly that track.
+        if doc.track_id() != track_id {
+            return Err(ArtifactCodecError::DomainInvariant(diagnostic(&format!(
+                "obligations artifact track id mismatch: requested '{}', got '{}'",
+                track_id.as_ref(),
+                doc.track_id().as_ref()
+            ))));
+        }
+        Ok(Some(doc))
     }
 
     fn save(&self, doc: &ObligationsDocument) -> Result<(), DiagnosticMessage> {
@@ -487,6 +498,53 @@ mod tests {
         assert_eq!(id.item_identifier().as_str(), "invariant:non_empty");
     }
 
+    // IN-05: the shared semantic-verify DTO preserves every catalogue section
+    // vocabulary value used to locate an obligation target.
+    #[test]
+    fn test_catalogue_entry_ref_dto_round_trips_each_section_key() {
+        for (section_key, expected_wire) in [
+            (CatalogueSectionKey::Types, "types"),
+            (CatalogueSectionKey::Traits, "traits"),
+            (CatalogueSectionKey::Functions, "functions"),
+        ] {
+            let entry = CatalogueEntryRef::new(
+                "track/items/x/domain-types.json".to_owned(),
+                section_key,
+                CatalogueEntryKey::try_new("domain::User".to_owned()).unwrap(),
+            );
+
+            let dto = CatalogueEntryRefDto::from_domain(&entry);
+            let wire = serde_json::to_value(&dto).unwrap();
+
+            assert_eq!(wire["section_key"], expected_wire);
+            assert_eq!(dto.into_domain().unwrap(), entry);
+        }
+    }
+
+    // IN-05: the obligation-kind DTO exposes the complete closed wire
+    // vocabulary and maps every value back to its domain counterpart.
+    #[test]
+    fn test_obligation_kind_dto_round_trips_every_variant() {
+        for (kind, expected_wire) in [
+            (TestObligationKind::Boundary, "boundary"),
+            (TestObligationKind::InvariantPreservation, "invariant_preservation"),
+            (TestObligationKind::EventEmission, "event_emission"),
+            (TestObligationKind::LogicResult, "logic_result"),
+            (TestObligationKind::PredicateBothBranches, "predicate_both_branches"),
+            (TestObligationKind::ConstructionResult, "construction_result"),
+            (TestObligationKind::Result, "result"),
+            (TestObligationKind::Reaction, "reaction"),
+            (TestObligationKind::Transition, "transition"),
+            (TestObligationKind::Contract, "contract"),
+            (TestObligationKind::ContractConformance, "contract_conformance"),
+            (TestObligationKind::Logic, "logic"),
+        ] {
+            let dto = kind_to_dto(&kind);
+            assert_eq!(serde_json::to_string(&dto).unwrap(), format!("\"{expected_wire}\""));
+            assert_eq!(kind_from_dto(dto), kind);
+        }
+    }
+
     // IN-05: every target-role section variant round-trips through the wire form.
     #[test]
     fn test_all_target_role_variants_round_trip() {
@@ -573,5 +631,63 @@ mod tests {
         let codec = JsonObligationsCodec::new(dir.path().to_path_buf());
         let loaded = codec.load(&TrackId::try_new("absent-track").unwrap()).unwrap();
         assert!(loaded.is_none());
+    }
+
+    // IN-05 / CN-04: a symlinked *ancestor* of the items root (not just the leaf)
+    // must be rejected — otherwise `lstat(items_dir)` follows the parent symlink
+    // and returns the redirected leaf's metadata, letting the codec read / write
+    // outside the worktree.
+    #[cfg(unix)]
+    #[test]
+    fn test_codec_symlinked_items_root_ancestor_is_rejected() {
+        let dir = tempfile::tempdir().unwrap();
+        let real_track = dir.path().join("real-track");
+        std::fs::create_dir_all(real_track.join("items")).unwrap();
+        let track_link = dir.path().join("track-link");
+        std::os::unix::fs::symlink(&real_track, &track_link).unwrap();
+
+        // items_dir points at a real directory *through* the symlinked parent.
+        let items_via_link = track_link.join("items");
+        let codec = JsonObligationsCodec::new(items_via_link);
+        let doc = sample_document();
+
+        match codec.load(doc.track_id()) {
+            Err(ArtifactCodecError::Io(message)) => {
+                assert!(message.as_str().contains("symlinked track items root"));
+            }
+            other => panic!("expected symlinked ancestor load error, got {other:?}"),
+        }
+        let save_error = codec.save(&doc).unwrap_err();
+        assert!(save_error.as_str().contains("symlinked track items root"));
+    }
+
+    // CN-04: an obligations artifact whose embedded `track_id` disagrees with the
+    // requested id must not be returned — a copy from another track would
+    // otherwise satisfy or block the gate on unrelated data.
+    #[test]
+    fn test_codec_load_rejects_track_id_mismatch() {
+        let dir = tempfile::tempdir().unwrap();
+        let codec = JsonObligationsCodec::new(dir.path().to_path_buf());
+        // Save under the document's own track id.
+        let doc = sample_document();
+        codec.save(&doc).unwrap();
+
+        // Move the saved artifact into a different track's directory so the
+        // requested id does not match the document body.
+        let other_track = TrackId::try_new("other-track").unwrap();
+        let source = dir.path().join(doc.track_id().as_ref()).join(OBLIGATIONS_ARTIFACT);
+        let target_dir = dir.path().join(other_track.as_ref());
+        std::fs::create_dir_all(&target_dir).unwrap();
+        std::fs::rename(&source, target_dir.join(OBLIGATIONS_ARTIFACT)).unwrap();
+
+        match codec.load(&other_track) {
+            Err(ArtifactCodecError::DomainInvariant(message)) => {
+                let text = message.as_str();
+                assert!(text.contains("obligations artifact track id mismatch"), "got: {text}");
+                assert!(text.contains(other_track.as_ref()), "got: {text}");
+                assert!(text.contains(doc.track_id().as_ref()), "got: {text}");
+            }
+            other => panic!("expected DomainInvariant track-id mismatch error, got {other:?}"),
+        }
     }
 }

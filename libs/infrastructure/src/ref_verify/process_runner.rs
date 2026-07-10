@@ -204,7 +204,7 @@ fn run_claude_ref_verifier(
 ) -> Result<String, RefVerifyError> {
     let bin: OsString = "claude".into();
     let args = build_claude_ref_verifier_args(model, prompt);
-    let outcome = run_process(&bin, &args, project_root, "claude ref-verifier")?;
+    let outcome = run_process_retryable(&bin, &args, project_root, "claude ref-verifier")?;
     extract_claude_ref_verifier_output(&outcome.stdout)
         .or_else(|| nonempty_trimmed(&outcome.stdout))
         .ok_or_else(|| ref_verify_runner_error("claude ref-verifier produced no output"))
@@ -260,7 +260,7 @@ fn run_codex_ref_verifier(
 
     let bin: OsString = "codex".into();
     let args = build_codex_ref_verifier_args(model, prompt, schema.path(), last_message.path());
-    run_process(&bin, &args, project_root, "codex ref-verifier")?;
+    run_process_retryable(&bin, &args, project_root, "codex ref-verifier")?;
 
     // Codex writes the final structured message to `--output-last-message`.
     // Fail closed if the authoritative output file is absent or empty — do NOT fall back to
@@ -321,7 +321,7 @@ fn run_gemini_ref_verifier(
 ) -> Result<String, RefVerifyError> {
     let bin: OsString = "gemini".into();
     let args = build_gemini_ref_verifier_args(model, prompt);
-    let outcome = run_process(&bin, &args, project_root, "gemini ref-verifier")?;
+    let outcome = run_process_retryable(&bin, &args, project_root, "gemini ref-verifier")?;
     nonempty_trimmed(&outcome.stdout)
         .ok_or_else(|| ref_verify_runner_error("gemini ref-verifier produced no output"))
 }
@@ -393,6 +393,27 @@ fn run_process(
     }
 
     Ok(ProcessOutcome { stdout: stdout_text })
+}
+
+/// Retry-aware wrapper around [`run_process`]: the same subprocess call, plus
+/// bounded backoff on transient provider failures.
+///
+/// The retry is intentionally at the subprocess seam (not per verifier lane)
+/// so the ref-verify chain1/2, obligation-fulfillment, and waiver runners all
+/// share the same resilience without each re-implementing it. Codex-specific
+/// transient files (schema + last-message) are created once by the caller and
+/// stay alive across retries because they live outside this function's scope.
+fn run_process_retryable(
+    bin: &OsStr,
+    args: &[OsString],
+    current_dir: &Path,
+    label: &str,
+) -> Result<ProcessOutcome, RefVerifyError> {
+    super::retry::retry_transient(
+        super::retry::DEFAULT_TRANSIENT_BACKOFFS,
+        || run_process(bin, args, current_dir, label),
+        std::thread::sleep,
+    )
 }
 
 fn spawn_read_to_string<R>(mut pipe: R) -> std::thread::JoinHandle<std::io::Result<String>>

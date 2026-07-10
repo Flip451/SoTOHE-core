@@ -247,6 +247,67 @@ mod tests {
     }
 
     #[test]
+    fn test_fs_spec_document_loader_relative_malformed_spec_fails_closed_for_check_path() {
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        let items_root = workspace_root.join("track/items");
+        let track = items_root.join("example-track");
+        std::fs::create_dir_all(&track).unwrap();
+        std::fs::write(track.join("spec.json"), "{").unwrap();
+        let loader = FsSpecDocumentLoader::new(workspace_root, items_root);
+
+        let err = loader.load(Path::new("track/items/example-track/spec.json")).unwrap_err();
+
+        assert!(matches!(err, SpecDocumentLoadError::JsonParse { .. }));
+    }
+
+    #[test]
+    fn test_fs_spec_document_loader_reads_valid_document_without_mutation() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path().join("track/items");
+        let track = root.join("example-track");
+        std::fs::create_dir_all(&track).unwrap();
+        let path = track.join("spec.json");
+        let source = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json");
+        std::fs::copy(source, &path).unwrap();
+        let before = std::fs::read(&path).unwrap();
+        let loader = loader_for(&root);
+
+        let document = loader.load(&path).unwrap();
+
+        assert_eq!(
+            document.title(),
+            "テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成"
+        );
+        assert_eq!(std::fs::read(&path).unwrap(), before);
+    }
+
+    #[test]
+    fn test_fs_spec_document_loader_port_loads_relative_document_without_mutation() {
+        let dir = tempfile::tempdir().unwrap();
+        let workspace_root = dir.path().join("workspace");
+        let items_root = workspace_root.join("track/items");
+        let track = items_root.join("example-track");
+        std::fs::create_dir_all(&track).unwrap();
+        let path = track.join("spec.json");
+        let source = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json");
+        std::fs::copy(source, &path).unwrap();
+        let before = std::fs::read(&path).unwrap();
+        let loader: &dyn SpecDocumentLoaderPort =
+            &FsSpecDocumentLoader::new(workspace_root, items_root);
+
+        let document = loader.load(Path::new("track/items/example-track/spec.json")).unwrap();
+
+        assert_eq!(
+            document.title(),
+            "テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成"
+        );
+        assert_eq!(std::fs::read(&path).unwrap(), before);
+    }
+
+    #[test]
     fn test_fs_spec_document_loader_invariant_failure_returns_invariant() {
         let dir = tempfile::tempdir().unwrap();
         let root = dir.path().join("track/items");

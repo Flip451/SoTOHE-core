@@ -12,7 +12,7 @@ use crate::TrackId;
 use crate::tddd::semantic_verify::CatalogueEntryRef;
 use crate::tddd::test_obligation::hashes::DeclarationHash;
 use crate::tddd::test_obligation::ids::{
-    TestObligationAnchorId, TestObligationBrief, TestObligationId,
+    TestObligationAnchorId, TestObligationBrief, TestObligationEdgeId, TestObligationId,
 };
 use crate::tddd::test_obligation::vocab::TargetEntryRoleKind;
 
@@ -103,6 +103,26 @@ impl ObligationsDocument {
     pub fn obligations(&self) -> &[TestObligation] {
         &self.obligations
     }
+
+    /// Resolves the unique obligation owning `edge_id` for IN-10 results provenance.
+    ///
+    /// Ownership requires matching catalogue entry keys and a cited spec anchor
+    /// with the same file path and element id. Returns `None` when no unique
+    /// owner exists.
+    #[must_use]
+    pub fn owning_obligation(&self, edge_id: &TestObligationEdgeId) -> Option<&TestObligation> {
+        let mut owners = self.obligations.iter().filter(|obligation| {
+            obligation.id().entry_key() == edge_id.entry_key()
+                && obligation.spec_refs().iter().any(|spec_ref| {
+                    spec_ref.file_path() == edge_id.anchor_id().file_path()
+                        && spec_ref.element_id() == edge_id.anchor_id().element_id()
+                })
+        });
+        match (owners.next(), owners.next()) {
+            (Some(owner), None) => Some(owner),
+            (None, _) | (Some(_), Some(_)) => None,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -139,6 +159,23 @@ mod tests {
         )
     }
 
+    fn edge(entry_key: &str, anchor: &str) -> TestObligationEdgeId {
+        TestObligationEdgeId::new(
+            CatalogueEntryKey::try_new(entry_key.to_owned()).unwrap(),
+            TestObligationAnchorId::try_new("spec.json".to_owned(), anchor.to_owned()).unwrap(),
+        )
+    }
+
+    fn obligation_with_id(item_identifier: &str) -> TestObligation {
+        let mut obligation = sample_obligation();
+        obligation.id = TestObligationId::new(
+            CatalogueEntryKey::try_new("domain::User".to_owned()).unwrap(),
+            TestObligationKind::Boundary,
+            TestObligationItemIdentifier::try_new(item_identifier.to_owned()).unwrap(),
+        );
+        obligation
+    }
+
     #[test]
     fn test_obligation_exposes_all_components() {
         let obligation = sample_obligation();
@@ -169,5 +206,52 @@ mod tests {
     fn test_empty_obligations_document_is_valid() {
         let doc = ObligationsDocument::new(TrackId::try_new("empty-track").unwrap(), vec![]);
         assert!(doc.obligations().is_empty());
+    }
+
+    #[test]
+    fn test_owning_obligation_unique_owner_returns_owner() {
+        let owner = sample_obligation();
+        let owner_id = owner.id().clone();
+        let document = ObligationsDocument::new(TrackId::try_new("my-track").unwrap(), vec![owner]);
+
+        let resolved = document.owning_obligation(&edge("domain::User", "IN-05"));
+
+        assert_eq!(resolved.map(TestObligation::id), Some(&owner_id));
+    }
+
+    #[test]
+    fn test_owning_obligation_unmatched_entry_returns_none() {
+        let document = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![sample_obligation()],
+        );
+
+        let resolved = document.owning_obligation(&edge("domain::Account", "IN-05"));
+
+        assert_eq!(resolved, None);
+    }
+
+    #[test]
+    fn test_owning_obligation_multiple_owners_returns_none() {
+        let document = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![obligation_with_id("invariant:first"), obligation_with_id("invariant:second")],
+        );
+
+        let resolved = document.owning_obligation(&edge("domain::User", "IN-05"));
+
+        assert_eq!(resolved, None);
+    }
+
+    #[test]
+    fn test_owning_obligation_anchor_not_cited_returns_none() {
+        let document = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![sample_obligation()],
+        );
+
+        let resolved = document.owning_obligation(&edge("domain::User", "IN-06"));
+
+        assert_eq!(resolved, None);
     }
 }

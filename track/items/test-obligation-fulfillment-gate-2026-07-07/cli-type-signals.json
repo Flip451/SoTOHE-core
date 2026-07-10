@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-10T00:57:32Z",
-  "declaration_hash": "0e25077941a28dacf4355b9254c39d0a89df12b3d6c18fe455cfcbe27eaecf96",
+  "generated_at": "2026-07-10T20:23:00Z",
+  "declaration_hash": "09b6ff828267e3d9a77762fbbf1f1774dfc1a81ae5f217245cdec896cc7380bf",
   "signals": [
     {
       "type_name": "CliCommand",
@@ -114,6 +114,12 @@
       "found_type": true
     },
     {
+      "type_name": "cli::commands::test_obligation::command_context_with",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "cli::commands::test_obligation::command_root",
       "kind_tag": "free_function",
       "signal": "blue",
@@ -121,6 +127,12 @@
     },
     {
       "type_name": "cli::commands::test_obligation::current_branch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::test_obligation::dispatch_test_obligation",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
@@ -138,7 +150,19 @@
       "found_type": true
     },
     {
+      "type_name": "cli::commands::test_obligation::execute_bindings_skeleton_with",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "cli::commands::test_obligation::execute_check",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_check_with",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
@@ -150,13 +174,31 @@
       "found_type": true
     },
     {
+      "type_name": "cli::commands::test_obligation::execute_derive_with",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "cli::commands::test_obligation::execute_evaluate",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true
     },
     {
+      "type_name": "cli::commands::test_obligation::execute_evaluate_with",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "cli::commands::test_obligation::execute_results",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_results_with",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true

@@ -4,9 +4,10 @@
 //! waiver lanes through their semantic verifiers, freezing each verdict against a
 //! three-component cache key (IN-09 / AC-06 / CN-04 — D6): the fulfillment key is
 //! `(bound_tests_set_hash, declaration_hash, anchor_text_hash)` and the waiver key
-//! is `(waived_reason_hash, declaration_hash, anchor_text_hash)`. A verdict that
-//! is already frozen against the current key is reused; otherwise the pair is
-//! escalated `fast → final` and the fresh verdict is persisted (CN-03 edge-local).
+//! is `(waived_reason_hash, declaration_hash, anchor_text_hash)`. A verdict is
+//! reused only when its verifier-prompt fingerprint also matches; otherwise the
+//! pair is escalated `fast → final` and the fresh verdict is persisted (CN-03
+//! edge-local).
 
 // `ObligationEvaluateError` carries unboxed non-empty payloads
 // (`NonEmptyEdgeVerdictRecords`) per the catalogue contract, which makes the
@@ -22,17 +23,14 @@ use std::sync::Arc;
 
 use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort;
 use domain::tddd::semantic_verify::ModelTier;
-use domain::tddd::test_obligation::binding::{
-    TestBindingRecord, TestBindingsDocument, TestLocation,
-};
+use domain::tddd::test_obligation::binding::{TestBindingRecord, TestBindingsDocument};
 use domain::tddd::test_obligation::drift::{EdgeVerdictRecord, NonEmptyEdgeVerdictRecords};
 use domain::tddd::test_obligation::errors::{
-    ArtifactCodecError, ObligationEvaluateError, SemanticVerifierError, TestSourceScanError,
+    ArtifactCodecError, ObligationEvaluateError, SemanticVerifierError,
 };
 use domain::tddd::test_obligation::hashes::{
-    AnchorTextHash, BoundTestsSetHash, DeclarationHash, WaivedReasonHash,
+    AnchorTextHash, BoundTestsSetHash, DeclarationHash, VerifierPromptFingerprint,
 };
-use domain::tddd::test_obligation::ids::{TestObligationEdgeId, TestObligationId, WaivedReason};
 use domain::tddd::test_obligation::obligations::ObligationsDocument;
 use domain::tddd::test_obligation::pair::{
     AnchorText, EntryDeclaration, ObligationFulfillmentPair, TestsSource, WaiverPair,
@@ -42,9 +40,8 @@ use domain::tddd::test_obligation::ports::{
     TestSourceScannerPort, WaiverCachePort,
 };
 use domain::tddd::test_obligation::verdict::{
-    DetectionRatePercent, ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheEntry,
-    ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, WaiverCacheDocument,
-    WaiverCacheEntry, WaiverCacheKey, WaiverVerdict,
+    DetectionRatePercent, ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict,
+    WaiverCacheKey, WaiverVerdict,
 };
 use domain::{SpecDocumentLoaderPort, TrackId};
 
@@ -55,13 +52,16 @@ use super::{LoadedCatalogueDocument, diag, is_active_branch};
 
 mod cache;
 mod calibration;
+mod concurrency;
 mod edges;
+mod plan;
 mod records;
 mod verify;
 
-use cache::{cached_fulfillment_verdict, cached_waiver_verdict};
 use calibration::{CategoryTally, calibration_probe_count, probe_shape_for};
-use verify::{map_verifier_error, record_fulfillment, record_waiver};
+use concurrency::{MAX_IN_FLIGHT, drive_bounded_in_order};
+use plan::PlannedAction;
+use verify::map_verifier_error;
 
 /// Command input for [`EvaluateTestObligationsApplicationService`] (IN-09).
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -278,6 +278,8 @@ pub struct EvaluateTestObligationsInteractor {
     >,
     fulfillment_cache: Arc<dyn ObligationFulfillmentCachePort + Send + Sync>,
     waiver_cache: Arc<dyn WaiverCachePort + Send + Sync>,
+    fulfillment_verifier_fingerprint: VerifierPromptFingerprint,
+    waiver_verifier_fingerprint: VerifierPromptFingerprint,
     config: TestObligationEvaluateConfig,
     spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
     catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
@@ -312,6 +314,8 @@ impl EvaluateTestObligationsInteractor {
         >,
         fulfillment_cache: Arc<dyn ObligationFulfillmentCachePort + Send + Sync>,
         waiver_cache: Arc<dyn WaiverCachePort + Send + Sync>,
+        fulfillment_verifier_fingerprint: VerifierPromptFingerprint,
+        waiver_verifier_fingerprint: VerifierPromptFingerprint,
         config: TestObligationEvaluateConfig,
         spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
         catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
@@ -325,6 +329,8 @@ impl EvaluateTestObligationsInteractor {
             waiver_driver,
             fulfillment_cache,
             waiver_cache,
+            fulfillment_verifier_fingerprint,
+            waiver_verifier_fingerprint,
             config,
             spec_reader,
             catalogue_reader,
@@ -357,33 +363,33 @@ impl EvaluateTestObligationsInteractor {
                 .map_err(|_| invalid_input_error("known_bad_detection_rate"));
         }
 
-        // AC-08 distributes probes across the three fulfillment-fail
-        // categories (a/b/c) via `index % 3`; track per-category counts so
-        // the healthy-verifier gate below refuses an aggregate rate that
-        // masks a category the verifier never flags.
+        // Plan every calibration probe up front so their verdict futures can
+        // be fanned out through the same bounded multiplexer the production
+        // pairs use. Categories are tallied here rather than after the fan-out
+        // so the per-category gate remains deterministic w.r.t. probe index.
         let mut category_tally = CategoryTally::default();
-        let mut detected = 0usize;
+        let mut probe_categories: Vec<
+            domain::tddd::test_obligation::vocab::FulfillmentFailCategory,
+        > = Vec::with_capacity(probe_count);
+        let mut probe_futures = Vec::with_capacity(probe_count);
         for index in 0..probe_count {
             let shape = probe_shape_for(index);
             category_tally.record_issued(&shape.category);
-            let key = ObligationFulfillmentCacheKey::new(
-                BoundTestsSetHash::new(self.hasher.sha256(shape.tests_source.as_bytes())),
-                DeclarationHash::new(self.hasher.sha256(shape.declaration.as_bytes())),
-                AnchorTextHash::new(self.hasher.sha256(shape.anchor_text.as_bytes())),
-            );
-            let verdict = self
-                .fulfillment_verdict(
-                    &shape.tests_source,
-                    shape.declaration,
-                    shape.anchor_text,
-                    &key,
-                )
-                .await?;
+            probe_categories.push(shape.category.clone());
+            probe_futures.push(self.calibration_probe_future(shape));
+        }
+
+        // Fan out the probe verdicts under the module-local concurrency
+        // ceiling; results come back in `probe_index` order.
+        let verdicts = drive_bounded_in_order(probe_futures, MAX_IN_FLIGHT).await?;
+
+        let mut detected = 0usize;
+        for (verdict, expected_category) in verdicts.into_iter().zip(probe_categories.into_iter()) {
             if let ObligationFulfillmentVerdict::Fail { category, .. } = verdict
-                && category == shape.category
+                && category == expected_category
             {
                 detected += 1;
-                category_tally.record_detected(&shape.category);
+                category_tally.record_detected(&expected_category);
             }
         }
 
@@ -416,125 +422,42 @@ impl EvaluateTestObligationsInteractor {
         Ok(detection_rate)
     }
 
-    /// Concatenates and hashes the bound test bodies (claim side of the pair).
-    fn bound_tests(
-        &self,
-        tests: &[TestLocation],
-    ) -> Result<(String, BoundTestsSetHash), ObligationEvaluateError> {
-        let mut source = String::new();
-        for location in tests {
-            let body = self
-                .source_scanner
-                .scan_test_body(location)
-                .map_err(ObligationEvaluateError::TestSourceScan)?
-                .ok_or_else(|| {
-                    ObligationEvaluateError::TestSourceScan(TestSourceScanError::Io(diag(
-                        "bound test source not found",
-                    )))
-                })?;
-            source.push_str(&body);
-            source.push('\n');
-        }
-        let hash = BoundTestsSetHash::new(self.hasher.sha256(source.as_bytes()));
-        Ok((source, hash))
-    }
-
-    /// Evaluates one fulfillment / voluntary edge, freezing the fresh verdict.
-    #[allow(clippy::too_many_arguments)]
-    async fn evaluate_fulfillment(
-        &self,
-        edge_id: TestObligationEdgeId,
-        obligation_id: TestObligationId,
-        declaration: &str,
-        anchor_text: &str,
-        declaration_hash: DeclarationHash,
-        tests: &[TestLocation],
-        existing_cache: Option<&ObligationFulfillmentCacheDocument>,
-        tally: &mut Tally,
-        entries: &mut Vec<ObligationFulfillmentCacheEntry>,
-    ) -> Result<(), ObligationEvaluateError> {
-        let (source, bound_hash) = self.bound_tests(tests)?;
-        let anchor_hash = AnchorTextHash::new(self.hasher.sha256(anchor_text.as_bytes()));
-        let key = ObligationFulfillmentCacheKey::new(bound_hash, declaration_hash, anchor_hash);
-        let verdict = if let Some(verdict) =
-            cached_fulfillment_verdict(existing_cache, &edge_id, &obligation_id, &key)
-        {
-            verdict
-        } else {
-            self.fulfillment_verdict(&source, declaration, anchor_text, &key).await?
-        };
-        record_fulfillment(&edge_id, &verdict, tally);
-        entries.push(ObligationFulfillmentCacheEntry::new(edge_id, obligation_id, key, verdict));
-        Ok(())
-    }
-
-    /// Sends one fulfillment pair through the shared semantic escalation core.
-    async fn fulfillment_verdict(
-        &self,
-        tests_source: &str,
-        declaration: &str,
-        anchor_text: &str,
-        key: &ObligationFulfillmentCacheKey,
-    ) -> Result<ObligationFulfillmentVerdict, ObligationEvaluateError> {
-        let pair = ObligationFulfillmentPair::new(
-            TestsSource::try_new(tests_source.to_owned())
-                .map_err(|_| invalid_input_error("tests_source"))?,
-            EntryDeclaration::try_new(declaration.to_owned())
-                .map_err(|_| invalid_input_error("entry_declaration"))?,
-            AnchorText::try_new(anchor_text.to_owned())
-                .map_err(|_| invalid_input_error("anchor_text"))?,
+    /// Builds one calibration-probe verdict future.
+    ///
+    /// Split out so the concurrency helper can fan the probes out under the
+    /// same bounded ceiling as production pairs; the future's success value
+    /// is a fulfillment verdict for the probe's category.
+    fn calibration_probe_future<'a>(
+        &'a self,
+        shape: calibration::CalibrationProbeShape,
+    ) -> Pin<
+        Box<
+            dyn Future<Output = Result<ObligationFulfillmentVerdict, ObligationEvaluateError>>
+                + Send
+                + 'a,
+        >,
+    > {
+        let key = ObligationFulfillmentCacheKey::new(
+            BoundTestsSetHash::new(self.hasher.sha256(shape.tests_source.as_bytes())),
+            DeclarationHash::new(self.hasher.sha256(shape.declaration.as_bytes())),
+            AnchorTextHash::new(self.hasher.sha256(shape.anchor_text.as_bytes())),
         );
-        self.fulfillment_driver
-            .evaluate_with_escalation(&pair, key, ModelTier::Fast)
-            .await
-            .map_err(map_verifier_error)
-    }
-
-    /// Evaluates one waiver edge, freezing the fresh verdict.
-    #[allow(clippy::too_many_arguments)]
-    async fn evaluate_waiver(
-        &self,
-        edge_id: TestObligationEdgeId,
-        reason: &WaivedReason,
-        declaration: &str,
-        anchor_text: &str,
-        declaration_hash: DeclarationHash,
-        existing_cache: Option<&WaiverCacheDocument>,
-        tally: &mut Tally,
-        entries: &mut Vec<WaiverCacheEntry>,
-    ) -> Result<(), ObligationEvaluateError> {
-        let reason_hash = WaivedReasonHash::new(self.hasher.sha256(reason.as_str().as_bytes()));
-        let anchor_hash = AnchorTextHash::new(self.hasher.sha256(anchor_text.as_bytes()));
-        let key = WaiverCacheKey::new(reason_hash, declaration_hash, anchor_hash);
-        let verdict = if let Some(verdict) = cached_waiver_verdict(existing_cache, &edge_id, &key) {
-            verdict
-        } else {
-            self.waiver_verdict(reason, declaration, anchor_text, &key).await?
-        };
-        record_waiver(&edge_id, &verdict, tally);
-        entries.push(WaiverCacheEntry::new(edge_id, key, verdict));
-        Ok(())
-    }
-
-    /// Sends one waiver pair through the shared semantic escalation core.
-    async fn waiver_verdict(
-        &self,
-        reason: &WaivedReason,
-        declaration: &str,
-        anchor_text: &str,
-        key: &WaiverCacheKey,
-    ) -> Result<WaiverVerdict, ObligationEvaluateError> {
-        let pair = WaiverPair::new(
-            reason.clone(),
-            EntryDeclaration::try_new(declaration.to_owned())
-                .map_err(|_| invalid_input_error("entry_declaration"))?,
-            AnchorText::try_new(anchor_text.to_owned())
-                .map_err(|_| invalid_input_error("anchor_text"))?,
-        );
-        self.waiver_driver
-            .evaluate_with_escalation(&pair, key, ModelTier::Fast)
-            .await
-            .map_err(map_verifier_error)
+        let calibration::CalibrationProbeShape { tests_source, declaration, anchor_text, .. } =
+            shape;
+        Box::pin(async move {
+            let pair = ObligationFulfillmentPair::new(
+                TestsSource::try_new(tests_source)
+                    .map_err(|_| invalid_input_error("tests_source"))?,
+                EntryDeclaration::try_new(declaration.to_owned())
+                    .map_err(|_| invalid_input_error("entry_declaration"))?,
+                AnchorText::try_new(anchor_text.to_owned())
+                    .map_err(|_| invalid_input_error("anchor_text"))?,
+            );
+            self.fulfillment_driver
+                .evaluate_with_escalation(&pair, &key, ModelTier::Fast)
+                .await
+                .map_err(map_verifier_error)
+        })
     }
 }
 
@@ -640,20 +563,48 @@ impl EvaluateTestObligationsInteractor {
         let mut fulfillment_entries = Vec::new();
         let mut waiver_entries = Vec::new();
 
-        for record in bindings.records() {
-            self.evaluate_record(
-                record,
-                &obligations,
-                &catalogues,
-                &spec,
-                existing_fulfillment_cache.as_ref(),
-                existing_waiver_cache.as_ref(),
-                &mut tally,
-                &mut fulfillment_entries,
-                &mut waiver_entries,
-            )
-            .await?;
+        // Plan every binding record synchronously — this classifies each edge
+        // as either an immediate outcome (pending / cache hit) or an LLM
+        // task carrying every input the verifier subprocess needs. The plan
+        // order is the byte layout downstream cache documents keep.
+        let plan = self.plan_binding_records(
+            bindings.records(),
+            &obligations,
+            &catalogues,
+            &spec,
+            existing_fulfillment_cache.as_ref(),
+            existing_waiver_cache.as_ref(),
+        )?;
+
+        // Build futures for the LLM tasks in plan order, then fan them out
+        // through the bounded multiplexer. Verdict order mirrors the input
+        // order regardless of completion order, so `apply_planned` can fold
+        // them back in place.
+        let mut fulfillment_futures = Vec::new();
+        let mut waiver_futures = Vec::new();
+        for action in &plan {
+            match action {
+                PlannedAction::Fulfillment(task) => {
+                    fulfillment_futures.push(self.fulfillment_llm_future(task));
+                }
+                PlannedAction::Waiver(task) => {
+                    waiver_futures.push(self.waiver_llm_future(task));
+                }
+                PlannedAction::Immediate(_) => {}
+            }
         }
+        let fulfillment_verdicts =
+            drive_bounded_in_order(fulfillment_futures, MAX_IN_FLIGHT).await?;
+        let waiver_verdicts = drive_bounded_in_order(waiver_futures, MAX_IN_FLIGHT).await?;
+
+        self.apply_planned(
+            plan,
+            fulfillment_verdicts,
+            waiver_verdicts,
+            &mut tally,
+            &mut fulfillment_entries,
+            &mut waiver_entries,
+        );
 
         self.save_caches(&cmd.track_id, fulfillment_entries, waiver_entries)?;
 

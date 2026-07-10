@@ -9,10 +9,18 @@ use std::sync::Arc;
 
 use domain::TrackId;
 use domain::tddd::LayerId;
-use domain::tddd::test_obligation::binding::{TestBindingRecord, TestBindingsDocument};
-use domain::tddd::test_obligation::drift::{EdgeResolutionOutcome, EdgeVerdictRecord};
+pub use domain::tddd::semantic_verify::CatalogueEntryKey;
+use domain::tddd::test_obligation::binding::{
+    NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument,
+};
+pub use domain::tddd::test_obligation::drift::{
+    EdgeResolutionOutcome, EdgeVerdictRecord, TestObligationDrift,
+};
 use domain::tddd::test_obligation::errors::{ArtifactCodecError, ObligationResultsError};
-use domain::tddd::test_obligation::ids::{TestObligationEdgeId, TestObligationId};
+pub use domain::tddd::test_obligation::ids::{
+    TestObligationAnchorId, TestObligationEdgeId, TestObligationId, TestObligationItemIdentifier,
+};
+use domain::tddd::test_obligation::obligations::ObligationsDocument;
 use domain::tddd::test_obligation::ports::{
     ObligationFulfillmentCachePort, ObligationsArtifactPort, TestBindingsArtifactPort,
     WaiverCachePort,
@@ -22,7 +30,7 @@ use domain::tddd::test_obligation::verdict::{
     ObligationFulfillmentCacheDocument, ObligationFulfillmentVerdict, WaiverCacheDocument,
     WaiverVerdict,
 };
-use domain::tddd::test_obligation::vocab::FulfillmentFailCategory;
+pub use domain::tddd::test_obligation::vocab::{FulfillmentFailCategory, TestObligationKind};
 
 use super::diag;
 
@@ -181,9 +189,7 @@ impl TestObligationResultsApplicationService for TestObligationResultsInteractor
         &self,
         cmd: &TestObligationResultsCommand,
     ) -> Result<TestObligationResultsOutput, ObligationResultsError> {
-        // Loaded for completeness of the informational surface; a malformed
-        // obligations artifact is surfaced rather than silently ignored.
-        let _obligations = self.obligations_port.load(&cmd.track_id).map_err(map_artifact_error)?;
+        let obligations = self.obligations_port.load(&cmd.track_id).map_err(map_artifact_error)?;
         let bindings = self.bindings_port.load(&cmd.track_id).map_err(map_artifact_error)?;
         let fulfillment = self.fulfillment_cache.load(&cmd.track_id).map_err(map_cache_error)?;
         let waiver = self.waiver_cache.load(&cmd.track_id).map_err(map_cache_error)?;
@@ -195,7 +201,13 @@ impl TestObligationResultsApplicationService for TestObligationResultsInteractor
             fulfillment_lanes(document, bindings.as_ref(), &mut lane_summaries, &mut records);
         }
         if let Some(document) = waiver.as_ref() {
-            waiver_lane(document, &mut lane_summaries, &mut records);
+            waiver_lane(
+                document,
+                bindings.as_ref(),
+                obligations.as_ref(),
+                &mut lane_summaries,
+                &mut records,
+            );
         }
 
         Ok(TestObligationResultsOutput::new(lane_summaries, records, Vec::new()))
@@ -266,18 +278,20 @@ fn fulfillment_lanes(
             ObligationFulfillmentVerdict::Fulfilled { .. } => counts.pass += 1,
             ObligationFulfillmentVerdict::Fail { category, .. } => {
                 counts.fail += 1;
-                records.push(EdgeVerdictRecord::new(
-                    entry.edge_id().clone(),
+                records.push(fulfillment_record(
+                    entry,
                     EdgeResolutionOutcome::Fail(category.clone()),
-                    None,
+                    fulfillment_verdict_reason(entry.verdict()),
+                    bindings,
                 ));
             }
             ObligationFulfillmentVerdict::Pending => {
                 counts.pending += 1;
-                records.push(EdgeVerdictRecord::new(
-                    entry.edge_id().clone(),
+                records.push(fulfillment_record(
+                    entry,
                     EdgeResolutionOutcome::Pending,
                     None,
+                    bindings,
                 ));
             }
         }
@@ -296,6 +310,8 @@ fn fulfillment_lanes(
 /// Accumulates a single waiver lane (waiver caches carry no layer evidence).
 fn waiver_lane(
     document: &WaiverCacheDocument,
+    bindings: Option<&TestBindingsDocument>,
+    obligations: Option<&ObligationsDocument>,
     lanes: &mut Vec<TestObligationLaneSummary>,
     records: &mut Vec<EdgeVerdictRecord>,
 ) {
@@ -308,11 +324,20 @@ fn waiver_lane(
                 records.push(waiver_record(
                     entry.edge_id(),
                     EdgeResolutionOutcome::Fail(FulfillmentFailCategory::CentralUnverified),
+                    waiver_verdict_reason(entry.verdict()),
+                    bindings,
+                    obligations,
                 ));
             }
             WaiverVerdict::Pending => {
                 counts.pending += 1;
-                records.push(waiver_record(entry.edge_id(), EdgeResolutionOutcome::Pending));
+                records.push(waiver_record(
+                    entry.edge_id(),
+                    EdgeResolutionOutcome::Pending,
+                    None,
+                    bindings,
+                    obligations,
+                ));
             }
         }
     }
@@ -327,12 +352,139 @@ fn waiver_lane(
     }
 }
 
-/// Builds a waiver [`EdgeVerdictRecord`] with no attached drift.
+/// Builds a fulfillment [`EdgeVerdictRecord`] with binding-derived provenance.
+fn fulfillment_record(
+    entry: &domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheEntry,
+    outcome: EdgeResolutionOutcome,
+    verdict_reason: Option<domain::tddd::test_obligation::ids::DiagnosticMessage>,
+    bindings: Option<&TestBindingsDocument>,
+) -> EdgeVerdictRecord {
+    let (claim_source, evidence_source) =
+        fulfillment_binding_sources(entry.obligation_id(), entry.edge_id(), bindings);
+    EdgeVerdictRecord::new(
+        Some(entry.obligation_id().clone()),
+        entry.edge_id().clone(),
+        claim_source,
+        evidence_source,
+        outcome,
+        verdict_reason,
+        None,
+    )
+}
+
+/// Builds a waiver [`EdgeVerdictRecord`] with binding- and obligation-derived provenance.
 fn waiver_record(
     edge_id: &TestObligationEdgeId,
     outcome: EdgeResolutionOutcome,
+    verdict_reason: Option<domain::tddd::test_obligation::ids::DiagnosticMessage>,
+    bindings: Option<&TestBindingsDocument>,
+    obligations: Option<&ObligationsDocument>,
 ) -> EdgeVerdictRecord {
-    EdgeVerdictRecord::new(edge_id.clone(), outcome, None)
+    let obligation_id = obligations
+        .and_then(|document| document.owning_obligation(edge_id))
+        .map(|obligation| obligation.id().clone());
+    let (claim_source, evidence_source) = waiver_binding_sources(edge_id, bindings);
+    EdgeVerdictRecord::new(
+        obligation_id,
+        edge_id.clone(),
+        claim_source,
+        evidence_source,
+        outcome,
+        verdict_reason,
+        None,
+    )
+}
+
+/// Returns waiver provenance only when the bindings artifact contains this edge.
+fn waiver_binding_sources(
+    edge_id: &TestObligationEdgeId,
+    bindings: Option<&TestBindingsDocument>,
+) -> (
+    Option<domain::tddd::test_obligation::ids::DiagnosticMessage>,
+    Option<domain::tddd::test_obligation::ids::DiagnosticMessage>,
+) {
+    let reason = bindings.and_then(|document| {
+        document.records().iter().find_map(|record| match record {
+            TestBindingRecord::Waiver { edge_id: bound, reason } if bound == edge_id => {
+                Some(reason)
+            }
+            _ => None,
+        })
+    });
+    match reason {
+        Some(reason) => (Some(diag("waiver")), Some(diag(reason.as_str()))),
+        None => (None, None),
+    }
+}
+
+/// Returns the claim and evidence source recorded for a fulfillment edge.
+fn fulfillment_binding_sources(
+    obligation_id: &TestObligationId,
+    edge_id: &TestObligationEdgeId,
+    bindings: Option<&TestBindingsDocument>,
+) -> (
+    Option<domain::tddd::test_obligation::ids::DiagnosticMessage>,
+    Option<domain::tddd::test_obligation::ids::DiagnosticMessage>,
+) {
+    let Some(document) = bindings else {
+        return (None, None);
+    };
+    for record in document.records() {
+        match record {
+            TestBindingRecord::Fulfillment { obligation_id: bound, tests }
+                if bound == obligation_id =>
+            {
+                return (Some(diag("fulfillment binding")), Some(bound_tests_source(tests)));
+            }
+            TestBindingRecord::VoluntaryBinding { edge_id: bound, tests } if bound == edge_id => {
+                return (Some(diag("voluntary binding")), Some(bound_tests_source(tests)));
+            }
+            _ => {}
+        }
+    }
+    (None, None)
+}
+
+/// Renders bound test locations compactly for the informational results record.
+fn bound_tests_source(
+    tests: &NonEmptyTestLocations,
+) -> domain::tddd::test_obligation::ids::DiagnosticMessage {
+    let locations = tests
+        .as_slice()
+        .iter()
+        .map(|location| {
+            let layer: &str = location.layer().as_ref();
+            format!(
+                "{layer}::{}::{}",
+                location.module_path().as_str(),
+                location.test_name().as_str()
+            )
+        })
+        .collect::<Vec<_>>()
+        .join(", ");
+    diag(&locations)
+}
+
+/// Extracts the failure explanation from a fulfillment verdict.
+fn fulfillment_verdict_reason(
+    verdict: &ObligationFulfillmentVerdict,
+) -> Option<domain::tddd::test_obligation::ids::DiagnosticMessage> {
+    match verdict {
+        ObligationFulfillmentVerdict::Fail { reason, .. } => Some(reason.clone()),
+        ObligationFulfillmentVerdict::Fulfilled { .. } | ObligationFulfillmentVerdict::Pending => {
+            None
+        }
+    }
+}
+
+/// Extracts the failure explanation from a waiver verdict.
+fn waiver_verdict_reason(
+    verdict: &WaiverVerdict,
+) -> Option<domain::tddd::test_obligation::ids::DiagnosticMessage> {
+    match verdict {
+        WaiverVerdict::Fail { reason } => Some(reason.clone()),
+        WaiverVerdict::Waived { .. } | WaiverVerdict::Pending => None,
+    }
 }
 
 /// Resolves the layer of a fulfillment obligation via its binding test

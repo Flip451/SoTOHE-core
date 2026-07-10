@@ -7,8 +7,10 @@
 //! every derived obligation is bound and its tests exist (`missing` /
 //! `orphaned` existence drift — IN-13), every ref edge resolves to a fulfilled
 //! / waived verdict (totality — CN-02), and every resolving verdict is fresh
-//! against the current three-hash key (`spec_changed` / `decl_changed` /
-//! `test_changed` / `reason_changed` freshness drift — CN-04 / AC-04). Scope is
+//! against the current three-hash key and verifier-prompt fingerprint
+//! (`spec_changed` / `decl_changed` / `test_changed` / `reason_changed` freshness
+//! drift — CN-04 / AC-04). A mismatched or absent fingerprint is treated as a
+//! missing verdict. Scope is
 //! resolved by artifact existence (IN-14 / AC-10): both absent passes with zero
 //! pairs, a half-materialised scope is fail-closed. Uncited `AC` / `CN` spec
 //! elements are surfaced as findings (IN-16 / AC-13). The gate never recomputes
@@ -31,6 +33,7 @@ use domain::tddd::test_obligation::binding::{
 };
 use domain::tddd::test_obligation::drift::{NonEmptyDrifts, TestObligationDrift};
 use domain::tddd::test_obligation::errors::{ObligationCheckError, TestSourceScanError};
+use domain::tddd::test_obligation::hashes::VerifierPromptFingerprint;
 use domain::tddd::test_obligation::ids::{
     NonEmptyEdgeIds, TestObligationEdgeId, TestObligationId, WaivedReason,
 };
@@ -132,6 +135,8 @@ pub struct CheckTestObligationsInteractor {
     source_scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
     fulfillment_cache: Arc<dyn ObligationFulfillmentCachePort + Send + Sync>,
     waiver_cache: Arc<dyn WaiverCachePort + Send + Sync>,
+    fulfillment_verifier_fingerprint: VerifierPromptFingerprint,
+    waiver_verifier_fingerprint: VerifierPromptFingerprint,
     spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
     catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
 }
@@ -147,6 +152,8 @@ impl CheckTestObligationsInteractor {
         source_scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
         fulfillment_cache: Arc<dyn ObligationFulfillmentCachePort + Send + Sync>,
         waiver_cache: Arc<dyn WaiverCachePort + Send + Sync>,
+        fulfillment_verifier_fingerprint: VerifierPromptFingerprint,
+        waiver_verifier_fingerprint: VerifierPromptFingerprint,
         spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
         catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
     ) -> Self {
@@ -157,6 +164,8 @@ impl CheckTestObligationsInteractor {
             source_scanner,
             fulfillment_cache,
             waiver_cache,
+            fulfillment_verifier_fingerprint,
+            waiver_verifier_fingerprint,
             spec_reader,
             catalogue_reader,
         }
@@ -485,6 +494,10 @@ impl CheckTestObligationsInteractor {
             gate.stale.push(edge.clone());
             return Ok(());
         };
+        if entry.verifier_fingerprint() != Some(&self.fulfillment_verifier_fingerprint) {
+            gate.stale.push(edge.clone());
+            return Ok(());
+        }
         let current_bound = self.current_bound_hash(tests)?;
         let current_decl = sha256_content_hash(declaration.as_bytes());
         let current_anchor =
@@ -560,6 +573,10 @@ impl CheckTestObligationsInteractor {
             gate.stale.push(edge.clone());
             return;
         };
+        if entry.verifier_fingerprint() != Some(&self.waiver_verifier_fingerprint) {
+            gate.stale.push(edge.clone());
+            return;
+        }
         let current_reason = sha256_content_hash(reason.as_str().as_bytes());
         let current_decl = sha256_content_hash(declaration.as_bytes());
         let current_anchor =

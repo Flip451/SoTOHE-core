@@ -26,6 +26,7 @@ pub mod rules_codec;
 mod semantic_verifier;
 pub mod sha256_content_hasher;
 pub mod source_scanner;
+mod spawn_blocking;
 pub mod waiver_cache_codec;
 pub mod waiver_escalation_driver;
 pub mod waiver_verifier;
@@ -54,17 +55,20 @@ pub(crate) fn diagnostic(message: &str) -> DiagnosticMessage {
 /// Rejects a symlinked track-items root before it is used as a trusted guard
 /// anchor. Missing roots are allowed so missing artifacts can still load as
 /// `None` and saves can create the directory.
+///
+/// Delegates to
+/// [`reject_symlinks_up_to_root`](crate::track::symlink_guard::reject_symlinks_up_to_root)
+/// so a symlink at *any* ancestor of `items_dir` — not just the leaf — is
+/// rejected. A symlinked parent (e.g., `track` → `/mounted/track`) would
+/// otherwise let `lstat(items_dir)` return metadata for the redirected `items`
+/// directory, and downstream `reject_symlinks_below(_, items_dir)` calls would
+/// treat that redirected location as the trusted root, letting the codecs read
+/// and write outside the worktree instead of failing closed.
 pub(crate) fn reject_symlinked_items_root(items_dir: &Path) -> Result<(), std::io::Error> {
-    match items_dir.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!("refusing to use symlinked track items root: {}", items_dir.display()),
-        )),
-        Ok(_) => Ok(()),
-        Err(source) if source.kind() == std::io::ErrorKind::NotFound => Ok(()),
-        Err(source) => Err(std::io::Error::new(
+    crate::track::symlink_guard::reject_symlinks_up_to_root(items_dir).map_err(|source| {
+        std::io::Error::new(
             source.kind(),
-            format!("failed to stat track items root {}: {source}", items_dir.display()),
-        )),
-    }
+            format!("refusing to use symlinked track items root {}: {source}", items_dir.display()),
+        )
+    })
 }

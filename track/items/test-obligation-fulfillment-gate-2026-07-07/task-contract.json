@@ -58,7 +58,6 @@
     ],
     "T007": [
       { "layer": "domain", "entry_key": "TestObligation" },
-      { "layer": "domain", "entry_key": "ObligationsDocument" },
       { "layer": "domain", "entry_key": "TestLocation" },
       { "layer": "domain", "entry_key": "TestBindingRecord" },
       { "layer": "domain", "entry_key": "TestBindingsDocument" },
@@ -69,15 +68,12 @@
       { "layer": "domain", "entry_key": "ObligationFulfillmentVerdict" },
       { "layer": "domain", "entry_key": "WaiverVerdict" },
       { "layer": "domain", "entry_key": "ObligationFulfillmentCacheKey" },
-      { "layer": "domain", "entry_key": "ObligationFulfillmentCacheEntry" },
       { "layer": "domain", "entry_key": "ObligationFulfillmentCacheDocument" },
       { "layer": "domain", "entry_key": "WaiverCacheKey" },
-      { "layer": "domain", "entry_key": "WaiverCacheEntry" },
       { "layer": "domain", "entry_key": "WaiverCacheDocument" },
       { "layer": "domain", "entry_key": "TestObligationDriftKind" },
       { "layer": "domain", "entry_key": "TestObligationDrift" },
-      { "layer": "domain", "entry_key": "EdgeResolutionOutcome" },
-      { "layer": "domain", "entry_key": "EdgeVerdictRecord" }
+      { "layer": "domain", "entry_key": "EdgeResolutionOutcome" }
     ],
     "T009": [
       { "layer": "domain", "entry_key": "ObligationCheckError" },
@@ -156,7 +152,6 @@
       { "layer": "usecase", "entry_key": "CheckTestObligationsCommand" },
       { "layer": "usecase", "entry_key": "CheckTestObligationsOutcome" },
       { "layer": "usecase", "entry_key": "CheckTestObligationsApplicationService" },
-      { "layer": "usecase", "entry_key": "CheckTestObligationsInteractor" },
       { "layer": "domain", "entry_key": "NonEmptyDrifts" }
     ],
     "T018": [
@@ -164,7 +159,6 @@
       { "layer": "usecase", "entry_key": "EvaluateTestObligationsOutcome" },
       { "layer": "usecase", "entry_key": "TestObligationEvaluateConfig" },
       { "layer": "usecase", "entry_key": "EvaluateTestObligationsApplicationService" },
-      { "layer": "usecase", "entry_key": "EvaluateTestObligationsInteractor" },
       { "layer": "usecase", "entry_key": "EvaluateTestObligationsFuture" },
       { "layer": "usecase", "entry_key": "TestObligationEvaluateConfigError" },
       { "layer": "domain", "entry_key": "NonEmptyEdgeIds" },
@@ -244,6 +238,30 @@
       { "layer": "cli", "entry_key": "cli::commands::test_obligation::command_root" },
       { "layer": "cli", "entry_key": "cli::commands::test_obligation::current_branch" },
       { "layer": "cli", "entry_key": "cli::commands::test_obligation::read_command_branch" }
+    ],
+    "T028": [
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::command_context_with" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::dispatch_test_obligation" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_bindings_skeleton_with" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_check_with" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_derive_with" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_evaluate_with" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_results_with" }
+    ],
+    "T029": [
+      { "layer": "domain", "entry_key": "VerifierPromptFingerprint" },
+      { "layer": "domain", "entry_key": "ObligationFulfillmentCacheEntry" },
+      { "layer": "domain", "entry_key": "WaiverCacheEntry" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint" },
+      { "layer": "usecase", "entry_key": "CheckTestObligationsInteractor" },
+      { "layer": "usecase", "entry_key": "EvaluateTestObligationsInteractor" }
+    ],
+    "T030": [
+      { "layer": "domain", "entry_key": "EdgeVerdictRecord" }
+    ],
+    "T031": [
+      { "layer": "domain", "entry_key": "ObligationsDocument" }
     ]
   }
 }

@@ -66,11 +66,13 @@ Parallelism rules:
 
 **Step 4: Test-obligation binding artifacts (when applicable)**
 
-When the track materializes the test-obligation gate, delegate binding artifact authoring to
-the `implementer` capability contract in `.harness/capabilities/implementer.md`. That contract
-defines how the implementer derives `obligations.json`, authors `test-bindings.json`, refreshes
-verdict caches, and runs `bin/sotp test-obligation check`. The workflow only requires that the
-gate is passing before implementation is reported complete once obligation artifacts exist.
+When the track materializes the test-obligation gate, run the `obligation-fulfillment`
+workflow (`.harness/workflows/track/obligation-fulfillment.md`) — it owns the derive →
+author → totality → evaluate → repair loop, including the split between implementer-side
+authoring and orchestrator-side `evaluate`. Per-record authoring discipline lives in the
+`implementer` capability contract (`.harness/capabilities/implementer.md`). This workflow
+only requires that the gate is passing before implementation is reported complete once
+obligation artifacts exist.
 
 **Step 5: CI validation**
 

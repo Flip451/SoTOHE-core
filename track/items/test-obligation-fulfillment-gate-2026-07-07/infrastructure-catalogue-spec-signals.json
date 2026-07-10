@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c5a46759641674372948f215388835b10aedc037afd893e6d21123066fa61f86",
+  "catalogue_declaration_hash": "9d0fc308f407aee807d7704549bb48721b129413f3fe6a4ffb0720f888c4cbb1",
   "signals": [
     {
       "type_name": "CatalogueEntryRefDto",
@@ -30,7 +30,7 @@
     {
       "type_name": "FsSpecDocumentLoader",
       "signal": "blue",
-      "entry_hash": "62184ab3df6ac7ffcc781f27b6f98aba737f28602dcd2ca1a00ba6c8a9b77fa4"
+      "entry_hash": "8ffc9a948f018356e6deb8497fd5b2404c14e1f642aca7e46989848a40363025"
     },
     {
       "type_name": "FulfillmentFailCategoryDto",
@@ -206,6 +206,16 @@
       "type_name": "WaiverVerifierAdapter",
       "signal": "blue",
       "entry_hash": "a40d0579a81afccbe5a3bf776ac733c1caad03abcc005f1bfc358779ca986d6b"
+    },
+    {
+      "type_name": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint",
+      "signal": "blue",
+      "entry_hash": "7e7648881c93f4af2f706ccef91747984fc88f71a916ce1469ae932e707ecf0b"
+    },
+    {
+      "type_name": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint",
+      "signal": "blue",
+      "entry_hash": "1ff578e90328d9d2688947a7d13d4194dadc865ef511d42c69309f98d680da82"
     }
   ]
 }

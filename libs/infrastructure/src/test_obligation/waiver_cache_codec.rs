@@ -5,14 +5,18 @@
 //! freezes a waiver verdict against the three-hash cache key (waived-reason hash,
 //! entry-declaration hash, anchor-text hash, ADR D6): the hashes are serialised as
 //! lowercase hex and any change to a component produces a different key, so a
-//! stale verdict is treated as absent and recovery is only via re-evaluation
-//! (CN-04). A passing verdict structurally carries its evidence citation.
+//! stale verdict is treated as absent. Each entry also persists its verifier-prompt
+//! fingerprint; an absent legacy fingerprint remains readable but is fail-closed
+//! by cache readers, and recovery is only via re-evaluation (CN-04). A passing
+//! verdict structurally carries its evidence citation.
 
 use std::path::PathBuf;
 
 use domain::TrackId;
 use domain::tddd::test_obligation::errors::VerifyCacheError;
-use domain::tddd::test_obligation::hashes::{AnchorTextHash, DeclarationHash, WaivedReasonHash};
+use domain::tddd::test_obligation::hashes::{
+    AnchorTextHash, DeclarationHash, VerifierPromptFingerprint, WaivedReasonHash,
+};
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::test_obligation::ports::WaiverCachePort;
 use domain::tddd::test_obligation::verdict::{
@@ -73,6 +77,8 @@ pub struct WaiverCacheEntryDto {
     edge_id: TestObligationEdgeIdDto,
     key: WaiverCacheKeyWire,
     verdict: WaiverVerdictDto,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    verifier_fingerprint: Option<String>,
 }
 
 /// Serde DTO for [`WaiverCacheDocument`] (IN-09).
@@ -133,7 +139,18 @@ impl WaiverCachePort for JsonWaiverCacheCodec {
         })?;
         let dto: WaiverCacheDocumentDto = serde_json::from_str(&content)
             .map_err(|e| VerifyCacheError::MalformedJson(diagnostic(&e.to_string())))?;
-        Ok(Some(document_from_dto(dto)?))
+        let doc = document_from_dto(dto)?;
+        // Fail closed when the on-disk cache was copied from another track: a
+        // matching filename is not proof of matching content, and the caller
+        // trusts a `load(track_id)` result to describe exactly that track.
+        if doc.track_id() != track_id {
+            return Err(VerifyCacheError::MalformedJson(diagnostic(&format!(
+                "waiver cache track id mismatch: requested '{}', got '{}'",
+                track_id.as_ref(),
+                doc.track_id().as_ref()
+            ))));
+        }
+        Ok(Some(doc))
     }
 
     fn save(&self, doc: &WaiverCacheDocument) -> Result<(), DiagnosticMessage> {
@@ -204,6 +221,9 @@ fn entry_to_dto(entry: &WaiverCacheEntry) -> WaiverCacheEntryDto {
         edge_id: edge_id_to_dto(entry.edge_id()),
         key: key_to_wire(entry.key()),
         verdict: verdict_to_dto(entry.verdict()),
+        verifier_fingerprint: entry
+            .verifier_fingerprint()
+            .map(|fingerprint| fingerprint.as_hash().to_hex()),
     }
 }
 
@@ -211,7 +231,11 @@ fn entry_from_dto(dto: WaiverCacheEntryDto) -> Result<WaiverCacheEntry, VerifyCa
     let edge_id = edge_id_from_dto(dto.edge_id).map_err(cache_error_from_artifact)?;
     let key = key_from_wire(dto.key)?;
     let verdict = verdict_from_dto(dto.verdict)?;
-    Ok(WaiverCacheEntry::new(edge_id, key, verdict))
+    let verifier_fingerprint = dto
+        .verifier_fingerprint
+        .map(|fingerprint| parse_cache_hash(&fingerprint).map(VerifierPromptFingerprint::new))
+        .transpose()?;
+    Ok(WaiverCacheEntry::new(edge_id, key, verdict, verifier_fingerprint))
 }
 
 fn key_to_wire(key: &WaiverCacheKey) -> WaiverCacheKeyWire {
@@ -278,10 +302,14 @@ mod tests {
         )
     }
 
+    fn verifier_fingerprint() -> VerifierPromptFingerprint {
+        VerifierPromptFingerprint::new(ContentHash::from_bytes([5u8; 32]))
+    }
+
     fn document(verdict: WaiverVerdict) -> WaiverCacheDocument {
         WaiverCacheDocument::new(
             TrackId::try_new("my-track").unwrap(),
-            vec![WaiverCacheEntry::new(edge_id(), key(), verdict)],
+            vec![WaiverCacheEntry::new(edge_id(), key(), verdict, Some(verifier_fingerprint()))],
         )
     }
 
@@ -325,6 +353,19 @@ mod tests {
         assert_eq!(wire.waived_reason_hash, "04".repeat(32));
         assert_eq!(wire.declaration_hash, "02".repeat(32));
         assert_eq!(wire.anchor_text_hash, "03".repeat(32));
+        assert_eq!(dto.entries[0].verifier_fingerprint, Some("05".repeat(32)));
+    }
+
+    #[test]
+    fn test_legacy_entry_without_fingerprint_decodes_as_absent() {
+        let dto = document_to_dto(&document(WaiverVerdict::Pending));
+        let mut json = serde_json::to_value(dto).unwrap();
+        json["entries"][0].as_object_mut().unwrap().remove("verifier_fingerprint");
+
+        let legacy: WaiverCacheDocumentDto = serde_json::from_value(json).unwrap();
+        let decoded = document_from_dto(legacy).unwrap();
+
+        assert_eq!(decoded.entries()[0].verifier_fingerprint(), None);
     }
 
     // IN-09 fail-closed: a malformed cache-key hash is a malformed-cache error.
@@ -383,5 +424,32 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let codec = JsonWaiverCacheCodec::new(dir.path().to_path_buf());
         assert!(codec.load(&TrackId::try_new("absent-track").unwrap()).unwrap().is_none());
+    }
+
+    // CN-04: a waiver cache whose embedded `track_id` disagrees with the
+    // requested id must not be returned — a copy from another track would
+    // otherwise satisfy or block the gate on unrelated verdicts.
+    #[test]
+    fn test_codec_load_rejects_track_id_mismatch() {
+        let dir = tempfile::tempdir().unwrap();
+        let codec = JsonWaiverCacheCodec::new(dir.path().to_path_buf());
+        let doc = document(WaiverVerdict::Pending);
+        codec.save(&doc).unwrap();
+
+        let other_track = TrackId::try_new("other-track").unwrap();
+        let source = dir.path().join(doc.track_id().as_ref()).join(WAIVER_CACHE_ARTIFACT);
+        let target_dir = dir.path().join(other_track.as_ref());
+        std::fs::create_dir_all(&target_dir).unwrap();
+        std::fs::rename(&source, target_dir.join(WAIVER_CACHE_ARTIFACT)).unwrap();
+
+        match codec.load(&other_track) {
+            Err(VerifyCacheError::MalformedJson(message)) => {
+                let text = message.as_str();
+                assert!(text.contains("waiver cache track id mismatch"), "got: {text}");
+                assert!(text.contains(other_track.as_ref()), "got: {text}");
+                assert!(text.contains(doc.track_id().as_ref()), "got: {text}");
+            }
+            other => panic!("expected MalformedJson track-id mismatch error, got {other:?}"),
+        }
     }
 }

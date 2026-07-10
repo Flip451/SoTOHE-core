@@ -437,6 +437,28 @@ mod tests {
     }
 
     #[test]
+    fn test_role_obligation_rules_expose_declared_generation_rules() {
+        let expected_rule = TestObligationRule::new(
+            TestObligationKind::Boundary,
+            TestObligationPerAxis::Invariant,
+            None,
+            Some(
+                TestObligationBriefTemplate::try_new("assert the invariant boundary".to_owned())
+                    .unwrap(),
+            ),
+        );
+        let rules = RoleObligationRules::new(vec![expected_rule.clone()]);
+
+        assert!(!rules.is_empty_explicitly());
+        let [actual_rule] = rules.obligations() else {
+            panic!("the explicit list must retain exactly one declared generation rule");
+        };
+        assert_eq!(actual_rule.kind(), &TestObligationKind::Boundary);
+        assert_eq!(actual_rule.per_axis(), &TestObligationPerAxis::Invariant);
+        assert_eq!(rules.obligations(), &[expected_rule]);
+    }
+
+    #[test]
     fn test_data_role_totality_anchor_matches_variant_name() {
         // Exercises the compile-time totality anchor and confirms its names line
         // up with the coverage list the document constructor checks against.

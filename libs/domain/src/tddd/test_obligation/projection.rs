@@ -192,7 +192,8 @@ mod tests {
     use super::RoleObligationItemsProjector;
     use crate::tddd::catalogue_v2::identifiers::InvariantName;
     use crate::tddd::catalogue_v2::roles::{
-        ContractRole, DataRole, InvariantDecl, InvariantPredicate, ItemAction, SelfReceiver,
+        ContractRole, DataRole, InvariantDecl, InvariantPredicate, ItemAction, NonEmptyVec,
+        SelfReceiver,
     };
     use crate::tddd::catalogue_v2::{
         MethodDeclaration, MethodName, ModulePath, StructKind, StructShape, TraitEntry, TypeEntry,
@@ -267,6 +268,16 @@ mod tests {
         let entry = type_entry(DataRole::domain_service(), plain_struct(), vec![]);
         let items = projector().data_role_items(&entry, &TestObligationPerAxis::Entry);
         assert_eq!(items_as_str(&items), vec!["entry"]);
+    }
+
+    #[test]
+    fn data_role_items_domain_service_without_emits_yields_no_emits_obligations() {
+        // CN-16 / IN-07: the default DomainService declaration explicitly has
+        // no emitted events, so the decision-table interpreter must not invent
+        // an `emits:*` obligation for it.
+        let entry = type_entry(DataRole::domain_service(), plain_struct(), vec![]);
+        let items = projector().data_role_items(&entry, &TestObligationPerAxis::Emits);
+        assert!(items.is_empty());
     }
 
     #[test]
@@ -371,6 +382,74 @@ mod tests {
                     &TestObligationPerAxis::Method,
                 )
                 .is_none()
+        );
+    }
+
+    #[test]
+    fn test_projector_interprets_remaining_per_axis_vocabulary_variants() {
+        // CN-10: cover the remaining decision-table axes not exercised by
+        // the focused invariant, method, handles, and transition tests above.
+        let p = projector();
+        let order_placed = TypeRef::new("OrderPlaced").unwrap();
+        let event_policy = type_entry(
+            DataRole::EventPolicy { reacts_to: NonEmptyVec::new(order_placed, vec![]) },
+            plain_struct(),
+            vec![],
+        );
+        assert_eq!(
+            items_as_str(&p.data_role_items(&event_policy, &TestObligationPerAxis::ReactsTo)),
+            vec!["reacts_to:OrderPlaced"]
+        );
+
+        let emitting_service = type_entry(
+            DataRole::DomainService { emits: vec![TypeRef::new("OrderCreated").unwrap()] },
+            plain_struct(),
+            vec![],
+        );
+        assert_eq!(
+            items_as_str(&p.data_role_items(&emitting_service, &TestObligationPerAxis::Emits)),
+            vec!["emits:OrderCreated"]
+        );
+
+        let execute = MethodDeclaration::new(
+            MethodName::new("execute").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("Output").unwrap(),
+            false,
+            None,
+        );
+        let port = TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![execute],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
+        assert_eq!(
+            items_as_str(&p.contract_role_items(&port, &TestObligationPerAxis::TraitMethod)),
+            vec!["trait_method:execute"]
+        );
+        assert_eq!(
+            items_as_str(&p.function_role_items(&TestObligationPerAxis::Entry)),
+            vec!["entry"]
+        );
+        assert_eq!(
+            items_as_str(
+                &p.trait_impl_items(
+                    &TypeRef::new("usecase::OrderPort").unwrap(),
+                    &TestObligationPerAxis::TraitImpl,
+                )
+                .unwrap(),
+            ),
+            vec!["trait_impl:usecase::OrderPort"]
         );
     }
 }

@@ -99,6 +99,8 @@ impl TestObligationCheckHandler {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    use std::sync::Mutex;
+
     use super::*;
 
     struct StubService;
@@ -127,5 +129,72 @@ mod tests {
 
         assert_eq!(outcome.exit_code, 0);
         assert!(outcome.stdout.unwrap().contains("resolved_edges=0"));
+    }
+
+    #[test]
+    fn test_check_handler_anchors_catalogue_paths_at_workspace_root() {
+        struct CapturingService {
+            captured: Mutex<Option<CheckTestObligationsCommand>>,
+        }
+
+        impl CheckTestObligationsApplicationService for CapturingService {
+            fn execute(
+                &self,
+                cmd: &CheckTestObligationsCommand,
+            ) -> Result<
+                usecase::test_obligation::check::CheckTestObligationsOutcome,
+                usecase::test_obligation::errors::ObligationCheckError,
+            > {
+                *self.captured.lock().unwrap() = Some(cmd.clone());
+                Ok(usecase::test_obligation::check::CheckTestObligationsOutcome::new_empty_scope(
+                    Vec::new(),
+                ))
+            }
+        }
+
+        let service = Arc::new(CapturingService { captured: Mutex::new(None) });
+        let workspace_root = PathBuf::from("/discovered/workspace");
+        let handler = TestObligationCheckHandler::new(service.clone(), workspace_root.clone());
+        let branch = DiagnosticMessage::try_new("track/example".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationCheckInput::new(None, branch));
+
+        assert_eq!(outcome.exit_code, 0);
+        let captured = service.captured.lock().unwrap().clone().unwrap();
+        let track_id = TrackId::try_new("example".to_owned()).unwrap();
+        let expected = CheckTestObligationsCommand::new(
+            usecase::test_obligation::TestObligationCatalogueCommandInput::new(
+                track_id.clone(),
+                "track/example".to_owned(),
+                super::super::default_catalogue_paths(&workspace_root, &track_id),
+            ),
+        );
+        assert_eq!(captured, expected);
+    }
+
+    #[test]
+    fn test_check_handler_surfaces_fail_closed_gate_errors() {
+        struct FailingService;
+
+        impl CheckTestObligationsApplicationService for FailingService {
+            fn execute(
+                &self,
+                _cmd: &CheckTestObligationsCommand,
+            ) -> Result<
+                usecase::test_obligation::check::CheckTestObligationsOutcome,
+                usecase::test_obligation::errors::ObligationCheckError,
+            > {
+                Err(usecase::test_obligation::errors::ObligationCheckError::BindingsAbsent)
+            }
+        }
+
+        let handler =
+            TestObligationCheckHandler::new(Arc::new(FailingService), PathBuf::from("/repo"));
+        let branch = DiagnosticMessage::try_new("track/test-track".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationCheckInput::new(None, branch));
+
+        assert_ne!(outcome.exit_code, 0);
+        assert!(outcome.stderr.unwrap().contains("BindingsAbsent"));
     }
 }

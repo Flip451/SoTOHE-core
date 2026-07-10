@@ -12,6 +12,8 @@ use usecase::semantic_verdict_core::driver::{
 };
 use usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig;
 
+use crate::test_obligation::spawn_blocking::SpawnBlocking;
+
 /// Concrete escalation driver for the waiver verifier lane.
 #[derive(Clone)]
 pub struct WaiverEscalationDriver {
@@ -52,22 +54,37 @@ impl SemanticEscalationDriverPort<WaiverPair, WaiverCacheKey, WaiverVerdict, Sem
         _key: &'a WaiverCacheKey,
         initial_tier: ModelTier,
     ) -> SemanticEscalationFuture<'a, WaiverVerdict, SemanticVerifierError> {
+        // Materialise the pair inputs into owned values before the async move
+        // so each `SpawnBlocking` closure has an `'static` capture and can be
+        // driven on a worker thread while the usecase-level bounded
+        // multiplexer polls its siblings.
+        let verifier = Arc::clone(&self.verifier);
+        let waived_reason = pair.waived_reason().as_str().to_owned();
+        let entry_declaration = pair.entry_declaration().as_str().to_owned();
+        let anchor_text = pair.anchor_text().as_str().to_owned();
         Box::pin(async move {
-            let verdict = self.verifier.verify_pair(
-                pair.waived_reason().as_str(),
-                pair.entry_declaration().as_str(),
-                pair.anchor_text().as_str(),
+            let fast_verifier = Arc::clone(&verifier);
+            let (wr, ed, at, tier) = (
+                waived_reason.clone(),
+                entry_declaration.clone(),
+                anchor_text.clone(),
                 initial_tier.clone(),
-            )?;
+            );
+            let verdict =
+                SpawnBlocking::new(move || fast_verifier.verify_pair(&wr, &ed, &at, tier)).await?;
             if matches!(initial_tier, ModelTier::Fast)
                 && !matches!(verdict, WaiverVerdict::Waived { .. })
             {
-                return self.verifier.verify_pair(
-                    pair.waived_reason().as_str(),
-                    pair.entry_declaration().as_str(),
-                    pair.anchor_text().as_str(),
-                    ModelTier::Final,
-                );
+                let final_verifier = Arc::clone(&verifier);
+                return SpawnBlocking::new(move || {
+                    final_verifier.verify_pair(
+                        &waived_reason,
+                        &entry_declaration,
+                        &anchor_text,
+                        ModelTier::Final,
+                    )
+                })
+                .await;
             }
             Ok(verdict)
         })

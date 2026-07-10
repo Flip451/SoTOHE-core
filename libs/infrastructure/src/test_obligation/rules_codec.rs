@@ -643,7 +643,7 @@ fn diag(message: &str) -> DiagnosticMessage {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use super::*;
 
@@ -722,6 +722,38 @@ mod tests {
         assert_eq!(doc.trait_impls().len(), 4);
     }
 
+    #[test]
+    fn test_rules_document_dto_preserves_generation_brief_template() {
+        let mut dto = complete_dto();
+        let brief_template = "test the declared boundary".to_owned();
+        dto.data_roles.insert(
+            "ValueObject".to_owned(),
+            RoleObligationRulesDto {
+                obligations: Some(vec![TestObligationRuleDto {
+                    kind: "boundary".to_owned(),
+                    per: TestObligationPerAxisDto::Invariant,
+                    min: None,
+                    brief_template: Some(brief_template.clone()),
+                }]),
+            },
+        );
+
+        let document = dto.into_domain().unwrap();
+        let (_, rules) = document
+            .data_roles()
+            .iter()
+            .find(|(role, _)| *role == DataRole::value_object())
+            .unwrap();
+        let expected = RoleObligationRules::new(vec![TestObligationRule::new(
+            TestObligationKind::Boundary,
+            TestObligationPerAxis::Invariant,
+            None,
+            Some(TestObligationBriefTemplate::try_new(brief_template).unwrap()),
+        )]);
+
+        assert_eq!(rules, &expected);
+    }
+
     // AC-02 (a): a role variant missing from the config fails with RoleNotCovered.
     #[test]
     fn test_missing_data_role_is_role_not_covered() {
@@ -793,6 +825,27 @@ mod tests {
         assert_eq!(per_axis_dto_to_domain(&dto.per), TestObligationPerAxis::ReactsTo);
     }
 
+    // CN-10: the rules codec accepts precisely the complete per-axis
+    // vocabulary used by the default decision table.
+    #[test]
+    fn test_per_axis_dto_decodes_all_nine_closed_vocabulary_variants() {
+        for (wire, expected) in [
+            ("invariant", TestObligationPerAxis::Invariant),
+            ("method", TestObligationPerAxis::Method),
+            ("handles", TestObligationPerAxis::Handles),
+            ("reacts_to", TestObligationPerAxis::ReactsTo),
+            ("transition", TestObligationPerAxis::Transition),
+            ("trait_method", TestObligationPerAxis::TraitMethod),
+            ("entry", TestObligationPerAxis::Entry),
+            ("emits", TestObligationPerAxis::Emits),
+            ("trait_impl", TestObligationPerAxis::TraitImpl),
+        ] {
+            let dto: TestObligationPerAxisDto =
+                serde_json::from_str(&format!("\"{wire}\"")).unwrap();
+            assert_eq!(per_axis_dto_to_domain(&dto), expected);
+        }
+    }
+
     #[test]
     fn test_min_zero_is_invalid_rule_value() {
         let mut dto = complete_dto();
@@ -825,6 +878,156 @@ mod tests {
         assert_eq!(doc.function_roles().len(), 2);
         assert_eq!(doc.patterns().len(), 1);
         assert_eq!(doc.trait_impls().len(), 4);
+    }
+
+    // AC-01 / IN-02 / IN-03: the shipped decision table keeps every role
+    // explicit, including zero-obligation roles, and preserves the declared
+    // kind × per-axis rules through its DTO and domain value objects.
+    #[test]
+    fn test_default_config_preserves_explicit_rule_shapes_and_empty_lists() {
+        let trusted_root = workspace_root();
+        let config_path = trusted_root.join(".harness/config/test-obligation-rules.json");
+        let source = std::fs::read_to_string(&config_path).unwrap();
+        let wire: serde_json::Value = serde_json::from_str(&source).unwrap();
+
+        for section_name in
+            ["data_roles", "contract_roles", "function_roles", "patterns", "trait_impls"]
+        {
+            let section = wire[section_name].as_object().unwrap();
+            assert!(
+                section.values().all(|entry| entry["obligations"].is_array()),
+                "{section_name} must state every obligation list explicitly"
+            );
+        }
+
+        let doc = JsonTestObligationRulesLoader::new(config_path, trusted_root).load().unwrap();
+        let (_, value_object_rules) =
+            doc.data_roles().iter().find(|(role, _)| *role == DataRole::value_object()).unwrap();
+        let [value_object_rule] = value_object_rules.obligations() else {
+            panic!("ValueObject must have its declared boundary rule");
+        };
+        assert_eq!(value_object_rule.kind(), &TestObligationKind::Boundary);
+        assert_eq!(value_object_rule.per_axis(), &TestObligationPerAxis::Invariant);
+
+        let (_, dto_rules) =
+            doc.data_roles().iter().find(|(role, _)| *role == DataRole::Dto).unwrap();
+        assert!(dto_rules.is_empty_explicitly());
+
+        let (_, trait_impl_rules) = doc
+            .trait_impls()
+            .iter()
+            .find(|(role, _)| *role == ContractRole::ApplicationService)
+            .unwrap();
+        assert!(trait_impl_rules.is_empty_explicitly());
+    }
+
+    #[test]
+    fn test_default_config_covers_the_declared_role_universe_and_generation_rules() {
+        let trusted_root = workspace_root();
+        let config_path = trusted_root.join(".harness/config/test-obligation-rules.json");
+        let source = std::fs::read_to_string(&config_path).unwrap();
+        let wire: serde_json::Value = serde_json::from_str(&source).unwrap();
+
+        for (section, expected) in [
+            ("data_roles", DATA_ROLE_KEYS),
+            ("contract_roles", CONTRACT_ROLE_KEYS),
+            ("function_roles", FUNCTION_ROLE_KEYS),
+            ("trait_impls", CONTRACT_ROLE_KEYS),
+        ] {
+            let mut actual: Vec<&str> =
+                wire[section].as_object().unwrap().keys().map(String::as_str).collect();
+            actual.sort_unstable();
+            let mut expected = expected.to_vec();
+            expected.sort_unstable();
+            assert_eq!(actual, expected, "{section} must cover its full role universe");
+        }
+        assert!(wire["patterns"].get("typestate").is_some());
+
+        assert_eq!(wire["data_roles"]["ValueObject"]["obligations"][0]["kind"], "boundary");
+        assert_eq!(wire["data_roles"]["ValueObject"]["obligations"][0]["per"], "invariant");
+        assert_eq!(
+            wire["trait_impls"]["SecondaryPort"]["obligations"][0]["kind"],
+            "contract_conformance"
+        );
+        assert_eq!(wire["trait_impls"]["SecondaryPort"]["obligations"][0]["per"], "trait_impl");
+        assert!(
+            wire["trait_impls"]["ApplicationService"]["obligations"].as_array().unwrap().is_empty()
+        );
+
+        let document: TestObligationRulesDocumentDto = serde_json::from_str(&source).unwrap();
+        let domain = document.into_domain().unwrap();
+        assert_eq!(domain.data_roles().len(), DATA_ROLE_KEYS.len());
+        assert_eq!(domain.contract_roles().len(), CONTRACT_ROLE_KEYS.len());
+        assert_eq!(domain.function_roles().len(), FUNCTION_ROLE_KEYS.len());
+        assert_eq!(domain.trait_impls().len(), CONTRACT_ROLE_KEYS.len());
+    }
+
+    #[test]
+    fn test_loader_rejects_role_incomplete_document_after_reading_config_file() {
+        // IN-04 / AC-02: the port must validate totality after reading JSON,
+        // rather than relying on callers to invoke DTO conversion themselves.
+        let dir = tempfile::tempdir().unwrap();
+        let config_dir = dir.path().join(".harness/config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        let config_path = config_dir.join("test-obligation-rules.json");
+        std::fs::write(
+            &config_path,
+            r#"{
+                "data_roles": {},
+                "contract_roles": {},
+                "function_roles": {},
+                "patterns": {},
+                "trait_impls": {}
+            }"#,
+        )
+        .unwrap();
+
+        let loader = JsonTestObligationRulesLoader::new(config_path, dir.path().to_path_buf());
+        assert!(matches!(loader.load(), Err(TestObligationRulesLoadError::RoleNotCovered { .. })));
+    }
+
+    #[test]
+    fn test_loader_rejects_omitted_obligations_and_unknown_roles_after_reading_json() {
+        let source = std::fs::read_to_string(
+            workspace_root().join(".harness/config/test-obligation-rules.json"),
+        )
+        .unwrap();
+
+        for (replacement, expected_role) in [
+            (
+                source.replace(
+                    "\"Dto\":              { \"obligations\": [] }",
+                    "\"Dto\":              {}",
+                ),
+                "Dto",
+            ),
+            (
+                source.replace(
+                    "\"Dto\":              { \"obligations\": [] },",
+                    "\"Dto\":              { \"obligations\": [] },\n    \"UnknownRole\":      { \"obligations\": [] },",
+                ),
+                "UnknownRole",
+            ),
+        ] {
+            let dir = tempfile::tempdir().unwrap();
+            let config_dir = dir.path().join(".harness/config");
+            std::fs::create_dir_all(&config_dir).unwrap();
+            let config_path = config_dir.join("test-obligation-rules.json");
+            std::fs::write(&config_path, replacement).unwrap();
+            let loader = JsonTestObligationRulesLoader::new(config_path, dir.path().to_path_buf());
+
+            match loader.load() {
+                Err(TestObligationRulesLoadError::ObligationsFieldOmitted { role_name }) => {
+                    assert_eq!(expected_role, "Dto");
+                    assert_eq!(role_name.as_str(), expected_role);
+                }
+                Err(TestObligationRulesLoadError::UnknownRoleName { role_name }) => {
+                    assert_eq!(expected_role, "UnknownRole");
+                    assert_eq!(role_name.as_str(), expected_role);
+                }
+                other => panic!("expected read-time rules validation failure, got {other:?}"),
+            }
+        }
     }
 
     #[test]

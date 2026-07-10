@@ -16,9 +16,11 @@ use std::sync::Arc;
 use domain::EvidenceCitation;
 use domain::ModelTier;
 use domain::tddd::test_obligation::errors::SemanticVerifierError;
+use domain::tddd::test_obligation::hashes::VerifierPromptFingerprint;
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::test_obligation::ports::WaiverVerifierPort;
 use domain::tddd::test_obligation::verdict::WaiverVerdict;
+use usecase::test_obligation::hasher::ContentHasherPort;
 
 use crate::agent_profiles::AgentProfiles;
 use crate::test_obligation::diagnostic;
@@ -26,6 +28,7 @@ use crate::test_obligation::semantic_verifier::{
     SemanticVerifierRunner, VerdictKindWire, default_waiver_verifier_runner, extract_verdict_json,
     resolve_execution_or_err, semantic_verifier_error, tier_to_round_type,
 };
+use crate::test_obligation::sha256_content_hasher::Sha256ContentHasher;
 
 /// Capability name resolved from `agent-profiles.json` for this verifier.
 const CAPABILITY: &str = "waiver-verifier";
@@ -51,6 +54,17 @@ explanation of why it was rejected.
 Representative acceptable reasons: the anchor promises no verifiable behaviour for this entry \
 (design rationale), the structure is guaranteed by the type system, or the property is enforced \
 by a deterministic verify gate.";
+
+/// Returns the SHA-256 content hash of this verifier's judging prompt preamble.
+///
+/// The hash deliberately excludes execution provider, model, and tier: it
+/// invalidates cache entries only when the judging instructions change.
+#[must_use]
+pub fn waiver_verifier_fingerprint() -> VerifierPromptFingerprint {
+    VerifierPromptFingerprint::new(
+        Sha256ContentHasher::new().sha256(WAIVER_PROMPT_PREAMBLE.as_bytes()),
+    )
+}
 
 /// Capability adapter that resolves the waiver verifier provider and delegates
 /// the semantic judgement to it (IN-09 / IN-15 / AC-07 / CN-08).
@@ -212,6 +226,23 @@ mod tests {
     }
 
     #[test]
+    fn test_failing_waiver_verifier_for_each_pair_returns_fail_closed_port_error() {
+        let verifier = FailingWaiverVerifier::from_message("profile unavailable");
+
+        for (waived_reason, entry_declaration, anchor_text, tier) in [
+            ("reason", "struct Entry", "anchor promise", ModelTier::Fast),
+            ("another reason", "trait Port", "different anchor promise", ModelTier::Final),
+        ] {
+            let err = verifier
+                .verify_pair(waived_reason, entry_declaration, anchor_text, tier)
+                .unwrap_err();
+
+            let SemanticVerifierError::VerifierPort(message) = err;
+            assert_eq!(message.as_str(), "profile unavailable");
+        }
+    }
+
+    #[test]
     fn pass_verdict_decodes_to_waived_with_citation() {
         let verdict = adapter(
             r#"{"kind":"pass","citation":"the anchor states this is a design goal","reason":null}"#,
@@ -229,6 +260,35 @@ mod tests {
             }
             other => panic!("expected Waived, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn test_waiver_adapter_pair_uses_waiver_capability_and_citation() {
+        let captured: Arc<Mutex<Option<(ResolvedExecution, String)>>> = Arc::new(Mutex::new(None));
+        let captured_clone = Arc::clone(&captured);
+        let runner: Arc<SemanticVerifierRunner> = Arc::new(move |resolved, prompt| {
+            *captured_clone.lock().unwrap() = Some((resolved, prompt));
+            Ok(r#"{"kind":"pass","citation":"the anchor is a design goal","reason":null}"#
+                .to_owned())
+        });
+        let adapter = WaiverVerifierAdapter::with_runner(profiles(), runner);
+
+        let verdict = adapter
+            .verify_pair(
+                "this design goal has no independently observable behaviour",
+                "struct Entry",
+                "the design goal explains the purpose",
+                ModelTier::Final,
+            )
+            .unwrap();
+
+        assert!(matches!(verdict, WaiverVerdict::Waived { .. }));
+        let (resolved, prompt) = captured.lock().unwrap().clone().unwrap();
+        assert_eq!(resolved.model.as_deref(), Some("claude-opus-4-8"));
+        assert!(prompt.contains("waiver verifier"));
+        assert!(prompt.contains("this design goal has no independently observable behaviour"));
+        assert!(prompt.contains("struct Entry"));
+        assert!(prompt.contains("the design goal explains the purpose"));
     }
 
     #[test]
@@ -314,5 +374,23 @@ mod tests {
         assert!(prompt.contains("REASON_MARKER"));
         assert!(prompt.contains("DECL_MARKER"));
         assert!(prompt.contains("ANCHOR_MARKER"));
+    }
+
+    #[test]
+    fn test_waiver_prompt_requires_reason_to_anchor_semantic_comparison() {
+        let prompt = WaiverVerifierAdapter::render_prompt("reason", "entry", "anchor");
+
+        assert!(prompt.contains("implementer-authored waiver reason justifies"));
+        assert!(prompt.contains("cited anchor as it relates to the given catalogue entry"));
+        assert!(prompt.contains("reason must be self-contained"));
+        assert!(!prompt.contains("obligation-fulfillment verifier"));
+    }
+
+    #[test]
+    fn test_waiver_verifier_fingerprint_hashes_prompt_preamble_only() {
+        let fingerprint = waiver_verifier_fingerprint();
+        let expected = Sha256ContentHasher::new().sha256(WAIVER_PROMPT_PREAMBLE.as_bytes());
+
+        assert_eq!(fingerprint.as_hash(), &expected);
     }
 }

@@ -5,7 +5,8 @@
 use std::sync::Arc;
 
 use domain::tddd::LayerId;
-use domain::tddd::semantic_verify::CatalogueEntryKey;
+use domain::tddd::catalogue_v2::roles::DataRole;
+use domain::tddd::semantic_verify::{CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey};
 use domain::tddd::test_obligation::binding::{
     NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument, TestLocation,
 };
@@ -16,9 +17,10 @@ use domain::tddd::test_obligation::errors::{
 use domain::tddd::test_obligation::hashes::{AnchorTextHash, BoundTestsSetHash, DeclarationHash};
 use domain::tddd::test_obligation::ids::{
     DiagnosticMessage, TestFunctionName, TestModulePath, TestObligationAnchorId,
-    TestObligationEdgeId, TestObligationId, TestObligationItemIdentifier,
+    TestObligationBrief, TestObligationEdgeId, TestObligationId, TestObligationItemIdentifier,
+    WaivedReason,
 };
-use domain::tddd::test_obligation::obligations::ObligationsDocument;
+use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
 use domain::tddd::test_obligation::ports::{
     ObligationFulfillmentCachePort, ObligationsArtifactPort, TestBindingsArtifactPort,
     WaiverCachePort,
@@ -28,7 +30,9 @@ use domain::tddd::test_obligation::verdict::{
     ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, WaiverCacheDocument,
     WaiverCacheEntry, WaiverCacheKey, WaiverVerdict,
 };
-use domain::tddd::test_obligation::vocab::{FulfillmentFailCategory, TestObligationKind};
+use domain::tddd::test_obligation::vocab::{
+    FulfillmentFailCategory, TargetEntryRoleKind, TestObligationKind,
+};
 use domain::{ContentHash, EvidenceCitation, TrackId};
 
 use super::{
@@ -40,11 +44,10 @@ use super::{
 // Test doubles
 // ---------------------------------------------------------------------------
 
-#[derive(Default)]
-struct StubObligations;
+struct StubObligations(Option<ObligationsDocument>);
 impl ObligationsArtifactPort for StubObligations {
     fn load(&self, _track_id: &TrackId) -> Result<Option<ObligationsDocument>, ArtifactCodecError> {
-        Ok(None)
+        Ok(self.0.clone())
     }
     fn save(&self, _doc: &ObligationsDocument) -> Result<(), DiagnosticMessage> {
         Ok(())
@@ -182,13 +185,68 @@ fn location(layer: &str) -> TestLocation {
     )
 }
 
+fn fulfillment_binding(obligation_id: TestObligationId) -> TestBindingRecord {
+    TestBindingRecord::Fulfillment {
+        obligation_id,
+        tests: NonEmptyTestLocations::try_new(vec![location("infrastructure")]).unwrap(),
+    }
+}
+
+fn obligation(name: &str, item: &str) -> TestObligation {
+    obligation_with_spec_refs(name, item, vec![anchor("IN-06")])
+}
+
+fn obligation_with_spec_refs(
+    name: &str,
+    item: &str,
+    spec_refs: Vec<TestObligationAnchorId>,
+) -> TestObligation {
+    TestObligation::new(
+        obligation_id(name, item),
+        CatalogueEntryRef::new(
+            "domain-types.json".to_owned(),
+            CatalogueSectionKey::Types,
+            entry_key(name),
+        ),
+        TargetEntryRoleKind::DataRole(DataRole::value_object()),
+        TestObligationBrief::try_new("cover results provenance".to_owned()).unwrap(),
+        DeclarationHash::new(hash(2)),
+        spec_refs,
+    )
+}
+
+fn waiver_failure_cache(edge_id: TestObligationEdgeId) -> WaiverCacheDocument {
+    WaiverCacheDocument::new(
+        track(),
+        vec![WaiverCacheEntry::new(
+            edge_id,
+            WaiverCacheKey::new(
+                domain::tddd::test_obligation::hashes::WaivedReasonHash::new(hash(5)),
+                DeclarationHash::new(hash(2)),
+                AnchorTextHash::new(hash(3)),
+            ),
+            WaiverVerdict::Fail { reason: reason("does not hold") },
+            None,
+        )],
+    )
+}
+
 fn interactor(
     bindings: Option<TestBindingsDocument>,
     fulfillment: Option<ObligationFulfillmentCacheDocument>,
     waiver: Option<WaiverCacheDocument>,
 ) -> TestObligationResultsInteractor {
+    interactor_with_obligations(None, bindings, fulfillment, waiver)
+}
+
+fn interactor_with_obligations(
+    obligations: Option<ObligationsDocument>,
+    bindings: Option<TestBindingsDocument>,
+    fulfillment: Option<ObligationFulfillmentCacheDocument>,
+    waiver: Option<WaiverCacheDocument>,
+) -> TestObligationResultsInteractor {
     TestObligationResultsInteractor::new(
-        Arc::new(StubObligations),
+        Arc::new(StubObligations(obligations)),
         Arc::new(StubBindings(bindings)),
         Arc::new(StubFulfillmentCache(fulfillment)),
         Arc::new(StubWaiverCache(waiver)),
@@ -202,31 +260,45 @@ fn interactor(
 #[test]
 fn test_fulfillment_lane_counts_and_records() {
     // IN-10 / AC-09: pass / fail / pending are counted; fail + pending yield records.
+    let fulfilled_id = obligation_id("Money", "invariant:a");
+    let failed_id = obligation_id("Money", "invariant:b");
+    let pending_id = obligation_id("Money", "invariant:c");
+    let bindings = TestBindingsDocument::new(
+        track(),
+        vec![
+            fulfillment_binding(fulfilled_id.clone()),
+            fulfillment_binding(failed_id.clone()),
+            fulfillment_binding(pending_id.clone()),
+        ],
+    );
     let entries = vec![
         ObligationFulfillmentCacheEntry::new(
             edge("Money", "IN-05"),
-            obligation_id("Money", "invariant:a"),
+            fulfilled_id,
             fulfillment_key(),
             ObligationFulfillmentVerdict::Fulfilled { citation: citation() },
+            None,
         ),
         ObligationFulfillmentCacheEntry::new(
             edge("Money", "IN-06"),
-            obligation_id("Money", "invariant:b"),
+            failed_id.clone(),
             fulfillment_key(),
             ObligationFulfillmentVerdict::Fail {
                 category: FulfillmentFailCategory::Contradiction,
                 reason: reason("asserts the opposite"),
             },
+            None,
         ),
         ObligationFulfillmentCacheEntry::new(
             edge("Money", "IN-07"),
-            obligation_id("Money", "invariant:c"),
+            pending_id.clone(),
             fulfillment_key(),
             ObligationFulfillmentVerdict::Pending,
+            None,
         ),
     ];
     let cache = ObligationFulfillmentCacheDocument::new(track(), entries);
-    let output = interactor(None, Some(cache), None)
+    let output = interactor(Some(bindings), Some(cache), None)
         .execute(&TestObligationResultsCommand::new(track()))
         .unwrap();
 
@@ -241,6 +313,24 @@ fn test_fulfillment_lane_counts_and_records() {
     assert_eq!(fulfillment_lanes[0].pending_count(), 1);
     // Records are emitted for the fail + pending edges only.
     assert_eq!(output.records().len(), 2);
+    assert!(output.records().contains(&EdgeVerdictRecord::new(
+        Some(failed_id),
+        edge("Money", "IN-06"),
+        Some(reason("fulfillment binding")),
+        Some(reason("infrastructure::infrastructure::tests::test_case")),
+        EdgeResolutionOutcome::Fail(FulfillmentFailCategory::Contradiction),
+        Some(reason("asserts the opposite")),
+        None,
+    )));
+    assert!(output.records().contains(&EdgeVerdictRecord::new(
+        Some(pending_id),
+        edge("Money", "IN-07"),
+        Some(reason("fulfillment binding")),
+        Some(reason("infrastructure::infrastructure::tests::test_case")),
+        EdgeResolutionOutcome::Pending,
+        None,
+        None,
+    )));
 }
 
 #[test]
@@ -259,6 +349,7 @@ fn test_layer_resolved_from_binding_test_location() {
             obligation,
             fulfillment_key(),
             ObligationFulfillmentVerdict::Fulfilled { citation: citation() },
+            None,
         )],
     );
     let output = interactor(Some(bindings), Some(cache), None)
@@ -283,6 +374,7 @@ fn test_layer_resolved_from_migrated_voluntary_binding() {
             obligation,
             fulfillment_key(),
             ObligationFulfillmentVerdict::Fulfilled { citation: citation() },
+            None,
         )],
     );
 
@@ -295,6 +387,17 @@ fn test_layer_resolved_from_migrated_voluntary_binding() {
 
 #[test]
 fn test_waiver_lane_counts() {
+    let waived_edge = edge("Money", "IN-06");
+    let resolved_obligation = obligation("Money", "invariant:b");
+    let resolved_obligation_id = resolved_obligation.id().clone();
+    let waiver_reason = "the fallback cannot emit a pass verdict";
+    let bindings = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::Waiver {
+            edge_id: waived_edge.clone(),
+            reason: WaivedReason::try_new(waiver_reason.to_owned()).unwrap(),
+        }],
+    );
     let entries = vec![
         WaiverCacheEntry::new(
             edge("Money", "IN-05"),
@@ -304,21 +407,28 @@ fn test_waiver_lane_counts() {
                 AnchorTextHash::new(hash(3)),
             ),
             WaiverVerdict::Waived { citation: citation() },
+            None,
         ),
         WaiverCacheEntry::new(
-            edge("Money", "IN-06"),
+            waived_edge.clone(),
             WaiverCacheKey::new(
                 domain::tddd::test_obligation::hashes::WaivedReasonHash::new(hash(5)),
                 DeclarationHash::new(hash(2)),
                 AnchorTextHash::new(hash(3)),
             ),
             WaiverVerdict::Fail { reason: reason("does not hold") },
+            None,
         ),
     ];
     let cache = WaiverCacheDocument::new(track(), entries);
-    let output = interactor(None, None, Some(cache))
-        .execute(&TestObligationResultsCommand::new(track()))
-        .unwrap();
+    let output = interactor_with_obligations(
+        Some(ObligationsDocument::new(track(), vec![resolved_obligation])),
+        Some(bindings),
+        None,
+        Some(cache),
+    )
+    .execute(&TestObligationResultsCommand::new(track()))
+    .unwrap();
 
     let waiver_lanes: Vec<_> = output
         .lane_summaries()
@@ -329,10 +439,124 @@ fn test_waiver_lane_counts() {
     assert_eq!(waiver_lanes[0].pass_count(), 1);
     assert_eq!(waiver_lanes[0].fail_count(), 1);
     assert!(output.records().contains(&EdgeVerdictRecord::new(
-        edge("Money", "IN-06"),
+        Some(resolved_obligation_id),
+        waived_edge,
+        Some(reason("waiver")),
+        Some(reason(waiver_reason)),
         EdgeResolutionOutcome::Fail(FulfillmentFailCategory::CentralUnverified),
+        Some(reason("does not hold")),
         None,
     )));
+}
+
+#[test]
+fn test_waiver_record_without_exact_binding_has_no_provenance() {
+    let waived_edge = edge("Money", "IN-06");
+    let resolved_obligation = obligation("Money", "invariant:a");
+    let expected_record = EdgeVerdictRecord::new(
+        Some(resolved_obligation.id().clone()),
+        waived_edge.clone(),
+        None,
+        None,
+        EdgeResolutionOutcome::Fail(FulfillmentFailCategory::CentralUnverified),
+        Some(reason("does not hold")),
+        None,
+    );
+
+    for bindings in [
+        None,
+        Some(TestBindingsDocument::new(
+            track(),
+            vec![TestBindingRecord::Waiver {
+                edge_id: edge("Money", "IN-05"),
+                reason: WaivedReason::try_new("unrelated waiver".to_owned()).unwrap(),
+            }],
+        )),
+    ] {
+        let output = interactor_with_obligations(
+            Some(ObligationsDocument::new(track(), vec![resolved_obligation.clone()])),
+            bindings,
+            None,
+            Some(waiver_failure_cache(waived_edge.clone())),
+        )
+        .execute(&TestObligationResultsCommand::new(track()))
+        .unwrap();
+
+        assert_eq!(output.records(), std::slice::from_ref(&expected_record));
+    }
+}
+
+#[test]
+fn test_waiver_record_resolves_unique_owner_by_anchor() {
+    let waived_edge = edge("Money", "IN-07");
+    let unrelated_obligation = obligation("Money", "invariant:a");
+    let owner = obligation_with_spec_refs("Money", "invariant:b", vec![anchor("IN-07")]);
+    let owner_id = owner.id().clone();
+    let bindings = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::Waiver {
+            edge_id: waived_edge.clone(),
+            reason: WaivedReason::try_new("valid waiver".to_owned()).unwrap(),
+        }],
+    );
+
+    let output = interactor_with_obligations(
+        Some(ObligationsDocument::new(track(), vec![unrelated_obligation, owner])),
+        Some(bindings),
+        None,
+        Some(waiver_failure_cache(waived_edge.clone())),
+    )
+    .execute(&TestObligationResultsCommand::new(track()))
+    .unwrap();
+
+    assert_eq!(
+        output.records(),
+        &[EdgeVerdictRecord::new(
+            Some(owner_id),
+            waived_edge,
+            Some(reason("waiver")),
+            Some(reason("valid waiver")),
+            EdgeResolutionOutcome::Fail(FulfillmentFailCategory::CentralUnverified),
+            Some(reason("does not hold")),
+            None,
+        )]
+    );
+}
+
+#[test]
+fn test_waiver_record_with_ambiguous_anchor_owner_leaves_obligation_unresolved() {
+    let waived_edge = edge("Money", "IN-07");
+    let first_owner = obligation_with_spec_refs("Money", "invariant:a", vec![anchor("IN-07")]);
+    let second_owner = obligation_with_spec_refs("Money", "invariant:b", vec![anchor("IN-07")]);
+    let bindings = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::Waiver {
+            edge_id: waived_edge.clone(),
+            reason: WaivedReason::try_new("valid waiver".to_owned()).unwrap(),
+        }],
+    );
+
+    let output = interactor_with_obligations(
+        Some(ObligationsDocument::new(track(), vec![first_owner, second_owner])),
+        Some(bindings),
+        None,
+        Some(waiver_failure_cache(waived_edge.clone())),
+    )
+    .execute(&TestObligationResultsCommand::new(track()))
+    .unwrap();
+
+    assert_eq!(
+        output.records(),
+        &[EdgeVerdictRecord::new(
+            None,
+            waived_edge,
+            Some(reason("waiver")),
+            Some(reason("valid waiver")),
+            EdgeResolutionOutcome::Fail(FulfillmentFailCategory::CentralUnverified),
+            Some(reason("does not hold")),
+            None,
+        )]
+    );
 }
 
 #[test]
@@ -367,7 +591,7 @@ fn test_obligations_io_error_maps_to_io_error() {
 #[test]
 fn test_bindings_malformed_error_maps_to_malformed_artifact() {
     let interactor = TestObligationResultsInteractor::new(
-        Arc::new(StubObligations),
+        Arc::new(StubObligations(None)),
         Arc::new(FailingBindings { error: artifact_malformed_error }),
         Arc::new(StubFulfillmentCache(None)),
         Arc::new(StubWaiverCache(None)),

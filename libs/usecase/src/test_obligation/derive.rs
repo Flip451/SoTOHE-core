@@ -36,7 +36,10 @@ use domain::tddd::test_obligation::vocab::{
 
 use domain::SpecDocumentLoaderPort;
 
-use super::{TestObligationCatalogueCommandInput, diag, is_active_branch, sha256_content_hash};
+use super::{
+    TestObligationCatalogueCommandInput, catalogue_artifact_path, diag, is_active_branch,
+    sha256_content_hash,
+};
 
 /// Command input for [`DeriveTestObligationsApplicationService`] (IN-07).
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -117,7 +120,7 @@ impl DeriveTestObligationsApplicationService for DeriveTestObligationsInteractor
 
         let mut obligations: Vec<TestObligation> = Vec::new();
         for (path, catalogue) in &catalogues {
-            let file_path = path.display().to_string();
+            let file_path = catalogue_artifact_path(path);
             derive_type_obligations(
                 &rules,
                 &self.projector,

@@ -280,7 +280,7 @@ mod tests {
     }
 
     fn record() -> EdgeVerdictRecord {
-        EdgeVerdictRecord::new(edge(), EdgeResolutionOutcome::Pending, None)
+        EdgeVerdictRecord::new(None, edge(), None, None, EdgeResolutionOutcome::Pending, None, None)
     }
 
     fn catalogue_load_error() -> CatalogueDocumentLoaderError {

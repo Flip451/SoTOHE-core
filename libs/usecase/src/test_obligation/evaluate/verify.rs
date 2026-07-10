@@ -27,16 +27,24 @@ pub(super) fn record_fulfillment(
         ObligationFulfillmentVerdict::Fail { category, .. } => {
             tally.fail += 1;
             tally.failure_records.push(EdgeVerdictRecord::new(
+                None,
                 edge_id.clone(),
+                None,
+                None,
                 EdgeResolutionOutcome::Fail(category.clone()),
+                None,
                 None,
             ));
         }
         ObligationFulfillmentVerdict::Pending => {
             tally.pending += 1;
             tally.pending_records.push(EdgeVerdictRecord::new(
+                None,
                 edge_id.clone(),
+                None,
+                None,
                 EdgeResolutionOutcome::Pending,
+                None,
                 None,
             ));
         }
@@ -82,8 +90,12 @@ pub(super) fn record_pending_obligation_edges(obligation: &TestObligation, tally
 pub(super) fn record_pending_edge(edge_id: TestObligationEdgeId, tally: &mut Tally) {
     tally.pending += 1;
     tally.pending_records.push(EdgeVerdictRecord::new(
+        None,
         edge_id,
+        None,
+        None,
         EdgeResolutionOutcome::Pending,
+        None,
         None,
     ));
 }
@@ -99,16 +111,24 @@ pub(super) fn record_waiver(
         WaiverVerdict::Fail { .. } => {
             tally.fail += 1;
             tally.failure_records.push(EdgeVerdictRecord::new(
+                None,
                 edge_id.clone(),
+                None,
+                None,
                 EdgeResolutionOutcome::Fail(FulfillmentFailCategory::CentralUnverified),
+                None,
                 None,
             ));
         }
         WaiverVerdict::Pending => {
             tally.pending += 1;
             tally.pending_records.push(EdgeVerdictRecord::new(
+                None,
                 edge_id.clone(),
+                None,
+                None,
                 EdgeResolutionOutcome::Pending,
+                None,
                 None,
             ));
         }

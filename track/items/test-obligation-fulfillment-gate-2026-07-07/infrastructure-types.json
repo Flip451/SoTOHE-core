@@ -1,6 +1,45 @@
 {
   "crate_name": "infrastructure",
-  "functions": {},
+  "functions": {
+    "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint": {
+      "action": "add",
+      "docs": "Computes the fingerprint of the fulfillment judging-prompt preamble; see IN-09 / CN-04.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [],
+      "returns": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint": {
+      "action": "add",
+      "docs": "Computes the fingerprint of the waiver judging-prompt preamble; see IN-09 / CN-04.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [],
+      "returns": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    }
+  },
   "inherent_impls": [],
   "layer": "infrastructure",
   "schema_version": 5,
@@ -84,802 +123,801 @@
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "ContractRoleKey"
+      "for_type": "ContractRoleKey",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "ContractRoleKey"
+      "for_type": "ContractRoleKey",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "ContractRoleKey"
+      "for_type": "ContractRoleKey",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "ContractRoleKey"
+      "for_type": "ContractRoleKey",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "DataRoleKey"
+      "for_type": "DataRoleKey",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "DataRoleKey"
+      "for_type": "DataRoleKey",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "DataRoleKey"
+      "for_type": "DataRoleKey",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "DataRoleKey"
+      "for_type": "DataRoleKey",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "FulfillmentFailCategoryDto"
+      "for_type": "FulfillmentFailCategoryDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "FulfillmentFailCategoryDto"
+      "for_type": "FulfillmentFailCategoryDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "FulfillmentFailCategoryDto"
+      "for_type": "FulfillmentFailCategoryDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "FulfillmentFailCategoryDto"
+      "for_type": "FulfillmentFailCategoryDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "FunctionRoleKey"
+      "for_type": "FunctionRoleKey",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "FunctionRoleKey"
+      "for_type": "FunctionRoleKey",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "FunctionRoleKey"
+      "for_type": "FunctionRoleKey",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "FunctionRoleKey"
+      "for_type": "FunctionRoleKey",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "ObligationFulfillmentCacheDocumentDto"
+      "for_type": "ObligationFulfillmentCacheDocumentDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "ObligationFulfillmentCacheDocumentDto"
+      "for_type": "ObligationFulfillmentCacheDocumentDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "ObligationFulfillmentCacheDocumentDto"
+      "for_type": "ObligationFulfillmentCacheDocumentDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "ObligationFulfillmentCacheDocumentDto"
+      "for_type": "ObligationFulfillmentCacheDocumentDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "ObligationFulfillmentCacheEntryDto"
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "ObligationFulfillmentCacheEntryDto"
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "ObligationFulfillmentCacheEntryDto"
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "ObligationFulfillmentCacheEntryDto"
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "ObligationFulfillmentVerdictDto"
+      "for_type": "ObligationFulfillmentVerdictDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "ObligationFulfillmentVerdictDto"
+      "for_type": "ObligationFulfillmentVerdictDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "ObligationFulfillmentVerdictDto"
+      "for_type": "ObligationFulfillmentVerdictDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "ObligationFulfillmentVerdictDto"
+      "for_type": "ObligationFulfillmentVerdictDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "ObligationsDocumentDto"
+      "for_type": "ObligationsDocumentDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "ObligationsDocumentDto"
+      "for_type": "ObligationsDocumentDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "ObligationsDocumentDto"
+      "for_type": "ObligationsDocumentDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "ObligationsDocumentDto"
+      "for_type": "ObligationsDocumentDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "PatternKey"
+      "for_type": "PatternKey",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "PatternKey"
+      "for_type": "PatternKey",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "PatternKey"
+      "for_type": "PatternKey",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "PatternKey"
+      "for_type": "PatternKey",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "RoleObligationRulesDto"
+      "for_type": "RoleObligationRulesDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "RoleObligationRulesDto"
+      "for_type": "RoleObligationRulesDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "RoleObligationRulesDto"
+      "for_type": "RoleObligationRulesDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "RoleObligationRulesDto"
+      "for_type": "RoleObligationRulesDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestBindingRecordDto"
+      "for_type": "TestBindingRecordDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestBindingRecordDto"
+      "for_type": "TestBindingRecordDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestBindingRecordDto"
+      "for_type": "TestBindingRecordDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestBindingRecordDto"
+      "for_type": "TestBindingRecordDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestBindingsDocumentDto"
+      "for_type": "TestBindingsDocumentDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestBindingsDocumentDto"
+      "for_type": "TestBindingsDocumentDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestBindingsDocumentDto"
+      "for_type": "TestBindingsDocumentDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestBindingsDocumentDto"
+      "for_type": "TestBindingsDocumentDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestLocationDto"
+      "for_type": "TestLocationDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestLocationDto"
+      "for_type": "TestLocationDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestLocationDto"
+      "for_type": "TestLocationDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestLocationDto"
+      "for_type": "TestLocationDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationAnchorIdDto"
+      "for_type": "TestObligationAnchorIdDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationAnchorIdDto"
+      "for_type": "TestObligationAnchorIdDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationAnchorIdDto"
+      "for_type": "TestObligationAnchorIdDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationAnchorIdDto"
+      "for_type": "TestObligationAnchorIdDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationDto"
+      "for_type": "TestObligationDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationDto"
+      "for_type": "TestObligationDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationDto"
+      "for_type": "TestObligationDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationDto"
+      "for_type": "TestObligationDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationEdgeIdDto"
+      "for_type": "TestObligationEdgeIdDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationEdgeIdDto"
+      "for_type": "TestObligationEdgeIdDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationEdgeIdDto"
+      "for_type": "TestObligationEdgeIdDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationEdgeIdDto"
+      "for_type": "TestObligationEdgeIdDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationIdDto"
+      "for_type": "TestObligationIdDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationIdDto"
+      "for_type": "TestObligationIdDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationIdDto"
+      "for_type": "TestObligationIdDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationIdDto"
+      "for_type": "TestObligationIdDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationKindDto"
+      "for_type": "TestObligationKindDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationKindDto"
+      "for_type": "TestObligationKindDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationKindDto"
+      "for_type": "TestObligationKindDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationKindDto"
+      "for_type": "TestObligationKindDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationPerAxisDto"
+      "for_type": "TestObligationPerAxisDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationPerAxisDto"
+      "for_type": "TestObligationPerAxisDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationPerAxisDto"
+      "for_type": "TestObligationPerAxisDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationPerAxisDto"
+      "for_type": "TestObligationPerAxisDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationRuleDto"
+      "for_type": "TestObligationRuleDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationRuleDto"
+      "for_type": "TestObligationRuleDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationRuleDto"
+      "for_type": "TestObligationRuleDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationRuleDto"
+      "for_type": "TestObligationRuleDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TestObligationRulesDocumentDto"
+      "for_type": "TestObligationRulesDocumentDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "TestObligationRulesDocumentDto"
+      "for_type": "TestObligationRulesDocumentDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "TestObligationRulesDocumentDto"
+      "for_type": "TestObligationRulesDocumentDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "TestObligationRulesDocumentDto"
+      "for_type": "TestObligationRulesDocumentDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "WaiverCacheDocumentDto"
+      "for_type": "WaiverCacheDocumentDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "WaiverCacheDocumentDto"
+      "for_type": "WaiverCacheDocumentDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "WaiverCacheDocumentDto"
+      "for_type": "WaiverCacheDocumentDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "WaiverCacheDocumentDto"
+      "for_type": "WaiverCacheDocumentDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "WaiverCacheEntryDto"
+      "for_type": "WaiverCacheEntryDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "WaiverCacheEntryDto"
+      "for_type": "WaiverCacheEntryDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "WaiverCacheEntryDto"
+      "for_type": "WaiverCacheEntryDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "WaiverCacheEntryDto"
+      "for_type": "WaiverCacheEntryDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "WaiverVerdictDto"
+      "for_type": "WaiverVerdictDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "WaiverVerdictDto"
+      "for_type": "WaiverVerdictDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "WaiverVerdictDto"
+      "for_type": "WaiverVerdictDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "WaiverVerdictDto"
+      "for_type": "WaiverVerdictDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "TestObligationPerAxisDto"
+      "for_type": "TestObligationPerAxisDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "TestObligationRuleDto"
+      "for_type": "TestObligationRuleDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "RoleObligationRulesDto"
+      "for_type": "RoleObligationRulesDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "TestObligationRulesDocumentDto"
+      "for_type": "TestObligationRulesDocumentDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "JsonTestObligationRulesLoader"
+      "for_type": "JsonTestObligationRulesLoader",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "JsonTestObligationRulesLoader"
+      "for_type": "JsonTestObligationRulesLoader",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "ObligationsDocumentDto"
+      "for_type": "ObligationsDocumentDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "ObligationsDocumentDto"
+      "for_type": "ObligationsDocumentDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "TestObligationDto"
+      "for_type": "TestObligationDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "TestObligationDto"
+      "for_type": "TestObligationDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "TestObligationIdDto"
+      "for_type": "TestObligationIdDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "TestObligationIdDto"
+      "for_type": "TestObligationIdDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "TestObligationAnchorIdDto"
+      "for_type": "TestObligationAnchorIdDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "TestObligationAnchorIdDto"
+      "for_type": "TestObligationAnchorIdDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "TestObligationKindDto"
+      "for_type": "TestObligationKindDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "TestObligationKindDto"
+      "for_type": "TestObligationKindDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "TestBindingsDocumentDto"
+      "for_type": "TestBindingsDocumentDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "TestBindingsDocumentDto"
+      "for_type": "TestBindingsDocumentDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "TestBindingRecordDto"
+      "for_type": "TestBindingRecordDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "TestBindingRecordDto"
+      "for_type": "TestBindingRecordDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "TestLocationDto"
+      "for_type": "TestLocationDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "TestLocationDto"
+      "for_type": "TestLocationDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "TestObligationEdgeIdDto"
+      "for_type": "TestObligationEdgeIdDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "TestObligationEdgeIdDto"
+      "for_type": "TestObligationEdgeIdDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "ObligationFulfillmentCacheDocumentDto"
+      "for_type": "ObligationFulfillmentCacheDocumentDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "ObligationFulfillmentCacheDocumentDto"
+      "for_type": "ObligationFulfillmentCacheDocumentDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "ObligationFulfillmentCacheEntryDto"
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "ObligationFulfillmentCacheEntryDto"
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "ObligationFulfillmentVerdictDto"
+      "for_type": "ObligationFulfillmentVerdictDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "ObligationFulfillmentVerdictDto"
+      "for_type": "ObligationFulfillmentVerdictDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "FulfillmentFailCategoryDto"
+      "for_type": "FulfillmentFailCategoryDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "FulfillmentFailCategoryDto"
+      "for_type": "FulfillmentFailCategoryDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "WaiverCacheDocumentDto"
+      "for_type": "WaiverCacheDocumentDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "WaiverCacheDocumentDto"
+      "for_type": "WaiverCacheDocumentDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "WaiverCacheEntryDto"
+      "for_type": "WaiverCacheEntryDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "WaiverCacheEntryDto"
+      "for_type": "WaiverCacheEntryDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "WaiverVerdictDto"
+      "for_type": "WaiverVerdictDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "WaiverVerdictDto"
+      "for_type": "WaiverVerdictDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "CatalogueEntryRefDto"
+      "for_type": "CatalogueEntryRefDto",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "CatalogueEntryRefDto"
+      "for_type": "CatalogueEntryRefDto",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::PartialEq",
-      "for_type": "CatalogueEntryRefDto"
+      "for_type": "CatalogueEntryRefDto",
+      "trait_ref": "core::cmp::PartialEq"
     },
     {
       "action": "add",
-      "trait_ref": "core::cmp::Eq",
-      "for_type": "CatalogueEntryRefDto"
+      "for_type": "CatalogueEntryRefDto",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::ser::Serialize",
-      "for_type": "CatalogueEntryRefDto"
+      "for_type": "CatalogueEntryRefDto",
+      "trait_ref": "serde_core::ser::Serialize"
     },
     {
       "action": "add",
-      "trait_ref": "serde_core::de::Deserialize<'de>",
-      "for_type": "CatalogueEntryRefDto"
+      "for_type": "CatalogueEntryRefDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "JsonObligationsCodec"
+      "for_type": "JsonObligationsCodec",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "JsonObligationsCodec"
+      "for_type": "JsonObligationsCodec",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "JsonTestBindingsCodec"
+      "for_type": "JsonTestBindingsCodec",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "JsonTestBindingsCodec"
+      "for_type": "JsonTestBindingsCodec",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "JsonObligationFulfillmentCacheCodec"
+      "for_type": "JsonObligationFulfillmentCacheCodec",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "JsonObligationFulfillmentCacheCodec"
+      "for_type": "JsonObligationFulfillmentCacheCodec",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "JsonWaiverCacheCodec"
+      "for_type": "JsonWaiverCacheCodec",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "JsonWaiverCacheCodec"
+      "for_type": "JsonWaiverCacheCodec",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "ObligationFulfillmentEscalationDriver"
+      "for_type": "ObligationFulfillmentEscalationDriver",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "ObligationFulfillmentEscalationDriver"
+      "for_type": "ObligationFulfillmentEscalationDriver",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::ObligationFulfillmentPair, domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey, domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError>",
-      "for_type": "ObligationFulfillmentEscalationDriver"
+      "for_type": "ObligationFulfillmentEscalationDriver",
+      "trait_ref": "usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::ObligationFulfillmentPair, domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey, domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError>"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "WaiverEscalationDriver"
+      "for_type": "WaiverEscalationDriver",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "WaiverEscalationDriver"
+      "for_type": "WaiverEscalationDriver",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError>",
-      "for_type": "WaiverEscalationDriver"
+      "for_type": "WaiverEscalationDriver",
+      "trait_ref": "usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError>"
     },
     {
       "action": "add",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "Sha256ContentHasher"
+      "for_type": "Sha256ContentHasher",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "add",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "Sha256ContentHasher"
+      "for_type": "Sha256ContentHasher",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "add",
-      "trait_ref": "core::default::Default",
-      "for_type": "Sha256ContentHasher"
+      "for_type": "Sha256ContentHasher",
+      "trait_ref": "core::default::Default"
     },
     {
       "action": "add",
-      "trait_ref": "usecase::test_obligation::hasher::ContentHasherPort",
-      "for_type": "Sha256ContentHasher"
+      "for_type": "Sha256ContentHasher",
+      "trait_ref": "usecase::test_obligation::hasher::ContentHasherPort"
     }
   ],
   "traits": {},
   "types": {
-    "FsSpecDocumentLoader": {
+    "CatalogueEntryRefDto": {
       "action": "add",
-      "role": {
-        "SecondaryAdapter": {}
-      },
+      "docs": "Semantic-verify catalogue-entry DTO publicized for its cache codec; see IN-05.",
+      "informal_grounds": [],
       "kind": {
         "kind": "struct",
         "shape": {
@@ -890,39 +928,43 @@
       },
       "methods": [
         {
-          "name": "new",
-          "receiver": null,
-          "params": [
-            {
-              "name": "workspace_root",
-              "ty": "std::path::PathBuf"
-            },
-            {
-              "name": "trusted_root",
-              "ty": "std::path::PathBuf"
-            }
-          ],
-          "returns": "Self",
-          "is_async": false,
+          "docs": "Projects CatalogueEntryRef through the semantic-verify section-key wire vocabulary; see IN-05.",
           "generics": [],
           "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Construct a filesystem spec document loader; workspace_root anchors relative spec paths and trusted_root is the containment constraint."
-        }
-      ],
-      "module_path": "spec::document_loader",
-      "docs": "Filesystem SpecDocumentLoaderPort adapter for parsed spec.json, anchored at the discovered workspace root. See IN-07 / IN-08.",
-      "spec_refs": [
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "IN-07"
+          "is_async": false,
+          "name": "from_domain",
+          "params": [
+            {
+              "name": "entry",
+              "ty": "&domain::tddd::semantic_verify::CatalogueEntryRef"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
         },
         {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "IN-08"
+          "docs": "Reconstructs through the semantic-verify section-key wire vocabulary. Only ValidationError::EmptyString is reachable from CatalogueEntryKey::try_new; the shared ValidationError return type matches the domain constructor boundary.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "Result<domain::tddd::semantic_verify::CatalogueEntryRef, domain::ValidationError>",
+          "where_predicates": []
         }
       ],
-      "informal_grounds": []
+      "module_path": "tddd::semantic_verify_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
     },
     "ContractRoleKey": {
       "action": "add",
@@ -1096,6 +1138,165 @@
         },
         {
           "anchor": "CN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "FailingObligationFulfillmentVerifier": {
+      "action": "add",
+      "docs": "Fail-closed ObligationFulfillmentVerifierPort adapter for configuration-load failures. See IN-09 / AC-07 / CN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "message",
+              "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_message",
+          "params": [
+            {
+              "name": "message",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::fulfillment_verifier",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "FailingWaiverVerifier": {
+      "action": "add",
+      "docs": "Fail-closed WaiverVerifierPort adapter for configuration-load failures. See IN-09 / AC-07 / CN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "message",
+              "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_message",
+          "params": [
+            {
+              "name": "message",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::waiver_verifier",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "FsSpecDocumentLoader": {
+      "action": "add",
+      "docs": "Filesystem SpecDocumentLoaderPort adapter for parsed spec.json, anchored at the discovered workspace root. See IN-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Construct a filesystem spec document loader; workspace_root anchors relative spec paths and trusted_root is the containment constraint.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "trusted_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "spec::document_loader",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
@@ -1453,6 +1654,59 @@
         }
       ]
     },
+    "ObligationFulfillmentEscalationDriver": {
+      "action": "add",
+      "docs": "Concrete SemanticEscalationDriverPort impl for the obligation-fulfillment verifier lane. See IN-01 / AC-15 / OS-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Wire the concrete fulfillment escalation driver over the injected verifier port and probe config.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "verifier",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort + Send + Sync>"
+            },
+            {
+              "name": "probe_config",
+              "ty": "usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "test_obligation::fulfillment_escalation_driver",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "OS-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
     "ObligationFulfillmentVerdictDto": {
       "action": "add",
       "docs": "Serde DTO for ObligationFulfillmentVerdict; see IN-09 / AC-06.",
@@ -1553,63 +1807,6 @@
         },
         {
           "anchor": "IN-11",
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
-        },
-        {
-          "anchor": "AC-07",
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
-        },
-        {
-          "anchor": "CN-08",
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
-        }
-      ]
-    },
-    "FailingObligationFulfillmentVerifier": {
-      "action": "add",
-      "docs": "Fail-closed ObligationFulfillmentVerifierPort adapter for configuration-load failures. See IN-09 / AC-07 / CN-08.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "message",
-              "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
-            }
-          ],
-          "returns": "Self"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "from_message",
-          "params": [
-            {
-              "name": "message",
-              "ty": "&str"
-            }
-          ],
-          "returns": "Self"
-        }
-      ],
-      "module_path": "test_obligation::fulfillment_verifier",
-      "role": {
-        "SecondaryAdapter": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-09",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         },
         {
@@ -1742,6 +1939,50 @@
         },
         {
           "anchor": "CN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "Sha256ContentHasher": {
+      "action": "add",
+      "docs": "Concrete ContentHasherPort impl over sha2. See IN-09 / AC-06 / CN-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Construct a Sha256 backed content hasher.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "test_obligation::sha256_content_hasher",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
@@ -2338,6 +2579,59 @@
         }
       ]
     },
+    "WaiverEscalationDriver": {
+      "action": "add",
+      "docs": "Concrete SemanticEscalationDriverPort impl for the waiver verifier lane. See IN-01 / AC-15 / OS-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Wire the concrete waiver escalation driver over the injected verifier port and probe config.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "verifier",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverVerifierPort + Send + Sync>"
+            },
+            {
+              "name": "probe_config",
+              "ty": "usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "test_obligation::waiver_escalation_driver",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "OS-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
     "WaiverVerdictDto": {
       "action": "add",
       "docs": "Serde DTO for WaiverVerdict; see IN-09 / AC-06.",
@@ -2441,265 +2735,6 @@
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
-    },
-    "FailingWaiverVerifier": {
-      "action": "add",
-      "docs": "Fail-closed WaiverVerifierPort adapter for configuration-load failures. See IN-09 / AC-07 / CN-08.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "message",
-              "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
-            }
-          ],
-          "returns": "Self"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "from_message",
-          "params": [
-            {
-              "name": "message",
-              "ty": "&str"
-            }
-          ],
-          "returns": "Self"
-        }
-      ],
-      "module_path": "test_obligation::waiver_verifier",
-      "role": {
-        "SecondaryAdapter": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-09",
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
-        },
-        {
-          "anchor": "AC-07",
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
-        },
-        {
-          "anchor": "CN-08",
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
-        }
-      ]
-    },
-    "CatalogueEntryRefDto": {
-      "action": "add",
-      "role": {
-        "Dto": {}
-      },
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": true
-        }
-      },
-      "methods": [
-        {
-          "name": "from_domain",
-          "receiver": null,
-          "params": [
-            {
-              "name": "entry",
-              "ty": "&domain::tddd::semantic_verify::CatalogueEntryRef"
-            }
-          ],
-          "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Projects CatalogueEntryRef through the semantic-verify section-key wire vocabulary; see IN-05."
-        },
-        {
-          "name": "into_domain",
-          "receiver": "self",
-          "params": [],
-          "returns": "Result<domain::tddd::semantic_verify::CatalogueEntryRef, domain::ValidationError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Reconstructs through the semantic-verify section-key wire vocabulary. Only ValidationError::EmptyString is reachable from CatalogueEntryKey::try_new; the shared ValidationError return type matches the domain constructor boundary."
-        }
-      ],
-      "module_path": "tddd::semantic_verify_codec",
-      "docs": "Semantic-verify catalogue-entry DTO publicized for its cache codec; see IN-05.",
-      "spec_refs": [
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "IN-05"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "ObligationFulfillmentEscalationDriver": {
-      "action": "add",
-      "role": {
-        "SecondaryAdapter": {}
-      },
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": true
-        }
-      },
-      "methods": [
-        {
-          "name": "new",
-          "receiver": null,
-          "params": [
-            {
-              "name": "verifier",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort + Send + Sync>"
-            },
-            {
-              "name": "probe_config",
-              "ty": "usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig"
-            }
-          ],
-          "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Wire the concrete fulfillment escalation driver over the injected verifier port and probe config."
-        }
-      ],
-      "module_path": "test_obligation::fulfillment_escalation_driver",
-      "docs": "Concrete SemanticEscalationDriverPort impl for the obligation-fulfillment verifier lane. See IN-01 / AC-15 / OS-02.",
-      "spec_refs": [
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "IN-01"
-        },
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "AC-15"
-        },
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "OS-02"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "WaiverEscalationDriver": {
-      "action": "add",
-      "role": {
-        "SecondaryAdapter": {}
-      },
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": true
-        }
-      },
-      "methods": [
-        {
-          "name": "new",
-          "receiver": null,
-          "params": [
-            {
-              "name": "verifier",
-              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverVerifierPort + Send + Sync>"
-            },
-            {
-              "name": "probe_config",
-              "ty": "usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig"
-            }
-          ],
-          "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Wire the concrete waiver escalation driver over the injected verifier port and probe config."
-        }
-      ],
-      "module_path": "test_obligation::waiver_escalation_driver",
-      "docs": "Concrete SemanticEscalationDriverPort impl for the waiver verifier lane. See IN-01 / AC-15 / OS-02.",
-      "spec_refs": [
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "IN-01"
-        },
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "AC-15"
-        },
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "OS-02"
-        }
-      ],
-      "informal_grounds": []
-    },
-    "Sha256ContentHasher": {
-      "action": "add",
-      "role": {
-        "SecondaryAdapter": {}
-      },
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "plain",
-          "fields": [],
-          "has_stripped_fields": true
-        }
-      },
-      "methods": [
-        {
-          "name": "new",
-          "receiver": null,
-          "params": [],
-          "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": [],
-          "docs": "Construct a Sha256 backed content hasher."
-        }
-      ],
-      "module_path": "test_obligation::sha256_content_hasher",
-      "docs": "Concrete ContentHasherPort impl over sha2. See IN-09 / AC-06 / CN-04.",
-      "spec_refs": [
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "IN-09"
-        },
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "AC-06"
-        },
-        {
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "anchor": "CN-04"
-        }
-      ],
-      "informal_grounds": []
     }
   }
 }

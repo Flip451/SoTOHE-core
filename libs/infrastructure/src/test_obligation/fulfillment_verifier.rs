@@ -17,10 +17,12 @@ use std::sync::Arc;
 use domain::EvidenceCitation;
 use domain::ModelTier;
 use domain::tddd::test_obligation::errors::SemanticVerifierError;
+use domain::tddd::test_obligation::hashes::VerifierPromptFingerprint;
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort;
 use domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict;
 use domain::tddd::test_obligation::vocab::FulfillmentFailCategory;
+use usecase::test_obligation::hasher::ContentHasherPort;
 
 use crate::agent_profiles::AgentProfiles;
 use crate::test_obligation::diagnostic;
@@ -28,6 +30,7 @@ use crate::test_obligation::semantic_verifier::{
     SemanticVerifierRunner, VerdictKindWire, default_fulfillment_verifier_runner,
     extract_verdict_json, resolve_execution_or_err, semantic_verifier_error, tier_to_round_type,
 };
+use crate::test_obligation::sha256_content_hasher::Sha256ContentHasher;
 
 /// Capability name resolved from `agent-profiles.json` for this verifier.
 const CAPABILITY: &str = "obligation-fulfillment-verifier";
@@ -48,11 +51,25 @@ Reply with exactly one JSON object and nothing else:
 
 - \"pass\": the bound tests fulfil the obligation. \"citation\" MUST quote verbatim the \
 part of the test source that fulfils it. A pass without a citation is invalid.
+If the tests fully verify the promise as restricted to this entry, return pass even when the \
+anchor promises more for other entries.
 - \"fail\": set \"reason\" and \"category\": \"contradiction\" (a test asserts the opposite of \
-the promise), \"substitution\" (the tests cite the anchor but verify unrelated content), or \
-\"central_unverified\" (no contradiction or irrelevance, but the anchor's central behaviour \
-is left unverified).
+the promise), \"substitution\" (the tests cite the anchor but verify content unrelated to the \
+entry-relevant promise part), or \"central_unverified\" (no contradiction or irrelevance, but \
+the central, entry-relevant part of the anchor's promise is left unverified; do NOT demand \
+from this edge promise parts belonging to other entries' responsibilities).
 - \"pending\": you cannot confirm fulfilment from the material provided.";
+
+/// Returns the SHA-256 content hash of this verifier's judging prompt preamble.
+///
+/// The hash deliberately excludes execution provider, model, and tier: it
+/// invalidates cache entries only when the judging instructions change.
+#[must_use]
+pub fn fulfillment_verifier_fingerprint() -> VerifierPromptFingerprint {
+    VerifierPromptFingerprint::new(
+        Sha256ContentHasher::new().sha256(FULFILLMENT_PROMPT_PREAMBLE.as_bytes()),
+    )
+}
 
 /// Capability adapter that resolves the obligation-fulfillment verifier provider
 /// and delegates the semantic judgement to it (IN-09 / IN-11 / AC-07 / CN-08).
@@ -249,6 +266,42 @@ mod tests {
         assert_eq!(message.as_str(), "profile missing");
     }
 
+    /// AC-06 (entry-relevant part): a pass verdict must carry a citation, and a
+    /// citation-less pass must fail closed. The fail-closed stand-in can never
+    /// emit a pass verdict at all — every invocation returns a VerifierPort
+    /// error — therefore no uncited pass can exist. This test verifies that
+    /// premise directly on the stand-in itself.
+    #[test]
+    fn failing_verifier_never_emits_pass_verdict_so_no_uncited_pass_can_exist() {
+        let verifier = FailingObligationFulfillmentVerifier::from_message("profile unavailable");
+
+        let result = verifier.verify_pair("tests", "entry", "anchor", ModelTier::Fast);
+
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_failing_fulfillment_verifier_for_each_pair_returns_fail_closed_port_error() {
+        let verifier = FailingObligationFulfillmentVerifier::from_message("profile unavailable");
+
+        for (tests_source, entry_declaration, anchor_text, tier) in [
+            ("assert!(covered)", "struct Entry", "anchor promise", ModelTier::Fast),
+            (
+                "assert_eq!(actual, expected)",
+                "trait Port",
+                "different anchor promise",
+                ModelTier::Final,
+            ),
+        ] {
+            let err = verifier
+                .verify_pair(tests_source, entry_declaration, anchor_text, tier)
+                .unwrap_err();
+
+            let SemanticVerifierError::VerifierPort(message) = err;
+            assert_eq!(message.as_str(), "profile unavailable");
+        }
+    }
+
     #[test]
     fn pass_verdict_decodes_to_fulfilled_with_citation() {
         let verdict = adapter(r#"{"kind":"pass","citation":"asserts empty input is rejected","reason":null,"category":null}"#)
@@ -260,6 +313,37 @@ mod tests {
             }
             other => panic!("expected Fulfilled, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn test_fulfillment_adapter_pair_uses_fulfillment_capability_and_citation() {
+        let captured: Arc<Mutex<Option<(ResolvedExecution, String)>>> = Arc::new(Mutex::new(None));
+        let captured_clone = Arc::clone(&captured);
+        let runner: Arc<SemanticVerifierRunner> = Arc::new(move |resolved, prompt| {
+            *captured_clone.lock().unwrap() = Some((resolved, prompt));
+            Ok(
+                r#"{"kind":"pass","citation":"assert_eq!(actual, expected)","reason":null,"category":null}"#
+                    .to_owned(),
+            )
+        });
+        let adapter = ObligationFulfillmentVerifierAdapter::with_runner(profiles(), runner);
+
+        let verdict = adapter
+            .verify_pair(
+                "assert_eq!(actual, expected);",
+                "struct Entry",
+                "the operation returns the expected value",
+                ModelTier::Final,
+            )
+            .unwrap();
+
+        assert!(matches!(verdict, ObligationFulfillmentVerdict::Fulfilled { .. }));
+        let (resolved, prompt) = captured.lock().unwrap().clone().unwrap();
+        assert_eq!(resolved.model.as_deref(), Some("claude-opus-4-8"));
+        assert!(prompt.contains("obligation-fulfillment verifier"));
+        assert!(prompt.contains("assert_eq!(actual, expected);"));
+        assert!(prompt.contains("struct Entry"));
+        assert!(prompt.contains("the operation returns the expected value"));
     }
 
     #[test]
@@ -364,5 +448,40 @@ mod tests {
         assert!(prompt.contains("TEST_BODY_MARKER"));
         assert!(prompt.contains("DECL_MARKER"));
         assert!(prompt.contains("ANCHOR_MARKER"));
+    }
+
+    #[test]
+    fn test_fulfillment_prompt_requires_code_to_anchor_semantic_comparison() {
+        let prompt =
+            ObligationFulfillmentVerifierAdapter::render_prompt("tests", "entry", "anchor");
+
+        assert!(prompt.contains("provided test source actually verifies the behaviour"));
+        assert!(prompt.contains("cited anchor promises for the given catalogue entry"));
+        assert!(prompt.contains("obligation-fulfillment verifier"));
+        assert!(!prompt.contains("implementer-authored waiver reason"));
+    }
+
+    #[test]
+    fn test_fulfillment_verifier_fingerprint_hashes_prompt_preamble_only() {
+        let fingerprint = fulfillment_verifier_fingerprint();
+        let expected = Sha256ContentHasher::new().sha256(FULFILLMENT_PROMPT_PREAMBLE.as_bytes());
+
+        assert_eq!(fingerprint.as_hash(), &expected);
+    }
+
+    #[test]
+    fn test_render_prompt_with_entry_local_categories_includes_locality_guidance() {
+        let prompt =
+            ObligationFulfillmentVerifierAdapter::render_prompt("tests", "entry", "anchor");
+
+        assert!(prompt.contains(
+            "the tests cite the anchor but verify content unrelated to the entry-relevant promise part"
+        ));
+        assert!(prompt.contains(
+            "the central, entry-relevant part of the anchor's promise is left unverified; do NOT demand from this edge promise parts belonging to other entries' responsibilities"
+        ));
+        assert!(prompt.contains(
+            "If the tests fully verify the promise as restricted to this entry, return pass even when the anchor promises more for other entries"
+        ));
     }
 }

@@ -60,6 +60,7 @@
 | TraitImplDeclV2 | value_object | modify | — | 🔵 | 🔵 |
 | TraitName | value_object | reference | — | 🔵 | 🔵 |
 | UncitedSpecElementFinding | value_object | add | — | 🔵 | 🔵 |
+| VerifierPromptFingerprint | value_object | add | — | 🔵 | 🔵 |
 | WaivedReason | value_object | add | — | 🔵 | 🔵 |
 | WaivedReasonHash | value_object | add | — | 🔵 | 🔵 |
 | WaiverCacheDocument | value_object | add | — | 🔵 | 🔵 |
@@ -72,7 +73,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ArtifactCodecError | error_type | add | Io, MalformedJson, DomainInvariant | 🔵 | 🔵 |
-| CatalogueDocumentLoaderError | error_type | reference | — | 🔵 | 🔵 |
+| CatalogueDocumentLoaderError | error_type | reference | NotFound, Io, Decode | 🔵 | 🔵 |
 | ObligationCheckError | error_type | add | RulesLoad, ObligationsAbsent, BindingsAbsent, DriftsDetected, UnresolvedEdges, StaleVerdicts, CatalogueLoad, SpecLoad, InvalidCatalogueState, ArtifactCodec, SourceScan, CacheIo | 🔵 | 🔵 |
 | ObligationDeriveError | error_type | add | RulesLoad, TrackNotActive, CatalogueLoad, SpecLoad, InvalidCatalogueState, ArtifactCodec, ArtifactWrite | 🔵 | 🔵 |
 | ObligationEvaluateError | error_type | add | TrackNotActive, CatalogueLoad, SpecLoad, ArtifactLoad, TestSourceScan, VerifierPort, CachePersistence, SemanticFailuresConfirmed, HumanEscalationRequired | 🔵 | 🔵 |
@@ -88,7 +89,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueDocumentLoaderPort | secondary_port | reference | — | 🔵 | 🔵 |
+| CatalogueDocumentLoaderPort | secondary_port | reference | fn load(&self, path: &std::path::Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> | 🔵 | 🔵 |
 | ObligationFulfillmentCachePort | secondary_port | add | fn load(&self, track_id: &TrackId) -> Result<Option<ObligationFulfillmentCacheDocument>, VerifyCacheError>, fn save(&self, doc: &ObligationFulfillmentCacheDocument) -> Result<(), DiagnosticMessage> | 🔵 | 🔵 |
 | ObligationFulfillmentVerifierPort | secondary_port | add | fn verify_pair(&self, tests_source: &str, entry_declaration: &str, anchor_text: &str, tier: ModelTier) -> Result<ObligationFulfillmentVerdict, SemanticVerifierError> | 🔵 | 🔵 |
 | ObligationsArtifactPort | secondary_port | add | fn load(&self, track_id: &TrackId) -> Result<Option<ObligationsDocument>, ArtifactCodecError>, fn save(&self, doc: &ObligationsDocument) -> Result<(), DiagnosticMessage> | 🔵 | 🔵 |

@@ -14,83 +14,84 @@
   "capabilities": {
     "orchestrator": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.6-terra"
     },
     "spec-designer": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.6-terra"
     },
     "impl-planner": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.6-terra"
     },
     "type-designer": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.6-sol"
     },
     "adr-editor": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.6-sol"
     },
     "rollback-diagnoser": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.6-sol"
     },
     "implementer": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.6-terra"
     },
     "reviewer": {
       "provider": "codex",
-      "model": "gpt-5.5",
-      "fast_model": "gpt-5.4-mini"
+      "model": "gpt-5.6-sol",
+      "fast_model": "gpt-5.6-luna"
     },
     "researcher": {
-      "provider": "gemini"
+      "provider": "codex",
+      "model": "gpt-5.6-terra"
     },
     "review-fix-lead": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.6-terra"
     },
     "dry-checker": {
       "provider": "codex",
-      "model": "gpt-5.5",
-      "fast_model": "gpt-5.4-mini",
+      "model": "gpt-5.6-terra",
+      "fast_model": "gpt-5.6-luna",
       "fast_reasoning_effort": "medium",
       "final_reasoning_effort": "high"
     },
     "dry-fix-lead": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.6-terra"
     },
     "pr-reviewer": {
       "provider": "codex"
     },
     "ref-verifier-chain1": {
       "provider": "codex",
-      "model": "gpt-5.5",
+      "model": "gpt-5.6-sol",
       "fast_provider": "codex",
-      "fast_model": "gpt-5.4-mini",
+      "fast_model": "gpt-5.6-luna",
       "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
     },
     "ref-verifier-chain2": {
       "provider": "codex",
-      "model": "gpt-5.5",
+      "model": "gpt-5.6-sol",
       "fast_provider": "codex",
-      "fast_model": "gpt-5.4-mini",
+      "fast_model": "gpt-5.6-luna",
       "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md"
     },
     "obligation-fulfillment-verifier": {
       "provider": "codex",
-      "model": "gpt-5.5",
+      "model": "gpt-5.6-terra",
       "fast_provider": "codex",
-      "fast_model": "gpt-5.4-mini"
+      "fast_model": "gpt-5.6-luna"
     },
     "waiver-verifier": {
       "provider": "codex",
-      "model": "gpt-5.5",
+      "model": "gpt-5.6-terra",
       "fast_provider": "codex",
-      "fast_model": "gpt-5.4-mini"
+      "fast_model": "gpt-5.6-luna"
     }
   }
 }

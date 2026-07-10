@@ -61,3 +61,10 @@
 | WaiverEscalationDriver | secondary_adapter | add | impl Debug, impl Clone, impl SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> | 🔵 | 🔵 |
 | WaiverVerifierAdapter | secondary_adapter | add | impl WaiverVerifierPort | 🔵 | 🔵 |
 
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint | free_function | add | fn() -> domain::tddd::test_obligation::hashes::VerifierPromptFingerprint | 🔵 | 🔵 |
+| infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint | free_function | add | fn() -> domain::tddd::test_obligation::hashes::VerifierPromptFingerprint | 🔵 | 🔵 |
+

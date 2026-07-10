@@ -9,6 +9,7 @@ mod pair_source;
 mod pair_source_chain2;
 mod pair_source_json;
 pub mod process_runner;
+mod retry;
 pub mod scope_resolver;
 
 use guarded_io::{CacheWriteGuard, atomic_write_guarded_file, read_guarded_text};

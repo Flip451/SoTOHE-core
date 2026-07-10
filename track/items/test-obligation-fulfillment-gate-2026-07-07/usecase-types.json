@@ -824,7 +824,7 @@
     },
     "CheckTestObligationsInteractor": {
       "action": "add",
-      "docs": "Interactor implementing CheckTestObligationsApplicationService; see IN-08.",
+      "docs": "Interactor implementing CheckTestObligationsApplicationService; see IN-08 / CN-04.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -865,6 +865,14 @@
               "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
             },
             {
+              "name": "fulfillment_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "waiver_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
               "name": "spec_reader",
               "ty": "std::sync::Arc<dyn domain::spec_document_loader_port::SpecDocumentLoaderPort + Send + Sync>"
             },
@@ -883,6 +891,10 @@
       "spec_refs": [
         {
           "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
@@ -1156,7 +1168,7 @@
     },
     "EvaluateTestObligationsInteractor": {
       "action": "add",
-      "docs": "Interactor implementing EvaluateTestObligationsApplicationService; see IN-09 / AC-06 / AC-07.",
+      "docs": "Interactor implementing EvaluateTestObligationsApplicationService; see IN-09 / CN-04.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1201,6 +1213,14 @@
               "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
             },
             {
+              "name": "fulfillment_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "waiver_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
               "name": "config",
               "ty": "TestObligationEvaluateConfig"
             },
@@ -1227,6 +1247,10 @@
       "spec_refs": [
         {
           "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]

@@ -20,6 +20,7 @@ use infrastructure::test_obligation::fulfillment_cache_codec::JsonObligationFulf
 use infrastructure::test_obligation::fulfillment_escalation_driver::ObligationFulfillmentEscalationDriver;
 use infrastructure::test_obligation::fulfillment_verifier::{
     FailingObligationFulfillmentVerifier, ObligationFulfillmentVerifierAdapter,
+    fulfillment_verifier_fingerprint,
 };
 use infrastructure::test_obligation::obligations_codec::JsonObligationsCodec;
 use infrastructure::test_obligation::rules_codec::JsonTestObligationRulesLoader;
@@ -28,7 +29,7 @@ use infrastructure::test_obligation::source_scanner::SynTestSourceScanner;
 use infrastructure::test_obligation::waiver_cache_codec::JsonWaiverCacheCodec;
 use infrastructure::test_obligation::waiver_escalation_driver::WaiverEscalationDriver;
 use infrastructure::test_obligation::waiver_verifier::{
-    FailingWaiverVerifier, WaiverVerifierAdapter,
+    FailingWaiverVerifier, WaiverVerifierAdapter, waiver_verifier_fingerprint,
 };
 use usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort;
 use usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig;
@@ -121,6 +122,8 @@ impl TestObligationCompositionRoot {
             self.source_scanner(),
             self.fulfillment_cache(),
             self.waiver_cache(),
+            fulfillment_verifier_fingerprint(),
+            waiver_verifier_fingerprint(),
             self.spec_loader(),
             self.catalogue_loader(),
         ));
@@ -153,6 +156,8 @@ impl TestObligationCompositionRoot {
             self.waiver_driver(),
             self.fulfillment_cache(),
             self.waiver_cache(),
+            fulfillment_verifier_fingerprint(),
+            waiver_verifier_fingerprint(),
             config,
             self.spec_loader(),
             self.catalogue_loader(),
@@ -302,6 +307,10 @@ fn default_probe_config() -> SemanticCalibrationProbeConfig {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    use cli_driver::test_obligation::check::TestObligationCheckInput;
+    use domain::ModelTier;
+    use infrastructure::agent_profiles::RoundType;
+
     use super::*;
 
     #[test]
@@ -348,5 +357,141 @@ mod tests {
         let config = default_probe_config();
         assert_eq!(config.injection().get(), 10);
         assert_eq!(config.threshold().get(), 90);
+    }
+
+    #[test]
+    fn test_composition_root_resolves_separate_verifier_capabilities_for_each_tier() {
+        let workspace_root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let root = TestObligationCompositionRoot::new(
+            workspace_root.clone(),
+            workspace_root.join(TEST_OBLIGATION_RULES_PATH),
+        );
+        let profiles = root.agent_profiles().unwrap();
+
+        for capability in ["obligation-fulfillment-verifier", "waiver-verifier"] {
+            assert!(profiles.resolve_capability(capability).is_some());
+            assert_eq!(
+                profiles.resolve_model(capability, RoundType::Fast).as_deref(),
+                Some("gpt-5.6-luna")
+            );
+            assert_eq!(
+                profiles.resolve_model(capability, RoundType::Final).as_deref(),
+                Some("gpt-5.6-terra")
+            );
+        }
+    }
+
+    #[test]
+    fn test_composition_root_resolves_independent_fast_providers_for_verifier_capabilities() {
+        let workspace = tempfile::tempdir().unwrap();
+        let config_path = workspace.path().join(AGENT_PROFILES_PATH);
+        std::fs::create_dir_all(config_path.parent().unwrap()).unwrap();
+        std::fs::write(
+            &config_path,
+            r#"{
+                "schema_version": 1,
+                "providers": {
+                    "codex": { "label": "Codex" },
+                    "claude": { "label": "Claude" },
+                    "gemini": { "label": "Gemini" }
+                },
+                "capabilities": {
+                    "obligation-fulfillment-verifier": {
+                        "provider": "codex",
+                        "model": "fulfillment-final",
+                        "fast_provider": "claude",
+                        "fast_model": "fulfillment-fast"
+                    },
+                    "waiver-verifier": {
+                        "provider": "claude",
+                        "model": "waiver-final",
+                        "fast_provider": "gemini",
+                        "fast_model": "waiver-fast"
+                    }
+                }
+            }"#,
+        )
+        .unwrap();
+        let root = TestObligationCompositionRoot::new(
+            workspace.path().to_path_buf(),
+            workspace.path().join(TEST_OBLIGATION_RULES_PATH),
+        );
+        let profiles = root.agent_profiles().unwrap();
+
+        let fulfillment_fast =
+            profiles.resolve_execution("obligation-fulfillment-verifier", RoundType::Fast).unwrap();
+        let fulfillment_final = profiles
+            .resolve_execution("obligation-fulfillment-verifier", RoundType::Final)
+            .unwrap();
+        let waiver_fast = profiles.resolve_execution("waiver-verifier", RoundType::Fast).unwrap();
+        let waiver_final = profiles.resolve_execution("waiver-verifier", RoundType::Final).unwrap();
+
+        assert_eq!(fulfillment_fast.provider, "claude");
+        assert_eq!(fulfillment_fast.model.as_deref(), Some("fulfillment-fast"));
+        assert_eq!(fulfillment_final.provider, "codex");
+        assert_eq!(fulfillment_final.model.as_deref(), Some("fulfillment-final"));
+        assert_eq!(waiver_fast.provider, "gemini");
+        assert_eq!(waiver_fast.model.as_deref(), Some("waiver-fast"));
+        assert_eq!(waiver_final.provider, "claude");
+        assert_eq!(waiver_final.model.as_deref(), Some("waiver-final"));
+    }
+
+    #[test]
+    fn test_composition_root_check_wires_fs_loader_and_fails_closed_for_partial_scope_and_invalid_rules()
+     {
+        const TRACK_ID: &str = "test-obligation-fulfillment-gate-2026-07-07";
+
+        let workspace = tempfile::tempdir().unwrap();
+        let workspace_root = workspace.path();
+        let rules_path = workspace_root.join(TEST_OBLIGATION_RULES_PATH);
+        let items_dir = workspace_root.join("track/items").join(TRACK_ID);
+        let source_root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+
+        std::fs::create_dir_all(rules_path.parent().unwrap()).unwrap();
+        std::fs::create_dir_all(&items_dir).unwrap();
+        std::fs::copy(source_root.join(TEST_OBLIGATION_RULES_PATH), &rules_path).unwrap();
+        std::fs::copy(
+            source_root.join("track/items").join(TRACK_ID).join("obligations.json"),
+            items_dir.join("obligations.json"),
+        )
+        .unwrap();
+
+        let root =
+            TestObligationCompositionRoot::new(workspace_root.to_path_buf(), rules_path.clone());
+        let input = TestObligationCheckInput::try_from_raw(
+            Some(TRACK_ID.to_owned()),
+            "detached-but-explicit-track".to_owned(),
+        )
+        .unwrap();
+        assert_ne!(root.check_handler().handle(input).exit_code, 0);
+
+        std::fs::write(&rules_path, "{}").unwrap();
+        let invalid_rules_input = TestObligationCheckInput::try_from_raw(
+            Some(TRACK_ID.to_owned()),
+            "detached-but-explicit-track".to_owned(),
+        )
+        .unwrap();
+        assert_ne!(root.check_handler().handle(invalid_rules_input).exit_code, 0);
+    }
+
+    #[test]
+    fn test_composition_root_fails_closed_with_distinct_verifier_fallbacks() {
+        let workspace_root = tempfile::tempdir().unwrap();
+        let root = TestObligationCompositionRoot::new(
+            workspace_root.path().to_path_buf(),
+            workspace_root.path().join(TEST_OBLIGATION_RULES_PATH),
+        );
+
+        let fulfillment_error = root
+            .fulfillment_verifier()
+            .verify_pair("assert!(covered)", "entry", "anchor", ModelTier::Fast)
+            .unwrap_err();
+        let waiver_error = root
+            .waiver_verifier()
+            .verify_pair("reason", "entry", "anchor", ModelTier::Fast)
+            .unwrap_err();
+
+        assert!(matches!(fulfillment_error, SemanticVerifierError::VerifierPort(_)));
+        assert!(matches!(waiver_error, SemanticVerifierError::VerifierPort(_)));
     }
 }

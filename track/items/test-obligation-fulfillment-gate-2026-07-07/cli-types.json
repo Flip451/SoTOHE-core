@@ -3,7 +3,7 @@
   "functions": {
     "cli::commands::test_obligation::command_context": {
       "action": "add",
-      "docs": "Build the test-obligation command context; see AC-14 / CN-09.",
+      "docs": "Build the branch-sensitive test-obligation command context for derive and evaluate. The returned String is the opaque VCS branch spelling interpreted downstream; see IN-07 / IN-09.",
       "informal_grounds": [],
       "is_async": false,
       "params": [],
@@ -11,9 +11,33 @@
       "role": "FreeFunction",
       "spec_refs": [
         {
-          "anchor": "AC-14",
+          "anchor": "IN-07",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "cli::commands::test_obligation::command_context_with": {
+      "action": "add",
+      "docs": "Build the test-obligation command context through injected discovery and branch-reading seams; see AC-14.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "discover_root",
+          "ty": "impl FnOnce() -> Result<cli_composition::TestObligationCompositionRoot, crate::CliError>"
+        },
+        {
+          "name": "read_current_branch",
+          "ty": "impl FnOnce(&cli_composition::TestObligationCompositionRoot) -> Result<String, crate::CliError>"
+        }
+      ],
+      "returns": "Result<(cli_composition::TestObligationCompositionRoot, String), crate::CliError>",
+      "role": "FreeFunction",
+      "spec_refs": [
         {
           "anchor": "CN-09",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
@@ -65,6 +89,46 @@
           "anchor": "IN-10",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "cli::commands::test_obligation::dispatch_test_obligation": {
+      "action": "add",
+      "docs": "Dispatch `sotp test-obligation <subcommand>` through injected command handlers; see AC-14 / CN-09.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "TestObligationArgs"
+        },
+        {
+          "name": "derive",
+          "ty": "impl FnOnce(&TestObligationDeriveArgs) -> std::process::ExitCode"
+        },
+        {
+          "name": "check",
+          "ty": "impl FnOnce(&TestObligationCheckArgs) -> std::process::ExitCode"
+        },
+        {
+          "name": "evaluate",
+          "ty": "impl FnOnce(&TestObligationEvaluateArgs) -> std::process::ExitCode"
+        },
+        {
+          "name": "results",
+          "ty": "impl FnOnce(&TestObligationResultsArgs) -> std::process::ExitCode"
+        },
+        {
+          "name": "bindings_skeleton",
+          "ty": "impl FnOnce(&TestBindingsSkeletonArgs) -> std::process::ExitCode"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
         {
           "anchor": "CN-09",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
@@ -123,6 +187,38 @@
         }
       ]
     },
+    "cli::commands::test_obligation::execute_bindings_skeleton_with": {
+      "action": "add",
+      "docs": "Execute `sotp test-obligation bindings-skeleton` through injected context and handler seams; see IN-06 / CN-09 / AC-14.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "&TestBindingsSkeletonArgs"
+        },
+        {
+          "name": "build_context",
+          "ty": "impl FnOnce(Option<&str>) -> Result<(cli_composition::TestObligationCompositionRoot, String), crate::CliError>"
+        },
+        {
+          "name": "handle",
+          "ty": "impl FnOnce(&cli_composition::TestObligationCompositionRoot, cli_driver::test_obligation::bindings_skeleton::TestBindingsSkeletonInput) -> std::process::ExitCode"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
     "cli::commands::test_obligation::execute_check": {
       "action": "add",
       "docs": "Execute `sotp test-obligation check` through the composition root and cli-driver handler; see IN-08 / AC-04 / AC-10.",
@@ -155,6 +251,46 @@
         }
       ]
     },
+    "cli::commands::test_obligation::execute_check_with": {
+      "action": "add",
+      "docs": "Execute `sotp test-obligation check` through injected context and handler seams; see IN-08 / AC-04 / AC-10 / AC-14.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "&TestObligationCheckArgs"
+        },
+        {
+          "name": "build_context",
+          "ty": "impl FnOnce(Option<&str>) -> Result<(cli_composition::TestObligationCompositionRoot, String), crate::CliError>"
+        },
+        {
+          "name": "handle",
+          "ty": "impl FnOnce(&cli_composition::TestObligationCompositionRoot, cli_driver::test_obligation::check::TestObligationCheckInput) -> std::process::ExitCode"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
     "cli::commands::test_obligation::execute_derive": {
       "action": "add",
       "docs": "Execute `sotp test-obligation derive` through the composition root and cli-driver handler; see IN-07 / AC-03.",
@@ -179,6 +315,42 @@
         },
         {
           "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "cli::commands::test_obligation::execute_derive_with": {
+      "action": "add",
+      "docs": "Execute `sotp test-obligation derive` through injected context and handler seams; see IN-07 / AC-03 / AC-14.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "&TestObligationDeriveArgs"
+        },
+        {
+          "name": "build_context",
+          "ty": "impl FnOnce() -> Result<(cli_composition::TestObligationCompositionRoot, String), crate::CliError>"
+        },
+        {
+          "name": "handle",
+          "ty": "impl FnOnce(&cli_composition::TestObligationCompositionRoot, cli_driver::test_obligation::derive::TestObligationDeriveInput) -> std::process::ExitCode"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
@@ -211,6 +383,42 @@
         }
       ]
     },
+    "cli::commands::test_obligation::execute_evaluate_with": {
+      "action": "add",
+      "docs": "Execute `sotp test-obligation evaluate` through injected context and handler seams; see IN-09 / AC-06 / AC-14.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "&TestObligationEvaluateArgs"
+        },
+        {
+          "name": "build_context",
+          "ty": "impl FnOnce() -> Result<(cli_composition::TestObligationCompositionRoot, String), crate::CliError>"
+        },
+        {
+          "name": "handle",
+          "ty": "impl FnOnce(&cli_composition::TestObligationCompositionRoot, cli_driver::test_obligation::evaluate::TestObligationEvaluateInput) -> std::process::ExitCode"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
     "cli::commands::test_obligation::execute_results": {
       "action": "add",
       "docs": "Execute `sotp test-obligation results` through the composition root and cli-driver handler; see IN-10 / AC-09.",
@@ -235,6 +443,42 @@
         },
         {
           "anchor": "AC-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "cli::commands::test_obligation::execute_results_with": {
+      "action": "add",
+      "docs": "Execute `sotp test-obligation results` through injected context and handler seams; see IN-10 / AC-09 / AC-14.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "&TestObligationResultsArgs"
+        },
+        {
+          "name": "build_context",
+          "ty": "impl FnOnce(Option<&str>) -> Result<(cli_composition::TestObligationCompositionRoot, String), crate::CliError>"
+        },
+        {
+          "name": "handle",
+          "ty": "impl FnOnce(&cli_composition::TestObligationCompositionRoot, cli_driver::test_obligation::results::TestObligationResultsInput) -> std::process::ExitCode"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-09",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]

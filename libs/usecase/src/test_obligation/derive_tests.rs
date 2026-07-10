@@ -14,8 +14,9 @@ use domain::tddd::catalogue_v2::roles::{
     ContractRole, DataRole, FunctionRole, InvariantDecl, InvariantPredicate, ItemAction,
 };
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, DocString, InvariantName, MethodName, ModulePath, StructKind,
-    StructShape, TraitEntry, TraitImplDeclV2, TraitName, TypeEntry, TypeKindV2, TypeName, TypeRef,
+    CatalogueDocument, CrateName, DocString, InvariantName, MethodDeclaration, MethodName,
+    ModulePath, SelfReceiver, StructKind, StructShape, TraitEntry, TraitImplDeclV2, TraitName,
+    TypeEntry, TypeKindV2, TypeName, TypeRef,
 };
 use domain::tddd::test_obligation::errors::{ArtifactCodecError, TestObligationRulesLoadError};
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
@@ -28,7 +29,7 @@ use domain::tddd::test_obligation::rules::{
     RoleObligationRules, TestObligationMinimum, TestObligationRule, TestObligationRulesDocument,
 };
 use domain::tddd::test_obligation::vocab::{
-    TestObligationKind, TestObligationPatternKind, TestObligationPerAxis,
+    TargetEntryRoleKind, TestObligationKind, TestObligationPatternKind, TestObligationPerAxis,
 };
 use domain::{SpecDocument, SpecDocumentLoadError, SpecElementId, SpecRef, SpecScope, TrackId};
 
@@ -218,6 +219,45 @@ fn rules_doc_with_secondary_port_trait_impl_rules(
     .unwrap()
 }
 
+fn rules_doc_with_secondary_port_contract_rules() -> TestObligationRulesDocument {
+    let data_roles: Vec<(DataRole, RoleObligationRules)> = DATA_ROLE_NAMES
+        .iter()
+        .map(|name| (name.parse::<DataRole>().unwrap(), RoleObligationRules::new(vec![])))
+        .collect();
+    let contract_roles: Vec<(ContractRole, RoleObligationRules)> = CONTRACT_ROLE_NAMES
+        .iter()
+        .map(|name| {
+            let rules = if *name == "SecondaryPort" {
+                RoleObligationRules::new(vec![rule(
+                    TestObligationKind::Contract,
+                    TestObligationPerAxis::TraitMethod,
+                    None,
+                )])
+            } else {
+                RoleObligationRules::new(vec![])
+            };
+            (name.parse::<ContractRole>().unwrap(), rules)
+        })
+        .collect();
+    let function_roles = vec![
+        (FunctionRole::FreeFunction, RoleObligationRules::new(vec![])),
+        (FunctionRole::UseCaseFunction, RoleObligationRules::new(vec![])),
+    ];
+    let patterns = vec![(TestObligationPatternKind::Typestate, RoleObligationRules::new(vec![]))];
+    let trait_impls: Vec<(ContractRole, RoleObligationRules)> = CONTRACT_ROLE_NAMES
+        .iter()
+        .map(|name| (name.parse::<ContractRole>().unwrap(), RoleObligationRules::new(vec![])))
+        .collect();
+    TestObligationRulesDocument::try_new(
+        data_roles,
+        contract_roles,
+        function_roles,
+        patterns,
+        trait_impls,
+    )
+    .unwrap()
+}
+
 fn invariant(name: &str) -> InvariantDecl {
     InvariantDecl::new(
         InvariantName::new(name).unwrap(),
@@ -337,6 +377,233 @@ fn test_value_object_emits_one_obligation_per_invariant() {
 }
 
 #[test]
+fn test_derivation_reads_secondary_port_methods_and_saves_stable_obligations() {
+    // IN-07 / AC-03: deriving a declared SecondaryPort creates one stable
+    // obligation for each declared method, then persists the resulting artifact.
+    let path = PathBuf::from("domain-types.json");
+    let mut catalogue = empty_catalogue("domain", "domain");
+    catalogue.insert_trait(
+        TraitName::new("ObligationsArtifactPort").unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![
+                MethodDeclaration::new(
+                    MethodName::new("load").unwrap(),
+                    Some(SelfReceiver::SharedRef),
+                    vec![],
+                    TypeRef::new("Result<Option<ObligationsDocument>, ArtifactCodecError>")
+                        .unwrap(),
+                    false,
+                    None,
+                ),
+                MethodDeclaration::new(
+                    MethodName::new("save").unwrap(),
+                    Some(SelfReceiver::SharedRef),
+                    vec![],
+                    TypeRef::new("Result<(), DiagnosticMessage>").unwrap(),
+                    false,
+                    None,
+                ),
+            ],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![spec_ref("AC-03")],
+            vec![],
+        ),
+    );
+    let (interactor, sink) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    interactor.execute(&command(vec![path])).unwrap();
+
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    let items: Vec<&str> = saved
+        .obligations()
+        .iter()
+        .map(|obligation| obligation.id().item_identifier().as_str())
+        .collect();
+    assert_eq!(items, vec!["trait_method:load", "trait_method:save"]);
+    assert!(
+        saved
+            .obligations()
+            .iter()
+            .all(|obligation| obligation.id().entry_key().as_str() == "ObligationsArtifactPort")
+    );
+}
+
+#[test]
+fn test_obligations_artifact_port_declaration_change_keeps_method_ids() {
+    let path = PathBuf::from("domain-types.json");
+    let first_catalogue = obligations_artifact_port_catalogue(None);
+    let (first_interactor, first_sink) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), first_catalogue, &path);
+    first_interactor.execute(&command(vec![path.clone()])).unwrap();
+    let first = first_sink.saved.lock().unwrap().clone().unwrap();
+
+    let second_catalogue = obligations_artifact_port_catalogue(Some(DocString::new(
+        "changed declaration body".to_owned(),
+    )));
+    let (second_interactor, second_sink) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), second_catalogue, &path);
+    second_interactor.execute(&command(vec![path])).unwrap();
+    let second = second_sink.saved.lock().unwrap().clone().unwrap();
+
+    let first_items: Vec<_> =
+        first.obligations().iter().map(|obligation| obligation.id().clone()).collect();
+    let second_items: Vec<_> =
+        second.obligations().iter().map(|obligation| obligation.id().clone()).collect();
+    assert_eq!(first_items, second_items);
+    assert!(
+        first
+            .obligations()
+            .iter()
+            .zip(second.obligations())
+            .all(|(before, after)| before.declaration_hash() != after.declaration_hash())
+    );
+}
+
+#[test]
+fn test_spec_document_loader_port_load_method_derives_contract_obligation() {
+    let path = PathBuf::from("domain-types.json");
+    let mut catalogue = empty_catalogue("domain", "domain");
+    catalogue.insert_trait(
+        TraitName::new("SpecDocumentLoaderPort").unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![MethodDeclaration::new(
+                MethodName::new("load").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![],
+                TypeRef::new("Result<SpecDocument, SpecDocumentLoadError>").unwrap(),
+                false,
+                None,
+            )],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![spec_ref("IN-07")],
+            vec![],
+        ),
+    );
+    let (interactor, sink) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    interactor.execute(&command(vec![path])).unwrap();
+
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    assert_eq!(saved.obligations().len(), 1);
+    let obligation = &saved.obligations()[0];
+    assert_eq!(obligation.id().entry_key().as_str(), "SpecDocumentLoaderPort");
+    assert_eq!(obligation.id().item_identifier().as_str(), "trait_method:load");
+    assert_eq!(obligation.spec_refs()[0].element_id(), "IN-07");
+}
+
+fn obligations_artifact_port_catalogue(docs: Option<DocString>) -> CatalogueDocument {
+    let mut catalogue = empty_catalogue("domain", "domain");
+    catalogue.insert_trait(
+        TraitName::new("ObligationsArtifactPort").unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![
+                MethodDeclaration::new(
+                    MethodName::new("load").unwrap(),
+                    Some(SelfReceiver::SharedRef),
+                    vec![],
+                    TypeRef::new("Result<Option<ObligationsDocument>, ArtifactCodecError>")
+                        .unwrap(),
+                    false,
+                    None,
+                ),
+                MethodDeclaration::new(
+                    MethodName::new("save").unwrap(),
+                    Some(SelfReceiver::SharedRef),
+                    vec![],
+                    TypeRef::new("Result<(), DiagnosticMessage>").unwrap(),
+                    false,
+                    None,
+                ),
+            ],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            docs,
+            vec![spec_ref("AC-03")],
+            vec![],
+        ),
+    );
+    catalogue
+}
+
+#[test]
+fn test_derivation_is_repeatable_and_populates_required_obligation_fields() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = catalogue_with_type(
+        "Money",
+        value_object_entry(ItemAction::Add, vec![invariant("positive")]),
+    );
+
+    let (first_interactor, first_sink) = interactor(rules_doc(), catalogue.clone(), &path);
+    first_interactor.execute(&command(vec![path.clone()])).unwrap();
+    let first = first_sink.saved.lock().unwrap().clone().unwrap();
+
+    let (second_interactor, second_sink) = interactor(rules_doc(), catalogue, &path);
+    second_interactor.execute(&command(vec![path])).unwrap();
+    let second = second_sink.saved.lock().unwrap().clone().unwrap();
+
+    assert_eq!(first, second);
+    let obligation = &first.obligations()[0];
+    assert_eq!(obligation.id().entry_key().as_str(), "Money");
+    assert_eq!(obligation.id().item_identifier().as_str(), "invariant:positive");
+    assert_eq!(obligation.target_entry().entry_key.as_str(), "Money");
+    assert!(matches!(obligation.target_role(), TargetEntryRoleKind::DataRole(_)));
+    assert!(!obligation.brief().as_str().is_empty());
+    assert_eq!(obligation.spec_refs()[0].element_id(), "IN-05");
+}
+
+#[test]
+fn test_derivation_with_anchored_catalogue_path_persists_project_relative_path() {
+    let relative_path = PathBuf::from("track/items/my-track/domain-types.json");
+    let anchored_path = PathBuf::from("/checkout/project/track/items/my-track/domain-types.json");
+    let catalogue = catalogue_with_type(
+        "Money",
+        value_object_entry(ItemAction::Add, vec![invariant("positive")]),
+    );
+    let (relative_interactor, relative_sink) =
+        interactor(rules_doc(), catalogue.clone(), &relative_path);
+    let (anchored_interactor, anchored_sink) = interactor(rules_doc(), catalogue, &anchored_path);
+
+    relative_interactor.execute(&command(vec![relative_path])).unwrap();
+    anchored_interactor.execute(&command(vec![anchored_path])).unwrap();
+
+    let relative = relative_sink.saved.lock().unwrap().clone().unwrap();
+    let anchored = anchored_sink.saved.lock().unwrap().clone().unwrap();
+    assert_eq!(
+        anchored.obligations()[0].target_entry().file_path,
+        "track/items/my-track/domain-types.json"
+    );
+    assert_eq!(
+        anchored.obligations()[0].declaration_hash(),
+        relative.obligations()[0].declaration_hash()
+    );
+    assert_eq!(anchored.obligations()[0].spec_refs(), relative.obligations()[0].spec_refs());
+}
+
+#[test]
 fn test_value_object_without_invariants_emits_zero() {
     // CN-16: the type system makes the invalid state unrepresentable -> 0.
     let path = PathBuf::from("domain-types.json");
@@ -385,8 +652,7 @@ fn test_declaration_change_keeps_id_but_changes_declaration_hash() {
 
     let a = &first.obligations()[0];
     let b = &second.obligations()[0];
-    assert_eq!(a.id().item_identifier().as_str(), b.id().item_identifier().as_str());
-    assert_eq!(a.id().entry_key().as_str(), b.id().entry_key().as_str());
+    assert_eq!(a.id(), b.id());
     assert_ne!(a.declaration_hash(), b.declaration_hash());
 }
 
@@ -473,6 +739,46 @@ fn test_trait_impl_resolves_role_and_external_trait_yields_zero() {
     assert_eq!(conformance[0].id().entry_key().as_str(), "MyAdapter");
     assert_eq!(conformance[0].spec_refs().len(), 1);
     assert_eq!(conformance[0].spec_refs()[0].element_id(), "IN-06");
+}
+
+#[test]
+fn test_fs_spec_document_loader_trait_impl_derives_its_secondary_port_obligation() {
+    // IN-07 / IN-08: the real filesystem loader declaration resolves the
+    // domain port's SecondaryPort role across the catalogue boundary.
+    let domain_path = PathBuf::from("domain-types.json");
+    let infrastructure_path = PathBuf::from("infrastructure-types.json");
+    let mut domain = empty_catalogue("domain", "domain");
+    domain.insert_trait(
+        TraitName::new("SpecDocumentLoaderPort").unwrap(),
+        trait_entry(ContractRole::SecondaryPort, "IN-07"),
+    );
+    let mut infrastructure = empty_catalogue("infrastructure", "infrastructure");
+    infrastructure.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("domain::spec_document_loader_port::SpecDocumentLoaderPort").unwrap(),
+        TypeRef::new("FsSpecDocumentLoader").unwrap(),
+    ));
+
+    let (interactor, sink) = interactor_with_catalogues(
+        rules_doc(),
+        vec![(domain_path.clone(), domain), (infrastructure_path.clone(), infrastructure)],
+    );
+    interactor.execute(&command(vec![domain_path, infrastructure_path])).unwrap();
+
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    let conformance: Vec<_> = saved
+        .obligations()
+        .iter()
+        .filter(|obligation| {
+            obligation.id().entry_key().as_str() == "FsSpecDocumentLoader"
+                && *obligation.id().obligation_kind() == TestObligationKind::ContractConformance
+        })
+        .collect();
+    assert_eq!(conformance.len(), 1);
+    assert_eq!(
+        conformance[0].id().item_identifier().as_str(),
+        "trait_impl:domain::spec_document_loader_port::SpecDocumentLoaderPort"
+    );
+    assert_eq!(conformance[0].spec_refs()[0].element_id(), "IN-07");
 }
 
 #[test]

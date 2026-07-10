@@ -182,6 +182,8 @@ mod tests {
         assert_eq!(record["obligation_id"]["obligation_kind"], "boundary");
         assert_eq!(record["obligation_id"]["item_identifier"], "invariant:non_empty");
         assert_eq!(record["tests"][0]["layer"], "TODO_LAYER");
+        assert_eq!(record["tests"][0]["module_path"], "TODO::module::tests");
+        assert_eq!(record["tests"][0]["test_name"], "TODO_test_name");
         // Wire-shape guard: the draft carries no annotation fields, only the
         // exact keys the fail-closed test-bindings codec accepts.
         let mut document_keys: Vec<_> = value.as_object().unwrap().keys().collect();

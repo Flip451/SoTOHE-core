@@ -120,9 +120,17 @@ pub struct EdgeVerdictRecord {
     // Read by the results interactor (T019) when it renders per-edge records; no
     // read accessors are declared in this batch's type contract.
     #[allow(dead_code)]
+    obligation_id: Option<TestObligationId>,
+    #[allow(dead_code)]
     edge_id: TestObligationEdgeId,
     #[allow(dead_code)]
+    claim_source: Option<DiagnosticMessage>,
+    #[allow(dead_code)]
+    evidence_source: Option<DiagnosticMessage>,
+    #[allow(dead_code)]
     outcome: EdgeResolutionOutcome,
+    #[allow(dead_code)]
+    verdict_reason: Option<DiagnosticMessage>,
     #[allow(dead_code)]
     drift: Option<TestObligationDrift>,
 }
@@ -131,11 +139,23 @@ impl EdgeVerdictRecord {
     /// Builds an [`EdgeVerdictRecord`].
     #[must_use]
     pub fn new(
+        obligation_id: Option<TestObligationId>,
         edge_id: TestObligationEdgeId,
+        claim_source: Option<DiagnosticMessage>,
+        evidence_source: Option<DiagnosticMessage>,
         outcome: EdgeResolutionOutcome,
+        verdict_reason: Option<DiagnosticMessage>,
         drift: Option<TestObligationDrift>,
     ) -> Self {
-        Self { edge_id, outcome, drift }
+        Self {
+            obligation_id,
+            edge_id,
+            claim_source,
+            evidence_source,
+            outcome,
+            verdict_reason,
+            drift,
+        }
     }
 }
 
@@ -279,7 +299,15 @@ mod tests {
     }
 
     fn verdict_record() -> EdgeVerdictRecord {
-        EdgeVerdictRecord::new(edge_id(), EdgeResolutionOutcome::MissingBinding, Some(drift()))
+        EdgeVerdictRecord::new(
+            Some(obligation_id()),
+            edge_id(),
+            None,
+            None,
+            EdgeResolutionOutcome::MissingBinding,
+            None,
+            Some(drift()),
+        )
     }
 
     #[test]
@@ -367,10 +395,22 @@ mod tests {
 
     #[test]
     fn test_edge_verdict_record_holds_outcome_and_optional_drift() {
-        let fulfilled = EdgeVerdictRecord::new(edge_id(), EdgeResolutionOutcome::Fulfilled, None);
-        let missing = EdgeVerdictRecord::new(
+        let fulfilled = EdgeVerdictRecord::new(
+            Some(obligation_id()),
             edge_id(),
+            Some(detail("fulfillment binding")),
+            Some(detail("domain::user::tests::test_fulfilled")),
+            EdgeResolutionOutcome::Fulfilled,
+            None,
+            None,
+        );
+        let missing = EdgeVerdictRecord::new(
+            None,
+            edge_id(),
+            None,
+            None,
             EdgeResolutionOutcome::MissingBinding,
+            Some(detail("binding is missing")),
             Some(TestObligationDrift::missing_obligation(obligation_id(), detail("no binding"))),
         );
         assert_ne!(fulfilled, missing);

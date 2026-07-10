@@ -4,10 +4,10 @@
   "entries": [
     {
       "claim_hash": "7b0cf8df3153c20a97755010eacfdcd881969df909a2e83be4120c5ee23172cc",
-      "evidence_hash": "86bfc5d228e9fe78ce3c30e6cc9dfa0eaa21fe3c8b170a12c490ee738bc0cee6",
+      "evidence_hash": "0ab9cd4316ab24b379d3406fe63aab9ea90bd98f1001043249d95ff0bb8dc43f",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。... commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。"
+        "citation": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -27,11 +27,11 @@
       }
     },
     {
-      "claim_hash": "2d06ab5b28b148825cd81dc0a560537b60e89c872f607e10c5ecacd138ef101c",
-      "evidence_hash": "86bfc5d228e9fe78ce3c30e6cc9dfa0eaa21fe3c8b170a12c490ee738bc0cee6",
+      "claim_hash": "4a480beddd490fb9813ac61894d712aa5fa29c5c50ac70965fa3fc0e162da3dd",
+      "evidence_hash": "0ab9cd4316ab24b379d3406fe63aab9ea90bd98f1001043249d95ff0bb8dc43f",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。"
+        "citation": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -51,11 +51,35 @@
       }
     },
     {
-      "claim_hash": "f9d63391d33d9780d884d6f6c45f6da280e520a2045616079cf03de27ca5fcd7",
-      "evidence_hash": "86bfc5d228e9fe78ce3c30e6cc9dfa0eaa21fe3c8b170a12c490ee738bc0cee6",
+      "claim_hash": "4a480beddd490fb9813ac61894d712aa5fa29c5c50ac70965fa3fc0e162da3dd",
+      "evidence_hash": "84e984d43176f96d78afbe79bb3c38441786e7fface2c6e72358713f77752dda",
       "verdict": {
         "kind": "pass",
-        "citation": "(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。"
+        "citation": "鮮度と verdict の結合は fail-closed。verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点で既存 verdict は無効となり「存在しない」ものとして扱う。hash 再計算だけで鮮度を回復する経路は存在せず、回復は再評価（`evaluate`）の pass のみで達成される。verifier-prompt fingerprint が現行 prompt と不一致または不在なら verdict は考慮対象から除外され、再評価まで gate を厳しくする方向にしか作用せず、手動 cache purge は回復経路ではない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CheckTestObligationsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "鮮度と verdict の結合は fail-closed。verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点で既存 verdict は無効となり「存在しない」ものとして扱う。hash 再計算だけで鮮度を回復する経路は存在せず、回復は再評価（`evaluate`）の pass のみで達成される。verifier-prompt fingerprint が現行 prompt と不一致または不在なら verdict は考慮対象から除外され、再評価まで gate を厳しくする方向にしか作用せず、手動 cache purge は回復経路ではない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9d63391d33d9780d884d6f6c45f6da280e520a2045616079cf03de27ca5fcd7",
+      "evidence_hash": "0ab9cd4316ab24b379d3406fe63aab9ea90bd98f1001043249d95ff0bb8dc43f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -220,7 +244,7 @@
     },
     {
       "claim_hash": "048ed227673266e1bedb35b8e8bca3ef2e2e691cce41f3dd4c45503c2402ebf4",
-      "evidence_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
+      "evidence_hash": "ea8420d96fcd552a8f15e1f8c612852de8bd59ed60ab9408f6ac884af9c3f099",
       "verdict": {
         "kind": "pass",
         "citation": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する"
@@ -238,16 +262,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-09",
-          "text_label": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。"
+          "text_label": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。記録する各 verdict には verifier-prompt fingerprint を持たせ、現在の verifier prompt と fingerprint が不一致または fingerprint 不在の entry は存在しないものとして無視して再評価する。"
         }
       }
     },
     {
       "claim_hash": "51f33aee77d3ef1ae56575a1c509c4e78386dda1d9528080a4c4334937d95d95",
-      "evidence_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
+      "evidence_hash": "ea8420d96fcd552a8f15e1f8c612852de8bd59ed60ab9408f6ac884af9c3f099",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し"
+        "citation": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -262,16 +286,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-09",
-          "text_label": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。"
+          "text_label": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。記録する各 verdict には verifier-prompt fingerprint を持たせ、現在の verifier prompt と fingerprint が不一致または fingerprint 不在の entry は存在しないものとして無視して再評価する。"
         }
       }
     },
     {
       "claim_hash": "51f33aee77d3ef1ae56575a1c509c4e78386dda1d9528080a4c4334937d95d95",
-      "evidence_hash": "05cf2fcdde6a24ed77b505f6e97d70267bb3f578da05515dfc09ca9e048e4c08",
+      "evidence_hash": "439ada29677c11025b4f5c43083dbd5c3969fab680ea94a7b2d4d32c06ee1c5c",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し、pass verdict には裏付け引用（根拠のどの箇所が主張を裏付けるかの引用）を必須とする"
+        "citation": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -286,7 +310,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し、pass verdict には裏付け引用（根拠のどの箇所が主張を裏付けるかの引用）を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。fast → final → 人間 の段階引き上げが参照ペア単位で発火する。"
+          "text_label": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し、pass verdict には裏付け引用（根拠のどの箇所が主張を裏付けるかの引用）を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。fast → final → 人間 の段階引き上げが参照ペア単位で発火する。verifier provider が設定読込失敗又は capability 解決不能のために解決されない場合、composition root は fail-closed stand-in adapter を接続する。この stand-in は全呼出しで `VerifierPort` error を返して verdict を一切生成しないため、この経路では cited / uncited を問わず pass verdict は生じず、引用必須の規律は不合格方向にのみ保たれる。"
         }
       }
     },
@@ -315,11 +339,11 @@
       }
     },
     {
-      "claim_hash": "ba0c397779256a41a2f15b581162d43323b7eb5e9ed44fa65a2dd2b2092856c7",
-      "evidence_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
+      "claim_hash": "bcfb1f7a5658414c8c5b9e26d4eeb05bd646df1fbbd7d51c6e19c745e3e0d269",
+      "evidence_hash": "ea8420d96fcd552a8f15e1f8c612852de8bd59ed60ab9408f6ac884af9c3f099",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする"
+        "citation": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -334,16 +358,40 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-09",
-          "text_label": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。"
+          "text_label": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。記録する各 verdict には verifier-prompt fingerprint を持たせ、現在の verifier prompt と fingerprint が不一致または fingerprint 不在の entry は存在しないものとして無視して再評価する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bcfb1f7a5658414c8c5b9e26d4eeb05bd646df1fbbd7d51c6e19c745e3e0d269",
+      "evidence_hash": "84e984d43176f96d78afbe79bb3c38441786e7fface2c6e72358713f77752dda",
+      "verdict": {
+        "kind": "pass",
+        "citation": "鮮度と verdict の結合は fail-closed。verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点で既存 verdict は無効となり「存在しない」ものとして扱う。hash 再計算だけで鮮度を回復する経路は存在せず、回復は再評価（`evaluate`）の pass のみで達成される。verifier-prompt fingerprint が現行 prompt と不一致または不在なら verdict は考慮対象から除外され、再評価まで gate を厳しくする方向にしか作用せず、手動 cache purge は回復経路ではない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "EvaluateTestObligationsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "鮮度と verdict の結合は fail-closed。verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点で既存 verdict は無効となり「存在しない」ものとして扱う。hash 再計算だけで鮮度を回復する経路は存在せず、回復は再評価（`evaluate`）の pass のみで達成される。verifier-prompt fingerprint が現行 prompt と不一致または不在なら verdict は考慮対象から除外され、再評価まで gate を厳しくする方向にしか作用せず、手動 cache purge は回復経路ではない。"
         }
       }
     },
     {
       "claim_hash": "d959d07a3b8d5009cebbac9e5d608bf769348067d9f60473574ad2ff2ebb3aa1",
-      "evidence_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
+      "evidence_hash": "ea8420d96fcd552a8f15e1f8c612852de8bd59ed60ab9408f6ac884af9c3f099",
       "verdict": {
         "kind": "pass",
-        "citation": "obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する"
+        "citation": "obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -358,16 +406,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-09",
-          "text_label": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。"
+          "text_label": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。記録する各 verdict には verifier-prompt fingerprint を持たせ、現在の verifier prompt と fingerprint が不一致または fingerprint 不在の entry は存在しないものとして無視して再評価する。"
         }
       }
     },
     {
       "claim_hash": "d959d07a3b8d5009cebbac9e5d608bf769348067d9f60473574ad2ff2ebb3aa1",
-      "evidence_hash": "05cf2fcdde6a24ed77b505f6e97d70267bb3f578da05515dfc09ca9e048e4c08",
+      "evidence_hash": "439ada29677c11025b4f5c43083dbd5c3969fab680ea94a7b2d4d32c06ee1c5c",
       "verdict": {
         "kind": "pass",
-        "citation": "`obligation-fulfillment pair と waiver pair を LLM で評価し`"
+        "citation": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し、pass verdict には裏付け引用（根拠のどの箇所が主張を裏付けるかの引用）を必須とする"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -382,7 +430,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し、pass verdict には裏付け引用（根拠のどの箇所が主張を裏付けるかの引用）を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。fast → final → 人間 の段階引き上げが参照ペア単位で発火する。"
+          "text_label": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し、pass verdict には裏付け引用（根拠のどの箇所が主張を裏付けるかの引用）を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。fast → final → 人間 の段階引き上げが参照ペア単位で発火する。verifier provider が設定読込失敗又は capability 解決不能のために解決されない場合、composition root は fail-closed stand-in adapter を接続する。この stand-in は全呼出しで `VerifierPort` error を返して verdict を一切生成しないため、この経路では cited / uncited を問わず pass verdict は生じず、引用必須の規律は不合格方向にのみ保たれる。"
         }
       }
     },
@@ -652,10 +700,10 @@
     },
     {
       "claim_hash": "0b914d3efb5e2048e35b452561bccecf688eb1de52459d99cdbe7f4cb91387c6",
-      "evidence_hash": "d8e51e6021c7a928e1d1ee5df5596a877ff2f4c778e0076cc96edfcd7eee57be",
+      "evidence_hash": "eb9b3df49897b2ebf00876dbe9e423881891aa6121f33d0a90f23a218eae90d2",
       "verdict": {
         "kind": "pass",
-        "citation": "bindings-skeleton は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に、案内文は stderr に出すだけで、`test-bindings.json` も verdict cache も書き換えない"
+        "citation": "`bindings-skeleton` は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -724,10 +772,10 @@
     },
     {
       "claim_hash": "f6812a477b1209afec0dc40cbce1dd3785a9bfb57eadad581d139c5fa9e9315e",
-      "evidence_hash": "d8e51e6021c7a928e1d1ee5df5596a877ff2f4c778e0076cc96edfcd7eee57be",
+      "evidence_hash": "eb9b3df49897b2ebf00876dbe9e423881891aa6121f33d0a90f23a218eae90d2",
       "verdict": {
         "kind": "pass",
-        "citation": "bindings-skeleton は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に、案内文は stderr に出すだけで、`test-bindings.json` も verdict cache も書き換えない"
+        "citation": "`bindings-skeleton` は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -796,10 +844,10 @@
     },
     {
       "claim_hash": "f66465af939b25571352bae4b7147791bbb512e806edb182cdcd1f116784ca6f",
-      "evidence_hash": "d8e51e6021c7a928e1d1ee5df5596a877ff2f4c778e0076cc96edfcd7eee57be",
+      "evidence_hash": "eb9b3df49897b2ebf00876dbe9e423881891aa6121f33d0a90f23a218eae90d2",
       "verdict": {
         "kind": "pass",
-        "citation": "`bindings-skeleton` は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に、案内文は stderr に出すだけで、`test-bindings.json` も verdict cache も書き換えない（stdout は schema-pure に保たれ、利用者はそのまま保存して値だけ置換できる）。"
+        "citation": "`bindings-skeleton` は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に、案内文は stderr に出すだけ"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -868,10 +916,10 @@
     },
     {
       "claim_hash": "f8b7ac82763b1468240c9c0113779020ae5127d0515b9e4f4cb2b88c0729ba25",
-      "evidence_hash": "d8e51e6021c7a928e1d1ee5df5596a877ff2f4c778e0076cc96edfcd7eee57be",
+      "evidence_hash": "eb9b3df49897b2ebf00876dbe9e423881891aa6121f33d0a90f23a218eae90d2",
       "verdict": {
         "kind": "pass",
-        "citation": "bindings-skeleton は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に"
+        "citation": "`bindings-skeleton` は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -940,10 +988,10 @@
     },
     {
       "claim_hash": "a09f2f40150a2bdb2ebc4e72e91602457d1cdb0eb6628851c1179620fc1a0af8",
-      "evidence_hash": "d8e51e6021c7a928e1d1ee5df5596a877ff2f4c778e0076cc96edfcd7eee57be",
+      "evidence_hash": "eb9b3df49897b2ebf00876dbe9e423881891aa6121f33d0a90f23a218eae90d2",
       "verdict": {
         "kind": "pass",
-        "citation": "`bindings-skeleton` は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に、案内文は stderr に出すだけで、`test-bindings.json` も verdict cache も書き換えない"
+        "citation": "`bindings-skeleton` は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1012,10 +1060,10 @@
     },
     {
       "claim_hash": "b46799a3d1491d7f32beb0a89e05bb79de7b9becca1669d8646cd5cce5a44ba6",
-      "evidence_hash": "86bfc5d228e9fe78ce3c30e6cc9dfa0eaa21fe3c8b170a12c490ee738bc0cee6",
+      "evidence_hash": "0ab9cd4316ab24b379d3406fe63aab9ea90bd98f1001043249d95ff0bb8dc43f",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する... commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。"
+        "citation": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する:"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1060,10 +1108,10 @@
     },
     {
       "claim_hash": "fc1dbaaca953db2b96cedd33ad0ec8ece8bc00fd5690f4bd93fbdd34e77434c7",
-      "evidence_hash": "bc8ade098e87cb76c91a122047b9988d47717e992db217a1135a5b9dd4a591b3",
+      "evidence_hash": "311a5ec489202895822f52ee3aac4c664ddb41cace11a8802b95f9a2828a6ef2",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation results` が既存 `bin/sotp ref-verify results` と対称の出力面を提供する: (1) 集計ブロック（chain × layer で `pass=N fail=N pending=N` を 1 行 / lane）"
+        "citation": "(1) 集計ブロック（chain × layer で `pass=N fail=N pending=N` を 1 行 / lane）"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1204,10 +1252,10 @@
     },
     {
       "claim_hash": "965456bc8a3b2100ce1dc1314ae05641191a291beaafc0f9230cfae3792f3bb3",
-      "evidence_hash": "bc8ade098e87cb76c91a122047b9988d47717e992db217a1135a5b9dd4a591b3",
+      "evidence_hash": "311a5ec489202895822f52ee3aac4c664ddb41cace11a8802b95f9a2828a6ef2",
       "verdict": {
         "kind": "pass",
-        "citation": "(1) 集計ブロック（chain × layer で `pass=N fail=N pending=N` を 1 行 / lane）"
+        "citation": "集計ブロック（chain × layer で `pass=N fail=N pending=N` を 1 行 / lane）"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1252,10 +1300,10 @@
     },
     {
       "claim_hash": "cfd6f2c43decc6ff0a8639d1dc18f1469565cd59686e25ef6d2fdb4a06f025da",
-      "evidence_hash": "bc8ade098e87cb76c91a122047b9988d47717e992db217a1135a5b9dd4a591b3",
+      "evidence_hash": "311a5ec489202895822f52ee3aac4c664ddb41cace11a8802b95f9a2828a6ef2",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation results` が既存 `bin/sotp ref-verify results` と対称の出力面を提供する ... `--track-id` は省略時に現在ブランチから自動解決される。"
+        "citation": "`bin/sotp test-obligation results` が既存 `bin/sotp ref-verify results` と対称の出力面を提供する"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1300,10 +1348,10 @@
     },
     {
       "claim_hash": "0d55122a189837928b909f6b3e01d91108b2a27b1fc50c6236364ee39794e10d",
-      "evidence_hash": "bc8ade098e87cb76c91a122047b9988d47717e992db217a1135a5b9dd4a591b3",
+      "evidence_hash": "311a5ec489202895822f52ee3aac4c664ddb41cace11a8802b95f9a2828a6ef2",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation results` が既存 `bin/sotp ref-verify results` と対称の出力面を提供する: (1) 集計ブロック（chain × layer で `pass=N fail=N pending=N` を 1 行 / lane）、(2) fail/pending の詳細（義務 id / edge id / claim source / evidence source / verdict / reason / drift 種別）、(3) summary 行。exit は常に 0（informational）で、verdict gate は `check` の責務であることが help text に明記される。`--track-id` は省略時に現在ブランチから自動解決される。"
+        "citation": "`bin/sotp test-obligation results` が既存 `bin/sotp ref-verify results` と対称の出力面を提供する"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1348,10 +1396,10 @@
     },
     {
       "claim_hash": "950a8000ac1f82d7a2f3f54e87df983efa76a00c925e1ea22f43f13e3250e989",
-      "evidence_hash": "bc8ade098e87cb76c91a122047b9988d47717e992db217a1135a5b9dd4a591b3",
+      "evidence_hash": "311a5ec489202895822f52ee3aac4c664ddb41cace11a8802b95f9a2828a6ef2",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation results` が既存 `bin/sotp ref-verify results` と対称の出力面を提供する: (1) 集計ブロック（chain × layer で `pass=N fail=N pending=N` を 1 行 / lane）、(2) fail/pending の詳細（義務 id / edge id / claim source / evidence source / verdict / reason / drift 種別）、(3) summary 行。"
+        "citation": "集計ブロック（chain × layer で `pass=N fail=N pending=N` を 1 行 / lane）、(2) fail/pending の詳細（義務 id / edge id / claim source / evidence source / verdict / reason / drift 種別）、(3) summary 行。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1372,10 +1420,10 @@
     },
     {
       "claim_hash": "4d09d2fbfc6d2c983cd85cb3507bdc2ec55599f091df2a0c08bf2d355226dee9",
-      "evidence_hash": "86bfc5d228e9fe78ce3c30e6cc9dfa0eaa21fe3c8b170a12c490ee738bc0cee6",
+      "evidence_hash": "0ab9cd4316ab24b379d3406fe63aab9ea90bd98f1001043249d95ff0bb8dc43f",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。... commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。"
+        "citation": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1444,10 +1492,10 @@
     },
     {
       "claim_hash": "e91f7962250d055f5ac01b1887e24f222f8122d7591dee56b63e4a3715cf4190",
-      "evidence_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
+      "evidence_hash": "ea8420d96fcd552a8f15e1f8c612852de8bd59ed60ab9408f6ac884af9c3f099",
       "verdict": {
         "kind": "pass",
-        "citation": "verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)"
+        "citation": "tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1462,13 +1510,13 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-09",
-          "text_label": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。"
+          "text_label": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。記録する各 verdict には verifier-prompt fingerprint を持たせ、現在の verifier prompt と fingerprint が不一致または fingerprint 不在の entry は存在しないものとして無視して再評価する。"
         }
       }
     },
     {
       "claim_hash": "e91f7962250d055f5ac01b1887e24f222f8122d7591dee56b63e4a3715cf4190",
-      "evidence_hash": "05cf2fcdde6a24ed77b505f6e97d70267bb3f578da05515dfc09ca9e048e4c08",
+      "evidence_hash": "439ada29677c11025b4f5c43083dbd5c3969fab680ea94a7b2d4d32c06ee1c5c",
       "verdict": {
         "kind": "pass",
         "citation": "verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。"
@@ -1486,13 +1534,13 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し、pass verdict には裏付け引用（根拠のどの箇所が主張を裏付けるかの引用）を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。fast → final → 人間 の段階引き上げが参照ペア単位で発火する。"
+          "text_label": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し、pass verdict には裏付け引用（根拠のどの箇所が主張を裏付けるかの引用）を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。fast → final → 人間 の段階引き上げが参照ペア単位で発火する。verifier provider が設定読込失敗又は capability 解決不能のために解決されない場合、composition root は fail-closed stand-in adapter を接続する。この stand-in は全呼出しで `VerifierPort` error を返して verdict を一切生成しないため、この経路では cited / uncited を問わず pass verdict は生じず、引用必須の規律は不合格方向にのみ保たれる。"
         }
       }
     },
     {
       "claim_hash": "e91f7962250d055f5ac01b1887e24f222f8122d7591dee56b63e4a3715cf4190",
-      "evidence_hash": "f5b3a5ffaaa5a66b3145d0206b23ae2322d2754cb7336f4843509b4f3bc2c97a",
+      "evidence_hash": "84e984d43176f96d78afbe79bb3c38441786e7fface2c6e72358713f77752dda",
       "verdict": {
         "kind": "pass",
         "citation": "verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点で既存 verdict は無効となり「存在しない」ものとして扱う。"
@@ -1510,7 +1558,7 @@
         "data": {
           "section": "constraint",
           "element_id": "CN-04",
-          "text_label": "鮮度と verdict の結合は fail-closed。verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点で既存 verdict は無効となり「存在しない」ものとして扱う。hash 再計算だけで鮮度を回復する経路は存在せず、回復は再評価（`evaluate`）の pass のみで達成される。"
+          "text_label": "鮮度と verdict の結合は fail-closed。verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点で既存 verdict は無効となり「存在しない」ものとして扱う。hash 再計算だけで鮮度を回復する経路は存在せず、回復は再評価（`evaluate`）の pass のみで達成される。verifier-prompt fingerprint が現行 prompt と不一致または不在なら verdict は考慮対象から除外され、再評価まで gate を厳しくする方向にしか作用せず、手動 cache purge は回復経路ではない。"
         }
       }
     },
@@ -1540,10 +1588,10 @@
     },
     {
       "claim_hash": "1b182a5ac05eb6820f4f065b365c5782c4f050f9b2be7c03128db956aafc0310",
-      "evidence_hash": "0e53a91d4e7954aa4be967767cba56d07728c1b29c94232f7c9114be307d70e4",
+      "evidence_hash": "69bcaac923488eb1594afcb2c10ca4e8999e119a91ff596e55bda92615dee574",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation derive` が catalogue + spec + 決定表 config から obligations artifact を決定論的に導出する。義務 id が (entry 識別子, 義務種別, 宣言内項目の識別子) のみから構成され、内容 hash / 位置 index に依存しない。上流の宣言の内容だけを修正（例: invariant 本文の変更）した場合、義務 id は不変で `decl_changed` drift のみが発生する。"
+        "citation": "`bin/sotp test-obligation derive` が catalogue + spec + 決定表 config から obligations artifact を決定論的に導出する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1564,10 +1612,10 @@
     },
     {
       "claim_hash": "e763bba9dcaf9ceb5ca68823331e5984364725bc8c2ee060ce8b87b42b7e95f7",
-      "evidence_hash": "d7d0ec06b0eb150a8565139fc9453fcbb208af0e51587bd496234214115359d0",
+      "evidence_hash": "ea8420d96fcd552a8f15e1f8c612852de8bd59ed60ab9408f6ac884af9c3f099",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。"
+        "citation": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1582,13 +1630,13 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-09",
-          "text_label": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。"
+          "text_label": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。記録する各 verdict には verifier-prompt fingerprint を持たせ、現在の verifier prompt と fingerprint が不一致または fingerprint 不在の entry は存在しないものとして無視して再評価する。"
         }
       }
     },
     {
       "claim_hash": "e763bba9dcaf9ceb5ca68823331e5984364725bc8c2ee060ce8b87b42b7e95f7",
-      "evidence_hash": "05cf2fcdde6a24ed77b505f6e97d70267bb3f578da05515dfc09ca9e048e4c08",
+      "evidence_hash": "439ada29677c11025b4f5c43083dbd5c3969fab680ea94a7b2d4d32c06ee1c5c",
       "verdict": {
         "kind": "pass",
         "citation": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し、pass verdict には裏付け引用（根拠のどの箇所が主張を裏付けるかの引用）を必須とする"
@@ -1606,7 +1654,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し、pass verdict には裏付け引用（根拠のどの箇所が主張を裏付けるかの引用）を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。fast → final → 人間 の段階引き上げが参照ペア単位で発火する。"
+          "text_label": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し、pass verdict には裏付け引用（根拠のどの箇所が主張を裏付けるかの引用）を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。fast → final → 人間 の段階引き上げが参照ペア単位で発火する。verifier provider が設定読込失敗又は capability 解決不能のために解決されない場合、composition root は fail-closed stand-in adapter を接続する。この stand-in は全呼出しで `VerifierPort` error を返して verdict を一切生成しないため、この経路では cited / uncited を問わず pass verdict は生じず、引用必須の規律は不合格方向にのみ保たれる。"
         }
       }
     },
@@ -1756,10 +1804,10 @@
     },
     {
       "claim_hash": "e9a67b9ddb3b81f38a86c1436c4a83d2534b8709fc77528b390fa5690b0fac2d",
-      "evidence_hash": "d8e51e6021c7a928e1d1ee5df5596a877ff2f4c778e0076cc96edfcd7eee57be",
+      "evidence_hash": "eb9b3df49897b2ebf00876dbe9e423881891aa6121f33d0a90f23a218eae90d2",
       "verdict": {
         "kind": "pass",
-        "citation": "bindings-skeleton は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に、案内文は stderr に出すだけで、`test-bindings.json` も verdict cache も書き換えない"
+        "citation": "`bindings-skeleton` は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に、案内文は stderr に出すだけ"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1828,10 +1876,10 @@
     },
     {
       "claim_hash": "c2a23f7a8f3b264ed0b1d34584cecd90bb33cf987da8a3af0932aedb4ff43c61",
-      "evidence_hash": "bc8ade098e87cb76c91a122047b9988d47717e992db217a1135a5b9dd4a591b3",
+      "evidence_hash": "311a5ec489202895822f52ee3aac4c664ddb41cace11a8802b95f9a2828a6ef2",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation results` が既存 `bin/sotp ref-verify results` と対称の出力面を提供する: (1) 集計ブロック（chain × layer で `pass=N fail=N pending=N` を 1 行 / lane）、(2) fail/pending の詳細（義務 id / edge id / claim source / evidence source / verdict / reason / drift 種別）、(3) summary 行。exit は常に 0（informational）で、verdict gate は `check` の責務であることが help text に明記される。"
+        "citation": "`bin/sotp test-obligation results` が既存 `bin/sotp ref-verify results` と対称の出力面を提供する"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

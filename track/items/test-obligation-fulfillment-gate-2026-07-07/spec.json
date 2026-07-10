@@ -155,12 +155,16 @@
           {
             "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
             "anchor": "D11"
+          },
+          {
+            "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+            "anchor": "D14"
           }
         ]
       },
       {
         "id": "IN-09",
-        "text": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。",
+        "text": "`bin/sotp test-obligation evaluate` の実装（LLM による履行の意味論検証実行）。obligation-fulfillment pair（claim = bind されたテスト群の関数本体集合、evidence = entry 宣言 × anchor の対）と waiver pair（claim = author された waived 理由散文、evidence = entry 宣言 × anchor の対）の両者を評価し、verdict をキャッシュキーの三つ組で凍結する: tests pair は (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair は (waived理由 hash, entry宣言 hash, anchor hash)。pass verdict には裏付け引用を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。記録する各 verdict には verifier-prompt fingerprint を持たせ、現在の verifier prompt と fingerprint が不一致または fingerprint 不在の entry は存在しないものとして無視して再評価する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
@@ -169,6 +173,10 @@
           {
             "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
             "anchor": "D11"
+          },
+          {
+            "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+            "anchor": "D16"
           }
         ]
       },
@@ -421,11 +429,15 @@
     },
     {
       "id": "CN-04",
-      "text": "鮮度と verdict の結合は fail-closed。verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点で既存 verdict は無効となり「存在しない」ものとして扱う。hash 再計算だけで鮮度を回復する経路は存在せず、回復は再評価（`evaluate`）の pass のみで達成される。",
+      "text": "鮮度と verdict の結合は fail-closed。verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点で既存 verdict は無効となり「存在しない」ものとして扱う。hash 再計算だけで鮮度を回復する経路は存在せず、回復は再評価（`evaluate`）の pass のみで達成される。verifier-prompt fingerprint が現行 prompt と不一致または不在なら verdict は考慮対象から除外され、再評価まで gate を厳しくする方向にしか作用せず、手動 cache purge は回復経路ではない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
           "anchor": "D6"
+        },
+        {
+          "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "anchor": "D16"
         }
       ]
     },
@@ -479,11 +491,11 @@
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
-          "anchor": "D6"
+          "anchor": "D11"
         },
         {
           "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
-          "anchor": "D11"
+          "anchor": "D14"
         }
       ]
     },
@@ -610,10 +622,6 @@
         {
           "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
           "anchor": "D9"
-        },
-        {
-          "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
-          "anchor": "D11"
         }
       ]
     },
@@ -643,7 +651,7 @@
     },
     {
       "id": "AC-06",
-      "text": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し、pass verdict には裏付け引用（根拠のどの箇所が主張を裏付けるかの引用）を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。fast → final → 人間 の段階引き上げが参照ペア単位で発火する。",
+      "text": "`bin/sotp test-obligation evaluate` が obligation-fulfillment pair と waiver pair を LLM で評価し、pass verdict には裏付け引用（根拠のどの箇所が主張を裏付けるかの引用）を必須とする（引用を提示できない合格は判定保留として不合格方向に倒す）。verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。fast → final → 人間 の段階引き上げが参照ペア単位で発火する。verifier provider が設定読込失敗又は capability 解決不能のために解決されない場合、composition root は fail-closed stand-in adapter を接続する。この stand-in は全呼出しで `VerifierPort` error を返して verdict を一切生成しないため、この経路では cited / uncited を問わず pass verdict は生じず、引用必須の規律は不合格方向にのみ保たれる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
@@ -681,7 +689,7 @@
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
-          "anchor": "D11"
+          "anchor": "D14"
         }
       ]
     },

@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成
 
-## Tasks (27/27 resolved)
+## Tasks (29/31 resolved)
 
 ### S1 — Preceding shared foundation: semantic-verdict core & ref-verify migration
 
@@ -19,6 +19,8 @@
 - [x] **T006**: Target libs/domain tddd::test_obligation::{hashes,ids}. Add AnchorTextHash, DeclarationHash, BoundTestsSetHash, WaivedReasonHash, TestBodySpanHash; TestObligationId, TestObligationAnchorId, TestObligationEdgeId, TestObligationItemIdentifier, TestObligationBrief, TestModulePath, TestFunctionName, WaivedReason, RoleName, DiagnosticMessage (IN-05/IN-06/CN-01). Add unit tests covering IN-05/IN-06/CN-01. (`1b9c8c26`)
 - [x] **T007**: Target libs/domain tddd::test_obligation::{obligations,binding,scope}. Add TestObligation, ObligationsDocument; TestLocation, NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument; UncitedSpecElementFinding (IN-05/IN-06/IN-16/CN-02/CN-07/CN-13/CN-15/AC-13). Add unit tests covering those anchors. (`1b9c8c26`)
 - [x] **T008**: Target libs/domain tddd::test_obligation::{verdict,drift}. Add ObligationFulfillmentVerdict, WaiverVerdict; ObligationFulfillmentCacheKey, ObligationFulfillmentCacheEntry, ObligationFulfillmentCacheDocument; WaiverCacheKey, WaiverCacheEntry, WaiverCacheDocument; TestObligationDriftKind, TestObligationDrift, EdgeResolutionOutcome, EdgeVerdictRecord (IN-13/CN-01/CN-04/AC-05). Add unit tests covering those anchors. (`1b9c8c26`)
+- [x] **T030**: results record block IN-10 conformance (EdgeVerdictRecord enrichment) + AC-06 vacuity evidence test
+- [x] **T031**: `domain::ObligationsDocument` に `owning_obligation` メソッドを追加し、results の provenance 解決を domain 所有にする (IN-10)
 - [x] **T009**: Target libs/domain tddd::test_obligation::{errors,ports,vocab}. Add ObligationCheckError, ObligationDeriveError, ObligationEvaluateError, ObligationResultsError, FulfillmentFailCategory, SemanticVerifierError, ArtifactCodecError, TestSourceScanError, VerifyCacheError; ObligationsArtifactPort, TestBindingsArtifactPort, ObligationFulfillmentCachePort, WaiverCachePort, ObligationFulfillmentVerifierPort, WaiverVerifierPort, TestSourceScannerPort (IN-08/IN-11/IN-12/CN-08). Add unit tests for Display/Error over every error variant. (`1b9c8c26`)
 
 ### S4 — Infrastructure codecs
@@ -56,3 +58,11 @@
 ### S9 — Bindings-skeleton authoring helper follow-up (usecase + presentation)
 
 - [x] **T027**: Target libs/usecase test_obligation::bindings_skeleton, apps/cli-driver test_obligation::bindings_skeleton, apps/cli-composition test_obligation, and apps/cli commands::test_obligation. Add TestBindingsSkeletonCommand, TestBindingsSkeletonRecord, TestBindingsSkeletonOutcome, TestBindingsSkeletonError, TestBindingsSkeletonApplicationService (trait), TestBindingsSkeletonInteractor, TestBindingsSkeletonInput, TestBindingsSkeletonHandler, TestObligationCompositionRoot::bindings_skeleton_handler, TestObligationSubcommand::BindingsSkeleton, TestBindingsSkeletonArgs, execute_bindings_skeleton, command_root, current_branch, read_command_branch, and read_only_command_context (IN-06/CN-09/AC-14). Add unit tests covering those anchors. (`b98c91d482fde2f82a356675597105f0456884b5`)
+
+### S10 — Gate dogfood on this track
+
+- [~] **T028**: Target track/items/test-obligation-fulfillment-gate-2026-07-07/{obligations.json,test-bindings.json,obligation-fulfillment-cache.json,waiver-cache.json} and cli::commands::test_obligation::{command_context_with,dispatch_test_obligation,execute_bindings_skeleton_with,execute_check_with,execute_derive_with,execute_evaluate_with,execute_results_with}; materialize the track gate artifacts and add the CLI DI seams for the command paths (IN-05/IN-06/IN-08/IN-09/AC-04/AC-10/AC-12).
+
+### S11 — Verdict-cache verifier-fingerprint follow-up
+
+- [~] **T029**: Target libs/domain tddd::test_obligation::verdict, libs/infrastructure test_obligation::{fulfillment_cache_codec,waiver_cache_codec,fulfillment_verifier,waiver_verifier}, and libs/usecase test_obligation::{evaluate,check}; add verifier-prompt fingerprint support across cache entries, codecs, verifiers, and check/evaluate interactors (IN-09/CN-04).

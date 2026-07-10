@@ -162,6 +162,26 @@
       "description": "Target libs/usecase test_obligation::bindings_skeleton, apps/cli-driver test_obligation::bindings_skeleton, apps/cli-composition test_obligation, and apps/cli commands::test_obligation. Add TestBindingsSkeletonCommand, TestBindingsSkeletonRecord, TestBindingsSkeletonOutcome, TestBindingsSkeletonError, TestBindingsSkeletonApplicationService (trait), TestBindingsSkeletonInteractor, TestBindingsSkeletonInput, TestBindingsSkeletonHandler, TestObligationCompositionRoot::bindings_skeleton_handler, TestObligationSubcommand::BindingsSkeleton, TestBindingsSkeletonArgs, execute_bindings_skeleton, command_root, current_branch, read_command_branch, and read_only_command_context (IN-06/CN-09/AC-14). Add unit tests covering those anchors.",
       "status": "done",
       "commit_hash": "b98c91d482fde2f82a356675597105f0456884b5"
+    },
+    {
+      "id": "T028",
+      "description": "Target track/items/test-obligation-fulfillment-gate-2026-07-07/{obligations.json,test-bindings.json,obligation-fulfillment-cache.json,waiver-cache.json} and cli::commands::test_obligation::{command_context_with,dispatch_test_obligation,execute_bindings_skeleton_with,execute_check_with,execute_derive_with,execute_evaluate_with,execute_results_with}; materialize the track gate artifacts and add the CLI DI seams for the command paths (IN-05/IN-06/IN-08/IN-09/AC-04/AC-10/AC-12).",
+      "status": "in_progress"
+    },
+    {
+      "id": "T029",
+      "description": "Target libs/domain tddd::test_obligation::verdict, libs/infrastructure test_obligation::{fulfillment_cache_codec,waiver_cache_codec,fulfillment_verifier,waiver_verifier}, and libs/usecase test_obligation::{evaluate,check}; add verifier-prompt fingerprint support across cache entries, codecs, verifiers, and check/evaluate interactors (IN-09/CN-04).",
+      "status": "in_progress"
+    },
+    {
+      "id": "T030",
+      "description": "results record block IN-10 conformance (EdgeVerdictRecord enrichment) + AC-06 vacuity evidence test",
+      "status": "done"
+    },
+    {
+      "id": "T031",
+      "description": "`domain::ObligationsDocument` に `owning_obligation` メソッドを追加し、results の provenance 解決を domain 所有にする (IN-10)",
+      "status": "done"
     }
   ],
   "plan": {
@@ -194,6 +214,8 @@
           "T006",
           "T007",
           "T008",
+          "T030",
+          "T031",
           "T009"
         ]
       },
@@ -255,6 +277,22 @@
         "description": [],
         "task_ids": [
           "T027"
+        ]
+      },
+      {
+        "id": "S10",
+        "title": "Gate dogfood on this track",
+        "description": [],
+        "task_ids": [
+          "T028"
+        ]
+      },
+      {
+        "id": "S11",
+        "title": "Verdict-cache verifier-fingerprint follow-up",
+        "description": [],
+        "task_ids": [
+          "T029"
         ]
       }
     ]

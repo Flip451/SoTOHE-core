@@ -118,6 +118,30 @@ impl TestBodySpanHash {
     }
 }
 
+/// Hash of the judging-prompt preamble that produced a cached verdict.
+///
+/// This is a validity attribute of a verdict record rather than a cache-key
+/// component. A changed verifier prompt must therefore invalidate the record
+/// without changing the identity of the pair it judged (IN-09 / CN-04).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VerifierPromptFingerprint {
+    hash: ContentHash,
+}
+
+impl VerifierPromptFingerprint {
+    /// Wraps `hash` as a [`VerifierPromptFingerprint`].
+    #[must_use]
+    pub fn new(hash: ContentHash) -> Self {
+        Self { hash }
+    }
+
+    /// Borrows the inner content hash.
+    #[must_use]
+    pub fn as_hash(&self) -> &ContentHash {
+        &self.hash
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
@@ -159,6 +183,13 @@ mod tests {
     fn test_test_body_span_hash_round_trips() {
         let hash = sample_hash();
         let wrapped = TestBodySpanHash::new(hash.clone());
+        assert_eq!(wrapped.as_hash(), &hash);
+    }
+
+    #[test]
+    fn test_verifier_prompt_fingerprint_round_trips() {
+        let hash = sample_hash();
+        let wrapped = VerifierPromptFingerprint::new(hash.clone());
         assert_eq!(wrapped.as_hash(), &hash);
     }
 

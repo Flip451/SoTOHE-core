@@ -28,7 +28,8 @@ use domain::tddd::test_obligation::errors::{
     VerifyCacheError,
 };
 use domain::tddd::test_obligation::hashes::{
-    AnchorTextHash, BoundTestsSetHash, DeclarationHash, TestBodySpanHash, WaivedReasonHash,
+    AnchorTextHash, BoundTestsSetHash, DeclarationHash, TestBodySpanHash,
+    VerifierPromptFingerprint, WaivedReasonHash,
 };
 use domain::tddd::test_obligation::ids::{
     DiagnosticMessage, TestFunctionName, TestModulePath, TestObligationAnchorId,
@@ -114,6 +115,7 @@ impl TestSourceScannerPort for StubScanner {
 struct ScriptedFulfillment {
     fast: ObligationFulfillmentVerdict,
     last: ObligationFulfillmentVerdict,
+    verifier_error: Mutex<Option<DiagnosticMessage>>,
     // AC-08: optional calibration overrides. Per-category slots take
     // precedence; the global slot forces one verdict for every shape. With no
     // override, the stub returns a `Fail` whose category matches the probe
@@ -182,6 +184,9 @@ impl
             }
             self.tiers.lock().unwrap().push(initial_tier);
             self.declarations.lock().unwrap().push(pair.entry_declaration().as_str().to_owned());
+            if let Some(message) = self.verifier_error.lock().unwrap().clone() {
+                return Err(SemanticVerifierError::VerifierPort(message));
+            }
             if matches!(self.fast, ObligationFulfillmentVerdict::Fulfilled { .. }) {
                 return Ok(self.fast.clone());
             }
@@ -285,6 +290,14 @@ impl ContentHasherPort for SumHasher {
 
 fn track() -> TrackId {
     TrackId::try_new("my-track").unwrap()
+}
+
+fn fulfillment_verifier_fingerprint() -> VerifierPromptFingerprint {
+    VerifierPromptFingerprint::new(ContentHash::from_bytes([8u8; 32]))
+}
+
+fn waiver_verifier_fingerprint() -> VerifierPromptFingerprint {
+    VerifierPromptFingerprint::new(ContentHash::from_bytes([9u8; 32]))
 }
 
 fn config() -> TestObligationEvaluateConfig {
@@ -613,6 +626,7 @@ fn harness_with_read_models_and_config(
     let fulfillment_driver = Arc::new(ScriptedFulfillment {
         fast,
         last,
+        verifier_error: Mutex::new(None),
         calibration: Mutex::new(None),
         calibration_contradiction: Mutex::new(None),
         calibration_substitution: Mutex::new(None),
@@ -661,6 +675,8 @@ fn harness_with_read_models_and_config(
             >,
         Arc::clone(&fulfillment_cache) as Arc<dyn ObligationFulfillmentCachePort + Send + Sync>,
         Arc::clone(&waiver_cache) as Arc<dyn WaiverCachePort + Send + Sync>,
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
         cfg,
         Arc::new(StubSpec(spec)),
         Arc::new(StubCatalogue(catalogue)),
@@ -705,6 +721,13 @@ fn sum_hash(bytes: &[u8]) -> ContentHash {
 fn cached_fulfillment_doc(
     verdict: ObligationFulfillmentVerdict,
 ) -> ObligationFulfillmentCacheDocument {
+    cached_fulfillment_doc_with_fingerprint(verdict, Some(fulfillment_verifier_fingerprint()))
+}
+
+fn cached_fulfillment_doc_with_fingerprint(
+    verdict: ObligationFulfillmentVerdict,
+    verifier_fingerprint: Option<VerifierPromptFingerprint>,
+) -> ObligationFulfillmentCacheDocument {
     let obligation = obligation();
     let declaration =
         crate::test_obligation::obligation_declaration_text(&[money_catalogue()], &obligation)
@@ -716,11 +739,24 @@ fn cached_fulfillment_doc(
     );
     ObligationFulfillmentCacheDocument::new(
         track(),
-        vec![ObligationFulfillmentCacheEntry::new(edge(), obligation.id().clone(), key, verdict)],
+        vec![ObligationFulfillmentCacheEntry::new(
+            edge(),
+            obligation.id().clone(),
+            key,
+            verdict,
+            verifier_fingerprint,
+        )],
     )
 }
 
 fn cached_waiver_doc(verdict: WaiverVerdict) -> WaiverCacheDocument {
+    cached_waiver_doc_with_fingerprint(verdict, Some(waiver_verifier_fingerprint()))
+}
+
+fn cached_waiver_doc_with_fingerprint(
+    verdict: WaiverVerdict,
+    verifier_fingerprint: Option<VerifierPromptFingerprint>,
+) -> WaiverCacheDocument {
     let declaration =
         crate::test_obligation::find_declaration_text(&[money_catalogue()], "Money").unwrap();
     let key = WaiverCacheKey::new(
@@ -728,7 +764,10 @@ fn cached_waiver_doc(verdict: WaiverVerdict) -> WaiverCacheDocument {
         DeclarationHash::new(sum_hash(declaration.as_bytes())),
         AnchorTextHash::new(sum_hash(anchor_text().as_bytes())),
     );
-    WaiverCacheDocument::new(track(), vec![WaiverCacheEntry::new(edge(), key, verdict)])
+    WaiverCacheDocument::new(
+        track(),
+        vec![WaiverCacheEntry::new(edge(), key, verdict, verifier_fingerprint)],
+    )
 }
 
 // ---------------------------------------------------------------------------
@@ -742,6 +781,78 @@ fn test_config_validation_rejects_out_of_range() {
     assert!(TestObligationEvaluateConfig::try_new(10, 0, 1).is_err());
     assert!(TestObligationEvaluateConfig::try_new(10, 90, 0).is_err());
     assert!(TestObligationEvaluateConfig::try_new(0, 100, 1).is_ok());
+}
+
+#[test]
+fn test_config_exposes_validated_calibration_bounds() {
+    let config = TestObligationEvaluateConfig::try_new(10, 90, 4).unwrap();
+
+    assert_eq!(config.injection_rate(), 10);
+    assert_eq!(config.detection_threshold().get(), 90);
+    assert_eq!(config.parallelism(), 4);
+}
+
+#[test]
+fn test_new_accepts_and_wires_declared_dependencies() {
+    let fulfillment_driver = Arc::new(ScriptedFulfillment {
+        fast: fulfilled(),
+        last: fulfillment_fail(),
+        verifier_error: Mutex::new(None),
+        calibration: Mutex::new(None),
+        calibration_contradiction: Mutex::new(None),
+        calibration_substitution: Mutex::new(None),
+        calibration_central_unverified: Mutex::new(None),
+        calibration_calls: Mutex::new(0),
+        calibration_probe_sources: Mutex::new(Vec::new()),
+        tiers: Mutex::new(Vec::new()),
+        declarations: Mutex::new(Vec::new()),
+    });
+    let waiver_driver = Arc::new(ScriptedWaiver {
+        verdict: WaiverVerdict::Pending,
+        calls: Mutex::new(0),
+        tiers: Mutex::new(Vec::new()),
+        declarations: Mutex::new(Vec::new()),
+    });
+    let fulfillment_cache = Arc::new(CapFulfillmentCache::default());
+    let waiver_cache = Arc::new(CapWaiverCache::default());
+
+    let interactor = EvaluateTestObligationsInteractor::new(
+        Arc::new(StubObligations(Some(obligations_doc()))),
+        Arc::new(StubBindings(Some(fulfillment_bindings()))),
+        Arc::new(StubScanner),
+        Arc::clone(&fulfillment_driver)
+            as Arc<
+                dyn SemanticEscalationDriverPort<
+                        ObligationFulfillmentPair,
+                        ObligationFulfillmentCacheKey,
+                        ObligationFulfillmentVerdict,
+                        SemanticVerifierError,
+                    >,
+            >,
+        Arc::clone(&waiver_driver)
+            as Arc<
+                dyn SemanticEscalationDriverPort<
+                        WaiverPair,
+                        WaiverCacheKey,
+                        WaiverVerdict,
+                        SemanticVerifierError,
+                    >,
+            >,
+        Arc::clone(&fulfillment_cache) as Arc<dyn ObligationFulfillmentCachePort + Send + Sync>,
+        Arc::clone(&waiver_cache) as Arc<dyn WaiverCachePort + Send + Sync>,
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        config(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+        Arc::new(SumHasher),
+    );
+
+    let outcome = run(interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);
+    assert_eq!(fulfillment_cache.saved.lock().unwrap().as_ref().unwrap().entries().len(), 1);
 }
 
 #[test]
@@ -762,6 +873,28 @@ fn test_fulfilled_on_fast_counts_pass_without_escalation() {
     assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);
     // The verdict is frozen in the fulfillment cache.
     assert_eq!(h.fulfillment_cache.saved.lock().unwrap().clone().unwrap().entries().len(), 1);
+}
+
+#[test]
+fn test_stand_in_verifier_port_error_fails_closed_without_pass_verdict() {
+    let h = harness(
+        Some(obligations_doc()),
+        Some(fulfillment_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Pending,
+    );
+    *h.fulfillment_driver.verifier_error.lock().unwrap() =
+        Some(DiagnosticMessage::try_new("provider unavailable".to_owned()).unwrap());
+
+    let result = run(h.interactor.execute(&command()));
+
+    assert!(matches!(
+        result,
+        Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message)))
+            if message.as_str() == "provider unavailable"
+    ));
+    assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());
 }
 
 #[test]
@@ -942,6 +1075,56 @@ fn test_matching_fulfillment_cache_reuses_frozen_verdict() {
     assert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty());
     let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
     assert!(matches!(saved.entries()[0].verdict(), ObligationFulfillmentVerdict::Fulfilled { .. }));
+}
+
+#[test]
+fn test_mismatched_fulfillment_fingerprint_reverifies_and_overwrites_entry() {
+    let h = harness_with_existing_caches(
+        Some(obligations_doc()),
+        Some(fulfillment_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Pending,
+        Some(cached_fulfillment_doc_with_fingerprint(
+            fulfillment_fail(),
+            Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))),
+        )),
+        None,
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);
+    let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
+    assert!(matches!(saved.entries()[0].verdict(), ObligationFulfillmentVerdict::Fulfilled { .. }));
+    assert_eq!(
+        saved.entries()[0].verifier_fingerprint(),
+        Some(&fulfillment_verifier_fingerprint())
+    );
+}
+
+#[test]
+fn test_absent_fulfillment_fingerprint_reverifies_and_overwrites_entry() {
+    let h = harness_with_existing_caches(
+        Some(obligations_doc()),
+        Some(fulfillment_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Pending,
+        Some(cached_fulfillment_doc_with_fingerprint(fulfillment_fail(), None)),
+        None,
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);
+    let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
+    assert_eq!(
+        saved.entries()[0].verifier_fingerprint(),
+        Some(&fulfillment_verifier_fingerprint())
+    );
 }
 
 #[test]
@@ -1181,6 +1364,54 @@ fn test_matching_waiver_cache_reuses_frozen_verdict() {
     assert_eq!(*h.waiver_driver.calls.lock().unwrap(), 0);
     let saved = h.waiver_cache.saved.lock().unwrap().clone().unwrap();
     assert!(matches!(saved.entries()[0].verdict(), WaiverVerdict::Waived { .. }));
+}
+
+#[test]
+fn test_mismatched_waiver_fingerprint_reverifies_and_overwrites_entry() {
+    let h = harness_with_existing_caches(
+        Some(obligations_doc()),
+        Some(waiver_bindings()),
+        fulfillment_fail(),
+        fulfillment_fail(),
+        WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("fresh waiver citation".to_owned()).unwrap(),
+        },
+        None,
+        Some(cached_waiver_doc_with_fingerprint(
+            WaiverVerdict::Pending,
+            Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))),
+        )),
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(*h.waiver_driver.calls.lock().unwrap(), 1);
+    let saved = h.waiver_cache.saved.lock().unwrap().clone().unwrap();
+    assert!(matches!(saved.entries()[0].verdict(), WaiverVerdict::Waived { .. }));
+    assert_eq!(saved.entries()[0].verifier_fingerprint(), Some(&waiver_verifier_fingerprint()));
+}
+
+#[test]
+fn test_absent_waiver_fingerprint_reverifies_and_overwrites_entry() {
+    let h = harness_with_existing_caches(
+        Some(obligations_doc()),
+        Some(waiver_bindings()),
+        fulfillment_fail(),
+        fulfillment_fail(),
+        WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("fresh waiver citation".to_owned()).unwrap(),
+        },
+        None,
+        Some(cached_waiver_doc_with_fingerprint(WaiverVerdict::Pending, None)),
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(*h.waiver_driver.calls.lock().unwrap(), 1);
+    let saved = h.waiver_cache.saved.lock().unwrap().clone().unwrap();
+    assert_eq!(saved.entries()[0].verifier_fingerprint(), Some(&waiver_verifier_fingerprint()));
 }
 
 #[test]

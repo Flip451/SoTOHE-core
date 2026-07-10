@@ -5,12 +5,14 @@
 //! [`EvidenceCitation`] so "pass without citation" is impossible, a fail carries
 //! a reason (and, for fulfillment, a [`FulfillmentFailCategory`]), and `Pending`
 //! is treated as fail at the gate. Verdicts are frozen against a three-component
-//! cache key ([`ObligationFulfillmentCacheKey`] / [`WaiverCacheKey`]); when any
-//! key component's hash changes the entry is stale and treated as absent, so the
-//! only recovery path is re-evaluation (IN-09 / IN-12 / CN-04 / AC-05 / AC-06).
+//! cache key ([`ObligationFulfillmentCacheKey`] / [`WaiverCacheKey`]) plus the
+//! verifier-prompt fingerprint that makes the recorded verdict valid. When any
+//! key component or the prompt fingerprint changes, the entry is stale and
+//! treated as absent, so the only recovery path is re-evaluation (IN-09 / IN-12 /
+//! CN-04 / AC-05 / AC-06).
 
 use crate::tddd::test_obligation::hashes::{
-    AnchorTextHash, BoundTestsSetHash, DeclarationHash, WaivedReasonHash,
+    AnchorTextHash, BoundTestsSetHash, DeclarationHash, VerifierPromptFingerprint, WaivedReasonHash,
 };
 use crate::tddd::test_obligation::ids::{
     DiagnosticMessage, TestObligationEdgeId, TestObligationId,
@@ -132,6 +134,7 @@ pub struct ObligationFulfillmentCacheEntry {
     obligation_id: TestObligationId,
     key: ObligationFulfillmentCacheKey,
     verdict: ObligationFulfillmentVerdict,
+    verifier_fingerprint: Option<VerifierPromptFingerprint>,
 }
 
 impl ObligationFulfillmentCacheEntry {
@@ -142,8 +145,9 @@ impl ObligationFulfillmentCacheEntry {
         obligation_id: TestObligationId,
         key: ObligationFulfillmentCacheKey,
         verdict: ObligationFulfillmentVerdict,
+        verifier_fingerprint: Option<VerifierPromptFingerprint>,
     ) -> Self {
-        Self { edge_id, obligation_id, key, verdict }
+        Self { edge_id, obligation_id, key, verdict, verifier_fingerprint }
     }
 
     /// Returns the obligation edge this verdict is frozen against.
@@ -168,6 +172,14 @@ impl ObligationFulfillmentCacheEntry {
     #[must_use]
     pub fn verdict(&self) -> &ObligationFulfillmentVerdict {
         &self.verdict
+    }
+
+    /// Returns the verifier-prompt fingerprint that produced this verdict.
+    ///
+    /// `None` denotes a legacy cache entry and is fail-closed by readers.
+    #[must_use]
+    pub fn verifier_fingerprint(&self) -> Option<&VerifierPromptFingerprint> {
+        self.verifier_fingerprint.as_ref()
     }
 }
 
@@ -246,13 +258,19 @@ pub struct WaiverCacheEntry {
     edge_id: TestObligationEdgeId,
     key: WaiverCacheKey,
     verdict: WaiverVerdict,
+    verifier_fingerprint: Option<VerifierPromptFingerprint>,
 }
 
 impl WaiverCacheEntry {
     /// Builds a [`WaiverCacheEntry`].
     #[must_use]
-    pub fn new(edge_id: TestObligationEdgeId, key: WaiverCacheKey, verdict: WaiverVerdict) -> Self {
-        Self { edge_id, key, verdict }
+    pub fn new(
+        edge_id: TestObligationEdgeId,
+        key: WaiverCacheKey,
+        verdict: WaiverVerdict,
+        verifier_fingerprint: Option<VerifierPromptFingerprint>,
+    ) -> Self {
+        Self { edge_id, key, verdict, verifier_fingerprint }
     }
 
     /// Returns the obligation edge this waiver verdict is frozen against.
@@ -271,6 +289,14 @@ impl WaiverCacheEntry {
     #[must_use]
     pub fn verdict(&self) -> &WaiverVerdict {
         &self.verdict
+    }
+
+    /// Returns the verifier-prompt fingerprint that produced this verdict.
+    ///
+    /// `None` denotes a legacy cache entry and is fail-closed by readers.
+    #[must_use]
+    pub fn verifier_fingerprint(&self) -> Option<&VerifierPromptFingerprint> {
+        self.verifier_fingerprint.as_ref()
     }
 }
 
@@ -363,6 +389,10 @@ mod tests {
         )
     }
 
+    fn verifier_fingerprint() -> VerifierPromptFingerprint {
+        VerifierPromptFingerprint::new(ContentHash::from_bytes([5u8; 32]))
+    }
+
     #[test]
     fn test_fulfillment_verdict_variants() {
         let fulfilled = ObligationFulfillmentVerdict::Fulfilled {
@@ -392,33 +422,80 @@ mod tests {
             DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
             AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
         );
+        let different_declaration = ObligationFulfillmentCacheKey::new(
+            BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),
+            DeclarationHash::new(ContentHash::from_bytes([8u8; 32])),
+            AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
+        );
+        let different_anchor = ObligationFulfillmentCacheKey::new(
+            BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),
+            DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
+            AnchorTextHash::new(ContentHash::from_bytes([7u8; 32])),
+        );
         assert_ne!(base, different_tests);
+        assert_ne!(base, different_declaration);
+        assert_ne!(base, different_anchor);
+    }
+
+    #[test]
+    fn test_waiver_cache_key_changes_with_any_component() {
+        let base = waiver_key();
+        let different_reason = WaiverCacheKey::new(
+            WaivedReasonHash::new(ContentHash::from_bytes([9u8; 32])),
+            DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
+            AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
+        );
+        let different_declaration = WaiverCacheKey::new(
+            WaivedReasonHash::new(ContentHash::from_bytes([1u8; 32])),
+            DeclarationHash::new(ContentHash::from_bytes([8u8; 32])),
+            AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
+        );
+        let different_anchor = WaiverCacheKey::new(
+            WaivedReasonHash::new(ContentHash::from_bytes([1u8; 32])),
+            DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
+            AnchorTextHash::new(ContentHash::from_bytes([7u8; 32])),
+        );
+        assert_ne!(base, different_reason);
+        assert_ne!(base, different_declaration);
+        assert_ne!(base, different_anchor);
     }
 
     #[test]
     fn test_fulfillment_cache_document_round_trips() {
+        let fingerprint = verifier_fingerprint();
         let entry = ObligationFulfillmentCacheEntry::new(
             edge_id(),
             obligation_id(),
             fulfillment_key(),
             ObligationFulfillmentVerdict::Fulfilled { citation: citation("cite") },
+            Some(fingerprint.clone()),
         );
         let doc = ObligationFulfillmentCacheDocument::new(
             TrackId::try_new("my-track").unwrap(),
             vec![entry],
         );
         assert_eq!(doc.entries().len(), 1);
+        let [entry] = doc.entries() else {
+            panic!("expected exactly one fulfillment cache entry");
+        };
+        assert_eq!(entry.verifier_fingerprint(), Some(&fingerprint));
     }
 
     #[test]
     fn test_waiver_cache_document_round_trips() {
+        let fingerprint = verifier_fingerprint();
         let entry = WaiverCacheEntry::new(
             edge_id(),
             waiver_key(),
             WaiverVerdict::Waived { citation: citation("cite") },
+            Some(fingerprint.clone()),
         );
         let doc = WaiverCacheDocument::new(TrackId::try_new("my-track").unwrap(), vec![entry]);
         assert_eq!(doc.entries().len(), 1);
+        let [entry] = doc.entries() else {
+            panic!("expected exactly one waiver cache entry");
+        };
+        assert_eq!(entry.verifier_fingerprint(), Some(&fingerprint));
     }
 
     #[test]

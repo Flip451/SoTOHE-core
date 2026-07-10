@@ -14,6 +14,8 @@ use usecase::semantic_verdict_core::driver::{
 };
 use usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig;
 
+use crate::test_obligation::spawn_blocking::SpawnBlocking;
+
 /// Concrete escalation driver for the fulfillment verifier lane.
 #[derive(Clone)]
 pub struct ObligationFulfillmentEscalationDriver {
@@ -59,22 +61,37 @@ impl
         _key: &'a ObligationFulfillmentCacheKey,
         initial_tier: ModelTier,
     ) -> SemanticEscalationFuture<'a, ObligationFulfillmentVerdict, SemanticVerifierError> {
+        // Materialise the sync pair inputs into owned values before the async
+        // move so each `SpawnBlocking` closure below has an `'static` capture
+        // and can be driven on a worker thread while the bounded multiplexer
+        // in `usecase::test_obligation::evaluate` polls its siblings.
+        let verifier = Arc::clone(&self.verifier);
+        let tests_source = pair.tests_source().as_str().to_owned();
+        let entry_declaration = pair.entry_declaration().as_str().to_owned();
+        let anchor_text = pair.anchor_text().as_str().to_owned();
         Box::pin(async move {
-            let verdict = self.verifier.verify_pair(
-                pair.tests_source().as_str(),
-                pair.entry_declaration().as_str(),
-                pair.anchor_text().as_str(),
+            let fast_verifier = Arc::clone(&verifier);
+            let (ts, ed, at, tier) = (
+                tests_source.clone(),
+                entry_declaration.clone(),
+                anchor_text.clone(),
                 initial_tier.clone(),
-            )?;
+            );
+            let verdict =
+                SpawnBlocking::new(move || fast_verifier.verify_pair(&ts, &ed, &at, tier)).await?;
             if matches!(initial_tier, ModelTier::Fast)
                 && !matches!(verdict, ObligationFulfillmentVerdict::Fulfilled { .. })
             {
-                return self.verifier.verify_pair(
-                    pair.tests_source().as_str(),
-                    pair.entry_declaration().as_str(),
-                    pair.anchor_text().as_str(),
-                    ModelTier::Final,
-                );
+                let final_verifier = Arc::clone(&verifier);
+                return SpawnBlocking::new(move || {
+                    final_verifier.verify_pair(
+                        &tests_source,
+                        &entry_declaration,
+                        &anchor_text,
+                        ModelTier::Final,
+                    )
+                })
+                .await;
             }
             Ok(verdict)
         })

@@ -180,7 +180,18 @@ impl TestBindingsArtifactPort for JsonTestBindingsCodec {
         })?;
         let dto: TestBindingsDocumentDto = serde_json::from_str(&content)
             .map_err(|e| ArtifactCodecError::MalformedJson(diagnostic(&e.to_string())))?;
-        Ok(Some(dto.into_domain()?))
+        let doc = dto.into_domain()?;
+        // Fail closed when the on-disk artifact was copied from another track: a
+        // matching filename is not proof of matching content, and the caller
+        // trusts a `load(track_id)` result to describe exactly that track.
+        if doc.track_id() != track_id {
+            return Err(ArtifactCodecError::DomainInvariant(diagnostic(&format!(
+                "test-bindings artifact track id mismatch: requested '{}', got '{}'",
+                track_id.as_ref(),
+                doc.track_id().as_ref()
+            ))));
+        }
+        Ok(Some(doc))
     }
 
     fn save(&self, doc: &TestBindingsDocument) -> Result<(), DiagnosticMessage> {
@@ -447,6 +458,24 @@ mod tests {
         assert_eq!(codec.load(doc.track_id()).unwrap(), Some(doc));
     }
 
+    #[test]
+    fn test_codec_load_is_read_only_for_check_gate_artifacts() {
+        let dir = tempfile::tempdir().unwrap();
+        let codec = JsonTestBindingsCodec::new(dir.path().to_path_buf());
+        let doc = document(vec![TestBindingRecord::Fulfillment {
+            obligation_id: obligation_id(),
+            tests: tests(),
+        }]);
+        codec.save(&doc).unwrap();
+        let artifact = dir.path().join(doc.track_id().as_ref()).join(BINDINGS_ARTIFACT);
+        let before = std::fs::read(&artifact).unwrap();
+
+        let loaded = codec.load(doc.track_id()).unwrap();
+
+        assert_eq!(loaded, Some(doc));
+        assert_eq!(std::fs::read(&artifact).unwrap(), before);
+    }
+
     // IN-06 / CN-04: the trusted items root itself must not be a symlink.
     #[cfg(unix)]
     #[test]
@@ -478,5 +507,65 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let codec = JsonTestBindingsCodec::new(dir.path().to_path_buf());
         assert!(codec.load(&TrackId::try_new("absent-track").unwrap()).unwrap().is_none());
+    }
+
+    // IN-06 / CN-04: a symlinked *ancestor* of the items root (not just the leaf)
+    // must be rejected — otherwise `lstat(items_dir)` follows the parent symlink
+    // and returns the redirected leaf's metadata, letting the codec read / write
+    // outside the worktree.
+    #[cfg(unix)]
+    #[test]
+    fn test_codec_symlinked_items_root_ancestor_is_rejected() {
+        let dir = tempfile::tempdir().unwrap();
+        let real_track = dir.path().join("real-track");
+        std::fs::create_dir_all(real_track.join("items")).unwrap();
+        let track_link = dir.path().join("track-link");
+        std::os::unix::fs::symlink(&real_track, &track_link).unwrap();
+
+        let items_via_link = track_link.join("items");
+        let codec = JsonTestBindingsCodec::new(items_via_link);
+        let doc = document(vec![TestBindingRecord::Fulfillment {
+            obligation_id: obligation_id(),
+            tests: tests(),
+        }]);
+
+        match codec.load(doc.track_id()) {
+            Err(ArtifactCodecError::Io(message)) => {
+                assert!(message.as_str().contains("symlinked track items root"));
+            }
+            other => panic!("expected symlinked ancestor load error, got {other:?}"),
+        }
+        let save_error = codec.save(&doc).unwrap_err();
+        assert!(save_error.as_str().contains("symlinked track items root"));
+    }
+
+    // CN-04: a test-bindings artifact whose embedded `track_id` disagrees with
+    // the requested id must not be returned — a copy from another track would
+    // otherwise satisfy or block the gate on unrelated data.
+    #[test]
+    fn test_codec_load_rejects_track_id_mismatch() {
+        let dir = tempfile::tempdir().unwrap();
+        let codec = JsonTestBindingsCodec::new(dir.path().to_path_buf());
+        let doc = document(vec![TestBindingRecord::Fulfillment {
+            obligation_id: obligation_id(),
+            tests: tests(),
+        }]);
+        codec.save(&doc).unwrap();
+
+        let other_track = TrackId::try_new("other-track").unwrap();
+        let source = dir.path().join(doc.track_id().as_ref()).join(BINDINGS_ARTIFACT);
+        let target_dir = dir.path().join(other_track.as_ref());
+        std::fs::create_dir_all(&target_dir).unwrap();
+        std::fs::rename(&source, target_dir.join(BINDINGS_ARTIFACT)).unwrap();
+
+        match codec.load(&other_track) {
+            Err(ArtifactCodecError::DomainInvariant(message)) => {
+                let text = message.as_str();
+                assert!(text.contains("test-bindings artifact track id mismatch"), "got: {text}");
+                assert!(text.contains(other_track.as_ref()), "got: {text}");
+                assert!(text.contains(doc.track_id().as_ref()), "got: {text}");
+            }
+            other => panic!("expected DomainInvariant track-id mismatch error, got {other:?}"),
+        }
     }
 }

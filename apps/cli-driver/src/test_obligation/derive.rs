@@ -129,4 +129,39 @@ mod tests {
         assert_eq!(outcome.exit_code, 0);
         assert_eq!(*service.calls.lock().unwrap(), 1);
     }
+
+    #[test]
+    fn test_derive_handler_anchors_catalogue_paths_at_workspace_root() {
+        struct CapturingService {
+            captured: Mutex<Option<DeriveTestObligationsCommand>>,
+        }
+
+        impl DeriveTestObligationsApplicationService for CapturingService {
+            fn execute(
+                &self,
+                cmd: &DeriveTestObligationsCommand,
+            ) -> Result<(), usecase::test_obligation::errors::ObligationDeriveError> {
+                *self.captured.lock().unwrap() = Some(cmd.clone());
+                Ok(())
+            }
+        }
+
+        let service = Arc::new(CapturingService { captured: Mutex::new(None) });
+        let workspace_root = PathBuf::from("/discovered/workspace");
+        let handler = TestObligationDeriveHandler::new(service.clone(), workspace_root.clone());
+
+        let outcome = handler.handle(TestObligationDeriveInput::new(None, branch()));
+
+        assert_eq!(outcome.exit_code, 0);
+        let captured = service.captured.lock().unwrap().clone().unwrap();
+        let track_id = TrackId::try_new("test-track".to_owned()).unwrap();
+        let expected = DeriveTestObligationsCommand::new(
+            usecase::test_obligation::TestObligationCatalogueCommandInput::new(
+                track_id.clone(),
+                "track/test-track".to_owned(),
+                super::super::default_catalogue_paths(&workspace_root, &track_id),
+            ),
+        );
+        assert_eq!(captured, expected);
+    }
 }

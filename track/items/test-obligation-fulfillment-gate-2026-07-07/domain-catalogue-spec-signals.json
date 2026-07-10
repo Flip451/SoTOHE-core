@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "ae35171e8d9e6a28302d3d889c9e863825adfddb6a83221d7579b19257b9f8d6",
+  "catalogue_declaration_hash": "c81ec8e8f9931c2a1dac5830be1b92acaaebb4450e1455972e3b1aaff48830b6",
   "signals": [
     {
       "type_name": "AnchorText",
@@ -25,12 +25,12 @@
     {
       "type_name": "CatalogueDocumentLoaderError",
       "signal": "blue",
-      "entry_hash": "1dd663885b7f1f640f869bbac7254683fcb11725787980cd9b910e02493e6603"
+      "entry_hash": "81f424a1462fa6ae79dc6bf01bcc1e2ad86414e66d3d65bc0e59ef82e77d426f"
     },
     {
       "type_name": "CrateName",
       "signal": "blue",
-      "entry_hash": "e97cd0bc3315b9fd89ba214d179be945a8d115b6f63927c64c9243cac9779d6b"
+      "entry_hash": "2c5e291cb5c9ad3366cf582fd8e01fc80dcd43d1307ff43cba237bcf638f9c6b"
     },
     {
       "type_name": "DeclarationHash",
@@ -55,7 +55,7 @@
     {
       "type_name": "EdgeVerdictRecord",
       "signal": "blue",
-      "entry_hash": "995afa7c8eada5a2866bcb22410595f593aace1de763b26a05096a234e4f1fdd"
+      "entry_hash": "c8d84e145a5ec804e2604e9bc4f2f1870da8ca90d6e1614b68dfbe01ac94039f"
     },
     {
       "type_name": "EntryDeclaration",
@@ -110,7 +110,7 @@
     {
       "type_name": "ObligationFulfillmentCacheEntry",
       "signal": "blue",
-      "entry_hash": "d661b1e75429581b8350aead5eb7030e92b5ea9c81f79307d5938976fdb16460"
+      "entry_hash": "bf99570363fa1145b3540f75b2964386ef5aa173d47799fc9ad827cc287adb18"
     },
     {
       "type_name": "ObligationFulfillmentCacheKey",
@@ -135,7 +135,7 @@
     {
       "type_name": "ObligationsDocument",
       "signal": "blue",
-      "entry_hash": "da2fd288c460b8d1866253f644e15be1180213b8977bc85ab18bdf29230c95de"
+      "entry_hash": "85bd6dbba019cc9656d3c20c08f03be3c3f586ac465279df961298f6110e9a29"
     },
     {
       "type_name": "RoleName",
@@ -295,7 +295,7 @@
     {
       "type_name": "TraitName",
       "signal": "blue",
-      "entry_hash": "49e16afc22aa5cf06040fa903dc613ad54f44b77c1296ffea9d9f35715ca3600"
+      "entry_hash": "006d9bae96d35e9c23fd598699cf58a42ec44debb4ab71175e61b585cf96e334"
     },
     {
       "type_name": "TraitRefScope",
@@ -311,6 +311,11 @@
       "type_name": "ValidationError",
       "signal": "blue",
       "entry_hash": "4451e82dcea9327628f440214b4ecbcff7315d503ffacea68dd54b43dff521ba"
+    },
+    {
+      "type_name": "VerifierPromptFingerprint",
+      "signal": "blue",
+      "entry_hash": "b38d8c4a3ee4a47420ea42575c8494cfe4f67e54ca126001ae8bb9b29571d0f3"
     },
     {
       "type_name": "VerifyCacheError",
@@ -335,7 +340,7 @@
     {
       "type_name": "WaiverCacheEntry",
       "signal": "blue",
-      "entry_hash": "2eac817213704d98a54f38735b53adc62fad9e0a1340d3403d9cb8e9ff9a73a7"
+      "entry_hash": "b03f4528044df688f49fdef592718b56439ac35d7454b32b1846ea9ef0e09b4e"
     },
     {
       "type_name": "WaiverCacheKey",
@@ -355,7 +360,7 @@
     {
       "type_name": "CatalogueDocumentLoaderPort",
       "signal": "blue",
-      "entry_hash": "775c62c0511c94c960932b03c3b1df5481f45d75eb5c5de464430b5ee9cc6656"
+      "entry_hash": "06cad37c424fa942e756ec3e2340f4728d65b5a629f55c79cfc2f16b7d161d9a"
     },
     {
       "type_name": "ObligationFulfillmentCachePort",
@@ -375,7 +380,7 @@
     {
       "type_name": "SpecDocumentLoaderPort",
       "signal": "blue",
-      "entry_hash": "a8a87b1e2e6a5c80439f1015b48ac40b6a104db005b209f78a4cb6dc45123555"
+      "entry_hash": "5b3c8705ce7efd8db4bf01d1944bbc53858e50863b1f11478d0b44fb8928dff7"
     },
     {
       "type_name": "TestBindingsArtifactPort",

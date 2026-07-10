@@ -25,7 +25,8 @@ use domain::tddd::test_obligation::errors::{
     VerifyCacheError,
 };
 use domain::tddd::test_obligation::hashes::{
-    AnchorTextHash, BoundTestsSetHash, DeclarationHash, TestBodySpanHash, WaivedReasonHash,
+    AnchorTextHash, BoundTestsSetHash, DeclarationHash, TestBodySpanHash,
+    VerifierPromptFingerprint, WaivedReasonHash,
 };
 use domain::tddd::test_obligation::ids::{
     DiagnosticMessage, RoleName, TestFunctionName, TestModulePath, TestObligationAnchorId,
@@ -112,6 +113,17 @@ impl TestBindingsArtifactPort for StubBindings {
     }
     fn save(&self, _d: &TestBindingsDocument) -> Result<(), DiagnosticMessage> {
         Ok(())
+    }
+}
+
+struct ReadOnlyBindings(TestBindingsDocument);
+impl TestBindingsArtifactPort for ReadOnlyBindings {
+    fn load(&self, _t: &TrackId) -> Result<Option<TestBindingsDocument>, ArtifactCodecError> {
+        Ok(Some(self.0.clone()))
+    }
+
+    fn save(&self, _d: &TestBindingsDocument) -> Result<(), DiagnosticMessage> {
+        Err(DiagnosticMessage::try_new("check must not save bindings".to_owned()).unwrap())
     }
 }
 
@@ -237,6 +249,14 @@ fn rules_doc() -> TestObligationRulesDocument {
 
 fn track() -> TrackId {
     TrackId::try_new("my-track").unwrap()
+}
+
+fn fulfillment_verifier_fingerprint() -> VerifierPromptFingerprint {
+    VerifierPromptFingerprint::new(ContentHash::from_bytes([8u8; 32]))
+}
+
+fn waiver_verifier_fingerprint() -> VerifierPromptFingerprint {
+    VerifierPromptFingerprint::new(ContentHash::from_bytes([9u8; 32]))
 }
 
 fn entry_key() -> CatalogueEntryKey {
@@ -480,6 +500,13 @@ fn fresh_fulfillment_cache() -> ObligationFulfillmentCacheDocument {
 }
 
 fn fresh_fulfillment_cache_for(obligation: &TestObligation) -> ObligationFulfillmentCacheDocument {
+    fresh_fulfillment_cache_for_fingerprint(obligation, Some(fulfillment_verifier_fingerprint()))
+}
+
+fn fresh_fulfillment_cache_for_fingerprint(
+    obligation: &TestObligation,
+    verifier_fingerprint: Option<VerifierPromptFingerprint>,
+) -> ObligationFulfillmentCacheDocument {
     let bound = BoundTestsSetHash::new(sha256_content_hash(format!("{BODY}\n").as_bytes()));
     let decl = DeclarationHash::new(sha256_content_hash(
         obligation_declaration_text(&[money_catalogue()], obligation).unwrap().as_bytes(),
@@ -492,11 +519,19 @@ fn fresh_fulfillment_cache_for(obligation: &TestObligation) -> ObligationFulfill
         ObligationFulfillmentVerdict::Fulfilled {
             citation: EvidenceCitation::try_new("asserts positivity".to_owned()).unwrap(),
         },
+        verifier_fingerprint,
     );
     ObligationFulfillmentCacheDocument::new(track(), vec![entry])
 }
 
 fn fresh_waiver_cache_for(obligation: &TestObligation) -> WaiverCacheDocument {
+    fresh_waiver_cache_for_fingerprint(obligation, Some(waiver_verifier_fingerprint()))
+}
+
+fn fresh_waiver_cache_for_fingerprint(
+    obligation: &TestObligation,
+    verifier_fingerprint: Option<VerifierPromptFingerprint>,
+) -> WaiverCacheDocument {
     let reason = WaivedReason::try_new("covered elsewhere".to_owned()).unwrap();
     let reason_hash = WaivedReasonHash::new(sha256_content_hash(reason.as_str().as_bytes()));
     let decl = DeclarationHash::new(sha256_content_hash(
@@ -509,6 +544,7 @@ fn fresh_waiver_cache_for(obligation: &TestObligation) -> WaiverCacheDocument {
         WaiverVerdict::Waived {
             citation: EvidenceCitation::try_new("waived by policy".to_owned()).unwrap(),
         },
+        verifier_fingerprint,
     );
     WaiverCacheDocument::new(track(), vec![entry])
 }
@@ -538,6 +574,8 @@ fn interactor_with_scanner(
         scanner,
         Arc::new(StubFulfillmentCache(fulfillment)),
         Arc::new(StubWaiverCache(waiver)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
         Arc::new(StubSpec(spec_doc())),
         Arc::new(StubCatalogue(money_catalogue())),
     )
@@ -553,6 +591,8 @@ fn interactor_with_rules_loader(
         Arc::new(StubScanner),
         Arc::new(StubFulfillmentCache(None)),
         Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
         Arc::new(StubSpec(spec_doc())),
         Arc::new(StubCatalogue(money_catalogue())),
     )
@@ -566,6 +606,8 @@ fn empty_scope_interactor_without_readers() -> CheckTestObligationsInteractor {
         Arc::new(StubScanner),
         Arc::new(StubFulfillmentCache(None)),
         Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
         Arc::new(FailingSpec),
         Arc::new(FailingCatalogue),
     )
@@ -645,7 +687,7 @@ fn test_obligation_declaration_text_uses_target_section_for_same_key() {
 }
 
 #[test]
-fn test_obligation_declaration_text_uses_recorded_catalogue_path() {
+fn test_obligation_declaration_text_with_relative_catalogue_identity_matches_anchored_read_path() {
     let entry_key = entry_key();
     let obligation = TestObligation::new(
         TestObligationId::new(
@@ -654,7 +696,7 @@ fn test_obligation_declaration_text_uses_recorded_catalogue_path() {
             TestObligationItemIdentifier::try_new("invariant:positive".to_owned()).unwrap(),
         ),
         CatalogueEntryRef::new(
-            "usecase-types.json".to_owned(),
+            "track/items/my-track/usecase-types.json".to_owned(),
             CatalogueSectionKey::Types,
             entry_key,
         ),
@@ -665,11 +707,11 @@ fn test_obligation_declaration_text_uses_recorded_catalogue_path() {
     );
     let catalogues = vec![
         LoadedCatalogueDocument::new(
-            Path::new("domain-types.json"),
+            Path::new("/checkout/project/track/items/my-track/domain-types.json"),
             money_catalogue_with_role(DataRole::entity().unwrap()),
         ),
         LoadedCatalogueDocument::new(
-            Path::new("usecase-types.json"),
+            Path::new("/checkout/project/track/items/my-track/usecase-types.json"),
             money_catalogue_with_role(DataRole::value_object()),
         ),
     ];
@@ -767,6 +809,92 @@ fn test_fresh_fulfilled_verdict_resolves_edge() {
 }
 
 #[test]
+fn test_check_reads_bindings_without_mutating_the_artifact() {
+    let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+    let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+    let interactor = CheckTestObligationsInteractor::new(
+        Arc::new(StubRules::valid()),
+        Arc::new(StubObligations(Some(obligations))),
+        Arc::new(ReadOnlyBindings(bindings)),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(Some(fresh_fulfillment_cache()))),
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+    );
+
+    let outcome = interactor.execute(&command()).unwrap();
+
+    assert_eq!(outcome.resolved_edges(), &[edge()]);
+}
+
+#[test]
+fn test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict() {
+    struct FailingScanner;
+    impl TestSourceScannerPort for FailingScanner {
+        fn scan_test_body(
+            &self,
+            _location: &TestLocation,
+        ) -> Result<Option<String>, TestSourceScanError> {
+            Err(TestSourceScanError::Io(
+                DiagnosticMessage::try_new("scanner must not be called".to_owned()).unwrap(),
+            ))
+        }
+
+        fn hash_test_body(&self, _source: &str) -> TestBodySpanHash {
+            TestBodySpanHash::new(ContentHash::from_bytes([0u8; 32]))
+        }
+    }
+
+    let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+    let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+    let cache = fresh_fulfillment_cache_for_fingerprint(
+        &obligation(),
+        Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))),
+    );
+
+    let result = interactor_with_scanner(
+        Some(obligations),
+        Some(bindings),
+        Some(cache),
+        None,
+        Arc::new(FailingScanner),
+    )
+    .execute(&command());
+
+    assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));
+}
+
+#[test]
+fn test_mismatched_waiver_fingerprint_is_a_missing_stale_verdict() {
+    let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+    let bindings = TestBindingsDocument::new(track(), vec![waiver_binding()]);
+    let cache = fresh_waiver_cache_for_fingerprint(
+        &obligation(),
+        Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))),
+    );
+
+    let result =
+        interactor(Some(obligations), Some(bindings), None, Some(cache)).execute(&command());
+
+    assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));
+}
+
+#[test]
+fn test_absent_waiver_fingerprint_is_a_missing_stale_verdict() {
+    let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+    let bindings = TestBindingsDocument::new(track(), vec![waiver_binding()]);
+    let cache = fresh_waiver_cache_for_fingerprint(&obligation(), None);
+
+    let result =
+        interactor(Some(obligations), Some(bindings), None, Some(cache)).execute(&command());
+
+    assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));
+}
+
+#[test]
 fn test_voluntary_binding_migrates_to_newly_derived_obligation() {
     // AC-12: a prior edge-level binding becomes fulfillment for the derived
     // obligation once the decision table starts producing one for that edge.
@@ -841,11 +969,58 @@ fn test_declaration_change_stales_verdict_as_drift() {
         ObligationFulfillmentVerdict::Fulfilled {
             citation: EvidenceCitation::try_new("asserts positivity".to_owned()).unwrap(),
         },
+        Some(fulfillment_verifier_fingerprint()),
     );
     let cache = ObligationFulfillmentCacheDocument::new(track(), vec![entry]);
     let result =
         interactor(Some(obligations), Some(bindings), Some(cache), None).execute(&command());
     assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));
+}
+
+#[test]
+fn test_check_reports_bound_test_or_anchor_hash_changes_as_freshness_drift() {
+    // IN-08 / AC-04: `check` remains pure-read and refuses a frozen verdict
+    // whenever either the bound-test claim or anchor evidence no longer matches.
+    let fresh = fresh_fulfillment_cache();
+    let entry = fresh.entries().first().unwrap();
+    let current_declaration = entry.key().declaration_hash().clone();
+    let current_anchor = entry.key().anchor_text_hash().clone();
+    let current_bound_tests = entry.key().bound_tests_set_hash().clone();
+
+    for key in [
+        ObligationFulfillmentCacheKey::new(
+            BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),
+            current_declaration.clone(),
+            current_anchor.clone(),
+        ),
+        ObligationFulfillmentCacheKey::new(
+            current_bound_tests.clone(),
+            current_declaration.clone(),
+            AnchorTextHash::new(ContentHash::from_bytes([2u8; 32])),
+        ),
+    ] {
+        let cache = ObligationFulfillmentCacheDocument::new(
+            track(),
+            vec![ObligationFulfillmentCacheEntry::new(
+                edge(),
+                obligation().id().clone(),
+                key,
+                ObligationFulfillmentVerdict::Fulfilled {
+                    citation: EvidenceCitation::try_new("asserts positivity".to_owned()).unwrap(),
+                },
+                Some(fulfillment_verifier_fingerprint()),
+            )],
+        );
+        let result = interactor(
+            Some(ObligationsDocument::new(track(), vec![obligation()])),
+            Some(TestBindingsDocument::new(track(), vec![fulfillment_binding()])),
+            Some(cache),
+            None,
+        )
+        .execute(&command());
+
+        assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));
+    }
 }
 
 #[test]

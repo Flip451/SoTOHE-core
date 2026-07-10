@@ -76,10 +76,10 @@
     },
     {
       "claim_hash": "fecd8ef9b2e2f7a82045878a30911588f08a02662552db69ea9d554cfe072aca",
-      "evidence_hash": "d8e51e6021c7a928e1d1ee5df5596a877ff2f4c778e0076cc96edfcd7eee57be",
+      "evidence_hash": "eb9b3df49897b2ebf00876dbe9e423881891aa6121f33d0a90f23a218eae90d2",
       "verdict": {
         "kind": "pass",
-        "citation": "CLI gate サブコマンド（`derive` / `check` / `evaluate` / `results`）は fail-closed で、`--lenient` / `--force` 系フラグを持たず、scope 指定フラグも持たない。スコープは artifact 存在ベースで自動解決される。verdict gate は `check` の責務であり、`results` は informational（exit 常に 0）。`bindings-skeleton` は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft..."
+        "citation": "CLI gate サブコマンド（`derive` / `check` / `evaluate` / `results`）は fail-closed で、`--lenient` / `--force` 系フラグを持たず、scope 指定フラグも持たない。スコープは artifact 存在ベースで自動解決される。verdict gate は `check` の責務であり、`results` は informational（exit 常に 0）。`bindings-skeleton` は authoring helper で、obligations artifact から `test-bindings.json` と同一 wire 形状の schema 準拠 draft（義務 id ごとに `fulfillment` レコードを TODO placeholder 付きで事前充填）を stdout に、案内文は stderr に出すだけで、`test-bindings.json` も verdict cache も書き換えない（stdout は schema-pure に保たれ、利用者はそのまま保存して値だけ置換できる）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

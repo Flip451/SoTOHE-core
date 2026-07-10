@@ -39,8 +39,8 @@ use domain::tddd::test_obligation::vocab::TargetEntryRoleKind;
 /// A loaded catalogue paired with the command path that produced it.
 #[derive(Debug, Clone)]
 pub(crate) struct LoadedCatalogueDocument {
-    file_path: String,
-    normalized_file_path: String,
+    read_file_path: String,
+    artifact_file_path: String,
     document: CatalogueDocument,
 }
 
@@ -48,9 +48,9 @@ impl LoadedCatalogueDocument {
     /// Builds a loaded catalogue record from a command path and parsed document.
     #[must_use]
     pub(crate) fn new(path: &Path, document: CatalogueDocument) -> Self {
-        let file_path = path.display().to_string();
-        let normalized_file_path = normalize_catalogue_path(&file_path);
-        Self { file_path, normalized_file_path, document }
+        let read_file_path = path.display().to_string();
+        let artifact_file_path = catalogue_artifact_path(path);
+        Self { read_file_path, artifact_file_path, document }
     }
 
     /// Returns the parsed catalogue document.
@@ -60,8 +60,8 @@ impl LoadedCatalogueDocument {
     }
 
     fn matches_file_path(&self, file_path: &str) -> bool {
-        self.file_path == file_path
-            || self.normalized_file_path == normalize_catalogue_path(file_path)
+        self.read_file_path == file_path
+            || self.artifact_file_path == catalogue_artifact_path(Path::new(file_path))
     }
 }
 
@@ -296,18 +296,28 @@ fn trait_impl_declaration_text_in<'a>(
     None
 }
 
-fn normalize_catalogue_path(path: &str) -> String {
-    let mut normalized = PathBuf::new();
-    for component in Path::new(path).components() {
-        match component {
-            Component::CurDir => {}
-            Component::Normal(part) => normalized.push(part),
-            Component::ParentDir => normalized.push(".."),
-            Component::RootDir | Component::Prefix(_) => normalized.push(component.as_os_str()),
-        }
-    }
-    let text = normalized.display().to_string();
-    if text.is_empty() { path.to_owned() } else { text }
+/// Returns the artifact identity for a catalogue path.
+///
+/// Catalogue reads use paths anchored at the discovered workspace root. Track
+/// artifacts must instead remain portable across checkouts, so a catalogue path
+/// below `track/items/` is stored relative to that project root. Paths outside
+/// that shape retain their supplied display form.
+#[must_use]
+pub(crate) fn catalogue_artifact_path(path: &Path) -> String {
+    let components: Vec<Component<'_>> = path.components().collect();
+    let Some(start) = components.windows(2).position(|pair| {
+        matches!(pair, [Component::Normal(track), Component::Normal(items)]
+            if *track == "track" && *items == "items")
+    }) else {
+        return path.display().to_string();
+    };
+
+    components
+        .iter()
+        .skip(start)
+        .map(|component| component.as_os_str().to_string_lossy())
+        .collect::<Vec<_>>()
+        .join("/")
 }
 
 /// Collects the spec-anchor element ids cited by every catalogue entry across

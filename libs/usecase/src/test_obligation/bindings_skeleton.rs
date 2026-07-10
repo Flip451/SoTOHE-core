@@ -241,4 +241,30 @@ mod tests {
 
         assert!(matches!(err, TestBindingsSkeletonError::ObligationsAbsent));
     }
+
+    struct FailingObligations;
+
+    impl ObligationsArtifactPort for FailingObligations {
+        fn load(
+            &self,
+            _track_id: &TrackId,
+        ) -> Result<Option<ObligationsDocument>, ArtifactCodecError> {
+            Err(ArtifactCodecError::Io(
+                DiagnosticMessage::try_new("unreadable obligations artifact".to_owned()).unwrap(),
+            ))
+        }
+
+        fn save(&self, _doc: &ObligationsDocument) -> Result<(), DiagnosticMessage> {
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn test_skeleton_maps_artifact_load_error_to_error_variant() {
+        let service = TestBindingsSkeletonInteractor::new(Arc::new(FailingObligations));
+
+        let err = service.execute(&TestBindingsSkeletonCommand::new(track())).unwrap_err();
+
+        assert!(matches!(err, TestBindingsSkeletonError::ArtifactLoad(ArtifactCodecError::Io(_))));
+    }
 }

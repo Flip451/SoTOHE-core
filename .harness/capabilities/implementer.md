@@ -37,12 +37,14 @@ Allowed writes:
 - Track state transitions through `bin/sotp track transition`.
 - Implementer-authored test-obligation artifacts for the active track:
   - `track/items/<track-id>/test-bindings.json`
-  - test-obligation verdict caches written by `bin/sotp test-obligation evaluate`
 - Generated views/signals written by sanctioned `bin/sotp` / `cargo make` wrappers.
 
 Forbidden writes:
 
 - Direct edits to `review.json`, `dry-check.json`, ref-verify caches, or other verdict files.
+- Test-obligation verdict caches: they are written only by `bin/sotp test-obligation
+  evaluate`, which the orchestrator host runs (`obligation-fulfillment` workflow) — never
+  this capability.
 - Direct edits to `obligations.json`; it is generated only by `bin/sotp test-obligation derive`.
 - Direct commits, staging, pushes, PR edits, or git notes.
 - Other tracks' artifacts.
@@ -73,6 +75,11 @@ Run this step when the track already has `obligations.json` / `test-bindings.jso
 assigned task creates or changes the test-obligation gate itself, or when the orchestrator
 explicitly asks for obligation coverage.
 
+The surrounding orchestration loop (who runs `evaluate`, totality iteration, repair rounds,
+file-safety backups, cache semantics) is owned by the `obligation-fulfillment` workflow
+(`.harness/workflows/track/obligation-fulfillment.md`); this contract owns the per-record
+authoring discipline below.
+
 1. Run:
    ```
    bin/sotp test-obligation derive
@@ -93,6 +100,22 @@ explicitly asks for obligation coverage.
    - Convert records to the `waiver` / `voluntary_binding` forms where appropriate.
    - Consult `obligations.json` for each obligation's brief and target entry while binding.
    The draft stays rejected by the fail-closed codec until every placeholder is replaced.
+
+   **Triangulate every obligation/edge through BOTH sides before writing or binding a test.**
+   The obligation is the join point between the type contract and the behavioral contract:
+
+   1. Follow `target_entry` to the catalogue entry's declaration fragment (what the type
+      promises structurally).
+   2. Follow the anchor to the spec element's text (what behavior is promised).
+   3. The intersection — the part of the anchor's promise that concerns THIS entry's
+      declaration — is what the bound tests must verify (fulfillment judgment is edge-local).
+   4. Verifier rejection reasons are delta signals against that intersection, never a
+      substitute for reading the two sides; repairing from reasons alone converges slowly
+      and invites misreadings of spec wording.
+
+   Tests written against the intersection bind first-time; tests written against either side
+   alone (only the type's surface, or only the anchor's whole promise) are the primary cause
+   of `substitution` / `central_unverified` rejections.
 4. Use exactly one of these record forms:
    - `kind: "fulfillment"` with `obligation_id` and non-empty `tests[]`.
    - `kind: "waiver"` with `edge_id` and a human-authored `reason`.
@@ -104,11 +127,13 @@ explicitly asks for obligation coverage.
 6. Do not add marker comments to Rust tests.
 7. Run:
    ```
-   bin/sotp test-obligation evaluate
    bin/sotp test-obligation check
    ```
-8. Fix `missing`, `orphaned`, unresolved, or stale findings by updating tests, bindings, or
-   routing upstream SoT corrections to the owning capability.
+   Do not run `bin/sotp test-obligation evaluate` — evaluation is host-owned
+   (`obligation-fulfillment` workflow); the orchestrator runs it between authoring rounds.
+8. Fix `missing`, `orphaned`, or unresolved findings by updating tests, bindings, or
+   routing upstream SoT corrections to the owning capability. The missing/stale-VERDICT
+   class is resolved by the host's next `evaluate` round, not by this capability.
 
 If neither `obligations.json` nor `test-bindings.json` exists, the gate has an empty
 existence-based scope and `check` reports zero pairs. If exactly one exists, the scope is

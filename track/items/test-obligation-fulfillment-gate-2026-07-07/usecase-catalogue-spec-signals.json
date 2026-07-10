@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a35f1e5085c1f6e10e956aa267d4d1bf079bd6f0b9cde4fb1460ccae11ecf29c",
+  "catalogue_declaration_hash": "1bed246d43f875d12380f6520d25675ff2e3c3c4ca08981d24ac0f7f6abe60b0",
   "signals": [
     {
       "type_name": "CheckTestObligationsCommand",
@@ -10,7 +10,7 @@
     {
       "type_name": "CheckTestObligationsInteractor",
       "signal": "blue",
-      "entry_hash": "2d06ab5b28b148825cd81dc0a560537b60e89c872f607e10c5ecacd138ef101c"
+      "entry_hash": "4a480beddd490fb9813ac61894d712aa5fa29c5c50ac70965fa3fc0e162da3dd"
     },
     {
       "type_name": "CheckTestObligationsOutcome",
@@ -40,7 +40,7 @@
     {
       "type_name": "EvaluateTestObligationsInteractor",
       "signal": "blue",
-      "entry_hash": "ba0c397779256a41a2f15b581162d43323b7eb5e9ed44fa65a2dd2b2092856c7"
+      "entry_hash": "bcfb1f7a5658414c8c5b9e26d4eeb05bd646df1fbbd7d51c6e19c745e3e0d269"
     },
     {
       "type_name": "EvaluateTestObligationsOutcome",

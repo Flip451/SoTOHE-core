@@ -48,6 +48,12 @@ decisions:
   - id: D14
     user_decision_ref: "chat:session-86a37bf1:2026-07-09/10 ユーザー直接指示「63 個の義務 id を implementer が手写する体制は現実的でない。`test-bindings.json` と同一 wire 形状の schema-pure draft を stdout に出す authoring helper を追加せよ。gate 面には含めず、副作用（`test-bindings.json` / verdict cache への write）は一切持たせない。`results` は informational（exit 常に 0、verdict gate は `check` の責務）である旨を明文化」"
     status: proposed
+  - id: D15
+    user_decision_ref: "chat:session-86a37bf1:2026-07-10 ユーザー直接指示「task-contract gate と同型の task-status 連動（todo タスク帰属の義務は 🟡 許容、done は 🔵 必須）を check に入れる。各タスクごとの型契約との紐付けと、各型契約と義務の紐付けは可能なので新アーティファクトは不要。ADR に新決定を追加することも許可する」+ derive 時点議論（義務導出の入力（catalogue / spec / rules）は Phase 2 完了時点で確定するため、Phase 2 直後が最適点）"
+    status: proposed
+  - id: D16
+    user_decision_ref: "chat:session-86a37bf1:2026-07-10 ユーザー裁定「いや、それは設計がおかしい。キャッシュは生かしつつ、失効したキャッシュは無視されなければならない」— fulfillment verifier prompt の D6 edge-locality 修正後も、verdict cache の同一性が tests / declaration / anchor の hash 三つ組だけで judge の変更を検知できず、手動削除なしには再評価されなかった incident を受けた裁定"
+    status: proposed
 ---
 
 # テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成
@@ -193,6 +199,8 @@ waiver 検証が reject した場合は implementer に差し戻す（理由を�
 
 **鮮度と verdict の結合（fail-closed）**: verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点（= drift 鮮度系の `spec_changed` / `decl_changed` / `test_changed` / `reason_changed`・D9）で既存 verdict は無効となり「存在しない」ものとして扱う。`check` ゲートの合格条件は「全 edge が bindings 上で解決宣言され（tests または waived・D9）、現行 hash と一致する fulfilled / waived verdict が存在すること」であり、hash 再計算だけで鮮度を回復する経路はない——回復は再評価（`evaluate`）の pass のみで達成される。
 
+verdict の有効性は本決定の三つ組キャッシュキーに加え、D16 の verifier-prompt fingerprint を validity 属性として持つ（不一致・不在の entry は verdict 不在として扱われ再評価される——詳細は D16）。verifier provider が設定読込失敗・capability 解決不能で解決されない場合、composition root は fail-closed stand-in adapter を接続し、評価呼出しは常に `VerifierPort` error に倒れる（D7 の capability→provider 解決規律の fail-closed 帰結）。
+
 スコープ解決は existence-based 原則に従う: obligations / test-bindings artifact（D9）が不在なら zero pairs で通過し、部分的・不整合な存在（binding だけ存在する等）は fail-closed とする。
 
 ### D7: 責務中立な semantic-verdict core の抽出を先行させる
@@ -254,6 +262,8 @@ CI は書き換えなしに drift を検出できる。
 **完全性保証**: `derive` / `check` はロード時に、config が全 role（DataRole 17種 / ContractRole / FunctionRole——role enum は Rust 側が SSoT）を被覆し、義務 0 件も `"obligations": []` と**明示**していることを fail-closed で検証する。sotp に新 role が追加されると既存 config は loud に fail し、「生成数の決め忘れ」は依然として構造的に不可能である（コンパイル時網羅 match による保証の、config ロード時への移設）。
 
 **語彙**: 生成ルールは per 軸（`invariant` / `method` / `handles` / `reacts_to` / `transition` / `trait_method` / 定数——宣言 payload のフィールドに対応する閉集合）× 義務種別 × brief テンプレートで表現する。語彙の解釈器は Rust 側で per 軸への網羅 match として実装し、**語彙の拡張のみが template 上流の責務**となる。
+
+**非ブロッキング保証**: 決定表の内容レベルの欠陥・調整不足（義務生成ルールの内容が不適切・不足している場合）に限り、track のブロッカーにしない。解決手段は2層である: (1) **ルール水準**では、本決定の責任境界どおり利用者所有 config を編集し、tooling の修正を待たずに解決する。(2) **edge 水準の一回性救済**では、義務が導出されていない edge に D9 の `voluntary_binding` 形態で自発的 binding を直接 author する。いずれの層も tooling 内部の修正を要求しない。role 未被覆・`"obligations": []` 非明示等、本決定の完全性保証が fail-closed で阻止する構造的破綻は、引き続き block される。
 
 ### D11: CLI surface — fail-closed、lenient / force 系フラグなし
 
@@ -357,7 +367,7 @@ D11 が定めた4サブコマンド（`derive` / `check` / `evaluate` / `results
 - **fail-closed セマンティクスの不変性**: TODO placeholder が残る間は当該 binding が実在テスト関数を指せないため、`check` が missing drift として fail-closed で reject する。skeleton の生成は義務・履行・鮮度いずれの検証も肩代わりせず、D11 の fail-closed gate と D6 の鮮度 → verdict 結合を弱めない
 - **gate 面ではない**: `bindings-skeleton` は D11 の4サブコマンドにも pass/fail gate にも含まれない。CLI grouping としては同じ `sotp test-obligation` グループに置くが、gate ではない本コマンドは fail-closed verdict 判定の対象外である。CI からは呼ばれない
 
-**`results` の informational 性質の再確認**（D11 の該当行の明文化）: `sotp test-obligation results` は verdict 閲覧のみを目的とし、**exit は常に 0**（informational）である。verdict の合否判定＝ゲートとしての pass/fail は **`check` の責務**であり、`results` は結果の可視化に専念する（既存 `sotp ref-verify results` / `sotp review results` / `sotp dry results` と同じ用法）。verdict gate と閲覧の責務分離は、rerun 時の副作用不在（`results` の複数回実行は等価な出力を返すのみ）と、CI の pass/fail 経路の唯一性（gate は `check` のみ）を同時に保つための構造判断であり、`results` に非 0 exit を持たせない選択はこの構造の帰結である。
+**`results` の informational 性質の再確認**（D11 の該当行の明文化）: `sotp test-obligation results` は verdict 閲覧のみを目的とし、**exit は常に 0**（informational）である。verdict の合否判定＝ゲートとしての pass/fail は **`check` の責務**であり、`results` は結果の可視化に専念する（既存 `sotp ref-verify results` / `sotp review results` / `sotp dry results` と同じ用法）。verdict gate と閲覧の責務分離は、rerun 時の副作用不在（`results` の複数回実行は等価な出力を返すのみ）と、CI の pass/fail 経路の唯一性（gate は `check` のみ）を同時に保つための構造判断であり、`results` に非 0 exit を持たせない選択はこの構造の帰結である。`results` を含むこのグループの全サブコマンドは現在の `track/<id>` ブランチから track を自動解決し、`--track-id` はブランチ外実行（detached HEAD 等）でのみ必要になる（bindings-skeleton について本決定が定める規約と同一）。
 
 **動機の grounding**:
 
@@ -365,6 +375,59 @@ D11 が定めた4サブコマンド（`derive` / `check` / `evaluate` / `results
 - **implementer authored の binding 原則の保持**: D9 の binding は「implementer が author する」設計（テスト位置 / waived 理由 / 自発的 binding のいずれも人が書く）。skeleton は**空欄（TODO placeholder）だけを生成**し、テスト位置の意味的な決定は依然として implementer に委ねる——事前充填されるのは形（同一 wire 形状 + 網羅された義務 id）のみで、内容（どのテスト関数を bind するか）は空である。この分業は Rejected A（テスト本文自動生成）との境界を保つ: 呼び出し部・import・雛形は生成せず、生成対象は binding artifact の「空きスロット」の網羅にとどまる
 
 **位置づけの明確化**: bindings-skeleton は fail-closed gate 面（D11）でも意味論検証 core（D7）でもなく、**執筆補助レイヤ**である。D6 の鮮度 → verdict 結合と D11 の fail-closed セマンティクスは、この executable の存在によっても弱まらない（skeleton は draft を stdout に出すだけで、gate 面の pure-read verdict / hash 凍結キャッシュには一切触れない）。gate の完全性を担保するのは依然として `check` の decision（現行 hash と一致する verdict の全 edge 存在）であり、skeleton は**そこに至るための implementer 側の boilerplate コストを削減する装置**である。
+
+### D15: `check` の判定を task status に連動させ、todo 帰属の未解消を 🟡 として通す
+
+D11 が定めた現行の `check` は、全 edge の bindings totality + 現行 hash 一致 verdict の存在を **task の status によらず一律**に要求する。この一律性は「obligations.json / test-bindings.json は全 task が done に到達する直前に materialize する」運用を暗黙前提としており、TDDD 本来の順序——**義務を知ってからテストを書く**——を阻む。derive の入力（catalogue / spec / rules）は Phase 2（type-design）完了時点で確定するため、義務導出の最適時点は Phase 2 直後であり、その時点で obligations.json + 空 records の test-bindings.json をコミットしておけば implementer は自 entry の義務を brief 付きで参照しながらテスト設計を進められる（TDDD）。しかし現行の status-blind な totality の下でこれを行うと、未着手 task 由来の義務が全て missing / verdict 欠如で fail するため、以後の全実装バッチのコミットが塞がれる。
+
+本決定は、`check` の判定を **task status レーンに分岐**させ、この構造的閉塞を解消する方針を **RECORDED（記録済み）** とする。ただし実装は後続 track に延期し、その実装が merge target に取り込まれるまでは、現行の `bin/sotp test-obligation check` は status-blind のまま、task status に関係なく全ての unresolved / stale edge を fail-closed で block する。以下に定める task status レーン別の挙動は、後続 track による導入後の契約である。導入後もこれは fail-closed セマンティクスの弱化ではなく、**適用時期の精緻化**である。
+
+**導入後の帰属機構 — 新アーティファクトは追加しない**: 義務 / edge の所属 task は、既存アーティファクトの決定論的合成のみで解決する。
+
+```
+obligation の target_entry (catalogue file → layer, entry_key)
+  ↓ task-contract.json entries を引く
+(layer, entry_key) → task id 群
+  ↓ impl-plan.json の tasks[] を引く
+task id → task status (todo / in_progress / done)
+```
+
+この transitive 帰属の前提——「全 catalogue entry がいずれかの task に帰属している」——は `bin/sotp task-contract coverage`（`cargo make ci` に含まれる被覆前提 gate）が既に CI で強制しており、導入後の判定は同 gate の被覆保証にそのまま乗る。同一 entry が複数 task に帰属する場合、**最も進んだ status が勝つ**（done > in_progress > todo — strictest-wins）: 「複数 task のいずれかがこの entry の実装を終えている」なら、その義務は既に done 相当の履行が要求される段階に達したとみなす。帰属を解決できない entry（coverage 前提の破れ）は、導入後も構造的破綻として **status を問わず常時 block**（fail-closed）する。
+
+**導入後の判定規則 — pre-review task-contract gate と同型**:
+
+- **`done` / `in_progress` 帰属**: 従来どおり 🔵 必須。missing / stale（鮮度失効）/ verdict 欠如は fail-closed で block する
+- **`todo` 帰属**: 未解消（binding 欠如・verdict 欠如・鮮度失効）を **🟡 警告**として報告し、gate 判定は pass させる。理由の grounding は plan-level の事実——「この義務の実装 task が未着手である」——であり、未着手 task の義務にテスト履行を要求するのは順序として破綻している
+- **構造軸**（未帰属 entry / rules load-time totality 違反〔D10〕/ artifact malformed〔D11 の fail-closed 対象〕等）: task status に関わらず **常時 block**。todo の 🟡 猶予は「実装が未着手であるがゆえの一時的な未履行」に対するものであって、artifact 構造 / rules 構造の破綻を覆う根拠にはならない
+
+導入後の分岐は、既存の pre-review task-contract gate が `impl_catalog` 信号を task 状態別に処理する方式（done / in_progress は 🔵 必須、todo は 🟡 許容、🔴 は常時 block）と**同型**である。`check` への導入対象は新規機構ではなく、既存機構のパターンの相貌である。
+
+**保証境界の不変性**: 導入後も D6 の fulfillment 判定の edge 局所性、D9 の drift 分類（存在系 / 鮮度系）、D10 の rules load-time totality 検証、D11 の fail-closed セマンティクスをいずれも変更しない。導入後の todo 猶予は verdict の不成立を「一時的に 🟡 として表示する」だけであり、drift 検出機構と verdict 判定機構は status に依存しない（`missing` / `orphaned` / `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` はいずれも status 分岐前に決定論的に計算され、status 分岐は最終的な gate 判定側の解釈にのみ入る）。
+
+**動機の grounding — early-derive 運用の解禁**:
+
+- **TDDD の順序回復**: 義務導出は Phase 2 直後が最適時点である。現行の status-blind な totality は、この時点で obligations.json をコミットすると未着手 task 由来の義務が missing として全実装バッチのコミットを塞ぐため、事実上「obligations の materialize は Phase 3 完了間際まで待つ」運用を強いている。D15 の実装導入後は、Phase 2 直後の derive → obligations.json + **空 records の test-bindings.json**（fail-closed codec が受理する明示的な authoring act。IN-14 / AC-10 の half-materialized fail-closed は不変のまま、両 artifact が存在する状態を要求する）のコミットが可能になる
+- **バッチごとの増分著作**: D15 の実装導入後は、未実装 task の義務が 🟡 で通過するため、implementer は task を1つずつ done に遷移させながら、その task に帰属する義務の binding を増分著作できる。task が done に遷移した時点で、その task に帰属する義務は自動的に 🔵 必須のレーンへ切り替わり、以後の commit gate はその task 分に対してのみ従来どおりの fail-closed 判定を要求する
+
+**導入後の merge gate の自然収束**: merge gate（`sotp pr wait-and-merge` の task completion 強制）は既に「全 task が done に到達していること」を merge 前提として要求している。したがって D15 の実装導入後も、merge 時点では todo 帰属の義務は存在せず、🟡 の残存も自然に消滅する。導入に伴って **`signal-gates.json` に `impl_catalog` 用の interim/strict 切り分けは新設しない**——`signal-gates.json` は SoT chain × gate の per-chain 宣言体系であり、既存の chain × gate 宣言の構造には手を入れない。導入後の task-status 分岐は `check` 内部の判定規則にとどまり、chain × gate の宣言レイヤの複雑度を増やさない。
+
+**導入後の `results` の status レーン別集計**: D15 の実装導入後、D14 が informational（exit 常に 0）と定めた `sotp test-obligation results` は、todo / in_progress / done の各レーンごとの unresolved 件数と、その内訳（missing / stale / verdict 欠如）を集計表示する。gate 判定は引き続き `check` の責務であり（D11 / D14）、`results` の exit は常に 0 のまま維持する——status レーン別集計は閲覧のための可視化拡張であって、pass/fail 経路の追加ではない。
+
+**導入後の保証の不変条件**: D15 の実装導入後も、fail-closed セマンティクスを弱化せず、適用時期だけを精緻化する。done / in_progress 帰属分の履行と鮮度・構造軸は従来どおり block し、todo 分の猶予は「その義務の実装 task 自体が未着手」という plan 上の事実に根拠する。merge gate は全 task done を強制するため、この猶予は merge 時点で必ず消尽し、本番運用に漏出する経路は存在しない。
+
+### D16: verdict cache entry に verifier-prompt fingerprint を持たせ、不一致は無視し手動 purge しない
+
+D6 の三つ組——test pair の (bound tests 集合 hash, entry 宣言 hash, anchor hash) / waiver pair の (waived 理由 hash, entry 宣言 hash, anchor hash)——は、引き続き pair の**同一性**を定める cache key である。本決定はこの同一性を変更せず、記録された verdict の**有効性 dimension**として verifier-prompt fingerprint を追加する。
+
+obligation-fulfillment / waiver の両 verdict cache は、各 entry にその lane の judging prompt preamble（fulfillment prompt / waiver prompt）の content hash である **verifier fingerprint** を記録する。fingerprint が現在の verifier prompt と一致する entry は、従来どおり hash 三つ組に凍結された cache としてそのまま再利用し、書き換えない（キャッシュは生かす）。
+
+すべての cache reader——`evaluate` の cache lookup と `check` の freshness verification の双方——は、fingerprint が現在値と異なる entry、または fingerprint を持たない legacy entry を、error ではなく**存在しない verdict**として無視する。`evaluate` はその pair を再検証し、現在の fingerprint を持つ entry で上書きする。`check` は現行 hash に対する verdict 欠如として扱い、D15 導入前は task status を問わず全 edge を D6 が stale hash に対して定めたものと同じ fail-closed 規則で block し、D15 導入後は同規則を D15 の task-status レーンによる最終解釈に従って適用する。
+
+verdict cache file の手動削除・手編集は、verifier 更新を反映する経路として**要求も許容もしない**。judge の instruction semantics が変われば fingerprint mismatch により旧 verdict が自動的に失効し、再評価可能になる。
+
+**model / tier は fingerprint に含めない**。既存の fast → final escalation は異なる model tier の verdict を交換可能として扱い、model は verdict identity の軸ではない。fingerprint が捉えるのは judge の identity そのものではなく、判定意味論を規定する **instructions（prompt semantics）**である。
+
+**fail-closed の不変性**: fingerprint mismatch / absence は既存 verdict を考慮対象から除くだけであり、verdict を新たに accept する経路を作らない。したがって不一致は再評価まで gate を厳しくする方向にしか作用せず、D6 の鮮度と verdict の結合を弱めない。
 
 ## Rejected Alternatives
 

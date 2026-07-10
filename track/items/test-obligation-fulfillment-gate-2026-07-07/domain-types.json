@@ -1259,14 +1259,159 @@
       "action": "add",
       "for_type": "DetectionRatePercent",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "VerifierPromptFingerprint",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "VerifierPromptFingerprint",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "VerifierPromptFingerprint",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "VerifierPromptFingerprint",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueDocumentLoaderError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueDocumentLoaderError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueDocumentLoaderError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::str::traits::FromStr"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::convert::AsRef<str>"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::str::traits::FromStr"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::convert::AsRef<str>"
     }
   ],
   "traits": {
     "CatalogueDocumentLoaderPort": {
       "action": "reference",
-      "docs": "Loader port for the persisted CatalogueDocument. Sibling of SpecDocumentLoaderPort. See IN-07 / IN-08.",
+      "docs": "Baseline domain secondary port for loading a persisted CatalogueDocument from a typed filesystem path (IN-07 / IN-08).",
       "informal_grounds": [],
-      "methods": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "path",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CatalogueDocument, CatalogueDocumentLoaderError>"
+        }
+      ],
       "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
       "role": {
         "SecondaryPort": {}
@@ -1281,7 +1426,10 @@
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ],
-      "supertrait_bounds": []
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
     },
     "ObligationFulfillmentCachePort": {
       "action": "add",
@@ -1474,10 +1622,6 @@
       "spec_refs": [
         {
           "anchor": "IN-07",
-          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
-        },
-        {
-          "anchor": "IN-08",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ],
@@ -1927,11 +2071,56 @@
     },
     "CatalogueDocumentLoaderError": {
       "action": "reference",
-      "docs": "Loader error for CatalogueDocumentLoaderPort. See IN-07 / IN-08.",
+      "docs": "Baseline loader error for CatalogueDocumentLoaderPort. Path payloads remain typed as std::path::PathBuf; reason is deliberately raw String because it is opaque human-readable diagnostic text with no constrained domain vocabulary (IN-07 / IN-08).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
-        "variants": []
+        "variants": [
+          {
+            "name": "NotFound",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Decode",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
       },
       "methods": [],
       "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
@@ -1951,7 +2140,7 @@
     },
     "CrateName": {
       "action": "reference",
-      "docs": "Crate name newtype. See IN-17.",
+      "docs": "Referenced identifier newtype carried as the workspace crate name in trait_ref resolution (`Workspace` trait-ref form); see IN-17.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1961,7 +2150,28 @@
           "kind": "tuple"
         }
       },
-      "methods": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "s",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, IdentifierError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
       "module_path": "tddd::catalogue_v2::identifiers",
       "role": {
         "ValueObject": {}
@@ -2211,12 +2421,28 @@
           "name": "new",
           "params": [
             {
+              "name": "obligation_id",
+              "ty": "Option<TestObligationId>"
+            },
+            {
               "name": "edge_id",
               "ty": "TestObligationEdgeId"
             },
             {
+              "name": "claim_source",
+              "ty": "Option<DiagnosticMessage>"
+            },
+            {
+              "name": "evidence_source",
+              "ty": "Option<DiagnosticMessage>"
+            },
+            {
               "name": "outcome",
               "ty": "EdgeResolutionOutcome"
+            },
+            {
+              "name": "verdict_reason",
+              "ty": "Option<DiagnosticMessage>"
             },
             {
               "name": "drift",
@@ -3206,7 +3432,7 @@
     },
     "ObligationFulfillmentCacheEntry": {
       "action": "add",
-      "docs": "Cache-entry value object for obligation-fulfillment verdict records; see IN-09 / AC-06.",
+      "docs": "Cache-entry value object for obligation-fulfillment verdict records; see IN-09 / CN-04.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -3237,6 +3463,10 @@
             {
               "name": "verdict",
               "ty": "ObligationFulfillmentVerdict"
+            },
+            {
+              "name": "verifier_fingerprint",
+              "ty": "Option<VerifierPromptFingerprint>"
             }
           ],
           "returns": "Self"
@@ -3272,6 +3502,14 @@
           "params": [],
           "receiver": "&self",
           "returns": "&ObligationFulfillmentVerdict"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verifier_fingerprint",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&VerifierPromptFingerprint>"
         }
       ],
       "module_path": "tddd::test_obligation::verdict",
@@ -3285,6 +3523,10 @@
         },
         {
           "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
@@ -3610,6 +3852,20 @@
           "params": [],
           "receiver": "&self",
           "returns": "&[TestObligation]"
+        },
+        {
+          "docs": "Resolves the obligation owning an edge for results provenance; see IN-10.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "owning_obligation",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "&TestObligationEdgeId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&TestObligation>"
         }
       ],
       "module_path": "tddd::test_obligation::obligations",
@@ -5943,7 +6199,7 @@
     },
     "TraitName": {
       "action": "reference",
-      "docs": "Trait short-name newtype. See IN-17.",
+      "docs": "Baseline validated Rust-identifier newtype used for catalogue trait short names; construction rejects empty or syntactically invalid identifiers (IN-17).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -5953,7 +6209,28 @@
           "kind": "tuple"
         }
       },
-      "methods": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "s",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, IdentifierError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
       "module_path": "tddd::catalogue_v2::identifiers",
       "role": {
         "ValueObject": {}
@@ -6447,6 +6724,55 @@
         }
       ]
     },
+    "VerifierPromptFingerprint": {
+      "action": "add",
+      "docs": "Hash of the judging-prompt preamble carried by cached verdicts; see IN-09 / CN-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "hash",
+              "ty": "ContentHash"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ContentHash"
+        }
+      ],
+      "module_path": "tddd::test_obligation::hashes",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
     "VerifyCacheError": {
       "action": "add",
       "docs": "Error vocabulary for obligation-fulfillment and waiver verdict cache repositories; see IN-09 / AC-06 / CN-04.",
@@ -6651,7 +6977,7 @@
     },
     "WaiverCacheEntry": {
       "action": "add",
-      "docs": "Cache-entry value object for waiver verdict records; see IN-09 / AC-06.",
+      "docs": "Cache-entry value object for waiver verdict records; see IN-09 / CN-04.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -6678,6 +7004,10 @@
             {
               "name": "verdict",
               "ty": "WaiverVerdict"
+            },
+            {
+              "name": "verifier_fingerprint",
+              "ty": "Option<VerifierPromptFingerprint>"
             }
           ],
           "returns": "Self"
@@ -6705,6 +7035,14 @@
           "params": [],
           "receiver": "&self",
           "returns": "&WaiverVerdict"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verifier_fingerprint",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&VerifierPromptFingerprint>"
         }
       ],
       "module_path": "tddd::test_obligation::verdict",
@@ -6718,6 +7056,10 @@
         },
         {
           "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
