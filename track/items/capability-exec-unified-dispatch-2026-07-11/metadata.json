@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "capability-exec-unified-dispatch-2026-07-11",
+  "title": "capability exec: profile 駆動の汎用 capability dispatch コマンド",
+  "branch": "track/capability-exec-unified-dispatch-2026-07-11",
+  "created_at": "2026-07-11T20:21:17Z",
+  "updated_at": "2026-07-11T20:21:17Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

@@ -207,6 +207,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Codex review-fix-lead の hexagonal Rust 化 + 入れ子 reviewer session 失敗の解消 + 自己 dogfooding](2026-05-31-0542-review-fix-codex-hexagonal-nested-session.md) | Proposed | 2026-05-31 |
 | [Codex を Claude と同等の SoTOHE オーケストレーターにする設定追加](2026-06-13-0002-codex-orchestrator-settings-addition.md) | Proposed | 2026-06-13 |
 | [Claude/Codex 運用文書の .harness SSoT 化](2026-06-30-0425-harness-workflow-ssot-adapters.md) | Proposed | 2026-06-30 |
+| [capability exec: profile 駆動の汎用 capability dispatch コマンド](2026-07-12-0510-capability-exec-unified-dispatch.md) | Proposed | 2026-07-12 |
 
 ### テスト・CI ツーリング
 
