@@ -1,0 +1,143 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "TestObligationCheckHandler": {
+      "action": "modify",
+      "docs": "TestObligationCheckHandler rendering surface updated; see AC-01, AC-02, AC-04, and AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::test_obligation::check::CheckTestObligationsApplicationService>"
+            }
+          ],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::test_obligation::check::CheckTestObligationsApplicationService>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "TestObligationCheckInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "test_obligation::check",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "TestObligationResultsHandler": {
+      "action": "modify",
+      "docs": "TestObligationResultsHandler rendering surface updated with a distinct skipped lane; see AC-05 and AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::test_obligation::results::TestObligationResultsApplicationService>"
+            }
+          ],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::test_obligation::results::TestObligationResultsApplicationService>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "TestObligationResultsInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "test_obligation::results",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-05",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        }
+      ]
+    }
+  }
+}

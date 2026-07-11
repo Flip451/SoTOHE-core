@@ -1,0 +1,111 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "TestObligationCompositionRoot": {
+      "action": "modify",
+      "docs": "Composition root modified to wire the existing task-contract and impl-plan readers into check and informational results lane attribution.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "config_path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "config_path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "derive_handler",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::test_obligation::derive::TestObligationDeriveHandler"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check_handler",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::test_obligation::check::TestObligationCheckHandler"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "bindings_skeleton_handler",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::test_obligation::bindings_skeleton::TestBindingsSkeletonHandler"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "evaluate_handler",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::test_obligation::evaluate::TestObligationEvaluateHandler"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "results_handler",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::test_obligation::results::TestObligationResultsHandler"
+        }
+      ],
+      "module_path": "test_obligation",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        }
+      ]
+    }
+  }
+}

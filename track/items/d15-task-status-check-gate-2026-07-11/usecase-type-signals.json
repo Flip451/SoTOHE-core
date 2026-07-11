@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-11T10:03:49Z",
+  "declaration_hash": "99a436bffbeb853317276338d61a5cd2ae571fa7a88bec0ff2507110f48ee2f1",
+  "signals": [
+    {
+      "type_name": "CheckTestObligationsInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "CheckTestObligationsOutcome",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TestObligationResultsCommand",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TestObligationResultsInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TestObligationResultsOutput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TestObligationStatusLaneSummary",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "ImplPlanReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PreReviewGateError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskContractReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

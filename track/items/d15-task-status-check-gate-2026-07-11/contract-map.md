@@ -1,0 +1,258 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph T34_domain_domain_ObligationCheckError["tddd::test_obligation::errors::ObligationCheckError"]
+    direction TB
+    T34_domain_domain_ObligationCheckError__self[ObligationCheckError]
+    T34_domain_domain_ObligationCheckError_RulesLoad[RulesLoad]
+    T34_domain_domain_ObligationCheckError_ObligationsAbsent[ObligationsAbsent]
+    T34_domain_domain_ObligationCheckError_BindingsAbsent[BindingsAbsent]
+    T34_domain_domain_ObligationCheckError_StaleObligationsArtifact[StaleObligationsArtifact]
+    T34_domain_domain_ObligationCheckError_DriftsDetected[DriftsDetected]
+    T34_domain_domain_ObligationCheckError_UnresolvedEdges[UnresolvedEdges]
+    T34_domain_domain_ObligationCheckError_StaleVerdicts[StaleVerdicts]
+    T34_domain_domain_ObligationCheckError_CatalogueLoad[CatalogueLoad]
+    T34_domain_domain_ObligationCheckError_SpecLoad[SpecLoad]
+    T34_domain_domain_ObligationCheckError_InvalidCatalogueState[InvalidCatalogueState]
+    T34_domain_domain_ObligationCheckError_ArtifactCodec[ArtifactCodec]
+    T34_domain_domain_ObligationCheckError_SourceScan[SourceScan]
+    T34_domain_domain_ObligationCheckError_CacheIo[CacheIo]
+    T34_domain_domain_ObligationCheckError_TaskAttribution[TaskAttribution]
+  end
+  end
+  subgraph domain_domain_module_track["domain::track"]
+    direction TB
+  subgraph T28_domain_domain_TaskStatusKind["track::TaskStatusKind"]
+    direction TB
+    T28_domain_domain_TaskStatusKind__self[TaskStatusKind]
+    T28_domain_domain_TaskStatusKind_Todo[Todo]
+    T28_domain_domain_TaskStatusKind_InProgress[InProgress]
+    T28_domain_domain_TaskStatusKind_Done[Done]
+    T28_domain_domain_TaskStatusKind_Skipped[Skipped]
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_pre_review_gate["usecase::pre_review_gate"]
+    direction TB
+  subgraph T34_usecase_usecase_PreReviewGateError["pre_review_gate::PreReviewGateError"]
+    direction TB
+    T34_usecase_usecase_PreReviewGateError__self[PreReviewGateError]
+    T34_usecase_usecase_PreReviewGateError_TaskContractNotFound[TaskContractNotFound]
+    T34_usecase_usecase_PreReviewGateError_TaskContractReadFailed[TaskContractReadFailed]
+    T34_usecase_usecase_PreReviewGateError_SignalReadFailed[SignalReadFailed]
+    T34_usecase_usecase_PreReviewGateError_ImplPlanReadFailed[ImplPlanReadFailed]
+  end
+  subgraph R34_usecase_usecase_ImplPlanReaderPort["pre_review_gate::ImplPlanReaderPort"]
+    direction TB
+    R34_usecase_usecase_ImplPlanReaderPort__self[ImplPlanReaderPort]
+    R34_usecase_usecase_ImplPlanReaderPort_read_task_statuses([read_task_statuses])
+  end
+  subgraph R38_usecase_usecase_TaskContractReaderPort["pre_review_gate::TaskContractReaderPort"]
+    direction TB
+    R38_usecase_usecase_TaskContractReaderPort__self[TaskContractReaderPort]
+    R38_usecase_usecase_TaskContractReaderPort_read([read])
+  end
+  end
+  subgraph usecase_usecase_module_test_obligation["usecase::test_obligation"]
+    direction TB
+  subgraph T46_usecase_usecase_CheckTestObligationsInteractor["test_obligation::check::CheckTestObligationsInteractor"]
+    direction TB
+    T46_usecase_usecase_CheckTestObligationsInteractor__self[CheckTestObligationsInteractor]
+    T46_usecase_usecase_CheckTestObligationsInteractor_new([new])
+  end
+  subgraph T43_usecase_usecase_CheckTestObligationsOutcome["test_obligation::check::CheckTestObligationsOutcome"]
+    direction TB
+    T43_usecase_usecase_CheckTestObligationsOutcome__self[CheckTestObligationsOutcome]
+    T43_usecase_usecase_CheckTestObligationsOutcome_new_verified_scope([new_verified_scope])
+    T43_usecase_usecase_CheckTestObligationsOutcome_new_empty_scope([new_empty_scope])
+    T43_usecase_usecase_CheckTestObligationsOutcome_resolved_edges([resolved_edges])
+    T43_usecase_usecase_CheckTestObligationsOutcome_uncited_findings([uncited_findings])
+    T43_usecase_usecase_CheckTestObligationsOutcome_status_lane_summaries([status_lane_summaries])
+  end
+  subgraph T44_usecase_usecase_TestObligationResultsCommand["test_obligation::results::TestObligationResultsCommand"]
+    direction TB
+    T44_usecase_usecase_TestObligationResultsCommand__self[TestObligationResultsCommand]
+    T44_usecase_usecase_TestObligationResultsCommand_new([new])
+  end
+  subgraph T47_usecase_usecase_TestObligationResultsInteractor["test_obligation::results::TestObligationResultsInteractor"]
+    direction TB
+    T47_usecase_usecase_TestObligationResultsInteractor__self[TestObligationResultsInteractor]
+    T47_usecase_usecase_TestObligationResultsInteractor_new([new])
+  end
+  subgraph T43_usecase_usecase_TestObligationResultsOutput["test_obligation::results::TestObligationResultsOutput"]
+    direction TB
+    T43_usecase_usecase_TestObligationResultsOutput__self[TestObligationResultsOutput]
+    T43_usecase_usecase_TestObligationResultsOutput_new([new])
+    T43_usecase_usecase_TestObligationResultsOutput_lane_summaries([lane_summaries])
+    T43_usecase_usecase_TestObligationResultsOutput_records([records])
+    T43_usecase_usecase_TestObligationResultsOutput_uncited_findings([uncited_findings])
+    T43_usecase_usecase_TestObligationResultsOutput_status_lane_summaries([status_lane_summaries])
+  end
+  subgraph T47_usecase_usecase_TestObligationStatusLaneSummary["test_obligation::results::TestObligationStatusLaneSummary"]
+    direction TB
+    T47_usecase_usecase_TestObligationStatusLaneSummary__self[TestObligationStatusLaneSummary]
+    T47_usecase_usecase_TestObligationStatusLaneSummary_new([new])
+    T47_usecase_usecase_TestObligationStatusLaneSummary_task_status([task_status])
+    T47_usecase_usecase_TestObligationStatusLaneSummary_missing_count([missing_count])
+    T47_usecase_usecase_TestObligationStatusLaneSummary_stale_count([stale_count])
+    T47_usecase_usecase_TestObligationStatusLaneSummary_verdict_absent_count([verdict_absent_count])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+  subgraph cli_driver_cli_driver_module_test_obligation["cli_driver::test_obligation"]
+    direction TB
+  subgraph T48_cli_driver_cli_driver_TestObligationCheckHandler["test_obligation::check::TestObligationCheckHandler"]
+    direction TB
+    T48_cli_driver_cli_driver_TestObligationCheckHandler__self[TestObligationCheckHandler]
+    T48_cli_driver_cli_driver_TestObligationCheckHandler_new([new])
+    T48_cli_driver_cli_driver_TestObligationCheckHandler_handle([handle])
+  end
+  subgraph T50_cli_driver_cli_driver_TestObligationResultsHandler["test_obligation::results::TestObligationResultsHandler"]
+    direction TB
+    T50_cli_driver_cli_driver_TestObligationResultsHandler__self[TestObligationResultsHandler]
+    T50_cli_driver_cli_driver_TestObligationResultsHandler_new([new])
+    T50_cli_driver_cli_driver_TestObligationResultsHandler_handle([handle])
+  end
+  end
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+  subgraph cli_composition_cli_composition_module_test_obligation["cli_composition::test_obligation"]
+    direction TB
+  subgraph T61_cli_composition_cli_composition_TestObligationCompositionRoot["test_obligation::TestObligationCompositionRoot"]
+    direction TB
+    T61_cli_composition_cli_composition_TestObligationCompositionRoot__self[TestObligationCompositionRoot]
+    T61_cli_composition_cli_composition_TestObligationCompositionRoot_new([new])
+    T61_cli_composition_cli_composition_TestObligationCompositionRoot_derive_handler([derive_handler])
+    T61_cli_composition_cli_composition_TestObligationCompositionRoot_check_handler([check_handler])
+    T61_cli_composition_cli_composition_TestObligationCompositionRoot_bindings_skeleton_handler([bindings_skeleton_handler])
+    T61_cli_composition_cli_composition_TestObligationCompositionRoot_evaluate_handler([evaluate_handler])
+    T61_cli_composition_cli_composition_TestObligationCompositionRoot_results_handler([results_handler])
+  end
+  end
+end
+subgraph cli["cli"]
+  direction TB
+end
+R34_usecase_usecase_ImplPlanReaderPort_read_task_statuses --> T34_usecase_usecase_PreReviewGateError__self
+R34_usecase_usecase_ImplPlanReaderPort_read_task_statuses --> T28_domain_domain_TaskStatusKind__self
+R38_usecase_usecase_TaskContractReaderPort_read --> T34_usecase_usecase_PreReviewGateError__self
+T46_usecase_usecase_CheckTestObligationsInteractor_new --> T46_usecase_usecase_CheckTestObligationsInteractor__self
+T43_usecase_usecase_CheckTestObligationsOutcome_new_verified_scope --o T47_usecase_usecase_TestObligationStatusLaneSummary__self
+T43_usecase_usecase_CheckTestObligationsOutcome_new_verified_scope --> T43_usecase_usecase_CheckTestObligationsOutcome__self
+T43_usecase_usecase_CheckTestObligationsOutcome_new_empty_scope --> T43_usecase_usecase_CheckTestObligationsOutcome__self
+T43_usecase_usecase_CheckTestObligationsOutcome_status_lane_summaries --> T47_usecase_usecase_TestObligationStatusLaneSummary__self
+T44_usecase_usecase_TestObligationResultsCommand_new --> T44_usecase_usecase_TestObligationResultsCommand__self
+T47_usecase_usecase_TestObligationResultsInteractor_new --> T47_usecase_usecase_TestObligationResultsInteractor__self
+T43_usecase_usecase_TestObligationResultsOutput_new --o T47_usecase_usecase_TestObligationStatusLaneSummary__self
+T43_usecase_usecase_TestObligationResultsOutput_new --> T43_usecase_usecase_TestObligationResultsOutput__self
+T43_usecase_usecase_TestObligationResultsOutput_status_lane_summaries --> T47_usecase_usecase_TestObligationStatusLaneSummary__self
+T47_usecase_usecase_TestObligationStatusLaneSummary_new --o T28_domain_domain_TaskStatusKind__self
+T47_usecase_usecase_TestObligationStatusLaneSummary_new --> T47_usecase_usecase_TestObligationStatusLaneSummary__self
+T47_usecase_usecase_TestObligationStatusLaneSummary_task_status --> T28_domain_domain_TaskStatusKind__self
+T48_cli_driver_cli_driver_TestObligationCheckHandler_new --> T48_cli_driver_cli_driver_TestObligationCheckHandler__self
+T50_cli_driver_cli_driver_TestObligationResultsHandler_new --> T50_cli_driver_cli_driver_TestObligationResultsHandler__self
+T61_cli_composition_cli_composition_TestObligationCompositionRoot_new --> T61_cli_composition_cli_composition_TestObligationCompositionRoot__self
+T61_cli_composition_cli_composition_TestObligationCompositionRoot_check_handler --> T48_cli_driver_cli_driver_TestObligationCheckHandler__self
+T61_cli_composition_cli_composition_TestObligationCompositionRoot_results_handler --> T50_cli_driver_cli_driver_TestObligationResultsHandler__self
+class T34_domain_domain_ObligationCheckError_RulesLoad variant_node
+class T34_domain_domain_ObligationCheckError_ObligationsAbsent variant_node
+class T34_domain_domain_ObligationCheckError_BindingsAbsent variant_node
+class T34_domain_domain_ObligationCheckError_StaleObligationsArtifact variant_node
+class T34_domain_domain_ObligationCheckError_DriftsDetected variant_node
+class T34_domain_domain_ObligationCheckError_UnresolvedEdges variant_node
+class T34_domain_domain_ObligationCheckError_StaleVerdicts variant_node
+class T34_domain_domain_ObligationCheckError_CatalogueLoad variant_node
+class T34_domain_domain_ObligationCheckError_SpecLoad variant_node
+class T34_domain_domain_ObligationCheckError_InvalidCatalogueState variant_node
+class T34_domain_domain_ObligationCheckError_ArtifactCodec variant_node
+class T34_domain_domain_ObligationCheckError_SourceScan variant_node
+class T34_domain_domain_ObligationCheckError_CacheIo variant_node
+class T34_domain_domain_ObligationCheckError_TaskAttribution variant_node
+class T34_domain_domain_ObligationCheckError__self error_type
+class T28_domain_domain_TaskStatusKind_Todo variant_node
+class T28_domain_domain_TaskStatusKind_InProgress variant_node
+class T28_domain_domain_TaskStatusKind_Done variant_node
+class T28_domain_domain_TaskStatusKind_Skipped variant_node
+class T28_domain_domain_TaskStatusKind__self value_object
+class T34_usecase_usecase_PreReviewGateError_TaskContractNotFound variant_node
+class T34_usecase_usecase_PreReviewGateError_TaskContractReadFailed variant_node
+class T34_usecase_usecase_PreReviewGateError_SignalReadFailed variant_node
+class T34_usecase_usecase_PreReviewGateError_ImplPlanReadFailed variant_node
+class T34_usecase_usecase_PreReviewGateError__self error_type
+class R34_usecase_usecase_ImplPlanReaderPort_read_task_statuses method_node
+class R34_usecase_usecase_ImplPlanReaderPort__self secondary_port
+class R38_usecase_usecase_TaskContractReaderPort_read method_node
+class R38_usecase_usecase_TaskContractReaderPort__self secondary_port
+class T46_usecase_usecase_CheckTestObligationsInteractor_new method_node
+class T46_usecase_usecase_CheckTestObligationsInteractor__self interactor
+class T43_usecase_usecase_CheckTestObligationsOutcome_new_verified_scope method_node
+class T43_usecase_usecase_CheckTestObligationsOutcome_new_empty_scope method_node
+class T43_usecase_usecase_CheckTestObligationsOutcome_resolved_edges method_node
+class T43_usecase_usecase_CheckTestObligationsOutcome_uncited_findings method_node
+class T43_usecase_usecase_CheckTestObligationsOutcome_status_lane_summaries method_node
+class T43_usecase_usecase_CheckTestObligationsOutcome__self dto
+class T44_usecase_usecase_TestObligationResultsCommand_new method_node
+class T44_usecase_usecase_TestObligationResultsCommand__self command
+class T47_usecase_usecase_TestObligationResultsInteractor_new method_node
+class T47_usecase_usecase_TestObligationResultsInteractor__self interactor
+class T43_usecase_usecase_TestObligationResultsOutput_new method_node
+class T43_usecase_usecase_TestObligationResultsOutput_lane_summaries method_node
+class T43_usecase_usecase_TestObligationResultsOutput_records method_node
+class T43_usecase_usecase_TestObligationResultsOutput_uncited_findings method_node
+class T43_usecase_usecase_TestObligationResultsOutput_status_lane_summaries method_node
+class T43_usecase_usecase_TestObligationResultsOutput__self dto
+class T47_usecase_usecase_TestObligationStatusLaneSummary_new method_node
+class T47_usecase_usecase_TestObligationStatusLaneSummary_task_status method_node
+class T47_usecase_usecase_TestObligationStatusLaneSummary_missing_count method_node
+class T47_usecase_usecase_TestObligationStatusLaneSummary_stale_count method_node
+class T47_usecase_usecase_TestObligationStatusLaneSummary_verdict_absent_count method_node
+class T47_usecase_usecase_TestObligationStatusLaneSummary__self dto
+class T48_cli_driver_cli_driver_TestObligationCheckHandler_new method_node
+class T48_cli_driver_cli_driver_TestObligationCheckHandler_handle method_node
+class T50_cli_driver_cli_driver_TestObligationResultsHandler_new method_node
+class T50_cli_driver_cli_driver_TestObligationResultsHandler_handle method_node
+class T61_cli_composition_cli_composition_TestObligationCompositionRoot_new method_node
+class T61_cli_composition_cli_composition_TestObligationCompositionRoot_derive_handler method_node
+class T61_cli_composition_cli_composition_TestObligationCompositionRoot_check_handler method_node
+class T61_cli_composition_cli_composition_TestObligationCompositionRoot_bindings_skeleton_handler method_node
+class T61_cli_composition_cli_composition_TestObligationCompositionRoot_evaluate_handler method_node
+class T61_cli_composition_cli_composition_TestObligationCompositionRoot_results_handler method_node
+```

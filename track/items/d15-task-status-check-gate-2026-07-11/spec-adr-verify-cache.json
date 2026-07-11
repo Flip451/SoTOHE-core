@@ -1,0 +1,925 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "70ade7b7fca2dd31a92ec833ce3077a99449c7ad1397a349553dc0796428077e",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「義務 / edge の所属 task は、既存アーティファクトの決定論的合成のみで解決する。」また、「todo 帰属: 未解消（binding 欠如・verdict 欠如・鮮度失効）を 🟡 警告として報告し、gate 判定は pass させる。」さらに、Phase 2 直後の derive と「バッチごとの増分著作」が可能になると明記されている。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "`bin/sotp test-obligation check` が、義務・edge の task 帰属を既存の track artifact から決定論的に解決し、未着手 task に帰属する未解消を許容することで、Phase 2 完了直後の early-derive と実装 batch ごとの増分 fulfillment を可能にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab3640875445971a5f03574ca0b3b716d6c05d2b65c8f9aa05a80a5b2e157e7c",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "導入後も D6 の fulfillment 判定の edge 局所性、D9 の drift 分類（存在系 / 鮮度系）、D10 の rules load-time totality 検証、D11 の fail-closed セマンティクスをいずれも変更しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "task-status lane による最終 gate 解釈を導入しても、obligation-fulfillment の fail-closed 保証、merge 時の収束、および `results` と `check` の責務分離を維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab3640875445971a5f03574ca0b3b716d6c05d2b65c8f9aa05a80a5b2e157e7c",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「fail-closed セマンティクスの不変性」」「verdict の合否判定＝ゲートとしての pass/fail は `check` の責務」「CI の pass/fail 経路の唯一性（gate は `check` のみ）」「D6 の鮮度 → verdict 結合と D11 の fail-closed セマンティクス」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "task-status lane による最終 gate 解釈を導入しても、obligation-fulfillment の fail-closed 保証、merge 時の収束、および `results` と `check` の責務分離を維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D14"
+        }
+      }
+    },
+    {
+      "claim_hash": "bc158e06ed55944625414c0898b23c8ce4ec06fa400242afd81e856cc87b0d82",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "義務 / edge の所属 task は、既存アーティファクトの決定論的合成のみで解決する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "義務または edge の task 帰属を、`obligations.json` の target entry から `task-contract.json` の entry 帰属、さらに `impl-plan.json` の task status（todo / in_progress / done）へ至る既存 artifact の合成で解決する。同一 entry が複数 task に帰属するときは、done または in_progress があれば todo より strict lane を適用する（strictest-wins）。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "f257061e54aa6d673e13d08971cc1cf0c05d5c45fb8e9e820af7949e1f9ed6dd",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**導入後の判定規則 — pre-review task-contract gate と同型**:\n\n- **`done` / `in_progress` 帰属**: 従来どおり 🔵 必須。missing / stale（鮮度失効）/ verdict 欠如は fail-closed で block する\n- **`todo` 帰属**: 未解消（binding 欠如・verdict 欠如・鮮度失効）を **🟡 警告**として報告し、gate 判定は pass させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`check` の最終 gate 判定を task-status lane で解釈する。done・in_progress 帰属の missing・stale・verdict 欠如は従来どおり fail-closed で block し、todo 帰属の同じ未解消だけを 🟡 warning として報告して gate を通す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f30c0186f13e8bc55c9b068b3c9d3639f7cb5699842acfdf2ee7e2e010f5061",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "保証境界の不変性: 導入後も D6 の fulfillment 判定の edge 局所性、D9 の drift 分類（存在系 / 鮮度系）、D10 の rules load-time totality 検証、D11 の fail-closed セマンティクスをいずれも変更しない。導入後の todo 猶予は verdict の不成立を「一時的に 🟡 として表示する」だけであり、drift 検出機構と verdict 判定機構は status に依存しない"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "task status を、drift と verdict 不在の検出後に行う最終 gate 解釈だけへ適用する。missing / orphaned と鮮度失効の分類、edge 局所の fulfillment 判定、rules の load-time totality、および malformed artifact の検出は status 非依存のまま維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f30c0186f13e8bc55c9b068b3c9d3639f7cb5699842acfdf2ee7e2e010f5061",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「判定は edge 局所である」および「決定表の構造欠陥（malformed JSON / role-totality 違反等の load-time 検証、D10）は本 routing の対象外で、`derive` / `check` が fail-closed に block する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "task status を、drift と verdict 不在の検出後に行う最終 gate 解釈だけへ適用する。missing / orphaned と鮮度失効の分類、edge 局所の fulfillment 判定、rules の load-time totality、および malformed artifact の検出は status 非依存のまま維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f30c0186f13e8bc55c9b068b3c9d3639f7cb5699842acfdf2ee7e2e010f5061",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "存在系（独立の決定論検査）"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "task status を、drift と verdict 不在の検出後に行う最終 gate 解釈だけへ適用する。missing / orphaned と鮮度失効の分類、edge 局所の fulfillment 判定、rules の load-time totality、および malformed artifact の検出は status 非依存のまま維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "f5cb29852dade48d809ad892ec7ee9537d8f4f8243d70d36e806ca8a9619d05d",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**構造軸**（未帰属 entry / rules load-time totality 違反〔D10〕/ artifact malformed〔D11 の fail-closed 対象〕等）: task status に関わらず **常時 block**。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "unattributable entry、rules の load-time totality 違反、artifact malformed を構造軸として扱い、todo 帰属を含む全 status で fail-closed に block する。entry 帰属の完全性は既存の `task-contract coverage` gate を前提にし、その前提が破れた場合も status による許容を適用しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "f5cb29852dade48d809ad892ec7ee9537d8f4f8243d70d36e806ca8a9619d05d",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「role 未被覆・`\"obligations\": []` 非明示等、本決定の完全性保証が fail-closed で阻止する構造的破綻は、引き続き block される。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "unattributable entry、rules の load-time totality 違反、artifact malformed を構造軸として扱い、todo 帰属を含む全 status で fail-closed に block する。entry 帰属の完全性は既存の `task-contract coverage` gate を前提にし、その前提が破れた場合も status による許容を適用しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D10"
+        }
+      }
+    },
+    {
+      "claim_hash": "f5cb29852dade48d809ad892ec7ee9537d8f4f8243d70d36e806ca8a9619d05d",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "lenient / force 系フラグは採用しない — remove-lenient-and-force-flag-paths の既決方針に従い、解決不能な義務・不整合は finding + 非零 exit とし、治療は上流成果物（カタログ / spec / binding）側の修正で行う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "unattributable entry、rules の load-time totality 違反、artifact malformed を構造軸として扱い、todo 帰属を含む全 status で fail-closed に block する。entry 帰属の完全性は既存の `task-contract coverage` gate を前提にし、その前提が破れた場合も status による許容を適用しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D11"
+        }
+      }
+    },
+    {
+      "claim_hash": "171ed15d30bb3095d50e7c8f02bc3d3b642f74e5b4ff537383f460dd89a2e8bc",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**導入後の `results` の status レーン別集計**: D15 の実装導入後、`sotp test-obligation results` は、todo / in_progress / done の各レーンごとの unresolved 件数と、その内訳（missing / stale / verdict 欠如）を集計表示する。gate 判定は引き続き `check` の責務であり（D11 / D14）、`results` の exit は常に 0 のまま維持する——status レーン別集計は閲覧のための可視化拡張であって、pass/fail 経路の追加ではない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`sotp test-obligation results` に、todo / in_progress / done lane ごとの unresolved 件数と、各 lane の missing / stale / verdict 欠如の内訳を表示する informational 集計を追加する。gate の pass/fail は引き続き `check` だけが担い、`results` は read error を含め常に exit 0 とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "171ed15d30bb3095d50e7c8f02bc3d3b642f74e5b4ff537383f460dd89a2e8bc",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp test-obligation results` は verdict 閲覧のみを目的とし、**exit は常に 0**（informational）である。verdict の合否判定＝ゲートとしての pass/fail は **`check` の責務**であり、`results` は結果の可視化に専念する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`sotp test-obligation results` に、todo / in_progress / done lane ごとの unresolved 件数と、各 lane の missing / stale / verdict 欠如の内訳を表示する informational 集計を追加する。gate の pass/fail は引き続き `check` だけが担い、`results` は read error を含め常に exit 0 とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D14"
+        }
+      }
+    },
+    {
+      "claim_hash": "11979ea6de3a07210b5a4cf48bdf8f5a868f42589107b06dadec44879bdc22bc",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"drift 検出機構と verdict 判定機構は status に依存しない（`missing` / `orphaned` / `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` はいずれも status 分岐前に決定論的に計算され、status 分岐は最終的な gate 判定側の解釈にのみ入る）。\""
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "verifier-prompt fingerprint が不一致または不在の verdict を存在しない verdict として扱う既存の freshness 規律を、D15 の task-status lane による最終解釈へそのまま接続する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "11979ea6de3a07210b5a4cf48bdf8f5a868f42589107b06dadec44879bdc22bc",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check` は現行 hash に対する verdict 欠如として扱い、D15 導入前は task status を問わず全 edge を D6 が stale hash に対して定めたものと同じ fail-closed 規則で block し、D15 導入後は同規則を D15 の task-status レーンによる最終解釈に従って適用する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "verifier-prompt fingerprint が不一致または不在の verdict を存在しない verdict として扱う既存の freshness 規律を、D15 の task-status lane による最終解釈へそのまま接続する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D16"
+        }
+      }
+    },
+    {
+      "claim_hash": "8baf291b46a4087ffc3a1aeb546af10b6cb11c5e187072fc5e82861f2b888b59",
+      "evidence_hash": "59146ecaff09de87e84c1110dd4cd4b24d2c6c3c3d28df4b776de026c7fbc25b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "status 順序 `done > in_progress > skipped > todo` とする。これにより `skipped` は `todo` より厳しい側を必ず選び、todo 猶予へ落ちない。`results` は `skipped` を `todo` / `in_progress` / `done` と並ぶ独立した informational レーンとして集計表示する。親 ADR D14 の契約どおり exit は常に 0 のままとし、pass / fail 判定は `check` だけが担う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "strictest-wins の task 帰属解決で `skipped` となる義務は、`todo` より厳しい独立 lane に置き、status 順序 `done > in_progress > skipped > todo` に従う。binding 欠如、verdict 欠如、または鮮度失効の未解消は `check` が fail-closed に block する。`results` は `skipped` を独立した informational lane として集計表示し、exit は常に 0、pass/fail の判定は `check` だけが担う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-11-0802-test-obligation-skipped-status-lane.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "a52b7e6e56735efb8a1ecc2adeaf0d408802b66fbea9022a175fdc271c10d1ff",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "導入後の帰属機構 — 新アーティファクトは追加しない: 義務 / edge の所属 task は、既存アーティファクトの決定論的合成のみで解決する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "task-status lane のための新しい attribution artifact、status field、または coverage mechanism を追加しない。帰属は既存 artifact の決定論的合成と既存 `task-contract coverage` gate を利用する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "2a914c2f67f385e3590637eee70fe130dcefde81e4e2dcaa173bc5116c091eac",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「drift 検出機構と verdict 判定機構は status に依存しない」「status 分岐は最終的な gate 判定側の解釈にのみ入る」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "status を input とする drift 算出、verdict の意味論評価、または bindings totality の再設計は行わない。todo の猶予は未解消の表示と最終 gate verdict に限る。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "2a914c2f67f385e3590637eee70fe130dcefde81e4e2dcaa173bc5116c091eac",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本ゲートを既存 ref-verify の型（pair 型・chain filter・cache scope・verdict artifact）に**組み込まない**。理由は階数の違いによる構造差である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "status を input とする drift 算出、verdict の意味論評価、または bindings totality の再設計は行わない。todo の猶予は未解消の表示と最終 gate verdict に限る。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "599ae333dbca1aed858bfd60403b3022a84d40295b66da61e1bd93dca5dbe670",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "導入に伴って **`signal-gates.json` に `impl_catalog` 用の interim/strict 切り分けは新設しない**——`signal-gates.json` は SoT chain × gate の per-chain 宣言体系であり、既存の chain × gate 宣言の構造には手を入れない。導入後の task-status 分岐は `check` 内部の判定規則にとどまり、chain × gate の宣言レイヤの複雑度を増やさない。\n\n**導入後の merge gate の自然収束**: merge gate（`sotp pr wait-and-merge` の task completion 強制）は既に「全 task が done に到達していること」を merge 前提として要求している。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-03",
+          "text_label": "`.harness/config/signal-gates.json` の chain × gate 宣言、既存の merge task-completion 前提、または `sotp pr wait-and-merge` の待機・merge 手順を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "3e36636c6a9ec5def654bcc4b65e59db3ff38de14a7edbb3f7cdbd0ddb3ecd63",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「義務導出（obligations artifact の書き込み）」「履行の意味論検証の実行（test pair + waiver pair）」および「D14 で追加する同グループの authoring helper `bindings-skeleton` はこの4件にも gate 面にも含めない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-04",
+          "text_label": "`derive`、`evaluate`、および `bindings-skeleton` の artifact 作成・意味論評価・authoring helper としての責務を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D11"
+        }
+      }
+    },
+    {
+      "claim_hash": "3e36636c6a9ec5def654bcc4b65e59db3ff38de14a7edbb3f7cdbd0ddb3ecd63",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bindings-skeleton は fail-closed gate 面（D11）でも意味論検証 core（D7）でもなく、**執筆補助レイヤ**である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-04",
+          "text_label": "`derive`、`evaluate`、および `bindings-skeleton` の artifact 作成・意味論評価・authoring helper としての責務を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D14"
+        }
+      }
+    },
+    {
+      "claim_hash": "afc64a45261e9d853b85110a31bf9c84a845f733a5cf031ff0d5af3c6b4929a5",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "被覆ゲート（obligation-coverage: 解決宣言の totality + 全 edge に現行 hash 一致の verdict が存在すること。pure-read、CI / commit gate 用）"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`check` は pure-read の fail-closed gate であり続ける。status lane の解釈は artifact、binding、verdict cache、または obligations を書き換えて unresolved を解消する経路を作らない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D11"
+        }
+      }
+    },
+    {
+      "claim_hash": "afc64a45261e9d853b85110a31bf9c84a845f733a5cf031ff0d5af3c6b4929a5",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「導入後の帰属機構 — 新アーティファクトは追加しない」および「導入後の task-status 分岐は `check` 内部の判定規則にとどまり」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`check` は pure-read の fail-closed gate であり続ける。status lane の解釈は artifact、binding、verdict cache、または obligations を書き換えて unresolved を解消する経路を作らない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "581564c71bbdbed5a2ed2a4743840cded8cdd9126a9aaa605b69267062a00ad0",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**`todo` 帰属**: 未解消（binding 欠如・verdict 欠如・鮮度失効）を **🟡 警告**として報告し、gate 判定は pass させる。」「**構造軸**（未帰属 entry / rules load-time totality 違反〔D10〕/ artifact malformed〔D11 の fail-closed 対象〕等）: task status に関わらず **常時 block**。」「**`done` / `in_progress` 帰属**: 従来どおり 🔵 必須。missing / stale（鮮度失効）/ verdict 欠如は fail-closed で block する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "todo lane は、未着手 task に帰属する missing・stale・verdict 欠如だけを一時的に 🟡 として扱う。構造破綻、done / in_progress 帰属の未解消、または attribution を解決できない状態を許容してはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "a6c98df8f8ff459f9dc6453c91167ce7fdf8533eeca3329c2c3a8611b1df93f5",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "すべての cache reader——`evaluate` の cache lookup と `check` の freshness verification の双方——は、fingerprint が現在値と異なる entry、または fingerprint を持たない legacy entry を、error ではなく**存在しない verdict**として無視する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "fingerprint 不一致または legacy fingerprint 不在は error ではなく verdict 欠如として扱い、手動 purge や手編集を要求せず、status lane の規則で最終 gate を解釈する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D16"
+        }
+      }
+    },
+    {
+      "claim_hash": "a6c98df8f8ff459f9dc6453c91167ce7fdf8533eeca3329c2c3a8611b1df93f5",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**`todo` 帰属**: 未解消（binding 欠如・verdict 欠如・鮮度失効）を **🟡 警告**として報告し、gate 判定は pass させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "fingerprint 不一致または legacy fingerprint 不在は error ではなく verdict 欠如として扱い、手動 purge や手編集を要求せず、status lane の規則で最終 gate を解釈する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "e28edaf84be9d7b604e7192657654a0bde3774c9b8ac1e3f2a4ee89a7b33402b",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "導入後の merge gate の自然収束: merge gate（`sotp pr wait-and-merge` の task completion 強制）は既に「全 task が done に到達していること」を merge 前提として要求している。したがって D15 の実装導入後も、merge 時点では todo 帰属の義務は存在せず、🟡 の残存も自然に消滅する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "merge task-completion 前提で todo task が残らないため、todo lane の 🟡 許容は merge 時点で必ず消尽する。本番運用へ 🟡 未解消が漏出する経路を作らない。これは runtime の例外経路や追加の merge gate を必要としない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "fc55fe09bc5f56a58a638076644ab46a4477e72f9907ea64c06b6a31ade4aaa3",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本決定は、`check` の判定を **task status レーンに分岐**させ、この構造的閉塞を解消する方針を **RECORDED（記録済み）** とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`obligations.json` の target entry が `task-contract.json` の entry 帰属と `impl-plan.json` の `tasks[]` status を経由して決定論的に lane へ解決されることを検証する。同一の missing、stale、または verdict 欠如が、done / in_progress 帰属では非零 exit で block し、todo 帰属だけでは 🟡 warning を表示して exit 0 となることを検証する。複数 task 帰属では done または in_progress が todo より優先する strictest-wins により strict lane の結果になることも検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "c88d6a415dc3e688cfb2421b7300f009e72dc990182cee3613a15360b63475bc",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**導入後の判定規則 — pre-review task-contract gate と同型**:\n\n- **`todo` 帰属**: 未解消（binding 欠如・verdict 欠如・鮮度失効）を **🟡 警告**として報告し、gate 判定は pass させる。\n- **構造軸**（未帰属 entry / rules load-time totality 違反〔D10〕/ artifact malformed〔D11 の fail-closed 対象〕等）: task status に関わらず **常時 block**。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "todo task にだけ未解消が残る `check` は pass し、warning 出力で todo lane の未解消を識別できる。一方、義務が導出されない fulfillment binding（`orphaned`）、unattributable entry、rules totality 違反、または malformed artifact がある場合は todo status であっても非零 exit で block する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "c88d6a415dc3e688cfb2421b7300f009e72dc990182cee3613a15360b63475bc",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "role 未被覆・`\"obligations\": []` 非明示等、本決定の完全性保証が fail-closed で阻止する構造的破綻は、引き続き block される。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "todo task にだけ未解消が残る `check` は pass し、warning 出力で todo lane の未解消を識別できる。一方、義務が導出されない fulfillment binding（`orphaned`）、unattributable entry、rules totality 違反、または malformed artifact がある場合は todo status であっても非零 exit で block する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D10"
+        }
+      }
+    },
+    {
+      "claim_hash": "c7a47d4439e36cdec5b54da783f326b597a2d0585c137ef8ed7badbde70957a0",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "drift 検出機構と verdict 判定機構は status に依存しない（`missing` / `orphaned` / `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` はいずれも status 分岐前に決定論的に計算され、status 分岐は最終的な gate 判定側の解釈にのみ入る）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "missing / orphaned、spec_changed / decl_changed / test_changed / reason_changed、および verdict 欠如の検出結果が task status によって変化せず、status が変えるのは検出済み未解消に対する最終 gate verdict だけであることを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "c7a47d4439e36cdec5b54da783f326b597a2d0585c137ef8ed7badbde70957a0",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**鮮度と verdict の結合（fail-closed）**: verdict はキャッシュキーの hash 組に凍結され、いずれかの hash が変化した時点（= drift 鮮度系の `spec_changed` / `decl_changed` / `test_changed` / `reason_changed`・D9）で既存 verdict は無効となり「存在しない」ものとして扱う。`check` ゲートの合格条件は「全 edge が bindings 上で解決宣言され（tests または waived・D9）、現行 hash と一致する fulfilled / waived verdict が存在すること」であり、hash 再計算だけで鮮度を回復する経路はない——回復は再評価（`evaluate`）の pass のみで達成される。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "missing / orphaned、spec_changed / decl_changed / test_changed / reason_changed、および verdict 欠如の検出結果が task status によって変化せず、status が変えるのは検出済み未解消に対する最終 gate verdict だけであることを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "c7a47d4439e36cdec5b54da783f326b597a2d0585c137ef8ed7badbde70957a0",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**全 edge がいずれかで解決宣言されていること（totality）を check が決定論的に検査する**」「存在系（独立の決定論検査）」「CI は書き換えなしに drift を検出できる。」「解消は hash 再計算ではなく再評価（`evaluate`）の pass のみ（D6）"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "missing / orphaned、spec_changed / decl_changed / test_changed / reason_changed、および verdict 欠如の検出結果が task status によって変化せず、status が変えるのは検出済み未解消に対する最終 gate verdict だけであることを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "11b11600e1c6ba059c3cdd894b85426e72fa756707f325e09b9871e1efb56004",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「done / in_progress 帰属: 従来どおり 🔵 必須。missing / stale（鮮度失効）/ verdict 欠如は fail-closed で block する」「todo 帰属: 未解消（binding 欠如・verdict 欠如・鮮度失効）を 🟡 警告として報告し、gate 判定は pass させる」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "fingerprint 不一致または fingerprint 不在の cache entry は current verdict として採用されず、verdict 欠如として扱われる。その結果は done / in_progress lane では block、todo lane では warning と exit 0 になることを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "11b11600e1c6ba059c3cdd894b85426e72fa756707f325e09b9871e1efb56004",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "すべての cache reader——`evaluate` の cache lookup と `check` の freshness verification の双方——は、fingerprint が現在値と異なる entry、または fingerprint を持たない legacy entry を、error ではなく**存在しない verdict**として無視する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "fingerprint 不一致または fingerprint 不在の cache entry は current verdict として採用されず、verdict 欠如として扱われる。その結果は done / in_progress lane では block、todo lane では warning と exit 0 になることを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D16"
+        }
+      }
+    },
+    {
+      "claim_hash": "5ca6484d1b979f49e3c75d38f3da1c2dfcdd56711db243113d64f3ea773ba9af",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「導入後の `results` の status レーン別集計」: 「todo / in_progress / done の各レーンごとの unresolved 件数と、その内訳（missing / stale / verdict 欠如）を集計表示する。gate 判定は引き続き `check` の責務であり（D11 / D14）、`results` の exit は常に 0 のまま維持する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`sotp test-obligation results` が todo / in_progress / done ごとに unresolved 件数を表示し、各 lane で missing / stale / verdict 欠如を区別して集計する。unresolved の有無や read error の有無にかかわらず exit は常に 0 であり、gate の合否を表さないことを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "5ca6484d1b979f49e3c75d38f3da1c2dfcdd56711db243113d64f3ea773ba9af",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp test-obligation results` は verdict 閲覧のみを目的とし、**exit は常に 0**（informational）である。verdict の合否判定＝ゲートとしての pass/fail は **`check` の責務**であり、`results` は結果の可視化に専念する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`sotp test-obligation results` が todo / in_progress / done ごとに unresolved 件数を表示し、各 lane で missing / stale / verdict 欠如を区別して集計する。unresolved の有無や read error の有無にかかわらず exit は常に 0 であり、gate の合否を表さないことを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D14"
+        }
+      }
+    },
+    {
+      "claim_hash": "53d6da28c18cd2a338d6d8e4458fd994871028ddb4dbb536d6f0ecb48d1896f2",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**導入後の merge gate の自然収束**: merge gate（`sotp pr wait-and-merge` の task completion 強制）は既に「全 task が done に到達していること」を merge 前提として要求している。したがって D15 の実装導入後も、merge 時点では todo 帰属の義務は存在せず、🟡 の残存も自然に消滅する。導入に伴って **`signal-gates.json` に `impl_catalog` 用の interim/strict 切り分けは新設しない**"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "task-status lane の導入後も、`signal-gates.json` に変更がなく、既存の merge task-completion 前提により todo task が残らない時点では todo lane の 🟡 未解消が残らないことを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "1edb0d52acaefd8e8ad7c86369615c845b6a102565b59c74ebd592edf5eeb42e",
+      "evidence_hash": "59146ecaff09de87e84c1110dd4cd4b24d2c6c3c3d28df4b776de026c7fbc25b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "binding 欠如、verdict 欠如、鮮度失効を含む未解消状態は、`check` が fail-closed で block する。」「`results` は `skipped` を `todo` / `in_progress` / `done` と並ぶ独立した informational レーンとして集計表示する。親 ADR D14 の契約どおり exit は常に 0 のままとし、pass / fail 判定は `check` だけが担う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "strictest-wins の task 帰属解決が `skipped` となる missing、stale、または verdict 欠如は、todo 猶予として warning にせず、`check` が非零 exit で fail-closed に block することを検証する。`results` が skipped の未解消を独立 lane として表示し、unresolved や read error の有無にかかわらず exit 0 を維持することも検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-11-0802-test-obligation-skipped-status-lane.md",
+          "decision_id": "D1"
+        }
+      }
+    }
+  ]
+}
