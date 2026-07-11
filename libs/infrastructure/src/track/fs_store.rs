@@ -13,7 +13,7 @@ use domain::{
 
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
-use super::symlink_guard::reject_symlinks_below;
+use super::symlink_guard::{reject_symlinks_below, reject_symlinks_up_to_root};
 
 /// File-system backed TrackReader + TrackWriter.
 /// Uses `atomic_write_file` for crash-safe persistence.
@@ -273,13 +273,18 @@ pub fn metadata_json_path(root: &Path, id: &TrackId) -> PathBuf {
 fn guarded_items_dir(items_dir: &Path) -> Result<PathBuf, RepositoryError> {
     reject_parent_dir_items_dir(items_dir)?;
     let lexical_items_dir = absolutize_lexical(items_dir);
-    reject_symlinked_items_dir_chain(&lexical_items_dir)?;
-    lexical_items_dir.canonicalize().map_err(|e| {
-        RepositoryError::Message(format!(
-            "items_dir '{}' cannot be resolved: {e}",
-            items_dir.display()
-        ))
-    })
+    reject_symlinks_up_to_root(&lexical_items_dir).map_err(|e| {
+        let message = if e.kind() == std::io::ErrorKind::InvalidInput {
+            format!("symlink guard: refusing to use symlinked items_dir component: {e}")
+        } else {
+            format!(
+                "symlink guard: cannot stat items_dir component {}: {e}",
+                lexical_items_dir.display()
+            )
+        };
+        RepositoryError::Message(message)
+    })?;
+    canonicalize_deepest_existing_ancestor(&lexical_items_dir, items_dir)
 }
 
 fn reject_parent_dir_items_dir(items_dir: &Path) -> Result<(), RepositoryError> {
@@ -292,30 +297,48 @@ fn reject_parent_dir_items_dir(items_dir: &Path) -> Result<(), RepositoryError> 
     Ok(())
 }
 
-fn reject_symlinked_items_dir_chain(items_dir: &Path) -> Result<(), RepositoryError> {
-    let mut ancestors: Vec<&Path> = items_dir.ancestors().collect();
-    ancestors.reverse();
-    for component in ancestors {
-        if component.as_os_str().is_empty() {
-            continue;
-        }
-        match component.symlink_metadata() {
-            Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(RepositoryError::Message(format!(
-                    "symlink guard: refusing to use symlinked items_dir component: {}",
-                    component.display()
-                )));
+/// Canonicalize the deepest existing ancestor and retain the missing suffix.
+///
+/// `track init` is allowed to bootstrap a checkout where `track/items` has not
+/// been materialized. The symlink chain has already been checked before this
+/// function runs, so the retained suffix consists only of missing components
+/// that `create_dir_all` may safely create.
+fn canonicalize_deepest_existing_ancestor(
+    lexical_items_dir: &Path,
+    requested_items_dir: &Path,
+) -> Result<PathBuf, RepositoryError> {
+    for ancestor in lexical_items_dir.ancestors() {
+        match ancestor.symlink_metadata() {
+            Ok(_) => {
+                let missing_suffix = lexical_items_dir.strip_prefix(ancestor).map_err(|e| {
+                    RepositoryError::Message(format!(
+                        "items_dir '{}' cannot be resolved relative to existing ancestor {}: {e}",
+                        requested_items_dir.display(),
+                        ancestor.display()
+                    ))
+                })?;
+                let canonical_ancestor = ancestor.canonicalize().map_err(|e| {
+                    RepositoryError::Message(format!(
+                        "items_dir '{}' cannot be resolved: {e}",
+                        requested_items_dir.display()
+                    ))
+                })?;
+                return Ok(canonical_ancestor.join(missing_suffix));
             }
-            Ok(_) => {}
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
             Err(e) => {
                 return Err(RepositoryError::Message(format!(
-                    "symlink guard: cannot stat items_dir component {}: {e}",
-                    component.display()
+                    "items_dir '{}' cannot be resolved: {e}",
+                    requested_items_dir.display()
                 )));
             }
         }
     }
-    Ok(())
+
+    Err(RepositoryError::Message(format!(
+        "items_dir '{}' has no existing ancestor",
+        requested_items_dir.display()
+    )))
 }
 
 fn absolutize_lexical(path: &Path) -> PathBuf {
@@ -862,6 +885,50 @@ mod tests {
 
         let result = store.save(&track);
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_store_save_missing_items_dir_creates_metadata() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("track").join("items");
+        let track = sample_track("new-track");
+
+        assert!(!items_dir.exists(), "fixture must start without track/items");
+
+        let store = FsTrackStore::new(&items_dir);
+        store.save(&track).unwrap();
+
+        assert!(
+            items_dir.join(track.id().as_ref()).join("metadata.json").is_file(),
+            "save must bootstrap track/items and write metadata"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_store_save_symlinked_items_dir_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let real_items = dir.path().join("real-items");
+        let link_items = dir.path().join("items-link");
+        let track = sample_track("test-track");
+        std::fs::create_dir_all(&real_items).unwrap();
+        std::os::unix::fs::symlink(&real_items, &link_items).unwrap();
+
+        let store = FsTrackStore::new(&link_items);
+        let Err(TrackWriteError::Repository(RepositoryError::Message(message))) =
+            store.save(&track)
+        else {
+            panic!("symlinked items_dir must be rejected");
+        };
+
+        assert!(
+            message.contains("symlink guard: refusing to use symlinked items_dir component"),
+            "expected items_dir symlink guard error, got: {message}"
+        );
+        assert!(
+            !real_items.join(track.id().as_ref()).join("metadata.json").exists(),
+            "save must not write through a symlinked items_dir"
+        );
     }
 
     #[test]

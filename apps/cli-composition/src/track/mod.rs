@@ -596,6 +596,40 @@ mod tests {
     }
 
     #[test]
+    fn test_track_init_missing_items_root_creates_metadata() {
+        let root = tempfile::tempdir().unwrap();
+        let items_dir = root.path().join("track").join("items");
+        let config_dir = root.path().join(".harness").join("config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::write(
+            config_dir.join("branch-strategy.json"),
+            r#"{
+  "base_branch": "main",
+  "merge_target": "main",
+  "merge_method": "merge"
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.path().join("architecture-rules.json"),
+            include_str!("../../../../architecture-rules.json"),
+        )
+        .unwrap();
+
+        assert!(!items_dir.exists(), "fixture must start without track/items");
+
+        let outcome = crate::track::TrackCompositionRoot::new()
+            .track_init(items_dir.clone(), "new-track".to_owned(), "New Track".to_owned())
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(
+            items_dir.join("new-track").join("metadata.json").is_file(),
+            "track init must bootstrap track/items and write metadata"
+        );
+    }
+
+    #[test]
     fn test_track_archive_from_subdir_moves_track_and_logs_under_repo_root() {
         let _guard = crate::test_support::process_env_lock().lock().unwrap();
         let tmp = tempfile::tempdir().unwrap();

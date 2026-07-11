@@ -66,6 +66,11 @@ spec-designer カスケード）。教訓: 継承 edge の各実装クラス（�
 anchor 本文が名指しする必要がある。trait_impl 宣言に docs を持たせるスキーマ拡張は follow-up
 候補。
 
+**再発（PR レビュー対応中）**: 同じ stand-in の `× IN-11` edge（2 つの検証 capability の
+分離を規定する anchor）でも同型の詰みが再発し、同じ処方 — IN-11 に「capability ごとに独立の
+fail-closed stand-in が接続される」条項を追記 — で解消した。本節のパターンは一回性ではなく、
+port trait 引用を継承する fail-closed stand-in 全般に再現する構造問題である。
+
 ## 8. anchor 修正の失効コストと収束特性
 
 AC-06 追記で同 anchor の 43 edge が失効・再判定され、5 件が flake（~12%）。ただし拒否 reason
