@@ -10,5 +10,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ObligationCheckError | error_type | modify | RulesLoad, ObligationsAbsent, BindingsAbsent, StaleObligationsArtifact, DriftsDetected, UnresolvedEdges, StaleVerdicts, CatalogueLoad, SpecLoad, InvalidCatalogueState, ArtifactCodec, SourceScan, CacheIo, TaskAttribution | 🟡 | 🔵 |
+| ObligationCheckError | error_type | modify | RulesLoad, ObligationsAbsent, BindingsAbsent, StaleObligationsArtifact, DriftsDetected, UnresolvedEdges, StaleVerdicts, CatalogueLoad, SpecLoad, InvalidCatalogueState, ArtifactCodec, SourceScan, CacheIo, TaskAttribution | 🔵 | 🔵 |
 

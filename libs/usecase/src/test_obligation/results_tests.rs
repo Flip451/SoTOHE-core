@@ -2,18 +2,30 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 
+use std::collections::{BTreeMap, HashMap};
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use domain::SpecDocumentLoaderPort;
 use domain::tddd::LayerId;
-use domain::tddd::catalogue_v2::roles::DataRole;
+use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
+    CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
+};
+use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
+use domain::tddd::catalogue_v2::{
+    CatalogueDocument, CrateName, ModulePath, StructKind, StructShape, TypeEntry, TypeKindV2,
+    TypeName,
+};
 use domain::tddd::semantic_verify::{CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey};
 use domain::tddd::test_obligation::binding::{
     NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument, TestLocation,
 };
 use domain::tddd::test_obligation::drift::{EdgeResolutionOutcome, EdgeVerdictRecord};
+use domain::tddd::test_obligation::errors::TestSourceScanError;
 use domain::tddd::test_obligation::errors::{
     ArtifactCodecError, ObligationResultsError, VerifyCacheError,
 };
+use domain::tddd::test_obligation::hashes::VerifierPromptFingerprint;
 use domain::tddd::test_obligation::hashes::{AnchorTextHash, BoundTestsSetHash, DeclarationHash};
 use domain::tddd::test_obligation::ids::{
     DiagnosticMessage, TestFunctionName, TestModulePath, TestObligationAnchorId,
@@ -23,7 +35,7 @@ use domain::tddd::test_obligation::ids::{
 use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
 use domain::tddd::test_obligation::ports::{
     ObligationFulfillmentCachePort, ObligationsArtifactPort, TestBindingsArtifactPort,
-    WaiverCachePort,
+    TestSourceScannerPort, WaiverCachePort,
 };
 use domain::tddd::test_obligation::verdict::{
     ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheEntry,
@@ -33,12 +45,18 @@ use domain::tddd::test_obligation::verdict::{
 use domain::tddd::test_obligation::vocab::{
     FulfillmentFailCategory, TargetEntryRoleKind, TestObligationKind,
 };
-use domain::{ContentHash, EvidenceCitation, TrackId};
+use domain::{
+    ContentHash, EvidenceCitation, SpecDocument, SpecDocumentLoadError, SpecElementId, SpecRef,
+    SpecRequirement, SpecScope, TaskId, TaskStatusKind, TrackId,
+};
 
 use super::{
     TestObligationChainLabel, TestObligationResultsApplicationService,
-    TestObligationResultsCommand, TestObligationResultsInteractor,
+    TestObligationResultsCommand, TestObligationResultsInteractor, TestObligationResultsOutput,
+    TestObligationStatusLaneSummary,
 };
+use crate::pre_review_gate::{ImplPlanReaderPort, PreReviewGateError, TaskContractReaderPort};
+use domain::task_contract::{ContractedEntryRef, TaskContractDocument};
 
 // ---------------------------------------------------------------------------
 // Test doubles
@@ -118,6 +136,108 @@ impl WaiverCachePort for StubWaiverCache {
     }
     fn save(&self, _doc: &WaiverCacheDocument) -> Result<(), DiagnosticMessage> {
         Ok(())
+    }
+}
+
+struct UnusedScanner;
+impl TestSourceScannerPort for UnusedScanner {
+    fn scan_test_body(
+        &self,
+        _location: &TestLocation,
+    ) -> Result<Option<String>, TestSourceScanError> {
+        Ok(None)
+    }
+
+    fn hash_test_body(
+        &self,
+        _source: &str,
+    ) -> domain::tddd::test_obligation::hashes::TestBodySpanHash {
+        domain::tddd::test_obligation::hashes::TestBodySpanHash::new(hash(0))
+    }
+}
+
+struct UnusedSpecReader;
+impl SpecDocumentLoaderPort for UnusedSpecReader {
+    fn load(&self, path: &Path) -> Result<SpecDocument, SpecDocumentLoadError> {
+        Err(SpecDocumentLoadError::NotFound { path: path.to_path_buf() })
+    }
+}
+
+struct UnusedCatalogueReader;
+impl CatalogueDocumentLoaderPort for UnusedCatalogueReader {
+    fn load(
+        &self,
+        path: &Path,
+    ) -> Result<domain::tddd::catalogue_v2::CatalogueDocument, CatalogueDocumentLoaderError> {
+        Err(CatalogueDocumentLoaderError::NotFound { path: path.to_path_buf() })
+    }
+}
+
+struct UnusedTaskContractReader;
+impl TaskContractReaderPort for UnusedTaskContractReader {
+    fn read(
+        &self,
+        _track_id: &TrackId,
+    ) -> Result<domain::task_contract::TaskContractDocument, PreReviewGateError> {
+        Err(PreReviewGateError::TaskContractNotFound)
+    }
+}
+
+struct UnusedImplPlanReader;
+impl ImplPlanReaderPort for UnusedImplPlanReader {
+    fn read_task_statuses(
+        &self,
+        _track_id: &TrackId,
+    ) -> Result<HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
+        Err(PreReviewGateError::ImplPlanReadFailed { message: "unused".to_owned() })
+    }
+}
+
+struct StatusScanner;
+impl TestSourceScannerPort for StatusScanner {
+    fn scan_test_body(
+        &self,
+        _location: &TestLocation,
+    ) -> Result<Option<String>, TestSourceScanError> {
+        Ok(Some("assert status lane".to_owned()))
+    }
+
+    fn hash_test_body(
+        &self,
+        _source: &str,
+    ) -> domain::tddd::test_obligation::hashes::TestBodySpanHash {
+        domain::tddd::test_obligation::hashes::TestBodySpanHash::new(hash(0))
+    }
+}
+
+struct StatusSpecReader(SpecDocument);
+impl SpecDocumentLoaderPort for StatusSpecReader {
+    fn load(&self, _path: &Path) -> Result<SpecDocument, SpecDocumentLoadError> {
+        Ok(self.0.clone())
+    }
+}
+
+struct StatusCatalogueReader(CatalogueDocument);
+impl CatalogueDocumentLoaderPort for StatusCatalogueReader {
+    fn load(&self, _path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
+        Ok(self.0.clone())
+    }
+}
+
+struct StatusTaskContractReader(TaskContractDocument);
+impl TaskContractReaderPort for StatusTaskContractReader {
+    fn read(&self, _track_id: &TrackId) -> Result<TaskContractDocument, PreReviewGateError> {
+        Ok(self.0.clone())
+    }
+}
+
+struct StatusImplPlanReader(HashMap<TaskId, TaskStatusKind>);
+impl ImplPlanReaderPort for StatusImplPlanReader {
+    fn read_task_statuses(
+        &self,
+        _track_id: &TrackId,
+    ) -> Result<HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
+        Ok(self.0.clone())
     }
 }
 
@@ -248,9 +368,124 @@ fn interactor_with_obligations(
     TestObligationResultsInteractor::new(
         Arc::new(StubObligations(obligations)),
         Arc::new(StubBindings(bindings)),
+        Arc::new(UnusedScanner),
         Arc::new(StubFulfillmentCache(fulfillment)),
         Arc::new(StubWaiverCache(waiver)),
+        VerifierPromptFingerprint::new(hash(9)),
+        VerifierPromptFingerprint::new(hash(10)),
+        Arc::new(UnusedSpecReader),
+        Arc::new(UnusedCatalogueReader),
+        Arc::new(UnusedTaskContractReader),
+        Arc::new(UnusedImplPlanReader),
     )
+}
+
+fn command() -> TestObligationResultsCommand {
+    TestObligationResultsCommand::new(track(), Vec::new())
+}
+
+fn status_catalogue() -> CatalogueDocument {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    catalogue.insert_type(
+        TypeName::new("Money").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            ModulePath::root(),
+            None,
+            vec![SpecRef::new(
+                PathBuf::from("spec.json"),
+                SpecElementId::try_new("IN-05").unwrap(),
+            )],
+            Vec::new(),
+        ),
+    );
+    catalogue
+}
+
+fn status_spec() -> SpecDocument {
+    SpecDocument::new(
+        "Status lane results".to_owned(),
+        "1.0".to_owned(),
+        Vec::new(),
+        SpecScope::new(
+            vec![
+                SpecRequirement::new(
+                    SpecElementId::try_new("IN-05").unwrap(),
+                    "aggregate unresolved results by status".to_owned(),
+                    Vec::new(),
+                    Vec::new(),
+                    Vec::new(),
+                )
+                .unwrap(),
+            ],
+            Vec::new(),
+        ),
+        Vec::new(),
+        Vec::new(),
+        Vec::new(),
+        Vec::new(),
+        None,
+    )
+    .unwrap()
+}
+
+fn status_obligation() -> TestObligation {
+    TestObligation::new(
+        obligation_id("Money", "status-lane"),
+        CatalogueEntryRef::new(
+            "domain-types.json".to_owned(),
+            CatalogueSectionKey::Types,
+            entry_key("Money"),
+        ),
+        TargetEntryRoleKind::DataRole(DataRole::value_object()),
+        TestObligationBrief::try_new("cover status lane aggregation".to_owned()).unwrap(),
+        DeclarationHash::new(hash(2)),
+        vec![anchor("IN-05")],
+    )
+}
+
+fn status_interactor(
+    bindings: TestBindingsDocument,
+    fulfillment: Option<ObligationFulfillmentCacheDocument>,
+    status: TaskStatusKind,
+) -> TestObligationResultsInteractor {
+    let task_id = TaskId::try_new("T001".to_owned()).unwrap();
+    let mut entries = BTreeMap::new();
+    entries.insert(
+        task_id.clone(),
+        vec![ContractedEntryRef::new(LayerId::try_new("domain").unwrap(), entry_key("Money"))],
+    );
+    let mut statuses = HashMap::new();
+    statuses.insert(task_id, status);
+    TestObligationResultsInteractor::new(
+        Arc::new(StubObligations(Some(ObligationsDocument::new(
+            track(),
+            vec![status_obligation()],
+        )))),
+        Arc::new(StubBindings(Some(bindings))),
+        Arc::new(StatusScanner),
+        Arc::new(StubFulfillmentCache(fulfillment)),
+        Arc::new(StubWaiverCache(None)),
+        VerifierPromptFingerprint::new(hash(9)),
+        VerifierPromptFingerprint::new(hash(10)),
+        Arc::new(StatusSpecReader(status_spec())),
+        Arc::new(StatusCatalogueReader(status_catalogue())),
+        Arc::new(StatusTaskContractReader(TaskContractDocument::new(track(), entries).unwrap())),
+        Arc::new(StatusImplPlanReader(statuses)),
+    )
+}
+
+fn status_command() -> TestObligationResultsCommand {
+    TestObligationResultsCommand::new(track(), vec![PathBuf::from("domain-types.json")])
 }
 
 // ---------------------------------------------------------------------------
@@ -298,9 +533,7 @@ fn test_fulfillment_lane_counts_and_records() {
         ),
     ];
     let cache = ObligationFulfillmentCacheDocument::new(track(), entries);
-    let output = interactor(Some(bindings), Some(cache), None)
-        .execute(&TestObligationResultsCommand::new(track()))
-        .unwrap();
+    let output = interactor(Some(bindings), Some(cache), None).execute(&command()).unwrap();
 
     let fulfillment_lanes: Vec<_> = output
         .lane_summaries()
@@ -352,9 +585,7 @@ fn test_layer_resolved_from_binding_test_location() {
             None,
         )],
     );
-    let output = interactor(Some(bindings), Some(cache), None)
-        .execute(&TestObligationResultsCommand::new(track()))
-        .unwrap();
+    let output = interactor(Some(bindings), Some(cache), None).execute(&command()).unwrap();
     assert_eq!(output.lane_summaries()[0].layer().as_ref(), "infrastructure");
 }
 
@@ -378,9 +609,7 @@ fn test_layer_resolved_from_migrated_voluntary_binding() {
         )],
     );
 
-    let output = interactor(Some(bindings), Some(cache), None)
-        .execute(&TestObligationResultsCommand::new(track()))
-        .unwrap();
+    let output = interactor(Some(bindings), Some(cache), None).execute(&command()).unwrap();
 
     assert_eq!(output.lane_summaries()[0].layer().as_ref(), "infrastructure");
 }
@@ -427,7 +656,7 @@ fn test_waiver_lane_counts() {
         None,
         Some(cache),
     )
-    .execute(&TestObligationResultsCommand::new(track()))
+    .execute(&command())
     .unwrap();
 
     let waiver_lanes: Vec<_> = output
@@ -479,7 +708,7 @@ fn test_waiver_record_without_exact_binding_has_no_provenance() {
             None,
             Some(waiver_failure_cache(waived_edge.clone())),
         )
-        .execute(&TestObligationResultsCommand::new(track()))
+        .execute(&command())
         .unwrap();
 
         assert_eq!(output.records(), std::slice::from_ref(&expected_record));
@@ -506,7 +735,7 @@ fn test_waiver_record_resolves_unique_owner_by_anchor() {
         None,
         Some(waiver_failure_cache(waived_edge.clone())),
     )
-    .execute(&TestObligationResultsCommand::new(track()))
+    .execute(&command())
     .unwrap();
 
     assert_eq!(
@@ -542,7 +771,7 @@ fn test_waiver_record_with_ambiguous_anchor_owner_leaves_obligation_unresolved()
         None,
         Some(waiver_failure_cache(waived_edge.clone())),
     )
-    .execute(&TestObligationResultsCommand::new(track()))
+    .execute(&command())
     .unwrap();
 
     assert_eq!(
@@ -562,11 +791,272 @@ fn test_waiver_record_with_ambiguous_anchor_owner_leaves_obligation_unresolved()
 #[test]
 fn test_absent_caches_yield_empty_ok_output() {
     // CN-09: informational — never errors on absent caches, always Ok.
-    let output =
-        interactor(None, None, None).execute(&TestObligationResultsCommand::new(track())).unwrap();
+    let output = interactor(None, None, None).execute(&command()).unwrap();
     assert!(output.lane_summaries().is_empty());
     assert!(output.records().is_empty());
     assert!(output.uncited_findings().is_empty());
+    assert_eq!(output.status_lane_summaries().len(), 4);
+    assert!(output.status_lane_summaries().iter().all(|summary| summary.missing_count() == 0
+        && summary.stale_count() == 0
+        && summary.verdict_absent_count() == 0));
+}
+
+#[test]
+fn test_status_lane_summary_keeps_all_lanes_and_unresolved_breakdowns() {
+    let output = TestObligationResultsOutput::new(
+        Vec::new(),
+        Vec::new(),
+        Vec::new(),
+        vec![
+            TestObligationStatusLaneSummary::new(TaskStatusKind::Todo, 1, 2, 3),
+            TestObligationStatusLaneSummary::new(TaskStatusKind::InProgress, 4, 5, 6),
+            TestObligationStatusLaneSummary::new(TaskStatusKind::Done, 7, 8, 9),
+            TestObligationStatusLaneSummary::new(TaskStatusKind::Skipped, 10, 11, 12),
+        ],
+    );
+
+    let summaries = output.status_lane_summaries();
+    assert_eq!(summaries.len(), 4);
+    assert_eq!(summaries[0].task_status(), TaskStatusKind::Todo);
+    assert_eq!(summaries[1].task_status(), TaskStatusKind::InProgress);
+    assert_eq!(summaries[2].task_status(), TaskStatusKind::Done);
+    assert_eq!(summaries[3].task_status(), TaskStatusKind::Skipped);
+    assert_eq!(summaries[0].missing_count(), 1);
+    assert_eq!(summaries[1].stale_count(), 5);
+    assert_eq!(summaries[2].verdict_absent_count(), 9);
+    assert_eq!(summaries[3].missing_count(), 10);
+    assert_eq!(summaries[3].stale_count(), 11);
+    assert_eq!(summaries[3].verdict_absent_count(), 12);
+}
+
+#[test]
+fn test_results_interactor_aggregates_status_lanes_without_gate_failure() {
+    for status in [TaskStatusKind::Todo, TaskStatusKind::InProgress, TaskStatusKind::Done] {
+        let output =
+            status_interactor(TestBindingsDocument::new(track(), Vec::new()), None, status)
+                .execute(&status_command())
+                .unwrap();
+        let summary = output
+            .status_lane_summaries()
+            .iter()
+            .find(|summary| summary.task_status() == status)
+            .unwrap();
+        assert_eq!(summary.missing_count(), 1);
+        assert_eq!(summary.stale_count(), 0);
+        assert_eq!(summary.verdict_absent_count(), 0);
+    }
+
+    let obligation = status_obligation();
+    let bindings =
+        TestBindingsDocument::new(track(), vec![fulfillment_binding(obligation.id().clone())]);
+    let verdict_absent = status_interactor(bindings.clone(), None, TaskStatusKind::Skipped)
+        .execute(&status_command())
+        .unwrap();
+    let skipped = verdict_absent
+        .status_lane_summaries()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Skipped)
+        .unwrap();
+    assert_eq!(skipped.verdict_absent_count(), 1);
+
+    let stale_cache = ObligationFulfillmentCacheDocument::new(
+        track(),
+        vec![ObligationFulfillmentCacheEntry::new(
+            edge("Money", "IN-05"),
+            obligation.id().clone(),
+            fulfillment_key(),
+            ObligationFulfillmentVerdict::Fulfilled { citation: citation() },
+            Some(VerifierPromptFingerprint::new(hash(9))),
+        )],
+    );
+    let stale = status_interactor(bindings, Some(stale_cache), TaskStatusKind::Done)
+        .execute(&status_command())
+        .unwrap();
+    let done = stale
+        .status_lane_summaries()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Done)
+        .unwrap();
+    assert_eq!(done.stale_count(), 1);
+}
+
+#[test]
+fn test_results_interactor_with_unresolved_or_status_read_error_returns_ok() {
+    let unresolved = status_interactor(
+        TestBindingsDocument::new(track(), Vec::new()),
+        None,
+        TaskStatusKind::Skipped,
+    )
+    .execute(&status_command());
+    assert!(unresolved.is_ok());
+    let unresolved_output = unresolved.unwrap();
+    let skipped = unresolved_output
+        .status_lane_summaries()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Skipped)
+        .unwrap();
+    assert_eq!(skipped.missing_count(), 1);
+
+    let status_read_error = TestObligationResultsInteractor::new(
+        Arc::new(StubObligations(Some(ObligationsDocument::new(
+            track(),
+            vec![status_obligation()],
+        )))),
+        Arc::new(StubBindings(Some(TestBindingsDocument::new(track(), Vec::new())))),
+        Arc::new(StatusScanner),
+        Arc::new(StubFulfillmentCache(None)),
+        Arc::new(StubWaiverCache(None)),
+        VerifierPromptFingerprint::new(hash(9)),
+        VerifierPromptFingerprint::new(hash(10)),
+        Arc::new(StatusSpecReader(status_spec())),
+        Arc::new(StatusCatalogueReader(status_catalogue())),
+        Arc::new(UnusedTaskContractReader),
+        Arc::new(UnusedImplPlanReader),
+    )
+    .execute(&status_command());
+    assert!(status_read_error.is_ok());
+    let read_error_output = status_read_error.unwrap();
+    assert!(read_error_output.status_lane_summaries().iter().all(|summary| {
+        summary.missing_count() == 0
+            && summary.stale_count() == 0
+            && summary.verdict_absent_count() == 0
+    }));
+}
+
+#[test]
+fn test_results_interactor_with_absent_verifier_fingerprint_counts_verdict_absent() {
+    let obligation = status_obligation();
+    let bindings =
+        TestBindingsDocument::new(track(), vec![fulfillment_binding(obligation.id().clone())]);
+    let cache = ObligationFulfillmentCacheDocument::new(
+        track(),
+        vec![ObligationFulfillmentCacheEntry::new(
+            edge("Money", "IN-05"),
+            obligation.id().clone(),
+            fulfillment_key(),
+            ObligationFulfillmentVerdict::Fulfilled { citation: citation() },
+            None,
+        )],
+    );
+
+    let output = status_interactor(bindings, Some(cache), TaskStatusKind::Done)
+        .execute(&status_command())
+        .unwrap();
+    let done = output
+        .status_lane_summaries()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Done)
+        .unwrap();
+    assert_eq!(done.missing_count(), 0);
+    assert_eq!(done.stale_count(), 0);
+    assert_eq!(done.verdict_absent_count(), 1);
+}
+
+#[test]
+fn test_results_new_aggregates_todo_in_progress_and_done_lanes() {
+    for status in [TaskStatusKind::Todo, TaskStatusKind::InProgress, TaskStatusKind::Done] {
+        let task_id = TaskId::try_new("T001".to_owned()).unwrap();
+        let mut entries = BTreeMap::new();
+        entries.insert(
+            task_id.clone(),
+            vec![ContractedEntryRef::new(LayerId::try_new("domain").unwrap(), entry_key("Money"))],
+        );
+        let mut statuses = HashMap::new();
+        statuses.insert(task_id, status);
+
+        let interactor = TestObligationResultsInteractor::new(
+            Arc::new(StubObligations(Some(ObligationsDocument::new(
+                track(),
+                vec![status_obligation()],
+            )))),
+            Arc::new(StubBindings(Some(TestBindingsDocument::new(track(), Vec::new())))),
+            Arc::new(StatusScanner),
+            Arc::new(StubFulfillmentCache(None)),
+            Arc::new(StubWaiverCache(None)),
+            VerifierPromptFingerprint::new(hash(9)),
+            VerifierPromptFingerprint::new(hash(10)),
+            Arc::new(StatusSpecReader(status_spec())),
+            Arc::new(StatusCatalogueReader(status_catalogue())),
+            Arc::new(StatusTaskContractReader(
+                TaskContractDocument::new(track(), entries).unwrap(),
+            )),
+            Arc::new(StatusImplPlanReader(statuses)),
+        );
+
+        let output = interactor.execute(&status_command()).unwrap();
+        let summary = output
+            .status_lane_summaries()
+            .iter()
+            .find(|summary| summary.task_status() == status)
+            .unwrap();
+        assert_eq!(summary.missing_count(), 1);
+        assert_eq!(summary.stale_count(), 0);
+        assert_eq!(summary.verdict_absent_count(), 0);
+    }
+}
+
+#[test]
+fn test_results_new_keeps_unresolved_skipped_lane_informational() {
+    let obligation = status_obligation();
+    let task_id = TaskId::try_new("T001".to_owned()).unwrap();
+    let mut entries = BTreeMap::new();
+    entries.insert(
+        task_id.clone(),
+        vec![ContractedEntryRef::new(LayerId::try_new("domain").unwrap(), entry_key("Money"))],
+    );
+    let mut statuses = HashMap::new();
+    statuses.insert(task_id, TaskStatusKind::Skipped);
+
+    let interactor = TestObligationResultsInteractor::new(
+        Arc::new(StubObligations(Some(ObligationsDocument::new(
+            track(),
+            vec![obligation.clone()],
+        )))),
+        Arc::new(StubBindings(Some(TestBindingsDocument::new(
+            track(),
+            vec![fulfillment_binding(obligation.id().clone())],
+        )))),
+        Arc::new(StatusScanner),
+        Arc::new(StubFulfillmentCache(None)),
+        Arc::new(StubWaiverCache(None)),
+        VerifierPromptFingerprint::new(hash(9)),
+        VerifierPromptFingerprint::new(hash(10)),
+        Arc::new(StatusSpecReader(status_spec())),
+        Arc::new(StatusCatalogueReader(status_catalogue())),
+        Arc::new(StatusTaskContractReader(TaskContractDocument::new(track(), entries).unwrap())),
+        Arc::new(StatusImplPlanReader(statuses)),
+    );
+
+    let output = interactor.execute(&status_command()).unwrap();
+    let skipped = output
+        .status_lane_summaries()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Skipped)
+        .unwrap();
+    assert_eq!(skipped.missing_count(), 0);
+    assert_eq!(skipped.stale_count(), 0);
+    assert_eq!(skipped.verdict_absent_count(), 1);
+}
+
+#[test]
+fn test_results_command_with_catalogue_path_preserves_informational_success() {
+    let command =
+        TestObligationResultsCommand::new(track(), vec![PathBuf::from("domain-types.json")]);
+    let output = interactor_with_obligations(
+        Some(ObligationsDocument::new(track(), Vec::new())),
+        Some(TestBindingsDocument::new(track(), Vec::new())),
+        None,
+        None,
+    )
+    .execute(&command)
+    .unwrap();
+
+    assert_eq!(output.status_lane_summaries().len(), 4);
+    assert!(output.status_lane_summaries().iter().all(|summary| {
+        summary.missing_count() == 0
+            && summary.stale_count() == 0
+            && summary.verdict_absent_count() == 0
+    }));
 }
 
 #[test]
@@ -574,11 +1064,18 @@ fn test_obligations_io_error_maps_to_io_error() {
     let interactor = TestObligationResultsInteractor::new(
         Arc::new(FailingObligations { error: artifact_io_error }),
         Arc::new(StubBindings(None)),
+        Arc::new(UnusedScanner),
         Arc::new(StubFulfillmentCache(None)),
         Arc::new(StubWaiverCache(None)),
+        VerifierPromptFingerprint::new(hash(9)),
+        VerifierPromptFingerprint::new(hash(10)),
+        Arc::new(UnusedSpecReader),
+        Arc::new(UnusedCatalogueReader),
+        Arc::new(UnusedTaskContractReader),
+        Arc::new(UnusedImplPlanReader),
     );
 
-    let result = interactor.execute(&TestObligationResultsCommand::new(track()));
+    let result = interactor.execute(&command());
 
     match result {
         Err(ObligationResultsError::IoError(message)) => {
@@ -593,11 +1090,18 @@ fn test_bindings_malformed_error_maps_to_malformed_artifact() {
     let interactor = TestObligationResultsInteractor::new(
         Arc::new(StubObligations(None)),
         Arc::new(FailingBindings { error: artifact_malformed_error }),
+        Arc::new(UnusedScanner),
         Arc::new(StubFulfillmentCache(None)),
         Arc::new(StubWaiverCache(None)),
+        VerifierPromptFingerprint::new(hash(9)),
+        VerifierPromptFingerprint::new(hash(10)),
+        Arc::new(UnusedSpecReader),
+        Arc::new(UnusedCatalogueReader),
+        Arc::new(UnusedTaskContractReader),
+        Arc::new(UnusedImplPlanReader),
     );
 
-    let result = interactor.execute(&TestObligationResultsCommand::new(track()));
+    let result = interactor.execute(&command());
 
     match result {
         Err(ObligationResultsError::MalformedArtifact(message)) => {

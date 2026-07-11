@@ -1,6 +1,344 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4534d0c6d3530f7c0ed38e8a84ca9db8143e40dd5bb3b8a3be045ba8002df046",
+          "at": "2026-07-11T11:47:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4534d0c6d3530f7c0ed38e8a84ca9db8143e40dd5bb3b8a3be045ba8002df046",
+          "at": "2026-07-11T11:50:02Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 includes upstream behavior/rationale prose beginning “Preserve the existing task-status vocabulary…”; retain only target, operation, and anchor citation.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 restates the behavior contract (“retain status-independent detection”, “strictest-wins”, fail-closed errors, and todo-only warnings); reduce the description to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates the results behavior (“aggregate unresolved findings by…”, informational independence, and freshness/read-error semantics); reduce the description to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 restates rendering and exit-code behavior, including strict-lane blocking and strictest-wins cases; reduce the description to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 restates the output breakdown and exit-code contract (“preserve exit 0…”); reduce the description to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 includes upstream workflow/behavior constraints about signal-gate preservation, incremental bindings, and avoiding an empty obligations artifact; reduce the description to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 restates the fail-closed domain rationale (“required by the later usecase interpretation”); keep only concise section purpose if needed.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 48,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 restates status-independent detection and final interpretation behavior; remove the behavior-contract prose from the section description.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 58,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 restates the distinct exit-code contract; remove this upstream behavior prose from the section description.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 68,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:b97735b8bfd9377191b00630816668839d689533115d4c8b5c04eb01c0a17a32",
+          "at": "2026-07-11T08:39:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 restates the upstream fail-closed behavior in “so status-independent task-attribution and artifact-structure failures remain explicit...” after already naming the target, operation, and anchors. Keep only target + operation + anchors, per no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 embeds the upstream detection, strictest-wins, fail-closed, and warning contracts in prose. These are restatements beyond target + operation + anchors and should be removed per no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates the results lane semantics, pass/fail independence, read-error behavior, and freshness handling instead of limiting the description to target + operation + anchors.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 restates the todo warning, strict-lane blocking, status-independent failure, and exit behavior in prose. Replace the behavioral contract with target + operation + anchors only.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 restates the lane breakdown and exit-0 contract in prose beyond the permitted target + operation + anchors form.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 restates out-of-scope behavior (“without introducing an attribution artifact or changing signal-gate or merge workflows”) and adds obligation-artifact workflow semantics in prose. Keep the executable target/operation and anchors without duplicating the upstream contract.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 restates the fail-closed domain behavior and its dependency rationale (“required by the later usecase interpretation”) without an anchor. Plan section descriptions must use target + operation + anchor rather than upstream rationale/contract prose.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 48,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 restates status-independent detection and final gate interpretation behavior instead of citing the upstream anchors only.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 58,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 restates the distinct exit-code behavior contract in prose. Replace it with target + operation + anchor wording per no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 69,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:b97735b8bfd9377191b00630816668839d689533115d4c8b5c04eb01c0a17a32",
+          "at": "2026-07-11T08:40:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `plan.summary` field is empty (`\"summary\": []`), so GO-NN goal-to-task traceability is absent from the impl-plan SSoT. Add the goals and their carrying task IDs.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 42,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:61a5aff11e654fe06ca2b6c86b97c393d8a2f29f6c4f1277defba03b28ca030c",
+          "at": "2026-07-11T08:45:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 targets `libs/domain/src/tddd/test_obligation/{errors.rs,vocab.rs}` but claims to update `TaskStatusKind`; that type is in `libs/domain/src/track.rs` and is catalogued as `action: reference`, so the task scope cannot execute the stated change.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "`usecase-types.json` declares the `TestObligationDetectionDependencies` catalogue entry (`action: add`, IN-03/IN-05), but `task-contract.json` contains no corresponding usecase attribution. The claimed 15-entry coverage is therefore incomplete and the shared dependency carrier has no owning task.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/task-contract.json",
+              "line": 4,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:31d7b39b78db55bda329ed108cb6e3ae1f31c92bd1e8f1b0855949f2c828e77b",
+          "at": "2026-07-11T08:51:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 の「update implementation-batch test-obligation bindings」は対象ファイルまたはシンボルを示しておらず、実装者が変更境界を推測する必要がある。`test-bindings.json` など具体的な対象を記載すべき。",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 36,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:228d5fc6650b84d3b80090437dcdb489aa270f239bb6fc96197e2008eced1ae6",
+          "at": "2026-07-11T08:56:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31b6b3142534fb968f174e1e811e9b17fd51e3d53f7bb7acaec4cfe112042ef7",
+          "at": "2026-07-11T08:59:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31b6b3142534fb968f174e1e811e9b17fd51e3d53f7bb7acaec4cfe112042ef7",
+          "at": "2026-07-11T09:04:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31b6b3142534fb968f174e1e811e9b17fd51e3d53f7bb7acaec4cfe112042ef7",
+          "at": "2026-07-11T09:04:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e800a7e94191818d9cdb6ebd0802b7486feaf5533e26bd1fdde34a7ab13ba052",
+          "at": "2026-07-11T10:00:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0e60c1ad1fc79340263cf8150b6774692412f8f7a6ddf4ad50ebaec0eb2458c",
+          "at": "2026-07-11T11:59:22Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "All 36 records are `voluntary_binding`, but the two derived obligations require canonical `fulfillment` records. The 12 records covering their spec edges are therefore misclassified; fulfillment lookup ignores voluntary bindings, leaving both obligations unbound despite the cache entries. Replace them with two fulfillment records and retain voluntary bindings only for non-derived edges.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/test-bindings.json",
+              "line": 4,
+              "category": "artifact-schema"
+            }
+          ],
+          "hash": "rvw1:sha256:8ae4a69e76dfa5b280289deb5cbcce7e7ba6dc37e4c20f4647771ac295dae7af",
+          "at": "2026-07-11T11:48:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The two derived obligations in obligations.json have no fulfillment records; all 36 bindings are voluntary_binding records. This contradicts the briefing's required two fulfillment records and misuses voluntary_binding for edges that do carry derived obligations, weakening stable obligation-level coverage.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/test-bindings.json",
+              "line": 4,
+              "category": "artifact-integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:8ae4a69e76dfa5b280289deb5cbcce7e7ba6dc37e4c20f4647771ac295dae7af",
+          "at": "2026-07-11T11:48:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1579a9bd7cef96dd7aa7508f8c95996277fbf17496cb424b3e972cc73fd4d9b",
+          "at": "2026-07-11T12:34:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1579a9bd7cef96dd7aa7508f8c95996277fbf17496cb424b3e972cc73fd4d9b",
+          "at": "2026-07-11T12:38:08Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2f3cd1fb4b97b2c24a6a3698d524ef7dddfbf2de89aa7c7d6fa8376b2acdef3",
+          "at": "2026-07-11T11:47:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2f3cd1fb4b97b2c24a6a3698d524ef7dddfbf2de89aa7c7d6fa8376b2acdef3",
+          "at": "2026-07-11T11:48:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2f3cd1fb4b97b2c24a6a3698d524ef7dddfbf2de89aa7c7d6fa8376b2acdef3",
+          "at": "2026-07-11T11:50:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2f3cd1fb4b97b2c24a6a3698d524ef7dddfbf2de89aa7c7d6fa8376b2acdef3",
+          "at": "2026-07-11T11:50:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2f3cd1fb4b97b2c24a6a3698d524ef7dddfbf2de89aa7c7d6fa8376b2acdef3",
+          "at": "2026-07-11T11:52:46Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -23,6 +361,31 @@
           "findings": [],
           "hash": "rvw1:sha256:259fdd4c8f7fb5ef96e43c95e0729e1cd4e5968ef80f9cc845c08f56cc4cd018",
           "at": "2026-07-11T08:41:18Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:517625f0501d8479573d729cb7666a5337ec2d7dd4614604441e50bbf66265ea",
+          "at": "2026-07-11T11:53:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:517625f0501d8479573d729cb7666a5337ec2d7dd4614604441e50bbf66265ea",
+          "at": "2026-07-11T11:57:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aff3954520f0f9fb7794405fd91645db3b3cb5089d1e026dcd51657d70344e94",
+          "at": "2026-07-11T12:32:40Z"
         }
       ]
     },
@@ -84,6 +447,24 @@
           "findings": [],
           "hash": "rvw1:sha256:e3625eb65c708c3ff5aa710194e585923e5c911b192df4918a7f5de8de5d11b0",
           "at": "2026-07-11T09:02:02Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3ed1ce4d9c857c9a0019403a9c1d0090f567f9a2462f03c71d94ea6bbd94398",
+          "at": "2026-07-11T11:45:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3ed1ce4d9c857c9a0019403a9c1d0090f567f9a2462f03c71d94ea6bbd94398",
+          "at": "2026-07-11T11:48:09Z"
         }
       ]
     },
@@ -386,232 +767,6 @@
           "findings": [],
           "hash": "rvw1:sha256:d11adc59510ca68f18ab1a222135b3068450ede3e40148ee1c008397159e253e",
           "at": "2026-07-11T09:54:59Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 includes upstream behavior/rationale prose beginning “Preserve the existing task-status vocabulary…”; retain only target, operation, and anchor citation.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T002 restates the behavior contract (“retain status-independent detection”, “strictest-wins”, fail-closed errors, and todo-only warnings); reduce the description to target, operation, and anchors.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 12,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T003 restates the results behavior (“aggregate unresolved findings by…”, informational independence, and freshness/read-error semantics); reduce the description to target, operation, and anchors.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 18,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T004 restates rendering and exit-code behavior, including strict-lane blocking and strictest-wins cases; reduce the description to target, operation, and anchors.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 24,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T005 restates the output breakdown and exit-code contract (“preserve exit 0…”); reduce the description to target, operation, and anchors.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 30,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T006 includes upstream workflow/behavior constraints about signal-gate preservation, incremental bindings, and avoiding an empty obligations artifact; reduce the description to target, operation, and anchors.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 36,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S1 restates the fail-closed domain rationale (“required by the later usecase interpretation”); keep only concise section purpose if needed.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 48,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S2 restates status-independent detection and final interpretation behavior; remove the behavior-contract prose from the section description.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 58,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S3 restates the distinct exit-code contract; remove this upstream behavior prose from the section description.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 68,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:b97735b8bfd9377191b00630816668839d689533115d4c8b5c04eb01c0a17a32",
-          "at": "2026-07-11T08:39:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 restates the upstream fail-closed behavior in “so status-independent task-attribution and artifact-structure failures remain explicit...” after already naming the target, operation, and anchors. Keep only target + operation + anchors, per no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T002 embeds the upstream detection, strictest-wins, fail-closed, and warning contracts in prose. These are restatements beyond target + operation + anchors and should be removed per no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 12,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T003 restates the results lane semantics, pass/fail independence, read-error behavior, and freshness handling instead of limiting the description to target + operation + anchors.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 18,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T004 restates the todo warning, strict-lane blocking, status-independent failure, and exit behavior in prose. Replace the behavioral contract with target + operation + anchors only.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 24,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T005 restates the lane breakdown and exit-0 contract in prose beyond the permitted target + operation + anchors form.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 30,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T006 restates out-of-scope behavior (“without introducing an attribution artifact or changing signal-gate or merge workflows”) and adds obligation-artifact workflow semantics in prose. Keep the executable target/operation and anchors without duplicating the upstream contract.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 36,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S1 restates the fail-closed domain behavior and its dependency rationale (“required by the later usecase interpretation”) without an anchor. Plan section descriptions must use target + operation + anchor rather than upstream rationale/contract prose.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 48,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S2 restates status-independent detection and final gate interpretation behavior instead of citing the upstream anchors only.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 58,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S3 restates the distinct exit-code behavior contract in prose. Replace it with target + operation + anchor wording per no-upstream-restatement.md.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 69,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:b97735b8bfd9377191b00630816668839d689533115d4c8b5c04eb01c0a17a32",
-          "at": "2026-07-11T08:40:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `plan.summary` field is empty (`\"summary\": []`), so GO-NN goal-to-task traceability is absent from the impl-plan SSoT. Add the goals and their carrying task IDs.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 42,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:61a5aff11e654fe06ca2b6c86b97c393d8a2f29f6c4f1277defba03b28ca030c",
-          "at": "2026-07-11T08:45:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 targets `libs/domain/src/tddd/test_obligation/{errors.rs,vocab.rs}` but claims to update `TaskStatusKind`; that type is in `libs/domain/src/track.rs` and is catalogued as `action: reference`, so the task scope cannot execute the stated change.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 6,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "`usecase-types.json` declares the `TestObligationDetectionDependencies` catalogue entry (`action: add`, IN-03/IN-05), but `task-contract.json` contains no corresponding usecase attribution. The claimed 15-entry coverage is therefore incomplete and the shared dependency carrier has no owning task.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/task-contract.json",
-              "line": 4,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:31d7b39b78db55bda329ed108cb6e3ae1f31c92bd1e8f1b0855949f2c828e77b",
-          "at": "2026-07-11T08:51:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T006 の「update implementation-batch test-obligation bindings」は対象ファイルまたはシンボルを示しておらず、実装者が変更境界を推測する必要がある。`test-bindings.json` など具体的な対象を記載すべき。",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
-              "line": 36,
-              "category": "task description non-executable"
-            }
-          ],
-          "hash": "rvw1:sha256:228d5fc6650b84d3b80090437dcdb489aa270f239bb6fc96197e2008eced1ae6",
-          "at": "2026-07-11T08:56:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31b6b3142534fb968f174e1e811e9b17fd51e3d53f7bb7acaec4cfe112042ef7",
-          "at": "2026-07-11T08:59:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31b6b3142534fb968f174e1e811e9b17fd51e3d53f7bb7acaec4cfe112042ef7",
-          "at": "2026-07-11T09:04:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31b6b3142534fb968f174e1e811e9b17fd51e3d53f7bb7acaec4cfe112042ef7",
-          "at": "2026-07-11T09:04:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e800a7e94191818d9cdb6ebd0802b7486feaf5533e26bd1fdde34a7ab13ba052",
-          "at": "2026-07-11T10:00:17Z"
         }
       ]
     }

@@ -21,15 +21,62 @@ use domain::tddd::test_obligation::scope::UncitedSpecElementFinding;
 use domain::tddd::test_obligation::vocab::TestObligationKind;
 use domain::{SpecDocument, SpecElementId, SpecRef, SpecRequirement};
 
+use super::status_lanes::{StatusLaneFinding, StatusLaneFindingKind};
 use super::{LoadedCatalogueDocument, cited_anchor_ids, diag};
 
 /// Mutable accumulators for a single `check` run.
 #[derive(Default)]
 pub(super) struct GateState {
-    pub(super) drifts: Vec<TestObligationDrift>,
-    pub(super) unresolved: Vec<TestObligationEdgeId>,
-    pub(super) stale: Vec<TestObligationEdgeId>,
+    pub(super) structural_drifts: Vec<TestObligationDrift>,
+    pub(super) status_drifts: Vec<(TestObligationDrift, StatusLaneFinding)>,
+    pub(super) unresolved: Vec<(TestObligationEdgeId, StatusLaneFinding)>,
+    pub(super) verdict_absent: Vec<(TestObligationEdgeId, StatusLaneFinding)>,
     pub(super) resolved: Vec<TestObligationEdgeId>,
+}
+
+impl GateState {
+    /// Records an existence or freshness drift that status-lane interpretation
+    /// may defer only for a todo-attributed entry.
+    pub(super) fn status_drift(
+        &mut self,
+        drift: TestObligationDrift,
+        entry_key: CatalogueEntryKey,
+        kind: StatusLaneFindingKind,
+    ) {
+        self.status_drifts.push((drift, StatusLaneFinding::new(entry_key, kind)));
+    }
+
+    /// Records an orphaned binding, which remains structural in every lane.
+    pub(super) fn structural_drift(&mut self, drift: TestObligationDrift) {
+        self.structural_drifts.push(drift);
+    }
+
+    /// Records an edge with no binding resolution.
+    pub(super) fn unresolved(&mut self, edge: TestObligationEdgeId) {
+        self.unresolved.push((
+            edge.clone(),
+            StatusLaneFinding::new(edge.entry_key().clone(), StatusLaneFindingKind::Missing),
+        ));
+    }
+
+    /// Records an edge with no usable current verdict, including fingerprint
+    /// mismatch or absence.
+    pub(super) fn verdict_absent(&mut self, edge: TestObligationEdgeId) {
+        self.verdict_absent.push((
+            edge.clone(),
+            StatusLaneFinding::new(edge.entry_key().clone(), StatusLaneFindingKind::VerdictAbsent),
+        ));
+    }
+
+    /// Returns all status-attributable unresolved findings for display.
+    pub(super) fn status_findings(&self) -> Vec<StatusLaneFinding> {
+        self.status_drifts
+            .iter()
+            .map(|(_, finding)| finding.clone())
+            .chain(self.unresolved.iter().map(|(_, finding)| finding.clone()))
+            .chain(self.verdict_absent.iter().map(|(_, finding)| finding.clone()))
+            .collect()
+    }
 }
 
 /// A parsed spec element (id + section + anchor text).

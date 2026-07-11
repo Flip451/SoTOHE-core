@@ -5,5 +5,5 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | TestObligationCheckHandler | primary_adapter | modify | — | 🔵 | 🔵 |
-| TestObligationResultsHandler | primary_adapter | modify | — | 🟡 | 🔵 |
+| TestObligationResultsHandler | primary_adapter | modify | — | 🔵 | 🔵 |
 

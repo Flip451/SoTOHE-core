@@ -1,0 +1,869 @@
+{
+  "track_id": "d15-task-status-check-gate-2026-07-11",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bd6876ba0e4e1deed15aadba44398b84ac5f1ed187384cd7f7b088fc1b600a83",
+        "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
+        "anchor_text_hash": "faf3a8b36c676e24badd4cb8414753a01b0582ac142cd5cedd655082c9873b9c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let in_progress =\n        missing_binding_interactor_with_statuses(&[(\"T001\", TaskStatusKind::InProgress)])\n            .execute(&command());\n    assert!(matches!(in_progress, Err(ObligationCheckError::DriftsDetected { .. })));\n\n    let todo = missing_binding_interactor_with_statuses(&[(\"T001\", TaskStatusKind::Todo)])\n        .execute(&command())\n        .unwrap();\n\nlet result = missing_binding_interactor_with_statuses(&[\n        (\"T001\", TaskStatusKind::Todo),\n        (\"T002\", TaskStatusKind::InProgress),\n    ])\n    .execute(&command());\n\n    assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bd6876ba0e4e1deed15aadba44398b84ac5f1ed187384cd7f7b088fc1b600a83",
+        "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
+        "anchor_text_hash": "77a9559c41e1fc7c0974ce9b87521381084d589130a24b5b7b3d849502896448"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "`assert!(matches!(in_progress, Err(ObligationCheckError::DriftsDetected { .. })));` ... `let todo = missing_binding_interactor_with_statuses(&[(\"T001\", TaskStatusKind::Todo)])\\n        .execute(&command())\\n        .unwrap();` ... `assert_eq!(todo_summary.missing_count(), 1);` ... `if status == TaskStatusKind::Todo { ... assert_eq!(todo.verdict_absent_count(), 1); } else { assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. }))); }`"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bd6876ba0e4e1deed15aadba44398b84ac5f1ed187384cd7f7b088fc1b600a83",
+        "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
+        "anchor_text_hash": "5840b56dfc6035293a1775f7a5049d810ca972837b917efb99afa44913467788"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(classification.contains(\"Orphaned\"));\nassert_eq!(classifications[0], classifications[1]);\nassert_eq!(todo.verdict_absent_count(), 1);\nassert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));\nassert!(matches!(invalid_rules, Err(ObligationCheckError::RulesLoad(TestObligationRulesLoadError::RoleNotCovered { .. }))));\nassert!(matches!(malformed_obligations, Err(ObligationCheckError::ArtifactCodec(ArtifactCodecError::MalformedJson(_)))));\nassert_eq!(outcome.resolved_edges(), &[edge()]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bd6876ba0e4e1deed15aadba44398b84ac5f1ed187384cd7f7b088fc1b600a83",
+        "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
+        "anchor_text_hash": "507c57928262753c24b8b7ab61cdcc6386b900f1ee2816014d60fc13b1c72e69"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for status in [\n        TaskStatusKind::Todo,\n        TaskStatusKind::InProgress,\n        TaskStatusKind::Done,\n        TaskStatusKind::Skipped,\n    ] {\n        let unattributable = unattributable_interactor_with_status(status).execute(&command());\n        assert!(matches!(unattributable, Err(ObligationCheckError::TaskAttribution(_))));\n\n        let invalid_rules = interactor_with_rules_loader_and_status(Arc::new(FailingRules), status)\n            .execute(&command());\n        assert!(matches!(\n            invalid_rules,\n            Err(ObligationCheckError::RulesLoad(\n                TestObligationRulesLoadError::RoleNotCovered { .. }\n            ))\n        ));\n    }\n\n    for status in [\n        TaskStatusKind::Todo,\n        TaskStatusKind::InProgress,\n        TaskStatusKind::Done,\n        TaskStatusKind::Skipped,\n    ] {\n        let malformed_obligations = CheckTestObligationsInteractor::new(\n            Arc::new(StubRules::valid()),\n            Arc::new(MalformedObligationsArtifact),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bd6876ba0e4e1deed15aadba44398b84ac5f1ed187384cd7f7b088fc1b600a83",
+        "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
+        "anchor_text_hash": "ea4cd88397a66123398fe12bed3bf5cf7deb6e676306b9861312b09ef25910e3"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(todo.verdict_absent_count(), 1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bd6876ba0e4e1deed15aadba44398b84ac5f1ed187384cd7f7b088fc1b600a83",
+        "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
+        "anchor_text_hash": "8d7deb65d9ae63926b4e095e2c529632cc7852bdc2c26611f8d3cf93a36baa64"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "if status == TaskStatusKind::Todo {\n            let outcome = result.unwrap();\n            let todo = outcome\n                .status_lane_summaries()\n                .iter()\n                .find(|summary| summary.task_status() == TaskStatusKind::Todo)\n                .unwrap();\n            assert_eq!(todo.verdict_absent_count(), 1);\n        } else {\n            assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bd6876ba0e4e1deed15aadba44398b84ac5f1ed187384cd7f7b088fc1b600a83",
+        "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
+        "anchor_text_hash": "2996d7b7f50b4e79f02d8e13c793aa15d27ecd865b360b0e280735d9e8ec9e10"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(missing, Err(ObligationCheckError::DriftsDetected { .. }))); ... assert!(matches!(stale, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert!(matches!(verdict_absent, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert_eq!(skipped.missing_count(), 1); ... assert!(status_read_error.is_ok());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "29a792fb7f39ec4f75bcf060f8fd9ac5ec1215670522816034abe68b53078eae",
+        "declaration_hash": "9ba945335901014fffb1f5e8d8f21bd79a49006cc7d56be7cd131310c3fde0c4",
+        "anchor_text_hash": "dfe76ee6df8df3ed149cd8ea4bd2b7f914b06a18cf41e9bb53ef1a867c168da0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "`for status in [TaskStatusKind::Todo, TaskStatusKind::InProgress, TaskStatusKind::Done] { ... assert_eq!(summary.missing_count(), 1); assert_eq!(summary.stale_count(), 0); assert_eq!(summary.verdict_absent_count(), 0); }` and `assert!(status_read_error.is_ok());`"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "29a792fb7f39ec4f75bcf060f8fd9ac5ec1215670522816034abe68b53078eae",
+        "declaration_hash": "9ba945335901014fffb1f5e8d8f21bd79a49006cc7d56be7cd131310c3fde0c4",
+        "anchor_text_hash": "8d7deb65d9ae63926b4e095e2c529632cc7852bdc2c26611f8d3cf93a36baa64"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let skipped = unresolved_output\n        .status_lane_summaries()\n        .iter()\n        .find(|summary| summary.task_status() == TaskStatusKind::Skipped)\n        .unwrap();\n    assert_eq!(skipped.missing_count(), 1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "29a792fb7f39ec4f75bcf060f8fd9ac5ec1215670522816034abe68b53078eae",
+        "declaration_hash": "9ba945335901014fffb1f5e8d8f21bd79a49006cc7d56be7cd131310c3fde0c4",
+        "anchor_text_hash": "74df2ed25f9215f957727d994dbfe9461a1d03d256c79c5d1936b777392d1308"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for status in [TaskStatusKind::Todo, TaskStatusKind::InProgress, TaskStatusKind::Done] { ... assert_eq!(summary.missing_count(), 1); assert_eq!(summary.stale_count(), 0); assert_eq!(summary.verdict_absent_count(), 0); ... assert_eq!(skipped.verdict_absent_count(), 1); ... assert_eq!(done.stale_count(), 1); ... assert!(unresolved.is_ok()); ... assert!(status_read_error.is_ok());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "29a792fb7f39ec4f75bcf060f8fd9ac5ec1215670522816034abe68b53078eae",
+        "declaration_hash": "9ba945335901014fffb1f5e8d8f21bd79a49006cc7d56be7cd131310c3fde0c4",
+        "anchor_text_hash": "2996d7b7f50b4e79f02d8e13c793aa15d27ecd865b360b0e280735d9e8ec9e10"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(unresolved.is_ok()); ... .find(|summary| summary.task_status() == TaskStatusKind::Skipped) ... assert_eq!(skipped.missing_count(), 1); ... assert!(status_read_error.is_ok());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "29a792fb7f39ec4f75bcf060f8fd9ac5ec1215670522816034abe68b53078eae",
+        "declaration_hash": "9ba945335901014fffb1f5e8d8f21bd79a49006cc7d56be7cd131310c3fde0c4",
+        "anchor_text_hash": "ea4cd88397a66123398fe12bed3bf5cf7deb6e676306b9861312b09ef25910e3"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(done.stale_count(), 1); ... assert_eq!(done.verdict_absent_count(), 1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "16076f1b42c096df841653a4c00dcf63b6482c58b49f8d4a5772d82b0b4c1200",
+        "declaration_hash": "bb396110d30ceb80d017ec2385ba0608d52839f59106555ab46022e1320b2752",
+        "anchor_text_hash": "507c57928262753c24b8b7ab61cdcc6386b900f1ee2816014d60fc13b1c72e69"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "statuses.insert(TaskId::try_new(\"T001\".to_owned()).unwrap(), TaskStatusKind::Todo); ... assert!(matches!(result, Err(ObligationCheckError::TaskAttribution(_))));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "9d537d22efd82c4a26a34085a00254f08e4036204f2e7083cdfd1341647f5bc2",
+        "declaration_hash": "f82ecfeb6ce7edad0220ed511ee602847bdb174c63c60a14aa00a10b50762306",
+        "anchor_text_hash": "77a9559c41e1fc7c0974ce9b87521381084d589130a24b5b7b3d849502896448"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Ok(usecase::test_obligation::check::CheckTestObligationsOutcome::new_verified_scope(\n                    Vec::new(),\n                    Vec::new(),\n                    vec![usecase::test_obligation::results::TestObligationStatusLaneSummary::new(\n                        usecase::test_obligation::results::TaskStatusKind::Todo,\n                        1,\n                        2,\n                        3,\n                    )],\n                ))\n            }\n        }\n\n        let handler =\n            TestObligationCheckHandler::new(Arc::new(TodoWarningService), PathBuf::from(\"/repo\"));\n        let branch = DiagnosticMessage::try_new(\"track/test-track\".to_owned()).unwrap();\n\n        let outcome = handler.handle(TestObligationCheckInput::new(None, branch));\n\n        assert_eq!(outcome.exit_code, 0);\n        let stdout = outcome.stdout.unwrap();\n        assert!(stdout.contains(\"[WARN] todo-lane unresolved\"));\n        assert!(stdout.contains(\"missing=1 stale=2 verdict_absent=3\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "e7503549e22e5020ff8cc275acab7c4bc32a04e658a5ce7d48902f9dc7da8ed1",
+        "declaration_hash": "f82ecfeb6ce7edad0220ed511ee602847bdb174c63c60a14aa00a10b50762306",
+        "anchor_text_hash": "8d7deb65d9ae63926b4e095e2c529632cc7852bdc2c26611f8d3cf93a36baa64"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let outcome = CheckTestObligationsOutcome::new_verified_scope(\n        Vec::new(),\n        Vec::new(),\n        vec![TestObligationStatusLaneSummary::new(TaskStatusKind::Skipped, 1, 2, 3)],\n    );\n\n    let skipped = outcome\n        .status_lane_summaries()\n        .iter()\n        .find(|summary| summary.task_status() == TaskStatusKind::Skipped)\n        .unwrap();\n    assert_eq!(skipped.missing_count(), 1);\n    assert_eq!(skipped.stale_count(), 2);\n    assert_eq!(skipped.verdict_absent_count(), 3);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "798828306a53c7e239170d9fb9c1d76ac99749c0213e54954bc6d619d2378d44",
+        "declaration_hash": "f82ecfeb6ce7edad0220ed511ee602847bdb174c63c60a14aa00a10b50762306",
+        "anchor_text_hash": "2996d7b7f50b4e79f02d8e13c793aa15d27ecd865b360b0e280735d9e8ec9e10"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let outcome = CheckTestObligationsOutcome::new_verified_scope(\n        Vec::new(),\n        Vec::new(),\n        vec![TestObligationStatusLaneSummary::new(TaskStatusKind::Skipped, 1, 2, 3)],\n    );\n\n    let skipped = outcome\n        .status_lane_summaries()\n        .iter()\n        .find(|summary| summary.task_status() == TaskStatusKind::Skipped)\n        .unwrap();\n    assert_eq!(skipped.missing_count(), 1);\n    assert_eq!(skipped.stale_count(), 2);\n    assert_eq!(skipped.verdict_absent_count(), 3);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsCommand",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationResultsCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "9c408136567c81d4f4f860d97d56b3f43b83ce023478cfa50b073a79c883e152",
+        "declaration_hash": "959918beeda07c9e2be1babf2aa1de00fcca164f67b61107e304561241f37782",
+        "anchor_text_hash": "dfe76ee6df8df3ed149cd8ea4bd2b7f914b06a18cf41e9bb53ef1a867c168da0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let expected = TestObligationResultsCommand::new(\n            track_id.clone(),\n            super::super::default_catalogue_paths(&workspace_root, &track_id),\n        );\n        assert_eq!(*service.captured.lock().unwrap(), Some(expected));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsOutput",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationResultsOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "c2a1566e829cafb2128d554ecd712fa3542dfaf5f28352322240a3b6b8434a5b",
+        "declaration_hash": "ade01e3b2ebe52ceeff602a03b4092cba81dc1e4faa31b311c8e8f17bb73beda",
+        "anchor_text_hash": "dfe76ee6df8df3ed149cd8ea4bd2b7f914b06a18cf41e9bb53ef1a867c168da0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(stdout.contains(\"status:todo missing=1 stale=0 verdict_absent=2\"));\n        assert!(stdout.contains(\"status:in_progress missing=3 stale=4 verdict_absent=5\"));\n        assert!(stdout.contains(\"status:done missing=6 stale=7 verdict_absent=8\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsOutput",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationResultsOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "c2a1566e829cafb2128d554ecd712fa3542dfaf5f28352322240a3b6b8434a5b",
+        "declaration_hash": "ade01e3b2ebe52ceeff602a03b4092cba81dc1e4faa31b311c8e8f17bb73beda",
+        "anchor_text_hash": "8d7deb65d9ae63926b4e095e2c529632cc7852bdc2c26611f8d3cf93a36baa64"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(stdout.contains(\"status:skipped missing=9 stale=10 verdict_absent=11\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsOutput",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationResultsOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "c2a1566e829cafb2128d554ecd712fa3542dfaf5f28352322240a3b6b8434a5b",
+        "declaration_hash": "ade01e3b2ebe52ceeff602a03b4092cba81dc1e4faa31b311c8e8f17bb73beda",
+        "anchor_text_hash": "74df2ed25f9215f957727d994dbfe9461a1d03d256c79c5d1936b777392d1308"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0);\n        let stdout = outcome.stdout.unwrap();\n        assert!(stdout.contains(\"status:todo missing=1 stale=0 verdict_absent=2\"));\n        assert!(stdout.contains(\"status:in_progress missing=3 stale=4 verdict_absent=5\"));\n        assert!(stdout.contains(\"status:done missing=6 stale=7 verdict_absent=8\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsOutput",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationResultsOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "c2a1566e829cafb2128d554ecd712fa3542dfaf5f28352322240a3b6b8434a5b",
+        "declaration_hash": "ade01e3b2ebe52ceeff602a03b4092cba81dc1e4faa31b311c8e8f17bb73beda",
+        "anchor_text_hash": "2996d7b7f50b4e79f02d8e13c793aa15d27ecd865b360b0e280735d9e8ec9e10"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0);\n        let stdout = outcome.stdout.unwrap();\n        assert!(stdout.contains(\"status:skipped missing=9 stale=10 verdict_absent=11\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationStatusLaneSummary",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationStatusLaneSummary",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "9d537d22efd82c4a26a34085a00254f08e4036204f2e7083cdfd1341647f5bc2",
+        "declaration_hash": "ab64725a71c88e0978ca86f20632a2985f23338e6b7fb44c8611559b845d7e1f",
+        "anchor_text_hash": "77a9559c41e1fc7c0974ce9b87521381084d589130a24b5b7b3d849502896448"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0);\n        let stdout = outcome.stdout.unwrap();\n        assert!(stdout.contains(\"[WARN] todo-lane unresolved\"));\n        assert!(stdout.contains(\"missing=1 stale=2 verdict_absent=3\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationStatusLaneSummary",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationStatusLaneSummary",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "950fc0e937bf4631d986787ce6efc210b948f2fc2d69a0b864c0cba8560f1738",
+        "declaration_hash": "ab64725a71c88e0978ca86f20632a2985f23338e6b7fb44c8611559b845d7e1f",
+        "anchor_text_hash": "dfe76ee6df8df3ed149cd8ea4bd2b7f914b06a18cf41e9bb53ef1a867c168da0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(stdout.contains(\"status:todo missing=1 stale=0 verdict_absent=2\"));\n        assert!(stdout.contains(\"status:in_progress missing=3 stale=4 verdict_absent=5\"));\n        assert!(stdout.contains(\"status:done missing=6 stale=7 verdict_absent=8\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationStatusLaneSummary",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationStatusLaneSummary",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "c2a1566e829cafb2128d554ecd712fa3542dfaf5f28352322240a3b6b8434a5b",
+        "declaration_hash": "ab64725a71c88e0978ca86f20632a2985f23338e6b7fb44c8611559b845d7e1f",
+        "anchor_text_hash": "8d7deb65d9ae63926b4e095e2c529632cc7852bdc2c26611f8d3cf93a36baa64"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0);\n        let stdout = outcome.stdout.unwrap();\n        assert!(stdout.contains(\"status:skipped missing=9 stale=10 verdict_absent=11\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationStatusLaneSummary",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationStatusLaneSummary",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "950fc0e937bf4631d986787ce6efc210b948f2fc2d69a0b864c0cba8560f1738",
+        "declaration_hash": "ab64725a71c88e0978ca86f20632a2985f23338e6b7fb44c8611559b845d7e1f",
+        "anchor_text_hash": "74df2ed25f9215f957727d994dbfe9461a1d03d256c79c5d1936b777392d1308"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0);\nlet stdout = outcome.stdout.unwrap();\nassert!(stdout.contains(\"status:todo missing=1 stale=0 verdict_absent=2\"));\nassert!(stdout.contains(\"status:in_progress missing=3 stale=4 verdict_absent=5\"));\nassert!(stdout.contains(\"status:done missing=6 stale=7 verdict_absent=8\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationStatusLaneSummary",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationStatusLaneSummary",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "c2a1566e829cafb2128d554ecd712fa3542dfaf5f28352322240a3b6b8434a5b",
+        "declaration_hash": "ab64725a71c88e0978ca86f20632a2985f23338e6b7fb44c8611559b845d7e1f",
+        "anchor_text_hash": "2996d7b7f50b4e79f02d8e13c793aa15d27ecd865b360b0e280735d9e8ec9e10"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0);\n        let stdout = outcome.stdout.unwrap();\n        assert!(stdout.contains(\"status:skipped missing=9 stale=10 verdict_absent=11\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCheckHandler",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationCheckHandler",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "9d537d22efd82c4a26a34085a00254f08e4036204f2e7083cdfd1341647f5bc2",
+        "declaration_hash": "a5e6b8024062f204de83d3a519d6b1c46d0ddf6b65789f0ab3a9b136487a19b7",
+        "anchor_text_hash": "d86d67b41c2dc8fcf7900b01024de4cb6b600f3a52b684346ae07456f379522a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0);\nlet stdout = outcome.stdout.unwrap();\nassert!(stdout.contains(\"[WARN] todo-lane unresolved\"));\nassert!(stdout.contains(\"missing=1 stale=2 verdict_absent=3\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCheckHandler",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationCheckHandler",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "9d537d22efd82c4a26a34085a00254f08e4036204f2e7083cdfd1341647f5bc2",
+        "declaration_hash": "a5e6b8024062f204de83d3a519d6b1c46d0ddf6b65789f0ab3a9b136487a19b7",
+        "anchor_text_hash": "7f51734dc709d41562974c26066afcf822f75b2225fc77683c6e17fca286fd9a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0);\n        let stdout = outcome.stdout.unwrap();\n        assert!(stdout.contains(\"[WARN] todo-lane unresolved\"));\n        assert!(stdout.contains(\"missing=1 stale=2 verdict_absent=3\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCheckHandler",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationCheckHandler",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "9d537d22efd82c4a26a34085a00254f08e4036204f2e7083cdfd1341647f5bc2",
+        "declaration_hash": "a5e6b8024062f204de83d3a519d6b1c46d0ddf6b65789f0ab3a9b136487a19b7",
+        "anchor_text_hash": "007ae3728466d20236fe554a42f8c4415de8bc8ed0c49cff5b40ff8108946ae1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0);\n        let stdout = outcome.stdout.unwrap();\n        assert!(stdout.contains(\"[WARN] todo-lane unresolved\"));\n        assert!(stdout.contains(\"missing=1 stale=2 verdict_absent=3\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCheckHandler",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationCheckHandler",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "aa6151841f3cef503e7e5eb56ad5597a0e39b8092942ed9c911704a77adf5bcb",
+        "declaration_hash": "a5e6b8024062f204de83d3a519d6b1c46d0ddf6b65789f0ab3a9b136487a19b7",
+        "anchor_text_hash": "2996d7b7f50b4e79f02d8e13c793aa15d27ecd865b360b0e280735d9e8ec9e10"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(outcome.exit_code, 0);\n        assert!(outcome.stderr.unwrap().contains(\"stale obligations artifact\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsHandler",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationResultsHandler",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "22c770129723a355b39875fd09cc51b289ed21db2c689a88cb74e9375340bd78",
+        "declaration_hash": "7de11e5f257b4f8633455092bd131b0599234288a8297a1727b228c05f095ef1",
+        "anchor_text_hash": "74df2ed25f9215f957727d994dbfe9461a1d03d256c79c5d1936b777392d1308"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0); assert!(stdout.contains(\"status:todo missing=1 stale=0 verdict_absent=2\")); assert!(stdout.contains(\"status:in_progress missing=3 stale=4 verdict_absent=5\")); assert!(stdout.contains(\"status:done missing=6 stale=7 verdict_absent=8\")); ... assert_eq!(outcome.exit_code, 0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsHandler",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationResultsHandler",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "c2a1566e829cafb2128d554ecd712fa3542dfaf5f28352322240a3b6b8434a5b",
+        "declaration_hash": "7de11e5f257b4f8633455092bd131b0599234288a8297a1727b228c05f095ef1",
+        "anchor_text_hash": "2996d7b7f50b4e79f02d8e13c793aa15d27ecd865b360b0e280735d9e8ec9e10"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 0);\n        let stdout = outcome.stdout.unwrap();\n        assert!(stdout.contains(\"status:skipped missing=9 stale=10 verdict_absent=11\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "16f7e5c134fff2b212fb0ba2b6be98b499f27349347d84296f491e89cf3926cc",
+        "declaration_hash": "2c7f001f58dfc14cf719b0c8311820d534c2d06c4cae411649e5e3a729ed4e1b",
+        "anchor_text_hash": "faf3a8b36c676e24badd4cb8414753a01b0582ac142cd5cedd655082c9873b9c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "entries.get_mut(\"T003\").and_then(serde_json::Value::as_array_mut).unwrap().push(\n                serde_json::json!({\n                    \"layer\": \"usecase\",\n                    \"entry_key\": \"CheckTestObligationsInteractor\",\n                }),\n            );\n            ...\n            Some(\"T002\") => {\n                        task_fields.insert(\"status\".to_owned(), serde_json::json!(\"in_progress\"));\n                    }\n                    Some(\"T003\") => {\n                        task_fields.insert(\"status\".to_owned(), serde_json::json!(\"todo\"));\n                    }\n            ...\n            assert!(stdout.contains(\"status:in_progress missing=\"));\n            assert!(\n                !stdout.contains(\"status:in_progress missing=0 stale=0 verdict_absent=0\"),\n                \"expected the shared entry to resolve to an unresolved in-progress lane, got: {stdout}\"\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "19c15b4e283386af7e56631b0dda7f7e267170b8d38a2e560683ef0326fc9627",
+        "declaration_hash": "2c7f001f58dfc14cf719b0c8311820d534c2d06c4cae411649e5e3a729ed4e1b",
+        "anchor_text_hash": "dfe76ee6df8df3ed149cd8ea4bd2b7f914b06a18cf41e9bb53ef1a867c168da0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let results = root.results_handler().handle(TestObligationResultsInput::new(Some(\n                domain::TrackId::try_new(TRACK_ID.to_owned()).unwrap(),\n            )));\n            assert_eq!(results.exit_code, 0);\n            let stdout = results.stdout.unwrap();\n            assert!(stdout.contains(\"status:skipped missing=\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "19c15b4e283386af7e56631b0dda7f7e267170b8d38a2e560683ef0326fc9627",
+        "declaration_hash": "2c7f001f58dfc14cf719b0c8311820d534c2d06c4cae411649e5e3a729ed4e1b",
+        "anchor_text_hash": "8d7deb65d9ae63926b4e095e2c529632cc7852bdc2c26611f8d3cf93a36baa64"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(check.exit_code, 0); ... assert_eq!(results.exit_code, 0); ... assert!(stdout.contains(\"status:skipped missing=\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "19c15b4e283386af7e56631b0dda7f7e267170b8d38a2e560683ef0326fc9627",
+        "declaration_hash": "2c7f001f58dfc14cf719b0c8311820d534c2d06c4cae411649e5e3a729ed4e1b",
+        "anchor_text_hash": "2996d7b7f50b4e79f02d8e13c793aa15d27ecd865b360b0e280735d9e8ec9e10"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let check = root.check_handler().handle(check_input);\n            assert_ne!(check.exit_code, 0);\n\n            let results = root.results_handler().handle(TestObligationResultsInput::new(Some(\n                domain::TrackId::try_new(TRACK_ID.to_owned()).unwrap(),\n            )));\n            assert_eq!(results.exit_code, 0);\n            let stdout = results.stdout.unwrap();\n            assert!(stdout.contains(\"status:skipped missing=\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ]
+}

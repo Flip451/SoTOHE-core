@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-11T10:03:54Z",
+  "generated_at": "2026-07-11T12:39:07Z",
   "declaration_hash": "435e0a7b555fd50c69461d0e91389e7eaf29671ebbc3c24c3f893f3986bc8fa6",
   "signals": [
     {
@@ -12,7 +12,7 @@
     {
       "type_name": "TestObligationResultsHandler",
       "kind_tag": "primary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     }
   ]

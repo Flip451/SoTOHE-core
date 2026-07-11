@@ -17,20 +17,20 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CheckTestObligationsInteractor | interactor | modify | — | 🟡 | 🔵 |
-| TestObligationResultsInteractor | interactor | modify | — | 🟡 | 🔵 |
+| CheckTestObligationsInteractor | interactor | modify | — | 🔵 | 🔵 |
+| TestObligationResultsInteractor | interactor | modify | — | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CheckTestObligationsOutcome | dto | modify | — | 🟡 | 🔵 |
-| TestObligationResultsOutput | dto | modify | — | 🟡 | 🔵 |
-| TestObligationStatusLaneSummary | dto | add | — | 🟡 | 🔵 |
+| CheckTestObligationsOutcome | dto | modify | — | 🔵 | 🔵 |
+| TestObligationResultsOutput | dto | modify | — | 🔵 | 🔵 |
+| TestObligationStatusLaneSummary | dto | add | — | 🔵 | 🔵 |
 
 ## Commands
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TestObligationResultsCommand | command | modify | — | 🟡 | 🔵 |
+| TestObligationResultsCommand | command | modify | — | 🔵 | 🔵 |
 

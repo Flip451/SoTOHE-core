@@ -15,7 +15,11 @@
 //! catalogue declaration canonicalisation) live here so `derive` and `check`
 //! freeze and compare declaration hashes identically.
 
+mod check_contract;
+mod check_sources;
 mod check_support;
+mod results_status;
+mod status_lanes;
 
 pub mod bindings_skeleton;
 pub mod check;

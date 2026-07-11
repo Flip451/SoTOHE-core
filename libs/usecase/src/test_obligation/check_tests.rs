@@ -2,10 +2,12 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 
+use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
+use domain::task_contract::{ContractedEntryRef, TaskContractDocument};
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
     CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
@@ -55,16 +57,19 @@ use domain::tddd::test_obligation::vocab::{
 };
 use domain::{
     ContentHash, EvidenceCitation, SpecDocument, SpecDocumentLoadError, SpecElementId, SpecRef,
-    SpecRequirement, SpecScope, TrackId,
+    SpecRequirement, SpecScope, TaskId, TaskStatusKind, TrackId,
 };
 
 use domain::SpecDocumentLoaderPort;
 
+use crate::pre_review_gate::{ImplPlanReaderPort, PreReviewGateError, TaskContractReaderPort};
+
 use super::{
     CheckTestObligationsApplicationService, CheckTestObligationsCommand,
-    CheckTestObligationsInteractor,
+    CheckTestObligationsInteractor, CheckTestObligationsOutcome,
 };
 use crate::test_obligation::derive::derive_obligations_document;
+use crate::test_obligation::results::TestObligationStatusLaneSummary;
 use crate::test_obligation::{
     LoadedCatalogueDocument, TestObligationCatalogueCommandInput, obligation_declaration_text,
     obligation_declaration_text_from_loaded, sha256_content_hash,
@@ -117,6 +122,32 @@ impl TestBindingsArtifactPort for StubBindings {
     fn load(&self, _t: &TrackId) -> Result<Option<TestBindingsDocument>, ArtifactCodecError> {
         Ok(self.0.clone())
     }
+    fn save(&self, _d: &TestBindingsDocument) -> Result<(), DiagnosticMessage> {
+        Ok(())
+    }
+}
+
+struct MalformedObligationsArtifact;
+impl ObligationsArtifactPort for MalformedObligationsArtifact {
+    fn load(&self, _t: &TrackId) -> Result<Option<ObligationsDocument>, ArtifactCodecError> {
+        Err(ArtifactCodecError::MalformedJson(
+            DiagnosticMessage::try_new("malformed obligations artifact".to_owned()).unwrap(),
+        ))
+    }
+
+    fn save(&self, _d: &ObligationsDocument) -> Result<(), DiagnosticMessage> {
+        Ok(())
+    }
+}
+
+struct MalformedBindingsArtifact;
+impl TestBindingsArtifactPort for MalformedBindingsArtifact {
+    fn load(&self, _t: &TrackId) -> Result<Option<TestBindingsDocument>, ArtifactCodecError> {
+        Err(ArtifactCodecError::MalformedJson(
+            DiagnosticMessage::try_new("malformed bindings artifact".to_owned()).unwrap(),
+        ))
+    }
+
     fn save(&self, _d: &TestBindingsDocument) -> Result<(), DiagnosticMessage> {
         Ok(())
     }
@@ -206,6 +237,23 @@ struct FailingCatalogue;
 impl CatalogueDocumentLoaderPort for FailingCatalogue {
     fn load(&self, path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
         Err(CatalogueDocumentLoaderError::NotFound { path: path.to_path_buf() })
+    }
+}
+
+struct StubTaskContractReader(TaskContractDocument);
+impl TaskContractReaderPort for StubTaskContractReader {
+    fn read(&self, _track_id: &TrackId) -> Result<TaskContractDocument, PreReviewGateError> {
+        Ok(self.0.clone())
+    }
+}
+
+struct StubImplPlanReader(HashMap<TaskId, TaskStatusKind>);
+impl ImplPlanReaderPort for StubImplPlanReader {
+    fn read_task_statuses(
+        &self,
+        _track_id: &TrackId,
+    ) -> Result<HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
+        Ok(self.0.clone())
     }
 }
 
@@ -317,6 +365,72 @@ fn empty_rules_doc() -> TestObligationRulesDocument {
 
 fn track() -> TrackId {
     TrackId::try_new("my-track").unwrap()
+}
+
+fn task_contract_reader() -> Arc<dyn TaskContractReaderPort> {
+    let task_id = TaskId::try_new("T001".to_owned()).unwrap();
+    let entry = ContractedEntryRef::new(LayerId::try_new("domain").unwrap(), entry_key());
+    let mut entries = BTreeMap::new();
+    entries.insert(task_id, vec![entry]);
+    Arc::new(StubTaskContractReader(TaskContractDocument::new(track(), entries).unwrap()))
+}
+
+fn impl_plan_reader() -> Arc<dyn ImplPlanReaderPort> {
+    impl_plan_reader_with(&[("T001", TaskStatusKind::Done)])
+}
+
+fn impl_plan_reader_with(statuses: &[(&str, TaskStatusKind)]) -> Arc<dyn ImplPlanReaderPort> {
+    let mut task_statuses = HashMap::new();
+    for (task_id, status) in statuses {
+        task_statuses.insert(TaskId::try_new((*task_id).to_owned()).unwrap(), *status);
+    }
+    Arc::new(StubImplPlanReader(task_statuses))
+}
+
+fn task_contract_reader_with(task_ids: &[&str]) -> Arc<dyn TaskContractReaderPort> {
+    let entry = ContractedEntryRef::new(LayerId::try_new("domain").unwrap(), entry_key());
+    let mut entries = BTreeMap::new();
+    for task_id in task_ids {
+        entries.insert(TaskId::try_new((*task_id).to_owned()).unwrap(), vec![entry.clone()]);
+    }
+    Arc::new(StubTaskContractReader(TaskContractDocument::new(track(), entries).unwrap()))
+}
+
+fn missing_binding_interactor_with_statuses(
+    statuses: &[(&str, TaskStatusKind)],
+) -> CheckTestObligationsInteractor {
+    interactor_with_task_statuses(
+        Some(ObligationsDocument::new(track(), vec![obligation()])),
+        Some(TestBindingsDocument::new(track(), Vec::new())),
+        None,
+        None,
+        statuses,
+    )
+}
+
+fn interactor_with_task_statuses(
+    obligations: Option<ObligationsDocument>,
+    bindings: Option<TestBindingsDocument>,
+    fulfillment: Option<ObligationFulfillmentCacheDocument>,
+    waiver: Option<WaiverCacheDocument>,
+    statuses: &[(&str, TaskStatusKind)],
+) -> CheckTestObligationsInteractor {
+    CheckTestObligationsInteractor::new(
+        Arc::new(StubRules::valid()),
+        Arc::new(StubObligations(obligations)),
+        Arc::new(StubBindings(bindings)),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(fulfillment)),
+        Arc::new(StubWaiverCache(waiver)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+        task_contract_reader_with(
+            &statuses.iter().map(|(task_id, _)| *task_id).collect::<Vec<_>>(),
+        ),
+        impl_plan_reader_with(statuses),
+    )
 }
 
 fn fulfillment_verifier_fingerprint() -> VerifierPromptFingerprint {
@@ -773,6 +887,8 @@ fn interactor_with_rules_and_catalogue(
         waiver_verifier_fingerprint(),
         Arc::new(StubSpec(spec_doc())),
         Arc::new(StubCatalogue(catalogue)),
+        task_contract_reader(),
+        impl_plan_reader(),
     )
 }
 
@@ -808,6 +924,55 @@ fn interactor_with_rules_loader(
         waiver_verifier_fingerprint(),
         Arc::new(StubSpec(spec_doc())),
         Arc::new(StubCatalogue(money_catalogue())),
+        task_contract_reader(),
+        impl_plan_reader(),
+    )
+}
+
+fn interactor_with_rules_loader_and_status(
+    rules_loader: Arc<dyn TestObligationRulesLoaderPort + Send + Sync>,
+    status: TaskStatusKind,
+) -> CheckTestObligationsInteractor {
+    CheckTestObligationsInteractor::new(
+        rules_loader,
+        Arc::new(StubObligations(None)),
+        Arc::new(StubBindings(None)),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(None)),
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+        task_contract_reader(),
+        impl_plan_reader_with(&[("T001", status)]),
+    )
+}
+
+fn unattributable_interactor_with_status(status: TaskStatusKind) -> CheckTestObligationsInteractor {
+    let mut entries = BTreeMap::new();
+    entries.insert(
+        TaskId::try_new("T001".to_owned()).unwrap(),
+        vec![ContractedEntryRef::new(
+            LayerId::try_new("domain".to_owned()).unwrap(),
+            CatalogueEntryKey::try_new("OtherEntry".to_owned()).unwrap(),
+        )],
+    );
+    let mut statuses = HashMap::new();
+    statuses.insert(TaskId::try_new("T001".to_owned()).unwrap(), status);
+    CheckTestObligationsInteractor::new(
+        Arc::new(StubRules::valid()),
+        Arc::new(StubObligations(Some(ObligationsDocument::new(track(), vec![obligation()])))),
+        Arc::new(StubBindings(Some(TestBindingsDocument::new(track(), Vec::new())))),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(None)),
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+        Arc::new(StubTaskContractReader(TaskContractDocument::new(track(), entries).unwrap())),
+        Arc::new(StubImplPlanReader(statuses)),
     )
 }
 
@@ -823,6 +988,8 @@ fn empty_scope_interactor_without_readers() -> CheckTestObligationsInteractor {
         waiver_verifier_fingerprint(),
         Arc::new(FailingSpec),
         Arc::new(FailingCatalogue),
+        task_contract_reader(),
+        impl_plan_reader(),
     )
 }
 
@@ -1054,6 +1221,570 @@ fn test_fresh_fulfilled_verdict_resolves_edge() {
 }
 
 #[test]
+fn test_check_todo_missing_binding_warns_without_blocking() {
+    let outcome = missing_binding_interactor_with_statuses(&[("T001", TaskStatusKind::Todo)])
+        .execute(&command())
+        .unwrap();
+
+    let todo = outcome
+        .status_lane_summaries()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Todo)
+        .unwrap();
+    assert_eq!(todo.missing_count(), 1);
+    assert_eq!(todo.stale_count(), 0);
+    assert_eq!(todo.verdict_absent_count(), 0);
+}
+
+#[test]
+fn test_check_strictest_non_todo_attribution_blocks_missing_binding() {
+    let result = missing_binding_interactor_with_statuses(&[
+        ("T001", TaskStatusKind::Todo),
+        ("T002", TaskStatusKind::InProgress),
+    ])
+    .execute(&command());
+
+    assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));
+}
+
+#[test]
+fn test_check_new_resolves_task_contract_and_impl_plan_strictest_wins() {
+    let todo_task = TaskId::try_new("T001".to_owned()).unwrap();
+    let in_progress_task = TaskId::try_new("T002".to_owned()).unwrap();
+    let contracted_entry =
+        ContractedEntryRef::new(LayerId::try_new("domain").unwrap(), entry_key());
+    let mut entries = BTreeMap::new();
+    entries.insert(todo_task.clone(), vec![contracted_entry.clone()]);
+    entries.insert(in_progress_task.clone(), vec![contracted_entry]);
+    let task_contract = TaskContractDocument::new(track(), entries).unwrap();
+    let mut statuses = HashMap::new();
+    statuses.insert(todo_task, TaskStatusKind::Todo);
+    statuses.insert(in_progress_task, TaskStatusKind::InProgress);
+
+    let interactor = CheckTestObligationsInteractor::new(
+        Arc::new(StubRules::valid()),
+        Arc::new(StubObligations(Some(ObligationsDocument::new(track(), vec![obligation()])))),
+        Arc::new(StubBindings(Some(TestBindingsDocument::new(track(), Vec::new())))),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(None)),
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+        Arc::new(StubTaskContractReader(task_contract)),
+        Arc::new(StubImplPlanReader(statuses)),
+    );
+
+    let result = interactor.execute(&command());
+
+    assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));
+}
+
+#[test]
+fn test_check_in_progress_blocks_while_todo_warns_and_passes() {
+    let in_progress =
+        missing_binding_interactor_with_statuses(&[("T001", TaskStatusKind::InProgress)])
+            .execute(&command());
+    assert!(matches!(in_progress, Err(ObligationCheckError::DriftsDetected { .. })));
+
+    let todo = missing_binding_interactor_with_statuses(&[("T001", TaskStatusKind::Todo)])
+        .execute(&command())
+        .unwrap();
+    let todo_summary = todo
+        .status_lane_summaries()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Todo)
+        .unwrap();
+    assert_eq!(todo_summary.missing_count(), 1);
+    assert_eq!(todo_summary.stale_count(), 0);
+    assert_eq!(todo_summary.verdict_absent_count(), 0);
+}
+
+#[test]
+fn test_check_new_injected_readers_choose_blocking_and_warning_lanes() {
+    let entry = ContractedEntryRef::new(LayerId::try_new("domain").unwrap(), entry_key());
+    let in_progress_task = TaskId::try_new("T001".to_owned()).unwrap();
+    let mut in_progress_entries = BTreeMap::new();
+    in_progress_entries.insert(in_progress_task.clone(), vec![entry.clone()]);
+    let mut in_progress_statuses = HashMap::new();
+    in_progress_statuses.insert(in_progress_task, TaskStatusKind::InProgress);
+
+    let in_progress = CheckTestObligationsInteractor::new(
+        Arc::new(StubRules::valid()),
+        Arc::new(StubObligations(Some(ObligationsDocument::new(track(), vec![obligation()])))),
+        Arc::new(StubBindings(Some(TestBindingsDocument::new(track(), Vec::new())))),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(None)),
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+        Arc::new(StubTaskContractReader(
+            TaskContractDocument::new(track(), in_progress_entries).unwrap(),
+        )),
+        Arc::new(StubImplPlanReader(in_progress_statuses)),
+    )
+    .execute(&command());
+    assert!(matches!(in_progress, Err(ObligationCheckError::DriftsDetected { .. })));
+
+    let todo_task = TaskId::try_new("T001".to_owned()).unwrap();
+    let mut todo_entries = BTreeMap::new();
+    todo_entries.insert(todo_task.clone(), vec![entry]);
+    let mut todo_statuses = HashMap::new();
+    todo_statuses.insert(todo_task, TaskStatusKind::Todo);
+
+    let todo = CheckTestObligationsInteractor::new(
+        Arc::new(StubRules::valid()),
+        Arc::new(StubObligations(Some(ObligationsDocument::new(track(), vec![obligation()])))),
+        Arc::new(StubBindings(Some(TestBindingsDocument::new(track(), Vec::new())))),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(None)),
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+        Arc::new(StubTaskContractReader(TaskContractDocument::new(track(), todo_entries).unwrap())),
+        Arc::new(StubImplPlanReader(todo_statuses)),
+    )
+    .execute(&command())
+    .unwrap();
+    let todo_summary = todo
+        .status_lane_summaries()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Todo)
+        .unwrap();
+    assert_eq!(todo_summary.missing_count(), 1);
+}
+
+#[test]
+fn test_check_done_attribution_blocks_every_unresolved_kind() {
+    let missing = missing_binding_interactor_with_statuses(&[("T001", TaskStatusKind::Done)])
+        .execute(&command());
+    assert!(matches!(missing, Err(ObligationCheckError::DriftsDetected { .. })));
+
+    let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+    let stale_cache = fresh_fulfillment_cache_for_fingerprint(
+        &obligation(),
+        Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))),
+    );
+    let stale = interactor_with_task_statuses(
+        Some(ObligationsDocument::new(track(), vec![obligation()])),
+        Some(bindings.clone()),
+        Some(stale_cache),
+        None,
+        &[("T001", TaskStatusKind::Done)],
+    )
+    .execute(&command());
+    assert!(matches!(stale, Err(ObligationCheckError::StaleVerdicts { .. })));
+
+    let verdict_absent = interactor_with_task_statuses(
+        Some(ObligationsDocument::new(track(), vec![obligation()])),
+        Some(bindings),
+        None,
+        None,
+        &[("T001", TaskStatusKind::Done)],
+    )
+    .execute(&command());
+    assert!(matches!(verdict_absent, Err(ObligationCheckError::StaleVerdicts { .. })));
+}
+
+#[test]
+fn test_check_stale_classification_is_status_independent_before_final_gate() {
+    for status in [
+        TaskStatusKind::Todo,
+        TaskStatusKind::InProgress,
+        TaskStatusKind::Done,
+        TaskStatusKind::Skipped,
+    ] {
+        let result = interactor_with_task_statuses(
+            Some(ObligationsDocument::new(track(), vec![obligation()])),
+            Some(TestBindingsDocument::new(track(), vec![fulfillment_binding()])),
+            Some(fresh_fulfillment_cache_for_fingerprint(
+                &obligation(),
+                Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))),
+            )),
+            None,
+            &[("T001", status)],
+        )
+        .execute(&command());
+
+        if status == TaskStatusKind::Todo {
+            let outcome = result.unwrap();
+            let todo = outcome
+                .status_lane_summaries()
+                .iter()
+                .find(|summary| summary.task_status() == TaskStatusKind::Todo)
+                .unwrap();
+            assert_eq!(todo.verdict_absent_count(), 1);
+        } else {
+            assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));
+        }
+    }
+}
+
+#[test]
+fn test_check_todo_stale_verdict_warns_without_blocking() {
+    let stale_cache = fresh_fulfillment_cache_for_fingerprint(
+        &obligation(),
+        Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))),
+    );
+
+    let outcome = interactor_with_task_statuses(
+        Some(ObligationsDocument::new(track(), vec![obligation()])),
+        Some(TestBindingsDocument::new(track(), vec![fulfillment_binding()])),
+        Some(stale_cache),
+        None,
+        &[("T001", TaskStatusKind::Todo)],
+    )
+    .execute(&command())
+    .unwrap();
+
+    let todo = outcome
+        .status_lane_summaries()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Todo)
+        .unwrap();
+    assert_eq!(todo.missing_count(), 0);
+    assert_eq!(todo.stale_count(), 0);
+    assert_eq!(todo.verdict_absent_count(), 1);
+}
+
+#[test]
+fn test_check_skipped_attribution_blocks_missing_binding() {
+    let result = missing_binding_interactor_with_statuses(&[("T001", TaskStatusKind::Skipped)])
+        .execute(&command());
+
+    assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));
+}
+
+#[test]
+fn test_check_skipped_attribution_blocks_stale_verdict() {
+    let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+    let stale_cache = fresh_fulfillment_cache_for_fingerprint(
+        &obligation(),
+        Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))),
+    );
+
+    let result = interactor_with_task_statuses(
+        Some(ObligationsDocument::new(track(), vec![obligation()])),
+        Some(bindings),
+        Some(stale_cache),
+        None,
+        &[("T001", TaskStatusKind::Skipped)],
+    )
+    .execute(&command());
+
+    assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));
+}
+
+#[test]
+fn test_check_new_fails_closed_for_skipped_missing_and_absent_verdicts() {
+    let task_id = TaskId::try_new("T001".to_owned()).unwrap();
+    let mut entries = BTreeMap::new();
+    entries.insert(
+        task_id.clone(),
+        vec![ContractedEntryRef::new(LayerId::try_new("domain").unwrap(), entry_key())],
+    );
+    let mut statuses = HashMap::new();
+    statuses.insert(task_id, TaskStatusKind::Skipped);
+    let missing = CheckTestObligationsInteractor::new(
+        Arc::new(StubRules::valid()),
+        Arc::new(StubObligations(Some(ObligationsDocument::new(track(), vec![obligation()])))),
+        Arc::new(StubBindings(Some(TestBindingsDocument::new(track(), Vec::new())))),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(None)),
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+        Arc::new(StubTaskContractReader(TaskContractDocument::new(track(), entries).unwrap())),
+        Arc::new(StubImplPlanReader(statuses)),
+    )
+    .execute(&command());
+    assert!(matches!(missing, Err(ObligationCheckError::DriftsDetected { .. })));
+
+    let verdict_absent = interactor_with_task_statuses(
+        Some(ObligationsDocument::new(track(), vec![obligation()])),
+        Some(TestBindingsDocument::new(track(), vec![fulfillment_binding()])),
+        None,
+        None,
+        &[("T001", TaskStatusKind::Skipped)],
+    )
+    .execute(&command());
+    assert!(matches!(verdict_absent, Err(ObligationCheckError::StaleVerdicts { .. })));
+}
+
+#[test]
+fn test_check_outcome_retains_skipped_lane_summary() {
+    let outcome = CheckTestObligationsOutcome::new_verified_scope(
+        Vec::new(),
+        Vec::new(),
+        vec![TestObligationStatusLaneSummary::new(TaskStatusKind::Skipped, 1, 2, 3)],
+    );
+
+    let skipped = outcome
+        .status_lane_summaries()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Skipped)
+        .unwrap();
+    assert_eq!(skipped.missing_count(), 1);
+    assert_eq!(skipped.stale_count(), 2);
+    assert_eq!(skipped.verdict_absent_count(), 3);
+}
+
+#[test]
+fn test_check_verdict_absence_warns_for_todo_but_blocks_skipped() {
+    let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+    let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+
+    let todo_outcome = interactor_with_task_statuses(
+        Some(obligations.clone()),
+        Some(bindings.clone()),
+        None,
+        None,
+        &[("T001", TaskStatusKind::Todo)],
+    )
+    .execute(&command())
+    .unwrap();
+    let todo = todo_outcome
+        .status_lane_summaries()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Todo)
+        .unwrap();
+    assert_eq!(todo.verdict_absent_count(), 1);
+
+    let skipped_result = interactor_with_task_statuses(
+        Some(obligations),
+        Some(bindings),
+        None,
+        None,
+        &[("T001", TaskStatusKind::Skipped)],
+    )
+    .execute(&command());
+    assert!(matches!(skipped_result, Err(ObligationCheckError::StaleVerdicts { .. })));
+}
+
+#[test]
+fn test_check_orphaned_binding_fails_closed_for_todo() {
+    let expected_obligation = obligation();
+    let orphaned_obligation = obligation_with_item("orphaned");
+    let bindings = TestBindingsDocument::new(
+        track(),
+        vec![
+            fulfillment_binding_for(&expected_obligation),
+            fulfillment_binding_for(&orphaned_obligation),
+        ],
+    );
+
+    let result = interactor_with_task_statuses(
+        Some(ObligationsDocument::new(track(), vec![expected_obligation])),
+        Some(bindings),
+        Some(fresh_fulfillment_cache()),
+        None,
+        &[("T001", TaskStatusKind::Todo)],
+    )
+    .execute(&command());
+
+    assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));
+}
+
+#[test]
+fn test_check_orphaned_binding_across_task_statuses_returns_same_drift() {
+    let mut classifications = Vec::new();
+
+    for status in [TaskStatusKind::Todo, TaskStatusKind::Done] {
+        let expected_obligation = obligation();
+        let orphaned_obligation = obligation_with_item("orphaned");
+        let bindings = TestBindingsDocument::new(
+            track(),
+            vec![
+                fulfillment_binding_for(&expected_obligation),
+                fulfillment_binding_for(&orphaned_obligation),
+            ],
+        );
+        let result = interactor_with_task_statuses(
+            Some(ObligationsDocument::new(track(), vec![expected_obligation])),
+            Some(bindings),
+            Some(fresh_fulfillment_cache()),
+            None,
+            &[("T001", status)],
+        )
+        .execute(&command());
+
+        let Err(ObligationCheckError::DriftsDetected { drifts }) = result else {
+            panic!("orphaned binding must remain a structural drift for every status");
+        };
+        assert_eq!(drifts.as_slice().len(), 1);
+        let classification = format!("{drifts:?}");
+        assert!(classification.contains("Orphaned"));
+        classifications.push(classification);
+    }
+
+    assert_eq!(classifications[0], classifications[1]);
+}
+
+#[test]
+fn test_check_malformed_artifacts_block_across_task_statuses() {
+    for status in [
+        TaskStatusKind::Todo,
+        TaskStatusKind::InProgress,
+        TaskStatusKind::Done,
+        TaskStatusKind::Skipped,
+    ] {
+        let malformed_obligations = CheckTestObligationsInteractor::new(
+            Arc::new(StubRules::valid()),
+            Arc::new(MalformedObligationsArtifact),
+            Arc::new(StubBindings(None)),
+            Arc::new(StubScanner),
+            Arc::new(StubFulfillmentCache(None)),
+            Arc::new(StubWaiverCache(None)),
+            fulfillment_verifier_fingerprint(),
+            waiver_verifier_fingerprint(),
+            Arc::new(StubSpec(spec_doc())),
+            Arc::new(StubCatalogue(money_catalogue())),
+            task_contract_reader(),
+            impl_plan_reader_with(&[("T001", status)]),
+        )
+        .execute(&command());
+        assert!(matches!(
+            malformed_obligations,
+            Err(ObligationCheckError::ArtifactCodec(ArtifactCodecError::MalformedJson(_)))
+        ));
+
+        let malformed_bindings = CheckTestObligationsInteractor::new(
+            Arc::new(StubRules::valid()),
+            Arc::new(StubObligations(None)),
+            Arc::new(MalformedBindingsArtifact),
+            Arc::new(StubScanner),
+            Arc::new(StubFulfillmentCache(None)),
+            Arc::new(StubWaiverCache(None)),
+            fulfillment_verifier_fingerprint(),
+            waiver_verifier_fingerprint(),
+            Arc::new(StubSpec(spec_doc())),
+            Arc::new(StubCatalogue(money_catalogue())),
+            task_contract_reader(),
+            impl_plan_reader_with(&[("T001", status)]),
+        )
+        .execute(&command());
+        assert!(matches!(
+            malformed_bindings,
+            Err(ObligationCheckError::ArtifactCodec(ArtifactCodecError::MalformedJson(_)))
+        ));
+    }
+}
+
+#[test]
+fn test_check_coverage_broken_entry_blocks_across_task_statuses() {
+    for status in [
+        TaskStatusKind::Todo,
+        TaskStatusKind::InProgress,
+        TaskStatusKind::Done,
+        TaskStatusKind::Skipped,
+    ] {
+        // The contract omits Money, which makes this fixture fail the required
+        // task-contract coverage precondition before status interpretation.
+        let mut entries = BTreeMap::new();
+        entries.insert(
+            TaskId::try_new("T001".to_owned()).unwrap(),
+            vec![ContractedEntryRef::new(
+                LayerId::try_new("domain".to_owned()).unwrap(),
+                CatalogueEntryKey::try_new("OtherEntry".to_owned()).unwrap(),
+            )],
+        );
+        let mut statuses = HashMap::new();
+        statuses.insert(TaskId::try_new("T001".to_owned()).unwrap(), status);
+        let interactor = CheckTestObligationsInteractor::new(
+            Arc::new(StubRules::valid()),
+            Arc::new(StubObligations(Some(ObligationsDocument::new(track(), vec![obligation()])))),
+            Arc::new(StubBindings(Some(TestBindingsDocument::new(track(), Vec::new())))),
+            Arc::new(StubScanner),
+            Arc::new(StubFulfillmentCache(None)),
+            Arc::new(StubWaiverCache(None)),
+            fulfillment_verifier_fingerprint(),
+            waiver_verifier_fingerprint(),
+            Arc::new(StubSpec(spec_doc())),
+            Arc::new(StubCatalogue(money_catalogue())),
+            Arc::new(StubTaskContractReader(TaskContractDocument::new(track(), entries).unwrap())),
+            Arc::new(StubImplPlanReader(statuses)),
+        );
+
+        let result = interactor.execute(&command());
+
+        assert!(matches!(result, Err(ObligationCheckError::TaskAttribution(_))));
+    }
+}
+
+#[test]
+fn test_check_unattributable_entry_returns_task_attribution_error() {
+    let mut entries = BTreeMap::new();
+    entries.insert(
+        TaskId::try_new("T001".to_owned()).unwrap(),
+        vec![ContractedEntryRef::new(
+            LayerId::try_new("domain".to_owned()).unwrap(),
+            CatalogueEntryKey::try_new("OtherEntry".to_owned()).unwrap(),
+        )],
+    );
+    let task_contract = TaskContractDocument::new(track(), entries).unwrap();
+    let mut statuses = HashMap::new();
+    statuses.insert(TaskId::try_new("T001".to_owned()).unwrap(), TaskStatusKind::Todo);
+    let interactor = CheckTestObligationsInteractor::new(
+        Arc::new(StubRules::valid()),
+        Arc::new(StubObligations(Some(ObligationsDocument::new(track(), vec![obligation()])))),
+        Arc::new(StubBindings(Some(TestBindingsDocument::new(track(), Vec::new())))),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(None)),
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+        Arc::new(StubTaskContractReader(task_contract)),
+        Arc::new(StubImplPlanReader(statuses)),
+    );
+
+    let result = interactor.execute(&command());
+
+    assert!(matches!(result, Err(ObligationCheckError::TaskAttribution(_))));
+}
+
+#[test]
+fn test_check_structural_failures_block_regardless_of_task_status() {
+    for status in [
+        TaskStatusKind::Todo,
+        TaskStatusKind::InProgress,
+        TaskStatusKind::Done,
+        TaskStatusKind::Skipped,
+    ] {
+        let unattributable = unattributable_interactor_with_status(status).execute(&command());
+        assert!(matches!(unattributable, Err(ObligationCheckError::TaskAttribution(_))));
+
+        let invalid_rules = interactor_with_rules_loader_and_status(Arc::new(FailingRules), status)
+            .execute(&command());
+        assert!(matches!(
+            invalid_rules,
+            Err(ObligationCheckError::RulesLoad(
+                TestObligationRulesLoadError::RoleNotCovered { .. }
+            ))
+        ));
+    }
+}
+
+#[test]
+fn test_check_with_skipped_and_todo_attribution_blocks() {
+    let result = missing_binding_interactor_with_statuses(&[
+        ("T001", TaskStatusKind::Todo),
+        ("T002", TaskStatusKind::Skipped),
+    ])
+    .execute(&command());
+
+    assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));
+}
+
+#[test]
 fn test_new_accepts_and_wires_declared_dependencies() {
     let obligations = derived_obligations(rules_doc(), money_catalogue());
     let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
@@ -1074,6 +1805,8 @@ fn test_new_accepts_and_wires_declared_dependencies() {
         waiver_fingerprint.clone(),
         Arc::new(StubSpec(spec_doc())),
         Arc::new(StubCatalogue(money_catalogue())),
+        task_contract_reader(),
+        impl_plan_reader(),
     );
 
     let outcome = interactor.execute(&command()).unwrap();
@@ -1094,6 +1827,8 @@ fn test_new_accepts_and_wires_declared_dependencies() {
         waiver_fingerprint,
         Arc::new(StubSpec(spec_doc())),
         Arc::new(StubCatalogue(money_catalogue())),
+        task_contract_reader(),
+        impl_plan_reader(),
     );
 
     let waiver_outcome = waiver_interactor.execute(&command()).unwrap();
@@ -1203,6 +1938,8 @@ fn test_check_reads_bindings_without_mutating_the_artifact() {
         waiver_verifier_fingerprint(),
         Arc::new(StubSpec(spec_doc())),
         Arc::new(StubCatalogue(money_catalogue())),
+        task_contract_reader(),
+        impl_plan_reader(),
     );
 
     let outcome = interactor.execute(&command()).unwrap();
