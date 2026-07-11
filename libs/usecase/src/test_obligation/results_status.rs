@@ -3,6 +3,7 @@
 use std::path::PathBuf;
 
 use domain::SpecDocumentLoaderPort;
+use domain::TrackId;
 use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort;
 use domain::tddd::test_obligation::binding::{TestBindingsDocument, TestLocation};
 use domain::tddd::test_obligation::errors::ObligationResultsError;
@@ -14,7 +15,6 @@ use domain::tddd::test_obligation::verdict::{
     ObligationFulfillmentCacheDocument, ObligationFulfillmentVerdict, WaiverCacheDocument,
     WaiverVerdict,
 };
-use domain::{TrackId, tddd::semantic_verify::CatalogueEntryKey};
 
 use crate::pre_review_gate::{ImplPlanReaderPort, TaskContractReaderPort};
 
@@ -25,7 +25,8 @@ use super::check_support::{
 };
 use super::results::TestObligationStatusLaneSummary;
 use super::status_lanes::{
-    StatusLaneFinding, StatusLaneFindingKind, TaskStatusAttributor, tally_findings,
+    StatusLaneFinding, StatusLaneFindingKind, StatusLaneTarget, TaskStatusAttributor,
+    tally_findings, target_for_direct_edge, target_for_obligation, targets_for_scope,
 };
 use super::{
     LoadedCatalogueDocument, diag, find_declaration_text_from_loaded,
@@ -64,20 +65,12 @@ pub(super) fn collect_status_lane_summaries(
     let spec_texts = anchor_texts(&spec_elements_from_document(&spec));
     let cited_edges = active_cited_edges_from_catalogues(&catalogues)
         .map_err(|error| malformed(&format!("catalogue edge read failed: {error:?}")))?;
-    let entry_keys = obligations
-        .obligations()
-        .iter()
-        .map(|obligation| obligation.id().entry_key().clone())
-        .chain(cited_edges.iter().map(|edge| edge.entry_key().clone()))
-        .collect::<Vec<_>>();
-    let attributor = TaskStatusAttributor::load(
-        task_contract_reader,
-        impl_plan_reader,
-        track_id,
-        &catalogues,
-        &entry_keys,
-    )
-    .map_err(|error| malformed(&format!("task attribution failed: {}", error.as_str())))?;
+    let targets = targets_for_scope(obligations, &cited_edges, &catalogues).map_err(|error| {
+        malformed(&format!("task attribution target failed: {}", error.as_str()))
+    })?;
+    let attributor =
+        TaskStatusAttributor::load(task_contract_reader, impl_plan_reader, track_id, &targets)
+            .map_err(|error| malformed(&format!("task attribution failed: {}", error.as_str())))?;
     let fulfillment = fulfillment
         .cloned()
         .unwrap_or_else(|| ObligationFulfillmentCacheDocument::new(track_id.clone(), Vec::new()));
@@ -146,6 +139,9 @@ fn collect_obligation_findings(
     waiver_fingerprint: &VerifierPromptFingerprint,
     findings: &mut Vec<StatusLaneFinding>,
 ) -> Result<(), ObligationResultsError> {
+    let target = target_for_obligation(catalogues, obligation).map_err(|error| {
+        malformed(&format!("task attribution target failed: {}", error.as_str()))
+    })?;
     let edges = obligation
         .spec_refs()
         .iter()
@@ -157,7 +153,7 @@ fn collect_obligation_findings(
     let any_voluntary = edges.iter().any(|edge| voluntary_tests(bindings, edge).is_some());
     let any_waived = edges.iter().any(|edge| waived_reason(bindings, edge).is_some());
     if fulfilled.is_none() && !any_voluntary && !any_waived {
-        findings.push(missing(obligation.id().entry_key().clone()));
+        findings.push(missing(target));
         return Ok(());
     }
     for edge in edges {
@@ -166,6 +162,7 @@ fn collect_obligation_findings(
                 &edge,
                 &reason,
                 obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default(),
+                &target,
                 spec_texts,
                 waiver,
                 waiver_fingerprint,
@@ -177,6 +174,7 @@ fn collect_obligation_findings(
                 obligation.id(),
                 tests,
                 obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default(),
+                &target,
                 spec_texts,
                 fulfillment,
                 source_scanner,
@@ -189,6 +187,7 @@ fn collect_obligation_findings(
                 obligation.id(),
                 tests,
                 obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default(),
+                &target,
                 spec_texts,
                 fulfillment,
                 source_scanner,
@@ -196,7 +195,7 @@ fn collect_obligation_findings(
                 findings,
             )?;
         } else {
-            findings.push(missing(edge.entry_key().clone()));
+            findings.push(missing(target.clone()));
         }
     }
     Ok(())
@@ -215,6 +214,9 @@ fn collect_direct_edge_findings(
     waiver_fingerprint: &VerifierPromptFingerprint,
     findings: &mut Vec<StatusLaneFinding>,
 ) -> Result<(), ObligationResultsError> {
+    let target = target_for_direct_edge(catalogues, edge).map_err(|error| {
+        malformed(&format!("task attribution target failed: {}", error.as_str()))
+    })?;
     let declaration = find_declaration_text_from_loaded(catalogues, edge.entry_key().as_str())
         .unwrap_or_default();
     if let Some(reason) = waived_reason(bindings, edge) {
@@ -222,6 +224,7 @@ fn collect_direct_edge_findings(
             edge,
             &reason,
             declaration,
+            &target,
             spec_texts,
             waiver,
             waiver_fingerprint,
@@ -233,6 +236,7 @@ fn collect_direct_edge_findings(
             &synthetic_voluntary_obligation_id(edge),
             tests,
             declaration,
+            &target,
             spec_texts,
             fulfillment,
             source_scanner,
@@ -240,7 +244,7 @@ fn collect_direct_edge_findings(
             findings,
         )?;
     } else {
-        findings.push(missing(edge.entry_key().clone()));
+        findings.push(missing(target));
     }
     Ok(())
 }
@@ -251,6 +255,7 @@ fn inspect_fulfillment(
     obligation_id: &TestObligationId,
     tests: &[TestLocation],
     declaration: String,
+    target: &StatusLaneTarget,
     spec_texts: &[(String, String)],
     cache: &ObligationFulfillmentCacheDocument,
     source_scanner: &dyn TestSourceScannerPort,
@@ -263,7 +268,7 @@ fn inspect_fulfillment(
             .scan_test_body(test)
             .map_err(|error| malformed(&format!("test source read failed: {error:?}")))?
         else {
-            findings.push(missing(edge.entry_key().clone()));
+            findings.push(missing(target.clone()));
             return Ok(());
         };
         source.push_str(&body);
@@ -274,11 +279,11 @@ fn inspect_fulfillment(
         .iter()
         .find(|entry| entry.edge_id() == edge && entry.obligation_id() == obligation_id)
     else {
-        findings.push(verdict_absent(edge.entry_key().clone()));
+        findings.push(verdict_absent(target.clone()));
         return Ok(());
     };
     if entry.verifier_fingerprint() != Some(verifier_fingerprint) {
-        findings.push(verdict_absent(edge.entry_key().clone()));
+        findings.push(verdict_absent(target.clone()));
         return Ok(());
     }
     let current_bound = sha256_content_hash(source.as_bytes());
@@ -289,28 +294,30 @@ fn inspect_fulfillment(
         || key.declaration_hash().as_hash() != &current_decl
         || key.anchor_text_hash().as_hash() != &current_anchor
     {
-        findings.push(stale(edge.entry_key().clone()));
+        findings.push(stale(target.clone()));
     } else if !matches!(entry.verdict(), ObligationFulfillmentVerdict::Fulfilled { .. }) {
-        findings.push(verdict_absent(edge.entry_key().clone()));
+        findings.push(verdict_absent(target.clone()));
     }
     Ok(())
 }
 
+#[allow(clippy::too_many_arguments)]
 fn inspect_waiver(
     edge: &TestObligationEdgeId,
     reason: &WaivedReason,
     declaration: String,
+    target: &StatusLaneTarget,
     spec_texts: &[(String, String)],
     cache: &WaiverCacheDocument,
     verifier_fingerprint: &VerifierPromptFingerprint,
     findings: &mut Vec<StatusLaneFinding>,
 ) {
     let Some(entry) = cache.entries().iter().find(|entry| entry.edge_id() == edge) else {
-        findings.push(verdict_absent(edge.entry_key().clone()));
+        findings.push(verdict_absent(target.clone()));
         return;
     };
     if entry.verifier_fingerprint() != Some(verifier_fingerprint) {
-        findings.push(verdict_absent(edge.entry_key().clone()));
+        findings.push(verdict_absent(target.clone()));
         return;
     }
     let current_reason = sha256_content_hash(reason.as_str().as_bytes());
@@ -321,9 +328,9 @@ fn inspect_waiver(
         || key.declaration_hash().as_hash() != &current_decl
         || key.anchor_text_hash().as_hash() != &current_anchor
     {
-        findings.push(stale(edge.entry_key().clone()));
+        findings.push(stale(target.clone()));
     } else if !matches!(entry.verdict(), WaiverVerdict::Waived { .. }) {
-        findings.push(verdict_absent(edge.entry_key().clone()));
+        findings.push(verdict_absent(target.clone()));
     }
 }
 
@@ -355,16 +362,16 @@ pub(super) fn empty_status_lane_summaries() -> Vec<TestObligationStatusLaneSumma
     .collect()
 }
 
-fn missing(entry_key: CatalogueEntryKey) -> StatusLaneFinding {
-    StatusLaneFinding::new(entry_key, StatusLaneFindingKind::Missing)
+fn missing(target: StatusLaneTarget) -> StatusLaneFinding {
+    StatusLaneFinding::new(target, StatusLaneFindingKind::Missing)
 }
 
-fn stale(entry_key: CatalogueEntryKey) -> StatusLaneFinding {
-    StatusLaneFinding::new(entry_key, StatusLaneFindingKind::Stale)
+fn stale(target: StatusLaneTarget) -> StatusLaneFinding {
+    StatusLaneFinding::new(target, StatusLaneFindingKind::Stale)
 }
 
-fn verdict_absent(entry_key: CatalogueEntryKey) -> StatusLaneFinding {
-    StatusLaneFinding::new(entry_key, StatusLaneFindingKind::VerdictAbsent)
+fn verdict_absent(target: StatusLaneTarget) -> StatusLaneFinding {
+    StatusLaneFinding::new(target, StatusLaneFindingKind::VerdictAbsent)
 }
 
 fn malformed(message: &str) -> ObligationResultsError {

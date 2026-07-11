@@ -233,6 +233,17 @@ impl CatalogueDocumentLoaderPort for StubCatalogue {
     }
 }
 
+struct StubCatalogues(Vec<(PathBuf, CatalogueDocument)>);
+impl CatalogueDocumentLoaderPort for StubCatalogues {
+    fn load(&self, path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
+        self.0
+            .iter()
+            .find(|(known_path, _)| known_path == path)
+            .map(|(_, document)| document.clone())
+            .ok_or_else(|| CatalogueDocumentLoaderError::NotFound { path: path.to_path_buf() })
+    }
+}
+
 struct FailingCatalogue;
 impl CatalogueDocumentLoaderPort for FailingCatalogue {
     fn load(&self, path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
@@ -602,6 +613,37 @@ fn money_catalogue() -> CatalogueDocument {
         TypeRef::new("MyPort").unwrap(),
         TypeRef::new("Money").unwrap(),
     ));
+    doc
+}
+
+fn money_catalogue_in_layer(
+    crate_name: &str,
+    layer: &str,
+    action: ItemAction,
+) -> CatalogueDocument {
+    let mut doc = CatalogueDocument::new(
+        5,
+        CrateName::new(crate_name).unwrap(),
+        LayerId::try_new(layer).unwrap(),
+    );
+    doc.insert_type(
+        TypeName::new("Money").unwrap(),
+        TypeEntry::new(
+            action,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![SpecRef::new(
+                PathBuf::from("spec.json"),
+                SpecElementId::try_new("IN-05").unwrap(),
+            )],
+            vec![],
+        ),
+    );
     doc
 }
 
@@ -1119,6 +1161,73 @@ fn test_obligation_declaration_text_with_relative_catalogue_identity_matches_anc
 
     assert!(declaration.contains("ValueObject"));
     assert!(!declaration.contains("Entity"));
+}
+
+#[test]
+fn test_check_same_entry_in_two_layers_uses_obligation_origin_for_status_lane() {
+    let domain_catalogue = money_catalogue_in_layer("domain", "domain", ItemAction::Reference);
+    let usecase_catalogue = money_catalogue_in_layer("usecase", "usecase", ItemAction::Add);
+    let catalogue_paths =
+        vec![PathBuf::from("domain-types.json"), PathBuf::from("usecase-types.json")];
+    let obligations = derive_obligations_document(
+        track(),
+        &rules_doc(),
+        &[
+            (catalogue_paths[0].clone(), domain_catalogue.clone()),
+            (catalogue_paths[1].clone(), usecase_catalogue.clone()),
+        ],
+        &RoleObligationItemsProjector::new(),
+    )
+    .unwrap();
+
+    let mut entries = BTreeMap::new();
+    entries.insert(
+        TaskId::try_new("T001".to_owned()).unwrap(),
+        vec![ContractedEntryRef::new(LayerId::try_new("domain").unwrap(), entry_key())],
+    );
+    entries.insert(
+        TaskId::try_new("T002".to_owned()).unwrap(),
+        vec![ContractedEntryRef::new(LayerId::try_new("usecase").unwrap(), entry_key())],
+    );
+    let mut statuses = HashMap::new();
+    statuses.insert(TaskId::try_new("T001".to_owned()).unwrap(), TaskStatusKind::Done);
+    statuses.insert(TaskId::try_new("T002".to_owned()).unwrap(), TaskStatusKind::Todo);
+    let interactor = CheckTestObligationsInteractor::new(
+        Arc::new(StubRules::valid()),
+        Arc::new(StubObligations(Some(obligations))),
+        Arc::new(StubBindings(Some(TestBindingsDocument::new(track(), Vec::new())))),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(None)),
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogues(vec![
+            (catalogue_paths[0].clone(), domain_catalogue),
+            (catalogue_paths[1].clone(), usecase_catalogue),
+        ])),
+        Arc::new(StubTaskContractReader(TaskContractDocument::new(track(), entries).unwrap())),
+        Arc::new(StubImplPlanReader(statuses)),
+    );
+    let command = CheckTestObligationsCommand::new(TestObligationCatalogueCommandInput::new(
+        track(),
+        "track/my-track".to_owned(),
+        catalogue_paths,
+    ));
+
+    let outcome = interactor.execute(&command).unwrap();
+    let todo = outcome
+        .status_lane_summaries()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Todo)
+        .unwrap();
+    let done = outcome
+        .status_lane_summaries()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Done)
+        .unwrap();
+    assert_eq!(todo.missing_count(), 1);
+    assert_eq!(done.missing_count(), 0);
 }
 
 #[test]

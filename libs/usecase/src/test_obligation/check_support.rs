@@ -21,7 +21,7 @@ use domain::tddd::test_obligation::scope::UncitedSpecElementFinding;
 use domain::tddd::test_obligation::vocab::TestObligationKind;
 use domain::{SpecDocument, SpecElementId, SpecRef, SpecRequirement};
 
-use super::status_lanes::{StatusLaneFinding, StatusLaneFindingKind};
+use super::status_lanes::{StatusLaneFinding, StatusLaneFindingKind, StatusLaneTarget};
 use super::{LoadedCatalogueDocument, cited_anchor_ids, diag};
 
 /// Mutable accumulators for a single `check` run.
@@ -40,10 +40,10 @@ impl GateState {
     pub(super) fn status_drift(
         &mut self,
         drift: TestObligationDrift,
-        entry_key: CatalogueEntryKey,
+        target: StatusLaneTarget,
         kind: StatusLaneFindingKind,
     ) {
-        self.status_drifts.push((drift, StatusLaneFinding::new(entry_key, kind)));
+        self.status_drifts.push((drift, StatusLaneFinding::new(target, kind)));
     }
 
     /// Records an orphaned binding, which remains structural in every lane.
@@ -52,19 +52,17 @@ impl GateState {
     }
 
     /// Records an edge with no binding resolution.
-    pub(super) fn unresolved(&mut self, edge: TestObligationEdgeId) {
-        self.unresolved.push((
-            edge.clone(),
-            StatusLaneFinding::new(edge.entry_key().clone(), StatusLaneFindingKind::Missing),
-        ));
+    pub(super) fn unresolved(&mut self, edge: TestObligationEdgeId, target: StatusLaneTarget) {
+        self.unresolved
+            .push((edge.clone(), StatusLaneFinding::new(target, StatusLaneFindingKind::Missing)));
     }
 
     /// Records an edge with no usable current verdict, including fingerprint
     /// mismatch or absence.
-    pub(super) fn verdict_absent(&mut self, edge: TestObligationEdgeId) {
+    pub(super) fn verdict_absent(&mut self, edge: TestObligationEdgeId, target: StatusLaneTarget) {
         self.verdict_absent.push((
             edge.clone(),
-            StatusLaneFinding::new(edge.entry_key().clone(), StatusLaneFindingKind::VerdictAbsent),
+            StatusLaneFinding::new(target, StatusLaneFindingKind::VerdictAbsent),
         ));
     }
 

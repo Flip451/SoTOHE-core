@@ -10,7 +10,7 @@ use domain::tddd::test_obligation::ids::{TestObligationEdgeId, TestObligationId}
 
 use super::check::CheckTestObligationsInteractor;
 use super::check_support::GateState;
-use super::status_lanes::StatusLaneFindingKind;
+use super::status_lanes::{StatusLaneFindingKind, StatusLaneTarget};
 use super::{diag, sha256_content_hash};
 
 impl CheckTestObligationsInteractor {
@@ -58,17 +58,18 @@ impl CheckTestObligationsInteractor {
         edge: &TestObligationEdgeId,
         obligation_id: &TestObligationId,
         tests: &[TestLocation],
+        target: &StatusLaneTarget,
         gate: &mut GateState,
     ) -> Result<(), ObligationCheckError> {
         if self.bound_test_sources_exist(tests)? {
-            gate.verdict_absent(edge.clone());
+            gate.verdict_absent(edge.clone(), target.clone());
         } else {
             gate.status_drift(
                 TestObligationDrift::missing_obligation(
                     obligation_id.clone(),
                     diag("bound test source not found"),
                 ),
-                obligation_id.entry_key().clone(),
+                target.clone(),
                 StatusLaneFindingKind::Missing,
             );
         }

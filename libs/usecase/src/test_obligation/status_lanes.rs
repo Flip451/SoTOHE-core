@@ -3,13 +3,41 @@
 
 use std::collections::HashMap;
 
+use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::CatalogueDocument;
 use domain::tddd::semantic_verify::CatalogueEntryKey;
+use domain::tddd::test_obligation::ids::TestObligationEdgeId;
+use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
 use domain::{TaskId, TaskStatusKind, TrackId};
 
 use crate::pre_review_gate::{ImplPlanReaderPort, TaskContractReaderPort};
 
 use super::{LoadedCatalogueDocument, diag};
+
+/// A catalogue entry qualified by the layer that owns its task-contract row.
+///
+/// Test-obligation ids deliberately use only an entry key, but task-contract
+/// attribution is defined over `(layer, entry_key)`. Keeping the layer here
+/// prevents same-named entries from different catalogues being conflated.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(super) struct StatusLaneTarget {
+    layer: LayerId,
+    entry_key: CatalogueEntryKey,
+}
+
+impl StatusLaneTarget {
+    fn new(layer: LayerId, entry_key: CatalogueEntryKey) -> Self {
+        Self { layer, entry_key }
+    }
+
+    fn layer(&self) -> &LayerId {
+        &self.layer
+    }
+
+    fn entry_key(&self) -> &CatalogueEntryKey {
+        &self.entry_key
+    }
+}
 
 /// The category of an unresolved edge reported in a task-status lane.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -22,21 +50,21 @@ pub(super) enum StatusLaneFindingKind {
 /// An unresolved finding attributed by its catalogue entry key.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct StatusLaneFinding {
-    entry_key: CatalogueEntryKey,
+    target: StatusLaneTarget,
     kind: StatusLaneFindingKind,
 }
 
 impl StatusLaneFinding {
     /// Builds a status-attributable unresolved finding.
     #[must_use]
-    pub(super) fn new(entry_key: CatalogueEntryKey, kind: StatusLaneFindingKind) -> Self {
-        Self { entry_key, kind }
+    pub(super) fn new(target: StatusLaneTarget, kind: StatusLaneFindingKind) -> Self {
+        Self { target, kind }
     }
 
-    /// Returns the target catalogue entry key.
+    /// Returns the source-qualified target catalogue entry.
     #[must_use]
-    pub(super) fn entry_key(&self) -> &CatalogueEntryKey {
-        &self.entry_key
+    pub(super) fn target(&self) -> &StatusLaneTarget {
+        &self.target
     }
 
     /// Returns the unresolved category.
@@ -87,19 +115,18 @@ impl StatusLaneTally {
 
 /// Resolves every relevant catalogue entry to its strictest task status.
 pub(super) struct TaskStatusAttributor {
-    statuses: Vec<(CatalogueEntryKey, TaskStatusKind)>,
+    statuses: Vec<(StatusLaneTarget, TaskStatusKind)>,
 }
 
 impl TaskStatusAttributor {
-    /// Loads the two existing task artifacts and resolves `entry_key → status`
-    /// for every supplied entry. Missing or ambiguous attribution is structural
+    /// Loads the two existing task artifacts and resolves `(layer, entry_key)
+    /// → status` for every supplied target. Missing attribution is structural
     /// and is therefore returned to the caller as a fail-closed diagnostic.
     pub(super) fn load(
         task_contract_reader: &dyn TaskContractReaderPort,
         impl_plan_reader: &dyn ImplPlanReaderPort,
         track_id: &TrackId,
-        catalogues: &[LoadedCatalogueDocument],
-        entry_keys: &[CatalogueEntryKey],
+        targets: &[StatusLaneTarget],
     ) -> Result<Self, domain::tddd::test_obligation::ids::DiagnosticMessage> {
         let contract = task_contract_reader
             .read(track_id)
@@ -109,32 +136,25 @@ impl TaskStatusAttributor {
             .map_err(|error| diag(&format!("impl-plan attribution read failed: {error}")))?;
 
         let mut statuses = Vec::new();
-        for entry_key in entry_keys {
-            if statuses.iter().any(|(known, _)| known == entry_key) {
+        for target in targets {
+            if statuses.iter().any(|(known, _)| known == target) {
                 continue;
             }
-            let layers = layers_for_entry(catalogues, entry_key);
-            let Some(layer) = exactly_one(layers) else {
-                return Err(diag(&format!(
-                    "cannot uniquely resolve catalogue layer for entry '{}'",
-                    entry_key.as_str()
-                )));
-            };
-            let task_ids = task_ids_for_entry(&contract, &layer, entry_key);
+            let task_ids = task_ids_for_entry(&contract, target.layer(), target.entry_key());
             if task_ids.is_empty() {
                 return Err(diag(&format!(
                     "entry '{}' in layer '{}' has no task attribution",
-                    entry_key.as_str(),
-                    layer.as_ref()
+                    target.entry_key().as_str(),
+                    target.layer().as_ref()
                 )));
             }
             let status = strictest_status(&task_ids, &task_statuses).ok_or_else(|| {
                 diag(&format!(
                     "entry '{}' references a task absent from impl-plan.json",
-                    entry_key.as_str()
+                    target.entry_key().as_str()
                 ))
             })?;
-            statuses.push((entry_key.clone(), status));
+            statuses.push((target.clone(), status));
         }
         Ok(Self { statuses })
     }
@@ -142,16 +162,17 @@ impl TaskStatusAttributor {
     /// Returns the resolved status for one already-validated target entry.
     pub(super) fn status_for(
         &self,
-        entry_key: &CatalogueEntryKey,
+        target: &StatusLaneTarget,
     ) -> Result<TaskStatusKind, domain::tddd::test_obligation::ids::DiagnosticMessage> {
         self.statuses
             .iter()
-            .find(|(known, _)| known == entry_key)
+            .find(|(known, _)| known == target)
             .map(|(_, status)| *status)
             .ok_or_else(|| {
                 diag(&format!(
-                    "entry '{}' was not included in task attribution",
-                    entry_key.as_str()
+                    "entry '{}' in layer '{}' was not included in task attribution",
+                    target.entry_key().as_str(),
+                    target.layer().as_ref()
                 ))
             })
     }
@@ -169,7 +190,7 @@ pub(super) fn tally_findings(
         StatusLaneTally::new(TaskStatusKind::Skipped),
     ];
     for finding in findings {
-        let status = attributor.status_for(finding.entry_key())?;
+        let status = attributor.status_for(finding.target())?;
         let Some(tally) = tallies.iter_mut().find(|tally| tally.task_status == status) else {
             return Err(diag("task status lane is not representable"));
         };
@@ -182,15 +203,68 @@ pub(super) fn tally_findings(
     Ok(tallies)
 }
 
-fn layers_for_entry(
+/// Resolves the recorded source catalogue of a derived obligation to its
+/// layer-qualified task-contract target.
+pub(super) fn target_for_obligation(
     catalogues: &[LoadedCatalogueDocument],
-    entry_key: &CatalogueEntryKey,
-) -> Vec<domain::tddd::LayerId> {
-    catalogues
+    obligation: &TestObligation,
+) -> Result<StatusLaneTarget, domain::tddd::test_obligation::ids::DiagnosticMessage> {
+    let layers = catalogues
         .iter()
-        .filter(|catalogue| catalogue_contains(catalogue.document(), entry_key))
+        .filter(|catalogue| catalogue.matches_file_path(&obligation.target_entry().file_path))
         .map(|catalogue| catalogue.document().layer().clone())
-        .collect()
+        .collect();
+    let Some(layer) = exactly_one(layers) else {
+        return Err(diag(&format!(
+            "cannot uniquely resolve catalogue origin for entry '{}'",
+            obligation.id().entry_key().as_str()
+        )));
+    };
+    Ok(StatusLaneTarget::new(layer, obligation.id().entry_key().clone()))
+}
+
+/// Resolves a non-derived cited edge, whose edge id does not retain a source
+/// catalogue path, only when its entry key has one catalogue origin.
+pub(super) fn target_for_direct_edge(
+    catalogues: &[LoadedCatalogueDocument],
+    edge: &TestObligationEdgeId,
+) -> Result<StatusLaneTarget, domain::tddd::test_obligation::ids::DiagnosticMessage> {
+    let layers = catalogues
+        .iter()
+        .filter(|catalogue| catalogue_contains(catalogue.document(), edge.entry_key()))
+        .map(|catalogue| catalogue.document().layer().clone())
+        .collect();
+    let Some(layer) = exactly_one(layers) else {
+        return Err(diag(&format!(
+            "cannot uniquely resolve catalogue layer for direct entry '{}'",
+            edge.entry_key().as_str()
+        )));
+    };
+    Ok(StatusLaneTarget::new(layer, edge.entry_key().clone()))
+}
+
+/// Resolves every active entry in the current obligation scope to the target
+/// shape that task-contract uses for attribution.
+pub(super) fn targets_for_scope(
+    obligations: &ObligationsDocument,
+    cited_edges: &[TestObligationEdgeId],
+    catalogues: &[LoadedCatalogueDocument],
+) -> Result<Vec<StatusLaneTarget>, domain::tddd::test_obligation::ids::DiagnosticMessage> {
+    let mut targets = obligations
+        .obligations()
+        .iter()
+        .map(|obligation| target_for_obligation(catalogues, obligation))
+        .collect::<Result<Vec<_>, _>>()?;
+    for edge in cited_edges {
+        let is_derived = obligations.obligations().iter().any(|obligation| {
+            obligation.id().entry_key() == edge.entry_key()
+                && obligation.spec_refs().iter().any(|anchor| anchor == edge.anchor_id())
+        });
+        if !is_derived {
+            targets.push(target_for_direct_edge(catalogues, edge)?);
+        }
+    }
+    Ok(targets)
 }
 
 fn catalogue_contains(document: &CatalogueDocument, entry_key: &CatalogueEntryKey) -> bool {

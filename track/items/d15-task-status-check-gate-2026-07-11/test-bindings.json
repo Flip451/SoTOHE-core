@@ -23,6 +23,7 @@
         {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_new_fails_closed_for_skipped_missing_and_absent_verdicts"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_structural_failures_block_regardless_of_task_status"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_with_skipped_and_todo_attribution_blocks"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_same_entry_in_two_layers_uses_obligation_origin_for_status_lane"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_orphaned_binding_across_task_statuses_returns_same_drift"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_malformed_artifacts_block_across_task_statuses"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_coverage_broken_entry_blocks_across_task_statuses"},

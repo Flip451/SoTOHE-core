@@ -64,7 +64,10 @@ use super::check_support::{
 };
 use super::derive::derive_obligations_document;
 use super::results::TestObligationStatusLaneSummary;
-use super::status_lanes::{StatusLaneFindingKind, TaskStatusAttributor, tally_findings};
+use super::status_lanes::{
+    StatusLaneFindingKind, StatusLaneTarget, TaskStatusAttributor, tally_findings,
+    target_for_direct_edge, target_for_obligation, targets_for_scope,
+};
 use super::{
     LoadedCatalogueDocument, diag, find_declaration_text_from_loaded,
     obligation_declaration_text_from_loaded, sha256_content_hash,
@@ -220,18 +223,13 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
             &mut gate,
         )?;
 
-        let entry_keys = obligations
-            .obligations()
-            .iter()
-            .map(|obligation| obligation.id().entry_key().clone())
-            .chain(cited_edges.iter().map(|edge| edge.entry_key().clone()))
-            .collect::<Vec<_>>();
+        let targets = targets_for_scope(&obligations, &cited_edges, &catalogues)
+            .map_err(ObligationCheckError::TaskAttribution)?;
         let attributor = TaskStatusAttributor::load(
             self.task_contract_reader.as_ref(),
             self.impl_plan_reader.as_ref(),
             cmd.input.track_id(),
-            &catalogues,
-            &entry_keys,
+            &targets,
         )
         .map_err(ObligationCheckError::TaskAttribution)?;
         let status_lane_summaries = tally_findings(&attributor, &gate.status_findings())
@@ -252,7 +250,7 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
         let mut blocking_drifts = gate.structural_drifts;
         for (drift, finding) in gate.status_drifts {
             if attributor
-                .status_for(finding.entry_key())
+                .status_for(finding.target())
                 .map_err(ObligationCheckError::TaskAttribution)?
                 != TaskStatusKind::Todo
             {
@@ -267,7 +265,7 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
             .into_iter()
             .map(|(edge, finding)| {
                 attributor
-                    .status_for(finding.entry_key())
+                    .status_for(finding.target())
                     .map(|status| (edge, status))
                     .map_err(ObligationCheckError::TaskAttribution)
             })
@@ -283,7 +281,7 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
             .into_iter()
             .map(|(edge, finding)| {
                 attributor
-                    .status_for(finding.entry_key())
+                    .status_for(finding.target())
                     .map(|status| (edge, status))
                     .map_err(ObligationCheckError::TaskAttribution)
             })
@@ -356,6 +354,8 @@ impl CheckTestObligationsInteractor {
         gate: &mut GateState,
     ) -> Result<(), ObligationCheckError> {
         for obligation in obligations.obligations() {
+            let target = target_for_obligation(catalogues, obligation)
+                .map_err(ObligationCheckError::TaskAttribution)?;
             let edges: Vec<TestObligationEdgeId> = obligation
                 .spec_refs()
                 .iter()
@@ -373,7 +373,7 @@ impl CheckTestObligationsInteractor {
                         obligation.id().clone(),
                         diag("obligation has no fulfillment or waiver binding"),
                     ),
-                    obligation.id().entry_key().clone(),
+                    target.clone(),
                     StatusLaneFindingKind::Missing,
                 );
                 continue;
@@ -382,13 +382,14 @@ impl CheckTestObligationsInteractor {
             for edge in edges {
                 if let Some(reason) = waived_reason(bindings, &edge) {
                     self.resolve_waiver_edge(
-                        &edge, obligation, &reason, catalogues, spec_texts, waiver, gate,
+                        &edge, obligation, &reason, &target, catalogues, spec_texts, waiver, gate,
                     );
                 } else if let Some(tests) = fulfilled {
                     self.resolve_fulfillment_edge(
                         &edge,
                         obligation,
                         tests,
+                        &target,
                         catalogues,
                         spec_texts,
                         fulfillment,
@@ -399,13 +400,14 @@ impl CheckTestObligationsInteractor {
                         &edge,
                         obligation,
                         tests,
+                        &target,
                         catalogues,
                         spec_texts,
                         fulfillment,
                         gate,
                     )?;
                 } else {
-                    gate.unresolved(edge);
+                    gate.unresolved(edge, target.clone());
                 }
             }
         }
@@ -413,21 +415,24 @@ impl CheckTestObligationsInteractor {
             if edge_is_derived(obligations, edge) {
                 continue;
             }
+            let target = target_for_direct_edge(catalogues, edge)
+                .map_err(ObligationCheckError::TaskAttribution)?;
             if let Some(reason) = waived_reason(bindings, edge) {
                 self.resolve_direct_waiver_edge(
-                    edge, &reason, catalogues, spec_texts, waiver, gate,
+                    edge, &reason, &target, catalogues, spec_texts, waiver, gate,
                 );
             } else if let Some(tests) = voluntary_tests(bindings, edge) {
                 self.resolve_direct_fulfillment_edge(
                     edge,
                     tests,
+                    &target,
                     catalogues,
                     spec_texts,
                     fulfillment,
                     gate,
                 )?;
             } else {
-                gate.unresolved(edge.clone());
+                gate.unresolved(edge.clone(), target);
             }
         }
         Ok(())
@@ -440,6 +445,7 @@ impl CheckTestObligationsInteractor {
         edge: &TestObligationEdgeId,
         obligation: &TestObligation,
         tests: &[TestLocation],
+        target: &StatusLaneTarget,
         catalogues: &[LoadedCatalogueDocument],
         spec_texts: &[(String, String)],
         fulfillment: &ObligationFulfillmentCacheDocument,
@@ -452,6 +458,7 @@ impl CheckTestObligationsInteractor {
             obligation.id(),
             &declaration,
             tests,
+            target,
             spec_texts,
             fulfillment,
             gate,
@@ -464,6 +471,7 @@ impl CheckTestObligationsInteractor {
         &self,
         edge: &TestObligationEdgeId,
         tests: &[TestLocation],
+        target: &StatusLaneTarget,
         catalogues: &[LoadedCatalogueDocument],
         spec_texts: &[(String, String)],
         fulfillment: &ObligationFulfillmentCacheDocument,
@@ -477,6 +485,7 @@ impl CheckTestObligationsInteractor {
             &obligation_id,
             &declaration,
             tests,
+            target,
             spec_texts,
             fulfillment,
             gate,
@@ -491,6 +500,7 @@ impl CheckTestObligationsInteractor {
         obligation_id: &TestObligationId,
         declaration: &str,
         tests: &[TestLocation],
+        target: &StatusLaneTarget,
         spec_texts: &[(String, String)],
         fulfillment: &ObligationFulfillmentCacheDocument,
         gate: &mut GateState,
@@ -500,13 +510,31 @@ impl CheckTestObligationsInteractor {
             .iter()
             .find(|e| e.edge_id() == edge && e.obligation_id() == obligation_id)
         else {
-            return self.classify_unavailable_fulfillment_verdict(edge, obligation_id, tests, gate);
+            return self.classify_unavailable_fulfillment_verdict(
+                edge,
+                obligation_id,
+                tests,
+                target,
+                gate,
+            );
         };
         if entry.verifier_fingerprint() != Some(&self.fulfillment_verifier_fingerprint) {
-            return self.classify_unavailable_fulfillment_verdict(edge, obligation_id, tests, gate);
+            return self.classify_unavailable_fulfillment_verdict(
+                edge,
+                obligation_id,
+                tests,
+                target,
+                gate,
+            );
         }
         let Some(current_bound) = self.current_bound_hash(tests)? else {
-            return self.classify_unavailable_fulfillment_verdict(edge, obligation_id, tests, gate);
+            return self.classify_unavailable_fulfillment_verdict(
+                edge,
+                obligation_id,
+                tests,
+                target,
+                gate,
+            );
         };
         let current_decl = sha256_content_hash(declaration.as_bytes());
         let current_anchor =
@@ -518,7 +546,7 @@ impl CheckTestObligationsInteractor {
                     edge.clone(),
                     diag("bound test bodies changed since the verdict was frozen"),
                 ),
-                edge.entry_key().clone(),
+                target.clone(),
                 StatusLaneFindingKind::Stale,
             );
         } else if key.declaration_hash().as_hash() != &current_decl {
@@ -527,7 +555,7 @@ impl CheckTestObligationsInteractor {
                     edge.clone(),
                     diag("entry declaration changed since the verdict was frozen"),
                 ),
-                edge.entry_key().clone(),
+                target.clone(),
                 StatusLaneFindingKind::Stale,
             );
         } else if key.anchor_text_hash().as_hash() != &current_anchor {
@@ -536,13 +564,13 @@ impl CheckTestObligationsInteractor {
                     edge.clone(),
                     diag("anchor text changed since the verdict was frozen"),
                 ),
-                edge.entry_key().clone(),
+                target.clone(),
                 StatusLaneFindingKind::Stale,
             );
         } else if matches!(entry.verdict(), ObligationFulfillmentVerdict::Fulfilled { .. }) {
             gate.resolved.push(edge.clone());
         } else {
-            gate.verdict_absent(edge.clone());
+            gate.verdict_absent(edge.clone(), target.clone());
         }
         Ok(())
     }
@@ -554,6 +582,7 @@ impl CheckTestObligationsInteractor {
         edge: &TestObligationEdgeId,
         obligation: &TestObligation,
         reason: &WaivedReason,
+        target: &StatusLaneTarget,
         catalogues: &[LoadedCatalogueDocument],
         spec_texts: &[(String, String)],
         waiver: &WaiverCacheDocument,
@@ -561,7 +590,15 @@ impl CheckTestObligationsInteractor {
     ) {
         let declaration =
             obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default();
-        self.resolve_waiver_cache_entry(edge, reason, &declaration, spec_texts, waiver, gate);
+        self.resolve_waiver_cache_entry(
+            edge,
+            reason,
+            &declaration,
+            target,
+            spec_texts,
+            waiver,
+            gate,
+        );
     }
 
     /// Resolves a direct waived edge that has no derived obligation.
@@ -570,6 +607,7 @@ impl CheckTestObligationsInteractor {
         &self,
         edge: &TestObligationEdgeId,
         reason: &WaivedReason,
+        target: &StatusLaneTarget,
         catalogues: &[LoadedCatalogueDocument],
         spec_texts: &[(String, String)],
         waiver: &WaiverCacheDocument,
@@ -577,25 +615,35 @@ impl CheckTestObligationsInteractor {
     ) {
         let declaration = find_declaration_text_from_loaded(catalogues, edge.entry_key().as_str())
             .unwrap_or_default();
-        self.resolve_waiver_cache_entry(edge, reason, &declaration, spec_texts, waiver, gate);
+        self.resolve_waiver_cache_entry(
+            edge,
+            reason,
+            &declaration,
+            target,
+            spec_texts,
+            waiver,
+            gate,
+        );
     }
 
     /// Resolves a waiver edge from its already-selected declaration text.
+    #[allow(clippy::too_many_arguments)]
     fn resolve_waiver_cache_entry(
         &self,
         edge: &TestObligationEdgeId,
         reason: &WaivedReason,
         declaration: &str,
+        target: &StatusLaneTarget,
         spec_texts: &[(String, String)],
         waiver: &WaiverCacheDocument,
         gate: &mut GateState,
     ) {
         let Some(entry) = waiver.entries().iter().find(|e| e.edge_id() == edge) else {
-            gate.verdict_absent(edge.clone());
+            gate.verdict_absent(edge.clone(), target.clone());
             return;
         };
         if entry.verifier_fingerprint() != Some(&self.waiver_verifier_fingerprint) {
-            gate.verdict_absent(edge.clone());
+            gate.verdict_absent(edge.clone(), target.clone());
             return;
         }
         let current_reason = sha256_content_hash(reason.as_str().as_bytes());
@@ -609,7 +657,7 @@ impl CheckTestObligationsInteractor {
                     edge.clone(),
                     diag("waived reason changed since the verdict was frozen"),
                 ),
-                edge.entry_key().clone(),
+                target.clone(),
                 StatusLaneFindingKind::Stale,
             );
         } else if key.declaration_hash().as_hash() != &current_decl {
@@ -618,7 +666,7 @@ impl CheckTestObligationsInteractor {
                     edge.clone(),
                     diag("entry declaration changed since the verdict was frozen"),
                 ),
-                edge.entry_key().clone(),
+                target.clone(),
                 StatusLaneFindingKind::Stale,
             );
         } else if key.anchor_text_hash().as_hash() != &current_anchor {
@@ -627,13 +675,13 @@ impl CheckTestObligationsInteractor {
                     edge.clone(),
                     diag("anchor text changed since the verdict was frozen"),
                 ),
-                edge.entry_key().clone(),
+                target.clone(),
                 StatusLaneFindingKind::Stale,
             );
         } else if matches!(entry.verdict(), WaiverVerdict::Waived { .. }) {
             gate.resolved.push(edge.clone());
         } else {
-            gate.verdict_absent(edge.clone());
+            gate.verdict_absent(edge.clone(), target.clone());
         }
     }
 }

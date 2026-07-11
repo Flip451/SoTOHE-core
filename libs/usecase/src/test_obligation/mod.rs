@@ -71,7 +71,7 @@ impl LoadedCatalogueDocument {
         &self.read_path
     }
 
-    fn matches_file_path(&self, file_path: &str) -> bool {
+    pub(super) fn matches_file_path(&self, file_path: &str) -> bool {
         self.read_file_path == file_path
             || self.artifact_file_path == catalogue_artifact_path(Path::new(file_path))
     }
