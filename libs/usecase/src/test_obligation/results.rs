@@ -39,7 +39,7 @@ pub use domain::tddd::test_obligation::vocab::{FulfillmentFailCategory, TestObli
 use crate::pre_review_gate::{ImplPlanReaderPort, TaskContractReaderPort};
 
 use super::diag;
-use super::results_status::{collect_status_lane_summaries, empty_status_lane_summaries};
+use super::results_status::collect_status_lane_summaries;
 
 /// Verdict-chain lane discriminant for the results output (IN-10 / AC-09).
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -313,8 +313,7 @@ impl TestObligationResultsApplicationService for TestObligationResultsInteractor
             self.catalogue_reader.as_ref(),
             self.task_contract_reader.as_ref(),
             self.impl_plan_reader.as_ref(),
-        )
-        .unwrap_or_else(|_| empty_status_lane_summaries());
+        )?;
 
         Ok(TestObligationResultsOutput::new(
             lane_summaries,

@@ -914,13 +914,11 @@ fn test_results_interactor_with_unresolved_or_status_read_error_returns_ok() {
         Arc::new(UnusedImplPlanReader),
     )
     .execute(&status_command());
-    assert!(status_read_error.is_ok());
-    let read_error_output = status_read_error.unwrap();
-    assert!(read_error_output.status_lane_summaries().iter().all(|summary| {
-        summary.missing_count() == 0
-            && summary.stale_count() == 0
-            && summary.verdict_absent_count() == 0
-    }));
+    assert!(matches!(
+        status_read_error,
+        Err(ObligationResultsError::MalformedArtifact(message))
+            if message.as_str().contains("task attribution failed")
+    ));
 }
 
 #[test]
@@ -1039,24 +1037,22 @@ fn test_results_new_keeps_unresolved_skipped_lane_informational() {
 }
 
 #[test]
-fn test_results_command_with_catalogue_path_preserves_informational_success() {
+fn test_results_command_with_unreadable_catalogue_returns_malformed_artifact_error() {
     let command =
         TestObligationResultsCommand::new(track(), vec![PathBuf::from("domain-types.json")]);
-    let output = interactor_with_obligations(
+    let result = interactor_with_obligations(
         Some(ObligationsDocument::new(track(), Vec::new())),
         Some(TestBindingsDocument::new(track(), Vec::new())),
         None,
         None,
     )
-    .execute(&command)
-    .unwrap();
+    .execute(&command);
 
-    assert_eq!(output.status_lane_summaries().len(), 4);
-    assert!(output.status_lane_summaries().iter().all(|summary| {
-        summary.missing_count() == 0
-            && summary.stale_count() == 0
-            && summary.verdict_absent_count() == 0
-    }));
+    assert!(matches!(
+        result,
+        Err(ObligationResultsError::MalformedArtifact(message))
+            if message.as_str().contains("catalogue read failed")
+    ));
 }
 
 #[test]

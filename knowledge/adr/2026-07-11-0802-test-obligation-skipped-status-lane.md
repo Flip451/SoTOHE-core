@@ -2,6 +2,7 @@
 adr_id: 2026-07-11-0802-test-obligation-skipped-status-lane
 decisions:
   - id: D1
+    user_decision_ref: "chat:session-014Ubif2uPVJit1733uriobU:2026-07-11 ユーザー承認「ADR承認します」— skipped status lane 決定（D1）の明示承認"
     review_finding_ref: "ref-verify:2026-07-11 D15 skipped-status lane grounding failures（IN-01 / IN-05 / AC-01 / AC-04 / AC-05）"
     status: proposed
 ---

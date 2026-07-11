@@ -161,7 +161,10 @@ mod tests {
 
     fn malformed_artifact_error() -> ObligationResultsError {
         ObligationResultsError::MalformedArtifact(
-            DiagnosticMessage::try_new("results malformed artifact".to_owned()).unwrap(),
+            DiagnosticMessage::try_new(
+                "task attribution failed: results malformed artifact".to_owned(),
+            )
+            .unwrap(),
         )
     }
 
@@ -210,6 +213,7 @@ mod tests {
             stdout
                 .contains("test-obligation results (informational; read error): MalformedArtifact")
         );
+        assert!(stdout.contains("task attribution failed"));
         assert!(stdout.contains("results malformed artifact"));
     }
 

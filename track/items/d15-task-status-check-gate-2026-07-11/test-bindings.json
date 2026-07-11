@@ -43,6 +43,7 @@
         {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_new_aggregates_todo_in_progress_and_done_lanes"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_new_keeps_unresolved_skipped_lane_informational"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_interactor_with_unresolved_or_status_read_error_returns_ok"},
+        {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_with_malformed_artifact_error_returns_informational_success"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_interactor_with_absent_verifier_fingerprint_counts_verdict_absent"}
       ]
     },
@@ -156,7 +157,8 @@
       "edge_id": {"entry_key": "TestObligationResultsHandler", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "AC-05"}},
       "tests": [
         {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_renders_all_status_lanes_informationally"},
-        {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_with_io_error_returns_informational_success"}
+        {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_with_io_error_returns_informational_success"},
+        {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_with_malformed_artifact_error_returns_informational_success"}
       ]
     },
     {

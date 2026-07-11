@@ -15,13 +15,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "bfa6af91f28cc419ad8b269a2b11575b369d4ab93d756288cddf83cfd420e7c3",
+        "bound_tests_set_hash": "f2283a400dfba63114a67fcbf61ab71701e6a19cc9c5a344ca25592571007933",
         "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
         "anchor_text_hash": "faf3a8b36c676e24badd4cb8414753a01b0582ac142cd5cedd655082c9873b9c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let in_progress = CheckTestObligationsInteractor::new(\n        Arc::new(StubRules::valid()),\n        Arc::new(StubObligations(Some(ObligationsDocument::new(track(), vec![obligation()])))),\n        Arc::new(StubBindings(Some(TestBindingsDocument::new(track(), Vec::new())))),\n        Arc::new(StubScanner),\n        Arc::new(StubFulfillmentCache(None)),\n        Arc::new(StubWaiverCache(None)),\n        fulfillment_verifier_fingerprint(),\n        waiver_verifier_fingerprint(),\n        Arc::new(StubSpec(spec_doc())),\n        Arc::new(StubCatalogue(money_catalogue())),\n        Arc::new(StubTaskContractReader(\n            TaskContractDocument::new(track(), in_progress_entries).unwrap(),\n        )),\n        Arc::new(StubImplPlanReader(in_progress_statuses)),\n    )\n    .execute(&command());\n    assert!(matches!(in_progress, Err(ObligationCheckError::DriftsDetected { .. })));\n\n    let todo = CheckTestObligationsInteractor::new(\n        ...\n        Arc::new(StubTaskContractReader(TaskContractDocument::new(track(), todo_entries).unwrap())),\n        Arc::new(StubImplPlanReader(todo_statuses)),\n    )\n    .execute(&command())\n    .unwrap();\n    let todo_summary = todo\n        .status_lane_summaries()\n        .iter()\n        .find(|summary| summary.task_status() == TaskStatusKind::Todo)\n        .unwrap();\n    assert_eq!(todo_summary.missing_count(), 1);"
+        "citation": "let mut entries = BTreeMap::new();\n    entries.insert(todo_task.clone(), vec![contracted_entry.clone()]);\n    entries.insert(in_progress_task.clone(), vec![contracted_entry]);\n...\n    statuses.insert(todo_task, TaskStatusKind::Todo);\n    statuses.insert(in_progress_task, TaskStatusKind::InProgress);\n...\n    assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -39,13 +39,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "bfa6af91f28cc419ad8b269a2b11575b369d4ab93d756288cddf83cfd420e7c3",
+        "bound_tests_set_hash": "f2283a400dfba63114a67fcbf61ab71701e6a19cc9c5a344ca25592571007933",
         "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
         "anchor_text_hash": "77a9559c41e1fc7c0974ce9b87521381084d589130a24b5b7b3d849502896448"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let in_progress =\n        missing_binding_interactor_with_statuses(&[(\"T001\", TaskStatusKind::InProgress)])\n            .execute(&command());\n    assert!(matches!(in_progress, Err(ObligationCheckError::DriftsDetected { .. })));\n\n    let todo = missing_binding_interactor_with_statuses(&[(\"T001\", TaskStatusKind::Todo)])\n        .execute(&command())\n        .unwrap();\n    assert_eq!(todo_summary.missing_count(), 1);"
+        "citation": "let missing = missing_binding_interactor_with_statuses(&[(\"T001\", TaskStatusKind::Done)])\n        .execute(&command());\n    assert!(matches!(missing, Err(ObligationCheckError::DriftsDetected { .. })));\n\nlet in_progress =\n        missing_binding_interactor_with_statuses(&[(\"T001\", TaskStatusKind::InProgress)])\n            .execute(&command());\n    assert!(matches!(in_progress, Err(ObligationCheckError::DriftsDetected { .. })));\n\nlet todo = missing_binding_interactor_with_statuses(&[(\"T001\", TaskStatusKind::Todo)])\n        .execute(&command())\n        .unwrap();\n\nif status == TaskStatusKind::Todo {\n            let outcome = result.unwrap();\n            let todo = outcome\n                .status_lane_summaries()\n                .iter()\n                .find(|summary| summary.task_status() == TaskStatusKind::Todo)\n                .unwrap();\n            assert_eq!(todo.verdict_absent_count(), 1);\n        } else {\n            assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));\n        }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -63,13 +63,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "bfa6af91f28cc419ad8b269a2b11575b369d4ab93d756288cddf83cfd420e7c3",
+        "bound_tests_set_hash": "f2283a400dfba63114a67fcbf61ab71701e6a19cc9c5a344ca25592571007933",
         "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
         "anchor_text_hash": "5840b56dfc6035293a1775f7a5049d810ca972837b917efb99afa44913467788"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(in_progress, Err(ObligationCheckError::DriftsDetected { .. }))); ... assert_eq!(todo_summary.missing_count(), 1); ... assert!(matches!(stale, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert!(classification.contains(\"Orphaned\")); ... assert!(matches!(invalid_rules, Err(ObligationCheckError::RulesLoad(TestObligationRulesLoadError::RoleNotCovered { .. })))); ... assert!(matches!(malformed_obligations, Err(ObligationCheckError::ArtifactCodec(ArtifactCodecError::MalformedJson(_))))); ... assert_eq!(outcome.resolved_edges(), &[edge()]);"
+        "citation": "assert!(matches!(in_progress, Err(ObligationCheckError::DriftsDetected { .. }))); ... assert_eq!(todo_summary.missing_count(), 1); ... assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert_eq!(todo.verdict_absent_count(), 1); ... assert_eq!(classifications[0], classifications[1]); ... assert!(matches!(malformed_obligations, Err(ObligationCheckError::ArtifactCodec(ArtifactCodecError::MalformedJson(_)))));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -87,13 +87,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "bfa6af91f28cc419ad8b269a2b11575b369d4ab93d756288cddf83cfd420e7c3",
+        "bound_tests_set_hash": "f2283a400dfba63114a67fcbf61ab71701e6a19cc9c5a344ca25592571007933",
         "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
         "anchor_text_hash": "507c57928262753c24b8b7ab61cdcc6386b900f1ee2816014d60fc13b1c72e69"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "for status in [\n        TaskStatusKind::Todo,\n        TaskStatusKind::InProgress,\n        TaskStatusKind::Done,\n        TaskStatusKind::Skipped,\n    ] {\n        let unattributable = unattributable_interactor_with_status(status).execute(&command());\n        assert!(matches!(unattributable, Err(ObligationCheckError::TaskAttribution(_))));\n\n        let invalid_rules = interactor_with_rules_loader_and_status(Arc::new(FailingRules), status)\n            .execute(&command());\n        assert!(matches!(\n            invalid_rules,\n            Err(ObligationCheckError::RulesLoad(\n                TestObligationRulesLoadError::RoleNotCovered { .. }\n            ))\n        ));\n    }"
+        "citation": "\"for status in [\n        TaskStatusKind::Todo,\n        TaskStatusKind::InProgress,\n        TaskStatusKind::Done,\n        TaskStatusKind::Skipped,\n    ] {\n        let unattributable = unattributable_interactor_with_status(status).execute(&command());\n        assert!(matches!(unattributable, Err(ObligationCheckError::TaskAttribution(_))));\n\n        let invalid_rules = interactor_with_rules_loader_and_status(Arc::new(FailingRules), status)\n            .execute(&command());\n        assert!(matches!(\n            invalid_rules,\n            Err(ObligationCheckError::RulesLoad(\n                TestObligationRulesLoadError::RoleNotCovered { .. }\n            ))\n        ));\n    }\"; \"for status in [\n        TaskStatusKind::Todo,\n        TaskStatusKind::InProgress,\n        TaskStatusKind::Done,\n        TaskStatusKind::Skipped,\n    ] {\n        let malformed_obligations = CheckTestObligationsInteractor::new(\n            Arc::new(StubRules::valid()),\n            Arc::new(MalformedObligationsArtifact),\"; \"assert!(matches!(\n            malformed_obligations,\n            Err(ObligationCheckError::ArtifactCodec(ArtifactCodecError::MalformedJson(_)))\n        ));\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -111,13 +111,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "bfa6af91f28cc419ad8b269a2b11575b369d4ab93d756288cddf83cfd420e7c3",
+        "bound_tests_set_hash": "f2283a400dfba63114a67fcbf61ab71701e6a19cc9c5a344ca25592571007933",
         "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
         "anchor_text_hash": "ea4cd88397a66123398fe12bed3bf5cf7deb6e676306b9861312b09ef25910e3"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(stale, Err(ObligationCheckError::StaleVerdicts { .. })));\n\nlet verdict_absent = interactor_with_task_statuses(\n        Some(ObligationsDocument::new(track(), vec![obligation()])),\n        Some(bindings),\n        None,\n        None,\n        &[('T001', TaskStatusKind::Done)],\n    )\n    .execute(&command());\nassert!(matches!(verdict_absent, Err(ObligationCheckError::StaleVerdicts { .. })));\n\nassert_eq!(todo.verdict_absent_count(), 1);"
+        "citation": "let stale_cache = fresh_fulfillment_cache_for_fingerprint(\n        &obligation(),\n        Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))),\n    );\n    ...\n    assert!(matches!(stale, Err(ObligationCheckError::StaleVerdicts { .. })));\n    ...\n    assert!(matches!(verdict_absent, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert_eq!(todo.verdict_absent_count(), 1);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -135,13 +135,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "bfa6af91f28cc419ad8b269a2b11575b369d4ab93d756288cddf83cfd420e7c3",
+        "bound_tests_set_hash": "f2283a400dfba63114a67fcbf61ab71701e6a19cc9c5a344ca25592571007933",
         "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
         "anchor_text_hash": "8d7deb65d9ae63926b4e095e2c529632cc7852bdc2c26611f8d3cf93a36baa64"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "for status in [\n        TaskStatusKind::Todo,\n        TaskStatusKind::InProgress,\n        TaskStatusKind::Done,\n        TaskStatusKind::Skipped,\n    ] {\n        let result = interactor_with_task_statuses(\n            Some(ObligationsDocument::new(track(), vec![obligation()])),\n            Some(TestBindingsDocument::new(track(), vec![fulfillment_binding()])),\n            Some(fresh_fulfillment_cache_for_fingerprint(\n                &obligation(),\n                Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))),\n            )),\n            None,\n            &[(\"T001\", status)],\n        )\n        .execute(&command());\n\n        if status == TaskStatusKind::Todo {\n            let outcome = result.unwrap();\n            let todo = outcome\n                .status_lane_summaries()\n                .iter()\n                .find(|summary| summary.task_status() == TaskStatusKind::Todo)\n                .unwrap();\n            assert_eq!(todo.verdict_absent_count(), 1);\n        } else {\n            assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));\n        }\n    }\n\nlet missing = missing_binding_interactor_with_statuses(&[(\"T001\", TaskStatusKind::Skipped)])\n        .execute(&command());\n    assert!(matches!(missing, Err(ObligationCheckError::DriftsDetected { .. })));\n\nlet verdict_absent = interactor_with_task_statuses(\n        Some(ObligationsDocument::new(track(), vec![obligation()])),\n        Some(TestBindingsDocument::new(track(), vec![fulfillment_binding()])),\n        None,\n        None,\n        &[(\"T001\", TaskStatusKind::Skipped)],\n    )\n    .execute(&command());\n    assert!(matches!(verdict_absent, Err(ObligationCheckError::StaleVerdicts { .. })));"
+        "citation": "let missing = CheckTestObligationsInteractor::new(\n        Arc::new(StubRules::valid()),\n        Arc::new(StubObligations(Some(ObligationsDocument::new(track(), vec![obligation()])))),\n        Arc::new(StubBindings(Some(TestBindingsDocument::new(track(), Vec::new())))),\n        Arc::new(StubScanner),\n        Arc::new(StubFulfillmentCache(None)),\n        Arc::new(StubWaiverCache(None)),\n        fulfillment_verifier_fingerprint(),\n        waiver_verifier_fingerprint(),\n        Arc::new(StubSpec(spec_doc())),\n        Arc::new(StubCatalogue(money_catalogue())),\n        Arc::new(StubTaskContractReader(TaskContractDocument::new(track(), entries).unwrap())),\n        Arc::new(StubImplPlanReader(statuses)),\n    )\n    .execute(&command());\n    assert!(matches!(missing, Err(ObligationCheckError::DriftsDetected { .. })));\n\n    let verdict_absent = interactor_with_task_statuses(\n        Some(ObligationsDocument::new(track(), vec![obligation()])),\n        Some(TestBindingsDocument::new(track(), vec![fulfillment_binding()])),\n        None,\n        None,\n        &[(\"T001\", TaskStatusKind::Skipped)],\n    )\n    .execute(&command());\n    assert!(matches!(verdict_absent, Err(ObligationCheckError::StaleVerdicts { .. })));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -159,13 +159,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "bfa6af91f28cc419ad8b269a2b11575b369d4ab93d756288cddf83cfd420e7c3",
+        "bound_tests_set_hash": "f2283a400dfba63114a67fcbf61ab71701e6a19cc9c5a344ca25592571007933",
         "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
         "anchor_text_hash": "2996d7b7f50b4e79f02d8e13c793aa15d27ecd865b360b0e280735d9e8ec9e10"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(missing, Err(ObligationCheckError::DriftsDetected { .. }))); ... assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert!(matches!(verdict_absent, Err(ObligationCheckError::StaleVerdicts { .. })));"
+        "citation": "let task_id = TaskId::try_new(\"T001\".to_owned()).unwrap();\n...\nlet missing = CheckTestObligationsInteractor::new(...)\n    .execute(&command());\nassert!(matches!(missing, Err(ObligationCheckError::DriftsDetected { .. })));\n\nlet verdict_absent = interactor_with_task_statuses(\n    Some(ObligationsDocument::new(track(), vec![obligation()])),\n    Some(TestBindingsDocument::new(track(), vec![fulfillment_binding()])),\n    None,\n    None,\n    &[(\"T001\", TaskStatusKind::Skipped)],\n)\n.execute(&command());\nassert!(matches!(verdict_absent, Err(ObligationCheckError::StaleVerdicts { .. })));\n\nlet result = interactor_with_task_statuses(\n    Some(ObligationsDocument::new(track(), vec![obligation()])),\n    Some(bindings),\n    Some(stale_cache),\n    None,\n    &[(\"T001\", TaskStatusKind::Skipped)],\n)\n.execute(&command());\nassert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -183,13 +183,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "29a792fb7f39ec4f75bcf060f8fd9ac5ec1215670522816034abe68b53078eae",
+        "bound_tests_set_hash": "b35b4e80101c3992ca4babb4aa052b9a8239273e75f31ed78f98e00d707c7a1c",
         "declaration_hash": "9ba945335901014fffb1f5e8d8f21bd79a49006cc7d56be7cd131310c3fde0c4",
         "anchor_text_hash": "dfe76ee6df8df3ed149cd8ea4bd2b7f914b06a18cf41e9bb53ef1a867c168da0"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "`for status in [TaskStatusKind::Todo, TaskStatusKind::InProgress, TaskStatusKind::Done] { ... assert_eq!(summary.missing_count(), 1); assert_eq!(summary.stale_count(), 0); assert_eq!(summary.verdict_absent_count(), 0); }` and `assert!(status_read_error.is_ok());`"
+        "citation": "for status in [TaskStatusKind::Todo, TaskStatusKind::InProgress, TaskStatusKind::Done] {\n        let task_id = TaskId::try_new(\"T001\".to_owned()).unwrap();"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -207,13 +207,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "29a792fb7f39ec4f75bcf060f8fd9ac5ec1215670522816034abe68b53078eae",
+        "bound_tests_set_hash": "b35b4e80101c3992ca4babb4aa052b9a8239273e75f31ed78f98e00d707c7a1c",
         "declaration_hash": "9ba945335901014fffb1f5e8d8f21bd79a49006cc7d56be7cd131310c3fde0c4",
         "anchor_text_hash": "8d7deb65d9ae63926b4e095e2c529632cc7852bdc2c26611f8d3cf93a36baa64"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let skipped = unresolved_output\n        .status_lane_summaries()\n        .iter()\n        .find(|summary| summary.task_status() == TaskStatusKind::Skipped)\n        .unwrap();\n    assert_eq!(skipped.missing_count(), 1);"
+        "citation": "let skipped = output\n        .status_lane_summaries()\n        .iter()\n        .find(|summary| summary.task_status() == TaskStatusKind::Skipped)\n        .unwrap();\n    assert_eq!(skipped.missing_count(), 0);\n    assert_eq!(skipped.stale_count(), 0);\n    assert_eq!(skipped.verdict_absent_count(), 1);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -231,13 +231,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "29a792fb7f39ec4f75bcf060f8fd9ac5ec1215670522816034abe68b53078eae",
+        "bound_tests_set_hash": "b35b4e80101c3992ca4babb4aa052b9a8239273e75f31ed78f98e00d707c7a1c",
         "declaration_hash": "9ba945335901014fffb1f5e8d8f21bd79a49006cc7d56be7cd131310c3fde0c4",
         "anchor_text_hash": "74df2ed25f9215f957727d994dbfe9461a1d03d256c79c5d1936b777392d1308"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "for status in [TaskStatusKind::Todo, TaskStatusKind::InProgress, TaskStatusKind::Done] { ... assert_eq!(summary.missing_count(), 1); assert_eq!(summary.stale_count(), 0); assert_eq!(summary.verdict_absent_count(), 0); ... assert_eq!(skipped.verdict_absent_count(), 1); ... assert_eq!(done.stale_count(), 1); ... assert!(unresolved.is_ok()); ... assert!(status_read_error.is_ok());"
+        "citation": "for status in [TaskStatusKind::Todo, TaskStatusKind::InProgress, TaskStatusKind::Done] {\n    let output = interactor.execute(&status_command()).unwrap();\n    let summary = output\n        .status_lane_summaries()\n        .iter()\n        .find(|summary| summary.task_status() == status)\n        .unwrap();\n    assert_eq!(summary.missing_count(), 1);\n    assert_eq!(summary.stale_count(), 0);\n    assert_eq!(summary.verdict_absent_count(), 0);\n}"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -255,13 +255,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "29a792fb7f39ec4f75bcf060f8fd9ac5ec1215670522816034abe68b53078eae",
+        "bound_tests_set_hash": "b35b4e80101c3992ca4babb4aa052b9a8239273e75f31ed78f98e00d707c7a1c",
         "declaration_hash": "9ba945335901014fffb1f5e8d8f21bd79a49006cc7d56be7cd131310c3fde0c4",
         "anchor_text_hash": "2996d7b7f50b4e79f02d8e13c793aa15d27ecd865b360b0e280735d9e8ec9e10"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(unresolved.is_ok()); ... .find(|summary| summary.task_status() == TaskStatusKind::Skipped) ... assert_eq!(skipped.missing_count(), 1); ... assert!(status_read_error.is_ok());"
+        "citation": "assert!(unresolved.is_ok()); ... assert_eq!(skipped.missing_count(), 1); ... assert_eq!(outcome.exit_code, 0); ... stdout.contains(\"test-obligation results (informational; read error): MalformedArtifact\")"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -279,13 +279,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "29a792fb7f39ec4f75bcf060f8fd9ac5ec1215670522816034abe68b53078eae",
+        "bound_tests_set_hash": "b35b4e80101c3992ca4babb4aa052b9a8239273e75f31ed78f98e00d707c7a1c",
         "declaration_hash": "9ba945335901014fffb1f5e8d8f21bd79a49006cc7d56be7cd131310c3fde0c4",
         "anchor_text_hash": "ea4cd88397a66123398fe12bed3bf5cf7deb6e676306b9861312b09ef25910e3"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(done.stale_count(), 1); ... assert_eq!(done.verdict_absent_count(), 1);"
+        "citation": "`assert_eq!(done.stale_count(), 1);` and `assert_eq!(done.verdict_absent_count(), 1);`"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -735,13 +735,13 @@
         "item_identifier": "voluntary:AC-05"
       },
       "key": {
-        "bound_tests_set_hash": "22c770129723a355b39875fd09cc51b289ed21db2c689a88cb74e9375340bd78",
+        "bound_tests_set_hash": "7ba770508510cfc9d1d2b6a085e137f12fb359d02ea3dcf7cd8e4dbd64f01952",
         "declaration_hash": "7de11e5f257b4f8633455092bd131b0599234288a8297a1727b228c05f095ef1",
         "anchor_text_hash": "74df2ed25f9215f957727d994dbfe9461a1d03d256c79c5d1936b777392d1308"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(outcome.exit_code, 0); assert!(stdout.contains(\"status:todo missing=1 stale=0 verdict_absent=2\")); assert!(stdout.contains(\"status:in_progress missing=3 stale=4 verdict_absent=5\")); assert!(stdout.contains(\"status:done missing=6 stale=7 verdict_absent=8\")); ... assert_eq!(outcome.exit_code, 0);"
+        "citation": "`assert_eq!(outcome.exit_code, 0);` `assert!(stdout.contains(\"status:todo missing=1 stale=0 verdict_absent=2\"));` `assert!(stdout.contains(\"status:in_progress missing=3 stale=4 verdict_absent=5\"));` `assert!(stdout.contains(\"status:done missing=6 stale=7 verdict_absent=8\"));` `assert_eq!(outcome.exit_code, 0);` `assert!(stdout.contains(\"test-obligation results (informational; read error): IoError\"));`"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
