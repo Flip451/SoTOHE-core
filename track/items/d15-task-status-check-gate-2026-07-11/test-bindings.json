@@ -16,6 +16,7 @@
         {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_stale_classification_is_status_independent_before_final_gate"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_todo_stale_verdict_warns_without_blocking"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_missing_bound_test_with_fresh_cache_respects_final_status_lane"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_unattributable_entry_returns_task_attribution_error"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_new_accepts_and_wires_declared_dependencies"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_skipped_attribution_blocks_stale_verdict"},

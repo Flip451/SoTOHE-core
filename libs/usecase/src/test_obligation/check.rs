@@ -505,7 +505,9 @@ impl CheckTestObligationsInteractor {
         if entry.verifier_fingerprint() != Some(&self.fulfillment_verifier_fingerprint) {
             return self.classify_unavailable_fulfillment_verdict(edge, obligation_id, tests, gate);
         }
-        let current_bound = self.current_bound_hash(tests)?;
+        let Some(current_bound) = self.current_bound_hash(tests)? else {
+            return self.classify_unavailable_fulfillment_verdict(edge, obligation_id, tests, gate);
+        };
         let current_decl = sha256_content_hash(declaration.as_bytes());
         let current_anchor =
             sha256_content_hash(anchor_text(spec_texts, edge.anchor_id()).as_bytes());

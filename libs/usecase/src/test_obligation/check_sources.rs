@@ -5,7 +5,7 @@
 use domain::ContentHash;
 use domain::tddd::test_obligation::binding::TestLocation;
 use domain::tddd::test_obligation::drift::TestObligationDrift;
-use domain::tddd::test_obligation::errors::{ObligationCheckError, TestSourceScanError};
+use domain::tddd::test_obligation::errors::ObligationCheckError;
 use domain::tddd::test_obligation::ids::{TestObligationEdgeId, TestObligationId};
 
 use super::check::CheckTestObligationsInteractor;
@@ -18,22 +18,20 @@ impl CheckTestObligationsInteractor {
     pub(super) fn current_bound_hash(
         &self,
         tests: &[TestLocation],
-    ) -> Result<ContentHash, ObligationCheckError> {
+    ) -> Result<Option<ContentHash>, ObligationCheckError> {
         let mut source = String::new();
         for location in tests {
-            let body = self
+            let Some(body) = self
                 .source_scanner
                 .scan_test_body(location)
                 .map_err(ObligationCheckError::SourceScan)?
-                .ok_or_else(|| {
-                    ObligationCheckError::SourceScan(TestSourceScanError::Io(diag(
-                        "bound test source not found",
-                    )))
-                })?;
+            else {
+                return Ok(None);
+            };
             source.push_str(&body);
             source.push('\n');
         }
-        Ok(sha256_content_hash(source.as_bytes()))
+        Ok(Some(sha256_content_hash(source.as_bytes())))
     }
 
     /// Verifies that every bound test location still resolves in the worktree.

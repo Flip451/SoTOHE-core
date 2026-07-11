@@ -415,11 +415,30 @@ fn interactor_with_task_statuses(
     waiver: Option<WaiverCacheDocument>,
     statuses: &[(&str, TaskStatusKind)],
 ) -> CheckTestObligationsInteractor {
+    interactor_with_scanner_and_task_statuses(
+        obligations,
+        bindings,
+        fulfillment,
+        waiver,
+        Arc::new(StubScanner),
+        statuses,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn interactor_with_scanner_and_task_statuses(
+    obligations: Option<ObligationsDocument>,
+    bindings: Option<TestBindingsDocument>,
+    fulfillment: Option<ObligationFulfillmentCacheDocument>,
+    waiver: Option<WaiverCacheDocument>,
+    scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
+    statuses: &[(&str, TaskStatusKind)],
+) -> CheckTestObligationsInteractor {
     CheckTestObligationsInteractor::new(
         Arc::new(StubRules::valid()),
         Arc::new(StubObligations(obligations)),
         Arc::new(StubBindings(bindings)),
-        Arc::new(StubScanner),
+        scanner,
         Arc::new(StubFulfillmentCache(fulfillment)),
         Arc::new(StubWaiverCache(waiver)),
         fulfillment_verifier_fingerprint(),
@@ -2220,6 +2239,56 @@ fn test_missing_bound_test_without_cached_verdict_is_missing_drift() {
 }
 
 #[test]
+fn test_missing_bound_test_with_fresh_cache_respects_final_status_lane() {
+    struct MissingTestScanner;
+    impl TestSourceScannerPort for MissingTestScanner {
+        fn scan_test_body(
+            &self,
+            _location: &TestLocation,
+        ) -> Result<Option<String>, TestSourceScanError> {
+            Ok(None)
+        }
+
+        fn hash_test_body(&self, _source: &str) -> TestBodySpanHash {
+            TestBodySpanHash::new(ContentHash::from_bytes([0u8; 32]))
+        }
+    }
+
+    let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+    let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+
+    let todo = interactor_with_scanner_and_task_statuses(
+        Some(obligations.clone()),
+        Some(bindings.clone()),
+        Some(fresh_fulfillment_cache()),
+        None,
+        Arc::new(MissingTestScanner),
+        &[("T001", TaskStatusKind::Todo)],
+    )
+    .execute(&command())
+    .unwrap();
+    let todo_summary = todo
+        .status_lane_summaries()
+        .iter()
+        .find(|summary| summary.task_status() == TaskStatusKind::Todo)
+        .unwrap();
+    assert_eq!(todo_summary.missing_count(), 1);
+    assert_eq!(todo_summary.stale_count(), 0);
+    assert_eq!(todo_summary.verdict_absent_count(), 0);
+
+    let strict = interactor_with_scanner_and_task_statuses(
+        Some(obligations),
+        Some(bindings),
+        Some(fresh_fulfillment_cache()),
+        None,
+        Arc::new(MissingTestScanner),
+        &[("T001", TaskStatusKind::InProgress)],
+    )
+    .execute(&command());
+    assert!(matches!(strict, Err(ObligationCheckError::DriftsDetected { .. })));
+}
+
+#[test]
 fn test_source_scan_error_is_propagated() {
     struct FailingScanner;
     impl TestSourceScannerPort for FailingScanner {
@@ -2249,7 +2318,7 @@ fn test_source_scan_error_is_propagated() {
 }
 
 #[test]
-fn test_missing_bound_test_source_maps_to_io_absence() {
+fn test_missing_bound_test_source_with_fresh_cache_is_missing_drift() {
     struct MissingScanner;
     impl TestSourceScannerPort for MissingScanner {
         fn scan_test_body(&self, _l: &TestLocation) -> Result<Option<String>, TestSourceScanError> {
@@ -2272,7 +2341,7 @@ fn test_missing_bound_test_source_maps_to_io_absence() {
     )
     .execute(&command());
 
-    assert!(matches!(result, Err(ObligationCheckError::SourceScan(TestSourceScanError::Io(_)))));
+    assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));
 }
 
 #[test]
