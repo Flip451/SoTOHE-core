@@ -1,7 +1,7 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成
 
-## Tasks (31/33 resolved)
+## Tasks (33/33 resolved)
 
 ### S1 — Preceding shared foundation: semantic-verdict core & ref-verify migration
 
@@ -63,8 +63,8 @@
 
 ### S10 — Gate dogfood on this track
 
-- [~] **T028**: Target track/items/test-obligation-fulfillment-gate-2026-07-07/{obligations.json,test-bindings.json,obligation-fulfillment-cache.json,waiver-cache.json} and cli::commands::test_obligation::{command_context_with,dispatch_test_obligation,execute_bindings_skeleton_with,execute_check_with,execute_derive_with,execute_evaluate_with,execute_results_with}; materialize the track gate artifacts and add the CLI DI seams for the command paths (IN-05/IN-06/IN-08/IN-09/AC-04/AC-10/AC-12).
+- [x] **T028**: Target track/items/test-obligation-fulfillment-gate-2026-07-07/{obligations.json,test-bindings.json,obligation-fulfillment-cache.json,waiver-cache.json} and cli::commands::test_obligation::{command_context_with,dispatch_test_obligation,execute_bindings_skeleton_with,execute_check_with,execute_derive_with,execute_evaluate_with,execute_results_with}; materialize the track gate artifacts and add the CLI DI seams for the command paths (IN-05/IN-06/IN-08/IN-09/AC-04/AC-10/AC-12).
 
 ### S11 — Verdict-cache verifier-fingerprint follow-up
 
-- [~] **T029**: Target libs/domain tddd::test_obligation::verdict, libs/infrastructure test_obligation::{fulfillment_cache_codec,waiver_cache_codec,fulfillment_verifier,waiver_verifier}, and libs/usecase test_obligation::{evaluate,check}; add verifier-prompt fingerprint support across cache entries, codecs, verifiers, and check/evaluate interactors (IN-09/CN-04).
+- [x] **T029**: Target libs/domain tddd::test_obligation::verdict, libs/infrastructure test_obligation::{fulfillment_cache_codec,waiver_cache_codec,fulfillment_verifier,waiver_verifier}, and libs/usecase test_obligation::{evaluate,check}; add verifier-prompt fingerprint support across cache entries, codecs, verifiers, and check/evaluate interactors (IN-09/CN-04).
