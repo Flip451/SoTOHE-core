@@ -86,9 +86,9 @@ impl TestObligationResultsHandler {
                 ));
                 CommandOutcome::success(Some(text))
             }
-            Err(error) => {
-                CommandOutcome::failure(Some(format!("test-obligation results failed: {error:?}")))
-            }
+            Err(error) => CommandOutcome::success(Some(format!(
+                "test-obligation results (informational; read error): {error:?}"
+            ))),
         }
     }
 }
@@ -98,6 +98,7 @@ impl TestObligationResultsHandler {
 mod tests {
     use usecase::DiagnosticMessage;
     use usecase::LayerId;
+    use usecase::test_obligation::errors::ObligationResultsError;
     use usecase::test_obligation::results::{
         CatalogueEntryKey, EdgeResolutionOutcome, EdgeVerdictRecord, FulfillmentFailCategory,
         TestObligationAnchorId, TestObligationDrift, TestObligationEdgeId, TestObligationId,
@@ -120,6 +121,31 @@ mod tests {
         }
     }
 
+    struct ErrorStubService {
+        error: fn() -> ObligationResultsError,
+    }
+
+    impl TestObligationResultsApplicationService for ErrorStubService {
+        fn execute(
+            &self,
+            _cmd: &TestObligationResultsCommand,
+        ) -> Result<TestObligationResultsOutput, ObligationResultsError> {
+            Err((self.error)())
+        }
+    }
+
+    fn io_error() -> ObligationResultsError {
+        ObligationResultsError::IoError(
+            DiagnosticMessage::try_new("results io error".to_owned()).unwrap(),
+        )
+    }
+
+    fn malformed_artifact_error() -> ObligationResultsError {
+        ObligationResultsError::MalformedArtifact(
+            DiagnosticMessage::try_new("results malformed artifact".to_owned()).unwrap(),
+        )
+    }
+
     #[test]
     fn test_results_handler_with_valid_input_returns_success() {
         let handler = TestObligationResultsHandler::new(Arc::new(StubService));
@@ -130,6 +156,38 @@ mod tests {
 
         assert_eq!(outcome.exit_code, 0);
         assert!(outcome.stdout.unwrap().contains("records=0"));
+    }
+
+    #[test]
+    fn test_results_handler_with_io_error_returns_informational_success() {
+        let handler =
+            TestObligationResultsHandler::new(Arc::new(ErrorStubService { error: io_error }));
+        let input = TestObligationResultsInput::new(Some(TrackId::try_new("test-track").unwrap()));
+
+        let outcome = handler.handle(input);
+
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.unwrap();
+        assert!(stdout.contains("test-obligation results (informational; read error): IoError"));
+        assert!(stdout.contains("results io error"));
+    }
+
+    #[test]
+    fn test_results_handler_with_malformed_artifact_error_returns_informational_success() {
+        let handler = TestObligationResultsHandler::new(Arc::new(ErrorStubService {
+            error: malformed_artifact_error,
+        }));
+        let input = TestObligationResultsInput::new(Some(TrackId::try_new("test-track").unwrap()));
+
+        let outcome = handler.handle(input);
+
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.unwrap();
+        assert!(
+            stdout
+                .contains("test-obligation results (informational; read error): MalformedArtifact")
+        );
+        assert!(stdout.contains("results malformed artifact"));
     }
 
     #[test]

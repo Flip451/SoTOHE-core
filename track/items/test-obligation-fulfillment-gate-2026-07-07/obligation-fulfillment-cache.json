@@ -6927,13 +6927,13 @@
         "item_identifier": "voluntary:AC-09"
       },
       "key": {
-        "bound_tests_set_hash": "b8161f02d2f4242fd7adfab4da1a72e21084612e3c3cd2838e51eaa2fac33032",
+        "bound_tests_set_hash": "53d21918dc15ef3e9a86930694b231e6eb7c33aa2e765f225030ce78644b01e6",
         "declaration_hash": "99dcc8dbf3b29a3a20faa89be193e20f6256392564bf35bf33f64f544d312910",
         "anchor_text_hash": "f3b931241466d6279230a10422f1047ccec14fdf2c262b59876899f16ccf13bb"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(outcome.exit_code, 0);\nlet stdout = outcome.stdout.unwrap();\nassert!(stdout.contains(\"entry_key: CatalogueEntryKey(\\\"domain::Invoice\\\")\"));\nassert!(stdout.contains(\"claim_source: Some(DiagnosticMessage(\\\"fulfillment binding\\\"))\"));\nassert!(stdout.contains(\"outcome: Fail(CentralUnverified)\"));"
+        "citation": "assert_eq!(outcome.exit_code, 0);\nassert!(stdout.contains(\"Fulfillment:infrastructure pass=1 fail=1 pending=0\"));\nassert!(stdout.ends_with(\"records=0 uncited_findings=0\"));\nassert!(stdout.contains(\"claim_source: Some(DiagnosticMessage(\\\"fulfillment binding\\\"))\"));\nassert!(stdout.contains(\"outcome: Fail(CentralUnverified)\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -6951,13 +6951,13 @@
         "item_identifier": "voluntary:IN-10"
       },
       "key": {
-        "bound_tests_set_hash": "b8161f02d2f4242fd7adfab4da1a72e21084612e3c3cd2838e51eaa2fac33032",
+        "bound_tests_set_hash": "53d21918dc15ef3e9a86930694b231e6eb7c33aa2e765f225030ce78644b01e6",
         "declaration_hash": "99dcc8dbf3b29a3a20faa89be193e20f6256392564bf35bf33f64f544d312910",
         "anchor_text_hash": "ac928ab35b0e8fbc2f84bd32b6533080109ebc933489bc0b729793dbe67ab246"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(outcome.exit_code, 0); assert!(stdout.contains(\"Fulfillment:infrastructure pass=1 fail=1 pending=0\")); assert!(stdout.ends_with(\"records=0 uncited_findings=0\")); assert!(stdout.contains(\"entry_key: CatalogueEntryKey(\\\"domain::Invoice\\\")\")); assert!(stdout.contains(\"claim_source: Some(DiagnosticMessage(\\\"fulfillment binding\\\"))\")); assert!(stdout.contains(\"evidence_source: Some(DiagnosticMessage(\\\"cli_driver::test_obligation::results::tests::test_results_handler_renders_record_claim_evidence_verdict_and_reason\\\"))\")); assert!(stdout.contains(\"outcome: Fail(CentralUnverified)\")); assert!(stdout.contains(\"verdict_reason: Some(DiagnosticMessage(\\\"entry-relevant proof is missing\\\"))\")); assert!(stdout.contains(\"detail: DiagnosticMessage(\\\"evidence no longer matches the claim\\\")\"));"
+        "citation": "assert_eq!(outcome.exit_code, 0);\n        let stdout = outcome.stdout.unwrap();\n        assert!(stdout.contains(\"Fulfillment:infrastructure pass=1 fail=1 pending=0\"));\n        assert!(stdout.ends_with(\"records=0 uncited_findings=0\"));\n\n    assert_eq!(output.records().len(), 2);\n    assert!(output.records().contains(&EdgeVerdictRecord::new("
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },

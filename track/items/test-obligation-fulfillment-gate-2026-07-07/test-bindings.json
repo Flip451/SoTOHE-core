@@ -8984,6 +8984,16 @@
         "layer": "cli_driver",
         "module_path": "cli_driver::test_obligation::results::tests",
         "test_name": "test_results_handler_renders_record_claim_evidence_verdict_and_reason"
+      },
+      {
+        "layer": "cli_driver",
+        "module_path": "cli_driver::test_obligation::results::tests",
+        "test_name": "test_results_handler_with_io_error_returns_informational_success"
+      },
+      {
+        "layer": "cli_driver",
+        "module_path": "cli_driver::test_obligation::results::tests",
+        "test_name": "test_results_handler_with_malformed_artifact_error_returns_informational_success"
       }
     ]
   },
@@ -9021,6 +9031,16 @@
         "layer": "cli_driver",
         "module_path": "cli_driver::test_obligation::results::tests",
         "test_name": "test_results_handler_renders_record_claim_evidence_verdict_and_reason"
+      },
+      {
+        "layer": "cli_driver",
+        "module_path": "cli_driver::test_obligation::results::tests",
+        "test_name": "test_results_handler_with_io_error_returns_informational_success"
+      },
+      {
+        "layer": "cli_driver",
+        "module_path": "cli_driver::test_obligation::results::tests",
+        "test_name": "test_results_handler_with_malformed_artifact_error_returns_informational_success"
       }
     ]
   },
