@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "d0e7173276eba9d373c4013d323fa51ab063105fce0bacc3814ec98c3c2f6cd6",
+      "evidence_hash": "b908a76958e8a067ce89da1689b5799aa676da62bfe4da8862ed189309dd5a42",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify tech-stack` ゲート全経路の実装撤去。Makefile タスク (`verify-tech-stack` / `verify-tech-stack-local`) の削除、集約タスク (`ci-local` / `ci-container`) の dependencies 配列からの当該項目の除去、CLI サブコマンド (`sotp verify tech-stack`)、cli-driver 入力 (`VerifyInput::TechStack`)..."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/cli-types.json",
+          "section_key": "types",
+          "entry_key": "SpecVerifyArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`verify tech-stack` ゲート全経路の実装撤去。Makefile タスク (`verify-tech-stack` / `verify-tech-stack-local`) の削除、集約タスク (`ci-local` / `ci-container`) の dependencies 配列からの当該項目の除去、CLI サブコマンド (`sotp verify tech-stack`)、cli-driver 入力 (`VerifyInput::TechStack`)、usecase port method (`verify_tech_stack`)、infrastructure adapter method + `libs/infrastructure/src/verify/tech_stack.rs` モジュール本体、および `verify/mod.rs` の `pub mod tech_stack;` 宣言、関連テストコードのいずれも live source に残らない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9e20878fba2da8625c7f74e4bd7ad7f4c5e59fc36d227d8e86549d8989c56f6f",
+      "evidence_hash": "b908a76958e8a067ce89da1689b5799aa676da62bfe4da8862ed189309dd5a42",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify tech-stack` ゲート全経路の実装撤去。Makefile タスク (`verify-tech-stack` / `verify-tech-stack-local`) の削除、集約タスク (`ci-local` / `ci-container`) の dependencies 配列からの当該項目の除去、CLI サブコマンド (`sotp verify tech-stack`)..."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/cli-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`verify tech-stack` ゲート全経路の実装撤去。Makefile タスク (`verify-tech-stack` / `verify-tech-stack-local`) の削除、集約タスク (`ci-local` / `ci-container`) の dependencies 配列からの当該項目の除去、CLI サブコマンド (`sotp verify tech-stack`)、cli-driver 入力 (`VerifyInput::TechStack`)、usecase port method (`verify_tech_stack`)、infrastructure adapter method + `libs/infrastructure/src/verify/tech_stack.rs` モジュール本体、および `verify/mod.rs` の `pub mod tech_stack;` 宣言、関連テストコードのいずれも live source に残らない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "53672e685fe989c852ae17c7f245c83c67e2f52735e107a6aee67cfd3b7b52d4",
+      "evidence_hash": "b908a76958e8a067ce89da1689b5799aa676da62bfe4da8862ed189309dd5a42",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`verify tech-stack` ゲート全経路の実装撤去。Makefile タスク (`verify-tech-stack` / `verify-tech-stack-local`) の削除、集約タスク (`ci-local` / `ci-container`) の dependencies 配列からの当該項目の除去、CLI サブコマンド (`sotp verify tech-stack`) ... および `verify/mod.rs` の `pub mod tech_stack;` 宣言、関連テストコードのいずれも live source に残らない状態を要件とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/cli-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`verify tech-stack` ゲート全経路の実装撤去。Makefile タスク (`verify-tech-stack` / `verify-tech-stack-local`) の削除、集約タスク (`ci-local` / `ci-container`) の dependencies 配列からの当該項目の除去、CLI サブコマンド (`sotp verify tech-stack`)、cli-driver 入力 (`VerifyInput::TechStack`)、usecase port method (`verify_tech_stack`)、infrastructure adapter method + `libs/infrastructure/src/verify/tech_stack.rs` モジュール本体、および `verify/mod.rs` の `pub mod tech_stack;` 宣言、関連テストコードのいずれも live source に残らない状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "53672e685fe989c852ae17c7f245c83c67e2f52735e107a6aee67cfd3b7b52d4",
+      "evidence_hash": "8153d518c52d65108896d6ec504c5402c140aef813c235ae1e747dedcda49c5a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 実装から tech-stack サブコマンドが除去されている: `sotp verify --help` の subcommand 列挙に `tech-stack` が現れない。`sotp verify tech-stack --project-root .` を invoke すると clap の unknown subcommand error で非ゼロ exit する (成功 exit 0 で通過することがない)。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/cli-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "CLI 実装から tech-stack サブコマンドが除去されている: `sotp verify --help` の subcommand 列挙に `tech-stack` が現れない。`sotp verify tech-stack --project-root .` を invoke すると clap の unknown subcommand error で非ゼロ exit する (成功 exit 0 で通過することがない)。"
+        }
+      }
+    },
+    {
+      "claim_hash": "53672e685fe989c852ae17c7f245c83c67e2f52735e107a6aee67cfd3b7b52d4",
+      "evidence_hash": "f462a39f0a97b57ade26125ab34792baf150165e562339abfc08e58579f42790",
+      "verdict": {
+        "kind": "pass",
+        "citation": "識別子 `VerifyCommand::TechStack`, `VerifyInput::TechStack`, `verify_tech_stack`, `TECH_STACK_FILE`, および module 参照 `verify::tech_stack` / `pub mod tech_stack;` の live source (テストコード含む) での出現が 0 件"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/cli-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "Rust 層の tech-stack 関連定義がすべて除去されている: `libs/domain/**`, `libs/usecase/**`, `libs/infrastructure/**`, `apps/cli/**`, `apps/cli-driver/**`, `apps/cli-composition/**` を対象に、識別子 `VerifyCommand::TechStack`, `VerifyInput::TechStack`, `verify_tech_stack`, `TECH_STACK_FILE`, および module 参照 `verify::tech_stack` / `pub mod tech_stack;` の live source (テストコード含む) での出現が 0 件。`cargo build --all` および `cargo make test` が pass する状態でこの 0 件を満たす (dead code 由来のコンパイル error / warning を残さない)。"
+        }
+      }
+    }
+  ]
+}

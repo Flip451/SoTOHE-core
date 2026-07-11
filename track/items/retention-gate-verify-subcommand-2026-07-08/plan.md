@@ -1,0 +1,36 @@
+<!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
+# retention gate の verify サブコマンド化
+
+## Summary
+
+T001: infrastructure retention verifier and focused scanner tests carry IN-02, IN-03, IN-04, IN-05, CN-01, CN-04, CN-05, AC-02, AC-03, AC-04, AC-05, AC-06, and AC-10.
+T002: usecase VerifyPort/VerifyService plus FsVerifyAdapter wiring carries IN-02, CN-01, AC-02, AC-03, and AC-06.
+T003: CLI driver, CLI command, CLI gate-name mapping/tests, and composition wiring carries IN-02, CN-01, AC-02, AC-03, and AC-06.
+T004: integration-test deletion plus root Makefile and export verification carries IN-01, IN-06, OS-01, OS-02, OS-03, OS-04, OS-05, CN-02, CN-03, AC-01, AC-07, AC-08, AC-09, and AC-10.
+Goal traceability: GO-01 -> T001/T002/T003/T004; GO-02 -> T001/T002/T003; GO-03 -> T004.
+
+## Tasks (4/4 resolved)
+
+### S1 — Infrastructure scanner and verifier tests
+
+> Run T001 first so infrastructure::verify::retention_gate::verify and its unit tests exist before T002/T003 depend on them (IN-02, IN-03, IN-04, IN-05, CN-01, CN-04, CN-05, AC-02, AC-03, AC-04, AC-05, AC-06, AC-10).
+
+- [x] **T001**: libs/infrastructure/src/verify/retention_gate.rs and libs/infrastructure/src/verify/mod.rs — add infrastructure::verify::retention_gate::verify as declared in infrastructure-types.json, move the retention scanner from apps/cli/tests/retention_gate.rs into infrastructure production code, and add focused unit tests for the cited verifier/scanner anchors (IN-02, IN-03, IN-04, IN-05, CN-01, CN-04, CN-05, AC-02, AC-03, AC-04, AC-05, AC-06, AC-10). (`3c53bae9a664582ef73b487c05f5ce41b9cd32dd`)
+
+### S2 — Usecase port and filesystem adapter wiring
+
+> Run T002 after T001 so VerifyPort, VerifyService, VerifyInteractor, and FsVerifyAdapter carry verify_retention_gate before T003 CLI routing (IN-02, CN-01, AC-02, AC-03, AC-06).
+
+- [x] **T002**: libs/usecase/src/verify.rs and libs/infrastructure/src/verify_adapter.rs — add verify_retention_gate to VerifyPort, VerifyService, VerifyInteractor, and FsVerifyAdapter per usecase-types.json and infrastructure-types.json, and add usecase/adapter tests for the cited anchors (IN-02, CN-01, AC-02, AC-03, AC-06). (`3c53bae9a664582ef73b487c05f5ce41b9cd32dd`)
+
+### S3 — CLI route and composition dispatch
+
+> Run T003 after T002 so VerifyInput, VerifyCommand, VerifyDriver, verify_command_gate_name, and composition dispatch carry the retention route before T004 Makefile wiring (IN-02, CN-01, AC-02, AC-03, AC-06).
+
+- [x] **T003**: apps/cli-driver/src/verify.rs, apps/cli/src/commands/verify.rs, apps/cli/src/commands/verify_tests.rs, apps/cli/src/main.rs, and apps/cli-composition/src/verify.rs — add the RetentionGate route to VerifyInput, VerifyCommand, VerifyDriver, verify_command_gate_name, and composition dispatch per cli_driver-types.json and cli-types.json, and add CLI/driver/composition tests for the cited anchors (IN-02, CN-01, AC-02, AC-03, AC-06). (`3c53bae9a664582ef73b487c05f5ce41b9cd32dd`)
+
+### S4 — Maintainer CI wiring and distribution boundary
+
+> Run T004 last so Makefile/export verification follows the T003 sotp verify route (IN-01, IN-06, OS-01, OS-02, OS-03, OS-04, OS-05, CN-02, CN-03, AC-01, AC-07, AC-08, AC-09, AC-10).
+
+- [x] **T004**: apps/cli/tests/retention_gate.rs, Makefile.toml, and overlay/Makefile.toml — delete the old integration test, add root maintainer Makefile task/CI wiring, and verify distribution-boundary anchors against overlay/export artifacts (IN-01, IN-06, OS-01, OS-02, OS-03, OS-04, OS-05, CN-02, CN-03, AC-01, AC-07, AC-08, AC-09, AC-10). (`3c53bae9a664582ef73b487c05f5ce41b9cd32dd`)

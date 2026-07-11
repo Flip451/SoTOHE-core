@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "track_id": "retire-todo-marker-state-and-track-docs-2026-07-08",
+  "entries": {
+    "T001": [],
+    "T002": [
+      { "layer": "cli", "entry_key": "VerifyCommand" },
+      { "layer": "cli", "entry_key": "VerifyArgs" },
+      { "layer": "cli", "entry_key": "SpecVerifyArgs" },
+      { "layer": "cli_driver", "entry_key": "VerifyInput" },
+      { "layer": "cli_driver", "entry_key": "VerifyDriver" }
+    ],
+    "T003": [
+      { "layer": "usecase", "entry_key": "VerifyPort" },
+      { "layer": "usecase", "entry_key": "VerifyService" },
+      { "layer": "usecase", "entry_key": "VerifyInteractor" },
+      { "layer": "usecase", "entry_key": "VerifyOutcome" },
+      { "layer": "usecase", "entry_key": "VerifyPortError" },
+      { "layer": "infrastructure", "entry_key": "FsVerifyAdapter" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::verify::tech_stack::verify" }
+    ],
+    "T004": [],
+    "T005": [],
+    "T006": [],
+    "T007": [],
+    "T008": [],
+    "T009": [],
+    "T010": [],
+    "T011": []
+  }
+}

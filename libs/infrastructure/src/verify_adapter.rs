@@ -266,19 +266,6 @@ impl FsVerifyAdapter {
 }
 
 impl VerifyPort for FsVerifyAdapter {
-    fn verify_tech_stack(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
-        if let Some(outcome) =
-            reject_symlinked_trusted_root("verify tech stack readiness", project_root)
-        {
-            return Ok(outcome);
-        }
-
-        Ok(render_outcome(
-            "verify tech stack readiness",
-            &crate::verify::tech_stack::verify(project_root),
-        ))
-    }
-
     fn verify_latest_track(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) =
             reject_symlinked_trusted_root("verify latest track files", project_root)
@@ -289,6 +276,18 @@ impl VerifyPort for FsVerifyAdapter {
         Ok(render_outcome(
             "verify latest track files",
             &crate::verify::latest_track::verify(project_root),
+        ))
+    }
+
+    fn verify_retention_gate(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
+        if let Some(outcome) = reject_symlinked_trusted_root("verify retention gate", project_root)
+        {
+            return Ok(outcome);
+        }
+
+        Ok(render_outcome(
+            "verify retention gate",
+            &crate::verify::retention_gate::verify(project_root),
         ))
     }
 
@@ -590,15 +589,49 @@ mod tests {
     use super::FsVerifyAdapter;
     use usecase::verify::VerifyPort as _;
 
+    fn write_file(root: &std::path::Path, rel: &str, content: &str) {
+        let path = root.join(rel);
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).unwrap();
+        }
+        std::fs::write(path, content).unwrap();
+    }
+
+    #[test]
+    fn test_verify_retention_gate_clean_surface_returns_success() {
+        let root = tempfile::tempdir().unwrap();
+        write_file(root.path(), "README.md", "# Clean\n");
+
+        let outcome = FsVerifyAdapter::new().verify_retention_gate(root.path()).unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.unwrap_or_default();
+        assert!(stdout.contains("--- verify retention gate PASSED ---"), "{stdout}");
+    }
+
+    #[test]
+    fn test_verify_retention_gate_violation_returns_failure() {
+        let root = tempfile::tempdir().unwrap();
+        let kebab = ["tech", "stack"].join("-");
+        let token = format!("verify-{kebab}");
+        write_file(root.path(), "README.md", &format!("{token}\n"));
+
+        let outcome = FsVerifyAdapter::new().verify_retention_gate(root.path()).unwrap();
+
+        assert_eq!(outcome.exit_code, 1);
+        let stdout = outcome.stdout.unwrap_or_default();
+        assert!(stdout.contains("--- verify retention gate FAILED ---"), "{stdout}");
+    }
+
     #[cfg(unix)]
     #[test]
-    fn test_verify_tech_stack_rejects_symlinked_project_root() {
+    fn test_verify_latest_track_rejects_symlinked_project_root() {
         let real_root = tempfile::tempdir().unwrap();
         let link_parent = tempfile::tempdir().unwrap();
         let root_link = link_parent.path().join("workspace-link");
         std::os::unix::fs::symlink(real_root.path(), &root_link).unwrap();
 
-        let outcome = FsVerifyAdapter::new().verify_tech_stack(&root_link).unwrap();
+        let outcome = FsVerifyAdapter::new().verify_latest_track(&root_link).unwrap();
 
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.unwrap_or_default();

@@ -251,12 +251,6 @@ description = "[internal] Verify track metadata.json: schema, task graph, and st
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- track views validate --project-root .']
 
-[tasks.verify-tech-stack-local]
-private = true
-description = "[internal] Verify tech stack decisions are fully resolved"
-script_runner = "@shell"
-script = ['cargo run --quiet -p cli -- verify tech-stack']
-
 [tasks.verify-hooks-path-local]
 private = true
 description = "[internal] Verify local Git config core.hooksPath points at .githooks"
@@ -311,6 +305,12 @@ description = "[internal] Verify latest track has spec.md (or spec.json) and pla
 script_runner = "@shell"
 script = ['cargo run --quiet -p cli -- verify latest-track']
 
+[tasks.verify-retention-gate-local]
+private = true
+description = "[internal] Verify retention live surface excludes retired gate/document identifiers"
+script_runner = "@shell"
+script = ['cargo run --quiet -p cli -- verify retention-gate']
+
 [tasks.verify-plan-artifact-refs-local]
 private = true
 description = "[internal] Verify plan artifact refs + task-coverage integrity (active-track auto-resolved from branch)"
@@ -358,7 +358,7 @@ args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-catalog-spec", "--
 
 [tasks.template-export-smoke-local]
 private = true
-description = "[internal] Source-repo smoke gate: export the template tree to a fresh tmp dir OUTSIDE the workspace root, then run the exported tree's own gates with the ambient toolchain: skeleton fmt/clippy/test, exported-Makefile parseability, the exported tree's file-based `bin/sotp verify` gates (layers / module-size / canonical-modules / arch-docs / doc-links / purity trio, exercising the exported architecture-rules.json), and deny.toml validation (bans/licenses/sources) when cargo-deny is available. Smoke-level equivalent of AC-05 without docker-in-docker or network install: the freshly built source sotp binary is lent to the exported tree as bin/sotp. Uses `cargo run -p cli -- template export` (not the source bin/sotp) so the gate runs unchanged inside ci-container, where the host-built bin/sotp is absent. Scope boundary (OS-10/CN-09): the gate only asserts export success and exported-tree structural health; it deliberately does not hard-fail on consumer-owned config VALUES and skips when source-only overlay artifacts are absent."
+description = "[internal] Source-repo smoke gate: export the template tree to a fresh tmp dir OUTSIDE the workspace root, then run the exported tree's own gates with the ambient toolchain: skeleton fmt/clippy/test, exported-Makefile parseability, the exported tree's file-based `bin/sotp verify` gates (layers / module-size / canonical-modules / arch-docs / doc-links / purity trio, exercising the exported architecture-rules.json), deny.toml validation (bans/licenses/sources) when cargo-deny is available, plus the three post-export `bin/sotp` transplant checks required by ADR 2026-07-08-0541 (spec IN-05, AC-02, AC-07, CN-08, CN-09): (a) `bin/sotp` exists, (b) executable bit set on unix, (c) `bin/sotp --help` exits 0. Uses `cargo run -p cli -- template export` (not the source bin/sotp) so the gate runs unchanged inside ci-container, where the host-built bin/sotp is absent. Scope boundary (OS-10/CN-09): the gate only asserts export success and exported-tree structural health; it deliberately does not hard-fail on consumer-owned config VALUES and skips when source-only overlay artifacts are absent."
 script_runner = "@shell"
 script = ['''
 set -e
@@ -381,17 +381,23 @@ cargo run --quiet -p cli -- template export \
   --overlay-dir "$OVERLAY_DIR" \
   --output-dir "$SMOKE_OUT"
 
-# Build the source repo's sotp binary (debug, incremental — the export step above
-# already warmed this build) and remember its absolute path. The exported template
-# normally obtains bin/sotp via the network-installing install-sotp task; the smoke
-# gate lends the freshly built source binary instead so the exported tree's
-# file-based verify gates run hermetically.
-cargo build --quiet -p cli
-TD="${CARGO_TARGET_DIR:-target}"
-case "$TD" in
-  /*) SOTP_SRC_BIN="$TD/debug/sotp" ;;
-  *) SOTP_SRC_BIN="$(pwd)/$TD/debug/sotp" ;;
-esac
+# Post-export transplant checks (ADR 2026-07-08-0541 D1; spec IN-05, AC-02, AC-07,
+# CN-08, CN-09). The exporter now transplants the running binary into
+# `<output>/bin/sotp`, so the smoke gate no longer needs to lend the source binary
+# — the three assertions below make regression (missing / non-executable / non-runnable
+# bin/sotp) fail this gate rather than a downstream consumer checkout.
+if [ ! -f "$SMOKE_OUT/bin/sotp" ]; then
+  echo "[FAIL] template-export-smoke-local: bin/sotp not transplanted into exported tree" >&2
+  exit 1
+fi
+if [ ! -x "$SMOKE_OUT/bin/sotp" ]; then
+  echo "[FAIL] template-export-smoke-local: bin/sotp is not executable" >&2
+  exit 1
+fi
+if ! "$SMOKE_OUT/bin/sotp" --help >/dev/null 2>&1; then
+  echo "[FAIL] template-export-smoke-local: bin/sotp --help did not exit 0" >&2
+  exit 1
+fi
 
 # Run the exported tree's gates with the ambient cargo toolchain (host toolchain on
 # `cargo make`, container toolchain in ci-container). A full `cargo make ci` inside
@@ -410,8 +416,6 @@ cargo test --all-features
 # Overlay drift gates beyond the skeleton build: a broken overlay Makefile.toml /
 # architecture-rules.json / deny.toml must fail this smoke, not surface first in a
 # consumer checkout.
-mkdir -p bin
-cp "$SOTP_SRC_BIN" bin/sotp
 # Exported Makefile parses and enumerates its task graph.
 cargo make --list-all-steps >/dev/null
 # File-based verify gates against the exported tree (parse the exported
@@ -443,7 +447,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local repo-wide CI checks. Track-aware gates live in ci-track-local."
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
 
 [tasks.ci-track-local]
 private = true
@@ -456,7 +460,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run repo-wide CI checks inside a pre-existing container (no docker compose). Track-aware gates that require an active track/<id> branch are in ci-track-container."
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-tech-stack-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
 
 [tasks.ci-track-container]
 description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + check liveness + spec/catalogue/impl signal chains + test-obligation check). Skip on base branch / non-track CI runs."
@@ -571,12 +575,6 @@ dependencies = ["prepare-local-cache-dirs"]
 command = "docker"
 args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-track-metadata-local"]
 
-[tasks.verify-tech-stack]
-description = "[gate] Verify tech stack TODOs are fully resolved (docker compose)"
-dependencies = ["prepare-local-cache-dirs"]
-command = "docker"
-args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "verify-tech-stack-local"]
-
 [tasks.verify-hooks-path]
 description = "[gate] Verify local Git config core.hooksPath points at .githooks (docker compose)"
 dependencies = ["prepare-local-cache-dirs"]
@@ -599,6 +597,11 @@ args = ["compose", "run", "--rm", "tools", "cargo", "make", "--allow-private", "
 description = "[gate] Verify latest track files (host, no docker; uses bash/find only)"
 command = "cargo"
 args = ["make", "--allow-private", "verify-latest-track-local"]
+
+[tasks.verify-retention-gate]
+description = "[gate] Verify retention live surface (host, no docker)"
+command = "cargo"
+args = ["make", "--allow-private", "verify-retention-gate-local"]
 
 [tasks.verify-plan-artifact-refs]
 description = "[gate] Verify plan artifact refs + task-coverage integrity (docker compose)"

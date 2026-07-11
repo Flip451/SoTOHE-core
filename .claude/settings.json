@@ -60,7 +60,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '{\"hookSpecificOutput\": {\"additionalContext\": \"Context compaction triggered. Key context: Check CLAUDE.md for project rules and workflow. Check track/tech-stack.md for Rust stack. Check track/items/ for current feature specs and plans. Check .claude/rules/ for Rust coding standards. Check knowledge/conventions/README.md for project-specific implementation rules. Run cargo make ci to verify quality before commits.\"}}'"
+            "command": "echo '{\"hookSpecificOutput\": {\"additionalContext\": \"Context compaction triggered. Key context: Check CLAUDE.md for project rules and workflow. Check knowledge/adr/README.md for tech stack decisions. Check track/items/ for current feature specs and plans. Check .claude/rules/ for Rust coding standards. Check knowledge/conventions/README.md for project-specific implementation rules. Run cargo make ci to verify quality before commits.\"}}'"
           }
         ]
       }
@@ -124,7 +124,6 @@
       "Bash(cargo make verify-arch-docs)",
       "Bash(cargo make verify-plan-progress)",
       "Bash(cargo make verify-track-metadata)",
-      "Bash(cargo make verify-tech-stack)",
       "Bash(cargo make verify-latest-track)",
       "Bash(cargo make verify-track-registry)",
       "Bash(cargo make ci-rust)",

@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "113acdf9ffb53130da72eb48f5e922304f105dfa67695a341bf558f370310a62",
+      "evidence_hash": "c3497c7087bd8aebc4e10f7caaeffc25d7fd02decd2adfdadf4337e3120b2fc6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` の動作契約に、実行中の自バイナリを出力ツリーの `bin/sotp` として移植 (実行権限を保持したコピー) するステップを組み込む。移植元は現在のプロセスの実行バイナリのパスであり、リポジトリ tree 上の `bin/sotp` ファイルではない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-export-sotp-binary-transplant-2026-07-08/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsSelfBinaryTransplantAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`sotp template export` の動作契約に、実行中の自バイナリを出力ツリーの `bin/sotp` として移植 (実行権限を保持したコピー) するステップを組み込む。移植元は現在のプロセスの実行バイナリのパスであり、リポジトリ tree 上の `bin/sotp` ファイルではない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "113acdf9ffb53130da72eb48f5e922304f105dfa67695a341bf558f370310a62",
+      "evidence_hash": "4e265531c5f36cbdc900d70aa25cf8ef00283767552443c4b35e72d238d9bdc9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実行中バイナリのパス取得失敗、出力先への書き込み失敗、実行権限の設定失敗など、いずれかで移植が完了しない場合、export は非ゼロ exit で終了する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-export-sotp-binary-transplant-2026-07-08/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsSelfBinaryTransplantAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "移植ステップの fail-closed 動作契約。実行中バイナリのパス取得失敗、出力先への書き込み失敗、実行権限の設定失敗など、いずれかで移植が完了しない場合、export は非ゼロ exit で終了する (silent skip、部分成功、後段でのカバーは許容しない)。"
+        }
+      }
+    },
+    {
+      "claim_hash": "113acdf9ffb53130da72eb48f5e922304f105dfa67695a341bf558f370310a62",
+      "evidence_hash": "edb6084ac8c34fbf915d6b5c35169a27fa8d83c8521e3c4dceff84ed99b6c5ad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出力ツリーの `bin/sotp` は、export を実行した sotp バイナリと **バイト単位で同一** である。export 実行と出力側 sotp のバージョン (機能 / 依存性含む) が食い違う状態を作らない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-export-sotp-binary-transplant-2026-07-08/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsSelfBinaryTransplantAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "出力ツリーの `bin/sotp` は、export を実行した sotp バイナリと **バイト単位で同一** である。export 実行と出力側 sotp のバージョン (機能 / 依存性含む) が食い違う状態を作らない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "113acdf9ffb53130da72eb48f5e922304f105dfa67695a341bf558f370310a62",
+      "evidence_hash": "a657ad8071311e23563c22423bf7b6234e01ed58207b7ae87317d9e94786628a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出力ツリーの `bin/sotp` は実行権限を保持している。移植後に追加コマンド (chmod 等) なしで `bin/sotp` を直接起動できる状態を要件とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-export-sotp-binary-transplant-2026-07-08/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsSelfBinaryTransplantAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "出力ツリーの `bin/sotp` は実行権限を保持している。移植後に追加コマンド (chmod 等) なしで `bin/sotp` を直接起動できる状態を要件とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "113acdf9ffb53130da72eb48f5e922304f105dfa67695a341bf558f370310a62",
+      "evidence_hash": "924e7a055c16d1de691cc13141e4c58ae1ec1a610d1404b10fe53b86a50427ff",
+      "verdict": {
+        "kind": "pass",
+        "citation": "移植ステップの失敗 (パス取得失敗 / 書き込み失敗 / 権限設定失敗) は fail-closed で export の exit を非ゼロにする。silent skip、部分成功、後続 CI ゲートに委ねる形の遅延検出を許容しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-export-sotp-binary-transplant-2026-07-08/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsSelfBinaryTransplantAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "移植ステップの失敗 (パス取得失敗 / 書き込み失敗 / 権限設定失敗) は fail-closed で export の exit を非ゼロにする。silent skip、部分成功、後続 CI ゲートに委ねる形の遅延検出を許容しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "113acdf9ffb53130da72eb48f5e922304f105dfa67695a341bf558f370310a62",
+      "evidence_hash": "ba3977dd8d6ab571788f2b052c2647c7a148680ee306a6386b2f78bec03785bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` を実行した後、出力ディレクトリの `bin/sotp` が、export を実行したプロセスの実行バイナリと **バイト単位で同一** の内容を持ち、かつ実行権限が付与されている。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-export-sotp-binary-transplant-2026-07-08/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsSelfBinaryTransplantAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp template export` を実行した後、出力ディレクトリの `bin/sotp` が、export を実行したプロセスの実行バイナリと **バイト単位で同一** の内容を持ち、かつ実行権限が付与されている。"
+        }
+      }
+    },
+    {
+      "claim_hash": "113acdf9ffb53130da72eb48f5e922304f105dfa67695a341bf558f370310a62",
+      "evidence_hash": "3a6e110a0ebe4b9d1ac4349cf1b6236593bed782e992f98bad19ba833e5d43c7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実行中バイナリのパス取得失敗、出力先への書き込み失敗、または実行権限設定失敗のいずれかの状況を人為的に発生させた場合、`sotp template export` は非ゼロ exit で終了し、部分的な出力ツリー (transplant 失敗を示唆する不完全な `bin/sotp` を含む) を残さないか、または後段の検証で必ず失敗として検出可能な状態にとどめる。silent skip や部分成功として扱われない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-export-sotp-binary-transplant-2026-07-08/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsSelfBinaryTransplantAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "実行中バイナリのパス取得失敗、出力先への書き込み失敗、または実行権限設定失敗のいずれかの状況を人為的に発生させた場合、`sotp template export` は非ゼロ exit で終了し、部分的な出力ツリー (transplant 失敗を示唆する不完全な `bin/sotp` を含む) を残さないか、または後段の検証で必ず失敗として検出可能な状態にとどめる。silent skip や部分成功として扱われない。"
+        }
+      }
+    }
+  ]
+}

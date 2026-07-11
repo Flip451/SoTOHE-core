@@ -23,8 +23,6 @@ proceed until this workflow completes with OK.
 - **Git status** — expected clean, or containing only ADR / convention files that belong to
   this new track and will be committed inside it. Any unrelated in-progress changes must be
   resolved by the user before the workflow proceeds.
-- **`track/tech-stack.md`** — must be free of blocking `TODO:` markers before implementation
-  begins (not enforced at Phase 0 itself, but the convention applies to the track as a whole).
 
 ## Sequence
 

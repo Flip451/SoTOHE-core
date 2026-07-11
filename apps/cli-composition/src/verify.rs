@@ -81,3 +81,33 @@ impl VerifyCompositionRoot {
         cli_driver::verify::VerifyDriver::new(interactor)
     }
 }
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use std::path::Path;
+
+    use cli_driver::verify::VerifyInput;
+
+    use super::*;
+
+    fn write_file(root: &Path, rel: &str, content: &str) {
+        let path = root.join(rel);
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).unwrap();
+        }
+        std::fs::write(path, content).unwrap();
+    }
+
+    #[test]
+    fn test_verify_composition_root_retention_gate_driver_returns_success() {
+        let tmp = tempfile::tempdir().unwrap();
+        write_file(tmp.path(), "README.md", "# Clean\n");
+        let driver = VerifyCompositionRoot::new().verify_driver();
+
+        let outcome =
+            driver.handle(VerifyInput::RetentionGate { project_root: tmp.path().to_path_buf() });
+
+        assert_eq!(outcome.exit_code, 0);
+    }
+}

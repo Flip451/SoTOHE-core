@@ -37,7 +37,7 @@
 - [ ] `rust-version` in `Cargo.toml` updated to x.xx
 - [ ] `RUST_VERSION` ARG in `Dockerfile` updated
 - [ ] Tool versions in `Dockerfile` updated
-- [ ] `track/tech-stack.md` MSRV and changelog updated
+- [ ] Pre-track ADR recorded (when the version choice is a decision worth keeping)
 - [ ] User confirmed changes
 
 ## Source Links

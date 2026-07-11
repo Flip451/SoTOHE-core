@@ -1,0 +1,277 @@
+{
+  "crate_name": "cli",
+  "functions": {},
+  "layer": "cli",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "VerifyCommand": {
+      "action": "modify",
+      "docs": "clap subcommand enum for `sotp verify` (IN-01, AC-02, AC-03). This track removes the `TechStack(VerifyArgs)` variant; the post-modification enum carries 16 variants.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "LatestTrack",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ArchDocs",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Layers",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "HooksPath",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecAttribution",
+            "payload": {
+              "fields": [
+                "SpecVerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecFrontmatter",
+            "payload": {
+              "fields": [
+                "SpecVerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CanonicalModules",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ModuleSize",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DomainPurity",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DomainStrings",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UsecasePurity",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DocLinks",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ViewFreshness",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecSignals",
+            "payload": {
+              "fields": [
+                "SpecVerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "PlanArtifactRefs",
+            "payload": {
+              "fields": [
+                "PlanArtifactRefsArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CatalogueSpecRefs",
+            "payload": {
+              "fields": [
+                "CatalogueSpecRefsArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::verify",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json"
+        }
+      ]
+    },
+    "VerifyArgs": {
+      "action": "reference",
+      "docs": "Common clap args struct for project-root-based verify subcommands (baseline, unchanged this track). Declared as `reference` so `VerifyCommand` variant edges resolve in the contract-map graph.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::verify",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json"
+        }
+      ]
+    },
+    "SpecVerifyArgs": {
+      "action": "reference",
+      "docs": "clap args struct for spec-path-based verify subcommands (baseline, unchanged this track). Declared as `reference` so `VerifyCommand` variant edges resolve in the contract-map graph.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::verify",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "items_dir",
+          "params": [],
+          "receiver": "&self",
+          "returns": "std::path::PathBuf"
+        }
+      ],
+      "type_name": "VerifyCommand"
+    }
+  ],
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "VerifyCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerifyCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerifyArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerifyArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "reference",
+      "for_type": "SpecVerifyArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "reference",
+      "for_type": "SpecVerifyArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    }
+  ]
+}

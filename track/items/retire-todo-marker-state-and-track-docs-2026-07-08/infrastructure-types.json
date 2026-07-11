@@ -1,0 +1,71 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::verify::tech_stack::verify": {
+      "action": "delete",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json"
+        }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "FsVerifyAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsVerifyAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsVerifyAdapter",
+      "trait_ref": "usecase::verify::VerifyPort"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "FsVerifyAdapter": {
+      "action": "reference",
+      "docs": "Filesystem-backed adapter implementing `usecase::verify::VerifyPort`. Unchanged in identity by this track; only its `impl VerifyPort for FsVerifyAdapter` body loses the `verify_tech_stack` delegation (IN-01, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "verify_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.json"
+        }
+      ]
+    }
+  }
+}
