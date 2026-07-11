@@ -173,7 +173,10 @@
     {
       "kind": "voluntary_binding",
       "edge_id": {"entry_key": "TestObligationCompositionRoot", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "IN-05"}},
-      "tests": [{"layer": "cli_composition", "module_path": "cli_composition::test_obligation::tests", "test_name": "test_composition_root_wires_status_artifacts_for_check_and_results"}]
+      "tests": [
+        {"layer": "cli_composition", "module_path": "cli_composition::test_obligation::tests", "test_name": "test_composition_root_wires_status_artifacts_for_check_and_results"},
+        {"layer": "cli_composition", "module_path": "cli_composition::test_obligation::tests", "test_name": "test_composition_root_results_wires_informational_status_lanes"}
+      ]
     },
     {
       "kind": "voluntary_binding",

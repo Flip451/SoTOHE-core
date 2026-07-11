@@ -4,32 +4,38 @@
     {
       "id": "T001",
       "description": "Target libs/domain/src/tddd/test_obligation/errors.rs and colocated unit tests. Update ObligationCheckError (IN-04/CN-02/AC-02).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "5141873e2eb9e20622e52c540b85d85adf84eac2"
     },
     {
       "id": "T002",
       "description": "Target libs/usecase/src/test_obligation/{mod.rs,check.rs}, libs/usecase/src/pre_review_gate.rs, and their unit tests. Implement explicit-constructor status-lane interpretation in CheckTestObligationsInteractor and PreReviewGate using TaskStatusKind (IN-01/IN-02/IN-03/IN-04/IN-06/IN-07/OUT-01/OUT-02/OUT-03/OUT-04/CN-01/CN-02/CN-03/CN-04/AC-01/AC-02/AC-03/AC-04/AC-06/AC-07).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "5141873e2eb9e20622e52c540b85d85adf84eac2"
     },
     {
       "id": "T003",
       "description": "Target libs/usecase/src/test_obligation/results.rs and its unit tests. Implement TestObligationResultsInteractor status-lane aggregation (IN-01/IN-05/IN-06/IN-07/OUT-01/OUT-02/OUT-04/CN-02/CN-03/AC-05/AC-07).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "5141873e2eb9e20622e52c540b85d85adf84eac2"
     },
     {
       "id": "T004",
       "description": "Target apps/cli-driver/src/test_obligation/check.rs and its adapter tests. Implement TestObligationCheckHandler rendering (IN-02/IN-04/IN-07/CN-01/CN-02/CN-04/AC-01/AC-02/AC-04/AC-06/AC-07).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "5141873e2eb9e20622e52c540b85d85adf84eac2"
     },
     {
       "id": "T005",
       "description": "Target apps/cli-driver/src/test_obligation/results.rs and its adapter tests. Implement TestObligationResultsHandler rendering (IN-05/IN-07/CN-02/AC-05/AC-07).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "5141873e2eb9e20622e52c540b85d85adf84eac2"
     },
     {
       "id": "T006",
       "description": "Target apps/cli-composition/src/test_obligation/*, track/items/d15-task-status-check-gate-2026-07-11/test-bindings.json, and composition tests. Wire TestObligationCompositionRoot for the check and results handlers, and update implementation-batch test-obligation bindings (IN-01/IN-05/OUT-01/OUT-03/AC-05).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "5141873e2eb9e20622e52c540b85d85adf84eac2"
     }
   ],
   "plan": {

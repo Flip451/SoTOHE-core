@@ -783,13 +783,13 @@
         "item_identifier": "voluntary:IN-01"
       },
       "key": {
-        "bound_tests_set_hash": "16f7e5c134fff2b212fb0ba2b6be98b499f27349347d84296f491e89cf3926cc",
+        "bound_tests_set_hash": "a9e70b0d404dd0dc511327699b57a013b927dc39dda9d6d171acbdb4fa06542e",
         "declaration_hash": "2c7f001f58dfc14cf719b0c8311820d534c2d06c4cae411649e5e3a729ed4e1b",
         "anchor_text_hash": "faf3a8b36c676e24badd4cb8414753a01b0582ac142cd5cedd655082c9873b9c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "entries.get_mut(\"T003\").and_then(serde_json::Value::as_array_mut).unwrap().push(\n                serde_json::json!({\n                    \"layer\": \"usecase\",\n                    \"entry_key\": \"CheckTestObligationsInteractor\",\n                }),\n            );\n            ...\n            Some(\"T002\") => {\n                        task_fields.insert(\"status\".to_owned(), serde_json::json!(\"in_progress\"));\n                    }\n                    Some(\"T003\") => {\n                        task_fields.insert(\"status\".to_owned(), serde_json::json!(\"todo\"));\n                    }\n            ...\n            assert!(stdout.contains(\"status:in_progress missing=\"));\n            assert!(\n                !stdout.contains(\"status:in_progress missing=0 stale=0 verdict_absent=0\"),\n                \"expected the shared entry to resolve to an unresolved in-progress lane, got: {stdout}\"\n            );"
+        "citation": "entries.get_mut(\"T003\").and_then(serde_json::Value::as_array_mut).unwrap().push(\n                serde_json::json!({\n                    \"layer\": \"usecase\",\n                    \"entry_key\": \"CheckTestObligationsInteractor\",\n                }),\n            );\n            ...\n                    Some(\"T002\") => {\n                        task_fields.insert(\"status\".to_owned(), serde_json::json!(\"in_progress\"));\n...\n                    Some(\"T003\") => {\n                        task_fields.insert(\"status\".to_owned(), serde_json::json!(\"todo\"));\n...\n            assert!(stdout.contains(\"status:in_progress missing=\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -807,13 +807,13 @@
         "item_identifier": "voluntary:IN-05"
       },
       "key": {
-        "bound_tests_set_hash": "19c15b4e283386af7e56631b0dda7f7e267170b8d38a2e560683ef0326fc9627",
+        "bound_tests_set_hash": "d428b158708bfc038055da5809eaf045ca86088e7fcdc67d454e1f1dc1844a3c",
         "declaration_hash": "2c7f001f58dfc14cf719b0c8311820d534c2d06c4cae411649e5e3a729ed4e1b",
         "anchor_text_hash": "dfe76ee6df8df3ed149cd8ea4bd2b7f914b06a18cf41e9bb53ef1a867c168da0"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let results = root.results_handler().handle(TestObligationResultsInput::new(Some(\n                domain::TrackId::try_new(TRACK_ID.to_owned()).unwrap(),\n            )));\n            assert_eq!(results.exit_code, 0);\n            let stdout = results.stdout.unwrap();\n            assert!(stdout.contains(\"status:skipped missing=\"));"
+        "citation": "assert_ne!(check.exit_code, 0);\n\nlet results = root.results_handler().handle(TestObligationResultsInput::new(Some(\n    domain::TrackId::try_new(TRACK_ID.to_owned()).unwrap(),\n)));\nassert_eq!(results.exit_code, 0);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -831,13 +831,13 @@
         "item_identifier": "voluntary:IN-07"
       },
       "key": {
-        "bound_tests_set_hash": "19c15b4e283386af7e56631b0dda7f7e267170b8d38a2e560683ef0326fc9627",
+        "bound_tests_set_hash": "33cb4a06033a25db675db5e87e2c914540fa0bd5c4372701eeb2ec007dbbedda",
         "declaration_hash": "2c7f001f58dfc14cf719b0c8311820d534c2d06c4cae411649e5e3a729ed4e1b",
         "anchor_text_hash": "8d7deb65d9ae63926b4e095e2c529632cc7852bdc2c26611f8d3cf93a36baa64"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_ne!(check.exit_code, 0); ... assert_eq!(results.exit_code, 0); ... assert!(stdout.contains(\"status:skipped missing=\"));"
+        "citation": "assert_ne!(check.exit_code, 0);\n\nlet results = root.results_handler().handle(TestObligationResultsInput::new(Some(\n    domain::TrackId::try_new(TRACK_ID.to_owned()).unwrap(),\n)));\nassert_eq!(results.exit_code, 0);\nlet stdout = results.stdout.unwrap();\nassert!(stdout.contains(\"status:skipped missing=\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -855,13 +855,13 @@
         "item_identifier": "voluntary:AC-07"
       },
       "key": {
-        "bound_tests_set_hash": "19c15b4e283386af7e56631b0dda7f7e267170b8d38a2e560683ef0326fc9627",
+        "bound_tests_set_hash": "33cb4a06033a25db675db5e87e2c914540fa0bd5c4372701eeb2ec007dbbedda",
         "declaration_hash": "2c7f001f58dfc14cf719b0c8311820d534c2d06c4cae411649e5e3a729ed4e1b",
         "anchor_text_hash": "2996d7b7f50b4e79f02d8e13c793aa15d27ecd865b360b0e280735d9e8ec9e10"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let check = root.check_handler().handle(check_input);\n            assert_ne!(check.exit_code, 0);\n\n            let results = root.results_handler().handle(TestObligationResultsInput::new(Some(\n                domain::TrackId::try_new(TRACK_ID.to_owned()).unwrap(),\n            )));\n            assert_eq!(results.exit_code, 0);\n            let stdout = results.stdout.unwrap();\n            assert!(stdout.contains(\"status:skipped missing=\"));"
+        "citation": "assert_ne!(check.exit_code, 0);\n\nassert_eq!(results.exit_code, 0);\nlet stdout = results.stdout.unwrap();\nassert!(stdout.contains(\"status:skipped missing=\"));\nassert!(\n    !stdout.contains(\"status:skipped missing=0 stale=0 verdict_absent=0\"),\n    \"expected unresolved skipped findings, got: {stdout}\"\n);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     }

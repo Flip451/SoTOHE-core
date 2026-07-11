@@ -565,10 +565,21 @@ mod tests {
             )
             .unwrap();
             let impl_plan_path = target_track.join("impl-plan.json");
-            let impl_plan = std::fs::read_to_string(&impl_plan_path).unwrap();
-            let skipped_plan = impl_plan.replace(r#""status": "done""#, r#""status": "skipped""#);
-            assert_ne!(skipped_plan, impl_plan);
-            std::fs::write(&impl_plan_path, skipped_plan).unwrap();
+            let mut skipped_plan: serde_json::Value =
+                serde_json::from_str(&std::fs::read_to_string(&impl_plan_path).unwrap()).unwrap();
+            let original_plan = skipped_plan.clone();
+            let tasks =
+                skipped_plan.get_mut("tasks").and_then(serde_json::Value::as_array_mut).unwrap();
+            for task in tasks {
+                let task_fields = task.as_object_mut().unwrap();
+                if task_fields.get("status").and_then(serde_json::Value::as_str) == Some("done") {
+                    task_fields.insert("status".to_owned(), serde_json::json!("skipped"));
+                    task_fields.insert("commit_hash".to_owned(), serde_json::Value::Null);
+                }
+            }
+            assert_ne!(skipped_plan, original_plan);
+            std::fs::write(&impl_plan_path, serde_json::to_string_pretty(&skipped_plan).unwrap())
+                .unwrap();
 
             let root = TestObligationCompositionRoot::new(workspace_root.to_path_buf(), rules_path);
             let check_input = TestObligationCheckInput::try_from_raw(
@@ -659,9 +670,11 @@ mod tests {
                 match task_fields.get("id").and_then(serde_json::Value::as_str) {
                     Some("T002") => {
                         task_fields.insert("status".to_owned(), serde_json::json!("in_progress"));
+                        task_fields.insert("commit_hash".to_owned(), serde_json::Value::Null);
                     }
                     Some("T003") => {
                         task_fields.insert("status".to_owned(), serde_json::json!("todo"));
+                        task_fields.insert("commit_hash".to_owned(), serde_json::Value::Null);
                     }
                     _ => {}
                 }
