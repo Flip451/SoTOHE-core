@@ -1843,6 +1843,11 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_missing_bound_test_without_cached_verdict_is_missing_drift"
         }
       ]
     },
@@ -2663,6 +2668,16 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_reads_bindings_without_mutating_the_artifact"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_missing_bound_test_without_cached_verdict_is_missing_drift"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_bindings_only_is_fail_closed"
         },
         {
           "layer": "usecase",

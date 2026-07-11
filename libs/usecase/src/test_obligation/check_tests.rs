@@ -21,6 +21,7 @@ use domain::tddd::semantic_verify::{
 use domain::tddd::test_obligation::binding::{
     NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument, TestLocation,
 };
+use domain::tddd::test_obligation::drift::TestObligationDrift;
 use domain::tddd::test_obligation::errors::{
     ArtifactCodecError, ObligationCheckError, TestObligationRulesLoadError, TestSourceScanError,
     VerifyCacheError,
@@ -391,6 +392,14 @@ fn location() -> TestLocation {
         LayerId::try_new("domain").unwrap(),
         TestModulePath::try_new("domain::money::tests".to_owned()).unwrap(),
         TestFunctionName::try_new("test_positive".to_owned()).unwrap(),
+    )
+}
+
+fn missing_location() -> TestLocation {
+    TestLocation::new(
+        LayerId::try_new("domain").unwrap(),
+        TestModulePath::try_new("domain::money::tests".to_owned()).unwrap(),
+        TestFunctionName::try_new("test_renamed".to_owned()).unwrap(),
     )
 }
 
@@ -1204,15 +1213,14 @@ fn test_check_reads_bindings_without_mutating_the_artifact() {
 
 #[test]
 fn test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict() {
-    struct FailingScanner;
-    impl TestSourceScannerPort for FailingScanner {
+    struct CountingScanner(AtomicUsize);
+    impl TestSourceScannerPort for CountingScanner {
         fn scan_test_body(
             &self,
             _location: &TestLocation,
         ) -> Result<Option<String>, TestSourceScanError> {
-            Err(TestSourceScanError::Io(
-                DiagnosticMessage::try_new("scanner must not be called".to_owned()).unwrap(),
-            ))
+            self.0.fetch_add(1, Ordering::SeqCst);
+            Ok(Some(BODY.to_owned()))
         }
 
         fn hash_test_body(&self, _source: &str) -> TestBodySpanHash {
@@ -1226,17 +1234,19 @@ fn test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict() {
         &obligation(),
         Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))),
     );
+    let scanner = Arc::new(CountingScanner(AtomicUsize::new(0)));
 
     let result = interactor_with_scanner(
         Some(obligations),
         Some(bindings),
         Some(cache),
         None,
-        Arc::new(FailingScanner),
+        scanner.clone(),
     )
     .execute(&command());
 
     assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));
+    assert_eq!(scanner.0.load(Ordering::SeqCst), 1);
 }
 
 #[test]
@@ -1418,13 +1428,58 @@ fn test_check_reports_bound_test_or_anchor_hash_changes_as_freshness_drift() {
 
 #[test]
 fn test_bound_edge_without_verdict_is_stale() {
-    // A bound edge with no frozen verdict is stale (no fresh pass).
+    // A valid bound edge with no frozen verdict is stale (no fresh pass).
     let obligations = ObligationsDocument::new(track(), vec![obligation()]);
     let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
     let empty_cache = ObligationFulfillmentCacheDocument::new(track(), vec![]);
     let result =
         interactor(Some(obligations), Some(bindings), Some(empty_cache), None).execute(&command());
     assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));
+}
+
+#[test]
+fn test_missing_bound_test_without_cached_verdict_is_missing_drift() {
+    struct MissingTestScanner;
+    impl TestSourceScannerPort for MissingTestScanner {
+        fn scan_test_body(
+            &self,
+            _location: &TestLocation,
+        ) -> Result<Option<String>, TestSourceScanError> {
+            Ok(None)
+        }
+
+        fn hash_test_body(&self, _source: &str) -> TestBodySpanHash {
+            TestBodySpanHash::new(ContentHash::from_bytes([0u8; 32]))
+        }
+    }
+
+    let obligation = obligation();
+    let bindings = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::Fulfillment {
+            obligation_id: obligation.id().clone(),
+            tests: NonEmptyTestLocations::try_new(vec![missing_location()]).unwrap(),
+        }],
+    );
+    let result = interactor_with_scanner(
+        Some(ObligationsDocument::new(track(), vec![obligation.clone()])),
+        Some(bindings),
+        None,
+        None,
+        Arc::new(MissingTestScanner),
+    )
+    .execute(&command());
+
+    let expected = TestObligationDrift::missing_obligation(
+        obligation.id().clone(),
+        DiagnosticMessage::try_new("bound test source not found".to_owned()).unwrap(),
+    );
+    match result {
+        Err(ObligationCheckError::DriftsDetected { drifts }) => {
+            assert_eq!(drifts.as_slice(), &[expected]);
+        }
+        other => panic!("expected missing-test drift, got {other:?}"),
+    }
 }
 
 #[test]

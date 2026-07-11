@@ -215,6 +215,43 @@ impl CheckTestObligationsInteractor {
         }
         Ok(sha256_content_hash(source.as_bytes()))
     }
+
+    /// Verifies that every bound test location still resolves in the worktree.
+    fn bound_test_sources_exist(
+        &self,
+        tests: &[TestLocation],
+    ) -> Result<bool, ObligationCheckError> {
+        for location in tests {
+            if self
+                .source_scanner
+                .scan_test_body(location)
+                .map_err(ObligationCheckError::SourceScan)?
+                .is_none()
+            {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    }
+
+    /// Classifies an unavailable fulfillment verdict after checking test existence.
+    fn classify_unavailable_fulfillment_verdict(
+        &self,
+        edge: &TestObligationEdgeId,
+        obligation_id: &TestObligationId,
+        tests: &[TestLocation],
+        gate: &mut GateState,
+    ) -> Result<(), ObligationCheckError> {
+        if self.bound_test_sources_exist(tests)? {
+            gate.stale.push(edge.clone());
+        } else {
+            gate.drifts.push(TestObligationDrift::missing_obligation(
+                obligation_id.clone(),
+                diag("bound test source not found"),
+            ));
+        }
+        Ok(())
+    }
 }
 
 impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
@@ -504,12 +541,10 @@ impl CheckTestObligationsInteractor {
             .iter()
             .find(|e| e.edge_id() == edge && e.obligation_id() == obligation_id)
         else {
-            gate.stale.push(edge.clone());
-            return Ok(());
+            return self.classify_unavailable_fulfillment_verdict(edge, obligation_id, tests, gate);
         };
         if entry.verifier_fingerprint() != Some(&self.fulfillment_verifier_fingerprint) {
-            gate.stale.push(edge.clone());
-            return Ok(());
+            return self.classify_unavailable_fulfillment_verdict(edge, obligation_id, tests, gate);
         }
         let current_bound = self.current_bound_hash(tests)?;
         let current_decl = sha256_content_hash(declaration.as_bytes());
