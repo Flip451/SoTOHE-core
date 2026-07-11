@@ -329,6 +329,7 @@ mod tests {
 
     fn fixture_workspace(track_files: &[&str]) -> tempfile::TempDir {
         let temp_root = source_root().canonicalize().unwrap().join("tmp");
+        fs::create_dir_all(&temp_root).unwrap();
         let temp = tempfile::Builder::new()
             .prefix("sotp-cli-test-obligation-")
             .tempdir_in(temp_root)
