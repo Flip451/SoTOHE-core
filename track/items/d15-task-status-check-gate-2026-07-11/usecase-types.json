@@ -544,7 +544,7 @@
     },
     "TestObligationResultsInteractor": {
       "action": "modify",
-      "docs": "TestObligationResultsInteractor constructor and aggregation surface updated; see IN-05 and IN-07.",
+      "docs": "TestObligationResultsInteractor constructor and aggregation surface modification. IN-05, IN-07, AC-05, AC-07.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -637,7 +637,7 @@
     },
     "TestObligationResultsOutput": {
       "action": "modify",
-      "docs": "Usecase-local informational results DTO extended with task-status unresolved summaries for the primary adapter; it has no domain behavior.",
+      "docs": "TestObligationResultsOutput shape modification. IN-05, AC-05, AC-07.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -667,7 +667,7 @@
             },
             {
               "name": "status_lane_summaries",
-              "ty": "Vec<TestObligationStatusLaneSummary>"
+              "ty": "Result<Vec<TestObligationStatusLaneSummary>, domain::tddd::test_obligation::ids::DiagnosticMessage>"
             }
           ],
           "returns": "Self"
@@ -702,7 +702,7 @@
           "name": "status_lane_summaries",
           "params": [],
           "receiver": "&self",
-          "returns": "&[TestObligationStatusLaneSummary]"
+          "returns": "Result<&[TestObligationStatusLaneSummary], &domain::tddd::test_obligation::ids::DiagnosticMessage>"
         }
       ],
       "module_path": "test_obligation::results",

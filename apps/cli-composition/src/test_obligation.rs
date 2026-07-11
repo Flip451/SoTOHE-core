@@ -509,6 +509,78 @@ mod tests {
 
     #[test]
     fn test_composition_root_results_wires_informational_status_lanes() {
+        const TRACK_ID: &str = "d15-task-status-check-gate-2026-07-11";
+
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
+        let workspace = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(workspace.path(), &format!("track/{TRACK_ID}"));
+        crate::test_support::run_in_dir(workspace.path(), || {
+            let workspace_root = workspace.path();
+            let source_root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+            let source_track = source_root.join("track/items").join(TRACK_ID);
+            let target_track = workspace_root.join("track/items").join(TRACK_ID);
+            let rules_path = workspace_root.join(TEST_OBLIGATION_RULES_PATH);
+
+            std::fs::create_dir_all(rules_path.parent().unwrap()).unwrap();
+            std::fs::create_dir_all(&target_track).unwrap();
+            std::fs::copy(source_root.join(TEST_OBLIGATION_RULES_PATH), &rules_path).unwrap();
+            for artifact in [
+                "obligations.json",
+                "task-contract.json",
+                "impl-plan.json",
+                "spec.json",
+                "domain-types.json",
+                "usecase-types.json",
+                "infrastructure-types.json",
+                "cli-types.json",
+                "cli_driver-types.json",
+                "cli_composition-types.json",
+            ] {
+                std::fs::copy(source_track.join(artifact), target_track.join(artifact)).unwrap();
+            }
+            std::fs::write(
+                target_track.join("test-bindings.json"),
+                format!(r#"{{"records":[],"track_id":"{TRACK_ID}"}}"#),
+            )
+            .unwrap();
+
+            let impl_plan_path = target_track.join("impl-plan.json");
+            let mut impl_plan: serde_json::Value =
+                serde_json::from_str(&std::fs::read_to_string(&impl_plan_path).unwrap()).unwrap();
+            let tasks =
+                impl_plan.get_mut("tasks").and_then(serde_json::Value::as_array_mut).unwrap();
+            for task in tasks {
+                let task_fields = task.as_object_mut().unwrap();
+                match task_fields.get("id").and_then(serde_json::Value::as_str) {
+                    Some("T002") => {
+                        task_fields.insert("status".to_owned(), serde_json::json!("in_progress"));
+                        task_fields.insert("commit_hash".to_owned(), serde_json::Value::Null);
+                    }
+                    Some("T003") => {
+                        task_fields.insert("status".to_owned(), serde_json::json!("todo"));
+                        task_fields.insert("commit_hash".to_owned(), serde_json::Value::Null);
+                    }
+                    _ => {}
+                }
+            }
+            std::fs::write(&impl_plan_path, serde_json::to_string_pretty(&impl_plan).unwrap())
+                .unwrap();
+
+            let root = TestObligationCompositionRoot::new(workspace_root.to_path_buf(), rules_path);
+            let outcome = root.results_handler().handle(TestObligationResultsInput::new(Some(
+                domain::TrackId::try_new(TRACK_ID.to_owned()).unwrap(),
+            )));
+
+            assert_eq!(outcome.exit_code, 0);
+            let stdout = outcome.stdout.unwrap();
+            assert!(stdout.contains("status:todo missing=11 stale=0 verdict_absent=0"));
+            assert!(stdout.contains("status:in_progress missing=4 stale=0 verdict_absent=0"));
+            assert!(stdout.contains("status:done missing=11 stale=0 verdict_absent=0"));
+        });
+    }
+
+    #[test]
+    fn test_composition_root_results_empty_workspace_has_no_status_lanes() {
         let workspace = tempfile::tempdir().unwrap();
         let root = TestObligationCompositionRoot::new(
             workspace.path().to_path_buf(),
@@ -522,10 +594,8 @@ mod tests {
 
         assert_eq!(outcome.exit_code, 0);
         let stdout = outcome.stdout.unwrap();
-        assert!(stdout.contains("status:todo missing=0 stale=0 verdict_absent=0"));
-        assert!(stdout.contains("status:in_progress missing=0 stale=0 verdict_absent=0"));
-        assert!(stdout.contains("status:done missing=0 stale=0 verdict_absent=0"));
-        assert!(stdout.contains("status:skipped missing=0 stale=0 verdict_absent=0"));
+        assert!(!stdout.contains("status:"));
+        assert!(stdout.ends_with("records=0 uncited_findings=0"));
     }
 
     #[test]

@@ -1,67 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6bf46ec81737b716093cddb7403af473cb2795f134003232d0a6a8089df7c72f",
-          "at": "2026-07-11T08:38:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6bf46ec81737b716093cddb7403af473cb2795f134003232d0a6a8089df7c72f",
-          "at": "2026-07-11T08:38:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6bf46ec81737b716093cddb7403af473cb2795f134003232d0a6a8089df7c72f",
-          "at": "2026-07-11T08:43:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 requires deterministic task attribution through the existing artifact chain, but no acceptance criterion verifies the `obligations.json` target entry → `task-contract.json` task assignment → `impl-plan.json` status composition. AC-01 starts from an already-established lane, so an implementation can satisfy every AC without proving the goal’s attribution mechanism.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
-              "line": 8,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "GO-02 promises preservation of the fail-closed guarantee, but orphaned bindings have no acceptance criterion for their final gate outcome. AC-03 only checks that orphaned detection is status-independent, while AC-01/AC-02 enumerate blocking behavior only for missing, stale, verdict absence, and structural failures; therefore the stated fail-closed goal is not deterministically proven for orphaned findings.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
-              "line": 18,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:6bf46ec81737b716093cddb7403af473cb2795f134003232d0a6a8089df7c72f",
-          "at": "2026-07-11T08:43:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c9fb160df686e97dd05a27e64da8a822b741f5c0d004934f237ea20319b5338a",
-          "at": "2026-07-11T08:48:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e3625eb65c708c3ff5aa710194e585923e5c911b192df4918a7f5de8de5d11b0",
-          "at": "2026-07-11T09:02:02Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -92,139 +31,6 @@
           "findings": [],
           "hash": "rvw1:sha256:4f9d954a7080d73944f6d9b3cee0f666cd915b8e4c6f3ec11237203f289d6d3a",
           "at": "2026-07-11T14:40:30Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "All 36 records are `voluntary_binding`, but the two derived obligations require canonical `fulfillment` records. The 12 records covering their spec edges are therefore misclassified; fulfillment lookup ignores voluntary bindings, leaving both obligations unbound despite the cache entries. Replace them with two fulfillment records and retain voluntary bindings only for non-derived edges.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/test-bindings.json",
-              "line": 4,
-              "category": "artifact-schema"
-            }
-          ],
-          "hash": "rvw1:sha256:8ae4a69e76dfa5b280289deb5cbcce7e7ba6dc37e4c20f4647771ac295dae7af",
-          "at": "2026-07-11T11:48:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The two derived obligations in obligations.json have no fulfillment records; all 36 bindings are voluntary_binding records. This contradicts the briefing's required two fulfillment records and misuses voluntary_binding for edges that do carry derived obligations, weakening stable obligation-level coverage.",
-              "severity": "P1",
-              "file": "track/items/d15-task-status-check-gate-2026-07-11/test-bindings.json",
-              "line": 4,
-              "category": "artifact-integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:8ae4a69e76dfa5b280289deb5cbcce7e7ba6dc37e4c20f4647771ac295dae7af",
-          "at": "2026-07-11T11:48:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a1579a9bd7cef96dd7aa7508f8c95996277fbf17496cb424b3e972cc73fd4d9b",
-          "at": "2026-07-11T12:34:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a1579a9bd7cef96dd7aa7508f8c95996277fbf17496cb424b3e972cc73fd4d9b",
-          "at": "2026-07-11T12:38:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:88472094b2619fd4b8b98b49af0bf2f3ec98f91932ec8ab605eccce773a38585",
-          "at": "2026-07-11T13:03:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0a3131018c4fa72d023209105d81630f06c08c14cbbf27d56581acb2b3e784bb",
-          "at": "2026-07-11T13:24:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e306cd54d4718945da8efb3e4e16de2e6b378e6dc342130af26287e8d539ce4",
-          "at": "2026-07-11T13:51:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0012fd7cbf6b9a9a5ef004ad23b95b3c6ae0f6b31a49652fa99b50fb730b81f9",
-          "at": "2026-07-11T14:12:20Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4534d0c6d3530f7c0ed38e8a84ca9db8143e40dd5bb3b8a3be045ba8002df046",
-          "at": "2026-07-11T11:47:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4534d0c6d3530f7c0ed38e8a84ca9db8143e40dd5bb3b8a3be045ba8002df046",
-          "at": "2026-07-11T11:50:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aa6df7ebd3628a85584f23de2affa16a15fe69a774c9f9b369d8d6201946d34b",
-          "at": "2026-07-11T13:02:37Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:259fdd4c8f7fb5ef96e43c95e0729e1cd4e5968ef80f9cc845c08f56cc4cd018",
-          "at": "2026-07-11T08:37:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:259fdd4c8f7fb5ef96e43c95e0729e1cd4e5968ef80f9cc845c08f56cc4cd018",
-          "at": "2026-07-11T08:40:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:259fdd4c8f7fb5ef96e43c95e0729e1cd4e5968ef80f9cc845c08f56cc4cd018",
-          "at": "2026-07-11T08:41:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:681e8be13e8a5c58e54290abcbb6ad9c00721ed250a04d30cf86b8b0c5e1bd1f",
-          "at": "2026-07-11T14:15:58Z"
         }
       ]
     },
@@ -271,6 +77,13 @@
           "findings": [],
           "hash": "rvw1:sha256:52310cec0958746ca3734b89baf836e557ab3f129c0f89fddf99367c435c048f",
           "at": "2026-07-11T14:10:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a693f4d3f52dce193a71c54243b5f22a0478e341acd098b7a0f195bfe72c3760",
+          "at": "2026-07-11T15:36:07Z"
         }
       ]
     },
@@ -521,6 +334,126 @@
         }
       ]
     },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "All 36 records are `voluntary_binding`, but the two derived obligations require canonical `fulfillment` records. The 12 records covering their spec edges are therefore misclassified; fulfillment lookup ignores voluntary bindings, leaving both obligations unbound despite the cache entries. Replace them with two fulfillment records and retain voluntary bindings only for non-derived edges.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/test-bindings.json",
+              "line": 4,
+              "category": "artifact-schema"
+            }
+          ],
+          "hash": "rvw1:sha256:8ae4a69e76dfa5b280289deb5cbcce7e7ba6dc37e4c20f4647771ac295dae7af",
+          "at": "2026-07-11T11:48:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The two derived obligations in obligations.json have no fulfillment records; all 36 bindings are voluntary_binding records. This contradicts the briefing's required two fulfillment records and misuses voluntary_binding for edges that do carry derived obligations, weakening stable obligation-level coverage.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/test-bindings.json",
+              "line": 4,
+              "category": "artifact-integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:8ae4a69e76dfa5b280289deb5cbcce7e7ba6dc37e4c20f4647771ac295dae7af",
+          "at": "2026-07-11T11:48:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1579a9bd7cef96dd7aa7508f8c95996277fbf17496cb424b3e972cc73fd4d9b",
+          "at": "2026-07-11T12:34:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1579a9bd7cef96dd7aa7508f8c95996277fbf17496cb424b3e972cc73fd4d9b",
+          "at": "2026-07-11T12:38:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:88472094b2619fd4b8b98b49af0bf2f3ec98f91932ec8ab605eccce773a38585",
+          "at": "2026-07-11T13:03:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a3131018c4fa72d023209105d81630f06c08c14cbbf27d56581acb2b3e784bb",
+          "at": "2026-07-11T13:24:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e306cd54d4718945da8efb3e4e16de2e6b378e6dc342130af26287e8d539ce4",
+          "at": "2026-07-11T13:51:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0012fd7cbf6b9a9a5ef004ad23b95b3c6ae0f6b31a49652fa99b50fb730b81f9",
+          "at": "2026-07-11T14:12:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ca6408c3d32fafe57dcb1b8b2548135fa49a4d4e1bb67ae4336bd6f50761607",
+          "at": "2026-07-11T15:37:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The IN-05 composition-root binding does not cover the behavior it claims. `test_composition_root_results_wires_informational_status_lanes` now asserts that no status lanes are rendered for an empty workspace, while `test_composition_root_wires_status_artifacts_for_check_and_results` converts every done task to skipped and checks only a nonzero skipped missing count. Neither test exercises IN-05's todo/in_progress/done lane breakdowns or missing/stale/verdict-absent aggregation, so this edge lacks meaningful test coverage despite its cached fulfilled verdict.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/test-bindings.json",
+              "line": 183,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:8399be8f3abaf0a2065bb05355065d38fce54a13ce8cd81b8af95dbc0177c7eb",
+          "at": "2026-07-11T15:46:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The IN-05 composition-root binding now retains only `test_composition_root_results_wires_informational_status_lanes`, which asserts todo/in_progress/done output but never exercises the skipped lane. Removing `test_composition_root_wires_status_artifacts_for_check_and_results` drops the only bound composition test that asserts skipped-lane output, so the claimed four-lane coverage is no longer represented by this edge's test set.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/test-bindings.json",
+              "line": 182,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:9e5db627ee7b34415aea495cc6aad9745d5d4c7adf28a5a282a01ab34b5c0b70",
+          "at": "2026-07-11T15:55:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e44a781be43fa51e757a842ebbe2900d40cbd9fde7ab02b3ad949943d68eccf",
+          "at": "2026-07-11T16:01:27Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -586,6 +519,13 @@
           "findings": [],
           "hash": "rvw1:sha256:b0930ce6937765398b2b4a791b9982b55fa65620d07bdba7961957e7a64fd10b",
           "at": "2026-07-11T14:31:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:131e3ecf8d7b99cd98328000ca70581139e7378a25f99a392c65cf825523db1d",
+          "at": "2026-07-11T15:37:50Z"
         }
       ]
     },
@@ -604,6 +544,99 @@
           "findings": [],
           "hash": "rvw1:sha256:b3ed1ce4d9c857c9a0019403a9c1d0090f567f9a2462f03c71d94ea6bbd94398",
           "at": "2026-07-11T11:48:09Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bf46ec81737b716093cddb7403af473cb2795f134003232d0a6a8089df7c72f",
+          "at": "2026-07-11T08:38:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bf46ec81737b716093cddb7403af473cb2795f134003232d0a6a8089df7c72f",
+          "at": "2026-07-11T08:38:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bf46ec81737b716093cddb7403af473cb2795f134003232d0a6a8089df7c72f",
+          "at": "2026-07-11T08:43:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 requires deterministic task attribution through the existing artifact chain, but no acceptance criterion verifies the `obligations.json` target entry → `task-contract.json` task assignment → `impl-plan.json` status composition. AC-01 starts from an already-established lane, so an implementation can satisfy every AC without proving the goal’s attribution mechanism.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+              "line": 8,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "GO-02 promises preservation of the fail-closed guarantee, but orphaned bindings have no acceptance criterion for their final gate outcome. AC-03 only checks that orphaned detection is status-independent, while AC-01/AC-02 enumerate blocking behavior only for missing, stale, verdict absence, and structural failures; therefore the stated fail-closed goal is not deterministically proven for orphaned findings.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+              "line": 18,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:6bf46ec81737b716093cddb7403af473cb2795f134003232d0a6a8089df7c72f",
+          "at": "2026-07-11T08:43:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9fb160df686e97dd05a27e64da8a822b741f5c0d004934f237ea20319b5338a",
+          "at": "2026-07-11T08:48:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3625eb65c708c3ff5aa710194e585923e5c911b192df4918a7f5de8de5d11b0",
+          "at": "2026-07-11T09:02:02Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:259fdd4c8f7fb5ef96e43c95e0729e1cd4e5968ef80f9cc845c08f56cc4cd018",
+          "at": "2026-07-11T08:37:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:259fdd4c8f7fb5ef96e43c95e0729e1cd4e5968ef80f9cc845c08f56cc4cd018",
+          "at": "2026-07-11T08:40:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:259fdd4c8f7fb5ef96e43c95e0729e1cd4e5968ef80f9cc845c08f56cc4cd018",
+          "at": "2026-07-11T08:41:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:681e8be13e8a5c58e54290abcbb6ad9c00721ed250a04d30cf86b8b0c5e1bd1f",
+          "at": "2026-07-11T14:15:58Z"
         }
       ]
     },
@@ -906,6 +939,81 @@
           "findings": [],
           "hash": "rvw1:sha256:d11adc59510ca68f18ab1a222135b3068450ede3e40148ee1c008397159e253e",
           "at": "2026-07-11T09:54:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TestObligationResultsInteractor` の `docs` が、status-lane failure の格納方法、既存結果の保持、outer `Result` の責務という挙動契約を散文で再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、変更対象・操作と IN-05/IN-07/AC-05/AC-07 の anchor cite のみにしてください。",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 547,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "`usecase::TestObligationResultsOutput` の `docs` が、inner `Result` の意味、部分結果の保持、zero-count lane を生成しない理由まで挙動と設計理由を再記述しています。型 shape 自体と IN-05/AC-05/AC-07 の参照で表現し、`docs` は変更対象・操作・anchor cite に限定してください。",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 640,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "`cli_driver::TestObligationResultsHandler` の `docs` が、skipped lane の表示、degraded rendering、既存結果の保持、exit 0 を維持する挙動を AC-05/AC-07 から散文で再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、handler の変更対象・操作と anchor cite のみにしてください。",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/cli_driver-types.json",
+              "line": 81,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:727e18914fcdb1111f6e173d647e92a17fa05e063869f930f58ac1b2be709a62",
+          "at": "2026-07-11T15:36:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb2701431fa3276a70fe8e8e1de14728f11185308c3b598ab1173fd69ff58d5b",
+          "at": "2026-07-11T15:41:04Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4534d0c6d3530f7c0ed38e8a84ca9db8143e40dd5bb3b8a3be045ba8002df046",
+          "at": "2026-07-11T11:47:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4534d0c6d3530f7c0ed38e8a84ca9db8143e40dd5bb3b8a3be045ba8002df046",
+          "at": "2026-07-11T11:50:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa6df7ebd3628a85584f23de2affa16a15fe69a774c9f9b369d8d6201946d34b",
+          "at": "2026-07-11T13:02:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f792284d11d2acfa9770c8ec0a3bf864c6c5d6e6fa3217f7a145367d1b64eacc",
+          "at": "2026-07-11T15:36:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e080fc787d43bf37950a406722d61770b14f470174e1d20c5e052b40a3bacc4",
+          "at": "2026-07-11T15:54:14Z"
         }
       ]
     }

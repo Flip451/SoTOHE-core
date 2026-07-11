@@ -28,7 +28,8 @@
         {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_malformed_artifacts_block_across_task_statuses"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_coverage_broken_entry_blocks_across_task_statuses"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_new_keeps_unresolved_skipped_lane_informational"},
-        {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_interactor_with_unresolved_or_status_read_error_returns_ok"}
+        {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_interactor_with_unresolved_or_status_read_error_returns_ok"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::status_lanes::tests", "test_name": "test_strictest_status_with_shared_entry_competing_attributions_uses_total_order"}
       ]
     },
     {
@@ -44,7 +45,8 @@
         {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_new_keeps_unresolved_skipped_lane_informational"},
         {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_interactor_with_unresolved_or_status_read_error_returns_ok"},
         {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_with_malformed_artifact_error_returns_informational_success"},
-        {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_interactor_with_absent_verifier_fingerprint_counts_verdict_absent"}
+        {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_interactor_with_absent_verifier_fingerprint_counts_verdict_absent"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::status_lanes::tests", "test_name": "test_target_for_direct_edge_with_reference_peer_uses_active_origin"}
       ]
     },
     {
@@ -178,8 +180,8 @@
       "kind": "voluntary_binding",
       "edge_id": {"entry_key": "TestObligationCompositionRoot", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "IN-05"}},
       "tests": [
-        {"layer": "cli_composition", "module_path": "cli_composition::test_obligation::tests", "test_name": "test_composition_root_wires_status_artifacts_for_check_and_results"},
-        {"layer": "cli_composition", "module_path": "cli_composition::test_obligation::tests", "test_name": "test_composition_root_results_wires_informational_status_lanes"}
+        {"layer": "cli_composition", "module_path": "cli_composition::test_obligation::tests", "test_name": "test_composition_root_results_wires_informational_status_lanes"},
+        {"layer": "cli_composition", "module_path": "cli_composition::test_obligation::tests", "test_name": "test_composition_root_wires_status_artifacts_for_check_and_results"}
       ]
     },
     {

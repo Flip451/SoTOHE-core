@@ -52,10 +52,10 @@ pub(super) fn collect_status_lane_summaries(
     impl_plan_reader: &dyn ImplPlanReaderPort,
 ) -> Result<Vec<TestObligationStatusLaneSummary>, ObligationResultsError> {
     let (Some(obligations), Some(bindings)) = (obligations, bindings) else {
-        return Ok(empty_status_lane_summaries());
+        return Ok(Vec::new());
     };
     if catalogue_paths.is_empty() {
-        return Ok(empty_status_lane_summaries());
+        return Ok(Vec::new());
     }
     let catalogues = load_catalogues(catalogue_paths, catalogue_reader)?;
     let spec_path = PathBuf::from(format!("track/items/{}/spec.json", track_id.as_ref()));
@@ -347,19 +347,6 @@ fn load_catalogues(
                 .map_err(|error| malformed(&format!("catalogue read failed: {error:?}")))
         })
         .collect()
-}
-
-pub(super) fn empty_status_lane_summaries() -> Vec<TestObligationStatusLaneSummary> {
-    use domain::TaskStatusKind;
-    [
-        TaskStatusKind::Todo,
-        TaskStatusKind::InProgress,
-        TaskStatusKind::Done,
-        TaskStatusKind::Skipped,
-    ]
-    .into_iter()
-    .map(|status| TestObligationStatusLaneSummary::new(status, 0, 0, 0))
-    .collect()
 }
 
 fn missing(target: StatusLaneTarget) -> StatusLaneFinding {

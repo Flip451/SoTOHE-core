@@ -5,6 +5,7 @@ use std::collections::HashMap;
 
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::CatalogueDocument;
+use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::tddd::semantic_verify::CatalogueEntryKey;
 use domain::tddd::test_obligation::ids::TestObligationEdgeId;
 use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
@@ -224,14 +225,14 @@ pub(super) fn target_for_obligation(
 }
 
 /// Resolves a non-derived cited edge, whose edge id does not retain a source
-/// catalogue path, only when its entry key has one catalogue origin.
+/// catalogue path, only when its entry key has one active catalogue origin.
 pub(super) fn target_for_direct_edge(
     catalogues: &[LoadedCatalogueDocument],
     edge: &TestObligationEdgeId,
 ) -> Result<StatusLaneTarget, domain::tddd::test_obligation::ids::DiagnosticMessage> {
     let layers = catalogues
         .iter()
-        .filter(|catalogue| catalogue_contains(catalogue.document(), edge.entry_key()))
+        .filter(|catalogue| catalogue_contains_active(catalogue.document(), edge.entry_key()))
         .map(|catalogue| catalogue.document().layer().clone())
         .collect();
     let Some(layer) = exactly_one(layers) else {
@@ -267,10 +268,23 @@ pub(super) fn targets_for_scope(
     Ok(targets)
 }
 
-fn catalogue_contains(document: &CatalogueDocument, entry_key: &CatalogueEntryKey) -> bool {
-    document.types().keys().any(|key| key.as_str() == entry_key.as_str())
-        || document.traits().keys().any(|key| key.as_str() == entry_key.as_str())
-        || document.functions().keys().any(|key| key.to_string() == entry_key.as_str())
+/// Returns whether an active (`Add` / `Modify`) entry owns `entry_key`.
+///
+/// `Reference` and `Delete` entries never produce direct cited edges, so they
+/// must not participate in the origin resolution for one.
+fn catalogue_contains_active(document: &CatalogueDocument, entry_key: &CatalogueEntryKey) -> bool {
+    document.types().iter().any(|(key, entry)| {
+        key.as_str() == entry_key.as_str() && active_entry_action(entry.action())
+    }) || document.traits().iter().any(|(key, entry)| {
+        key.as_str() == entry_key.as_str() && active_entry_action(entry.action())
+    }) || document.functions().iter().any(|(key, entry)| {
+        key.to_string() == entry_key.as_str() && active_entry_action(entry.action())
+    })
+}
+
+/// Returns whether an entry contributes a direct cited edge.
+fn active_entry_action(action: ItemAction) -> bool {
+    matches!(action, ItemAction::Add | ItemAction::Modify)
 }
 
 fn task_ids_for_entry(
@@ -310,4 +324,125 @@ fn strictest_status(
             TaskStatusKind::InProgress => 2_u8,
             TaskStatusKind::Done => 3_u8,
         })
+}
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used)]
+
+    use std::collections::{BTreeMap, HashMap};
+    use std::path::Path;
+
+    use domain::task_contract::{ContractedEntryRef, TaskContractDocument};
+    use domain::tddd::LayerId;
+    use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction};
+    use domain::tddd::catalogue_v2::{
+        CatalogueDocument, CrateName, ModulePath, StructKind, StructShape, TypeEntry, TypeKindV2,
+        TypeName,
+    };
+    use domain::tddd::semantic_verify::CatalogueEntryKey;
+    use domain::tddd::test_obligation::ids::{TestObligationAnchorId, TestObligationEdgeId};
+    use domain::{TaskId, TaskStatusKind, TrackId};
+
+    use super::{
+        LoadedCatalogueDocument, strictest_status, target_for_direct_edge, task_ids_for_entry,
+    };
+
+    fn catalogue(layer: &str, action: ItemAction) -> CatalogueDocument {
+        let mut document = CatalogueDocument::new(
+            5,
+            CrateName::new(layer).unwrap(),
+            LayerId::try_new(layer).unwrap(),
+        );
+        document.insert_type(
+            TypeName::new("SharedEntry").unwrap(),
+            TypeEntry::new(
+                action,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+                ModulePath::root(),
+                None,
+                Vec::new(),
+                Vec::new(),
+            ),
+        );
+        document
+    }
+
+    #[test]
+    fn test_target_for_direct_edge_with_reference_peer_uses_active_origin() {
+        let edge = TestObligationEdgeId::new(
+            CatalogueEntryKey::try_new("SharedEntry".to_owned()).unwrap(),
+            TestObligationAnchorId::try_new("spec.json".to_owned(), "IN-01".to_owned()).unwrap(),
+        );
+        let catalogues = vec![
+            LoadedCatalogueDocument::new(
+                Path::new("domain-types.json"),
+                catalogue("domain", ItemAction::Reference),
+            ),
+            LoadedCatalogueDocument::new(
+                Path::new("usecase-types.json"),
+                catalogue("usecase", ItemAction::Add),
+            ),
+        ];
+
+        let target = target_for_direct_edge(&catalogues, &edge).unwrap();
+
+        assert_eq!(target.layer(), &LayerId::try_new("usecase").unwrap());
+        assert_eq!(
+            target.entry_key(),
+            &CatalogueEntryKey::try_new("SharedEntry".to_owned()).unwrap()
+        );
+    }
+
+    #[test]
+    fn test_strictest_status_with_shared_entry_competing_attributions_uses_total_order() {
+        let layer = LayerId::try_new("usecase").unwrap();
+        let entry_key = CatalogueEntryKey::try_new("SharedEntry".to_owned()).unwrap();
+        let strictest_for_shared_entry = |statuses: &[(&str, TaskStatusKind)]| {
+            let mut entries = BTreeMap::new();
+            let mut plan_statuses = HashMap::new();
+            for (task_label, status) in statuses {
+                let task_id = TaskId::try_new((*task_label).to_owned()).unwrap();
+                entries.insert(
+                    task_id.clone(),
+                    vec![ContractedEntryRef::new(layer.clone(), entry_key.clone())],
+                );
+                plan_statuses.insert(task_id, *status);
+            }
+            let contract = TaskContractDocument::new(
+                TrackId::try_new("status-order-track".to_owned()).unwrap(),
+                entries,
+            )
+            .unwrap();
+            let attributed_tasks = task_ids_for_entry(&contract, &layer, &entry_key);
+
+            strictest_status(&attributed_tasks, &plan_statuses)
+        };
+
+        assert_eq!(
+            strictest_for_shared_entry(&[
+                ("T001", TaskStatusKind::Done),
+                ("T002", TaskStatusKind::Skipped),
+            ]),
+            Some(TaskStatusKind::Done)
+        );
+        assert_eq!(
+            strictest_for_shared_entry(&[
+                ("T001", TaskStatusKind::InProgress),
+                ("T002", TaskStatusKind::Skipped),
+            ]),
+            Some(TaskStatusKind::InProgress)
+        );
+        assert_eq!(
+            strictest_for_shared_entry(&[
+                ("T001", TaskStatusKind::Skipped),
+                ("T002", TaskStatusKind::Todo),
+            ]),
+            Some(TaskStatusKind::Skipped)
+        );
+    }
 }

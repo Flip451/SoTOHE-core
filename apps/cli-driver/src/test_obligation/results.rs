@@ -84,14 +84,21 @@ impl TestObligationResultsHandler {
                         lane.pending_count()
                     ));
                 }
-                for summary in output.status_lane_summaries() {
-                    text.push_str(&format!(
-                        "status:{} missing={} stale={} verdict_absent={}\n",
-                        summary.task_status(),
-                        summary.missing_count(),
-                        summary.stale_count(),
-                        summary.verdict_absent_count()
-                    ));
+                match output.status_lane_summaries() {
+                    Ok(summaries) => {
+                        for summary in summaries {
+                            text.push_str(&format!(
+                                "status:{} missing={} stale={} verdict_absent={}\n",
+                                summary.task_status(),
+                                summary.missing_count(),
+                                summary.stale_count(),
+                                summary.verdict_absent_count()
+                            ));
+                        }
+                    }
+                    Err(reason) => {
+                        text.push_str(&format!("status lanes unavailable: {}\n", reason.as_str()));
+                    }
                 }
                 for record in output.records() {
                     text.push_str(&format!("record={record:?}\n"));
@@ -136,7 +143,7 @@ mod tests {
             TestObligationResultsOutput,
             usecase::test_obligation::errors::ObligationResultsError,
         > {
-            Ok(TestObligationResultsOutput::new(Vec::new(), Vec::new(), Vec::new(), Vec::new()))
+            Ok(TestObligationResultsOutput::new(Vec::new(), Vec::new(), Vec::new(), Ok(Vec::new())))
         }
     }
 
@@ -239,7 +246,7 @@ mod tests {
                     )],
                     Vec::new(),
                     Vec::new(),
-                    Vec::new(),
+                    Ok(Vec::new()),
                 ))
             }
         }
@@ -274,7 +281,7 @@ mod tests {
                     Vec::new(),
                     Vec::new(),
                     Vec::new(),
-                    vec![
+                    Ok(vec![
                         usecase::test_obligation::results::TestObligationStatusLaneSummary::new(
                             usecase::test_obligation::results::TaskStatusKind::Todo,
                             1,
@@ -299,7 +306,7 @@ mod tests {
                             10,
                             11,
                         ),
-                    ],
+                    ]),
                 ))
             }
         }
@@ -316,6 +323,60 @@ mod tests {
         assert!(stdout.contains("status:in_progress missing=3 stale=4 verdict_absent=5"));
         assert!(stdout.contains("status:done missing=6 stale=7 verdict_absent=8"));
         assert!(stdout.contains("status:skipped missing=9 stale=10 verdict_absent=11"));
+
+        struct DegradedStatusStubService;
+
+        impl TestObligationResultsApplicationService for DegradedStatusStubService {
+            fn execute(
+                &self,
+                _cmd: &TestObligationResultsCommand,
+            ) -> Result<TestObligationResultsOutput, ObligationResultsError> {
+                let edge = TestObligationEdgeId::new(
+                    CatalogueEntryKey::try_new("domain::Money".to_owned()).unwrap(),
+                    TestObligationAnchorId::try_new("spec.json".to_owned(), "AC-05".to_owned())
+                        .unwrap(),
+                );
+                Ok(TestObligationResultsOutput::new(
+                    vec![usecase::test_obligation::results::TestObligationLaneSummary::new(
+                        usecase::test_obligation::results::TestObligationChainLabel::Fulfillment,
+                        LayerId::try_new("infrastructure".to_owned()).unwrap(),
+                        0,
+                        1,
+                        0,
+                    )],
+                    vec![EdgeVerdictRecord::new(
+                        None,
+                        edge,
+                        None,
+                        None,
+                        EdgeResolutionOutcome::Pending,
+                        None,
+                        None,
+                    )],
+                    Vec::new(),
+                    Err(DiagnosticMessage::try_new(
+                        "task attribution failed: task-contract unavailable".to_owned(),
+                    )
+                    .unwrap()),
+                ))
+            }
+        }
+
+        let degraded_handler = TestObligationResultsHandler::new(
+            Arc::new(DegradedStatusStubService),
+            PathBuf::from("/repo"),
+        );
+        let degraded_outcome = degraded_handler
+            .handle(TestObligationResultsInput::new(Some(TrackId::try_new("test-track").unwrap())));
+
+        assert_eq!(degraded_outcome.exit_code, 0);
+        let degraded_stdout = degraded_outcome.stdout.unwrap();
+        assert!(degraded_stdout.contains("Fulfillment:infrastructure pass=0 fail=1 pending=0"));
+        assert!(degraded_stdout.contains("record=EdgeVerdictRecord"));
+        assert!(degraded_stdout.contains(
+            "status lanes unavailable: task attribution failed: task-contract unavailable"
+        ));
+        assert!(!degraded_stdout.contains("status:"));
     }
 
     #[test]
@@ -330,7 +391,12 @@ mod tests {
                 command: &TestObligationResultsCommand,
             ) -> Result<TestObligationResultsOutput, ObligationResultsError> {
                 *self.captured.lock().unwrap() = Some(command.clone());
-                Ok(TestObligationResultsOutput::new(Vec::new(), Vec::new(), Vec::new(), Vec::new()))
+                Ok(TestObligationResultsOutput::new(
+                    Vec::new(),
+                    Vec::new(),
+                    Vec::new(),
+                    Ok(Vec::new()),
+                ))
             }
         }
 
@@ -382,7 +448,7 @@ mod tests {
                         Some(drift),
                     )],
                     Vec::new(),
-                    Vec::new(),
+                    Ok(Vec::new()),
                 ))
             }
         }
@@ -461,7 +527,7 @@ mod tests {
                         Some(drift),
                     )],
                     Vec::new(),
-                    Vec::new(),
+                    Ok(Vec::new()),
                 ))
             }
         }

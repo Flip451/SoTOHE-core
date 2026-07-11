@@ -65,7 +65,7 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of TestObligationResultsInteractor",
-      "declaration_hash": "9ba945335901014fffb1f5e8d8f21bd79a49006cc7d56be7cd131310c3fde0c4",
+      "declaration_hash": "e1c71c3cf27e79e2fdda0466640d565653aa9474daa31580d45a216752e84af7",
       "spec_refs": [
         {
           "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",

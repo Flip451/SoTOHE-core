@@ -291,11 +291,11 @@
       }
     },
     {
-      "claim_hash": "9fc60a42bae7e53f9d372017f1e5fb77d92abf1efde40109ff630fae5fca73c6",
+      "claim_hash": "5d44a2ec1d69d14289b226f1bd7eac0eacf021cc16d365a85ed7f241f412a89e",
       "evidence_hash": "171ed15d30bb3095d50e7c8f02bc3d3b642f74e5b4ff537383f460dd89a2e8bc",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp test-obligation results` に、todo / in_progress / done lane ごとの unresolved 件数と、各 lane の missing / stale / verdict 欠如の内訳を表示する informational 集計を追加する。gate の pass/fail は引き続き `check` だけが担い、`results` は read error を含め常に exit 0 とする。"
+        "citation": "`sotp test-obligation results` に、todo / in_progress / done lane ごとの unresolved 件数と、各 lane の missing / stale / verdict 欠如の内訳を表示する informational 集計を追加する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -315,7 +315,7 @@
       }
     },
     {
-      "claim_hash": "9fc60a42bae7e53f9d372017f1e5fb77d92abf1efde40109ff630fae5fca73c6",
+      "claim_hash": "5d44a2ec1d69d14289b226f1bd7eac0eacf021cc16d365a85ed7f241f412a89e",
       "evidence_hash": "8baf291b46a4087ffc3a1aeb546af10b6cb11c5e187072fc5e82861f2b888b59",
       "verdict": {
         "kind": "pass",
@@ -339,11 +339,11 @@
       }
     },
     {
-      "claim_hash": "9fc60a42bae7e53f9d372017f1e5fb77d92abf1efde40109ff630fae5fca73c6",
+      "claim_hash": "5d44a2ec1d69d14289b226f1bd7eac0eacf021cc16d365a85ed7f241f412a89e",
       "evidence_hash": "5ca6484d1b979f49e3c75d38f3da1c2dfcdd56711db243113d64f3ea773ba9af",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp test-obligation results` が todo / in_progress / done ごとに unresolved 件数を表示し、各 lane で missing / stale / verdict 欠如を区別して集計する。"
+        "citation": "`sotp test-obligation results` が todo / in_progress / done ごとに unresolved 件数を表示し、各 lane で missing / stale / verdict 欠如を区別して集計する。unresolved の有無や read error の有無にかかわらず exit は常に 0 であり、gate の合否を表さないことを検証する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -363,7 +363,7 @@
       }
     },
     {
-      "claim_hash": "9fc60a42bae7e53f9d372017f1e5fb77d92abf1efde40109ff630fae5fca73c6",
+      "claim_hash": "5d44a2ec1d69d14289b226f1bd7eac0eacf021cc16d365a85ed7f241f412a89e",
       "evidence_hash": "1edb0d52acaefd8e8ad7c86369615c845b6a102565b59c74ebd592edf5eeb42e",
       "verdict": {
         "kind": "pass",
@@ -387,7 +387,7 @@
       }
     },
     {
-      "claim_hash": "9fc60a42bae7e53f9d372017f1e5fb77d92abf1efde40109ff630fae5fca73c6",
+      "claim_hash": "5d44a2ec1d69d14289b226f1bd7eac0eacf021cc16d365a85ed7f241f412a89e",
       "evidence_hash": "11979ea6de3a07210b5a4cf48bdf8f5a868f42589107b06dadec44879bdc22bc",
       "verdict": {
         "kind": "pass",
@@ -411,7 +411,7 @@
       }
     },
     {
-      "claim_hash": "cbe99680f20f05409fb75508aa0e366ce580df443e3f4c48e103f0fbff02590d",
+      "claim_hash": "a73aa855c992cbfcea1113661fa0eb8fead1395cf2df2f36cc7507734068ca90",
       "evidence_hash": "171ed15d30bb3095d50e7c8f02bc3d3b642f74e5b4ff537383f460dd89a2e8bc",
       "verdict": {
         "kind": "pass",
@@ -435,7 +435,7 @@
       }
     },
     {
-      "claim_hash": "cbe99680f20f05409fb75508aa0e366ce580df443e3f4c48e103f0fbff02590d",
+      "claim_hash": "a73aa855c992cbfcea1113661fa0eb8fead1395cf2df2f36cc7507734068ca90",
       "evidence_hash": "8baf291b46a4087ffc3a1aeb546af10b6cb11c5e187072fc5e82861f2b888b59",
       "verdict": {
         "kind": "pass",
@@ -459,7 +459,7 @@
       }
     },
     {
-      "claim_hash": "cbe99680f20f05409fb75508aa0e366ce580df443e3f4c48e103f0fbff02590d",
+      "claim_hash": "a73aa855c992cbfcea1113661fa0eb8fead1395cf2df2f36cc7507734068ca90",
       "evidence_hash": "5ca6484d1b979f49e3c75d38f3da1c2dfcdd56711db243113d64f3ea773ba9af",
       "verdict": {
         "kind": "pass",
@@ -483,7 +483,7 @@
       }
     },
     {
-      "claim_hash": "cbe99680f20f05409fb75508aa0e366ce580df443e3f4c48e103f0fbff02590d",
+      "claim_hash": "a73aa855c992cbfcea1113661fa0eb8fead1395cf2df2f36cc7507734068ca90",
       "evidence_hash": "1edb0d52acaefd8e8ad7c86369615c845b6a102565b59c74ebd592edf5eeb42e",
       "verdict": {
         "kind": "pass",

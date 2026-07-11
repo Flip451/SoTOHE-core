@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "99a436bffbeb853317276338d61a5cd2ae571fa7a88bec0ff2507110f48ee2f1",
+  "catalogue_declaration_hash": "054f61a395c1ae88f101c9d36bad808aa3fa05fede1f0a75d685903d13834fb5",
   "signals": [
     {
       "type_name": "CheckTestObligationsInteractor",
@@ -25,12 +25,12 @@
     {
       "type_name": "TestObligationResultsInteractor",
       "signal": "blue",
-      "entry_hash": "9fc60a42bae7e53f9d372017f1e5fb77d92abf1efde40109ff630fae5fca73c6"
+      "entry_hash": "5d44a2ec1d69d14289b226f1bd7eac0eacf021cc16d365a85ed7f241f412a89e"
     },
     {
       "type_name": "TestObligationResultsOutput",
       "signal": "blue",
-      "entry_hash": "cbe99680f20f05409fb75508aa0e366ce580df443e3f4c48e103f0fbff02590d"
+      "entry_hash": "a73aa855c992cbfcea1113661fa0eb8fead1395cf2df2f36cc7507734068ca90"
     },
     {
       "type_name": "TestObligationStatusLaneSummary",

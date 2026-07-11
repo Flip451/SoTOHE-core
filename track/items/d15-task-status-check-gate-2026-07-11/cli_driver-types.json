@@ -78,7 +78,7 @@
     },
     "TestObligationResultsHandler": {
       "action": "modify",
-      "docs": "TestObligationResultsHandler rendering surface updated with a distinct skipped lane; see AC-05 and AC-07.",
+      "docs": "TestObligationResultsHandler rendering-surface modification. AC-05, AC-07.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",

@@ -110,7 +110,10 @@ pub struct TestObligationResultsOutput {
     lane_summaries: Vec<TestObligationLaneSummary>,
     records: Vec<EdgeVerdictRecord>,
     uncited_findings: Vec<UncitedSpecElementFinding>,
-    status_lane_summaries: Vec<TestObligationStatusLaneSummary>,
+    status_lane_summaries: Result<
+        Vec<TestObligationStatusLaneSummary>,
+        domain::tddd::test_obligation::ids::DiagnosticMessage,
+    >,
 }
 
 impl TestObligationResultsOutput {
@@ -120,7 +123,10 @@ impl TestObligationResultsOutput {
         lane_summaries: Vec<TestObligationLaneSummary>,
         records: Vec<EdgeVerdictRecord>,
         uncited_findings: Vec<UncitedSpecElementFinding>,
-        status_lane_summaries: Vec<TestObligationStatusLaneSummary>,
+        status_lane_summaries: Result<
+            Vec<TestObligationStatusLaneSummary>,
+            domain::tddd::test_obligation::ids::DiagnosticMessage,
+        >,
     ) -> Self {
         Self { lane_summaries, records, uncited_findings, status_lane_summaries }
     }
@@ -143,10 +149,15 @@ impl TestObligationResultsOutput {
         &self.uncited_findings
     }
 
-    /// Returns unresolved findings grouped by task-status lane.
-    #[must_use]
-    pub fn status_lane_summaries(&self) -> &[TestObligationStatusLaneSummary] {
-        &self.status_lane_summaries
+    /// Returns unresolved findings grouped by task-status lane, or the
+    /// diagnostic explaining why that independent lane is unavailable.
+    pub fn status_lane_summaries(
+        &self,
+    ) -> Result<
+        &[TestObligationStatusLaneSummary],
+        &domain::tddd::test_obligation::ids::DiagnosticMessage,
+    > {
+        self.status_lane_summaries.as_deref()
     }
 }
 
@@ -313,7 +324,8 @@ impl TestObligationResultsApplicationService for TestObligationResultsInteractor
             self.catalogue_reader.as_ref(),
             self.task_contract_reader.as_ref(),
             self.impl_plan_reader.as_ref(),
-        )?;
+        )
+        .map_err(status_lane_diagnostic);
 
         Ok(TestObligationResultsOutput::new(
             lane_summaries,
@@ -321,6 +333,16 @@ impl TestObligationResultsApplicationService for TestObligationResultsInteractor
             Vec::new(),
             status_lane_summaries,
         ))
+    }
+}
+
+/// Extracts the validated diagnostic for an independently unavailable status lane.
+fn status_lane_diagnostic(
+    error: ObligationResultsError,
+) -> domain::tddd::test_obligation::ids::DiagnosticMessage {
+    match error {
+        ObligationResultsError::IoError(message)
+        | ObligationResultsError::MalformedArtifact(message) => message,
     }
 }
 
