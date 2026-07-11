@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c81ec8e8f9931c2a1dac5830be1b92acaaebb4450e1455972e3b1aaff48830b6",
+  "catalogue_declaration_hash": "aa6c7955bf11e7a913dfc1595d0f2901ff1be5bcfe5f27c551d8563acce54e5b",
   "signals": [
     {
       "type_name": "AnchorText",
@@ -90,7 +90,7 @@
     {
       "type_name": "ObligationCheckError",
       "signal": "blue",
-      "entry_hash": "b2148561d7f49d8f377cffa9dad109efdfd9a0614e29182ae0f2a367241bb862"
+      "entry_hash": "38381789b84afea01e38dee816156cf423f3377e6b0cf77419209cd5ff44ca5d"
     },
     {
       "type_name": "ObligationDeriveError",
@@ -135,7 +135,7 @@
     {
       "type_name": "ObligationsDocument",
       "signal": "blue",
-      "entry_hash": "85bd6dbba019cc9656d3c20c08f03be3c3f586ac465279df961298f6110e9a29"
+      "entry_hash": "ae876dfa0302f1115c6780af09e8938238555a512850d8651e48502b2c7d5712"
     },
     {
       "type_name": "RoleName",
@@ -165,7 +165,7 @@
     {
       "type_name": "TargetEntryRoleKind",
       "signal": "blue",
-      "entry_hash": "661e1e3cce1f0b09f61a8b737281b032104a5a478fd22e1d3478e67ec9f2840c"
+      "entry_hash": "55762c6fae31b445f5d817e9fd56c199dc9c84ebe873bd7f3b23aafc3f377799"
     },
     {
       "type_name": "TestBindingRecord",

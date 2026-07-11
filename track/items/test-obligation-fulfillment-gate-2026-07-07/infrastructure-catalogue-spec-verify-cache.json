@@ -556,10 +556,10 @@
     },
     {
       "claim_hash": "f346d8f7fda64bce5a03673a9c6b3ddcae927318d86ebca5a1ad5c3dfe3b9117",
-      "evidence_hash": "cefa7085744d1ef41b80d8a40c408aee4bf62c63ad441c41b3da72e0d91010a5",
+      "evidence_hash": "d10e8b101852c41382aaf78ffca91d46ea011ace03f8f0214446b3499cbfc641",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation check` が pure-read で fail-closed であり ... obligations は存在するが test-bindings が不在（部分的存在） ... 合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」"
+        "citation": "obligations は存在するが test-bindings が不在（部分的存在）"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -574,7 +574,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) binding はあるが義務が導出されない（`orphaned`）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。"
+          "text_label": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) fulfillment binding（義務 id ベースの record）はあるが対応する義務が導出されない場合に `orphaned` としてブロックする（D9 の `voluntary_binding`（edge 直接束縛）は義務の導出を前提としない正当な解決宣言であり、`orphaned` の対象外）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。`check` は導出入力（catalogue × spec × 決定表 config）からメモリ上で再導出した期待義務集合と `obligations.json` の一致も合格条件に含める。義務の追加・削除・変更いずれの stale も決定論的に非零 exit でブロックし（fail-closed）、`check` は pure-read のまま artifact を書き換えない（解消は `derive` の再実行のみ — IN-08 と同一の規律）。"
         }
       }
     },

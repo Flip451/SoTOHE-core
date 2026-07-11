@@ -39,6 +39,7 @@ use domain::tddd::test_obligation::vocab::TargetEntryRoleKind;
 /// A loaded catalogue paired with the command path that produced it.
 #[derive(Debug, Clone)]
 pub(crate) struct LoadedCatalogueDocument {
+    read_path: PathBuf,
     read_file_path: String,
     artifact_file_path: String,
     document: CatalogueDocument,
@@ -48,15 +49,22 @@ impl LoadedCatalogueDocument {
     /// Builds a loaded catalogue record from a command path and parsed document.
     #[must_use]
     pub(crate) fn new(path: &Path, document: CatalogueDocument) -> Self {
+        let read_path = path.to_path_buf();
         let read_file_path = path.display().to_string();
         let artifact_file_path = catalogue_artifact_path(path);
-        Self { read_file_path, artifact_file_path, document }
+        Self { read_path, read_file_path, artifact_file_path, document }
     }
 
     /// Returns the parsed catalogue document.
     #[must_use]
     pub(crate) fn document(&self) -> &CatalogueDocument {
         &self.document
+    }
+
+    /// Returns the command path used to load this catalogue.
+    #[must_use]
+    pub(crate) fn read_path(&self) -> &Path {
+        &self.read_path
     }
 
     fn matches_file_path(&self, file_path: &str) -> bool {

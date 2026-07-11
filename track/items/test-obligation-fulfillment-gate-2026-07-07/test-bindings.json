@@ -1818,6 +1818,31 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_matching_obligations_artifact_passes_check"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_rules_adding_obligation_marks_artifact_stale"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_removed_obligation_marks_artifact_stale"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_changed_obligation_declaration_hash_marks_artifact_stale"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
         }
       ]
     },
@@ -2143,6 +2168,31 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::check_tests",
           "test_name": "test_check_reports_bound_test_or_anchor_hash_changes_as_freshness_drift"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_matching_obligations_artifact_passes_check"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_rules_adding_obligation_marks_artifact_stale"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_removed_obligation_marks_artifact_stale"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_changed_obligation_declaration_hash_marks_artifact_stale"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_zero_obligation_cited_edge_voluntary_binding_resolves"
         }
       ]
     },
@@ -2513,6 +2563,26 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::test_obligation::obligations_codec::tests",
           "test_name": "test_obligations_document_round_trips_through_json"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::test_obligation::tests",
+          "test_name": "test_derive_then_check_real_catalogues_does_not_report_stale_obligations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_matching_obligations_artifact_passes_check"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_derivation_reads_secondary_port_methods_and_saves_stable_obligations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_obligations_artifact_port_declaration_change_keeps_method_ids"
         },
         {
           "layer": "usecase",
@@ -4107,6 +4177,36 @@
           "test_name": "test_execute_check_partial_artifact_scope_returns_failure"
         },
         {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_missing_obligation_is_a_drift"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_orphaned_binding_is_a_drift"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_zero_obligation_cited_edge_without_binding_is_unresolved"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_declaration_change_stales_verdict_as_drift"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_reports_bound_test_or_anchor_hash_changes_as_freshness_drift"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_reads_bindings_without_mutating_the_artifact"
+        },
+        {
           "layer": "cli",
           "module_path": "cli::commands::test_obligation::tests",
           "test_name": "test_execute_gate_commands_delegate_to_composition_root"
@@ -5139,7 +5239,7 @@
       "reason": "At ObligationsCodecError × IN-05, this data carrier only provides type-level carriage and traceability; it makes no condition-to-observable-result promise. Process behavior is owned by CheckTestObligationsInteractor, DeriveTestObligationsInteractor, EvaluateTestObligationsInteractor, their handlers, and their adapters."
     },
     {
-      "kind": "waiver",
+      "kind": "voluntary_binding",
       "edge_id": {
         "entry_key": "ObligationsDocument",
         "anchor_id": {
@@ -5147,7 +5247,93 @@
           "element_id": "AC-03"
         }
       },
-      "reason": "At ObligationsDocument × AC-03, this data carrier only provides type-level carriage and traceability; it makes no condition-to-observable-result promise. Process behavior is owned by CheckTestObligationsInteractor, DeriveTestObligationsInteractor, EvaluateTestObligationsInteractor, their handlers, and their adapters."
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_obligations_document_staleness_against_identical_returns_none"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_obligations_document_staleness_against_added_returns_added_detail"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_obligations_document_staleness_against_removed_returns_removed_detail"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_obligations_document_staleness_against_changed_target_entry_reports_changed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_obligations_document_staleness_against_changed_target_role_reports_changed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_obligations_document_staleness_against_changed_brief_reports_changed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_obligations_document_staleness_against_changed_declaration_hash_reports_changed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_obligations_document_staleness_against_changed_spec_refs_reports_changed"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_obligations_document_staleness_against_duplicate_reports_removed_detail"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_matching_obligations_artifact_passes_check"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_rules_adding_obligation_marks_artifact_stale"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_removed_obligation_marks_artifact_stale"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_changed_obligation_declaration_hash_marks_artifact_stale"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_obligations_artifact_port_declaration_change_keeps_method_ids"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_derivation_is_repeatable_and_populates_required_obligation_fields"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_declaration_change_keeps_id_but_changes_declaration_hash"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::test_obligation::tests",
+          "test_name": "test_derive_then_check_real_catalogues_does_not_report_stale_obligations"
+        }
+      ]
     },
     {
       "kind": "waiver",
@@ -5275,7 +5461,7 @@
       "reason": "At SpecDocumentLoadError × IN-08, this data carrier only provides type-level carriage and traceability; it makes no condition-to-observable-result promise. Process behavior is owned by CheckTestObligationsInteractor, DeriveTestObligationsInteractor, EvaluateTestObligationsInteractor, their handlers, and their adapters."
     },
     {
-      "kind": "waiver",
+      "kind": "voluntary_binding",
       "edge_id": {
         "entry_key": "TargetEntryRoleKind",
         "anchor_id": {
@@ -5283,10 +5469,46 @@
           "element_id": "IN-07"
         }
       },
-      "reason": "At TargetEntryRoleKind × IN-07, this data carrier only provides type-level carriage and traceability; it makes no condition-to-observable-result promise. Process behavior is owned by CheckTestObligationsInteractor, DeriveTestObligationsInteractor, EvaluateTestObligationsInteractor, their handlers, and their adapters."
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::vocab::tests",
+          "test_name": "test_target_entry_role_kind_canonical_form_with_data_role_discards_payload"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::vocab::tests",
+          "test_name": "test_target_entry_role_kind_canonical_form_with_contract_role_discards_payload"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::vocab::tests",
+          "test_name": "test_target_entry_role_kind_canonical_form_with_trait_impl_discards_contract_payload"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::vocab::tests",
+          "test_name": "test_target_entry_role_kind_canonical_form_with_function_role_preserves_role"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::vocab::tests",
+          "test_name": "test_target_entry_role_kind_canonical_form_with_pattern_preserves_pattern"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_value_object_emits_one_obligation_per_invariant"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_derivation_is_repeatable_and_populates_required_obligation_fields"
+        }
+      ]
     },
     {
-      "kind": "waiver",
+      "kind": "voluntary_binding",
       "edge_id": {
         "entry_key": "TargetEntryRoleKind",
         "anchor_id": {
@@ -5294,7 +5516,23 @@
           "element_id": "IN-17"
         }
       },
-      "reason": "At TargetEntryRoleKind × IN-17, this data carrier only provides type-level carriage and traceability; it makes no condition-to-observable-result promise. Process behavior is owned by CheckTestObligationsInteractor, DeriveTestObligationsInteractor, EvaluateTestObligationsInteractor, their handlers, and their adapters."
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::vocab::tests",
+          "test_name": "test_target_entry_role_kind_canonical_form_with_trait_impl_discards_contract_payload"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_impl_resolves_role_and_external_trait_yields_zero"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_workspace_qualified_trait_impl_uses_qualified_crate_trait"
+        }
+      ]
     },
     {
       "kind": "waiver",
@@ -6514,6 +6752,21 @@
           "test_name": "test_command_context_uses_active_branch_for_existence_based_check_scope"
         },
         {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_reads_bindings_without_mutating_the_artifact"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_rules_adding_obligation_marks_artifact_stale"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_matching_obligations_artifact_passes_check"
+        },
+        {
           "layer": "cli",
           "module_path": "cli::commands::test_obligation::tests",
           "test_name": "test_execute_check_partial_artifact_scope_returns_failure"
@@ -6617,6 +6870,46 @@
           "layer": "cli",
           "module_path": "cli::commands::test_obligation::tests",
           "test_name": "test_parser_rejects_scope_selection_flags_for_every_gate_command"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::test_obligation::tests",
+          "test_name": "test_read_command_branch_with_track_id_does_not_read_current_branch"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::test_obligation::tests",
+          "test_name": "test_read_command_branch_without_track_id_reads_current_branch"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::test_obligation::tests",
+          "test_name": "test_command_context_uses_active_branch_for_existence_based_check_scope"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::test_obligation::tests",
+          "test_name": "test_execute_check_partial_artifact_scope_returns_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_empty_scope_passes_without_materialized_catalogue_or_spec"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_obligations_only_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_bindings_only_is_fail_closed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_rules_load_failure_fails_closed_before_any_stage"
         },
         {
           "layer": "usecase",
@@ -7028,7 +7321,7 @@
     "reason": "At ObligationFulfillmentVerdictDto x IN-09, this data carrier only provides type-level carriage and traceability; it makes no condition-to-observable-result promise. Process behavior is owned by CheckTestObligationsInteractor, DeriveTestObligationsInteractor, EvaluateTestObligationsInteractor, their handlers, and their adapters."
   },
   {
-    "kind": "waiver",
+    "kind": "voluntary_binding",
     "edge_id": {
       "entry_key": "ObligationsDocument",
       "anchor_id": {
@@ -7036,7 +7329,78 @@
         "element_id": "IN-05"
       }
     },
-    "reason": "At ObligationsDocument x IN-05, this data carrier only provides type-level carriage and traceability; it makes no condition-to-observable-result promise. Process behavior is owned by CheckTestObligationsInteractor, DeriveTestObligationsInteractor, EvaluateTestObligationsInteractor, their handlers, and their adapters."
+    "tests": [
+      {
+        "layer": "infrastructure",
+        "module_path": "infrastructure::test_obligation::obligations_codec::tests",
+        "test_name": "test_obligations_document_round_trips_through_json"
+      },
+      {
+        "layer": "infrastructure",
+        "module_path": "infrastructure::test_obligation::obligations_codec::tests",
+        "test_name": "test_obligation_id_identity_is_preserved"
+      },
+      {
+        "layer": "infrastructure",
+        "module_path": "infrastructure::test_obligation::obligations_codec::tests",
+        "test_name": "test_catalogue_entry_ref_dto_round_trips_each_section_key"
+      },
+      {
+        "layer": "infrastructure",
+        "module_path": "infrastructure::test_obligation::obligations_codec::tests",
+        "test_name": "test_obligation_kind_dto_round_trips_every_variant"
+      },
+      {
+        "layer": "infrastructure",
+        "module_path": "infrastructure::test_obligation::obligations_codec::tests",
+        "test_name": "test_all_target_role_variants_round_trip"
+      },
+      {
+        "layer": "infrastructure",
+        "module_path": "infrastructure::test_obligation::obligations_codec::tests",
+        "test_name": "test_unknown_field_is_rejected"
+      },
+      {
+        "layer": "infrastructure",
+        "module_path": "infrastructure::test_obligation::obligations_codec::tests",
+        "test_name": "test_codec_save_then_load_round_trips"
+      },
+      {
+        "layer": "usecase",
+        "module_path": "usecase::test_obligation::derive_tests",
+        "test_name": "test_derivation_is_repeatable_and_populates_required_obligation_fields"
+      },
+      {
+        "layer": "usecase",
+        "module_path": "usecase::test_obligation::derive_tests",
+        "test_name": "test_declaration_change_keeps_id_but_changes_declaration_hash"
+      },
+      {
+        "layer": "domain",
+        "module_path": "domain::tddd::test_obligation::ids::tests",
+        "test_name": "test_obligation_id_exposes_identity_components"
+      },
+      {
+        "layer": "domain",
+        "module_path": "domain::tddd::test_obligation::obligations::tests",
+        "test_name": "test_obligations_document_staleness_against_added_returns_added_detail"
+      },
+      {
+        "layer": "domain",
+        "module_path": "domain::tddd::test_obligation::obligations::tests",
+        "test_name": "test_obligations_document_staleness_against_removed_returns_removed_detail"
+      },
+      {
+        "layer": "domain",
+        "module_path": "domain::tddd::test_obligation::obligations::tests",
+        "test_name": "test_obligations_document_staleness_against_changed_declaration_hash_reports_changed"
+      },
+      {
+        "layer": "domain",
+        "module_path": "domain::tddd::test_obligation::obligations::tests",
+        "test_name": "test_obligations_document_staleness_against_duplicate_reports_removed_detail"
+      }
+    ]
   },
   {
     "kind": "voluntary_binding",
@@ -9353,6 +9717,83 @@
         "layer": "infrastructure",
         "module_path": "infrastructure::test_obligation::fulfillment_verifier::tests",
         "test_name": "failing_verifier_never_emits_pass_verdict_so_no_uncited_pass_can_exist"
+      }
+    ]
+  },
+  {
+    "kind": "voluntary_binding",
+    "edge_id": {
+      "entry_key": "ObligationsDocument",
+      "anchor_id": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+        "element_id": "IN-08"
+      }
+    },
+    "tests": [
+      {
+        "layer": "domain",
+        "module_path": "domain::tddd::test_obligation::obligations::tests",
+        "test_name": "test_obligations_document_staleness_against_identical_returns_none"
+      },
+      {
+        "layer": "domain",
+        "module_path": "domain::tddd::test_obligation::obligations::tests",
+        "test_name": "test_obligations_document_staleness_against_added_returns_added_detail"
+      },
+      {
+        "layer": "domain",
+        "module_path": "domain::tddd::test_obligation::obligations::tests",
+        "test_name": "test_obligations_document_staleness_against_removed_returns_removed_detail"
+      },
+      {
+        "layer": "domain",
+        "module_path": "domain::tddd::test_obligation::obligations::tests",
+        "test_name": "test_obligations_document_staleness_against_changed_target_entry_reports_changed"
+      },
+      {
+        "layer": "domain",
+        "module_path": "domain::tddd::test_obligation::obligations::tests",
+        "test_name": "test_obligations_document_staleness_against_changed_target_role_reports_changed"
+      },
+      {
+        "layer": "domain",
+        "module_path": "domain::tddd::test_obligation::obligations::tests",
+        "test_name": "test_obligations_document_staleness_against_changed_brief_reports_changed"
+      },
+      {
+        "layer": "domain",
+        "module_path": "domain::tddd::test_obligation::obligations::tests",
+        "test_name": "test_obligations_document_staleness_against_changed_declaration_hash_reports_changed"
+      },
+      {
+        "layer": "domain",
+        "module_path": "domain::tddd::test_obligation::obligations::tests",
+        "test_name": "test_obligations_document_staleness_against_changed_spec_refs_reports_changed"
+      },
+      {
+        "layer": "domain",
+        "module_path": "domain::tddd::test_obligation::obligations::tests",
+        "test_name": "test_obligations_document_staleness_against_duplicate_reports_removed_detail"
+      },
+      {
+        "layer": "usecase",
+        "module_path": "usecase::test_obligation::check_tests",
+        "test_name": "test_matching_obligations_artifact_passes_check"
+      },
+      {
+        "layer": "usecase",
+        "module_path": "usecase::test_obligation::check_tests",
+        "test_name": "test_rules_adding_obligation_marks_artifact_stale"
+      },
+      {
+        "layer": "usecase",
+        "module_path": "usecase::test_obligation::check_tests",
+        "test_name": "test_removed_obligation_marks_artifact_stale"
+      },
+      {
+        "layer": "usecase",
+        "module_path": "usecase::test_obligation::check_tests",
+        "test_name": "test_changed_obligation_declaration_hash_marks_artifact_stale"
       }
     ]
   }

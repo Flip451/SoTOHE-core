@@ -42,6 +42,7 @@ use domain::tddd::test_obligation::ports::{
     ObligationFulfillmentCachePort, ObligationsArtifactPort, TestBindingsArtifactPort,
     TestObligationRulesLoaderPort, TestSourceScannerPort, WaiverCachePort,
 };
+use domain::tddd::test_obligation::projection::RoleObligationItemsProjector;
 use domain::tddd::test_obligation::scope::UncitedSpecElementFinding;
 use domain::tddd::test_obligation::verdict::{
     ObligationFulfillmentCacheDocument, ObligationFulfillmentVerdict, WaiverCacheDocument,
@@ -56,6 +57,7 @@ use super::check_support::{
     spec_elements_from_document, synthetic_edge, synthetic_voluntary_obligation_id,
     voluntary_tests, waived_reason,
 };
+use super::derive::derive_obligations_document;
 use super::{
     LoadedCatalogueDocument, TestObligationCatalogueCommandInput, diag,
     find_declaration_text_from_loaded, obligation_declaration_text_from_loaded,
@@ -227,11 +229,8 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
         // Fail-closed rules-load gate (IN-08): the decision-table config must
         // load and validate before any downstream stage runs, so a malformed or
         // role-incomplete `.harness/config/test-obligation-rules.json` cannot let
-        // the gate silently pass on stale obligations / bindings / caches. The
-        // loaded document is intentionally not consumed further — the check
-        // gate's contract addition is load-and-validate only; drift / totality
-        // / freshness lanes below remain rules-content-independent.
-        let _rules_document = self.rules_loader.load().map_err(ObligationCheckError::RulesLoad)?;
+        // the gate silently pass on stale obligations / bindings / caches.
+        let rules_document = self.rules_loader.load().map_err(ObligationCheckError::RulesLoad)?;
 
         let obligations = self
             .obligations_port
@@ -252,6 +251,20 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
 
         let catalogues = self.load_catalogues(cmd)?;
         let elements = self.spec_elements(cmd.input.track_id())?;
+        let derivation_catalogues = catalogues
+            .iter()
+            .map(|catalogue| (catalogue.read_path().to_path_buf(), catalogue.document().clone()))
+            .collect::<Vec<_>>();
+        let expected = derive_obligations_document(
+            cmd.input.track_id().clone(),
+            &rules_document,
+            &derivation_catalogues,
+            &RoleObligationItemsProjector::new(),
+        )
+        .map_err(ObligationCheckError::InvalidCatalogueState)?;
+        if let Some(detail) = obligations.staleness_against(&expected) {
+            return Err(ObligationCheckError::StaleObligationsArtifact { detail });
+        }
         let uncited = compute_uncited_from(&catalogues, &elements);
         let cited_edges = active_cited_edges_from_catalogues(&catalogues)?;
         let spec_texts = anchor_texts(&elements);

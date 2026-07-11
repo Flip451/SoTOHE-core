@@ -12,6 +12,7 @@
 //! vocabulary is a template-side change (CN-10).
 
 use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
+use crate::tddd::test_obligation::ids::DiagnosticMessage;
 
 /// Obligation-kind vocabulary produced by the decision-table rules.
 ///
@@ -142,6 +143,51 @@ pub enum TargetEntryRoleKind {
     Pattern(TestObligationPatternKind),
 }
 
+impl TargetEntryRoleKind {
+    /// Returns the persistence canonical form used by obligation derivation; see IN-07.
+    ///
+    /// Catalogue roles may contain projection-only payloads, while persisted
+    /// obligations retain only their stable role selector.
+    pub fn canonical_form(&self) -> Result<Self, DiagnosticMessage> {
+        match self {
+            Self::DataRole(role) => role
+                .variant_name()
+                .parse::<DataRole>()
+                .map(Self::DataRole)
+                .map_err(|_| canonical_form_error("invalid data role for obligation artifact")),
+            Self::ContractRole(role) => {
+                role.variant_name().parse::<ContractRole>().map(Self::ContractRole).map_err(|_| {
+                    canonical_form_error("invalid contract role for obligation artifact")
+                })
+            }
+            Self::FunctionRole(role) => {
+                role.to_string().parse::<FunctionRole>().map(Self::FunctionRole).map_err(|_| {
+                    canonical_form_error("invalid function role for obligation artifact")
+                })
+            }
+            Self::TraitImpl(role) => {
+                role.variant_name().parse::<ContractRole>().map(Self::TraitImpl).map_err(|_| {
+                    canonical_form_error(
+                        "invalid trait implementation role for obligation artifact",
+                    )
+                })
+            }
+            Self::Pattern(pattern) => Ok(Self::Pattern(pattern.clone())),
+        }
+    }
+}
+
+/// Builds the non-empty diagnostic required by [`TargetEntryRoleKind::canonical_form`].
+fn canonical_form_error(message: &str) -> DiagnosticMessage {
+    let mut text = message.to_owned();
+    loop {
+        match DiagnosticMessage::try_new(text) {
+            Ok(message) => return message,
+            Err(_) => text = "invalid target entry role".to_owned(),
+        }
+    }
+}
+
 /// Drift classification for a test-obligation edge (IN-13 / AC-05).
 ///
 /// Split into two families. *Existence* drifts are independent deterministic
@@ -239,6 +285,7 @@ impl FulfillmentFailCategory {
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::tddd::catalogue_v2::identifiers::TypeRef;
 
     const ALL_KINDS: &[TestObligationKind] = &[
         TestObligationKind::Boundary,
@@ -319,6 +366,66 @@ mod tests {
         assert_eq!(function, TargetEntryRoleKind::FunctionRole(FunctionRole::FreeFunction));
         assert_eq!(trait_impl, TargetEntryRoleKind::TraitImpl(ContractRole::ApplicationService));
         assert_ne!(data, pattern);
+    }
+
+    #[test]
+    fn test_target_entry_role_kind_canonical_form_with_data_role_discards_payload() {
+        let role = TargetEntryRoleKind::DataRole(DataRole::UseCase {
+            handles: vec![TypeRef::new("CreateOrder").unwrap()],
+        });
+
+        assert_eq!(
+            role.canonical_form().unwrap(),
+            TargetEntryRoleKind::DataRole(DataRole::use_case())
+        );
+    }
+
+    #[test]
+    fn test_target_entry_role_kind_canonical_form_with_contract_role_discards_payload() {
+        let role = TargetEntryRoleKind::ContractRole(ContractRole::Repository {
+            aggregate: TypeRef::new("Order").unwrap(),
+        });
+
+        assert_eq!(
+            role.canonical_form().unwrap(),
+            TargetEntryRoleKind::ContractRole(ContractRole::Repository {
+                aggregate: TypeRef::new("AggregateRoot").unwrap(),
+            })
+        );
+    }
+
+    #[test]
+    fn test_target_entry_role_kind_canonical_form_with_function_role_preserves_role() {
+        let role = TargetEntryRoleKind::FunctionRole(FunctionRole::UseCaseFunction);
+
+        assert_eq!(
+            role.canonical_form().unwrap(),
+            TargetEntryRoleKind::FunctionRole(FunctionRole::UseCaseFunction)
+        );
+    }
+
+    #[test]
+    fn test_target_entry_role_kind_canonical_form_with_trait_impl_discards_contract_payload() {
+        let role = TargetEntryRoleKind::TraitImpl(ContractRole::Repository {
+            aggregate: TypeRef::new("Order").unwrap(),
+        });
+
+        assert_eq!(
+            role.canonical_form().unwrap(),
+            TargetEntryRoleKind::TraitImpl(ContractRole::Repository {
+                aggregate: TypeRef::new("AggregateRoot").unwrap(),
+            })
+        );
+    }
+
+    #[test]
+    fn test_target_entry_role_kind_canonical_form_with_pattern_preserves_pattern() {
+        let role = TargetEntryRoleKind::Pattern(TestObligationPatternKind::Typestate);
+
+        assert_eq!(
+            role.canonical_form().unwrap(),
+            TargetEntryRoleKind::Pattern(TestObligationPatternKind::Typestate)
+        );
     }
 
     const ALL_DRIFT_KINDS: &[TestObligationDriftKind] = &[

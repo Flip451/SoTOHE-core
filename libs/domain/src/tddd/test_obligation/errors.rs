@@ -132,6 +132,12 @@ pub enum ObligationCheckError {
     /// The test-bindings artifact is absent while the obligations artifact is
     /// present (half-materialised scope, fail-closed — AC-10).
     BindingsAbsent,
+    /// The persisted obligations artifact differs from the current in-memory
+    /// derivation and must be regenerated with `test-obligation derive`.
+    StaleObligationsArtifact {
+        /// Counts for missing, unexpected, and changed obligations.
+        detail: DiagnosticMessage,
+    },
     /// One or more drifts were detected.
     DriftsDetected {
         /// The detected drifts (non-empty by construction).
@@ -348,6 +354,9 @@ mod tests {
             }),
             ObligationCheckError::ObligationsAbsent,
             ObligationCheckError::BindingsAbsent,
+            ObligationCheckError::StaleObligationsArtifact {
+                detail: diag("missing=1, unexpected=0, changed=0"),
+            },
             ObligationCheckError::DriftsDetected { drifts: NonEmptyDrifts::new(drift(), vec![]) },
             ObligationCheckError::UnresolvedEdges { edges: NonEmptyEdgeIds::new(edge(), vec![]) },
             ObligationCheckError::StaleVerdicts { edges: NonEmptyEdgeIds::new(edge(), vec![]) },
@@ -357,7 +366,7 @@ mod tests {
             ObligationCheckError::SourceScan(TestSourceScanError::Io(diag("io"))),
             ObligationCheckError::CacheIo(VerifyCacheError::Io(diag("io"))),
         ];
-        assert_eq!(variants.len(), 11);
+        assert_eq!(variants.len(), 12);
         assert!(variants.iter().all(|v| !format!("{v:?}").is_empty()));
     }
 

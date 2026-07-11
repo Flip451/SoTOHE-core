@@ -3013,7 +3013,7 @@
     },
     "ObligationCheckError": {
       "action": "add",
-      "docs": "Rules-load and artifact / freshness failure modes for `sotp test-obligation check` (D11 / IN-08 / AC-04 / AC-05 / AC-10 / CN-04).",
+      "docs": "Error vocabulary for `sotp test-obligation check`, including stale derived obligations; see D11 / IN-08 / AC-04 / AC-05 / AC-10 / CN-04.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -3037,6 +3037,18 @@
             "name": "BindingsAbsent",
             "payload": {
               "kind": "unit"
+            }
+          },
+          {
+            "name": "StaleObligationsArtifact",
+            "payload": {
+              "fields": [
+                {
+                  "name": "detail",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
             }
           },
           {
@@ -3866,6 +3878,20 @@
           ],
           "receiver": "&self",
           "returns": "Option<&TestObligation>"
+        },
+        {
+          "docs": "Diagnoses obligation-document staleness; see IN-08.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "staleness_against",
+          "params": [
+            {
+              "name": "expected",
+              "ty": "&ObligationsDocument"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<DiagnosticMessage>"
         }
       ],
       "module_path": "tddd::test_obligation::obligations",
@@ -3879,6 +3905,10 @@
         },
         {
           "anchor": "AC-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-08",
           "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
         }
       ]
@@ -4349,7 +4379,17 @@
           }
         ]
       },
-      "methods": [],
+      "methods": [
+        {
+          "docs": "Returns the persistence canonical form used by obligation derivation; see IN-07.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "canonical_form",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<Self, DiagnosticMessage>"
+        }
+      ],
       "module_path": "tddd::test_obligation::vocab",
       "role": {
         "ValueObject": {}

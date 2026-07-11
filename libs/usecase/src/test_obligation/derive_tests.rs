@@ -570,7 +570,10 @@ fn test_derivation_is_repeatable_and_populates_required_obligation_fields() {
     assert_eq!(obligation.id().entry_key().as_str(), "Money");
     assert_eq!(obligation.id().item_identifier().as_str(), "invariant:positive");
     assert_eq!(obligation.target_entry().entry_key.as_str(), "Money");
-    assert!(matches!(obligation.target_role(), TargetEntryRoleKind::DataRole(_)));
+    assert_eq!(
+        obligation.target_role(),
+        &TargetEntryRoleKind::DataRole("ValueObject".parse().unwrap())
+    );
     assert!(!obligation.brief().as_str().is_empty());
     assert_eq!(obligation.spec_refs()[0].element_id(), "IN-05");
 }

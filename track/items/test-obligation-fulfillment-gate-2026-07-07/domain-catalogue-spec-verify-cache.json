@@ -172,7 +172,7 @@
     },
     {
       "claim_hash": "81f424a1462fa6ae79dc6bf01bcc1e2ad86414e66d3d65bc0e59ef82e77d426f",
-      "evidence_hash": "0ab9cd4316ab24b379d3406fe63aab9ea90bd98f1001043249d95ff0bb8dc43f",
+      "evidence_hash": "b8f70f775682cf36ca72f4f5abeca5d36ad91d5a4660ea9dbbbbf4aa2a199bcc",
       "verdict": {
         "kind": "pass",
         "citation": "`check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する"
@@ -190,7 +190,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。"
+          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。さらに `check` は catalogue × spec × 決定表 config の導出入力から期待義務集合をメモリ上で再導出し、`obligations.json` の内容との一致を検査する。不一致（例: rules 変更で義務が増えた後に `derive` が未実行で artifact が stale の場合）は fail-closed で非零 exit とし、解消は `derive` の再実行だけとする。`check` はこの比較でも artifact を書き換えない。"
         }
       }
     },
@@ -292,10 +292,10 @@
     },
     {
       "claim_hash": "0db39f38aa5f226b820cd2eb17d221774dbe54c6128179ce2c56410e6dbdbf27",
-      "evidence_hash": "0ab9cd4316ab24b379d3406fe63aab9ea90bd98f1001043249d95ff0bb8dc43f",
+      "evidence_hash": "b8f70f775682cf36ca72f4f5abeca5d36ad91d5a4660ea9dbbbbf4aa2a199bcc",
       "verdict": {
         "kind": "pass",
-        "citation": "各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。"
+        "citation": "各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closedで、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -310,7 +310,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。"
+          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。さらに `check` は catalogue × spec × 決定表 config の導出入力から期待義務集合をメモリ上で再導出し、`obligations.json` の内容との一致を検査する。不一致（例: rules 変更で義務が増えた後に `derive` が未実行で artifact が stale の場合）は fail-closed で非零 exit とし、解消は `derive` の再実行だけとする。`check` はこの比較でも artifact を書き換えない。"
         }
       }
     },
@@ -364,7 +364,7 @@
     },
     {
       "claim_hash": "81f52b8e20a0903c3a10bee4e0d03632aeb52580ac0e0f583e89a5e2f58f62c2",
-      "evidence_hash": "0ab9cd4316ab24b379d3406fe63aab9ea90bd98f1001043249d95ff0bb8dc43f",
+      "evidence_hash": "b8f70f775682cf36ca72f4f5abeca5d36ad91d5a4660ea9dbbbbf4aa2a199bcc",
       "verdict": {
         "kind": "pass",
         "citation": "(a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。"
@@ -382,7 +382,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。"
+          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。さらに `check` は catalogue × spec × 決定表 config の導出入力から期待義務集合をメモリ上で再導出し、`obligations.json` の内容との一致を検査する。不一致（例: rules 変更で義務が増えた後に `derive` が未実行で artifact が stale の場合）は fail-closed で非零 exit とし、解消は `derive` の再実行だけとする。`check` はこの比較でも artifact を書き換えない。"
         }
       }
     },
@@ -604,10 +604,10 @@
     },
     {
       "claim_hash": "029869eccd3f4bc5ea933de500549e1dda22b6315245464fce71c8277d8020cc",
-      "evidence_hash": "0ab9cd4316ab24b379d3406fe63aab9ea90bd98f1001043249d95ff0bb8dc43f",
+      "evidence_hash": "b8f70f775682cf36ca72f4f5abeca5d36ad91d5a4660ea9dbbbbf4aa2a199bcc",
       "verdict": {
         "kind": "pass",
-        "citation": "(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。"
+        "citation": "全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -622,16 +622,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。"
+          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。さらに `check` は catalogue × spec × 決定表 config の導出入力から期待義務集合をメモリ上で再導出し、`obligations.json` の内容との一致を検査する。不一致（例: rules 変更で義務が増えた後に `derive` が未実行で artifact が stale の場合）は fail-closed で非零 exit とし、解消は `derive` の再実行だけとする。`check` はこの比較でも artifact を書き換えない。"
         }
       }
     },
     {
       "claim_hash": "029869eccd3f4bc5ea933de500549e1dda22b6315245464fce71c8277d8020cc",
-      "evidence_hash": "cefa7085744d1ef41b80d8a40c408aee4bf62c63ad441c41b3da72e0d91010a5",
+      "evidence_hash": "d10e8b101852c41382aaf78ffca91d46ea011ace03f8f0214446b3499cbfc641",
       "verdict": {
         "kind": "pass",
-        "citation": "「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」"
+        "citation": "全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -646,7 +646,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) binding はあるが義務が導出されない（`orphaned`）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。"
+          "text_label": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) fulfillment binding（義務 id ベースの record）はあるが対応する義務が導出されない場合に `orphaned` としてブロックする（D9 の `voluntary_binding`（edge 直接束縛）は義務の導出を前提としない正当な解決宣言であり、`orphaned` の対象外）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。`check` は導出入力（catalogue × spec × 決定表 config）からメモリ上で再導出した期待義務集合と `obligations.json` の一致も合格条件に含める。義務の追加・削除・変更いずれの stale も決定論的に非零 exit でブロックし（fail-closed）、`check` は pure-read のまま artifact を書き換えない（解消は `derive` の再実行のみ — IN-08 と同一の規律）。"
         }
       }
     },
@@ -748,10 +748,10 @@
     },
     {
       "claim_hash": "8f43be4edf31ccc880eee46d8d22d4b4c9d569f1f4f212d5096e57ca5f958a5f",
-      "evidence_hash": "cefa7085744d1ef41b80d8a40c408aee4bf62c63ad441c41b3da72e0d91010a5",
+      "evidence_hash": "d10e8b101852c41382aaf78ffca91d46ea011ace03f8f0214446b3499cbfc641",
       "verdict": {
         "kind": "pass",
-        "citation": "obligations は存在するが test-bindings が不在（部分的存在）"
+        "citation": "(e) obligations は存在するが test-bindings が不在（部分的存在）"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -766,7 +766,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) binding はあるが義務が導出されない（`orphaned`）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。"
+          "text_label": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) fulfillment binding（義務 id ベースの record）はあるが対応する義務が導出されない場合に `orphaned` としてブロックする（D9 の `voluntary_binding`（edge 直接束縛）は義務の導出を前提としない正当な解決宣言であり、`orphaned` の対象外）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。`check` は導出入力（catalogue × spec × 決定表 config）からメモリ上で再導出した期待義務集合と `obligations.json` の一致も合格条件に含める。義務の追加・削除・変更いずれの stale も決定論的に非零 exit でブロックし（fail-closed）、`check` は pure-read のまま artifact を書き換えない（解消は `derive` の再実行のみ — IN-08 と同一の規律）。"
         }
       }
     },
@@ -795,11 +795,11 @@
       }
     },
     {
-      "claim_hash": "b2148561d7f49d8f377cffa9dad109efdfd9a0614e29182ae0f2a367241bb862",
-      "evidence_hash": "0ab9cd4316ab24b379d3406fe63aab9ea90bd98f1001043249d95ff0bb8dc43f",
+      "claim_hash": "38381789b84afea01e38dee816156cf423f3377e6b0cf77419209cd5ff44ca5d",
+      "evidence_hash": "b8f70f775682cf36ca72f4f5abeca5d36ad91d5a4660ea9dbbbbf4aa2a199bcc",
       "verdict": {
         "kind": "pass",
-        "citation": "`check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。"
+        "citation": "次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。さらに `check` は catalogue × spec × 決定表 config の導出入力から期待義務集合をメモリ上で再導出し、`obligations.json` の内容との一致を検査する。不一致（例: rules 変更で義務が増えた後に `derive` が未実行で artifact が stale の場合）は fail-closed で非零 exit とし、解消は `derive` の再実行だけとする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -814,16 +814,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。"
+          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。さらに `check` は catalogue × spec × 決定表 config の導出入力から期待義務集合をメモリ上で再導出し、`obligations.json` の内容との一致を検査する。不一致（例: rules 変更で義務が増えた後に `derive` が未実行で artifact が stale の場合）は fail-closed で非零 exit とし、解消は `derive` の再実行だけとする。`check` はこの比較でも artifact を書き換えない。"
         }
       }
     },
     {
-      "claim_hash": "b2148561d7f49d8f377cffa9dad109efdfd9a0614e29182ae0f2a367241bb862",
-      "evidence_hash": "cefa7085744d1ef41b80d8a40c408aee4bf62c63ad441c41b3da72e0d91010a5",
+      "claim_hash": "38381789b84afea01e38dee816156cf423f3377e6b0cf77419209cd5ff44ca5d",
+      "evidence_hash": "d10e8b101852c41382aaf78ffca91d46ea011ace03f8f0214446b3499cbfc641",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) binding はあるが義務が導出されない（`orphaned`）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。"
+        "citation": "`check` は導出入力（catalogue × spec × 決定表 config）からメモリ上で再導出した期待義務集合と `obligations.json` の一致も合格条件に含める。義務の追加・削除・変更いずれの stale も決定論的に非零 exit でブロックし（fail-closed）、`check` は pure-read のまま artifact を書き換えない"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -838,16 +838,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) binding はあるが義務が導出されない（`orphaned`）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。"
+          "text_label": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) fulfillment binding（義務 id ベースの record）はあるが対応する義務が導出されない場合に `orphaned` としてブロックする（D9 の `voluntary_binding`（edge 直接束縛）は義務の導出を前提としない正当な解決宣言であり、`orphaned` の対象外）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。`check` は導出入力（catalogue × spec × 決定表 config）からメモリ上で再導出した期待義務集合と `obligations.json` の一致も合格条件に含める。義務の追加・削除・変更いずれの stale も決定論的に非零 exit でブロックし（fail-closed）、`check` は pure-read のまま artifact を書き換えない（解消は `derive` の再実行のみ — IN-08 と同一の規律）。"
         }
       }
     },
     {
-      "claim_hash": "b2148561d7f49d8f377cffa9dad109efdfd9a0614e29182ae0f2a367241bb862",
+      "claim_hash": "38381789b84afea01e38dee816156cf423f3377e6b0cf77419209cd5ff44ca5d",
       "evidence_hash": "af9a7f7100504ada88916a60d154927b26f264783646865441ad81b1888d3271",
       "verdict": {
         "kind": "pass",
-        "citation": "6 種の drift（`missing` / `orphaned` / `spec_changed` / `decl_changed` / `test_changed` / `reason_changed`）が CI で書き換えなしに検出できる。ユニットテストで各 drift 種別に対応する fixture を用意し、`check` が該当 drift を出力して非零 exit することを検証する。"
+        "citation": "6 種の drift（`missing` / `orphaned` / `spec_changed` / `decl_changed` / `test_changed` / `reason_changed`）が CI で書き換えなしに検出できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -867,11 +867,11 @@
       }
     },
     {
-      "claim_hash": "b2148561d7f49d8f377cffa9dad109efdfd9a0614e29182ae0f2a367241bb862",
+      "claim_hash": "38381789b84afea01e38dee816156cf423f3377e6b0cf77419209cd5ff44ca5d",
       "evidence_hash": "a1695352f9fc9f36de00c6324d18b569010d82c7a8dd448f68243d4cf0f825f0",
       "verdict": {
         "kind": "pass",
-        "citation": "obligations / test-bindings artifact 双方が不在なら `check` が zero pairs で通過し、片方だけ存在する状態（binding のみ / obligations のみ）は fail-closed で非零 exit する。scope 指定フラグ（`--context` / `--layer` / `--scope`）は導入されない。"
+        "citation": "obligations / test-bindings artifact 双方が不在なら `check` が zero pairs で通過し、片方だけ存在する状態（binding のみ / obligations のみ）は fail-closed で非零 exit する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -891,7 +891,7 @@
       }
     },
     {
-      "claim_hash": "b2148561d7f49d8f377cffa9dad109efdfd9a0614e29182ae0f2a367241bb862",
+      "claim_hash": "38381789b84afea01e38dee816156cf423f3377e6b0cf77419209cd5ff44ca5d",
       "evidence_hash": "84e984d43176f96d78afbe79bb3c38441786e7fface2c6e72358713f77752dda",
       "verdict": {
         "kind": "pass",
@@ -1443,7 +1443,7 @@
       }
     },
     {
-      "claim_hash": "85bd6dbba019cc9656d3c20c08f03be3c3f586ac465279df961298f6110e9a29",
+      "claim_hash": "ae876dfa0302f1115c6780af09e8938238555a512850d8651e48502b2c7d5712",
       "evidence_hash": "7516033ef86a92980d248ae7b0fca34f257a3c13e0014e4ecf6d18e1b643090a",
       "verdict": {
         "kind": "pass",
@@ -1467,7 +1467,7 @@
       }
     },
     {
-      "claim_hash": "85bd6dbba019cc9656d3c20c08f03be3c3f586ac465279df961298f6110e9a29",
+      "claim_hash": "ae876dfa0302f1115c6780af09e8938238555a512850d8651e48502b2c7d5712",
       "evidence_hash": "69bcaac923488eb1594afcb2c10ca4e8999e119a91ff596e55bda92615dee574",
       "verdict": {
         "kind": "pass",
@@ -1487,6 +1487,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-03",
           "text_label": "`bin/sotp test-obligation derive` が catalogue + spec + 決定表 config から obligations artifact を決定論的に導出する。義務 id が (entry 識別子, 義務種別, 宣言内項目の識別子) のみから構成され、内容 hash / 位置 index に依存しない。上流の宣言の内容だけを修正（例: invariant 本文の変更）した場合、義務 id は不変で `decl_changed` drift のみが発生する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ae876dfa0302f1115c6780af09e8938238555a512850d8651e48502b2c7d5712",
+      "evidence_hash": "b8f70f775682cf36ca72f4f5abeca5d36ad91d5a4660ea9dbbbbf4aa2a199bcc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "さらに `check` は catalogue × spec × 決定表 config の導出入力から期待義務集合をメモリ上で再導出し、`obligations.json` の内容との一致を検査する。不一致（例: rules 変更で義務が増えた後に `derive` が未実行で artifact が stale の場合）は fail-closed で非零 exit とし、解消は `derive` の再実行だけとする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。さらに `check` は catalogue × spec × 決定表 config の導出入力から期待義務集合をメモリ上で再導出し、`obligations.json` の内容との一致を検査する。不一致（例: rules 変更で義務が増えた後に `derive` が未実行で artifact が stale の場合）は fail-closed で非零 exit とし、解消は `derive` の再実行だけとする。`check` はこの比較でも artifact を書き換えない。"
         }
       }
     },
@@ -1876,7 +1900,7 @@
     },
     {
       "claim_hash": "82bacac41925302ef58d21f523624d1146c91390518970ea318513295ad9c1ed",
-      "evidence_hash": "0ab9cd4316ab24b379d3406fe63aab9ea90bd98f1001043249d95ff0bb8dc43f",
+      "evidence_hash": "b8f70f775682cf36ca72f4f5abeca5d36ad91d5a4660ea9dbbbbf4aa2a199bcc",
       "verdict": {
         "kind": "pass",
         "citation": "`check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する"
@@ -1894,16 +1918,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。"
+          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。さらに `check` は catalogue × spec × 決定表 config の導出入力から期待義務集合をメモリ上で再導出し、`obligations.json` の内容との一致を検査する。不一致（例: rules 変更で義務が増えた後に `derive` が未実行で artifact が stale の場合）は fail-closed で非零 exit とし、解消は `derive` の再実行だけとする。`check` はこの比較でも artifact を書き換えない。"
         }
       }
     },
     {
-      "claim_hash": "661e1e3cce1f0b09f61a8b737281b032104a5a478fd22e1d3478e67ec9f2840c",
+      "claim_hash": "55762c6fae31b445f5d817e9fd56c199dc9c84ebe873bd7f3b23aafc3f377799",
       "evidence_hash": "a2ff16310f5a09e7ad71e5f6cd3792b8ff9ac3604f959f5dbb64ecab338904bf",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp test-obligation derive` の実装。catalogue + spec + 決定表 config から obligations artifact を決定論的に導出して書き出す。義務生成は entry 単位（宣言 → 義務一覧）で、件数は宣言のみの関数（anchor に乗算しない）。... trait_impls セクションの適用は `trait_ref` を track の層別カタログ中の TraitEntry に解決し、その ContractRole をキーとする"
+        "citation": "`bin/sotp test-obligation derive` の実装。catalogue + spec + 決定表 config から obligations artifact を決定論的に導出して書き出す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1923,7 +1947,7 @@
       }
     },
     {
-      "claim_hash": "661e1e3cce1f0b09f61a8b737281b032104a5a478fd22e1d3478e67ec9f2840c",
+      "claim_hash": "55762c6fae31b445f5d817e9fd56c199dc9c84ebe873bd7f3b23aafc3f377799",
       "evidence_hash": "c69bbbadc40cde7b502d17b6951b43eecf3ea508f28f15b4d77bc90a37c857a7",
       "verdict": {
         "kind": "pass",
@@ -2044,10 +2068,10 @@
     },
     {
       "claim_hash": "b3492d23ad0cccd5e816da6d7f21286d606033be99f88c309443d402cb96bc17",
-      "evidence_hash": "cefa7085744d1ef41b80d8a40c408aee4bf62c63ad441c41b3da72e0d91010a5",
+      "evidence_hash": "d10e8b101852c41382aaf78ffca91d46ea011ace03f8f0214446b3499cbfc641",
       "verdict": {
         "kind": "pass",
-        "citation": "「obligations は存在するが test-bindings が不在（部分的存在）」。"
+        "citation": "`check` は pure-read のまま artifact を書き換えない（解消は `derive` の再実行のみ — IN-08 と同一の規律）。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2062,7 +2086,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) binding はあるが義務が導出されない（`orphaned`）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。"
+          "text_label": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) fulfillment binding（義務 id ベースの record）はあるが対応する義務が導出されない場合に `orphaned` としてブロックする（D9 の `voluntary_binding`（edge 直接束縛）は義務の導出を前提としない正当な解決宣言であり、`orphaned` の対象外）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。`check` は導出入力（catalogue × spec × 決定表 config）からメモリ上で再導出した期待義務集合と `obligations.json` の一致も合格条件に含める。義務の追加・削除・変更いずれの stale も決定論的に非零 exit でブロックし（fail-closed）、`check` は pure-read のまま artifact を書き換えない（解消は `derive` の再実行のみ — IN-08 と同一の規律）。"
         }
       }
     },
@@ -2476,7 +2500,7 @@
     },
     {
       "claim_hash": "6bcbc6539e849b61c79743c3fe33ce9dc2b9a66240c3fab449f91351d303910a",
-      "evidence_hash": "0ab9cd4316ab24b379d3406fe63aab9ea90bd98f1001043249d95ff0bb8dc43f",
+      "evidence_hash": "b8f70f775682cf36ca72f4f5abeca5d36ad91d5a4660ea9dbbbbf4aa2a199bcc",
       "verdict": {
         "kind": "pass",
         "citation": "(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）"
@@ -2494,7 +2518,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。"
+          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。さらに `check` は catalogue × spec × 決定表 config の導出入力から期待義務集合をメモリ上で再導出し、`obligations.json` の内容との一致を検査する。不一致（例: rules 変更で義務が増えた後に `derive` が未実行で artifact が stale の場合）は fail-closed で非零 exit とし、解消は `derive` の再実行だけとする。`check` はこの比較でも artifact を書き換えない。"
         }
       }
     },
@@ -4036,10 +4060,10 @@
     },
     {
       "claim_hash": "06cad37c424fa942e756ec3e2340f4728d65b5a629f55c79cfc2f16b7d161d9a",
-      "evidence_hash": "0ab9cd4316ab24b379d3406fe63aab9ea90bd98f1001043249d95ff0bb8dc43f",
+      "evidence_hash": "b8f70f775682cf36ca72f4f5abeca5d36ad91d5a4660ea9dbbbbf4aa2a199bcc",
       "verdict": {
         "kind": "pass",
-        "citation": "存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）"
+        "citation": "`check` は catalogue × spec × 決定表 config の導出入力から期待義務集合をメモリ上で再導出し、`obligations.json` の内容との一致を検査する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -4054,7 +4078,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。"
+          "text_label": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。さらに `check` は catalogue × spec × 決定表 config の導出入力から期待義務集合をメモリ上で再導出し、`obligations.json` の内容との一致を検査する。不一致（例: rules 変更で義務が増えた後に `derive` が未実行で artifact が stale の場合）は fail-closed で非零 exit とし、解消は `derive` の再実行だけとする。`check` はこの比較でも artifact を書き換えない。"
         }
       }
     },
@@ -4372,10 +4396,10 @@
     },
     {
       "claim_hash": "86918c33a0a3bfd6a6973678a4a480e822beead56dc719a35d13ef018d61b397",
-      "evidence_hash": "cefa7085744d1ef41b80d8a40c408aee4bf62c63ad441c41b3da72e0d91010a5",
+      "evidence_hash": "d10e8b101852c41382aaf78ffca91d46ea011ace03f8f0214446b3499cbfc641",
       "verdict": {
         "kind": "pass",
-        "citation": "test-bindings が不在（部分的存在）"
+        "citation": "obligations は存在するが test-bindings が不在（部分的存在）"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -4390,7 +4414,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) binding はあるが義務が導出されない（`orphaned`）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。"
+          "text_label": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) fulfillment binding（義務 id ベースの record）はあるが対応する義務が導出されない場合に `orphaned` としてブロックする（D9 の `voluntary_binding`（edge 直接束縛）は義務の導出を前提としない正当な解決宣言であり、`orphaned` の対象外）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。`check` は導出入力（catalogue × spec × 決定表 config）からメモリ上で再導出した期待義務集合と `obligations.json` の一致も合格条件に含める。義務の追加・削除・変更いずれの stale も決定論的に非零 exit でブロックし（fail-closed）、`check` は pure-read のまま artifact を書き換えない（解消は `derive` の再実行のみ — IN-08 と同一の規律）。"
         }
       }
     },

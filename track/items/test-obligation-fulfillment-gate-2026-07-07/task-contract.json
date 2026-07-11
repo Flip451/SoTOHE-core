@@ -22,7 +22,6 @@
       { "layer": "domain", "entry_key": "TestObligationKind" },
       { "layer": "domain", "entry_key": "TestObligationPerAxis" },
       { "layer": "domain", "entry_key": "TestObligationPatternKind" },
-      { "layer": "domain", "entry_key": "TargetEntryRoleKind" },
       { "layer": "domain", "entry_key": "TestObligationRulesLoadError" },
       { "layer": "domain", "entry_key": "TestObligationRulesLoaderPort" },
       { "layer": "domain", "entry_key": "ValidationError" }
@@ -76,7 +75,6 @@
       { "layer": "domain", "entry_key": "EdgeResolutionOutcome" }
     ],
     "T009": [
-      { "layer": "domain", "entry_key": "ObligationCheckError" },
       { "layer": "domain", "entry_key": "ObligationDeriveError" },
       { "layer": "domain", "entry_key": "ObligationEvaluateError" },
       { "layer": "domain", "entry_key": "ObligationResultsError" },
@@ -262,6 +260,11 @@
     "T032": [
       { "layer": "infrastructure", "entry_key": "ObligationFulfillmentVerifierAdapter" },
       { "layer": "infrastructure", "entry_key": "WaiverVerifierAdapter" }
+    ],
+    "T033": [
+      { "layer": "domain", "entry_key": "ObligationCheckError" },
+      { "layer": "domain", "entry_key": "TargetEntryRoleKind" },
+      { "layer": "usecase", "entry_key": "CheckTestObligationsInteractor" }
     ]
   }
 }

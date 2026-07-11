@@ -20,7 +20,8 @@ use domain::tddd::semantic_verify::{CatalogueEntryKey, CatalogueEntryRef, Catalo
 use domain::tddd::test_obligation::errors::ObligationDeriveError;
 use domain::tddd::test_obligation::hashes::DeclarationHash;
 use domain::tddd::test_obligation::ids::{
-    TestObligationAnchorId, TestObligationBrief, TestObligationId, TestObligationItemIdentifier,
+    DiagnosticMessage, TestObligationAnchorId, TestObligationBrief, TestObligationId,
+    TestObligationItemIdentifier,
 };
 use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
 use domain::tddd::test_obligation::ports::{
@@ -116,46 +117,45 @@ impl DeriveTestObligationsApplicationService for DeriveTestObligationsInteractor
             catalogues.push((path.clone(), doc));
         }
 
-        let trait_roles = index_trait_roles(&catalogues)?;
-
-        let mut obligations: Vec<TestObligation> = Vec::new();
-        for (path, catalogue) in &catalogues {
-            let file_path = catalogue_artifact_path(path);
-            derive_type_obligations(
-                &rules,
-                &self.projector,
-                catalogue,
-                &file_path,
-                &mut obligations,
-            )?;
-            derive_function_obligations(
-                &rules,
-                &self.projector,
-                catalogue,
-                &file_path,
-                &mut obligations,
-            )?;
-            derive_trait_obligations(
-                &rules,
-                &self.projector,
-                catalogue,
-                &file_path,
-                &mut obligations,
-            )?;
-            derive_trait_impl_obligations(
-                &rules,
-                &self.projector,
-                catalogue,
-                &file_path,
-                &trait_roles,
-                &mut obligations,
-            )?;
-        }
-
-        let document = ObligationsDocument::new(input.track_id().clone(), obligations);
+        let document = derive_obligations_document(
+            input.track_id().clone(),
+            &rules,
+            &catalogues,
+            &self.projector,
+        )
+        .map_err(ObligationDeriveError::InvalidCatalogueState)?;
         self.obligations_port.save(&document).map_err(ObligationDeriveError::ArtifactWrite)?;
         Ok(())
     }
+}
+
+/// Derives an obligations document without reading from or writing to a port.
+///
+/// Both the write-side derive command and the read-only check gate use this
+/// projection, so their definition of the expected artifact cannot diverge.
+pub(crate) fn derive_obligations_document(
+    track_id: domain::TrackId,
+    rules: &TestObligationRulesDocument,
+    catalogues: &[(PathBuf, CatalogueDocument)],
+    projector: &RoleObligationItemsProjector,
+) -> Result<ObligationsDocument, DiagnosticMessage> {
+    let trait_roles = index_trait_roles(catalogues)?;
+    let mut obligations: Vec<TestObligation> = Vec::new();
+    for (path, catalogue) in catalogues {
+        let file_path = catalogue_artifact_path(path);
+        derive_type_obligations(rules, projector, catalogue, &file_path, &mut obligations)?;
+        derive_function_obligations(rules, projector, catalogue, &file_path, &mut obligations)?;
+        derive_trait_obligations(rules, projector, catalogue, &file_path, &mut obligations)?;
+        derive_trait_impl_obligations(
+            rules,
+            projector,
+            catalogue,
+            &file_path,
+            &trait_roles,
+            &mut obligations,
+        )?;
+    }
+    Ok(ObligationsDocument::new(track_id, obligations))
 }
 
 /// Whether an entry's change action participates in obligation derivation.
@@ -178,7 +178,7 @@ struct TraitRoleEntry {
 /// so a `trait_impl`'s `trait_ref` can be resolved across crates (IN-17).
 fn index_trait_roles(
     catalogues: &[(PathBuf, CatalogueDocument)],
-) -> Result<Vec<TraitRoleEntry>, ObligationDeriveError> {
+) -> Result<Vec<TraitRoleEntry>, DiagnosticMessage> {
     let mut index = Vec::new();
     for (_, catalogue) in catalogues {
         for (name, entry) in catalogue.traits() {
@@ -221,7 +221,7 @@ fn derive_type_obligations(
     catalogue: &CatalogueDocument,
     file_path: &str,
     out: &mut Vec<TestObligation>,
-) -> Result<(), ObligationDeriveError> {
+) -> Result<(), DiagnosticMessage> {
     for (name, entry) in catalogue.types() {
         if !is_derivable(entry.action()) {
             continue;
@@ -273,7 +273,7 @@ fn derive_trait_obligations(
     catalogue: &CatalogueDocument,
     file_path: &str,
     out: &mut Vec<TestObligation>,
-) -> Result<(), ObligationDeriveError> {
+) -> Result<(), DiagnosticMessage> {
     for (name, entry) in catalogue.traits() {
         if !is_derivable(entry.action()) {
             continue;
@@ -311,7 +311,7 @@ fn derive_function_obligations(
     catalogue: &CatalogueDocument,
     file_path: &str,
     out: &mut Vec<TestObligation>,
-) -> Result<(), ObligationDeriveError> {
+) -> Result<(), DiagnosticMessage> {
     for (path, entry) in catalogue.functions() {
         if !is_derivable(entry.action()) {
             continue;
@@ -354,7 +354,7 @@ fn derive_trait_impl_obligations(
     file_path: &str,
     trait_roles: &[TraitRoleEntry],
     out: &mut Vec<TestObligation>,
-) -> Result<(), ObligationDeriveError> {
+) -> Result<(), DiagnosticMessage> {
     for impl_decl in catalogue.trait_impls() {
         if !is_derivable(impl_decl.action()) {
             continue;
@@ -410,7 +410,7 @@ fn emit_rules<F>(
     anchors: &[TestObligationAnchorId],
     out: &mut Vec<TestObligation>,
     items: F,
-) -> Result<(), ObligationDeriveError>
+) -> Result<(), DiagnosticMessage>
 where
     F: Fn(&TestObligationPerAxis) -> Vec<TestObligationItemIdentifier>,
 {
@@ -440,13 +440,11 @@ fn emit_rule_items(
     anchors: &[TestObligationAnchorId],
     out: &mut Vec<TestObligation>,
     mut item_ids: Vec<TestObligationItemIdentifier>,
-) -> Result<(), ObligationDeriveError> {
+) -> Result<(), DiagnosticMessage> {
     if let Some(minimum) = rule.minimum() {
         while item_ids.len() < minimum.as_usize() {
             let filler = TestObligationItemIdentifier::try_new(format!("min#{}", item_ids.len()))
-                .map_err(|_| {
-                ObligationDeriveError::InvalidCatalogueState(diag("empty min filler"))
-            })?;
+                .map_err(|_| diag("empty min filler"))?;
             item_ids.push(filler);
         }
     }
@@ -467,7 +465,7 @@ fn build_obligation(
     item: &TestObligationItemIdentifier,
     decl_hash: &DeclarationHash,
     anchors: &[TestObligationAnchorId],
-) -> Result<TestObligation, ObligationDeriveError> {
+) -> Result<TestObligation, DiagnosticMessage> {
     let id = TestObligationId::new(entry_key.clone(), kind.clone(), item.clone());
     let brief_text = format!(
         "Author a {} test covering '{}' of {}",
@@ -475,12 +473,11 @@ fn build_obligation(
         item.as_str(),
         entry_key.as_str()
     );
-    let brief = TestObligationBrief::try_new(brief_text)
-        .map_err(|_| ObligationDeriveError::InvalidCatalogueState(diag("empty brief")))?;
+    let brief = TestObligationBrief::try_new(brief_text).map_err(|_| diag("empty brief"))?;
     Ok(TestObligation::new(
         id,
         target.clone(),
-        role_kind.clone(),
+        role_kind.canonical_form()?,
         brief,
         decl_hash.clone(),
         anchors.to_vec(),
@@ -493,23 +490,21 @@ fn declaration_hash<T: std::fmt::Debug>(entry: &T) -> DeclarationHash {
 }
 
 /// Validates a catalogue entry key.
-fn catalogue_key(key: &str) -> Result<CatalogueEntryKey, ObligationDeriveError> {
-    CatalogueEntryKey::try_new(key.to_owned()).map_err(|_| {
-        ObligationDeriveError::InvalidCatalogueState(diag("empty catalogue entry key"))
-    })
+fn catalogue_key(key: &str) -> Result<CatalogueEntryKey, DiagnosticMessage> {
+    CatalogueEntryKey::try_new(key.to_owned()).map_err(|_| diag("empty catalogue entry key"))
 }
 
 /// Converts catalogue `spec_refs` to obligation anchor ids.
 fn anchors_from_spec_refs(
     refs: &[SpecRef],
-) -> Result<Vec<TestObligationAnchorId>, ObligationDeriveError> {
+) -> Result<Vec<TestObligationAnchorId>, DiagnosticMessage> {
     let mut anchors = Vec::with_capacity(refs.len());
     for spec_ref in refs {
         let anchor = TestObligationAnchorId::try_new(
             spec_ref.file.display().to_string(),
             spec_ref.anchor.as_ref().to_owned(),
         )
-        .map_err(|_| ObligationDeriveError::InvalidCatalogueState(diag("empty spec ref")))?;
+        .map_err(|_| diag("empty spec ref"))?;
         anchors.push(anchor);
     }
     Ok(anchors)

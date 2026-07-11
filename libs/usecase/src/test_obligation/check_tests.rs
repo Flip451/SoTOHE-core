@@ -4,6 +4,7 @@
 
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
@@ -38,7 +39,10 @@ use domain::tddd::test_obligation::ports::{
     ObligationFulfillmentCachePort, ObligationsArtifactPort, TestBindingsArtifactPort,
     TestObligationRulesLoaderPort, TestSourceScannerPort, WaiverCachePort,
 };
-use domain::tddd::test_obligation::rules::{RoleObligationRules, TestObligationRulesDocument};
+use domain::tddd::test_obligation::projection::RoleObligationItemsProjector;
+use domain::tddd::test_obligation::rules::{
+    RoleObligationRules, TestObligationRule, TestObligationRulesDocument,
+};
 use domain::tddd::test_obligation::scope::UncitedSpecElementFinding;
 use domain::tddd::test_obligation::verdict::{
     ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheEntry,
@@ -46,7 +50,7 @@ use domain::tddd::test_obligation::verdict::{
     WaiverCacheEntry, WaiverCacheKey, WaiverVerdict,
 };
 use domain::tddd::test_obligation::vocab::{
-    TargetEntryRoleKind, TestObligationKind, TestObligationPatternKind,
+    TargetEntryRoleKind, TestObligationKind, TestObligationPatternKind, TestObligationPerAxis,
 };
 use domain::{
     ContentHash, EvidenceCitation, SpecDocument, SpecDocumentLoadError, SpecElementId, SpecRef,
@@ -59,6 +63,7 @@ use super::{
     CheckTestObligationsApplicationService, CheckTestObligationsCommand,
     CheckTestObligationsInteractor,
 };
+use crate::test_obligation::derive::derive_obligations_document;
 use crate::test_obligation::{
     LoadedCatalogueDocument, TestObligationCatalogueCommandInput, obligation_declaration_text,
     obligation_declaration_text_from_loaded, sha256_content_hash,
@@ -116,14 +121,29 @@ impl TestBindingsArtifactPort for StubBindings {
     }
 }
 
-struct ReadOnlyBindings(TestBindingsDocument);
+struct ReadOnlyBindings {
+    document: TestBindingsDocument,
+    save_calls: AtomicUsize,
+}
+
+impl ReadOnlyBindings {
+    fn new(document: TestBindingsDocument) -> Self {
+        Self { document, save_calls: AtomicUsize::new(0) }
+    }
+
+    fn save_calls(&self) -> usize {
+        self.save_calls.load(Ordering::SeqCst)
+    }
+}
+
 impl TestBindingsArtifactPort for ReadOnlyBindings {
     fn load(&self, _t: &TrackId) -> Result<Option<TestBindingsDocument>, ArtifactCodecError> {
-        Ok(Some(self.0.clone()))
+        Ok(Some(self.document.clone()))
     }
 
     fn save(&self, _d: &TestBindingsDocument) -> Result<(), DiagnosticMessage> {
-        Err(DiagnosticMessage::try_new("check must not save bindings".to_owned()).unwrap())
+        self.save_calls.fetch_add(1, Ordering::SeqCst);
+        Ok(())
     }
 }
 
@@ -223,13 +243,34 @@ const DATA_ROLE_NAMES: &[&str] = &[
 const CONTRACT_ROLE_NAMES: &[&str] =
     &["SpecificationPort", "ApplicationService", "SecondaryPort", "Repository"];
 
-/// Minimal valid rules document: every role covered with an explicitly empty
-/// rule list. The check gate's rules-load contract is load-and-validate only
-/// (IN-08); no downstream lane inspects the rules content.
+/// Minimal valid rules document with one obligation for the fixture catalogue.
+///
+/// Keeping the fixture artifact derived from the same shared projection used by
+/// `check` makes the non-staleness tests exercise their intended gate lanes.
 fn rules_doc() -> TestObligationRulesDocument {
+    rules_doc_with_value_object_rules(vec![TestObligationRule::new(
+        TestObligationKind::Boundary,
+        TestObligationPerAxis::Entry,
+        None,
+        None,
+    )])
+}
+
+fn rules_doc_with_value_object_rules(
+    value_object_rules: Vec<TestObligationRule>,
+) -> TestObligationRulesDocument {
     let empty = || RoleObligationRules::new(vec![]);
-    let data_roles: Vec<(DataRole, RoleObligationRules)> =
-        DATA_ROLE_NAMES.iter().map(|n| (n.parse::<DataRole>().unwrap(), empty())).collect();
+    let data_roles: Vec<(DataRole, RoleObligationRules)> = DATA_ROLE_NAMES
+        .iter()
+        .map(|name| {
+            let rules = if *name == "ValueObject" {
+                RoleObligationRules::new(value_object_rules.clone())
+            } else {
+                empty()
+            };
+            (name.parse::<DataRole>().unwrap(), rules)
+        })
+        .collect();
     let contract_roles: Vec<(ContractRole, RoleObligationRules)> =
         CONTRACT_ROLE_NAMES.iter().map(|n| (n.parse::<ContractRole>().unwrap(), empty())).collect();
     let function_roles =
@@ -237,6 +278,32 @@ fn rules_doc() -> TestObligationRulesDocument {
     let patterns = vec![(TestObligationPatternKind::Typestate, empty())];
     let trait_impls: Vec<(ContractRole, RoleObligationRules)> =
         CONTRACT_ROLE_NAMES.iter().map(|n| (n.parse::<ContractRole>().unwrap(), empty())).collect();
+    TestObligationRulesDocument::try_new(
+        data_roles,
+        contract_roles,
+        function_roles,
+        patterns,
+        trait_impls,
+    )
+    .unwrap()
+}
+
+/// A valid rules document that derives no obligations from the fixture catalogue.
+fn empty_rules_doc() -> TestObligationRulesDocument {
+    let empty = || RoleObligationRules::new(vec![]);
+    let data_roles: Vec<(DataRole, RoleObligationRules)> =
+        DATA_ROLE_NAMES.iter().map(|name| (name.parse::<DataRole>().unwrap(), empty())).collect();
+    let contract_roles: Vec<(ContractRole, RoleObligationRules)> = CONTRACT_ROLE_NAMES
+        .iter()
+        .map(|name| (name.parse::<ContractRole>().unwrap(), empty()))
+        .collect();
+    let function_roles =
+        vec![(FunctionRole::FreeFunction, empty()), (FunctionRole::UseCaseFunction, empty())];
+    let patterns = vec![(TestObligationPatternKind::Typestate, empty())];
+    let trait_impls: Vec<(ContractRole, RoleObligationRules)> = CONTRACT_ROLE_NAMES
+        .iter()
+        .map(|name| (name.parse::<ContractRole>().unwrap(), empty()))
+        .collect();
     TestObligationRulesDocument::try_new(
         data_roles,
         contract_roles,
@@ -276,7 +343,20 @@ fn unknown_edge() -> TestObligationEdgeId {
 }
 
 fn obligation() -> TestObligation {
-    obligation_with_item("invariant:positive")
+    derived_obligations(rules_doc(), money_catalogue()).obligations().first().cloned().unwrap()
+}
+
+fn derived_obligations(
+    rules: TestObligationRulesDocument,
+    catalogue: CatalogueDocument,
+) -> ObligationsDocument {
+    derive_obligations_document(
+        track(),
+        &rules,
+        &[(PathBuf::from("domain-types.json"), catalogue)],
+        &RoleObligationItemsProjector::new(),
+    )
+    .unwrap()
 }
 
 fn obligation_with_item(item: &str) -> TestObligation {
@@ -299,45 +379,11 @@ fn obligation_with_item(item: &str) -> TestObligation {
 }
 
 fn trait_impl_obligation() -> TestObligation {
-    TestObligation::new(
-        TestObligationId::new(
-            entry_key(),
-            TestObligationKind::ContractConformance,
-            TestObligationItemIdentifier::try_new("trait_impl:MyPort".to_owned()).unwrap(),
-        ),
-        CatalogueEntryRef::new(
-            "domain-types.json".to_owned(),
-            CatalogueSectionKey::Traits,
-            entry_key(),
-        ),
-        TargetEntryRoleKind::TraitImpl(ContractRole::SecondaryPort),
-        TestObligationBrief::try_new("cover impl".to_owned()).unwrap(),
-        DeclarationHash::new(sha256_content_hash(
-            obligation_declaration_text(&[money_catalogue()], &trait_impl_obligation_seed())
-                .unwrap()
-                .as_bytes(),
-        )),
-        vec![anchor()],
-    )
-}
-
-fn trait_impl_obligation_seed() -> TestObligation {
-    TestObligation::new(
-        TestObligationId::new(
-            entry_key(),
-            TestObligationKind::ContractConformance,
-            TestObligationItemIdentifier::try_new("trait_impl:MyPort".to_owned()).unwrap(),
-        ),
-        CatalogueEntryRef::new(
-            "domain-types.json".to_owned(),
-            CatalogueSectionKey::Traits,
-            entry_key(),
-        ),
-        TargetEntryRoleKind::TraitImpl(ContractRole::SecondaryPort),
-        TestObligationBrief::try_new("cover impl".to_owned()).unwrap(),
-        DeclarationHash::new(ContentHash::from_bytes([0u8; 32])),
-        vec![anchor()],
-    )
+    derived_obligations(trait_impl_rules_doc(), trait_impl_catalogue())
+        .obligations()
+        .first()
+        .cloned()
+        .unwrap()
 }
 
 fn location() -> TestLocation {
@@ -444,6 +490,72 @@ fn money_catalogue_with_role(role: DataRole) -> CatalogueDocument {
     doc
 }
 
+fn trait_impl_catalogue() -> CatalogueDocument {
+    let mut catalogue = money_catalogue_with_role(DataRole::value_object());
+    catalogue.insert_trait(
+        TraitName::new("MyPort").unwrap(),
+        TraitEntry::new(
+            ItemAction::Reference,
+            ContractRole::SecondaryPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![SpecRef::new(
+                PathBuf::from("spec.json"),
+                SpecElementId::try_new("IN-05").unwrap(),
+            )],
+            vec![],
+        ),
+    );
+    catalogue.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("MyPort").unwrap(),
+        TypeRef::new("Money").unwrap(),
+    ));
+    catalogue
+}
+
+fn trait_impl_rules_doc() -> TestObligationRulesDocument {
+    let empty = || RoleObligationRules::new(vec![]);
+    let data_roles: Vec<(DataRole, RoleObligationRules)> =
+        DATA_ROLE_NAMES.iter().map(|name| (name.parse::<DataRole>().unwrap(), empty())).collect();
+    let contract_roles: Vec<(ContractRole, RoleObligationRules)> = CONTRACT_ROLE_NAMES
+        .iter()
+        .map(|name| (name.parse::<ContractRole>().unwrap(), empty()))
+        .collect();
+    let function_roles =
+        vec![(FunctionRole::FreeFunction, empty()), (FunctionRole::UseCaseFunction, empty())];
+    let patterns = vec![(TestObligationPatternKind::Typestate, empty())];
+    let trait_impls: Vec<(ContractRole, RoleObligationRules)> = CONTRACT_ROLE_NAMES
+        .iter()
+        .map(|name| {
+            let rules = if *name == "SecondaryPort" {
+                RoleObligationRules::new(vec![TestObligationRule::new(
+                    TestObligationKind::ContractConformance,
+                    TestObligationPerAxis::TraitImpl,
+                    None,
+                    None,
+                )])
+            } else {
+                empty()
+            };
+            (name.parse::<ContractRole>().unwrap(), rules)
+        })
+        .collect();
+    TestObligationRulesDocument::try_new(
+        data_roles,
+        contract_roles,
+        function_roles,
+        patterns,
+        trait_impls,
+    )
+    .unwrap()
+}
+
 fn trait_entry(role: ContractRole) -> TraitEntry {
     TraitEntry::new(
         ItemAction::Add,
@@ -500,16 +612,55 @@ fn fresh_fulfillment_cache() -> ObligationFulfillmentCacheDocument {
 }
 
 fn fresh_fulfillment_cache_for(obligation: &TestObligation) -> ObligationFulfillmentCacheDocument {
-    fresh_fulfillment_cache_for_fingerprint(obligation, Some(fulfillment_verifier_fingerprint()))
+    fresh_fulfillment_cache_for_catalogue(
+        obligation,
+        &money_catalogue(),
+        Some(fulfillment_verifier_fingerprint()),
+    )
+}
+
+fn fresh_voluntary_fulfillment_cache() -> ObligationFulfillmentCacheDocument {
+    let catalogue = money_catalogue();
+    let bound = BoundTestsSetHash::new(sha256_content_hash(format!("{BODY}\n").as_bytes()));
+    let declaration = DeclarationHash::new(sha256_content_hash(
+        obligation_declaration_text(std::slice::from_ref(&catalogue), &obligation())
+            .unwrap()
+            .as_bytes(),
+    ));
+    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
+    let entry = ObligationFulfillmentCacheEntry::new(
+        edge(),
+        TestObligationId::new(
+            entry_key(),
+            TestObligationKind::Logic,
+            TestObligationItemIdentifier::try_new("voluntary:IN-05".to_owned()).unwrap(),
+        ),
+        ObligationFulfillmentCacheKey::new(bound, declaration, anchor_hash),
+        ObligationFulfillmentVerdict::Fulfilled {
+            citation: EvidenceCitation::try_new("asserts positivity".to_owned()).unwrap(),
+        },
+        Some(fulfillment_verifier_fingerprint()),
+    );
+    ObligationFulfillmentCacheDocument::new(track(), vec![entry])
 }
 
 fn fresh_fulfillment_cache_for_fingerprint(
     obligation: &TestObligation,
     verifier_fingerprint: Option<VerifierPromptFingerprint>,
 ) -> ObligationFulfillmentCacheDocument {
+    fresh_fulfillment_cache_for_catalogue(obligation, &money_catalogue(), verifier_fingerprint)
+}
+
+fn fresh_fulfillment_cache_for_catalogue(
+    obligation: &TestObligation,
+    catalogue: &CatalogueDocument,
+    verifier_fingerprint: Option<VerifierPromptFingerprint>,
+) -> ObligationFulfillmentCacheDocument {
     let bound = BoundTestsSetHash::new(sha256_content_hash(format!("{BODY}\n").as_bytes()));
     let decl = DeclarationHash::new(sha256_content_hash(
-        obligation_declaration_text(&[money_catalogue()], obligation).unwrap().as_bytes(),
+        obligation_declaration_text(std::slice::from_ref(catalogue), obligation)
+            .unwrap()
+            .as_bytes(),
     ));
     let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
     let entry = ObligationFulfillmentCacheEntry::new(
@@ -525,17 +676,31 @@ fn fresh_fulfillment_cache_for_fingerprint(
 }
 
 fn fresh_waiver_cache_for(obligation: &TestObligation) -> WaiverCacheDocument {
-    fresh_waiver_cache_for_fingerprint(obligation, Some(waiver_verifier_fingerprint()))
+    fresh_waiver_cache_for_catalogue(
+        obligation,
+        &money_catalogue(),
+        Some(waiver_verifier_fingerprint()),
+    )
 }
 
 fn fresh_waiver_cache_for_fingerprint(
     obligation: &TestObligation,
     verifier_fingerprint: Option<VerifierPromptFingerprint>,
 ) -> WaiverCacheDocument {
+    fresh_waiver_cache_for_catalogue(obligation, &money_catalogue(), verifier_fingerprint)
+}
+
+fn fresh_waiver_cache_for_catalogue(
+    obligation: &TestObligation,
+    catalogue: &CatalogueDocument,
+    verifier_fingerprint: Option<VerifierPromptFingerprint>,
+) -> WaiverCacheDocument {
     let reason = WaivedReason::try_new("covered elsewhere".to_owned()).unwrap();
     let reason_hash = WaivedReasonHash::new(sha256_content_hash(reason.as_str().as_bytes()));
     let decl = DeclarationHash::new(sha256_content_hash(
-        obligation_declaration_text(&[money_catalogue()], obligation).unwrap().as_bytes(),
+        obligation_declaration_text(std::slice::from_ref(catalogue), obligation)
+            .unwrap()
+            .as_bytes(),
     ));
     let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
     let entry = WaiverCacheEntry::new(
@@ -567,8 +732,29 @@ fn interactor_with_scanner(
     waiver: Option<WaiverCacheDocument>,
     scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
 ) -> CheckTestObligationsInteractor {
+    interactor_with_rules_and_catalogue(
+        obligations,
+        bindings,
+        fulfillment,
+        waiver,
+        rules_doc(),
+        money_catalogue(),
+        scanner,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn interactor_with_rules_and_catalogue(
+    obligations: Option<ObligationsDocument>,
+    bindings: Option<TestBindingsDocument>,
+    fulfillment: Option<ObligationFulfillmentCacheDocument>,
+    waiver: Option<WaiverCacheDocument>,
+    rules: TestObligationRulesDocument,
+    catalogue: CatalogueDocument,
+    scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
+) -> CheckTestObligationsInteractor {
     CheckTestObligationsInteractor::new(
-        Arc::new(StubRules::valid()),
+        Arc::new(StubRules { doc: rules }),
         Arc::new(StubObligations(obligations)),
         Arc::new(StubBindings(bindings)),
         scanner,
@@ -577,7 +763,25 @@ fn interactor_with_scanner(
         fulfillment_verifier_fingerprint(),
         waiver_verifier_fingerprint(),
         Arc::new(StubSpec(spec_doc())),
-        Arc::new(StubCatalogue(money_catalogue())),
+        Arc::new(StubCatalogue(catalogue)),
+    )
+}
+
+fn interactor_with_rules(
+    obligations: Option<ObligationsDocument>,
+    bindings: Option<TestBindingsDocument>,
+    fulfillment: Option<ObligationFulfillmentCacheDocument>,
+    waiver: Option<WaiverCacheDocument>,
+    rules: TestObligationRulesDocument,
+) -> CheckTestObligationsInteractor {
+    interactor_with_rules_and_catalogue(
+        obligations,
+        bindings,
+        fulfillment,
+        waiver,
+        rules,
+        money_catalogue(),
+        Arc::new(StubScanner),
     )
 }
 
@@ -759,7 +963,9 @@ fn test_orphaned_binding_is_a_drift() {
     // IN-13 / CN-11: a Fulfillment binding for a non-derived obligation is `orphaned`.
     let obligations = ObligationsDocument::new(track(), vec![]);
     let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
-    let result = interactor(Some(obligations), Some(bindings), None, None).execute(&command());
+    let result =
+        interactor_with_rules(Some(obligations), Some(bindings), None, None, empty_rules_doc())
+            .execute(&command());
     assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));
 }
 
@@ -768,7 +974,9 @@ fn test_orphaned_waiver_binding_is_a_drift() {
     // IN-13 / CN-11: a Waiver binding for a no-longer-derived edge is `orphaned`.
     let obligations = ObligationsDocument::new(track(), vec![]);
     let bindings = TestBindingsDocument::new(track(), vec![waiver_binding_for(unknown_edge())]);
-    let result = interactor(Some(obligations), Some(bindings), None, None).execute(&command());
+    let result =
+        interactor_with_rules(Some(obligations), Some(bindings), None, None, empty_rules_doc())
+            .execute(&command());
     assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));
 }
 
@@ -778,7 +986,9 @@ fn test_zero_obligation_cited_edge_without_binding_is_unresolved() {
     // even when the decision table derives zero obligations for it.
     let obligations = ObligationsDocument::new(track(), vec![]);
     let bindings = TestBindingsDocument::new(track(), vec![]);
-    let result = interactor(Some(obligations), Some(bindings), None, None).execute(&command());
+    let result =
+        interactor_with_rules(Some(obligations), Some(bindings), None, None, empty_rules_doc())
+            .execute(&command());
     assert!(matches!(result, Err(ObligationCheckError::UnresolvedEdges { .. })));
 }
 
@@ -789,9 +999,35 @@ fn test_zero_obligation_cited_edge_waiver_resolves() {
     let bindings = TestBindingsDocument::new(track(), vec![waiver_binding()]);
     let cache = fresh_waiver_cache_for(&obligation());
 
-    let outcome = interactor(Some(obligations), Some(bindings), None, Some(cache))
-        .execute(&command())
-        .unwrap();
+    let outcome = interactor_with_rules(
+        Some(obligations),
+        Some(bindings),
+        None,
+        Some(cache),
+        empty_rules_doc(),
+    )
+    .execute(&command())
+    .unwrap();
+
+    assert_eq!(outcome.resolved_edges(), &[edge()]);
+}
+
+#[test]
+fn test_zero_obligation_cited_edge_voluntary_binding_resolves() {
+    // AC-04 / D9: an edge-direct voluntary binding is valid without a derived obligation.
+    let obligations = ObligationsDocument::new(track(), vec![]);
+    let bindings = TestBindingsDocument::new(track(), vec![voluntary_binding()]);
+    let cache = fresh_voluntary_fulfillment_cache();
+
+    let outcome = interactor_with_rules(
+        Some(obligations),
+        Some(bindings),
+        Some(cache),
+        None,
+        empty_rules_doc(),
+    )
+    .execute(&command())
+    .unwrap();
 
     assert_eq!(outcome.resolved_edges(), &[edge()]);
 }
@@ -809,13 +1045,148 @@ fn test_fresh_fulfilled_verdict_resolves_edge() {
 }
 
 #[test]
+fn test_new_accepts_and_wires_declared_dependencies() {
+    let obligations = derived_obligations(rules_doc(), money_catalogue());
+    let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+    let fulfillment_fingerprint =
+        VerifierPromptFingerprint::new(ContentHash::from_bytes([17u8; 32]));
+    let waiver_fingerprint = VerifierPromptFingerprint::new(ContentHash::from_bytes([23u8; 32]));
+    let interactor = CheckTestObligationsInteractor::new(
+        Arc::new(StubRules::valid()),
+        Arc::new(StubObligations(Some(obligations.clone()))),
+        Arc::new(StubBindings(Some(bindings))),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(Some(fresh_fulfillment_cache_for_fingerprint(
+            &obligation(),
+            Some(fulfillment_fingerprint.clone()),
+        )))),
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_fingerprint.clone(),
+        waiver_fingerprint.clone(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+    );
+
+    let outcome = interactor.execute(&command()).unwrap();
+
+    assert_eq!(outcome.resolved_edges(), &[edge()]);
+
+    let waiver_interactor = CheckTestObligationsInteractor::new(
+        Arc::new(StubRules::valid()),
+        Arc::new(StubObligations(Some(obligations))),
+        Arc::new(StubBindings(Some(TestBindingsDocument::new(track(), vec![waiver_binding()])))),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(None)),
+        Arc::new(StubWaiverCache(Some(fresh_waiver_cache_for_fingerprint(
+            &obligation(),
+            Some(waiver_fingerprint.clone()),
+        )))),
+        fulfillment_fingerprint,
+        waiver_fingerprint,
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+    );
+
+    let waiver_outcome = waiver_interactor.execute(&command()).unwrap();
+
+    assert_eq!(waiver_outcome.resolved_edges(), &[edge()]);
+}
+
+#[test]
+fn test_matching_obligations_artifact_passes_check() {
+    let obligations = derived_obligations(rules_doc(), money_catalogue());
+    let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+
+    let outcome =
+        interactor(Some(obligations), Some(bindings), Some(fresh_fulfillment_cache()), None)
+            .execute(&command())
+            .unwrap();
+
+    assert_eq!(outcome.resolved_edges(), &[edge()]);
+}
+
+#[test]
+fn test_rules_adding_obligation_marks_artifact_stale() {
+    let persisted = derived_obligations(rules_doc(), money_catalogue());
+    let bindings = TestBindingsDocument::new(track(), vec![]);
+    let rules = rules_doc_with_value_object_rules(vec![
+        TestObligationRule::new(
+            TestObligationKind::Boundary,
+            TestObligationPerAxis::Entry,
+            None,
+            None,
+        ),
+        TestObligationRule::new(
+            TestObligationKind::Result,
+            TestObligationPerAxis::Entry,
+            None,
+            None,
+        ),
+    ]);
+
+    let result = interactor_with_rules(Some(persisted), Some(bindings), None, None, rules)
+        .execute(&command());
+
+    assert!(matches!(
+        result,
+        Err(ObligationCheckError::StaleObligationsArtifact { detail })
+            if detail.as_str().contains("added=1")
+    ));
+}
+
+#[test]
+fn test_removed_obligation_marks_artifact_stale() {
+    let persisted = derived_obligations(rules_doc(), money_catalogue());
+    let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+
+    let result =
+        interactor_with_rules(Some(persisted), Some(bindings), None, None, empty_rules_doc())
+            .execute(&command());
+
+    assert!(matches!(
+        result,
+        Err(ObligationCheckError::StaleObligationsArtifact { detail })
+            if detail.as_str().contains("removed=1")
+    ));
+}
+
+#[test]
+fn test_changed_obligation_declaration_hash_marks_artifact_stale() {
+    let expected = obligation();
+    let stale = TestObligation::new(
+        expected.id().clone(),
+        expected.target_entry().clone(),
+        expected.target_role().clone(),
+        expected.brief().clone(),
+        DeclarationHash::new(ContentHash::from_bytes([7u8; 32])),
+        expected.spec_refs().to_vec(),
+    );
+    let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding_for(&stale)]);
+
+    let result = interactor(
+        Some(ObligationsDocument::new(track(), vec![stale])),
+        Some(bindings),
+        None,
+        None,
+    )
+    .execute(&command());
+
+    assert!(matches!(
+        result,
+        Err(ObligationCheckError::StaleObligationsArtifact { detail })
+            if detail.as_str().contains("changed=1")
+    ));
+}
+
+#[test]
 fn test_check_reads_bindings_without_mutating_the_artifact() {
     let obligations = ObligationsDocument::new(track(), vec![obligation()]);
     let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+    let bindings_port = Arc::new(ReadOnlyBindings::new(bindings));
     let interactor = CheckTestObligationsInteractor::new(
         Arc::new(StubRules::valid()),
         Arc::new(StubObligations(Some(obligations))),
-        Arc::new(ReadOnlyBindings(bindings)),
+        bindings_port.clone(),
         Arc::new(StubScanner),
         Arc::new(StubFulfillmentCache(Some(fresh_fulfillment_cache()))),
         Arc::new(StubWaiverCache(None)),
@@ -828,6 +1199,7 @@ fn test_check_reads_bindings_without_mutating_the_artifact() {
     let outcome = interactor.execute(&command()).unwrap();
 
     assert_eq!(outcome.resolved_edges(), &[edge()]);
+    assert_eq!(bindings_port.save_calls(), 0);
 }
 
 #[test]
@@ -910,14 +1282,11 @@ fn test_voluntary_binding_migrates_to_newly_derived_obligation() {
 
 #[test]
 fn test_fulfillment_cache_entry_must_match_obligation_id() {
-    let first = obligation_with_item("invariant:first");
-    let second = obligation_with_item("invariant:second");
-    let obligations = ObligationsDocument::new(track(), vec![first.clone(), second.clone()]);
-    let bindings = TestBindingsDocument::new(
-        track(),
-        vec![fulfillment_binding_for(&first), fulfillment_binding_for(&second)],
-    );
-    let cache = fresh_fulfillment_cache_for(&first);
+    let expected = obligation();
+    let wrong_obligation_id = obligation_with_item("invariant:first");
+    let obligations = ObligationsDocument::new(track(), vec![expected.clone()]);
+    let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding_for(&expected)]);
+    let cache = fresh_fulfillment_cache_for(&wrong_obligation_id);
 
     let result =
         interactor(Some(obligations), Some(bindings), Some(cache), None).execute(&command());
@@ -930,11 +1299,23 @@ fn test_trait_impl_declaration_hash_resolves_from_impl_decl() {
     let obligation = trait_impl_obligation();
     let obligations = ObligationsDocument::new(track(), vec![obligation.clone()]);
     let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding_for(&obligation)]);
-    let cache = fresh_fulfillment_cache_for(&obligation);
+    let cache = fresh_fulfillment_cache_for_catalogue(
+        &obligation,
+        &trait_impl_catalogue(),
+        Some(fulfillment_verifier_fingerprint()),
+    );
 
-    let outcome = interactor(Some(obligations), Some(bindings), Some(cache), None)
-        .execute(&command())
-        .unwrap();
+    let outcome = interactor_with_rules_and_catalogue(
+        Some(obligations),
+        Some(bindings),
+        Some(cache),
+        None,
+        trait_impl_rules_doc(),
+        trait_impl_catalogue(),
+        Arc::new(StubScanner),
+    )
+    .execute(&command())
+    .unwrap();
 
     assert_eq!(outcome.resolved_edges(), &[edge()]);
 }
@@ -944,11 +1325,23 @@ fn test_trait_impl_waiver_declaration_hash_resolves_from_impl_decl() {
     let obligation = trait_impl_obligation();
     let obligations = ObligationsDocument::new(track(), vec![obligation.clone()]);
     let bindings = TestBindingsDocument::new(track(), vec![waiver_binding()]);
-    let cache = fresh_waiver_cache_for(&obligation);
+    let cache = fresh_waiver_cache_for_catalogue(
+        &obligation,
+        &trait_impl_catalogue(),
+        Some(waiver_verifier_fingerprint()),
+    );
 
-    let outcome = interactor(Some(obligations), Some(bindings), None, Some(cache))
-        .execute(&command())
-        .unwrap();
+    let outcome = interactor_with_rules_and_catalogue(
+        Some(obligations),
+        Some(bindings),
+        None,
+        Some(cache),
+        trait_impl_rules_doc(),
+        trait_impl_catalogue(),
+        Arc::new(StubScanner),
+    )
+    .execute(&command())
+    .unwrap();
 
     assert_eq!(outcome.resolved_edges(), &[edge()]);
 }

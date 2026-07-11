@@ -637,6 +637,41 @@ mod tests {
     }
 
     #[test]
+    fn test_derive_then_check_real_catalogues_does_not_report_stale_obligations() {
+        let temp = fixture_workspace(&[
+            "spec.json",
+            "domain-types.json",
+            "usecase-types.json",
+            "infrastructure-types.json",
+            "cli_composition-types.json",
+            "cli_driver-types.json",
+            "cli-types.json",
+            "test-bindings.json",
+        ]);
+        let workspace_root = temp.path().join("workspace");
+
+        let derive_exit = execute_derive_with(
+            &TestObligationDeriveArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },
+            || Ok((fixture_root(&workspace_root), format!("track/{OBLIGATION_TRACK_ID}"))),
+            |root, input| driver_outcome_to_exit(root.derive_handler().handle(input)),
+        );
+        assert_eq!(derive_exit, ExitCode::SUCCESS);
+
+        let check_input = TestObligationCheckInput::try_from_raw(
+            Some(OBLIGATION_TRACK_ID.to_owned()),
+            BRANCH_NOT_READ.to_owned(),
+        )
+        .unwrap();
+        let outcome = fixture_root(&workspace_root).check_handler().handle(check_input);
+        let diagnostic = outcome.stderr.unwrap_or_default();
+
+        assert!(
+            !diagnostic.contains("stale obligations artifact"),
+            "derive → check must share the persisted-obligation construction: {diagnostic}"
+        );
+    }
+
+    #[test]
     fn test_execute_check_partial_artifact_scope_returns_failure() {
         let temp = fixture_workspace(&["obligations.json"]);
         let workspace_root = temp.path().join("workspace");

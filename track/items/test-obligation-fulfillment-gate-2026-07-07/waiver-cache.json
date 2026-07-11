@@ -126,7 +126,7 @@
       "key": {
         "waived_reason_hash": "2a882002763f609d12b6b806bdf27b6a963101f7a6fb0e6a2dd6bcd2bc6e27f4",
         "declaration_hash": "0ab80fb0409e22d805a88634a73ee9d1b8120843a468ee90091f18f4e905fc0b",
-        "anchor_text_hash": "c8eb5ee4ee4d8332f5431abb9438c23966eeea88bd0f6088cc84be6c5c1f4031"
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
       },
       "verdict": {
         "kind": "waived",
@@ -259,11 +259,11 @@
       "key": {
         "waived_reason_hash": "eeecd0f5217332ffc520340a70c23678d7830773678f4b2e59f7467b2babab09",
         "declaration_hash": "34219b65b2085ca4367bba24fb559e7aa19fe51763a97d946eddb6aad14f39d6",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "role: ValueObject { invariants: [] }"
+        "citation": "Validated diagnostic-message newtype used by test-obligation errors and verdicts; see IN-08 / IN-09 / IN-10."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -335,11 +335,11 @@
       "key": {
         "waived_reason_hash": "a988ee385b7c10b3ff134efd9deac5954df98c2c10f09b4b3ac2970855f9632b",
         "declaration_hash": "1b364228145485f31c6358ff481a4a6ffbee337feb33ac528396ed01a6b9655a",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "role: ValueObject { invariants: [] }, kind: Enum ..., methods: []"
+        "citation": "invariants: [], methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -543,8 +543,8 @@
       },
       "key": {
         "waived_reason_hash": "c3840e67fa86483c03b50f122ccf1e79946ed412504b5391d26c10e9d7e09b4e",
-        "declaration_hash": "9952c45e1b5f007ad6273d9825d2620252090a089e745468c17be74aa1802429",
-        "anchor_text_hash": "c8eb5ee4ee4d8332f5431abb9438c23966eeea88bd0f6088cc84be6c5c1f4031"
+        "declaration_hash": "397b1db103c8aa03b785dd85e130cf033119c3e9bb549426fb3dffce922dd84b",
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
       },
       "verdict": {
         "kind": "waived",
@@ -562,12 +562,12 @@
       },
       "key": {
         "waived_reason_hash": "93a6a6284878bfdd8d1ddde4e98a8fa591abcc2b7de811f4d62a9bebe9af6ef1",
-        "declaration_hash": "9952c45e1b5f007ad6273d9825d2620252090a089e745468c17be74aa1802429",
+        "declaration_hash": "397b1db103c8aa03b785dd85e130cf033119c3e9bb549426fb3dffce922dd84b",
         "anchor_text_hash": "2ec5d0f388487e1a45112cb601d93a18d6a58dd72131c07a45a9f7ba9471da14"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "role: ErrorType, kind: Enum {"
+        "citation": "methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -581,7 +581,7 @@
       },
       "key": {
         "waived_reason_hash": "26ecd1f5789def2a57987a2560a01a5994de8e3280f4027d6e1c707068ba2747",
-        "declaration_hash": "9952c45e1b5f007ad6273d9825d2620252090a089e745468c17be74aa1802429",
+        "declaration_hash": "397b1db103c8aa03b785dd85e130cf033119c3e9bb549426fb3dffce922dd84b",
         "anchor_text_hash": "4802b74415a134607211305c91ff4d591a481cc1ae3e15a6cb105a84ca3d96ec"
       },
       "verdict": {
@@ -972,25 +972,6 @@
     },
     {
       "edge_id": {
-        "entry_key": "ObligationsDocument",
-        "anchor_id": {
-          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "element_id": "AC-03"
-        }
-      },
-      "key": {
-        "waived_reason_hash": "132b7c49d3486ae81369f53885d0261da52ce9da078d2bcb33a23db5bcbed5d9",
-        "declaration_hash": "b2df329068feb69edca220f2362d395cd48c0eb75bc34565dcf359d716ff682b",
-        "anchor_text_hash": "23ef7b6f69fba30ba0154c5a917cde7d21d58c34c8a688f6b54a554405bd4b76"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "Document value object for derived test obligations; see IN-05 / AC-03."
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
         "entry_key": "RefVerifyCacheKey",
         "anchor_id": {
           "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
@@ -1133,45 +1114,7 @@
       "key": {
         "waived_reason_hash": "95a759ec258f924ad50bb142d26e484c8bd6285019077e8541ebd90d00f892f4",
         "declaration_hash": "b067fd33dc2f3be8c92e0a2d4ab68a7a00e7c2c586a2f10dc330a81e9a60ba20",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "TargetEntryRoleKind",
-        "anchor_id": {
-          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "element_id": "IN-07"
-        }
-      },
-      "key": {
-        "waived_reason_hash": "ec2d01f6c3a6fb09ecfb758485a67bee39f5a5c1e2a66f42522a94e914efaa38",
-        "declaration_hash": "e918c9977607e39f7fd0ab2d410c9507138eded4fbd808ad1012fdde5c0d4447",
-        "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "role: ValueObject { invariants: [] }, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"DataRole\")), payload: Tuple([TypeRef(\"DataRole\")]) }, VariantDecl { name: VariantName(Identifier(\"ContractRole\")), payload: Tuple([TypeRef(\"ContractRole\")]) }, VariantDecl { name: VariantName(Identifier(\"FunctionRole\")), payload: Tuple([TypeRef(\"FunctionRole\")]) }, VariantDecl { name: VariantName(Identifier(\"TraitImpl\")), payload: Tuple([TypeRef(\"ContractRole\")]) }, VariantDecl { name: VariantName(Identifier(\"Pattern\")), payload: Tuple([TypeRef(\"TestObligationPatternKind\")]) }] }, methods: []"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "TargetEntryRoleKind",
-        "anchor_id": {
-          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "element_id": "IN-17"
-        }
-      },
-      "key": {
-        "waived_reason_hash": "47a0d70482a5706aa6c06264dfe4b21593431d90ba91783dace93b6f55ddbde0",
-        "declaration_hash": "e918c9977607e39f7fd0ab2d410c9507138eded4fbd808ad1012fdde5c0d4447",
-        "anchor_text_hash": "3357d986d9171bee78e1b975e78461e8ae02d6b1cf86f56a1774605d038d28a1"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "waived",
@@ -1228,11 +1171,11 @@
       "key": {
         "waived_reason_hash": "acf165795b6f9be7953d49ae8abc188d81429e336348e1167cd68781fe272dae",
         "declaration_hash": "092933c73a4bbd171185cc51a96b74804fb8fdb8e1846ec004374fb48e07c462",
-        "anchor_text_hash": "c8eb5ee4ee4d8332f5431abb9438c23966eeea88bd0f6088cc84be6c5c1f4031"
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "role: ValueObject { invariants: [] }"
+        "citation": "Document value object for test-bindings artifacts; see IN-06 / AC-04."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1513,11 +1456,11 @@
       "key": {
         "waived_reason_hash": "3cc481a7a687f7b803542b6d7caa937aea821c9da328df9be70a4d509ed89bd8",
         "declaration_hash": "1bf4dc0a09280c76a485ff41d35e02e2606b2648002a8f5957c9f8faee5bd66b",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "docs: Some(DocString(\"Shared catalogue snapshot command input for derive/check commands; see IN-07 / IN-08.\"))"
+        "citation": "Shared catalogue snapshot command input for derive/check commands; see IN-07 / IN-08."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1551,11 +1494,11 @@
       "key": {
         "waived_reason_hash": "0b4b03f80841130d47725d0c96e56ae4980892c62504f996d17e89a59589d7a5",
         "declaration_hash": "ad3aaba31fdf06c14845d7a453f3c2e3127db4234ea852cf116f666e7f9967ac",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "role: Dto, kind: Struct(StructKind { shape: Plain { fields: [FieldDecl { name: FieldName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }], has_stripped_fields: false }, typestate: None }), methods: [], generics: [], where_predicates: []"
+        "citation": "methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1570,7 +1513,7 @@
       "key": {
         "waived_reason_hash": "172db0cd535726246145b814ab53b558f71f7bfb9c60d98ff7f461956c1d9d6d",
         "declaration_hash": "85f9e5506eeaf45d1a8dedeeeba9d18bdbf0588aba0a7634b6b3f6310bc7402a",
-        "anchor_text_hash": "c8eb5ee4ee4d8332f5431abb9438c23966eeea88bd0f6088cc84be6c5c1f4031"
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
       },
       "verdict": {
         "kind": "waived",
@@ -1608,11 +1551,11 @@
       "key": {
         "waived_reason_hash": "d99eb9e99c71ea8d09b03a3fd2869c10ca837bfe3b980ff2438282b7181b8502",
         "declaration_hash": "85f9e5506eeaf45d1a8dedeeeba9d18bdbf0588aba0a7634b6b3f6310bc7402a",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+        "citation": "\"cli_driver-local DTO for `sotp test-obligation check`; see IN-08 / AC-04 / AC-10.\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -1779,11 +1722,11 @@
       "key": {
         "waived_reason_hash": "b921ba74b9b7e5447eb19dc98eae9d13bc82707e45e5f13c8eae0d08dbc0efc4",
         "declaration_hash": "03f0718ab322850cf61c0909824634bec66d0bfe5a0bb5c193d53567d2edf77e",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Edge identity value object for test-obligation bindings"
+        "citation": "Edge identity value object for test-obligation bindings; see IN-06 / IN-08 / CN-02."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -2881,11 +2824,11 @@
       "key": {
         "waived_reason_hash": "75717e8bc57d23488634df594035dea1e4a942e74d3dc09ff3617b59e02d0450",
         "declaration_hash": "3a216a3ad381c967b03d3c5a16842721ee0761b130b86256727c12ab4b5abc43",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+        "citation": "Command input for CheckTestObligationsApplicationService; see IN-08."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -2938,7 +2881,7 @@
       "key": {
         "waived_reason_hash": "cc0391db62770b7fefc097b56350596042d119a6ac1e210555eec6ba7029d448",
         "declaration_hash": "0ab80fb0409e22d805a88634a73ee9d1b8120843a468ee90091f18f4e905fc0b",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "waived",
@@ -3146,12 +3089,12 @@
       },
       "key": {
         "waived_reason_hash": "a756de1e0716e9a3e7466b3c97df6399f070a49c62f6bd6529d288def23566f0",
-        "declaration_hash": "9952c45e1b5f007ad6273d9825d2620252090a089e745468c17be74aa1802429",
+        "declaration_hash": "397b1db103c8aa03b785dd85e130cf033119c3e9bb549426fb3dffce922dd84b",
         "anchor_text_hash": "98b477739efddc669f1fb0ae30d514b897ef5d5db9442e55cdfbb0bdd1fdc8cd"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "role: ErrorType, kind: Enum ..., methods: []"
+        "citation": "methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -3165,8 +3108,8 @@
       },
       "key": {
         "waived_reason_hash": "49180157970e7a35194d29b03e4837d6e1bb5a16c7e86245f6ed84a046324efd",
-        "declaration_hash": "9952c45e1b5f007ad6273d9825d2620252090a089e745468c17be74aa1802429",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "declaration_hash": "397b1db103c8aa03b785dd85e130cf033119c3e9bb549426fb3dffce922dd84b",
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "waived",
@@ -3323,25 +3266,6 @@
       "verdict": {
         "kind": "waived",
         "citation": "methods: []"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "ObligationsDocument",
-        "anchor_id": {
-          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
-          "element_id": "IN-05"
-        }
-      },
-      "key": {
-        "waived_reason_hash": "9a1416c9871e94c4719ca1d5aa1370aa360a8861902016f902684413d5ea7877",
-        "declaration_hash": "b2df329068feb69edca220f2362d395cd48c0eb75bc34565dcf359d716ff682b",
-        "anchor_text_hash": "3c5acf05aa2b34161959f8cab9bcb86676033dc7d92f6dd52d6485b17d911066"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "\"role: ValueObject { invariants: [] }\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },

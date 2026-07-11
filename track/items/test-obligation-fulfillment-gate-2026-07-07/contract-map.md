@@ -217,6 +217,7 @@ subgraph domain["domain"]
     T34_domain_domain_ObligationCheckError_RulesLoad[RulesLoad]
     T34_domain_domain_ObligationCheckError_ObligationsAbsent[ObligationsAbsent]
     T34_domain_domain_ObligationCheckError_BindingsAbsent[BindingsAbsent]
+    T34_domain_domain_ObligationCheckError_StaleObligationsArtifact[StaleObligationsArtifact]
     T34_domain_domain_ObligationCheckError_DriftsDetected[DriftsDetected]
     T34_domain_domain_ObligationCheckError_UnresolvedEdges[UnresolvedEdges]
     T34_domain_domain_ObligationCheckError_StaleVerdicts[StaleVerdicts]
@@ -304,6 +305,7 @@ subgraph domain["domain"]
     T33_domain_domain_ObligationsDocument_track_id([track_id])
     T33_domain_domain_ObligationsDocument_obligations([obligations])
     T33_domain_domain_ObligationsDocument_owning_obligation([owning_obligation])
+    T33_domain_domain_ObligationsDocument_staleness_against([staleness_against])
   end
   subgraph T22_domain_domain_RoleName["tddd::test_obligation::ids::RoleName"]
     direction TB
@@ -342,6 +344,7 @@ subgraph domain["domain"]
     T33_domain_domain_TargetEntryRoleKind_FunctionRole[FunctionRole]
     T33_domain_domain_TargetEntryRoleKind_TraitImpl[TraitImpl]
     T33_domain_domain_TargetEntryRoleKind_Pattern[Pattern]
+    T33_domain_domain_TargetEntryRoleKind_canonical_form([canonical_form])
   end
   subgraph T31_domain_domain_TestBindingRecord["tddd::test_obligation::binding::TestBindingRecord"]
     direction TB
@@ -1429,6 +1432,7 @@ T35_domain_domain_NonEmptyTestLocations_try_new --> T35_domain_domain_NonEmptyTe
 T35_domain_domain_NonEmptyTestLocations_as_slice --> T26_domain_domain_TestLocation__self
 T35_domain_domain_NonEmptyTestLocations_first --> T26_domain_domain_TestLocation__self
 T34_domain_domain_ObligationCheckError_RulesLoad --o T42_domain_domain_TestObligationRulesLoadError__self
+T34_domain_domain_ObligationCheckError_StaleObligationsArtifact --o|detail| T31_domain_domain_DiagnosticMessage__self
 T34_domain_domain_ObligationCheckError_DriftsDetected --o|drifts| T28_domain_domain_NonEmptyDrifts__self
 T34_domain_domain_ObligationCheckError_UnresolvedEdges --o|edges| T29_domain_domain_NonEmptyEdgeIds__self
 T34_domain_domain_ObligationCheckError_StaleVerdicts --o|edges| T29_domain_domain_NonEmptyEdgeIds__self
@@ -1491,6 +1495,8 @@ T33_domain_domain_ObligationsDocument_new --> T33_domain_domain_ObligationsDocum
 T33_domain_domain_ObligationsDocument_obligations --> T28_domain_domain_TestObligation__self
 T33_domain_domain_ObligationsDocument_owning_obligation --o T34_domain_domain_TestObligationEdgeId__self
 T33_domain_domain_ObligationsDocument_owning_obligation --> T28_domain_domain_TestObligation__self
+T33_domain_domain_ObligationsDocument_staleness_against --o T33_domain_domain_ObligationsDocument__self
+T33_domain_domain_ObligationsDocument_staleness_against --> T31_domain_domain_DiagnosticMessage__self
 T22_domain_domain_RoleName_try_new --> T22_domain_domain_RoleName__self
 T22_domain_domain_RoleName_try_new --> T29_domain_domain_ValidationError__self
 T42_domain_domain_RoleObligationItemsProjector_new --> T42_domain_domain_RoleObligationItemsProjector__self
@@ -1509,6 +1515,8 @@ T33_domain_domain_RoleObligationRules_new --> T33_domain_domain_RoleObligationRu
 T33_domain_domain_RoleObligationRules_obligations --> T32_domain_domain_TestObligationRule__self
 T35_domain_domain_SemanticVerifierError_VerifierPort --o T31_domain_domain_DiagnosticMessage__self
 T33_domain_domain_TargetEntryRoleKind_Pattern --o T39_domain_domain_TestObligationPatternKind__self
+T33_domain_domain_TargetEntryRoleKind_canonical_form --> T31_domain_domain_DiagnosticMessage__self
+T33_domain_domain_TargetEntryRoleKind_canonical_form --> T33_domain_domain_TargetEntryRoleKind__self
 T31_domain_domain_TestBindingRecord_Fulfillment --o|obligation_id| T30_domain_domain_TestObligationId__self
 T31_domain_domain_TestBindingRecord_Fulfillment --o|tests| T35_domain_domain_NonEmptyTestLocations__self
 T31_domain_domain_TestBindingRecord_Waiver --o|edge_id| T34_domain_domain_TestObligationEdgeId__self
@@ -1972,6 +1980,7 @@ class T35_domain_domain_NonEmptyTestLocations__self value_object
 class T34_domain_domain_ObligationCheckError_RulesLoad variant_node
 class T34_domain_domain_ObligationCheckError_ObligationsAbsent variant_node
 class T34_domain_domain_ObligationCheckError_BindingsAbsent variant_node
+class T34_domain_domain_ObligationCheckError_StaleObligationsArtifact variant_node
 class T34_domain_domain_ObligationCheckError_DriftsDetected variant_node
 class T34_domain_domain_ObligationCheckError_UnresolvedEdges variant_node
 class T34_domain_domain_ObligationCheckError_StaleVerdicts variant_node
@@ -2032,6 +2041,7 @@ class T33_domain_domain_ObligationsDocument_new method_node
 class T33_domain_domain_ObligationsDocument_track_id method_node
 class T33_domain_domain_ObligationsDocument_obligations method_node
 class T33_domain_domain_ObligationsDocument_owning_obligation method_node
+class T33_domain_domain_ObligationsDocument_staleness_against method_node
 class T33_domain_domain_ObligationsDocument__self value_object
 class T22_domain_domain_RoleName_try_new method_node
 class T22_domain_domain_RoleName_as_str method_node
@@ -2055,6 +2065,7 @@ class T33_domain_domain_TargetEntryRoleKind_ContractRole variant_node
 class T33_domain_domain_TargetEntryRoleKind_FunctionRole variant_node
 class T33_domain_domain_TargetEntryRoleKind_TraitImpl variant_node
 class T33_domain_domain_TargetEntryRoleKind_Pattern variant_node
+class T33_domain_domain_TargetEntryRoleKind_canonical_form method_node
 class T33_domain_domain_TargetEntryRoleKind__self value_object
 class T31_domain_domain_TestBindingRecord_Fulfillment variant_node
 class T31_domain_domain_TestBindingRecord_Waiver variant_node

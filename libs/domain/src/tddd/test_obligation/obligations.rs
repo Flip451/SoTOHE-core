@@ -12,7 +12,8 @@ use crate::TrackId;
 use crate::tddd::semantic_verify::CatalogueEntryRef;
 use crate::tddd::test_obligation::hashes::DeclarationHash;
 use crate::tddd::test_obligation::ids::{
-    TestObligationAnchorId, TestObligationBrief, TestObligationEdgeId, TestObligationId,
+    DiagnosticMessage, TestObligationAnchorId, TestObligationBrief, TestObligationEdgeId,
+    TestObligationId,
 };
 use crate::tddd::test_obligation::vocab::TargetEntryRoleKind;
 
@@ -121,6 +122,145 @@ impl ObligationsDocument {
         match (owners.next(), owners.next()) {
             (Some(owner), None) => Some(owner),
             (None, _) | (Some(_), Some(_)) => None,
+        }
+    }
+
+    /// Diagnoses whether this persisted obligation document is stale against the
+    /// current derivation, comparing the complete obligation multiset (IN-08).
+    ///
+    /// Exact obligations match irrespective of ordering and with duplicate
+    /// occurrences counted. Remaining obligations with the same stable ID are
+    /// changes; the rest are additions or removals required to make this
+    /// document match `expected`.
+    #[must_use]
+    pub fn staleness_against(&self, expected: &ObligationsDocument) -> Option<DiagnosticMessage> {
+        let mut unmatched_expected = expected.obligations.iter().collect::<Vec<_>>();
+        let mut unmatched_current = Vec::new();
+        let mut differing_obligations = Vec::new();
+
+        for current in &self.obligations {
+            if let Some(index) = unmatched_expected.iter().position(|expected| *expected == current)
+            {
+                unmatched_expected.swap_remove(index);
+            } else {
+                unmatched_current.push(current);
+            }
+        }
+
+        let mut changed = 0;
+        let mut added = 0;
+        for expected in unmatched_expected {
+            if let Some(index) =
+                unmatched_current.iter().position(|current| current.id() == expected.id())
+            {
+                let current = unmatched_current.swap_remove(index);
+                push_stale_detail(
+                    &mut differing_obligations,
+                    format!(
+                        "{} ({})",
+                        obligation_id_label(current),
+                        changed_field_kinds(current, expected).join(", ")
+                    ),
+                );
+                changed += 1;
+            } else {
+                push_stale_detail(
+                    &mut differing_obligations,
+                    format!("{} (missing_from_artifact)", obligation_id_label(expected)),
+                );
+                added += 1;
+            }
+        }
+
+        let removed = unmatched_current.len();
+        for current in unmatched_current {
+            push_stale_detail(
+                &mut differing_obligations,
+                format!("{} (unexpected_in_artifact)", obligation_id_label(current)),
+            );
+        }
+        if added == 0 && removed == 0 && changed == 0 {
+            return None;
+        }
+
+        Some(stale_obligations_detail(added, removed, changed, &differing_obligations))
+    }
+}
+
+/// Number of obligation differences included in the stale-artifact diagnostic.
+const MAX_STALE_OBLIGATION_DETAILS: usize = 5;
+
+/// Retains a bounded sample of stale-obligation differences for diagnostics.
+fn push_stale_detail(details: &mut Vec<String>, detail: String) {
+    if details.len() < MAX_STALE_OBLIGATION_DETAILS {
+        details.push(detail);
+    }
+}
+
+/// Formats the stable identifier of an obligation for a stale-artifact diagnostic.
+fn obligation_id_label(obligation: &TestObligation) -> String {
+    format!(
+        "{}:{:?}:{}",
+        obligation.id().entry_key().as_str(),
+        obligation.id().obligation_kind(),
+        obligation.id().item_identifier().as_str()
+    )
+}
+
+/// Reports which non-identity fields differ between obligations with the same id.
+fn changed_field_kinds(current: &TestObligation, expected: &TestObligation) -> Vec<&'static str> {
+    let mut fields = Vec::new();
+    if current.target_entry().file_path != expected.target_entry().file_path {
+        fields.push("target_entry.file_path");
+    }
+    if current.target_entry().section_key != expected.target_entry().section_key {
+        fields.push("target_entry.section_key");
+    }
+    if current.target_entry().entry_key != expected.target_entry().entry_key {
+        fields.push("target_entry.entry_key");
+    }
+    if current.target_role() != expected.target_role() {
+        fields.push("target_role");
+    }
+    if current.brief() != expected.brief() {
+        fields.push("brief");
+    }
+    if current.declaration_hash() != expected.declaration_hash() {
+        fields.push("declaration_hash");
+    }
+    if current.spec_refs() != expected.spec_refs() {
+        fields.push("spec_refs");
+    }
+    fields
+}
+
+/// Builds the non-empty stale-obligations diagnostic for the IN-08 gate.
+#[must_use]
+fn stale_obligations_detail(
+    added: usize,
+    removed: usize,
+    changed: usize,
+    differing_obligations: &[String],
+) -> DiagnosticMessage {
+    let detail_count = added + removed + changed;
+    let detail_suffix = if differing_obligations.is_empty() {
+        String::new()
+    } else {
+        format!(
+            "; differing_obligations=[{}] (showing {} of {detail_count})",
+            differing_obligations.join("; "),
+            differing_obligations.len(),
+        )
+    };
+    let mut detail = format!(
+        "stale obligations artifact: added={added}, removed={removed}, changed={changed}{detail_suffix}; rerun test-obligation derive"
+    );
+    loop {
+        match DiagnosticMessage::try_new(detail) {
+            Ok(detail) => return detail,
+            // The generated text is non-empty. Retain the defensive fallback
+            // so diagnostics remain panic-free if that invariant changes.
+            Err(_) => detail = "stale obligations artifact".to_owned(),
         }
     }
 }
@@ -253,5 +393,175 @@ mod tests {
         let resolved = document.owning_obligation(&edge("domain::User", "IN-06"));
 
         assert_eq!(resolved, None);
+    }
+
+    #[test]
+    fn test_obligations_document_staleness_against_identical_returns_none() {
+        let current = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![sample_obligation()],
+        );
+        let expected = current.clone();
+
+        assert_eq!(current.staleness_against(&expected), None);
+    }
+
+    #[test]
+    fn test_obligations_document_staleness_against_added_returns_added_detail() {
+        let current = ObligationsDocument::new(TrackId::try_new("my-track").unwrap(), vec![]);
+        let expected = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![sample_obligation()],
+        );
+
+        let detail = current.staleness_against(&expected).unwrap();
+
+        assert!(detail.as_str().contains("added=1"));
+        assert!(detail.as_str().contains("removed=0"));
+        assert!(detail.as_str().contains("changed=0"));
+    }
+
+    #[test]
+    fn test_obligations_document_staleness_against_removed_returns_removed_detail() {
+        let current = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![sample_obligation()],
+        );
+        let expected = ObligationsDocument::new(TrackId::try_new("my-track").unwrap(), vec![]);
+
+        let detail = current.staleness_against(&expected).unwrap();
+
+        assert!(detail.as_str().contains("added=0"));
+        assert!(detail.as_str().contains("removed=1"));
+        assert!(detail.as_str().contains("changed=0"));
+    }
+
+    #[test]
+    fn test_obligations_document_staleness_against_changed_target_entry_reports_changed() {
+        let current = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![sample_obligation()],
+        );
+        let mut changed = sample_obligation();
+        changed.target_entry = CatalogueEntryRef::new(
+            "track/items/x/usecase-types.json".to_owned(),
+            CatalogueSectionKey::Types,
+            CatalogueEntryKey::try_new("domain::User".to_owned()).unwrap(),
+        );
+        let expected =
+            ObligationsDocument::new(TrackId::try_new("my-track").unwrap(), vec![changed]);
+
+        let detail = current.staleness_against(&expected).unwrap();
+
+        assert!(detail.as_str().contains("changed=1"));
+        assert!(
+            detail
+                .as_str()
+                .contains("domain::User:Boundary:invariant:non_empty (target_entry.file_path)")
+        );
+    }
+
+    #[test]
+    fn test_obligations_document_staleness_against_changed_target_role_reports_changed() {
+        let current = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![sample_obligation()],
+        );
+        let mut changed = sample_obligation();
+        changed.target_role = TargetEntryRoleKind::DataRole(DataRole::entity().unwrap());
+        let expected =
+            ObligationsDocument::new(TrackId::try_new("my-track").unwrap(), vec![changed]);
+
+        let detail = current.staleness_against(&expected).unwrap();
+
+        assert!(detail.as_str().contains("changed=1"));
+        assert!(detail.as_str().contains("target_role"));
+    }
+
+    #[test]
+    fn test_obligations_document_staleness_against_changed_brief_reports_changed() {
+        let current = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![sample_obligation()],
+        );
+        let mut changed = sample_obligation();
+        changed.brief =
+            TestObligationBrief::try_new("cover name normalization".to_owned()).unwrap();
+        let expected =
+            ObligationsDocument::new(TrackId::try_new("my-track").unwrap(), vec![changed]);
+
+        let detail = current.staleness_against(&expected).unwrap();
+
+        assert!(detail.as_str().contains("changed=1"));
+        assert!(detail.as_str().contains("brief"));
+    }
+
+    #[test]
+    fn test_obligations_document_staleness_against_changed_declaration_hash_reports_changed() {
+        let current = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![sample_obligation()],
+        );
+        let mut changed = sample_obligation();
+        changed.declaration_hash = DeclarationHash::new(ContentHash::from_bytes([4u8; 32]));
+        let expected =
+            ObligationsDocument::new(TrackId::try_new("my-track").unwrap(), vec![changed]);
+
+        let detail = current.staleness_against(&expected).unwrap();
+
+        assert!(detail.as_str().contains("changed=1"));
+        assert!(detail.as_str().contains("declaration_hash"));
+    }
+
+    #[test]
+    fn test_obligations_document_staleness_against_changed_spec_refs_reports_changed() {
+        let current = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![sample_obligation()],
+        );
+        let mut changed = sample_obligation();
+        changed.spec_refs = vec![
+            TestObligationAnchorId::try_new("spec.json".to_owned(), "IN-06".to_owned()).unwrap(),
+        ];
+        let expected =
+            ObligationsDocument::new(TrackId::try_new("my-track").unwrap(), vec![changed]);
+
+        let detail = current.staleness_against(&expected).unwrap();
+
+        assert!(detail.as_str().contains("changed=1"));
+    }
+
+    #[test]
+    fn test_obligations_document_staleness_against_duplicate_reports_removed_detail() {
+        let duplicate = sample_obligation();
+        let current = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![duplicate.clone(), duplicate],
+        );
+        let expected = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![sample_obligation()],
+        );
+
+        let detail = current.staleness_against(&expected).unwrap();
+
+        assert!(detail.as_str().contains("added=0"));
+        assert!(detail.as_str().contains("removed=1"));
+        assert!(detail.as_str().contains("changed=0"));
+    }
+
+    #[test]
+    fn test_obligations_document_staleness_detail_is_bounded_with_total_count() {
+        let current = ObligationsDocument::new(TrackId::try_new("my-track").unwrap(), vec![]);
+        let expected = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            (0..6).map(|index| obligation_with_id(&format!("invariant:example-{index}"))).collect(),
+        );
+
+        let detail = current.staleness_against(&expected).unwrap();
+
+        assert!(detail.as_str().contains("added=6"));
+        assert!(detail.as_str().contains("showing 5 of 6"));
+        assert!(detail.as_str().contains("missing_from_artifact"));
     }
 }

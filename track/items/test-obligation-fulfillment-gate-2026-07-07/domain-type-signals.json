@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-10T22:34:23Z",
-  "declaration_hash": "c81ec8e8f9931c2a1dac5830be1b92acaaebb4450e1455972e3b1aaff48830b6",
+  "generated_at": "2026-07-11T01:56:45Z",
+  "declaration_hash": "aa6c7955bf11e7a913dfc1595d0f2901ff1be5bcfe5f27c551d8563acce54e5b",
   "signals": [
     {
       "type_name": "AnchorText",

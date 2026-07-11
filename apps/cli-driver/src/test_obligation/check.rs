@@ -89,6 +89,14 @@ impl TestObligationCheckHandler {
                 output.resolved_edges().len(),
                 output.uncited_findings().len()
             ))),
+            Err(
+                usecase::test_obligation::errors::ObligationCheckError::StaleObligationsArtifact {
+                    detail,
+                },
+            ) => CommandOutcome::failure(Some(format!(
+                "test-obligation check failed: stale obligations artifact ({}); rerun test-obligation derive",
+                detail.as_str()
+            ))),
             Err(error) => {
                 CommandOutcome::failure(Some(format!("test-obligation check failed: {error:?}")))
             }
@@ -196,5 +204,38 @@ mod tests {
 
         assert_ne!(outcome.exit_code, 0);
         assert!(outcome.stderr.unwrap().contains("BindingsAbsent"));
+    }
+
+    #[test]
+    fn test_check_handler_surfaces_stale_obligations_artifact_error() {
+        struct FailingService;
+
+        impl CheckTestObligationsApplicationService for FailingService {
+            fn execute(
+                &self,
+                _cmd: &CheckTestObligationsCommand,
+            ) -> Result<
+                usecase::test_obligation::check::CheckTestObligationsOutcome,
+                usecase::test_obligation::errors::ObligationCheckError,
+            > {
+                Err(usecase::test_obligation::errors::ObligationCheckError::StaleObligationsArtifact {
+                    detail: DiagnosticMessage::try_new(
+                        "missing=1, unexpected=0, changed=0".to_owned(),
+                    )
+                    .unwrap(),
+                })
+            }
+        }
+
+        let handler =
+            TestObligationCheckHandler::new(Arc::new(FailingService), PathBuf::from("/repo"));
+        let branch = DiagnosticMessage::try_new("track/test-track".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationCheckInput::new(None, branch));
+
+        assert_ne!(outcome.exit_code, 0);
+        let stderr = outcome.stderr.unwrap();
+        assert!(stderr.contains("stale obligations artifact"));
+        assert!(stderr.contains("missing=1"));
     }
 }

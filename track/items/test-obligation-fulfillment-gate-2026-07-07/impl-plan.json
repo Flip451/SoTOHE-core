@@ -187,6 +187,11 @@
       "id": "T032",
       "description": "Target libs/infrastructure test_obligation::{fulfillment_verifier,waiver_verifier}. Extend ObligationFulfillmentVerifierAdapter and WaiverVerifierAdapter constructors to retain the discovered workspace root and anchor every verifier subprocess there (IN-09/IN-11/CN-08). Add unit tests covering both verifier lanes.",
       "status": "done"
+    },
+    {
+      "id": "T033",
+      "description": "Target libs/usecase test_obligation::check and libs/domain tddd::test_obligation::{obligations,errors,vocab}; update CheckTestObligationsInteractor, the ObligationCheckError stale-artifact variant, ObligationsDocument::staleness_against on the T031-attributed entry, and TargetEntryRoleKind canonical-form normalization (IN-08/AC-04/IN-09/CN-04).",
+      "status": "done"
     }
   ],
   "plan": {
@@ -253,6 +258,7 @@
           "T016",
           "T026",
           "T017",
+          "T033",
           "T018",
           "T024",
           "T025",

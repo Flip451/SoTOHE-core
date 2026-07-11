@@ -63,9 +63,9 @@
         "item_identifier": "invariant:non_empty"
       },
       "key": {
-        "bound_tests_set_hash": "84ed2db55678a7c61507a4ba16088b9506d2673ae52bacd7cb24a9b73efdd1cb",
+        "bound_tests_set_hash": "7a5e3501a30d782a822dd78b961da1545149eeec39b01b9a0b50316af3af0626",
         "declaration_hash": "76a9845840ea09a05069b949921c9d0e73be741e3135ffe4f3cd256e219350f9",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -87,13 +87,13 @@
         "item_identifier": "invariant:non_empty"
       },
       "key": {
-        "bound_tests_set_hash": "84ed2db55678a7c61507a4ba16088b9506d2673ae52bacd7cb24a9b73efdd1cb",
+        "bound_tests_set_hash": "7a5e3501a30d782a822dd78b961da1545149eeec39b01b9a0b50316af3af0626",
         "declaration_hash": "76a9845840ea09a05069b949921c9d0e73be741e3135ffe4f3cd256e219350f9",
-        "anchor_text_hash": "c8eb5ee4ee4d8332f5431abb9438c23966eeea88bd0f6088cc84be6c5c1f4031"
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(NonEmptyEdgeIds::try_new(vec![]), Err(ConstructionError::EmptyCollection));\n\nassert!(matches!(result, Err(ObligationCheckError::UnresolvedEdges { .. })));\n\nassert_eq!(outcome.resolved_edges(), &[edge()]);"
+        "citation": "// AC-04: a fresh fulfilled verdict resolves the edge and the gate passes.\nlet obligations = ObligationsDocument::new(track(), vec![obligation()]);\nlet bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);\nlet outcome =\n    interactor(Some(obligations), Some(bindings), Some(fresh_fulfillment_cache()), None)\n        .execute(&command())\n        .unwrap();\nassert_eq!(outcome.resolved_edges(), &[edge()]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -183,13 +183,13 @@
         "item_identifier": "invariant:non_empty"
       },
       "key": {
-        "bound_tests_set_hash": "097570f0e8e9d3a0c5c043e88a52b8ff8ddb3431d56776c54c715da306da02bf",
+        "bound_tests_set_hash": "e1c328cf0ac9d09ec3dfba1b9f95109f7ba30f96aeeca39cd848594b7c6c8425",
         "declaration_hash": "7ba7716c03e770d5e3b3e3fa25e2b6cc2cd1f07378210994fbceebe5265bcabb",
         "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "// AC-12: a prior edge-level binding becomes fulfillment for the derived\n    // obligation once the decision table starts producing one for that edge.\n    let obligations = ObligationsDocument::new(track(), vec![obligation()]);\n    let bindings = TestBindingsDocument::new(track(), vec![voluntary_binding()]);\n    let outcome =\n        interactor(Some(obligations), Some(bindings), Some(fresh_fulfillment_cache()), None)\n            .execute(&command())\n            .unwrap();\n\n    assert_eq!(outcome.resolved_edges(), &[edge()]);"
+        "citation": "assert_eq!(NonEmptyTestLocations::try_new(vec![]), Err(ConstructionError::EmptyCollection));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -207,13 +207,13 @@
         "item_identifier": "invariant:non_empty"
       },
       "key": {
-        "bound_tests_set_hash": "097570f0e8e9d3a0c5c043e88a52b8ff8ddb3431d56776c54c715da306da02bf",
+        "bound_tests_set_hash": "e1c328cf0ac9d09ec3dfba1b9f95109f7ba30f96aeeca39cd848594b7c6c8425",
         "declaration_hash": "7ba7716c03e770d5e3b3e3fa25e2b6cc2cd1f07378210994fbceebe5265bcabb",
-        "anchor_text_hash": "c8eb5ee4ee4d8332f5431abb9438c23966eeea88bd0f6088cc84be6c5c1f4031"
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. }))); | assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. }))); | assert!(matches!(result, Err(ObligationCheckError::BindingsAbsent))); | assert!(matches!(result, Err(ObligationCheckError::UnresolvedEdges { .. }))); | assert_eq!(outcome.resolved_edges(), &[edge()]);"
+        "citation": "// AC-12: a prior edge-level binding becomes fulfillment for the derived\n    // obligation once the decision table starts producing one for that edge.\n...\n    assert_eq!(outcome.resolved_edges(), &[edge()]);\n\n// CN-02 / AC-04: a cited active entry edge remains in the totality universe\n    // even when the decision table derives zero obligations for it.\n...\n    assert!(matches!(result, Err(ObligationCheckError::UnresolvedEdges { .. })));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -231,13 +231,13 @@
         "item_identifier": "invariant:non_empty"
       },
       "key": {
-        "bound_tests_set_hash": "097570f0e8e9d3a0c5c043e88a52b8ff8ddb3431d56776c54c715da306da02bf",
+        "bound_tests_set_hash": "e1c328cf0ac9d09ec3dfba1b9f95109f7ba30f96aeeca39cd848594b7c6c8425",
         "declaration_hash": "7ba7716c03e770d5e3b3e3fa25e2b6cc2cd1f07378210994fbceebe5265bcabb",
         "anchor_text_hash": "523b212626bb334f05925300c0aacbd9790c36d5f3ab7199ed777a92696e79c4"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "// AC-12: a prior edge-level binding becomes fulfillment for the derived\n    // obligation once the decision table starts producing one for that edge.\n    let obligations = ObligationsDocument::new(track(), vec![obligation()]);\n    let bindings = TestBindingsDocument::new(track(), vec![voluntary_binding()]);\n    let outcome =\n        interactor(Some(obligations), Some(bindings), Some(fresh_fulfillment_cache()), None)\n            .execute(&command())\n            .unwrap();\n\n    assert_eq!(outcome.resolved_edges(), &[edge()]);\n\n    let expected_obligation_id = obligation().id().clone();\n    assert_eq!(saved.entries()[0].edge_id(), &edge());\n    assert_eq!(saved.entries()[0].obligation_id(), &expected_obligation_id);"
+        "citation": "// AC-12: a prior edge-level binding becomes fulfillment for the derived\n    // obligation once the decision table starts producing one for that edge.\n    let bindings = TestBindingsDocument::new(track(), vec![voluntary_binding()]);\n    assert_eq!(outcome.resolved_edges(), &[edge()]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -255,13 +255,13 @@
         "item_identifier": "method:new"
       },
       "key": {
-        "bound_tests_set_hash": "25077be3a46e07d59992c1ac036629d1bbcdbbf9c1625cae162f843ebbfded4f",
+        "bound_tests_set_hash": "53934b45486a04f6edb96bcc1d15d218b8b63a08a383b825a236e01f0c40c6f6",
         "declaration_hash": "8a400f39fda03cafc38a692e144afb364360f3205acc3dd338651da313ab8378",
         "anchor_text_hash": "f3dcdf33f4e15a78a90f711c6df20e112a67f84c6abd460ba9660cfa3acf463b"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let mut dto = complete_dto();\n        dto.data_roles.remove(\"PrimaryAdapter\");\n        match dto.into_domain() {\n            Err(TestObligationRulesLoadError::RoleNotCovered { role_name }) => {\n                assert_eq!(role_name.as_str(), \"PrimaryAdapter\");\n            }"
+        "citation": "let entry = type_entry(DataRole::domain_service(), plain_struct(), vec![]);\n        let items = projector().data_role_items(&entry, &TestObligationPerAxis::Emits);\n        assert!(items.is_empty());\n\nlet mut dto = complete_dto();\n        dto.data_roles.remove(\"PrimaryAdapter\");\n        match dto.into_domain() {\n            Err(TestObligationRulesLoadError::RoleNotCovered { role_name }) => {\n                assert_eq!(role_name.as_str(), \"PrimaryAdapter\");\n            }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -279,13 +279,13 @@
         "item_identifier": "method:new"
       },
       "key": {
-        "bound_tests_set_hash": "25077be3a46e07d59992c1ac036629d1bbcdbbf9c1625cae162f843ebbfded4f",
+        "bound_tests_set_hash": "53934b45486a04f6edb96bcc1d15d218b8b63a08a383b825a236e01f0c40c6f6",
         "declaration_hash": "8a400f39fda03cafc38a692e144afb364360f3205acc3dd338651da313ab8378",
         "anchor_text_hash": "3c5acf05aa2b34161959f8cab9bcb86676033dc7d92f6dd52d6485b17d911066"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let items = projector().data_role_items(&entry, &TestObligationPerAxis::Emits);\n        assert!(items.is_empty());"
+        "citation": "let items = projector().data_role_items(&entry, &TestObligationPerAxis::Invariant);\n        assert_eq!(items_as_str(&items), vec![\"invariant:positive\", \"invariant:bounded\"]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -303,13 +303,13 @@
         "item_identifier": "method:new"
       },
       "key": {
-        "bound_tests_set_hash": "25077be3a46e07d59992c1ac036629d1bbcdbbf9c1625cae162f843ebbfded4f",
+        "bound_tests_set_hash": "53934b45486a04f6edb96bcc1d15d218b8b63a08a383b825a236e01f0c40c6f6",
         "declaration_hash": "8a400f39fda03cafc38a692e144afb364360f3205acc3dd338651da313ab8378",
         "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let entry = type_entry(DataRole::domain_service(), plain_struct(), vec![]);\n        let items = projector().data_role_items(&entry, &TestObligationPerAxis::Emits);\n        assert!(items.is_empty());"
+        "citation": "let entry = type_entry(DataRole::domain_service(), plain_struct(), vec![]);\nlet items = projector().data_role_items(&entry, &TestObligationPerAxis::Emits);\nassert!(items.is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -327,13 +327,13 @@
         "item_identifier": "method:new"
       },
       "key": {
-        "bound_tests_set_hash": "25077be3a46e07d59992c1ac036629d1bbcdbbf9c1625cae162f843ebbfded4f",
+        "bound_tests_set_hash": "53934b45486a04f6edb96bcc1d15d218b8b63a08a383b825a236e01f0c40c6f6",
         "declaration_hash": "8a400f39fda03cafc38a692e144afb364360f3205acc3dd338651da313ab8378",
         "anchor_text_hash": "3357d986d9171bee78e1b975e78461e8ae02d6b1cf86f56a1774605d038d28a1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "// IN-17 / AC-16: trait_ref -> catalogue ContractRole; external -> 0.\n...\n// Exactly one contract-conformance obligation (from MyPort's impl; Display is external).\nassert_eq!(conformance.len(), 1);\nassert_eq!(conformance[0].spec_refs()[0].element_id(), \"IN-06\");"
+        "citation": "// IN-17 / AC-16: trait_ref -> catalogue ContractRole; external -> 0.\n    let path = PathBuf::from(\"infrastructure-types.json\");\n...\n    assert_eq!(conformance.len(), 1);\n    assert_eq!(conformance[0].spec_refs()[0].element_id(), \"IN-06\");\n...\n    let infrastructure_path = PathBuf::from(\"infrastructure-types.json\");\n...\n    TypeRef::new(\"usecase::SharedPort\").unwrap(),\n...\n    assert_eq!(conformance[0].spec_refs()[0].element_id(), \"IN-06\");\n    assert_eq!(conformance[0].id().item_identifier().as_str(), \"trait_impl:usecase::SharedPort\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -351,7 +351,7 @@
         "item_identifier": "method:new"
       },
       "key": {
-        "bound_tests_set_hash": "25077be3a46e07d59992c1ac036629d1bbcdbbf9c1625cae162f843ebbfded4f",
+        "bound_tests_set_hash": "53934b45486a04f6edb96bcc1d15d218b8b63a08a383b825a236e01f0c40c6f6",
         "declaration_hash": "8a400f39fda03cafc38a692e144afb364360f3205acc3dd338651da313ab8378",
         "anchor_text_hash": "a581549bcdf2fbd8a31954e880e3bd3f14ffbfe0b3b0a544abeaec940eac47cf"
       },
@@ -375,13 +375,13 @@
         "item_identifier": "method:new"
       },
       "key": {
-        "bound_tests_set_hash": "25077be3a46e07d59992c1ac036629d1bbcdbbf9c1625cae162f843ebbfded4f",
+        "bound_tests_set_hash": "53934b45486a04f6edb96bcc1d15d218b8b63a08a383b825a236e01f0c40c6f6",
         "declaration_hash": "8a400f39fda03cafc38a692e144afb364360f3205acc3dd338651da313ab8378",
         "anchor_text_hash": "6e2982082d32efe4c4f49ca652e3225a4db26ed1ab83213f93a6344be4c6b48c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let entry = type_entry(DataRole::domain_service(), plain_struct(), vec![]);\n        let items = projector().data_role_items(&entry, &TestObligationPerAxis::Emits);\n        assert!(items.is_empty());"
+        "citation": "let items = projector().data_role_items(&entry, &TestObligationPerAxis::Emits);\n        assert!(items.is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1527,13 +1527,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "ea4d5e22b5a91bd9ba0b78738f615c279de9f57497456815f3f7d6f540931ccd",
+        "bound_tests_set_hash": "6b3bc72960d0b54c6ab18141197a083ff8b26a7083b736d797902bbb054781d0",
         "declaration_hash": "595c0fc73a5a252f747bfc729abdb9f972ffd3a3295626754ca3d7038a5ecb0a",
         "anchor_text_hash": "3c5acf05aa2b34161959f8cab9bcb86676033dc7d92f6dd52d6485b17d911066"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(items, vec![\"trait_method:load\", \"trait_method:save\"]); ... assert!(saved.obligations().iter().all(|obligation| obligation.id().entry_key().as_str() == \"ObligationsArtifactPort\")); ... codec.save(&doc).unwrap(); let loaded = codec.load(doc.track_id()).unwrap(); assert_eq!(loaded, Some(doc)); ... assert_eq!(a.id(), b.id()); assert_ne!(a.declaration_hash(), b.declaration_hash());"
+        "citation": "// IN-07 / AC-03: deriving a declared SecondaryPort creates one stable\n    // obligation for each declared method, then persists the resulting artifact.\n    ...\n    assert_eq!(items, vec![\"trait_method:load\", \"trait_method:save\"]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1551,13 +1551,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "ea4d5e22b5a91bd9ba0b78738f615c279de9f57497456815f3f7d6f540931ccd",
+        "bound_tests_set_hash": "6b3bc72960d0b54c6ab18141197a083ff8b26a7083b736d797902bbb054781d0",
         "declaration_hash": "595c0fc73a5a252f747bfc729abdb9f972ffd3a3295626754ca3d7038a5ecb0a",
         "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "// IN-07 / AC-03: deriving a declared SecondaryPort creates one stable\n// obligation for each declared method, then persists the resulting artifact.\n...\nassert_eq!(items, vec![\"trait_method:load\", \"trait_method:save\"]);"
+        "citation": "assert_eq!(items, vec![\"trait_method:load\", \"trait_method:save\"]);\nassert!(\n    saved\n        .obligations()\n        .iter()\n        .all(|obligation| obligation.id().entry_key().as_str() == \"ObligationsArtifactPort\")\n);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1575,13 +1575,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "ea4d5e22b5a91bd9ba0b78738f615c279de9f57497456815f3f7d6f540931ccd",
+        "bound_tests_set_hash": "6b3bc72960d0b54c6ab18141197a083ff8b26a7083b736d797902bbb054781d0",
         "declaration_hash": "595c0fc73a5a252f747bfc729abdb9f972ffd3a3295626754ca3d7038a5ecb0a",
         "anchor_text_hash": "23ef7b6f69fba30ba0154c5a917cde7d21d58c34c8a688f6b54a554405bd4b76"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(first_items, second_items);\n    assert!(\n        first\n            .obligations()\n            .iter()\n            .zip(second.obligations())\n            .all(|(before, after)| before.declaration_hash() != after.declaration_hash())\n    );"
+        "citation": "assert_eq!(first_items, second_items); ... .all(|(before, after)| before.declaration_hash() != after.declaration_hash()) ... assert_eq!(items, vec![\"trait_method:load\", \"trait_method:save\"]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1599,7 +1599,7 @@
         "item_identifier": "trait_method:save"
       },
       "key": {
-        "bound_tests_set_hash": "23bcc376b13e79b394b2e1b9a3a70f7cee43f139a9cbe58f1e3366cfceb20457",
+        "bound_tests_set_hash": "ae3a24f6ecbe4ccd3362fd252cb77e464ccd55536b39f1dfbe30b96d391dd5e0",
         "declaration_hash": "595c0fc73a5a252f747bfc729abdb9f972ffd3a3295626754ca3d7038a5ecb0a",
         "anchor_text_hash": "3c5acf05aa2b34161959f8cab9bcb86676033dc7d92f6dd52d6485b17d911066"
       },
@@ -1623,13 +1623,13 @@
         "item_identifier": "trait_method:save"
       },
       "key": {
-        "bound_tests_set_hash": "23bcc376b13e79b394b2e1b9a3a70f7cee43f139a9cbe58f1e3366cfceb20457",
+        "bound_tests_set_hash": "ae3a24f6ecbe4ccd3362fd252cb77e464ccd55536b39f1dfbe30b96d391dd5e0",
         "declaration_hash": "595c0fc73a5a252f747bfc729abdb9f972ffd3a3295626754ca3d7038a5ecb0a",
         "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "// IN-07 / AC-03: deriving a declared SecondaryPort creates one stable\n    // obligation for each declared method, then persists the resulting artifact.\n    assert_eq!(items, vec![\"trait_method:load\", \"trait_method:save\"]);"
+        "citation": "assert_eq!(items, vec![\"trait_method:load\", \"trait_method:save\"]);\n    assert!(\n        saved\n            .obligations()\n            .iter()\n            .all(|obligation| obligation.id().entry_key().as_str() == \"ObligationsArtifactPort\")\n    );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1647,13 +1647,13 @@
         "item_identifier": "trait_method:save"
       },
       "key": {
-        "bound_tests_set_hash": "23bcc376b13e79b394b2e1b9a3a70f7cee43f139a9cbe58f1e3366cfceb20457",
+        "bound_tests_set_hash": "ae3a24f6ecbe4ccd3362fd252cb77e464ccd55536b39f1dfbe30b96d391dd5e0",
         "declaration_hash": "595c0fc73a5a252f747bfc729abdb9f972ffd3a3295626754ca3d7038a5ecb0a",
         "anchor_text_hash": "23ef7b6f69fba30ba0154c5a917cde7d21d58c34c8a688f6b54a554405bd4b76"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(first_items, second_items);\nassert!(\n    first\n        .obligations()\n        .iter()\n        .zip(second.obligations())\n        .all(|(before, after)| before.declaration_hash() != after.declaration_hash())\n);"
+        "citation": "let first_items: Vec<_> =\n        first.obligations().iter().map(|obligation| obligation.id().clone()).collect();\n    let second_items: Vec<_> =\n        second.obligations().iter().map(|obligation| obligation.id().clone()).collect();\n    assert_eq!(first_items, second_items);\n    assert!(\n        first\n            .obligations()\n            .iter()\n            .zip(second.obligations())\n            .all(|(before, after)| before.declaration_hash() != after.declaration_hash())\n    );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1671,13 +1671,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "af403fce642510afacf5ee81aa267ee6ba7ccd9ab83715342cb673eab0a08aff",
+        "bound_tests_set_hash": "e126e1673b68c951efa624d15813d5326d140800b70ef7134062f84d09276cf5",
         "declaration_hash": "3625ef0ef8893be917428060f4ebf216bd25484f18c2034fba5f6158cfb417b7",
         "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(saved.obligations().len(), 1);\n    let obligation = &saved.obligations()[0];\n    assert_eq!(obligation.id().entry_key().as_str(), \"SpecDocumentLoaderPort\");\n    assert_eq!(obligation.id().item_identifier().as_str(), \"trait_method:load\");\n    assert_eq!(obligation.spec_refs()[0].element_id(), \"IN-07\");"
+        "citation": "    assert_eq!(saved.obligations().len(), 1);\n    let obligation = &saved.obligations()[0];\n    assert_eq!(obligation.id().entry_key().as_str(), \"SpecDocumentLoaderPort\");\n    assert_eq!(obligation.id().item_identifier().as_str(), \"trait_method:load\");\n    assert_eq!(obligation.spec_refs()[0].element_id(), \"IN-07\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1695,13 +1695,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "f601ce909e1cf64fbb0b18898d2abd8500f7d02d2c28b072094d34777682d4b0",
+        "bound_tests_set_hash": "50024f7049a92f6f8fef264e0bda174bd56bf713cbe94ceb51eab529581c7653",
         "declaration_hash": "022846a7d90e9c383edb743018558b4346db55f81331fc234563fda16f5d7ae6",
         "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "codec.save(&doc).unwrap();\n        assert_eq!(codec.load(doc.track_id()).unwrap(), Some(doc));\n\nround_trip(TestBindingRecord::VoluntaryBinding { edge_id: edge_id(), tests: tests() });"
+        "citation": "codec.save(&doc).unwrap();\n        assert_eq!(codec.load(doc.track_id()).unwrap(), Some(doc));\n...\nround_trip(TestBindingRecord::VoluntaryBinding { edge_id: edge_id(), tests: tests() });"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1719,13 +1719,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "f601ce909e1cf64fbb0b18898d2abd8500f7d02d2c28b072094d34777682d4b0",
+        "bound_tests_set_hash": "50024f7049a92f6f8fef264e0bda174bd56bf713cbe94ceb51eab529581c7653",
         "declaration_hash": "022846a7d90e9c383edb743018558b4346db55f81331fc234563fda16f5d7ae6",
-        "anchor_text_hash": "c8eb5ee4ee4d8332f5431abb9438c23966eeea88bd0f6088cc84be6c5c1f4031"
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "codec.save(&doc).unwrap();\n        assert_eq!(codec.load(doc.track_id()).unwrap(), Some(doc));\n\n        assert!(codec.load(&TrackId::try_new(\"absent-track\").unwrap()).is_none());"
+        "citation": "assert_eq!(bindings_port.save_calls(), 0);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1743,7 +1743,7 @@
         "item_identifier": "trait_method:save"
       },
       "key": {
-        "bound_tests_set_hash": "3090be3ec71f0bfa48c6827c267b4229ff5ab2d89e072c26c44e0bd442040e68",
+        "bound_tests_set_hash": "52b3fc8d69cc487f01a59faa5b42b028e5ffff7563a5f3fcf63277235ce6ce7d",
         "declaration_hash": "022846a7d90e9c383edb743018558b4346db55f81331fc234563fda16f5d7ae6",
         "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
       },
@@ -1767,13 +1767,13 @@
         "item_identifier": "trait_method:save"
       },
       "key": {
-        "bound_tests_set_hash": "3090be3ec71f0bfa48c6827c267b4229ff5ab2d89e072c26c44e0bd442040e68",
+        "bound_tests_set_hash": "52b3fc8d69cc487f01a59faa5b42b028e5ffff7563a5f3fcf63277235ce6ce7d",
         "declaration_hash": "022846a7d90e9c383edb743018558b4346db55f81331fc234563fda16f5d7ae6",
-        "anchor_text_hash": "c8eb5ee4ee4d8332f5431abb9438c23966eeea88bd0f6088cc84be6c5c1f4031"
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(codec.load(&TrackId::try_new(\"absent-track\").unwrap()).unwrap().is_none());\n\nassert!(matches!(result, Err(ObligationCheckError::BindingsAbsent)));"
+        "citation": "assert_eq!(bindings_port.save_calls(), 0);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2271,13 +2271,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "85d2bf36f163408a313106fc7fee92c774016b8bed0c9516e56725cd169c68ae",
+        "bound_tests_set_hash": "a6b11f4a29de2ae9c5d731e5aafc7312a5085593f2de3ffe34579aff5516de01",
         "declaration_hash": "d6a8669983281879d19855dc0dab1b12e128771e9ec4415c25109e382af30fe1",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "`// IN-08: a malformed / role-incomplete rules config aborts \\`check\\` up front` ... `assert!(matches!( result, Err(ObligationCheckError::RulesLoad(TestObligationRulesLoadError::RoleNotCovered { .. })) ));` ... `// IN-13: an obligation with no binding is \\`missing\\`.` ... `assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));` ... `// IN-13 / CN-11: a Fulfillment binding for a non-derived obligation is \\`orphaned\\`.` ... `// CN-02 / AC-04: a cited active entry edge remains in the totality universe` ... `assert!(matches!(result, Err(ObligationCheckError::UnresolvedEdges { .. })));` ... `// D4 / CN-02: a zero-obligation edge is resolved by a fresh waived verdict.` ... `assert_eq!(outcome.resolved_edges(), &[edge()]);` ... `// AC-04: a fresh fulfilled verdict resolves the edge and the gate passes.` ... `// IN-08 / AC-04: \\`check\\` remains pure-read and refuses a frozen verdict whenever either the bound-test claim or anchor evidence no longer matches.` ... `assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));`"
+        "citation": "\"assert!(matches!(result, Err(ObligationCheckError::BindingsAbsent)));\" / \"assert!(matches!(result, Err(ObligationCheckError::UnresolvedEdges { .. })));\" / \"assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));\" / \"assert!(matches!(result, Err(ObligationCheckError::RulesLoad(TestObligationRulesLoadError::RoleNotCovered { .. }))));\" / \"assert!(matches!(result, Err(ObligationCheckError::StaleObligationsArtifact { detail }) if detail.as_str().contains(\\\"added=1\\\")))\" / \"assert_eq!(outcome.resolved_edges(), &[edge()]);\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2295,13 +2295,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "85d2bf36f163408a313106fc7fee92c774016b8bed0c9516e56725cd169c68ae",
+        "bound_tests_set_hash": "a6b11f4a29de2ae9c5d731e5aafc7312a5085593f2de3ffe34579aff5516de01",
         "declaration_hash": "d6a8669983281879d19855dc0dab1b12e128771e9ec4415c25109e382af30fe1",
         "anchor_text_hash": "4802b74415a134607211305c91ff4d591a481cc1ae3e15a6cb105a84ca3d96ec"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "for key in [\n        ObligationFulfillmentCacheKey::new(\n            BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),\n            current_declaration.clone(),\n            current_anchor.clone(),\n        ),\n        ObligationFulfillmentCacheKey::new(\n            current_bound_tests.clone(),\n            current_declaration.clone(),\n            AnchorTextHash::new(ContentHash::from_bytes([2u8; 32])),\n        ),\n    ] {\n...\n        assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));\n    }"
+        "citation": "let interactor = CheckTestObligationsInteractor::new(\n        Arc::new(StubRules::valid()),\n        Arc::new(StubObligations(Some(obligations.clone()))),\n        Arc::new(StubBindings(Some(bindings))),\n        Arc::new(StubScanner),\n        Arc::new(StubFulfillmentCache(Some(fresh_fulfillment_cache_for_fingerprint(\n            &obligation(),\n            Some(fulfillment_fingerprint.clone()),\n        )))),\n        Arc::new(StubWaiverCache(None)),\n        fulfillment_fingerprint.clone(),\n        waiver_fingerprint.clone(),\n        Arc::new(StubSpec(spec_doc())),\n        Arc::new(StubCatalogue(money_catalogue())),\n    );\n\n    let outcome = interactor.execute(&command()).unwrap();\n\n    assert_eq!(outcome.resolved_edges(), &[edge()]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2319,13 +2319,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "c29a66ea421bc4752ca961d5a2c3c29938a31d202c587e9dd58d19595d3b633b",
+        "bound_tests_set_hash": "a2e523e9e364c0cbec2e1985af3c65acf3cbf2e0a8acf53bbb392ef9c9567095",
         "declaration_hash": "c73c1be9e1b85e9042b10dcfa13cb8dfad0f7d8edafd6e09f754c0d92d9bc164",
         "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(sink.saved.lock().unwrap().clone().unwrap().obligations().is_empty());\nassert_eq!(saved.obligations().len(), 2);\nassert!(items.contains(&\"invariant:positive\"));\nassert!(items.contains(&\"invariant:bounded\"));\nassert_eq!(first, second);"
+        "citation": "assert_eq!(first, second);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2607,13 +2607,13 @@
         "item_identifier": "trait_method:execute"
       },
       "key": {
-        "bound_tests_set_hash": "5db2ea2f790d8cbe3a21b01b321fca2315fb0ba732f296e310135276a904c8b9",
+        "bound_tests_set_hash": "c05d469989928218c3274517f8a37510ddadd2f8277953d58636156461d5755b",
         "declaration_hash": "3fd92b8837f2c23e8c2ea7d757648565985493a24bfc73e254091e46f90ee83b",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "// AC-04: a fresh fulfilled verdict resolves the edge and the gate passes.\nlet obligations = ObligationsDocument::new(track(), vec![obligation()]);\nlet bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);\nlet outcome =\n    interactor(Some(obligations), Some(bindings), Some(fresh_fulfillment_cache()), None)\n        .execute(&command())\n        .unwrap();\nassert_eq!(outcome.resolved_edges(), &[edge()]);\n\n// IN-08: a malformed / role-incomplete rules config aborts `check` up front\nlet result = interactor_with_rules_loader(Arc::new(FailingRules)).execute(&command());\nassert!(matches!(\n    result,\n    Err(ObligationCheckError::RulesLoad(TestObligationRulesLoadError::RoleNotCovered { .. }))\n));\n\n// A bound edge with no frozen verdict is stale (no fresh pass).\nassert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));"
+        "citation": "\"// AC-04: a fresh fulfilled verdict resolves the edge and the gate passes.\"; \"assert_eq!(outcome.resolved_edges(), &[edge()]);\"; \"assert_eq!(bindings_port.save_calls(), 0);\"; \"// IN-13: an obligation with no binding is `missing`.\"; \"// IN-13 / CN-11: a Fulfillment binding for a non-derived obligation is `orphaned`.\"; \"Err(ObligationCheckError::StaleObligationsArtifact { detail })\\n            if detail.as_str().contains(\\\"added=1\\\")\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2631,13 +2631,13 @@
         "item_identifier": "trait_method:execute"
       },
       "key": {
-        "bound_tests_set_hash": "5db2ea2f790d8cbe3a21b01b321fca2315fb0ba732f296e310135276a904c8b9",
+        "bound_tests_set_hash": "c05d469989928218c3274517f8a37510ddadd2f8277953d58636156461d5755b",
         "declaration_hash": "3fd92b8837f2c23e8c2ea7d757648565985493a24bfc73e254091e46f90ee83b",
-        "anchor_text_hash": "c8eb5ee4ee4d8332f5431abb9438c23966eeea88bd0f6088cc84be6c5c1f4031"
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "// IN-13: an obligation with no binding is `missing`. | assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. }))); | // IN-13 / CN-11: a Fulfillment binding for a non-derived obligation is `orphaned`. | assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. }))); | assert!(matches!(result, Err(ObligationCheckError::UnresolvedEdges { .. }))); | assert!(matches!(result, Err(ObligationCheckError::BindingsAbsent))); | // AC-04 / CN-04: a decl-hash mismatch surfaces `decl_changed` freshness drift. | assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. }))); | // IN-08 / AC-04: `check` remains pure-read and refuses a frozen verdict | assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. }))); | // AC-04: a fresh fulfilled verdict resolves the edge and the gate passes. | assert_eq!(outcome.resolved_edges(), &[edge()]);"
+        "citation": "assert!(matches!(result, Err(ObligationCheckError::ObligationsAbsent))); | assert!(matches!(result, Err(ObligationCheckError::BindingsAbsent))); | assert!(matches!(result, Err(ObligationCheckError::StaleObligationsArtifact { detail }) if detail.as_str().contains(\"added=1\"))); | assert!(matches!(result, Err(ObligationCheckError::StaleObligationsArtifact { detail }) if detail.as_str().contains(\"removed=1\"))); | assert!(matches!(result, Err(ObligationCheckError::StaleObligationsArtifact { detail }) if detail.as_str().contains(\"changed=1\"))); | assert!(matches!(result, Err(ObligationCheckError::UnresolvedEdges { .. }))); | assert_eq!(bindings_port.save_calls(), 0);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2655,13 +2655,13 @@
         "item_identifier": "trait_method:execute"
       },
       "key": {
-        "bound_tests_set_hash": "5db2ea2f790d8cbe3a21b01b321fca2315fb0ba732f296e310135276a904c8b9",
+        "bound_tests_set_hash": "c05d469989928218c3274517f8a37510ddadd2f8277953d58636156461d5755b",
         "declaration_hash": "3fd92b8837f2c23e8c2ea7d757648565985493a24bfc73e254091e46f90ee83b",
         "anchor_text_hash": "98b477739efddc669f1fb0ae30d514b897ef5d5db9442e55cdfbb0bdd1fdc8cd"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let outcome = empty_scope_interactor_without_readers().execute(&command()).unwrap();\n    assert!(outcome.resolved_edges().is_empty());\n    assert!(outcome.uncited_findings().is_empty()); ... assert!(matches!(result, Err(ObligationCheckError::ObligationsAbsent))); ... assert!(matches!(result, Err(ObligationCheckError::BindingsAbsent)));"
+        "citation": "// AC-10 / IN-14: both artifacts absent → zero pairs pass by artifact\n// existence alone, even before spec/catalogues are materialized.\nlet outcome = empty_scope_interactor_without_readers().execute(&command()).unwrap();\nassert!(outcome.resolved_edges().is_empty());\nassert!(outcome.uncited_findings().is_empty());\n\n// AC-10: half-materialised scope is fail-closed.\nlet result =\n    interactor(Some(ObligationsDocument::new(track(), vec![obligation()])), None, None, None)\n        .execute(&command());\nassert!(matches!(result, Err(ObligationCheckError::BindingsAbsent)));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -3159,13 +3159,13 @@
         "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationsArtifactPort"
       },
       "key": {
-        "bound_tests_set_hash": "d6a22b1c80cfb289dc5f43fcdc9100ee0ab04c13333557f31029f74426547bf7",
+        "bound_tests_set_hash": "09dfa86873c990e128a3ff935eeb51fe49c382e0ad8254fdab79f8698e3a3422",
         "declaration_hash": "648fe7023776f1e8a1264a66b5f03365c9cc08ae396454e1ff8d3c9120ecccd9",
         "anchor_text_hash": "3c5acf05aa2b34161959f8cab9bcb86676033dc7d92f6dd52d6485b17d911066"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(decoded.into_domain().unwrap(), doc);"
+        "citation": "codec.save(&doc).unwrap();\n        let loaded = codec.load(doc.track_id()).unwrap();\n        assert_eq!(loaded, Some(doc));\n\n        let dto = ObligationsDocumentDto::from_domain(&doc);\n        let json = serde_json::to_string_pretty(&dto).unwrap();\n        let decoded: ObligationsDocumentDto = serde_json::from_str(&json).unwrap();\n        assert_eq!(decoded.into_domain().unwrap(), doc);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -3183,13 +3183,13 @@
         "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationsArtifactPort"
       },
       "key": {
-        "bound_tests_set_hash": "d6a22b1c80cfb289dc5f43fcdc9100ee0ab04c13333557f31029f74426547bf7",
+        "bound_tests_set_hash": "09dfa86873c990e128a3ff935eeb51fe49c382e0ad8254fdab79f8698e3a3422",
         "declaration_hash": "648fe7023776f1e8a1264a66b5f03365c9cc08ae396454e1ff8d3c9120ecccd9",
         "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(conformance.len(), 1);\n    assert_eq!(conformance[0].id().entry_key().as_str(), \"MyAdapter\");\n    assert_eq!(conformance[0].spec_refs()[0].element_id(), \"IN-06\");\n    assert_eq!(conformance[0].id().item_identifier().as_str(), \"trait_impl:usecase::SharedPort\");"
+        "citation": "// IN-17 / AC-16: trait_ref -> catalogue ContractRole; external -> 0."
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -3207,13 +3207,13 @@
         "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationsArtifactPort"
       },
       "key": {
-        "bound_tests_set_hash": "d6a22b1c80cfb289dc5f43fcdc9100ee0ab04c13333557f31029f74426547bf7",
+        "bound_tests_set_hash": "09dfa86873c990e128a3ff935eeb51fe49c382e0ad8254fdab79f8698e3a3422",
         "declaration_hash": "648fe7023776f1e8a1264a66b5f03365c9cc08ae396454e1ff8d3c9120ecccd9",
         "anchor_text_hash": "23ef7b6f69fba30ba0154c5a917cde7d21d58c34c8a688f6b54a554405bd4b76"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(a.id(), b.id());\n    assert_ne!(a.declaration_hash(), b.declaration_hash());"
+        "citation": "codec.save(&doc).unwrap();\n        let loaded = codec.load(doc.track_id()).unwrap();\n        assert_eq!(loaded, Some(doc));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -3231,13 +3231,13 @@
         "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::TestBindingsArtifactPort"
       },
       "key": {
-        "bound_tests_set_hash": "4020ddd0586d97ca6fd3018eddaa2214fcafdfd40dd9ca2587d8852ed69beca4",
+        "bound_tests_set_hash": "dfe5d224893b726bf5c050ab12fd6e7eb3ebbfb62a27ca50637b35ec26971aa2",
         "declaration_hash": "4d6cfaf533a12839d3c3ea47a8d9748a542e41de8667b9d50171644aca948403",
         "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let doc = document(vec![\n            TestBindingRecord::Fulfillment { obligation_id: obligation_id(), tests: tests() },\n            TestBindingRecord::Waiver {\n                edge_id: edge_id(),\n                reason: WaivedReason::try_new(\"covered elsewhere\".to_owned()).unwrap(),\n            },\n        ]);\n        codec.save(&doc).unwrap();\n        assert_eq!(codec.load(doc.track_id()).unwrap(), Some(doc));\n\nround_trip(TestBindingRecord::VoluntaryBinding { edge_id: edge_id(), tests: tests() });"
+        "citation": "let doc = document(vec![\n            TestBindingRecord::Fulfillment { obligation_id: obligation_id(), tests: tests() },\n            TestBindingRecord::Waiver {\n                edge_id: edge_id(),\n                reason: WaivedReason::try_new(\"covered elsewhere\".to_owned()).unwrap(),\n            },\n        ]);\n        codec.save(&doc).unwrap();\n        assert_eq!(codec.load(doc.track_id()).unwrap(), Some(doc));\n\n        round_trip(TestBindingRecord::VoluntaryBinding { edge_id: edge_id(), tests: tests() });"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -3255,13 +3255,13 @@
         "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::TestBindingsArtifactPort"
       },
       "key": {
-        "bound_tests_set_hash": "4020ddd0586d97ca6fd3018eddaa2214fcafdfd40dd9ca2587d8852ed69beca4",
+        "bound_tests_set_hash": "dfe5d224893b726bf5c050ab12fd6e7eb3ebbfb62a27ca50637b35ec26971aa2",
         "declaration_hash": "4d6cfaf533a12839d3c3ea47a8d9748a542e41de8667b9d50171644aca948403",
-        "anchor_text_hash": "c8eb5ee4ee4d8332f5431abb9438c23966eeea88bd0f6088cc84be6c5c1f4031"
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let before = std::fs::read(&artifact).unwrap();\n\n        let loaded = codec.load(doc.track_id()).unwrap();\n\n        assert_eq!(loaded, Some(doc));\n        assert_eq!(std::fs::read(&artifact).unwrap(), before);"
+        "citation": "let loaded = codec.load(doc.track_id()).unwrap();\n\n        assert_eq!(loaded, Some(doc));\n        assert_eq!(std::fs::read(&artifact).unwrap(), before);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -3927,13 +3927,13 @@
         "item_identifier": "trait_impl:domain::spec_document_loader_port::SpecDocumentLoaderPort"
       },
       "key": {
-        "bound_tests_set_hash": "ea4989021137cb28b2d8741a9f0a72d39c26d25ee9e34e338cd44dd89509466e",
+        "bound_tests_set_hash": "4e66123f255ec73b625fb8a65a89ffd04ca16679f0c6678b9fae7f488ea82225",
         "declaration_hash": "df7027bba0d7ca758f571dbe4c77324811b641b3152bb512ef07654975537e53",
         "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "    infrastructure.push_trait_impl(TraitImplDeclV2::new(\n        TypeRef::new(\"domain::spec_document_loader_port::SpecDocumentLoaderPort\").unwrap(),\n        TypeRef::new(\"FsSpecDocumentLoader\").unwrap(),\n    ));\n\n    let (interactor, sink) = interactor_with_catalogues(\n        rules_doc(),\n        vec![(domain_path.clone(), domain), (infrastructure_path.clone(), infrastructure)],\n    );\n    interactor.execute(&command(vec![domain_path, infrastructure_path])).unwrap();\n\n    let saved = sink.saved.lock().unwrap().clone().unwrap();\n    let conformance: Vec<_> = saved\n        .obligations()\n        .iter()\n        .filter(|obligation| {\n            obligation.id().entry_key().as_str() == \"FsSpecDocumentLoader\"\n                && *obligation.id().obligation_kind() == TestObligationKind::ContractConformance\n        })\n        .collect();\n    assert_eq!(conformance.len(), 1);\n    assert_eq!(\n        conformance[0].id().item_identifier().as_str(),\n        \"trait_impl:domain::spec_document_loader_port::SpecDocumentLoaderPort\"\n    );\n    assert_eq!(conformance[0].spec_refs()[0].element_id(), \"IN-07\");"
+        "citation": "\"let conformance: Vec<_> = saved\\n        .obligations()\\n        .iter()\\n        .filter(|obligation| {\\n            obligation.id().entry_key().as_str() == \\\"FsSpecDocumentLoader\\\"\\n                && *obligation.id().obligation_kind() == TestObligationKind::ContractConformance\\n        })\\n        .collect();\\n    assert_eq!(conformance.len(), 1);\\n    assert_eq!(\\n        conformance[0].id().item_identifier().as_str(),\\n        \\\"trait_impl:domain::spec_document_loader_port::SpecDocumentLoaderPort\\\"\\n    );\\n    assert_eq!(conformance[0].spec_refs()[0].element_id(), \\\"IN-07\\\");\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4241,7 +4241,7 @@
       "key": {
         "bound_tests_set_hash": "5fe8cbca34d99cee3cfccb3ad63035343c4ed3d2db0b8a512a13dfe324b4a8aa",
         "declaration_hash": "2315aa6b4f8e7d8a087a786e62d53e5b3bc39cead87fc5396e0ab77e66bdb023",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -4431,9 +4431,9 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "1ce19976105fdaa55d79b124f749f194bd1024c05f11371935edc5cc4b3b798f",
+        "bound_tests_set_hash": "668e472b77d99fe0af03b2f244667153fadc8480952b33fd3e1a3c83ccce1641",
         "declaration_hash": "8a48c73b3a03b8df5ddb73e6a43c2030fb1dcde2e993236fdda91927e41e1022",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -4455,13 +4455,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "1ce19976105fdaa55d79b124f749f194bd1024c05f11371935edc5cc4b3b798f",
+        "bound_tests_set_hash": "668e472b77d99fe0af03b2f244667153fadc8480952b33fd3e1a3c83ccce1641",
         "declaration_hash": "8a48c73b3a03b8df5ddb73e6a43c2030fb1dcde2e993236fdda91927e41e1022",
-        "anchor_text_hash": "c8eb5ee4ee4d8332f5431abb9438c23966eeea88bd0f6088cc84be6c5c1f4031"
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let exit = execute_check_with(\n            &TestObligationCheckArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },\n            |explicit_track_id| {\n                assert_eq!(explicit_track_id, Some(OBLIGATION_TRACK_ID));\n                Ok((fixture_root(&workspace_root), BRANCH_NOT_READ.to_owned()))\n            },\n            |root, input| driver_outcome_to_exit(root.check_handler().handle(input)),\n        );\n\n        assert_eq!(exit, ExitCode::FAILURE);"
+        "citation": "let temp = fixture_workspace(&[\"obligations.json\"]);\n        let workspace_root = temp.path().join(\"workspace\");\n\n        let exit = execute_check_with(\n            &TestObligationCheckArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },\n            |explicit_track_id| {\n                assert_eq!(explicit_track_id, Some(OBLIGATION_TRACK_ID));\n                Ok((fixture_root(&workspace_root), BRANCH_NOT_READ.to_owned()))\n            },\n            |root, input| driver_outcome_to_exit(root.check_handler().handle(input)),\n        );\n\n        assert_eq!(exit, ExitCode::FAILURE);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4479,13 +4479,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "1ce19976105fdaa55d79b124f749f194bd1024c05f11371935edc5cc4b3b798f",
+        "bound_tests_set_hash": "668e472b77d99fe0af03b2f244667153fadc8480952b33fd3e1a3c83ccce1641",
         "declaration_hash": "8a48c73b3a03b8df5ddb73e6a43c2030fb1dcde2e993236fdda91927e41e1022",
         "anchor_text_hash": "98b477739efddc669f1fb0ae30d514b897ef5d5db9442e55cdfbb0bdd1fdc8cd"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"let outcome = empty_scope_interactor_without_readers().execute(&command()).unwrap();\\n    assert!(outcome.resolved_edges().is_empty());\\n    assert!(outcome.uncited_findings().is_empty());\" and \"let temp = fixture_workspace(&[\\\"obligations.json\\\"]);\" ... \"assert_eq!(exit, ExitCode::FAILURE);\" and \"for prohibited in [\\\"--context\\\", \\\"--layer\\\", \\\"--scope\\\"] {\\n                assert!(\\n                    TestCli::try_parse_from([\\\"test-obligation\\\", subcommand, prohibited]).is_err()\\n                );\\n            }\""
+        "citation": "let missing_track = Some(\"test-obligation-missing-track\".to_owned());\n\n        assert_eq!(\n            execute_check(&TestObligationCheckArgs { track_id: missing_track.clone() }),\n            ExitCode::SUCCESS\n        );\n\n        let outcome = handler.handle(TestObligationCheckInput::new(None, branch));\n\n        assert_eq!(outcome.exit_code, 0);\n        assert!(outcome.stdout.unwrap().contains(\"resolved_edges=0\"));\n\nfor subcommand in [\"derive\", \"check\", \"evaluate\", \"results\", \"bindings-skeleton\"] {\n            for prohibited in [\"--context\", \"--layer\", \"--scope\"] {\n                assert!(\n                    TestCli::try_parse_from([\"test-obligation\", subcommand, prohibited]).is_err()\n                );\n            }\n        }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4503,13 +4503,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "1ce19976105fdaa55d79b124f749f194bd1024c05f11371935edc5cc4b3b798f",
+        "bound_tests_set_hash": "668e472b77d99fe0af03b2f244667153fadc8480952b33fd3e1a3c83ccce1641",
         "declaration_hash": "8a48c73b3a03b8df5ddb73e6a43c2030fb1dcde2e993236fdda91927e41e1022",
         "anchor_text_hash": "5f1a57e5aada23c582a8e9638363a9efaed8d2498241bc14fd56e96bacce4af6"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let exit = execute_check_with(\n    &TestObligationCheckArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },\n    |explicit_track_id| {\n        assert_eq!(explicit_track_id, Some(OBLIGATION_TRACK_ID));\n        Ok((fixture_root(&workspace_root), BRANCH_NOT_READ.to_owned()))\n    },\n    |root, input| driver_outcome_to_exit(root.check_handler().handle(input)),\n);\n\nassert_eq!(exit, ExitCode::FAILURE);"
+        "citation": "let exit = execute_check_with(\n            &TestObligationCheckArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },\n            |explicit_track_id| {\n                assert_eq!(explicit_track_id, Some(OBLIGATION_TRACK_ID));\n                Ok((fixture_root(&workspace_root), BRANCH_NOT_READ.to_owned()))\n            },\n            |root, input| driver_outcome_to_exit(root.check_handler().handle(input)),\n        );\n\n        assert_eq!(exit, ExitCode::FAILURE);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4769,11 +4769,11 @@
       "key": {
         "bound_tests_set_hash": "800822a532acc5674c7511d16785ba2f5d3cf8d66e308f4d839bb29b7199ab39",
         "declaration_hash": "6fc7af23aec335f65231f6f9981631434ee0d235b887fc6828e05624f829c7fb",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"let branch = read_command_branch(Some(\\\"example-track\\\"), || -> Result<String, CliError> {\\n            panic!(\\\"current branch should not be read for explicit track id\\\");\\n        })\\n        .unwrap();\\n\\n        assert_eq!(branch, BRANCH_NOT_READ);\"; \"let branch = read_command_branch(None, || Ok(\\\"track/current-track\\\".to_owned())).unwrap();\\n\\n        assert_eq!(branch, \\\"track/current-track\\\");\""
+        "citation": "let branch = read_command_branch(None, || Ok(\"track/current-track\".to_owned())).unwrap();\n\n        assert_eq!(branch, \"track/current-track\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4889,7 +4889,7 @@
       "key": {
         "bound_tests_set_hash": "af55b8f4b64c86e6e6dbb63ed50775e5797a979be789ec5144a73f8f10dc6709",
         "declaration_hash": "7a8535a728de69d7fa44014eba3e84b7bd0f45b629999dc3c53604138ee324da",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -4971,6 +4971,30 @@
     },
     {
       "edge_id": {
+        "entry_key": "ObligationsDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "13ccf7e2a10c1ad02800600b1a8f0fe3f3f772a029123917b37ea0283cccbc1a",
+        "declaration_hash": "9c7cab6edbf8b56dfe9cbbd1d60c268aa08453b2b692df18958f51ba754130da",
+        "anchor_text_hash": "23ef7b6f69fba30ba0154c5a917cde7d21d58c34c8a688f6b54a554405bd4b76"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "// AC-03 / CN-01: id is content-hash-free; only decl_hash tracks content.\n...\nassert_eq!(a.id(), b.id());\nassert_ne!(a.declaration_hash(), b.declaration_hash());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
         "entry_key": "SemanticVerifierError",
         "anchor_id": {
           "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
@@ -4990,6 +5014,54 @@
       "verdict": {
         "kind": "fulfilled",
         "citation": "assert!(matches!(fulfillment_error, SemanticVerifierError::VerifierPort(_)));\\n        assert!(matches!(waiver_error, SemanticVerifierError::VerifierPort(_)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TargetEntryRoleKind",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TargetEntryRoleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "fb163b6c063aa638f00756997a7091a387ed173f27603d3079f73aee219dd2c1",
+        "declaration_hash": "299f29454bcf0fb2cade51ba2319cd61edb9c57d952c911b3d4576f53e76ef80",
+        "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let entry =\n        value_object_entry(ItemAction::Add, vec![invariant(\"positive\"), invariant(\"bounded\")]);\n    let (interactor, sink) = interactor(rules_doc(), catalogue_with_type(\"Money\", entry), &path);\n\n    interactor.execute(&command(vec![path])).unwrap();\n\n    let saved = sink.saved.lock().unwrap().clone().unwrap();\n    assert_eq!(saved.obligations().len(), 2);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TargetEntryRoleKind",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-17"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TargetEntryRoleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-17"
+      },
+      "key": {
+        "bound_tests_set_hash": "71b892c5a69d32d3aecb453c6342023ce13499600a21d8ef18f57c5f0c8352b3",
+        "declaration_hash": "299f29454bcf0fb2cade51ba2319cd61edb9c57d952c911b3d4576f53e76ef80",
+        "anchor_text_hash": "3357d986d9171bee78e1b975e78461e8ae02d6b1cf86f56a1774605d038d28a1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "// IN-17 / AC-16: trait_ref -> catalogue ContractRole; external -> 0.\n...\nassert_eq!(conformance.len(), 1);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5343,13 +5415,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "bd33cd294d9c1b5068ed3a2748bfce63e82c2d7589bf29b874ba4983f008ab52",
+        "bound_tests_set_hash": "d2a852fafcae2a7a93543fb2982b98976b8e54f2b8a841eecfe20affd3bcf119",
         "declaration_hash": "a578e0cfb1184e21aaa5d61e17331c81acb2b6d1d5a50657fb7d3dcb4af0b190",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let exit = execute_check_with(\n    &TestObligationCheckArgs { track_id: None },\n    |explicit_track_id| {\n        assert!(explicit_track_id.is_none());\n        command_context_with(\n            || Ok(fixture_root(&workspace_root)),\n            |_| Ok(format!(\"track/{OBLIGATION_TRACK_ID}\")),\n        )\n    },\n    |root, input| {\n        assert!(input.track_id().is_none());\n        assert_eq!(input.current_branch().as_str(), format!(\"track/{OBLIGATION_TRACK_ID}\"));\n        driver_outcome_to_exit(root.check_handler().handle(input))\n    },\n);\n\nassert_eq!(exit, ExitCode::SUCCESS);"
+        "citation": "let exit = execute_check_with(\n            &TestObligationCheckArgs { track_id: None },\n            |explicit_track_id| {\n                assert!(explicit_track_id.is_none());\n                command_context_with(\n                    || Ok(fixture_root(&workspace_root)),\n                    |_| Ok(format!(\"track/{OBLIGATION_TRACK_ID}\")),\n                )\n            },\n            |root, input| {\n                assert!(input.track_id().is_none());\n                assert_eq!(input.current_branch().as_str(), format!(\"track/{OBLIGATION_TRACK_ID}\"));\n                driver_outcome_to_exit(root.check_handler().handle(input))\n            },\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5367,13 +5439,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "bd33cd294d9c1b5068ed3a2748bfce63e82c2d7589bf29b874ba4983f008ab52",
+        "bound_tests_set_hash": "d2a852fafcae2a7a93543fb2982b98976b8e54f2b8a841eecfe20affd3bcf119",
         "declaration_hash": "a578e0cfb1184e21aaa5d61e17331c81acb2b6d1d5a50657fb7d3dcb4af0b190",
-        "anchor_text_hash": "c8eb5ee4ee4d8332f5431abb9438c23966eeea88bd0f6088cc84be6c5c1f4031"
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "|root, input| driver_outcome_to_exit(root.check_handler().handle(input)),\n        );\n\n        assert_eq!(exit, ExitCode::FAILURE);"
+        "citation": "let exit = execute_check_with(\n            &TestObligationCheckArgs { track_id: None },\n            |explicit_track_id| {\n                assert!(explicit_track_id.is_none());\n                command_context_with(\n                    || Ok(fixture_root(&workspace_root)),\n                    |_| Ok(format!(\"track/{OBLIGATION_TRACK_ID}\")),\n                )\n            },\n            |root, input| {\n                assert!(input.track_id().is_none());\n                assert_eq!(input.current_branch().as_str(), format!(\"track/{OBLIGATION_TRACK_ID}\"));\n                driver_outcome_to_exit(root.check_handler().handle(input))\n            },\n        );\n\n        assert_eq!(exit, ExitCode::SUCCESS);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5391,13 +5463,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "bd33cd294d9c1b5068ed3a2748bfce63e82c2d7589bf29b874ba4983f008ab52",
+        "bound_tests_set_hash": "d2a852fafcae2a7a93543fb2982b98976b8e54f2b8a841eecfe20affd3bcf119",
         "declaration_hash": "a578e0cfb1184e21aaa5d61e17331c81acb2b6d1d5a50657fb7d3dcb4af0b190",
         "anchor_text_hash": "98b477739efddc669f1fb0ae30d514b897ef5d5db9442e55cdfbb0bdd1fdc8cd"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(exit, ExitCode::SUCCESS);"
+        "citation": "let outcome = empty_scope_interactor_without_readers().execute(&command()).unwrap();\nassert!(outcome.resolved_edges().is_empty());\nassert!(outcome.uncited_findings().is_empty());\n\nassert!(matches!(result, Err(ObligationCheckError::BindingsAbsent)));\n\nassert!(matches!(result, Err(ObligationCheckError::ObligationsAbsent)));\n\nfor prohibited in [\"--context\", \"--layer\", \"--scope\"] {\n    assert!(\n        TestCli::try_parse_from([\"test-obligation\", subcommand, prohibited]).is_err()\n    );\n}"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5415,13 +5487,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "bd33cd294d9c1b5068ed3a2748bfce63e82c2d7589bf29b874ba4983f008ab52",
+        "bound_tests_set_hash": "d2a852fafcae2a7a93543fb2982b98976b8e54f2b8a841eecfe20affd3bcf119",
         "declaration_hash": "a578e0cfb1184e21aaa5d61e17331c81acb2b6d1d5a50657fb7d3dcb4af0b190",
         "anchor_text_hash": "7bc9fedeac270b98f77789e0857ba4d0516dc096c4c02bd5c98445bc01fa6730"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let exit = execute_check_with(\n            &TestObligationCheckArgs { track_id: None },\n            |explicit_track_id| {\n                assert!(explicit_track_id.is_none());\n                command_context_with(\n                    || Ok(fixture_root(&workspace_root)),\n                    |_| Ok(format!(\"track/{OBLIGATION_TRACK_ID}\")),\n                )\n            },\n            |root, input| {\n                assert!(input.track_id().is_none());\n                assert_eq!(input.current_branch().as_str(), format!(\"track/{OBLIGATION_TRACK_ID}\"));\n                driver_outcome_to_exit(root.check_handler().handle(input))\n            },\n        );\n\n        assert_eq!(exit, ExitCode::SUCCESS);"
+        "citation": "assert!(TestCli::try_parse_from([\"test-obligation\", subcommand, prohibited]).is_err())\n\nassert!(matches!(result, Err(ObligationCheckError::BindingsAbsent)));\n\nassert_eq!(outcome.resolved_edges(), &[edge()]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5439,13 +5511,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "cf87a821b215a7387f8cce23e2c9aeb97ea68e97c66f0e9d6f9fa99668ae7ede",
+        "bound_tests_set_hash": "dc27f0274aaa2ada643f3af409a27c215eaf7083216ab3fc8da1f34452d6759a",
         "declaration_hash": "5c166f38519a8b0a66259a9c61805892b1ffbd10030c0cb2ecadc0138ac49812",
         "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let exit = execute_derive_with(\n            &TestObligationDeriveArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },\n            || Ok((fixture_root(&workspace_root), format!(\"track/{OBLIGATION_TRACK_ID}\"))),\n            |root, input| driver_outcome_to_exit(root.derive_handler().handle(input)),\n        );\n\n        assert_eq!(exit, ExitCode::SUCCESS);\n        assert!(expected_artifact.is_file());"
+        "citation": "assert_eq!(exit, ExitCode::SUCCESS);\n        assert!(expected_artifact.is_file());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5463,13 +5535,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "cf87a821b215a7387f8cce23e2c9aeb97ea68e97c66f0e9d6f9fa99668ae7ede",
+        "bound_tests_set_hash": "dc27f0274aaa2ada643f3af409a27c215eaf7083216ab3fc8da1f34452d6759a",
         "declaration_hash": "5c166f38519a8b0a66259a9c61805892b1ffbd10030c0cb2ecadc0138ac49812",
         "anchor_text_hash": "23ef7b6f69fba30ba0154c5a917cde7d21d58c34c8a688f6b54a554405bd4b76"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let exit = execute_derive_with(\n            &TestObligationDeriveArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },\n            || Ok((fixture_root(&workspace_root), format!(\"track/{OBLIGATION_TRACK_ID}\"))),\n            |root, input| driver_outcome_to_exit(root.derive_handler().handle(input)),\n        );\n\n        assert_eq!(exit, ExitCode::SUCCESS);\n        assert!(expected_artifact.is_file());"
+        "citation": "assert_eq!(exit, ExitCode::SUCCESS);\n        assert!(expected_artifact.is_file());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5487,13 +5559,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "cf87a821b215a7387f8cce23e2c9aeb97ea68e97c66f0e9d6f9fa99668ae7ede",
+        "bound_tests_set_hash": "dc27f0274aaa2ada643f3af409a27c215eaf7083216ab3fc8da1f34452d6759a",
         "declaration_hash": "5c166f38519a8b0a66259a9c61805892b1ffbd10030c0cb2ecadc0138ac49812",
         "anchor_text_hash": "7bc9fedeac270b98f77789e0857ba4d0516dc096c4c02bd5c98445bc01fa6730"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(exit, ExitCode::SUCCESS);\n        assert!(expected_artifact.is_file());"
+        "citation": "let exit = execute_derive_with(\n            &TestObligationDeriveArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },\n            || Ok((fixture_root(&workspace_root), format!(\"track/{OBLIGATION_TRACK_ID}\"))),\n            |root, input| driver_outcome_to_exit(root.derive_handler().handle(input)),\n        );\n\n        assert_eq!(exit, ExitCode::SUCCESS);\n        assert!(expected_artifact.is_file());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5710,6 +5782,30 @@
       "verdict": {
         "kind": "fulfilled",
         "citation": "assert_eq!(entry.verifier_fingerprint(), Some(&fingerprint));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationsDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "312f68558af9ad71e2ec138a371f317decf39b2829c07d95f8112287c35eec7c",
+        "declaration_hash": "9c7cab6edbf8b56dfe9cbbd1d60c268aa08453b2b692df18958f51ba754130da",
+        "anchor_text_hash": "3c5acf05aa2b34161959f8cab9bcb86676033dc7d92f6dd52d6485b17d911066"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let json = serde_json::to_string_pretty(&dto).unwrap();\n        let decoded: ObligationsDocumentDto = serde_json::from_str(&json).unwrap();\n        assert_eq!(decoded.into_domain().unwrap(), doc); ... assert_eq!(a.id(), b.id());\n    assert_ne!(a.declaration_hash(), b.declaration_hash()); ... assert_eq!(obligation.id().entry_key().as_str(), \"Money\");\n    assert_eq!(obligation.id().item_identifier().as_str(), \"invariant:positive\");\n    assert_eq!(obligation.target_entry().entry_key.as_str(), \"Money\");\n    assert!(!obligation.brief().as_str().is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -6375,13 +6471,13 @@
         "item_identifier": "voluntary:AC-04"
       },
       "key": {
-        "bound_tests_set_hash": "f56fae10f97b8ef8a924b44b21110dfc842172d82a174e6653cbbccf306011f6",
+        "bound_tests_set_hash": "8fb597a4c1cd5865d03bb9adffbd1e20c06415ae11f577226e1fb12b7bd2afde",
         "declaration_hash": "516fceb9d32d53f1d9fa422edaa4e2047645c9601925facfed4c6d15e74ea811",
-        "anchor_text_hash": "c8eb5ee4ee4d8332f5431abb9438c23966eeea88bd0f6088cc84be6c5c1f4031"
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_ne!(outcome.exit_code, 0);\n        assert!(outcome.stderr.unwrap().contains(\"BindingsAbsent\"));"
+        "citation": "let handler = TestObligationCheckHandler::new(service.clone(), workspace_root.clone()); ... super::super::default_catalogue_paths(&workspace_root, &track_id), ... assert_eq!(captured, expected);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -6423,13 +6519,13 @@
         "item_identifier": "voluntary:IN-08"
       },
       "key": {
-        "bound_tests_set_hash": "0ad9a606e0462dd87430db1b171e7d7294e9d838e16ea0118c5cd37ec57e5684",
+        "bound_tests_set_hash": "a4c2a4af144b9209047069bd6b2b6129c5e5f963aa975ab98b69b14278d1c347",
         "declaration_hash": "516fceb9d32d53f1d9fa422edaa4e2047645c9601925facfed4c6d15e74ea811",
-        "anchor_text_hash": "a0c3a0de7d5152393cc2f4079d841ba671b7b139423ef18b6e2df30c9091735f"
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(captured, expected);"
+        "citation": "let expected = CheckTestObligationsCommand::new(\n            usecase::test_obligation::TestObligationCatalogueCommandInput::new(\n                track_id.clone(),\n                \"track/example\".to_owned(),\n                super::super::default_catalogue_paths(&workspace_root, &track_id),\n            ),\n        );\n        assert_eq!(captured, expected);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -6495,13 +6591,13 @@
         "item_identifier": "voluntary:AC-03"
       },
       "key": {
-        "bound_tests_set_hash": "e8f6a15c90ee529ba068bffcf536bac51c1c05a9a4c322c80e0751bf7f0584d5",
+        "bound_tests_set_hash": "f744e1f1f49644d6358d0367f751decb2674f17789c4e5a6a0987472642b3dc4",
         "declaration_hash": "2809af53fcd2269813d95f49dac71504fead70b3566e4835ef6bd0669fedb808",
         "anchor_text_hash": "23ef7b6f69fba30ba0154c5a917cde7d21d58c34c8a688f6b54a554405bd4b76"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let workspace_root = PathBuf::from(\"/discovered/workspace\");\n        let handler = TestObligationDeriveHandler::new(service.clone(), workspace_root.clone());\n\n        let outcome = handler.handle(TestObligationDeriveInput::new(None, branch()));\n\n        assert_eq!(outcome.exit_code, 0);\n        let captured = service.captured.lock().unwrap().clone().unwrap();\n        let track_id = TrackId::try_new(\"test-track\".to_owned()).unwrap();\n        let expected = DeriveTestObligationsCommand::new(\n            usecase::test_obligation::TestObligationCatalogueCommandInput::new(\n                track_id.clone(),\n                \"track/test-track\".to_owned(),\n                super::super::default_catalogue_paths(&workspace_root, &track_id),\n            ),\n        );\n        assert_eq!(captured, expected);"
+        "citation": "let expected = DeriveTestObligationsCommand::new(\n            usecase::test_obligation::TestObligationCatalogueCommandInput::new(\n                track_id.clone(),\n                \"track/test-track\".to_owned(),\n                super::super::default_catalogue_paths(&workspace_root, &track_id),\n            ),\n        );\n        assert_eq!(captured, expected);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -7294,6 +7390,30 @@
       "verdict": {
         "kind": "fulfilled",
         "citation": "let err = verifier\n                .verify_pair(tests_source, entry_declaration, anchor_text, tier)\n                .unwrap_err();\n\n            let SemanticVerifierError::VerifierPort(message) = err;\n            assert_eq!(message.as_str(), \"profile unavailable\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationsDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "444b21daee242809808d630f40c4e8b6fa39d151667dc75343bd4c3c78c590ff",
+        "declaration_hash": "9c7cab6edbf8b56dfe9cbbd1d60c268aa08453b2b692df18958f51ba754130da",
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(ObligationCheckError::StaleObligationsArtifact { detail })\n            if detail.as_str().contains(\"changed=1\")"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     }
