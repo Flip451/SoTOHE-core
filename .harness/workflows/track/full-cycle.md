@@ -48,7 +48,8 @@ Read `.harness/config/review-scope.json`. Load `default_diff_ceiling_lines` and 
 
 Walk the impl-plan `tasks` array in declared order, skipping tasks with `done` + non-null
 `commit_hash`, or `skipped`. Carry `done` with null `commit_hash` forward as **DonePending**
-(implementation complete, but still participates in DFP, Review, Commit, and D4 hash backfill).
+(implementation complete, but still participates in DFP, Review, Commit, and post-commit
+task hash backfill).
 Group the remaining `todo` / `in_progress` / DonePending tasks into batches by greedy
 accumulation:
 
@@ -92,7 +93,7 @@ gates. The order is encoded in the impl-plan sections.
 Invoke the `implement` workflow (`.harness/workflows/track/implement.md`) over every
 `todo` / `in_progress` task in this batch in Step 0c order. For DonePending tasks, skip
 implementation only — keep the task in the batch so its working-tree changes flow through DFP,
-Review, Commit, and D4 hash recording. Do NOT commit between tasks in the same batch.
+Review, Commit, and post-commit task hash recording. Do NOT commit between tasks in the same batch.
 
 **Step 1b: Actual-diff guard (advisory ceiling visibility)**
 
@@ -150,25 +151,26 @@ Stage **after** the final review round (`cargo make add-all` or selective `track
 then invoke the `commit` workflow (`.harness/workflows/track/commit.md`) once with a commit
 message naming the batch (e.g., "Batch A: T002-T004 …").
 
-The `commit` workflow enforces the DRY gate as a hard precondition via
-`cargo make track-commit-message` (which runs `sotp dry check-approved` before committing).
-A `blocked` DFP cannot be committed past.
+The `commit` workflow enforces the track-aware gates as hard preconditions via
+`cargo make track-commit-message` (including `cargo make ci-track`,
+`sotp test-obligation check`, and `sotp dry check-approved` before committing).
+A `blocked` DFP or failing test-obligation gate cannot be committed past.
 
-**D4 same-hash recording**: after the commit succeeds, record the single commit hash on every
-task in this batch (including DonePending tasks) with:
+**Post-commit task hash recording**: after the commit succeeds, record the single commit hash
+on every task in this batch (including DonePending tasks) with:
 
 ```
 bin/sotp track transition <task_id> done --commit-hash <hash>
 ```
 
 `TaskStatus::Done` has no `commit_hash` uniqueness constraint; the same hash on multiple
-tasks is the canonical D4 representation of a batch commit.
+tasks is the canonical representation of a batch commit.
 
 ### Step 4: Lifecycle tail commit (after all batches)
 
-D4 same-hash recording (Step 3) writes the commit hash to `impl-plan.json` *after* the batch
-commit — the hash cannot exist before the commit. For the last batch, no successor batch
-captures these writes.
+Post-commit task hash recording (Step 3) writes the commit hash to `impl-plan.json` *after*
+the batch commit — the hash cannot exist before the commit. For the last batch, no successor
+batch captures these writes.
 
 Procedure (after Step 3 of the **last** batch):
 
@@ -176,8 +178,8 @@ Procedure (after Step 3 of the **last** batch):
    `track/items/<track-id>/impl-plan.json` and `track/items/<track-id>/plan.md` only.
 2. If those (and only those) files are modified, run a tail review refresh before committing:
    - Invoke the `review` workflow. Expected required scope: `impl-plan` (the tail diff is
-     only the D4 backfill in `impl-plan.json`; the rendered `plan.md` is review-operational
-     and does not affect scope hashes).
+     only the task hash backfill in `impl-plan.json`; the rendered `plan.md` is
+     review-operational and does not affect scope hashes).
    - Continue only after `bin/sotp review check-approved` succeeds and:
      `bin/sotp review results --track-id <track-id> --scope impl-plan --round-type final --limit 1`
      shows a recorded final `zero_findings` round for the tail diff.
@@ -185,13 +187,13 @@ Procedure (after Step 3 of the **last** batch):
      `bin/sotp review check-approved` before committing, and after Step 3 mutates
      `impl-plan.json` / `plan.md`, the previous `impl-plan` review hash is stale.
 3. After the tail review refresh succeeds, stage and commit the lifecycle diff:
-   1. Run `cargo make add-all` to stage the D4 backfill (plus any review-operational artifacts produced by Step 2's review refresh, e.g. `review.json` / `<layer>-type-signals.json`).
+   1. Run `cargo make add-all` to stage the task hash backfill (plus any review-operational artifacts produced by Step 2's review refresh, e.g. `review.json` / `<layer>-type-signals.json`).
    2. Write the lifecycle tail commit message to `tmp/track-commit/commit-message.txt`. The wrapper in the next step reads this exact path (`bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup`), so the file must exist before invoking it. A typical message is:
 
       ```
-      ops(track): D4 hash backfill for batch <name> (post-commit lifecycle)
+      ops(track): backfill task commit hashes for batch <name>
       ```
-   3. Run `cargo make track-commit-message`. The wrapper runs CI + `bin/sotp review check-approved` + the DRY-gate precondition, then commits from the file and deletes it on success.
+   3. Run `cargo make track-commit-message`. The wrapper runs CI + `cargo make ci-track` + `bin/sotp review check-approved` + the test-obligation gate + the DRY-gate precondition, then commits from the file and deletes it on success.
    4. (Optional, recommended) Attach a git note via `cargo make track-note` (write `tmp/track-commit/note.md` first; the wrapper consumes that path).
 4. If no `impl-plan.json` / `plan.md` modifications were present in Step 1, skip this step.
 5. After Step 2, dirty files may include the two plan artifacts plus review-operational
@@ -219,7 +221,7 @@ Otherwise, skip (file absence = no observations).
 | 1 | Track branch and active tasks found | OK / stop |
 | 1c | DFP terminal state | skipped/completed → proceed; blocked/failed → halt |
 | 2 | Review `zero_findings` all required scopes | completed / blocked / failed |
-| 3 | `cargo make track-commit-message` (CI + DRY check) | OK / ERROR |
+| 3 | `cargo make track-commit-message` (CI + track-aware gates + DRY check) | OK / ERROR |
 | 4 | `git status --short` empty | OK / unexpected dirty state |
 
 ## Failure / recovery

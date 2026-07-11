@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "09b6ff828267e3d9a77762fbbf1f1774dfc1a81ae5f217245cdec896cc7380bf",
+  "signals": [
+    {
+      "type_name": "CliCommand",
+      "signal": "blue",
+      "entry_hash": "3372f773e921be6e9debb74a8f25e5ec289c3051b67f4f7ee2322b6f934f923d"
+    },
+    {
+      "type_name": "TestBindingsSkeletonArgs",
+      "signal": "blue",
+      "entry_hash": "18e1daa69e92d0f605b81bfeec204da8ad95f495e9bf674ed22f69bf6bfd3feb"
+    },
+    {
+      "type_name": "TestObligationArgs",
+      "signal": "blue",
+      "entry_hash": "40cdb868909c3d6df13f365b3363a0d6ed6ab59fa876893f64874cc1056fd9eb"
+    },
+    {
+      "type_name": "TestObligationCheckArgs",
+      "signal": "blue",
+      "entry_hash": "5248875f6b9e41ef16149c501bfc85cb8600db7d79fb4a38b6a4ec9342545545"
+    },
+    {
+      "type_name": "TestObligationDeriveArgs",
+      "signal": "blue",
+      "entry_hash": "4ae0cb6db7ac4bf4986bc521e6e4f3cae918ef6954958c9b9d4a333f46586997"
+    },
+    {
+      "type_name": "TestObligationEvaluateArgs",
+      "signal": "blue",
+      "entry_hash": "6320aaafddc7e3c77eede1629604c03b558421cb8f25d68c8f36454e2c1fe701"
+    },
+    {
+      "type_name": "TestObligationResultsArgs",
+      "signal": "blue",
+      "entry_hash": "e6ae9bf61c47fa5ea7a7f8f7e6283e5d7f9e7cb0962b651455a58730cb9ad8df"
+    },
+    {
+      "type_name": "TestObligationSubcommand",
+      "signal": "blue",
+      "entry_hash": "1329ed5304b8a692875e6bd9a960138ff7eb7e7f47c465c8c29c9d6004b22479"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::command_context",
+      "signal": "blue",
+      "entry_hash": "20d75957b7748f813262b3fc4fcb2b37c06e770e46cbbd7da8a2dab1514e9300"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::command_context_with",
+      "signal": "blue",
+      "entry_hash": "e4a86268f38ac6d7688e0dabec8c6f53d4f96d265576c431f7f2ff90de607a24"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::command_root",
+      "signal": "blue",
+      "entry_hash": "39bf8214b6fce775d29886dd58283b26990d805da176d59e52a8e8968370e604"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::current_branch",
+      "signal": "blue",
+      "entry_hash": "f85a2a3113c1bf8195db49921058e6168b41a53f223fdc4e8606badca6760a64"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::dispatch_test_obligation",
+      "signal": "blue",
+      "entry_hash": "b012116956959278e20f935302cd1e6acfc1e02372772f52f83c2af410396029"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute",
+      "signal": "blue",
+      "entry_hash": "d704217d2e89a7c09f90b8d3c97f6370d553b7d4af60c3a2706406a95ba17268"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_bindings_skeleton",
+      "signal": "blue",
+      "entry_hash": "d1ed51e95f96e56c50f1bd278b7c1985eaedcd0674b8c22d4cbdf040d77fcfdd"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_bindings_skeleton_with",
+      "signal": "blue",
+      "entry_hash": "8f7b0a40e4faaf0ab8ca0ec023931629f81116b39608f1cc08e7ad029ba42e81"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_check",
+      "signal": "blue",
+      "entry_hash": "4cc17f41c42f91819223f6b81bf0a66eb0e9198edafb46b8c9c2bbe1f7599ab6"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_check_with",
+      "signal": "blue",
+      "entry_hash": "6fec48a5cfb7bb33cdd6fa3f69b36bde55321c39a0219762bae22400cec30f91"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_derive",
+      "signal": "blue",
+      "entry_hash": "b7e951bd113a5f3646592ee36d1b3d05acefb28077038c122988547bcd8de100"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_derive_with",
+      "signal": "blue",
+      "entry_hash": "67a406ac93ec5cb0c3101fbd55d97b21538fa98765e3bb919e366ca1640f7edb"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_evaluate",
+      "signal": "blue",
+      "entry_hash": "af3b23ade586f35627b5ed77f56400247ccd5ea37ec2fa52b26046fe6f3d98a8"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_evaluate_with",
+      "signal": "blue",
+      "entry_hash": "d9da323e26e7ae060b1a9218bde52f1750ddd08462a0b4dd3be1d4b7fe18bf5b"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_results",
+      "signal": "blue",
+      "entry_hash": "5e83ecf2c55ce23c0e9735a2ae00ef529ad70f704c58c33d88ddc3feb35c032c"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::execute_results_with",
+      "signal": "blue",
+      "entry_hash": "ad27d35aabd74c0590085701704e42a8305de98a2c0bdca0470f5e16117fd8ee"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::failure",
+      "signal": "blue",
+      "entry_hash": "b3b258cee22f62ce1430fc47138ae4db0e16524be0744bb3ba6b60d9163bc364"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::read_command_branch",
+      "signal": "blue",
+      "entry_hash": "445a9a08a76bed206c24ba3a4246e8df01b39bec7f51b4cf1ca80cee49d4df79"
+    },
+    {
+      "type_name": "cli::commands::test_obligation::read_only_command_context",
+      "signal": "blue",
+      "entry_hash": "62e8f84f10c129867ef6708ee142ba1263adb51b1e1eff38a810d748002df0d7"
+    }
+  ]
+}

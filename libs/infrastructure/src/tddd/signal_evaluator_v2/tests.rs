@@ -3524,12 +3524,16 @@ fn test_impl_block_generics_symmetric_compare_blue() {
 
     // A-side: `impl<T: Clone> MyTrait for Foo` — impl_generics: [T: Clone]
     // ADR `2026-05-20-0048` D1/D2: top-level trait_impls; new API: (trait_ref, for_type).
-    let mut trait_impl =
-        TraitImplDeclV2::new(TypeRef::new("MyTrait").unwrap(), TypeRef::new("Foo").unwrap());
-    trait_impl.impl_generics = vec![MethodGenericParam {
-        name: ParamName::new("T").unwrap(),
-        bounds: vec![TypeRef::new("Clone").unwrap()],
-    }];
+    let trait_impl = TraitImplDeclV2::from_parts(
+        domain::tddd::catalogue_v2::ItemAction::Add,
+        TypeRef::new("MyTrait").unwrap(),
+        TypeRef::new("Foo").unwrap(),
+        vec![MethodGenericParam {
+            name: ParamName::new("T").unwrap(),
+            bounds: vec![TypeRef::new("Clone").unwrap()],
+        }],
+        vec![],
+    );
 
     doc.insert_type(
         TypeName::new("Foo").unwrap(),

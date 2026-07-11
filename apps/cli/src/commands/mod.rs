@@ -24,6 +24,7 @@ pub mod signal;
 pub mod task_contract;
 pub mod telemetry;
 pub mod template;
+pub mod test_obligation;
 pub mod track;
 pub mod verify;
 #[cfg(test)]

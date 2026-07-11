@@ -67,7 +67,7 @@ fn resolve_project_root(items_dir: &Path) -> Result<PathBuf, RefVerifyAdapterErr
             ensure_current_repo_root(&root)
         }
         _ => Err(RefVerifyAdapterError(format!(
-            "--items-dir must point to '<project-root>/track/items'; got {}",
+            "items_dir (--items-dir) must point to '<project root>/track/items'; got {}",
             items_dir.display()
         ))),
     }
@@ -200,11 +200,11 @@ fn load_ref_verify_config(
     let defaults = usecase::ref_verify::RefVerifyConfig::default();
     let injection = dto
         .known_bad_injection_rate_percent
-        .unwrap_or_else(|| defaults.known_bad_injection_rate_percent.as_u8());
+        .unwrap_or_else(|| defaults.known_bad_injection_rate_percent().as_u8());
     let threshold = dto
         .known_bad_detection_threshold_percent
-        .unwrap_or_else(|| defaults.known_bad_detection_threshold_percent.as_u8());
-    let parallelism = dto.max_parallelism.unwrap_or_else(|| defaults.max_parallelism.as_usize());
+        .unwrap_or_else(|| defaults.known_bad_detection_threshold_percent().as_u8());
+    let parallelism = dto.max_parallelism.unwrap_or_else(|| defaults.max_parallelism().as_usize());
 
     usecase::ref_verify::RefVerifyConfig::try_new(injection, threshold, parallelism)
         .map_err(|e| RefVerifyAdapterError(format!("ref-verify config validation failed: {e}")))

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "b438cc7f45b0f473cced83cb3aafa23171947bd483e70cc669fae48815cbbdb4",
+  "signals": [
+    {
+      "type_name": "TestBindingsSkeletonHandler",
+      "signal": "blue",
+      "entry_hash": "b4c10c15816953850426e3776bb96be450fff0d6c94fea70747d6319be506571"
+    },
+    {
+      "type_name": "TestBindingsSkeletonInput",
+      "signal": "blue",
+      "entry_hash": "d9fd8e716074debb445195027fd24059f5051142db6aa92bbbe90aa2e43a1e82"
+    },
+    {
+      "type_name": "TestObligationCheckHandler",
+      "signal": "blue",
+      "entry_hash": "33af2b1a27ef942a3f5dfe982a57e8b40d85915bc9e1896bd58fb6102b41049b"
+    },
+    {
+      "type_name": "TestObligationCheckInput",
+      "signal": "blue",
+      "entry_hash": "c7d751612a576303286a48c763afa7cf9a615530214fd93c937733a0e7040ee2"
+    },
+    {
+      "type_name": "TestObligationDeriveHandler",
+      "signal": "blue",
+      "entry_hash": "d25b8dbc48b7dcb0b35ee08f232d8e26012b9aa5b8800220fad6f7ddb3bc4792"
+    },
+    {
+      "type_name": "TestObligationDeriveInput",
+      "signal": "blue",
+      "entry_hash": "5a79f43870ddaa7ad74b668c186d38704d7f9a69213725b0477bbbc4e0a9f850"
+    },
+    {
+      "type_name": "TestObligationEvaluateHandler",
+      "signal": "blue",
+      "entry_hash": "86836732d5a5dbd94000400a4322b7304a71f78cdd558776247be9697369a74b"
+    },
+    {
+      "type_name": "TestObligationEvaluateInput",
+      "signal": "blue",
+      "entry_hash": "69f59064ca40b997aad34c8835ba7f7d760fcb010a4bdec23e1c1e15087b2b0a"
+    },
+    {
+      "type_name": "TestObligationResultsHandler",
+      "signal": "blue",
+      "entry_hash": "fc14ec1a8d991699ad241bfbe69200da9969b5fddec908561aca1ea75eda397f"
+    },
+    {
+      "type_name": "TestObligationResultsInput",
+      "signal": "blue",
+      "entry_hash": "7e9fe041cc0dbdf689763a59728aee88036c759c7eba7229159abc377aeeb260"
+    }
+  ]
+}

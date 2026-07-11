@@ -6,6 +6,7 @@
 
 use std::collections::BTreeMap;
 
+use crate::tddd::test_obligation::ids::DiagnosticMessage;
 use crate::{DomainError, SpecElementId, TaskId, ValidationError};
 
 /// The current schema version for `task-coverage.json`.
@@ -52,7 +53,10 @@ impl TaskCoverageDocument {
             for id in section_map.keys() {
                 let id_str = id.as_ref().to_owned();
                 if !seen.insert(id_str.clone()) {
-                    return Err(ValidationError::DuplicateElementId(id_str).into());
+                    return Err(ValidationError::DuplicateElementId(DiagnosticMessage::try_new(
+                        id_str,
+                    )?)
+                    .into());
                 }
             }
         }
@@ -177,7 +181,8 @@ mod tests {
         assert!(
             matches!(
                 err,
-                DomainError::Validation(ValidationError::DuplicateElementId(ref id)) if id == "IN-01"
+                DomainError::Validation(ValidationError::DuplicateElementId(ref id))
+                    if id.as_str() == "IN-01"
             ),
             "unexpected error: {err:?}"
         );
@@ -194,7 +199,8 @@ mod tests {
         assert!(
             matches!(
                 err,
-                DomainError::Validation(ValidationError::DuplicateElementId(ref id)) if id == "CO-01"
+                DomainError::Validation(ValidationError::DuplicateElementId(ref id))
+                    if id.as_str() == "CO-01"
             ),
             "unexpected error: {err:?}"
         );
@@ -211,7 +217,8 @@ mod tests {
         assert!(
             matches!(
                 err,
-                DomainError::Validation(ValidationError::DuplicateElementId(ref id)) if id == "AC-01"
+                DomainError::Validation(ValidationError::DuplicateElementId(ref id))
+                    if id.as_str() == "AC-01"
             ),
             "unexpected error: {err:?}"
         );

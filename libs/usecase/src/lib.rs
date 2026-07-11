@@ -6,6 +6,8 @@
 // depending on `domain` directly (architecture-rules.json: cli may_depend_on
 // [infrastructure, usecase]).
 pub use domain::tddd::LayerId;
+pub use domain::tddd::test_obligation::ids::DiagnosticMessage;
+pub use domain::tddd::test_obligation::verdict::DetectionRatePercent;
 pub use domain::{TrackId, ValidationError};
 
 pub mod arch;
@@ -51,6 +53,7 @@ pub mod review_v2;
 pub mod review_workflow;
 pub mod semantic_dup;
 pub mod semantic_dup_driver;
+pub mod semantic_verdict_core;
 pub mod signal;
 pub mod signal_gate;
 pub mod signal_service;
@@ -60,6 +63,7 @@ pub mod task_completion;
 pub mod task_ops;
 pub mod telemetry;
 pub mod template_export;
+pub mod test_obligation;
 pub mod track_phase;
 pub mod track_resolution;
 pub mod track_service;

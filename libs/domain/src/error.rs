@@ -1,5 +1,6 @@
 use thiserror::Error;
 
+use crate::tddd::test_obligation::ids::DiagnosticMessage;
 use crate::{TaskStatusKind, TrackStatus};
 
 /// Top-level domain error encompassing validation and transition errors.
@@ -16,23 +17,27 @@ pub enum DomainError {
 pub enum ValidationError {
     #[error("string must not be empty")]
     EmptyString,
-    #[error("track id '{0}' must be a lowercase slug")]
-    InvalidTrackId(String),
-    #[error("task id '{0}' must match the pattern T<digits>")]
-    InvalidTaskId(String),
-    #[error("commit hash '{0}' must be 7 to 40 lowercase hex characters")]
-    InvalidCommitHash(String),
-    #[error("invalid timestamp: {0}")]
-    InvalidTimestamp(String),
-    #[error("track branch '{0}' must match the pattern track/<slug>")]
-    InvalidTrackBranch(String),
-    #[error("branch '{branch}' slug does not match track id '{id}'")]
-    BranchIdMismatch { id: String, branch: String },
+    #[error("track id '{}' must be a lowercase slug", .0.as_str())]
+    InvalidTrackId(DiagnosticMessage),
+    #[error("task id '{}' must match the pattern T<digits>", .0.as_str())]
+    InvalidTaskId(DiagnosticMessage),
+    #[error("commit hash '{}' must be 7 to 40 lowercase hex characters", .0.as_str())]
+    InvalidCommitHash(DiagnosticMessage),
+    #[error("invalid timestamp: {}", .0.as_str())]
+    InvalidTimestamp(DiagnosticMessage),
+    #[error("track branch '{}' must match the pattern track/<slug>", .0.as_str())]
+    InvalidTrackBranch(DiagnosticMessage),
+    #[error("branch '{}' slug does not match track id '{}'", .branch.as_str(), .id.as_str())]
+    BranchIdMismatch { id: DiagnosticMessage, branch: DiagnosticMessage },
     #[error(
-        "status_override kind '{override_kind}' requires status '{required}', \
-         but status is '{actual}'"
+        "status_override kind '{}' requires status '{}', but status is '{}'",
+        .override_kind.as_str(), .required.as_str(), .actual.as_str()
     )]
-    StatusOverrideMismatch { override_kind: String, required: String, actual: String },
+    StatusOverrideMismatch {
+        override_kind: DiagnosticMessage,
+        required: DiagnosticMessage,
+        actual: DiagnosticMessage,
+    },
     #[error("track title must not be empty")]
     EmptyTrackTitle,
     #[error("task description must not be empty")]
@@ -41,62 +46,70 @@ pub enum ValidationError {
     EmptyPlanSectionId,
     #[error("plan section title must not be empty")]
     EmptyPlanSectionTitle,
-    #[error("duplicate task id '{0}'")]
-    DuplicateTaskId(String),
-    #[error("duplicate plan section id '{0}'")]
-    DuplicatePlanSectionId(String),
-    #[error("plan references unknown task '{0}'")]
-    UnknownTaskReference(String),
-    #[error("task '{0}' is referenced more than once in the plan")]
-    DuplicateTaskReference(String),
-    #[error("task '{0}' is not referenced by any plan section")]
-    UnreferencedTask(String),
+    #[error("duplicate task id '{}'", .0.as_str())]
+    DuplicateTaskId(DiagnosticMessage),
+    #[error("duplicate plan section id '{}'", .0.as_str())]
+    DuplicatePlanSectionId(DiagnosticMessage),
+    #[error("plan references unknown task '{}'", .0.as_str())]
+    UnknownTaskReference(DiagnosticMessage),
+    #[error("task '{}' is referenced more than once in the plan", .0.as_str())]
+    DuplicateTaskReference(DiagnosticMessage),
+    #[error("task '{}' is not referenced by any plan section", .0.as_str())]
+    UnreferencedTask(DiagnosticMessage),
     #[error("status override '{0}' is incompatible with all tasks resolved")]
     OverrideIncompatibleWithResolvedTasks(TrackStatus),
-    #[error("track '{track_id}' is not planning-only; current status is '{status}'")]
-    TrackActivationRequiresPlanningOnly { track_id: String, status: TrackStatus },
+    #[error("track '{}' is not planning-only; current status is '{}'", .track_id.as_str(), .status)]
+    TrackActivationRequiresPlanningOnly { track_id: DiagnosticMessage, status: TrackStatus },
     #[error(
-        "track '{track_id}' requires schema_version 3 for activation; current schema_version is {schema_version}"
+        "track '{}' requires schema_version 3 for activation; current schema_version is {}",
+        .track_id.as_str(), .schema_version
     )]
-    TrackActivationRequiresSchemaV3 { track_id: String, schema_version: u32 },
-    #[error("track '{track_id}' is already materialized on branch '{branch}'")]
-    TrackAlreadyMaterialized { track_id: String, branch: String },
-    #[error("unsupported target status: {0}")]
-    UnsupportedTargetStatus(String),
-    #[error("section '{0}' not found")]
-    SectionNotFound(String),
+    TrackActivationRequiresSchemaV3 { track_id: DiagnosticMessage, schema_version: u32 },
+    #[error("track '{}' is already materialized on branch '{}'", .track_id.as_str(), .branch.as_str())]
+    TrackAlreadyMaterialized { track_id: DiagnosticMessage, branch: DiagnosticMessage },
+    #[error("unsupported target status: {}", .0.as_str())]
+    UnsupportedTargetStatus(DiagnosticMessage),
+    #[error("section '{}' not found", .0.as_str())]
+    SectionNotFound(DiagnosticMessage),
     #[error("no sections available to add task to")]
     NoSectionsAvailable,
     #[error(
-        "task '{task_id}' description was mutated; task descriptions are immutable once created"
+        "task '{}' description was mutated; task descriptions are immutable once created",
+        .task_id.as_str()
     )]
-    TaskDescriptionMutated { task_id: String },
-    #[error("task '{task_id}' was removed; existing tasks cannot be deleted via save")]
-    TaskRemoved { task_id: String },
-    #[error("duplicate spec element id '{0}' — ids must be unique across all sections")]
-    DuplicateElementId(String),
+    TaskDescriptionMutated { task_id: DiagnosticMessage },
+    #[error("task '{}' was removed; existing tasks cannot be deleted via save", .task_id.as_str())]
+    TaskRemoved { task_id: DiagnosticMessage },
+    #[error("duplicate spec element id '{}' — ids must be unique across all sections", .0.as_str())]
+    DuplicateElementId(DiagnosticMessage),
     #[error(
-        "layer id '{0}' must be a non-empty ASCII identifier starting with a letter \
-         (allowed: letters, digits, `_`, `-`)"
+        "layer id '{}' must be a non-empty ASCII identifier starting with a letter \
+         (allowed: letters, digits, `_`, `-`)",
+        .0.as_str()
     )]
-    InvalidLayerId(String),
+    InvalidLayerId(DiagnosticMessage),
     #[error(
-        "spec element id '{0}' must match the pattern <UPPER>{{2,}}-<digits>+ \
-         (e.g. IN-01, AC-02, CO-03)"
+        "spec element id '{}' must match the pattern <UPPER>{{2,}}-<digits>+ \
+         (e.g. IN-01, AC-02, CO-03)",
+        .0.as_str()
     )]
-    InvalidSpecElementId(String),
+    InvalidSpecElementId(DiagnosticMessage),
     #[error("ADR anchor must not be empty")]
     EmptyAdrAnchor,
     #[error("convention anchor must not be empty")]
     EmptyConventionAnchor,
-    #[error("content hash '{0}' must be 64 lowercase hex characters (SHA-256)")]
-    InvalidContentHash(String),
+    #[error("content hash '{}' must be 64 lowercase hex characters (SHA-256)", .0.as_str())]
+    InvalidContentHash(DiagnosticMessage),
     #[error("informal ground summary must not be empty")]
     EmptyInformalGroundSummary,
     #[error("informal ground summary must be a single line (no line breaks)")]
     MultiLineInformalGroundSummary,
     #[error("decision ground reference must not be empty or whitespace-only")]
     EmptyDecisionGroundRef,
+    #[error("test-obligation minimum '{0}' must be at least 1")]
+    InvalidObligationMinimum(usize),
+    #[error("detection rate '{0}' must be a percentage in 0..=100")]
+    InvalidDetectionRate(u8),
 }
 
 /// Errors from invalid task state transitions.

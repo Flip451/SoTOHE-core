@@ -32,6 +32,7 @@ pub mod new_typegraph_codec_error;
 pub mod primitive_occurrence_scanner;
 pub mod semantic_verify;
 pub mod signal_evaluator;
+pub mod test_obligation;
 pub mod type_signals_doc;
 
 pub use baseline_document::BaselineDocument;

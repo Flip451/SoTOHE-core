@@ -1,0 +1,411 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "aa6c7955bf11e7a913dfc1595d0f2901ff1be5bcfe5f27c551d8563acce54e5b",
+  "signals": [
+    {
+      "type_name": "AnchorText",
+      "signal": "blue",
+      "entry_hash": "ccc60c428ad84ff8599b75e89d6734ce48f8444c15f311592f151e71924f8e5c"
+    },
+    {
+      "type_name": "AnchorTextHash",
+      "signal": "blue",
+      "entry_hash": "cbafa0ddf383203b6673085dac37797242686da20c9d8373982e753df64bdf2f"
+    },
+    {
+      "type_name": "ArtifactCodecError",
+      "signal": "blue",
+      "entry_hash": "744aeb813c678c3e345980f33a384132ca549d8383ba5e4f5e720d9317cc6b3a"
+    },
+    {
+      "type_name": "BoundTestsSetHash",
+      "signal": "blue",
+      "entry_hash": "376271bac8783e70c939e8e05b5adab46d3481647c450c46649c5e2b407cb36d"
+    },
+    {
+      "type_name": "CatalogueDocumentLoaderError",
+      "signal": "blue",
+      "entry_hash": "81f424a1462fa6ae79dc6bf01bcc1e2ad86414e66d3d65bc0e59ef82e77d426f"
+    },
+    {
+      "type_name": "CrateName",
+      "signal": "blue",
+      "entry_hash": "2c5e291cb5c9ad3366cf582fd8e01fc80dcd43d1307ff43cba237bcf638f9c6b"
+    },
+    {
+      "type_name": "DeclarationHash",
+      "signal": "blue",
+      "entry_hash": "7ab676bdae6f3e5fecbb4e616cac60742f399991b4367ac33d4c1b241f82ee17"
+    },
+    {
+      "type_name": "DetectionRatePercent",
+      "signal": "blue",
+      "entry_hash": "9f93443fa9e2d7ccb82fd6d3c8f83f3dc445b8fe9e199412a45bec4c6fe9e5b4"
+    },
+    {
+      "type_name": "DiagnosticMessage",
+      "signal": "blue",
+      "entry_hash": "0db39f38aa5f226b820cd2eb17d221774dbe54c6128179ce2c56410e6dbdbf27"
+    },
+    {
+      "type_name": "EdgeResolutionOutcome",
+      "signal": "blue",
+      "entry_hash": "81f52b8e20a0903c3a10bee4e0d03632aeb52580ac0e0f583e89a5e2f58f62c2"
+    },
+    {
+      "type_name": "EdgeVerdictRecord",
+      "signal": "blue",
+      "entry_hash": "c8d84e145a5ec804e2604e9bc4f2f1870da8ca90d6e1614b68dfbe01ac94039f"
+    },
+    {
+      "type_name": "EntryDeclaration",
+      "signal": "blue",
+      "entry_hash": "3cdca375b6a3c6dfed94910167b8566aedfe1d22554323e0fa41d7b8b14b8cad"
+    },
+    {
+      "type_name": "FulfillmentFailCategory",
+      "signal": "blue",
+      "entry_hash": "79f2c3b4bfec5e40295d27002bccfbd2878e5a16f07694284bfef477e63406cb"
+    },
+    {
+      "type_name": "NonEmptyDrifts",
+      "signal": "blue",
+      "entry_hash": "b5146969e6a6968477ebcf6a4078fafed127ce1cd1b5660501af12ec5823444b"
+    },
+    {
+      "type_name": "NonEmptyEdgeIds",
+      "signal": "blue",
+      "entry_hash": "029869eccd3f4bc5ea933de500549e1dda22b6315245464fce71c8277d8020cc"
+    },
+    {
+      "type_name": "NonEmptyEdgeVerdictRecords",
+      "signal": "blue",
+      "entry_hash": "a50c561918c6d4cac20b2982f4eacc1f445421eb0b37ebf5a68669235194e676"
+    },
+    {
+      "type_name": "NonEmptyTestLocations",
+      "signal": "blue",
+      "entry_hash": "8f43be4edf31ccc880eee46d8d22d4b4c9d569f1f4f212d5096e57ca5f958a5f"
+    },
+    {
+      "type_name": "ObligationCheckError",
+      "signal": "blue",
+      "entry_hash": "38381789b84afea01e38dee816156cf423f3377e6b0cf77419209cd5ff44ca5d"
+    },
+    {
+      "type_name": "ObligationDeriveError",
+      "signal": "blue",
+      "entry_hash": "0b9b3c0af6c60db1345647ca1ecc5683cdf05ebf018bb157f31e0439d8a54102"
+    },
+    {
+      "type_name": "ObligationEvaluateError",
+      "signal": "blue",
+      "entry_hash": "70877167f4f9dc6d595bd5e6b469db60f6ae1d07204a4f5997b895ec08cd4b1b"
+    },
+    {
+      "type_name": "ObligationFulfillmentCacheDocument",
+      "signal": "blue",
+      "entry_hash": "7ead8d733f60ccab2c56791ad0d55a9e6539c0439c1c4ef87cf3c3d4db158fec"
+    },
+    {
+      "type_name": "ObligationFulfillmentCacheEntry",
+      "signal": "blue",
+      "entry_hash": "bf99570363fa1145b3540f75b2964386ef5aa173d47799fc9ad827cc287adb18"
+    },
+    {
+      "type_name": "ObligationFulfillmentCacheKey",
+      "signal": "blue",
+      "entry_hash": "87ed44e95d7b9a198f2cfc723700a531d0b6a8fdd9722194448e396f1b8ab26d"
+    },
+    {
+      "type_name": "ObligationFulfillmentPair",
+      "signal": "blue",
+      "entry_hash": "feb95855a1961e9ddc05d0c00ba5833fa099012ef641a40f0b1966d9786c9fc1"
+    },
+    {
+      "type_name": "ObligationFulfillmentVerdict",
+      "signal": "blue",
+      "entry_hash": "57f3888f12f65493fd4089ded11b698f499847021c802f24ee94dcf272a1d7cd"
+    },
+    {
+      "type_name": "ObligationResultsError",
+      "signal": "blue",
+      "entry_hash": "0e4ff00199897481f5a6e66f9cfc142e424e7d5c6ff418c4642638b4b3b5bfed"
+    },
+    {
+      "type_name": "ObligationsDocument",
+      "signal": "blue",
+      "entry_hash": "ae876dfa0302f1115c6780af09e8938238555a512850d8651e48502b2c7d5712"
+    },
+    {
+      "type_name": "RoleName",
+      "signal": "blue",
+      "entry_hash": "c029b7de2e80bbcf6abc3b26d08b177fa2849516f8e9ec77df2a778c50aa31d3"
+    },
+    {
+      "type_name": "RoleObligationItemsProjector",
+      "signal": "blue",
+      "entry_hash": "8b107af14b492d650d6db1b8001b405f936352faf17c1d6d6484405dadd61f00"
+    },
+    {
+      "type_name": "RoleObligationRules",
+      "signal": "blue",
+      "entry_hash": "d584ba1fa0c2f2f91e57e13ead53c0d2f5f48150142273775185739386a76ee6"
+    },
+    {
+      "type_name": "SemanticVerifierError",
+      "signal": "blue",
+      "entry_hash": "cc883ef90fe47606c6b33a8cd0001ebdf22f97339dd099267aa9ac6195c907e4"
+    },
+    {
+      "type_name": "SpecDocumentLoadError",
+      "signal": "blue",
+      "entry_hash": "82bacac41925302ef58d21f523624d1146c91390518970ea318513295ad9c1ed"
+    },
+    {
+      "type_name": "TargetEntryRoleKind",
+      "signal": "blue",
+      "entry_hash": "55762c6fae31b445f5d817e9fd56c199dc9c84ebe873bd7f3b23aafc3f377799"
+    },
+    {
+      "type_name": "TestBindingRecord",
+      "signal": "blue",
+      "entry_hash": "cedca2a43fbd85ff9fded00516235fe1a98c0b2c62222f1c65008600e165882c"
+    },
+    {
+      "type_name": "TestBindingsDocument",
+      "signal": "blue",
+      "entry_hash": "b3492d23ad0cccd5e816da6d7f21286d606033be99f88c309443d402cb96bc17"
+    },
+    {
+      "type_name": "TestBodySpanHash",
+      "signal": "blue",
+      "entry_hash": "3ae6bb892dd17e8e16804e204e41d9fbd35b2badfb82c5dba4b24e00fb17f5c3"
+    },
+    {
+      "type_name": "TestFunctionName",
+      "signal": "blue",
+      "entry_hash": "4cf5010fcbe7d282c84041cc8f056a7300b0982d0150ff93c16bebd093f1ccd8"
+    },
+    {
+      "type_name": "TestLocation",
+      "signal": "blue",
+      "entry_hash": "d9f361c850502aab140e303099665ec24d996d8eb1a8715392c48bd3337b0319"
+    },
+    {
+      "type_name": "TestModulePath",
+      "signal": "blue",
+      "entry_hash": "e3eb569b4c7a061bc91fe190b455312c172684558ccec0037d7244b1128b5ec4"
+    },
+    {
+      "type_name": "TestObligation",
+      "signal": "blue",
+      "entry_hash": "9abc040aa5838ad176c914ecf156f923218063557c6fc0323851a7ef599f2db5"
+    },
+    {
+      "type_name": "TestObligationAnchorId",
+      "signal": "blue",
+      "entry_hash": "1895168f8657c344d8e1e98d37f6c9f7fbee691955e34d99dc8e2bdbf49c20d2"
+    },
+    {
+      "type_name": "TestObligationBrief",
+      "signal": "blue",
+      "entry_hash": "44be143b6afff6714dae4c135bad7aea4d57435d74cd963179fe17fc803b13a7"
+    },
+    {
+      "type_name": "TestObligationBriefTemplate",
+      "signal": "blue",
+      "entry_hash": "4e54a2e4a8801b25d1da26a4e70f5b3c78b60d0203feec6ddf9715fd9c0a45a5"
+    },
+    {
+      "type_name": "TestObligationDrift",
+      "signal": "blue",
+      "entry_hash": "7853c44c8e436466b2e035fcc135815303a28e0917e0f13820108fe544482f41"
+    },
+    {
+      "type_name": "TestObligationDriftKind",
+      "signal": "blue",
+      "entry_hash": "98d6aa26684c954cef02be12bb26d10f72c9105504b828893db895874a2e4958"
+    },
+    {
+      "type_name": "TestObligationEdgeId",
+      "signal": "blue",
+      "entry_hash": "6bcbc6539e849b61c79743c3fe33ce9dc2b9a66240c3fab449f91351d303910a"
+    },
+    {
+      "type_name": "TestObligationId",
+      "signal": "blue",
+      "entry_hash": "527a794e3d2f9be35135d152c9a138658d9f87d89fb9da6df39f4a2a91dcbf85"
+    },
+    {
+      "type_name": "TestObligationItemIdentifier",
+      "signal": "blue",
+      "entry_hash": "90af2b5a451281c6c4a5d54f873a18aa06283cfde579deb1afe9c2a06a2ed3b3"
+    },
+    {
+      "type_name": "TestObligationKind",
+      "signal": "blue",
+      "entry_hash": "739d38982f0ee1f88d983d09102f0cc65bfdab064c418f9063a5d467ba03f392"
+    },
+    {
+      "type_name": "TestObligationMinimum",
+      "signal": "blue",
+      "entry_hash": "28be608877b4d7175b533f8e8209e75264e76e148bd96b45177661a29cd2b55f"
+    },
+    {
+      "type_name": "TestObligationPatternKind",
+      "signal": "blue",
+      "entry_hash": "3f78099e77905eb475527290c7189ff962e6835ae60e4fd6e4d086de2e44b5de"
+    },
+    {
+      "type_name": "TestObligationPerAxis",
+      "signal": "blue",
+      "entry_hash": "1196697311c244b586762880907e6e0ace201218fe14aee439d73a68d5001bc6"
+    },
+    {
+      "type_name": "TestObligationRule",
+      "signal": "blue",
+      "entry_hash": "9323a7e5ee40cf0cf1d6e1796446ca19693f40efaf714d80b10e1deea2e78ec2"
+    },
+    {
+      "type_name": "TestObligationRulesDocument",
+      "signal": "blue",
+      "entry_hash": "cc4bcdbead362966d7d8f1aa88e7aa43ba86106c4da4e3331866f03d02c513bf"
+    },
+    {
+      "type_name": "TestObligationRulesLoadError",
+      "signal": "blue",
+      "entry_hash": "aaa750340a171c7f6a8ad55072344caf93d4d2629490b5ebce8425dea6133d21"
+    },
+    {
+      "type_name": "TestSourceScanError",
+      "signal": "blue",
+      "entry_hash": "dd41859f200a8371d4c3604769ef77547a76db18b306430247d09e5bd9c7431d"
+    },
+    {
+      "type_name": "TestsSource",
+      "signal": "blue",
+      "entry_hash": "44d7992c04998b2e576994f4b8dda0c4106d0163844090b23233945aebbff99a"
+    },
+    {
+      "type_name": "TraitImplDeclV2",
+      "signal": "blue",
+      "entry_hash": "04dbaa4c3adbec752cb239bbd6b4dbc25d4b479f27cca1b5e19a1d68d0b5b271"
+    },
+    {
+      "type_name": "TraitName",
+      "signal": "blue",
+      "entry_hash": "006d9bae96d35e9c23fd598699cf58a42ec44debb4ab71175e61b585cf96e334"
+    },
+    {
+      "type_name": "TraitRefScope",
+      "signal": "blue",
+      "entry_hash": "c15782c04e57c314f675e74ea12dc0b17c0915b850230c5e21abec7d5053863d"
+    },
+    {
+      "type_name": "UncitedSpecElementFinding",
+      "signal": "blue",
+      "entry_hash": "f277018705a966df5086e8267b1d6aef29227f73b1a83dc6b1f0d7570aa626bf"
+    },
+    {
+      "type_name": "ValidationError",
+      "signal": "blue",
+      "entry_hash": "4451e82dcea9327628f440214b4ecbcff7315d503ffacea68dd54b43dff521ba"
+    },
+    {
+      "type_name": "VerifierPromptFingerprint",
+      "signal": "blue",
+      "entry_hash": "b38d8c4a3ee4a47420ea42575c8494cfe4f67e54ca126001ae8bb9b29571d0f3"
+    },
+    {
+      "type_name": "VerifyCacheError",
+      "signal": "blue",
+      "entry_hash": "407696f665613d7631e1078b9a4c59f2bed8027d25344efd9631dc1820f22f75"
+    },
+    {
+      "type_name": "WaivedReason",
+      "signal": "blue",
+      "entry_hash": "d3e375b4a882921f99d8ac80c44c7fdd24a4058bf991586ecbfbfd00acb6b14d"
+    },
+    {
+      "type_name": "WaivedReasonHash",
+      "signal": "blue",
+      "entry_hash": "e15406d26b42dc2c14d4db67aec2511602ac126da2ba14dd8da36e33553c4492"
+    },
+    {
+      "type_name": "WaiverCacheDocument",
+      "signal": "blue",
+      "entry_hash": "f48b0c2b8c685812367e13af39da309376fabcaef72cba25d07869562dfbe50c"
+    },
+    {
+      "type_name": "WaiverCacheEntry",
+      "signal": "blue",
+      "entry_hash": "b03f4528044df688f49fdef592718b56439ac35d7454b32b1846ea9ef0e09b4e"
+    },
+    {
+      "type_name": "WaiverCacheKey",
+      "signal": "blue",
+      "entry_hash": "657b74d4cc16615bb83be9e676dd384607409b4a607a7a8a448502eb3e68ea22"
+    },
+    {
+      "type_name": "WaiverPair",
+      "signal": "blue",
+      "entry_hash": "bcd9b61364e684f1fb5bf85a2cfd30abd9d34c17feeeb7fcf8a9d04c16779558"
+    },
+    {
+      "type_name": "WaiverVerdict",
+      "signal": "blue",
+      "entry_hash": "66cf8151090f59dffcba295e45ffdf44d146c579db4c4f8c72c3bceeac95d997"
+    },
+    {
+      "type_name": "CatalogueDocumentLoaderPort",
+      "signal": "blue",
+      "entry_hash": "06cad37c424fa942e756ec3e2340f4728d65b5a629f55c79cfc2f16b7d161d9a"
+    },
+    {
+      "type_name": "ObligationFulfillmentCachePort",
+      "signal": "blue",
+      "entry_hash": "6499eedb1178b513556f9d7bb52850aa0833f58d709ae9fdce5deb0f821d9409"
+    },
+    {
+      "type_name": "ObligationFulfillmentVerifierPort",
+      "signal": "blue",
+      "entry_hash": "e8c3f38ea807a9101fb4ae71200608b8646f757546d883e7bc7ac41a129cbbbb"
+    },
+    {
+      "type_name": "ObligationsArtifactPort",
+      "signal": "blue",
+      "entry_hash": "f9d66a7ca0de96453a7e57dbffc84c4b24631f29c3b1fe9ffc3d80f9f09dc787"
+    },
+    {
+      "type_name": "SpecDocumentLoaderPort",
+      "signal": "blue",
+      "entry_hash": "5b3c8705ce7efd8db4bf01d1944bbc53858e50863b1f11478d0b44fb8928dff7"
+    },
+    {
+      "type_name": "TestBindingsArtifactPort",
+      "signal": "blue",
+      "entry_hash": "86918c33a0a3bfd6a6973678a4a480e822beead56dc719a35d13ef018d61b397"
+    },
+    {
+      "type_name": "TestObligationRulesLoaderPort",
+      "signal": "blue",
+      "entry_hash": "676e053bc5c3b9a82893a01ff24cb126df316e5a275e798464af1f5d48a1f52a"
+    },
+    {
+      "type_name": "TestSourceScannerPort",
+      "signal": "blue",
+      "entry_hash": "d50ce82e7bb2676f5ae35f2748c08aa4ad45ca9a9bee95c3dc0913bbe3929246"
+    },
+    {
+      "type_name": "WaiverCachePort",
+      "signal": "blue",
+      "entry_hash": "55b5495f673e34d91b017c931744cdfa10a1094ab1fd3d997ad411f910998e70"
+    },
+    {
+      "type_name": "WaiverVerifierPort",
+      "signal": "blue",
+      "entry_hash": "0ca8ebaf18abfdaad0c711c710f5d664555eaf034211761fef9642a78ca904f4"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "data_roles": {
+    "ValueObject":      { "obligations": [ { "kind": "boundary",               "per": "invariant" } ] },
+    "Entity":           { "obligations": [ { "kind": "invariant_preservation", "per": "invariant" } ] },
+    "AggregateRoot":    { "obligations": [ { "kind": "invariant_preservation", "per": "invariant" },
+                                           { "kind": "event_emission",         "per": "emits" } ] },
+    "DomainService":    { "obligations": [ { "kind": "logic_result",           "per": "method" },
+                                           { "kind": "event_emission",         "per": "emits" } ] },
+    "Specification":    { "obligations": [ { "kind": "predicate_both_branches", "per": "entry" } ] },
+    "Factory":          { "obligations": [ { "kind": "construction_result",    "per": "entry" } ] },
+    "UseCase":          { "obligations": [ { "kind": "result", "per": "handles", "min": 1 } ] },
+    "Interactor":       { "obligations": [ { "kind": "result", "per": "entry" } ] },
+    "EventPolicy":      { "obligations": [ { "kind": "reaction", "per": "reacts_to" } ] },
+    "Command":          { "obligations": [] },
+    "Query":            { "obligations": [] },
+    "Dto":              { "obligations": [] },
+    "DomainEvent":      { "obligations": [] },
+    "ErrorType":        { "obligations": [] },
+    "SecondaryAdapter": { "obligations": [] },
+    "CompositionRoot":  { "obligations": [] },
+    "PrimaryAdapter":   { "obligations": [] }
+  },
+  "contract_roles": {
+    "SecondaryPort":      { "obligations": [ { "kind": "contract", "per": "trait_method" } ] },
+    "SpecificationPort":  { "obligations": [ { "kind": "contract", "per": "trait_method" } ] },
+    "Repository":         { "obligations": [ { "kind": "contract", "per": "trait_method" } ] },
+    "ApplicationService": { "obligations": [ { "kind": "result",   "per": "trait_method" } ] }
+  },
+  "function_roles": {
+    "UseCaseFunction": { "obligations": [ { "kind": "result", "per": "entry" } ] },
+    "FreeFunction":    { "obligations": [ { "kind": "logic",  "per": "entry" } ] }
+  },
+  "patterns": {
+    "typestate": { "obligations": [ { "kind": "transition", "per": "transition" } ] }
+  },
+  "trait_impls": {
+    "SecondaryPort":      { "obligations": [ { "kind": "contract_conformance", "per": "trait_impl" } ] },
+    "SpecificationPort":  { "obligations": [ { "kind": "contract_conformance", "per": "trait_impl" } ] },
+    "Repository":         { "obligations": [ { "kind": "contract_conformance", "per": "trait_impl" } ] },
+    "ApplicationService": { "obligations": [] }
+  }
+}

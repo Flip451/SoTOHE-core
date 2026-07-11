@@ -67,7 +67,7 @@ pub use roles::{
     InvariantPredicate, ItemAction, NonEmptyVec, SelfReceiver,
 };
 
-pub use traits::TraitImplDeclV2;
+pub use traits::{TraitImplDeclV2, TraitRefScope};
 
 pub use variants::{FieldDecl, VariantDecl, VariantPayload};
 

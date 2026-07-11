@@ -401,7 +401,7 @@ fn fixpoint_resolve_empty_current_branch_returns_invalid_current_branch_failure(
 fn fixpoint_resolve_invalid_track_id_returns_failure() {
     let interactor = make_short_circuit_interactor();
     let input = FixpointResolveDriverInput {
-        track_id: String::new(),
+        track_id: "Not A Slug".to_owned(),
         current_branch: "track/x".to_owned(),
         items_dir: PathBuf::from("track/items"),
     };

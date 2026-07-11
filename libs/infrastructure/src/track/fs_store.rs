@@ -1,6 +1,6 @@
 //! File-system backed TrackReader + TrackWriter using atomic writes for crash-safe persistence.
 
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 
 use domain::{
     DomainError, ImplPlanDocument, ImplPlanReader, ImplPlanWriter, RepositoryError, TrackId,
@@ -13,7 +13,7 @@ use domain::{
 
 use super::atomic_write::atomic_write_file;
 use super::codec::{self, DocumentMeta};
-use super::symlink_guard::reject_symlinks_below;
+use super::symlink_guard::{reject_symlinks_below, reject_symlinks_up_to_root};
 
 /// File-system backed TrackReader + TrackWriter.
 /// Uses `atomic_write_file` for crash-safe persistence.
@@ -31,21 +31,14 @@ impl FsTrackStore {
         Self { root: root.into() }
     }
 
-    /// Returns the path to `metadata.json` for a given track ID.
-    fn metadata_path(&self, id: &TrackId) -> PathBuf {
-        self.root.join(id.as_ref()).join("metadata.json")
-    }
-
     /// Reads and decodes `metadata.json` for a given track ID.
     fn read_track(
         &self,
         id: &TrackId,
     ) -> Result<Option<(TrackMetadata, DocumentMeta)>, RepositoryError> {
-        let path = self.metadata_path(id);
-        if !path.exists() {
+        let Some(path) = guarded_track_file_path(&self.root, id, "metadata.json")? else {
             return Ok(None);
-        }
-
+        };
         let json = std::fs::read_to_string(&path).map_err(|e| {
             RepositoryError::Message(format!("failed to read {}: {e}", path.display()))
         })?;
@@ -63,7 +56,7 @@ impl FsTrackStore {
         track: &TrackMetadata,
         meta: &DocumentMeta,
     ) -> Result<(), RepositoryError> {
-        let path = self.metadata_path(track.id());
+        let path = guarded_track_file_path_for_write(&self.root, track.id(), "metadata.json")?;
 
         // Ensure the track directory exists.
         if let Some(parent) = path.parent() {
@@ -123,18 +116,6 @@ impl TrackReader for FsTrackStore {
 
 impl TrackWriter for FsTrackStore {
     fn save(&self, track: &TrackMetadata) -> Result<(), TrackWriteError> {
-        let path = self.metadata_path(track.id());
-
-        // Ensure the track directory exists.
-        if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent).map_err(|e| {
-                TrackWriteError::Repository(RepositoryError::Message(format!(
-                    "failed to create directory {}: {e}",
-                    parent.display()
-                )))
-            })?;
-        }
-
         // Read existing meta to preserve created_at, or create new meta.
         let meta = match self.read_track(track.id()).map_err(TrackWriteError::from)? {
             Some((_existing, mut meta)) => {
@@ -159,15 +140,6 @@ impl TrackWriter for FsTrackStore {
     where
         F: FnOnce(&mut TrackMetadata) -> Result<(), DomainError>,
     {
-        let path = self.metadata_path(id);
-
-        // Early return if the track directory or metadata.json does not exist.
-        if !path.exists() {
-            return Err(TrackWriteError::Repository(RepositoryError::TrackNotFound(
-                id.to_string(),
-            )));
-        }
-
         // Read current state.
         let (mut track, mut meta) =
             self.read_track(id).map_err(TrackWriteError::from)?.ok_or_else(|| {
@@ -213,18 +185,16 @@ impl FsTrackStore {
     {
         use fs4::fs_std::FileExt;
 
-        let path = self.metadata_path(id);
-
-        // Early return if metadata.json does not exist.
-        if !path.exists() {
-            return Err(TrackWriteError::Repository(RepositoryError::TrackNotFound(
-                id.to_string(),
-            )));
-        }
+        guarded_track_file_path(&self.root, id, "metadata.json")
+            .map_err(TrackWriteError::from)?
+            .ok_or_else(|| {
+                TrackWriteError::Repository(RepositoryError::TrackNotFound(id.to_string()))
+            })?;
 
         // Acquire an exclusive advisory lock on a sibling `.lock` file.
         // This serializes concurrent `with_locked_document` calls (e.g., parallel auto-record).
-        let lock_path = path.with_extension("json.lock");
+        let lock_path = guarded_track_file_path_for_write(&self.root, id, "metadata.json.lock")
+            .map_err(TrackWriteError::from)?;
         let lock_file = std::fs::File::create(&lock_path).map_err(|e| {
             TrackWriteError::Repository(RepositoryError::Message(format!(
                 "failed to create lock file {}: {e}",
@@ -259,10 +229,9 @@ impl FsTrackStore {
 
 impl ImplPlanReader for FsTrackStore {
     fn load_impl_plan(&self, id: &TrackId) -> Result<Option<ImplPlanDocument>, RepositoryError> {
-        let path = self.root.join(id.as_ref()).join("impl-plan.json");
-        if !path.exists() {
+        let Some(path) = guarded_track_file_path(&self.root, id, "impl-plan.json")? else {
             return Ok(None);
-        }
+        };
         let json = std::fs::read_to_string(&path).map_err(|e| {
             RepositoryError::Message(format!("failed to read {}: {e}", path.display()))
         })?;
@@ -275,7 +244,7 @@ impl ImplPlanReader for FsTrackStore {
 
 impl ImplPlanWriter for FsTrackStore {
     fn save_impl_plan(&self, id: &TrackId, doc: &ImplPlanDocument) -> Result<(), RepositoryError> {
-        let path = self.root.join(id.as_ref()).join("impl-plan.json");
+        let path = guarded_track_file_path_for_write(&self.root, id, "impl-plan.json")?;
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
                 RepositoryError::Message(format!(
@@ -301,6 +270,145 @@ pub fn metadata_json_path(root: &Path, id: &TrackId) -> PathBuf {
     root.join(id.as_ref()).join("metadata.json")
 }
 
+fn guarded_items_dir(items_dir: &Path) -> Result<PathBuf, RepositoryError> {
+    reject_parent_dir_items_dir(items_dir)?;
+    let lexical_items_dir = absolutize_lexical(items_dir);
+    reject_symlinks_up_to_root(&lexical_items_dir).map_err(|e| {
+        let message = if e.kind() == std::io::ErrorKind::InvalidInput {
+            format!("symlink guard: refusing to use symlinked items_dir component: {e}")
+        } else {
+            format!(
+                "symlink guard: cannot stat items_dir component {}: {e}",
+                lexical_items_dir.display()
+            )
+        };
+        RepositoryError::Message(message)
+    })?;
+    canonicalize_deepest_existing_ancestor(&lexical_items_dir, items_dir)
+}
+
+fn reject_parent_dir_items_dir(items_dir: &Path) -> Result<(), RepositoryError> {
+    if items_dir.components().any(|component| component == Component::ParentDir) {
+        return Err(RepositoryError::Message(format!(
+            "symlink guard: refusing items_dir with parent-dir component: {}",
+            items_dir.display()
+        )));
+    }
+    Ok(())
+}
+
+/// Canonicalize the deepest existing ancestor and retain the missing suffix.
+///
+/// `track init` is allowed to bootstrap a checkout where `track/items` has not
+/// been materialized. The symlink chain has already been checked before this
+/// function runs, so the retained suffix consists only of missing components
+/// that `create_dir_all` may safely create.
+fn canonicalize_deepest_existing_ancestor(
+    lexical_items_dir: &Path,
+    requested_items_dir: &Path,
+) -> Result<PathBuf, RepositoryError> {
+    for ancestor in lexical_items_dir.ancestors() {
+        match ancestor.symlink_metadata() {
+            Ok(_) => {
+                let missing_suffix = lexical_items_dir.strip_prefix(ancestor).map_err(|e| {
+                    RepositoryError::Message(format!(
+                        "items_dir '{}' cannot be resolved relative to existing ancestor {}: {e}",
+                        requested_items_dir.display(),
+                        ancestor.display()
+                    ))
+                })?;
+                let canonical_ancestor = ancestor.canonicalize().map_err(|e| {
+                    RepositoryError::Message(format!(
+                        "items_dir '{}' cannot be resolved: {e}",
+                        requested_items_dir.display()
+                    ))
+                })?;
+                return Ok(canonical_ancestor.join(missing_suffix));
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+            Err(e) => {
+                return Err(RepositoryError::Message(format!(
+                    "items_dir '{}' cannot be resolved: {e}",
+                    requested_items_dir.display()
+                )));
+            }
+        }
+    }
+
+    Err(RepositoryError::Message(format!(
+        "items_dir '{}' has no existing ancestor",
+        requested_items_dir.display()
+    )))
+}
+
+fn absolutize_lexical(path: &Path) -> PathBuf {
+    let absolute = if path.is_absolute() {
+        path.to_path_buf()
+    } else {
+        std::env::current_dir().map(|cwd| cwd.join(path)).unwrap_or_else(|_| path.to_path_buf())
+    };
+    lexical_normalize(&absolute)
+}
+
+fn lexical_normalize(path: &Path) -> PathBuf {
+    let mut components: Vec<Component<'_>> = Vec::new();
+    for component in path.components() {
+        match component {
+            Component::ParentDir => match components.last() {
+                Some(Component::Normal(_)) => {
+                    components.pop();
+                }
+                _ => components.push(component),
+            },
+            Component::CurDir => {}
+            _ => components.push(component),
+        }
+    }
+    components.iter().collect()
+}
+
+fn guarded_track_file_path(
+    items_dir: &Path,
+    id: &TrackId,
+    file_name: &str,
+) -> Result<Option<PathBuf>, RepositoryError> {
+    let items_dir = guarded_items_dir(items_dir)?;
+    let path = items_dir.join(id.as_ref()).join(file_name);
+    match reject_symlinks_below(&path, &items_dir) {
+        Ok(true) => Ok(Some(path)),
+        Ok(false) => Ok(None),
+        Err(e) => Err(RepositoryError::Message(format!(
+            "symlink guard: refusing to read {} {}: {e}",
+            file_name,
+            path.display()
+        ))),
+    }
+}
+
+fn guarded_track_file_path_for_write(
+    items_dir: &Path,
+    id: &TrackId,
+    file_name: &str,
+) -> Result<PathBuf, RepositoryError> {
+    let items_dir = guarded_items_dir(items_dir)?;
+    let path = items_dir.join(id.as_ref()).join(file_name);
+    match reject_symlinks_below(&path, &items_dir) {
+        Ok(_) => Ok(path),
+        Err(e) => Err(RepositoryError::Message(format!(
+            "symlink guard: refusing to write {} {}: {e}",
+            file_name,
+            path.display()
+        ))),
+    }
+}
+
+fn repository_error_message(error: RepositoryError) -> String {
+    match error {
+        RepositoryError::Message(message) => message,
+        other => other.to_string(),
+    }
+}
+
 /// Read-only metadata load directly from disk.
 ///
 /// Reads and decodes `metadata.json` for a given track ID.
@@ -313,7 +421,13 @@ pub fn read_track_metadata(
     items_dir: &Path,
     id: &TrackId,
 ) -> Result<(TrackMetadata, DocumentMeta), RepositoryError> {
-    let path = items_dir.join(id.as_ref()).join("metadata.json");
+    let requested_path = items_dir.join(id.as_ref()).join("metadata.json");
+    let Some(path) = guarded_track_file_path(items_dir, id, "metadata.json")? else {
+        return Err(RepositoryError::Message(format!(
+            "cannot read {}: file not found",
+            requested_path.display()
+        )));
+    };
     let json = std::fs::read_to_string(&path).map_err(|err| {
         RepositoryError::Message(format!("cannot read {}: {err}", path.display()))
     })?;
@@ -334,30 +448,7 @@ pub fn read_track_metadata(
 /// Returns an error string on metadata read failure, codec failure, or impl-plan
 /// load failure.
 pub fn read_track_status_str(items_dir: &Path, track_id_str: &str) -> Result<String, String> {
-    // Security: guard `items_dir` itself before using it as the symlink-guard trusted root.
-    // `reject_symlinks_below` only inspects descendants — a symlinked root would bypass it.
-    match items_dir.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(format!(
-                "symlink guard: refusing to use symlinked items_dir: {}",
-                items_dir.display()
-            ));
-        }
-        Ok(_) => {}
-        Err(e) => {
-            return Err(format!(
-                "symlink guard: cannot stat items_dir {}: {e}",
-                items_dir.display()
-            ));
-        }
-    }
-
-    // Containment: canonicalize items_dir to catch `..` traversal bypasses.
-    // Without this, a caller passing `track/items/../../../etc` as items_dir would
-    // resolve outside the intended directory tree.
-    let items_dir = items_dir
-        .canonicalize()
-        .map_err(|e| format!("items_dir '{}' cannot be resolved: {e}", items_dir.display()))?;
+    let items_dir = guarded_items_dir(items_dir).map_err(repository_error_message)?;
     let items_dir = items_dir.as_path();
 
     let valid_id =
@@ -402,10 +493,7 @@ pub fn read_track_status_str(items_dir: &Path, track_id_str: &str) -> Result<Str
 /// Always returns `Ok`; individual failures are swallowed and treated as
 /// "absent".
 pub fn load_impl_plan_for_track(items_dir: &Path, id: &TrackId) -> Option<ImplPlanDocument> {
-    let path = items_dir.join(id.as_ref()).join("impl-plan.json");
-    if !path.exists() {
-        return None;
-    }
+    let path = guarded_track_file_path(items_dir, id, "impl-plan.json").ok()??;
     let json = std::fs::read_to_string(&path).ok()?;
     crate::impl_plan_codec::decode(&json).ok()
 }
@@ -415,7 +503,7 @@ pub fn load_impl_plan_for_track(items_dir: &Path, id: &TrackId) -> Option<ImplPl
 mod tests {
     use super::*;
 
-    use domain::{StatusOverride, TrackId, TrackMetadata};
+    use domain::{ImplPlanDocument, PlanView, StatusOverride, TrackId, TrackMetadata};
 
     fn test_snapshot() -> domain::branch_strategy::BranchStrategySnapshot {
         domain::branch_strategy::BranchStrategySnapshot::new(
@@ -429,6 +517,307 @@ mod tests {
         // Identity-only TrackMetadata; status is derived on demand via derive_track_status.
         TrackMetadata::new(TrackId::try_new(id).unwrap(), "Test Track", None, test_snapshot())
             .unwrap()
+    }
+
+    fn write_sample_metadata(path: &Path, id: &str) {
+        let track = sample_track(id);
+        let meta = DocumentMeta {
+            schema_version: 6,
+            created_at: "2026-01-01T00:00:00Z".to_owned(),
+            updated_at: "2026-01-01T00:00:00Z".to_owned(),
+        };
+        let json = codec::encode(&track, &meta).unwrap();
+        std::fs::write(path, json).unwrap();
+    }
+
+    fn write_empty_impl_plan(path: &Path) {
+        let doc = ImplPlanDocument::new(vec![], PlanView::new(vec![], vec![])).unwrap();
+        let json = crate::impl_plan_codec::encode(&doc).unwrap();
+        std::fs::write(path, json).unwrap();
+    }
+
+    fn empty_impl_plan() -> ImplPlanDocument {
+        ImplPlanDocument::new(vec![], PlanView::new(vec![], vec![])).unwrap()
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_read_track_metadata_symlinked_items_dir_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let real_items = dir.path().join("real-items");
+        let link_items = dir.path().join("items-link");
+        let real_track = real_items.join("test-track");
+        std::fs::create_dir_all(&real_track).unwrap();
+        write_sample_metadata(&real_track.join("metadata.json"), "test-track");
+        std::os::unix::fs::symlink(&real_items, &link_items).unwrap();
+        let id = TrackId::try_new("test-track").unwrap();
+
+        let Err(RepositoryError::Message(message)) = read_track_metadata(&link_items, &id) else {
+            panic!("symlinked items_dir must be rejected");
+        };
+        assert!(
+            message.contains("symlink guard: refusing to use symlinked items_dir component"),
+            "expected symlink guard error, got: {message}"
+        );
+    }
+
+    #[test]
+    fn test_read_track_metadata_parent_dir_items_dir_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("items");
+        let track_dir = items_dir.join("test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        write_sample_metadata(&track_dir.join("metadata.json"), "test-track");
+        let parent_dir_items = dir.path().join("other").join("..").join("items");
+        let id = TrackId::try_new("test-track").unwrap();
+
+        let Err(RepositoryError::Message(message)) = read_track_metadata(&parent_dir_items, &id)
+        else {
+            panic!("items_dir with parent-dir component must be rejected");
+        };
+        assert!(
+            message.contains("parent-dir component"),
+            "expected parent-dir guard error, got: {message}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_read_track_metadata_symlinked_track_dir_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("items");
+        let outside_track = dir.path().join("outside-track");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        std::fs::create_dir_all(&outside_track).unwrap();
+        write_sample_metadata(&outside_track.join("metadata.json"), "test-track");
+        let id = TrackId::try_new("test-track").unwrap();
+        std::os::unix::fs::symlink(&outside_track, items_dir.join(id.as_ref())).unwrap();
+
+        let Err(RepositoryError::Message(message)) = read_track_metadata(&items_dir, &id) else {
+            panic!("symlinked track directory must be rejected");
+        };
+        assert!(
+            message.contains("symlink guard: refusing to read metadata.json"),
+            "expected metadata symlink guard error, got: {message}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_load_impl_plan_for_track_symlinked_items_dir_returns_none() {
+        let dir = tempfile::tempdir().unwrap();
+        let real_items = dir.path().join("real-items");
+        let link_items = dir.path().join("items-link");
+        let real_track = real_items.join("test-track");
+        std::fs::create_dir_all(&real_track).unwrap();
+        write_empty_impl_plan(&real_track.join("impl-plan.json"));
+        std::os::unix::fs::symlink(&real_items, &link_items).unwrap();
+        let id = TrackId::try_new("test-track").unwrap();
+
+        let result = load_impl_plan_for_track(&link_items, &id);
+
+        assert!(result.is_none(), "symlinked items_dir must not be read");
+    }
+
+    #[test]
+    fn test_load_impl_plan_for_track_parent_dir_items_dir_returns_none() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("items");
+        let track_dir = items_dir.join("test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        write_empty_impl_plan(&track_dir.join("impl-plan.json"));
+        let parent_dir_items = dir.path().join("other").join("..").join("items");
+        let id = TrackId::try_new("test-track").unwrap();
+
+        let result = load_impl_plan_for_track(&parent_dir_items, &id);
+
+        assert!(result.is_none(), "items_dir with parent-dir component must not be read");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_load_impl_plan_for_track_symlinked_track_dir_returns_none() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("items");
+        let outside_track = dir.path().join("outside-track");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        std::fs::create_dir_all(&outside_track).unwrap();
+        write_empty_impl_plan(&outside_track.join("impl-plan.json"));
+        let id = TrackId::try_new("test-track").unwrap();
+        std::os::unix::fs::symlink(&outside_track, items_dir.join(id.as_ref())).unwrap();
+
+        let result = load_impl_plan_for_track(&items_dir, &id);
+
+        assert!(result.is_none(), "symlinked track directory must not be read");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_store_find_symlinked_track_dir_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("items");
+        let outside_track = dir.path().join("outside-track");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        std::fs::create_dir_all(&outside_track).unwrap();
+        write_sample_metadata(&outside_track.join("metadata.json"), "test-track");
+        let id = TrackId::try_new("test-track").unwrap();
+        std::os::unix::fs::symlink(&outside_track, items_dir.join(id.as_ref())).unwrap();
+
+        let store = FsTrackStore::new(&items_dir);
+        let Err(TrackReadError::Repository(RepositoryError::Message(message))) = store.find(&id)
+        else {
+            panic!("symlinked track directory must be rejected");
+        };
+        assert!(
+            message.contains("symlink guard: refusing to read metadata.json"),
+            "expected metadata symlink guard error, got: {message}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_store_find_symlinked_metadata_file_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("items");
+        let track_dir = items_dir.join("test-track");
+        let outside_file = dir.path().join("metadata.json");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        write_sample_metadata(&outside_file, "test-track");
+        let id = TrackId::try_new("test-track").unwrap();
+        std::os::unix::fs::symlink(&outside_file, track_dir.join("metadata.json")).unwrap();
+
+        let store = FsTrackStore::new(&items_dir);
+        let Err(TrackReadError::Repository(RepositoryError::Message(message))) = store.find(&id)
+        else {
+            panic!("symlinked metadata file must be rejected");
+        };
+        assert!(
+            message.contains("symlink guard: refusing to read metadata.json"),
+            "expected metadata symlink guard error, got: {message}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_store_load_impl_plan_symlinked_track_dir_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("items");
+        let outside_track = dir.path().join("outside-track");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        std::fs::create_dir_all(&outside_track).unwrap();
+        write_empty_impl_plan(&outside_track.join("impl-plan.json"));
+        let id = TrackId::try_new("test-track").unwrap();
+        std::os::unix::fs::symlink(&outside_track, items_dir.join(id.as_ref())).unwrap();
+
+        let store = FsTrackStore::new(&items_dir);
+        let Err(RepositoryError::Message(message)) = store.load_impl_plan(&id) else {
+            panic!("symlinked track directory must be rejected");
+        };
+        assert!(
+            message.contains("symlink guard: refusing to read impl-plan.json"),
+            "expected impl-plan symlink guard error, got: {message}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_store_load_impl_plan_symlinked_file_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("items");
+        let track_dir = items_dir.join("test-track");
+        let outside_file = dir.path().join("impl-plan.json");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        write_empty_impl_plan(&outside_file);
+        let id = TrackId::try_new("test-track").unwrap();
+        std::os::unix::fs::symlink(&outside_file, track_dir.join("impl-plan.json")).unwrap();
+
+        let store = FsTrackStore::new(&items_dir);
+        let Err(RepositoryError::Message(message)) = store.load_impl_plan(&id) else {
+            panic!("symlinked impl-plan file must be rejected");
+        };
+        assert!(
+            message.contains("symlink guard: refusing to read impl-plan.json"),
+            "expected impl-plan symlink guard error, got: {message}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_store_save_impl_plan_symlinked_items_dir_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let real_items = dir.path().join("real-items");
+        let link_items = dir.path().join("items-link");
+        std::fs::create_dir_all(&real_items).unwrap();
+        std::os::unix::fs::symlink(&real_items, &link_items).unwrap();
+        let id = TrackId::try_new("test-track").unwrap();
+
+        let store = FsTrackStore::new(&link_items);
+        let Err(RepositoryError::Message(message)) = store.save_impl_plan(&id, &empty_impl_plan())
+        else {
+            panic!("symlinked items_dir must be rejected");
+        };
+        assert!(
+            message.contains("symlink guard: refusing to use symlinked items_dir component"),
+            "expected items_dir symlink guard error, got: {message}"
+        );
+        assert!(
+            !real_items.join(id.as_ref()).join("impl-plan.json").exists(),
+            "save_impl_plan must not write through a symlinked items_dir"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_store_save_impl_plan_symlinked_track_dir_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("items");
+        let outside_track = dir.path().join("outside-track");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        std::fs::create_dir_all(&outside_track).unwrap();
+        let id = TrackId::try_new("test-track").unwrap();
+        std::os::unix::fs::symlink(&outside_track, items_dir.join(id.as_ref())).unwrap();
+
+        let store = FsTrackStore::new(&items_dir);
+        let Err(RepositoryError::Message(message)) = store.save_impl_plan(&id, &empty_impl_plan())
+        else {
+            panic!("symlinked track directory must be rejected");
+        };
+        assert!(
+            message.contains("symlink guard: refusing to write impl-plan.json"),
+            "expected impl-plan symlink guard error, got: {message}"
+        );
+        assert!(
+            !outside_track.join("impl-plan.json").exists(),
+            "save_impl_plan must not write through a symlinked track directory"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_store_save_symlinked_track_dir_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("items");
+        let outside_track = dir.path().join("outside-track");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        std::fs::create_dir_all(&outside_track).unwrap();
+        let track = sample_track("test-track");
+        std::os::unix::fs::symlink(&outside_track, items_dir.join(track.id().as_ref())).unwrap();
+
+        let store = FsTrackStore::new(&items_dir);
+        let Err(TrackWriteError::Repository(RepositoryError::Message(message))) =
+            store.save(&track)
+        else {
+            panic!("symlinked track directory must be rejected");
+        };
+        assert!(
+            message.contains("symlink guard: refusing to read metadata.json")
+                || message.contains("symlink guard: refusing to write metadata.json"),
+            "expected metadata symlink guard error, got: {message}"
+        );
+        assert!(
+            !outside_track.join("metadata.json").exists(),
+            "save must not write through a symlinked track directory"
+        );
     }
 
     #[test]
@@ -496,6 +885,50 @@ mod tests {
 
         let result = store.save(&track);
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_store_save_missing_items_dir_creates_metadata() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("track").join("items");
+        let track = sample_track("new-track");
+
+        assert!(!items_dir.exists(), "fixture must start without track/items");
+
+        let store = FsTrackStore::new(&items_dir);
+        store.save(&track).unwrap();
+
+        assert!(
+            items_dir.join(track.id().as_ref()).join("metadata.json").is_file(),
+            "save must bootstrap track/items and write metadata"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_store_save_symlinked_items_dir_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let real_items = dir.path().join("real-items");
+        let link_items = dir.path().join("items-link");
+        let track = sample_track("test-track");
+        std::fs::create_dir_all(&real_items).unwrap();
+        std::os::unix::fs::symlink(&real_items, &link_items).unwrap();
+
+        let store = FsTrackStore::new(&link_items);
+        let Err(TrackWriteError::Repository(RepositoryError::Message(message))) =
+            store.save(&track)
+        else {
+            panic!("symlinked items_dir must be rejected");
+        };
+
+        assert!(
+            message.contains("symlink guard: refusing to use symlinked items_dir component"),
+            "expected items_dir symlink guard error, got: {message}"
+        );
+        assert!(
+            !real_items.join(track.id().as_ref()).join("metadata.json").exists(),
+            "save must not write through a symlinked items_dir"
+        );
     }
 
     #[test]
@@ -611,7 +1044,10 @@ mod tests {
 
         let result = store.with_locked_document(track.id(), |_, _| {
             Err(DomainError::Validation(domain::ValidationError::InvalidTaskId(
-                "intentional error".to_owned(),
+                domain::tddd::test_obligation::ids::DiagnosticMessage::try_new(
+                    "intentional error".to_owned(),
+                )
+                .expect("non-empty diagnostic"),
             )))
         });
         assert!(result.is_err());
@@ -619,6 +1055,33 @@ mod tests {
         // File must be unchanged.
         let json_after = std::fs::read_to_string(&path).unwrap();
         assert_eq!(json_before, json_after);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_with_locked_document_symlinked_lock_file_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let items_dir = dir.path().join("items");
+        let outside_file = dir.path().join("outside-lock-target");
+        std::fs::create_dir_all(&items_dir).unwrap();
+        let store = FsTrackStore::new(&items_dir);
+        let track = sample_track("test-track");
+        store.save(&track).unwrap();
+        std::fs::write(&outside_file, "do not truncate").unwrap();
+
+        let lock_path = items_dir.join(track.id().as_ref()).join("metadata.json.lock");
+        std::os::unix::fs::symlink(&outside_file, &lock_path).unwrap();
+
+        let Err(TrackWriteError::Repository(RepositoryError::Message(message))) =
+            store.with_locked_document(track.id(), |_, _| Ok(()))
+        else {
+            panic!("symlinked lock file must be rejected");
+        };
+        assert!(
+            message.contains("symlink guard: refusing to write metadata.json.lock"),
+            "expected lock-file symlink guard error, got: {message}"
+        );
+        assert_eq!(std::fs::read_to_string(outside_file).unwrap(), "do not truncate");
     }
 
     #[test]

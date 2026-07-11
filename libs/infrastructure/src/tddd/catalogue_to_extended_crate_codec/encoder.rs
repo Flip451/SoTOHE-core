@@ -218,11 +218,11 @@ impl Encoder {
         let mut crate_names: Vec<String> = Vec::new();
         for ti in self.doc.trait_impls() {
             // Extract crate prefix from trait_ref (e.g. "core" from "core::convert::From<X>").
-            if let Some(cn) = extract_crate(ti.trait_ref.as_str()) {
+            if let Some(cn) = extract_crate(ti.trait_ref().as_str()) {
                 crate_names.push(cn);
             }
             // Extract crate prefix from for_type (e.g. "std" from "std::vec::Vec<i32>").
-            if let Some(cn) = extract_crate(ti.for_type.as_str()) {
+            if let Some(cn) = extract_crate(ti.for_type().as_str()) {
                 crate_names.push(cn);
             }
         }
@@ -353,14 +353,14 @@ impl Encoder {
             let impl_id = state.alloc_id();
             // Read action from the TraitImplDeclV2 entry (CN-04: ItemAction::Add must NOT be
             // hardcoded — the codec must use entry.action to mirror TypeEntry/TraitEntry handling).
-            let action = ti.action;
+            let action = ti.action();
 
             // Collect impl-block generic parameter names (e.g. `["T", "U"]`) before
             // parsing `for_type`, so that bare generic names in `for_type` (e.g. `"T"` in
             // `impl<T> Trait for T`) are encoded as `Type::Generic("T")` rather than as
             // unresolved-marker `ResolvedPath` nodes (ADR 2026-06-18-0822 D2).
             let impl_generic_names: Vec<&str> =
-                ti.impl_generics.iter().map(|g| g.name.as_str()).collect();
+                ti.impl_generics().iter().map(|g| g.name.as_str()).collect();
 
             // Build the rustdoc `Type` for the impl's `for_` field.
             //
@@ -379,19 +379,20 @@ impl Encoder {
             // `"std::vec::Vec"`).  This normalization applies ONLY to the `for_` type —
             // NOT to the trait path (which needs its fully-qualified form for identity-key
             // disambiguation in `build_impl_identity_map`).
-            let for_type_resolved = normalize_impl_for_type_path(
-                state
-                    .parse_type_ref_str_with_generics(ti.for_type.as_str(), &impl_generic_names)?,
-            );
+            let for_type_resolved =
+                normalize_impl_for_type_path(state.parse_type_ref_str_with_generics(
+                    ti.for_type().as_str(),
+                    &impl_generic_names,
+                )?);
 
             // Resolve trait_ref: parse and resolve via parse_type_ref_str so that
             // nested type references in generic args are fully resolved.
-            let trait_path = state.resolve_trait_ref_for_top_level(ti.trait_ref.as_str())?;
+            let trait_path = state.resolve_trait_ref_for_top_level(ti.trait_ref().as_str())?;
 
             // Encode impl-block-level generics.
             let impl_generics = state.build_where_form_generics(
-                &ti.impl_generics,
-                &ti.impl_where_predicates,
+                ti.impl_generics(),
+                ti.impl_where_predicates(),
                 &impl_generic_names,
             )?;
             let impl_inner = Impl {

@@ -218,11 +218,11 @@ pub(super) fn has_trait_impl(
     let path_suffix = format!("::{trait_name_prefix}");
     catalogue.trait_impls().iter().any(|ti| {
         // Exclude delete-action impl entries: a deleted impl does not count as present.
-        if ti.action == ItemAction::Delete {
+        if ti.action() == ItemAction::Delete {
             return false;
         }
-        let for_type = ti.for_type.as_str();
-        let trait_ref = ti.trait_ref.as_str();
+        let for_type = ti.for_type().as_str();
+        let trait_ref = ti.trait_ref().as_str();
         // Match `for_type` either exactly or as a generic self type (e.g. "Foo<T>").
         let for_type_matches = for_type == type_name
             || for_type.starts_with(&format!("{type_name}<"))

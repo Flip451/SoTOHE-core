@@ -64,11 +64,21 @@ Parallelism rules:
   commands and full CI for the integration phase or a single worker to avoid build lock contention.
   To isolate a single test: `cargo nextest run <test_name>` inside the tools container.
 
-**Step 4: CI validation**
+**Step 4: Test-obligation binding artifacts (when applicable)**
+
+When the track materializes the test-obligation gate, run the `obligation-fulfillment`
+workflow (`.harness/workflows/track/obligation-fulfillment.md`) — it owns the derive →
+author → totality → evaluate → repair loop, including the split between implementer-side
+authoring and orchestrator-side `evaluate`. Per-record authoring discipline lives in the
+`implementer` capability contract (`.harness/capabilities/implementer.md`). This workflow
+only requires that the gate is passing before implementation is reported complete once
+obligation artifacts exist.
+
+**Step 5: CI validation**
 
 Before reporting completion, require `cargo make ci` equivalent validation.
 
-**Step 5: Record observations (conditional)**
+**Step 6: Record observations (conditional)**
 
 After CI passes, create or append to `track/items/<id>/observations.md` only when one of the
 following holds:
@@ -80,7 +90,7 @@ following holds:
 The file is free-form markdown with no required scaffold. Otherwise, skip this step
 (file absence = no observations).
 
-**Step 6: Mark tasks done**
+**Step 7: Mark tasks done**
 
 Use `bin/sotp track transition <task_id> done` to mark completed tasks as `done` (auto-renders
 `plan.md` + `registry.md`). After the subsequent `commit` workflow creates the actual commit,
@@ -93,7 +103,8 @@ keep tasks in `in_progress` and report why.
 | Step | Gate | Verdict |
 |------|------|---------|
 | 1 | Active `track/<id>` branch found | OK / stop |
-| 4 | `cargo make ci` exits 0 | pass / fail |
+| 4 | `bin/sotp test-obligation check` exits 0 once artifacts exist | pass / fail |
+| 5 | `cargo make ci` exits 0 | pass / fail |
 
 ## Failure / recovery
 

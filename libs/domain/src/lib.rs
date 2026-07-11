@@ -22,6 +22,7 @@ pub mod semantic_dup;
 mod signal;
 pub mod skill_compliance;
 pub mod spec;
+pub mod spec_document_loader_port;
 pub mod spec_file_loader_port;
 pub mod symlink_guard_port;
 pub mod task_contract;
@@ -80,6 +81,7 @@ pub use spec::{
     SpecRequirement, SpecScope, SpecSection, SpecValidationError, check_spec_doc_signals,
     evaluate_requirement_signal,
 };
+pub use spec_document_loader_port::{SpecDocumentLoadError, SpecDocumentLoaderPort};
 pub use spec_file_loader_port::{SpecFileLoadError, SpecFileLoaderPort};
 pub use symlink_guard_port::{SymlinkGuardError, SymlinkGuardPort};
 pub use task_coverage::{TASK_COVERAGE_SCHEMA_VERSION, TaskCoverageDocument};
@@ -142,7 +144,7 @@ mod tests {
 
         assert!(matches!(
             result,
-            Err(ValidationError::InvalidTrackId(value)) if value == "Not A Slug"
+            Err(ValidationError::InvalidTrackId(value)) if value.as_str() == "Not A Slug"
         ));
     }
 
@@ -152,7 +154,7 @@ mod tests {
 
         assert!(matches!(
             result,
-            Err(ValidationError::InvalidCommitHash(value)) if value == "abc123"
+            Err(ValidationError::InvalidCommitHash(value)) if value.as_str() == "abc123"
         ));
     }
 

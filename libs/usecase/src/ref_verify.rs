@@ -18,10 +18,13 @@
 //!   secondary ports.
 
 use std::fmt;
+use std::num::NonZeroU8;
 
 use domain::TrackId;
 use domain::tddd::LayerId;
 use domain::tddd::semantic_verify::{ModelTier, SemanticVerifyEntry};
+
+use crate::semantic_verdict_core::probe::SemanticCalibrationProbeConfig;
 
 // ── RefVerifyScope ────────────────────────────────────────────────────────────
 
@@ -117,6 +120,69 @@ pub struct RefVerifyPair {
     pub evidence_origin: VerifyOriginRef,
 }
 
+/// Full hash-frozen cache key for one ref-verify pair.
+///
+/// Carries the same four lookup dimensions used by the verify-cache
+/// persistence path so the semantic-verdict driver receives a verifier-owned
+/// cache key rather than reconstructing one from raw pair fields.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RefVerifyCacheKey {
+    /// Routing scope of the cache artifact.
+    cache_scope: RefVerifyCacheScope,
+    /// SHA-256 hash of the claim element.
+    claim_hash: domain::ContentHash,
+    /// SHA-256 hash of the evidence element.
+    evidence_hash: domain::ContentHash,
+    /// Origin reference identifying the artifact and location of the claim.
+    claim_origin: VerifyOriginRef,
+    /// Origin reference identifying the artifact and location of the evidence.
+    evidence_origin: VerifyOriginRef,
+}
+
+impl RefVerifyCacheKey {
+    /// Builds a full cache key from the pair currently being evaluated.
+    #[must_use]
+    pub fn from_pair(pair: &RefVerifyPair) -> Self {
+        Self {
+            cache_scope: pair.cache_scope.clone(),
+            claim_hash: pair.claim_hash.clone(),
+            evidence_hash: pair.evidence_hash.clone(),
+            claim_origin: pair.claim_origin.clone(),
+            evidence_origin: pair.evidence_origin.clone(),
+        }
+    }
+
+    /// Return the cache artifact scope.
+    #[must_use]
+    pub fn cache_scope(&self) -> &RefVerifyCacheScope {
+        &self.cache_scope
+    }
+
+    /// Return the claim hash.
+    #[must_use]
+    pub fn claim_hash(&self) -> &domain::ContentHash {
+        &self.claim_hash
+    }
+
+    /// Return the evidence hash.
+    #[must_use]
+    pub fn evidence_hash(&self) -> &domain::ContentHash {
+        &self.evidence_hash
+    }
+
+    /// Return the claim origin.
+    #[must_use]
+    pub fn claim_origin(&self) -> &VerifyOriginRef {
+        &self.claim_origin
+    }
+
+    /// Return the evidence origin.
+    #[must_use]
+    pub fn evidence_origin(&self) -> &VerifyOriginRef {
+        &self.evidence_origin
+    }
+}
+
 // ── RefVerifyPercent ──────────────────────────────────────────────────────────
 
 /// Validated nonzero percentage value object for ref-verify health-check
@@ -124,8 +190,14 @@ pub struct RefVerifyPair {
 ///
 /// `try_new` accepts only values in `1..=100` so known-bad injection and
 /// detection thresholds cannot be disabled by zero-valued settings.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct RefVerifyPercent(u8);
+#[derive(Debug, Copy, PartialEq, Eq)]
+pub struct RefVerifyPercent(NonZeroU8);
+
+impl Clone for RefVerifyPercent {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
 
 impl RefVerifyPercent {
     /// Construct a [`RefVerifyPercent`] from a raw `u8` value.
@@ -134,17 +206,32 @@ impl RefVerifyPercent {
     ///
     /// Returns [`RefVerifyError::InvalidConfig`] when `value` is 0 or > 100.
     pub fn try_new(value: u8) -> Result<Self, RefVerifyError> {
-        if value == 0 || value > 100 {
+        if value > 100 {
             return Err(RefVerifyError::InvalidConfig {
                 message: format!("percent value must be in 1..=100, got {value}"),
             });
         }
+        let value = NonZeroU8::new(value).ok_or_else(|| RefVerifyError::InvalidConfig {
+            message: format!("percent value must be in 1..=100, got {value}"),
+        })?;
         Ok(Self(value))
     }
 
     /// Return the inner percentage value.
     pub fn as_u8(self) -> u8 {
+        self.0.get()
+    }
+
+    /// Return the inner nonzero percentage value.
+    #[must_use]
+    pub fn as_non_zero_u8(self) -> NonZeroU8 {
         self.0
+    }
+
+    /// Return whether this already-validated percentage satisfies its invariant.
+    #[must_use]
+    pub fn is_valid(&self) -> bool {
+        self.0.get() <= 100
     }
 }
 
@@ -193,12 +280,12 @@ impl RefVerifyParallelism {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RefVerifyConfig {
     /// Rate at which known-bad monitor probes are injected into each batch.
-    pub known_bad_injection_rate_percent: RefVerifyPercent,
+    known_bad_injection_rate_percent: RefVerifyPercent,
     /// Minimum fraction of known-bad probes that must be detected as Fail
     /// for the calibration to be considered healthy.
-    pub known_bad_detection_threshold_percent: RefVerifyPercent,
+    known_bad_detection_threshold_percent: RefVerifyPercent,
     /// Maximum number of pairs verified in parallel.
-    pub max_parallelism: RefVerifyParallelism,
+    max_parallelism: RefVerifyParallelism,
 }
 
 impl RefVerifyConfig {
@@ -222,14 +309,57 @@ impl RefVerifyConfig {
             max_parallelism: parallelism,
         })
     }
+
+    /// Projects the ref-verify calibration settings into the shared semantic
+    /// verdict-core probe config.
+    #[must_use]
+    pub fn semantic_probe_config(&self) -> SemanticCalibrationProbeConfig {
+        SemanticCalibrationProbeConfig::new(
+            self.known_bad_injection_rate_percent.as_non_zero_u8(),
+            self.known_bad_detection_threshold_percent.as_non_zero_u8(),
+        )
+    }
+
+    /// Return the configured known-bad injection rate.
+    #[must_use]
+    pub fn known_bad_injection_rate_percent(&self) -> RefVerifyPercent {
+        self.known_bad_injection_rate_percent
+    }
+
+    /// Return the configured known-bad detection threshold.
+    #[must_use]
+    pub fn known_bad_detection_threshold_percent(&self) -> RefVerifyPercent {
+        self.known_bad_detection_threshold_percent
+    }
+
+    /// Return the configured parallelism limit.
+    #[must_use]
+    pub fn max_parallelism(&self) -> RefVerifyParallelism {
+        self.max_parallelism
+    }
+
+    /// Return whether this already-validated config satisfies its invariant.
+    #[must_use]
+    pub fn is_valid(&self) -> bool {
+        self.known_bad_injection_rate_percent.is_valid()
+            && self.known_bad_detection_threshold_percent.is_valid()
+            && self.max_parallelism.as_usize() > 0
+    }
 }
 
 impl Default for RefVerifyConfig {
     fn default() -> Self {
+        const DEFAULT_INJECTION: NonZeroU8 = match NonZeroU8::new(10) {
+            Some(value) => value,
+            None => NonZeroU8::MIN,
+        };
+        const DEFAULT_THRESHOLD: NonZeroU8 = match NonZeroU8::new(90) {
+            Some(value) => value,
+            None => NonZeroU8::MIN,
+        };
         Self {
-            // Safety: 10 and 90 are valid percent values; 4 is nonzero.
-            known_bad_injection_rate_percent: RefVerifyPercent(10),
-            known_bad_detection_threshold_percent: RefVerifyPercent(90),
+            known_bad_injection_rate_percent: RefVerifyPercent(DEFAULT_INJECTION),
+            known_bad_detection_threshold_percent: RefVerifyPercent(DEFAULT_THRESHOLD),
             max_parallelism: RefVerifyParallelism(4),
         }
     }
