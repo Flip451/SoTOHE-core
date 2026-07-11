@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "6658051c490fc9af0c57139bcfab032e4f4228d312200abe895df169604fb811",
+      "evidence_hash": "be50f31c85d765d3d4a710a4fddbba8d44f71dc326bc075d3057cbb15f277061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0c09b708db62d5dd14a395eaf2971267bc1fbf19a4c290a17c1d439ba8f29ba6",
+      "evidence_hash": "be50f31c85d765d3d4a710a4fddbba8d44f71dc326bc075d3057cbb15f277061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "33c42a7f7565e52941bfab2c6f9ebd88cd8f4b170fde9bcd8c724edd9192298e",
+      "evidence_hash": "759353985a2bffd1570e4cbb85415534dbaedd660c5a2d0b824468bea9e8d51e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp plan codex-local` の CLI、driver、usecase、infrastructure adapter と、それを正規経路として示す規約・command・設定・skill の参照を撤去し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+          "section_key": "types",
+          "entry_key": "PlanCodexLocalArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`sotp plan codex-local` の CLI、driver、usecase、infrastructure adapter と、それを正規経路として示す規約・command・設定・skill の参照を撤去し、writer capability への案内を `capability exec` の経路へ差し替える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "33c42a7f7565e52941bfab2c6f9ebd88cd8f4b170fde9bcd8c724edd9192298e",
+      "evidence_hash": "759353985a2bffd1570e4cbb85415534dbaedd660c5a2d0b824468bea9e8d51e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp plan codex-local` の CLI、driver、usecase、infrastructure adapter と、それを正規経路として示す規約・command・設定・skill の参照を撤去し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+          "section_key": "types",
+          "entry_key": "PlanCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`sotp plan codex-local` の CLI、driver、usecase、infrastructure adapter と、それを正規経路として示す規約・command・設定・skill の参照を撤去し、writer capability への案内を `capability exec` の経路へ差し替える。"
+        }
+      }
+    }
+  ]
+}

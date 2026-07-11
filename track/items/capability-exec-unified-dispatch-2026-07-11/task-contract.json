@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "track_id": "capability-exec-unified-dispatch-2026-07-11",
+  "entries": {
+    "T001": [
+      {"layer": "usecase", "entry_key": "BriefingText"},
+      {"layer": "usecase", "entry_key": "CapabilityExecError"},
+      {"layer": "usecase", "entry_key": "CapabilityExecRequest"},
+      {"layer": "usecase", "entry_key": "CapabilityFailureDetail"},
+      {"layer": "usecase", "entry_key": "CapabilityFilePath"},
+      {"layer": "usecase", "entry_key": "CapabilityInputValidationError"},
+      {"layer": "usecase", "entry_key": "CapabilityName"},
+      {"layer": "usecase", "entry_key": "CapabilityProfile"},
+      {"layer": "usecase", "entry_key": "DisciplineText"},
+      {"layer": "usecase", "entry_key": "ExecutionMode"},
+      {"layer": "usecase", "entry_key": "ModelName"},
+      {"layer": "usecase", "entry_key": "ProviderName"}
+    ],
+    "T002": [
+      {"layer": "usecase", "entry_key": "CapabilityDispatchOutcome"},
+      {"layer": "usecase", "entry_key": "CapabilityDispatchRequest"},
+      {"layer": "usecase", "entry_key": "CapabilityExecInteractor"},
+      {"layer": "usecase", "entry_key": "CapabilityExecService"},
+      {"layer": "usecase", "entry_key": "CapabilityProfilePort"},
+      {"layer": "usecase", "entry_key": "CapabilityProviderPort"},
+      {"layer": "usecase", "entry_key": "CapabilitySourcePort"},
+      {"layer": "usecase", "entry_key": "PlanRunOutput"},
+      {"layer": "usecase", "entry_key": "PlannerInteractor"},
+      {"layer": "usecase", "entry_key": "PlannerPort"},
+      {"layer": "usecase", "entry_key": "PlannerPortError"},
+      {"layer": "usecase", "entry_key": "PlannerService"}
+    ],
+    "T003": [],
+    "T004": [
+      {"layer": "infrastructure", "entry_key": "AgentProfilesCapabilityAdapter"},
+      {"layer": "infrastructure", "entry_key": "CapabilityConfigDto"},
+      {"layer": "infrastructure", "entry_key": "ExecutionModeDto"},
+      {"layer": "infrastructure", "entry_key": "FsCapabilitySourceAdapter"},
+      {"layer": "infrastructure", "entry_key": "ModelNameDto"},
+      {"layer": "infrastructure", "entry_key": "ProviderNameDto"}
+    ],
+    "T005": [
+      {"layer": "infrastructure", "entry_key": "ClaudeCapabilityAdapter"},
+      {"layer": "infrastructure", "entry_key": "CodexCapabilityAdapter"},
+      {"layer": "infrastructure", "entry_key": "CodexPlannerAdapter"},
+      {"layer": "infrastructure", "entry_key": "SandboxMode"}
+    ],
+    "T006": [
+      {"layer": "cli_driver", "entry_key": "CapabilityDriver"},
+      {"layer": "cli_driver", "entry_key": "CapabilityExecDriverInput"},
+      {"layer": "cli_driver", "entry_key": "CapabilityNameArg"},
+      {"layer": "cli_driver", "entry_key": "PlanDriver"},
+      {"layer": "cli_driver", "entry_key": "PlanInput"},
+      {"layer": "cli_driver", "entry_key": "ProviderNameArg"}
+    ],
+    "T007": [
+      {"layer": "cli", "entry_key": "CapabilityCommand"},
+      {"layer": "cli", "entry_key": "CapabilityExecArgs"},
+      {"layer": "cli", "entry_key": "PlanCodexLocalArgs"},
+      {"layer": "cli", "entry_key": "PlanCommand"}
+    ],
+    "T008": [
+      {"layer": "cli_composition", "entry_key": "CapabilityCompositionRoot"},
+      {"layer": "cli_composition", "entry_key": "PlanCompositionRoot"}
+    ],
+    "T009": []
+  }
+}

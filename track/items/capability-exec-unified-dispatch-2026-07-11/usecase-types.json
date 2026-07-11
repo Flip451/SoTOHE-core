@@ -1,0 +1,1285 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "ProviderName"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "ModelName"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::path::Path"
+        }
+      ],
+      "type_name": "CapabilityFilePath"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "BriefingText"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "DisciplineText"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "CapabilityFailureDetail"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "profile",
+              "ty": "std::sync::Arc<dyn CapabilityProfilePort>"
+            },
+            {
+              "name": "source",
+              "ty": "std::sync::Arc<dyn CapabilitySourcePort>"
+            },
+            {
+              "name": "providers",
+              "ty": "Vec<std::sync::Arc<dyn CapabilityProviderPort>>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "CapabilityExecInteractor"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "ProviderName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ProviderName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ProviderName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ProviderName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ProviderName",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ModelName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ModelName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ModelName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ModelName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ModelName",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "CapabilityFilePath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityFilePath",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityFilePath",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityFilePath",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CapabilityFilePath",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "BriefingText",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BriefingText",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BriefingText",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BriefingText",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "DisciplineText",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "DisciplineText",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "DisciplineText",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "DisciplineText",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CapabilityFailureDetail",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityFailureDetail",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityFailureDetail",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityFailureDetail",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CapabilityFailureDetail",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ExecutionMode",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ExecutionMode",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ExecutionMode",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "ExecutionMode",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ExecutionMode",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CapabilityInputValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityInputValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "CapabilityInputValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CapabilityProfile",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityProfile",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityProfile",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityProfile",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CapabilityDispatchRequest",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityDispatchRequest",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityDispatchRequest",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityDispatchRequest",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CapabilityDispatchOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityDispatchOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityDispatchOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityDispatchOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CapabilityExecError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityExecError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "CapabilityExecError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "CapabilityExecInteractor",
+      "trait_ref": "CapabilityExecService"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityName",
+      "trait_ref": "core::fmt::Display"
+    }
+  ],
+  "traits": {
+    "CapabilityExecService": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "request",
+              "ty": "CapabilityExecRequest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CapabilityDispatchOutcome, CapabilityExecError>"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "GO-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"]
+    },
+    "CapabilityProfilePort": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve",
+          "docs": "Intentionally synchronous and blocking; implementations may produce only CapabilityExecError::ProfileResolution or CapabilityExecError::ModelMissing.",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&CapabilityName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CapabilityProfile, CapabilityExecError>"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"]
+    },
+    "CapabilityProviderPort": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provider",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ProviderName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "dispatch",
+          "docs": "Intentionally synchronous and blocking; implementations may produce only CapabilityExecError::AdapterPreflight or CapabilityExecError::DispatchFailed.",
+          "params": [
+            {
+              "name": "request",
+              "ty": "&CapabilityDispatchRequest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CapabilityDispatchOutcome, CapabilityExecError>"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"]
+    },
+    "CapabilitySourcePort": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load_briefing",
+          "docs": "Intentionally synchronous and blocking; implementations may produce only CapabilityExecError::SourceValidation.",
+          "params": [
+            {
+              "name": "path",
+              "ty": "&CapabilityFilePath"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<BriefingText, CapabilityExecError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load_discipline",
+          "docs": "Intentionally synchronous and blocking; implementations may produce only CapabilityExecError::SourceValidation.",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<DisciplineText, CapabilityExecError>"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ],
+      "supertrait_bounds": ["Send", "Sync"]
+    },
+    "PlannerPort": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "planner",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "PlannerService": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "planner",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    }
+  },
+  "types": {
+    "BriefingText": {
+      "action": "add",
+      "docs": "Usecase-layer validated technical text value; not domain language.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityDispatchOutcome": {
+      "action": "add",
+      "docs": "Application result carrier; u8 is an opaque process status with no additional application invariant.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Executed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "provider",
+                  "ty": "ProviderName"
+                },
+                {
+                  "name": "exit_code",
+                  "ty": "u8"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DelegateInHost",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                },
+                {
+                  "name": "briefing_file",
+                  "ty": "CapabilityFilePath"
+                },
+                {
+                  "name": "discipline",
+                  "ty": "DisciplineText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityDispatchRequest": {
+      "action": "add",
+      "docs": "Usecase-layer non-serde DTO shared across application ports.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "request",
+              "ty": "CapabilityExecRequest"
+            },
+            {
+              "name": "profile",
+              "ty": "CapabilityProfile"
+            },
+            {
+              "name": "briefing",
+              "ty": "BriefingText"
+            },
+            {
+              "name": "discipline",
+              "ty": "DisciplineText"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecError": {
+      "action": "add",
+      "docs": "Usecase-layer error vocabulary; adapter diagnostics use the opaque CapabilityFailureDetail carrier.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ProfileResolution",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ExecutionModeRejected",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                },
+                {
+                  "name": "mode",
+                  "ty": "ExecutionMode"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ModelMissing",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnsupportedProvider",
+            "payload": {
+              "fields": [
+                {
+                  "name": "provider",
+                  "ty": "ProviderName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "SourceValidation",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "CapabilityFilePath"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "AdapterPreflight",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                },
+                {
+                  "name": "provider",
+                  "ty": "ProviderName"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DispatchFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "provider",
+                  "ty": "ProviderName"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecInteractor": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "GO-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecRequest": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "CapabilityName"
+            },
+            {
+              "name": "host",
+              "ty": "ProviderName"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "CapabilityFilePath"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityFailureDetail": {
+      "action": "add",
+      "docs": "Unconstrained presentation-only diagnostic text; raw String is intentional because no domain concept is represented.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityFilePath": {
+      "action": "add",
+      "docs": "Usecase-layer validated technical path value; not domain language.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityInputValidationError": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "EmptyCapabilityName",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyProviderName",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyModelName",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyFilePath",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyContent",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityName": {
+      "action": "reference",
+      "docs": "Validated non-empty capability lookup key used to query `.harness/config/agent-profiles.json` (e.g. `\"dry-checker\"`), carried by `DryCheckServiceFactoryError::AgentConfigResolutionFailed` so the failed lookup names which capability was being resolved.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, domain::ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "dry_write_driver::failure_details",
+      "role": { "ValueObject": {} },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityProfile": {
+      "action": "add",
+      "docs": "Usecase-layer non-serde DTO for typed routing data.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "provider",
+              "ty": "ProviderName"
+            },
+            {
+              "name": "model",
+              "ty": "ModelName"
+            },
+            {
+              "name": "execution_mode",
+              "ty": "ExecutionMode"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "DisciplineText": {
+      "action": "add",
+      "docs": "Usecase-layer validated technical policy-text value; not domain language.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "ExecutionMode": {
+      "action": "add",
+      "docs": "Usecase-layer finite profile execution-mode vocabulary with no state-transition semantics.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OrchestratorOutput",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TypedPipeline",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "ModelName": {
+      "action": "add",
+      "docs": "Usecase-layer validated technical identifier; not domain language.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "PlanRunOutput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "planner",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "PlannerInteractor": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "planner",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "PlannerPortError": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "planner",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "ProviderName": {
+      "action": "add",
+      "docs": "Usecase-layer validated technical provider identifier; not domain language.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    }
+  }
+}

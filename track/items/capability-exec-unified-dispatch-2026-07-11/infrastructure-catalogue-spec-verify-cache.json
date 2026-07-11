@@ -1,0 +1,534 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "1a271acd384b91a688daa72b1c50c1356e476bcf88f7a00c28cfc771e8283960",
+      "evidence_hash": "055aa4529d888e2564f44e8c780bcd817139155198e6629f8a71425e03677ea1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dispatch 対象を profile の capability entry から解決し、`execution_mode: orchestrator-output` の entry だけを通す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "AgentProfilesCapabilityAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "dispatch 対象を profile の capability entry から解決し、`execution_mode: orchestrator-output` の entry だけを通す。存在しない capability、`typed-pipeline`、execution_mode の欠如、または未知の execution_mode は subprocess を起動せず reject する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1a271acd384b91a688daa72b1c50c1356e476bcf88f7a00c28cfc771e8283960",
+      "evidence_hash": "0fd3869418db22a14ffdb93b7a193348d3ef3a1435647bab7ef36dc283bcd5ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "profile から provider と単一の model を解決し、claude と codex の provider arm だけを provider-generic な入口から dispatch する。未対応または未知の provider、model 欠如、または provider-native adapter 定義との model 不一致は dispatch 前に reject する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "AgentProfilesCapabilityAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "profile から provider と単一の model を解決し、claude と codex の provider arm だけを provider-generic な入口から dispatch する。未対応または未知の provider、model 欠如、または provider-native adapter 定義との model 不一致は dispatch 前に reject する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e59e9bb6071a848cf7d89ff8bc03346e5f0958740300dcd91262552ea7a5e54d",
+      "evidence_hash": "055aa4529d888e2564f44e8c780bcd817139155198e6629f8a71425e03677ea1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`execution_mode: orchestrator-output` の entry だけを通す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityConfigDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "dispatch 対象を profile の capability entry から解決し、`execution_mode: orchestrator-output` の entry だけを通す。存在しない capability、`typed-pipeline`、execution_mode の欠如、または未知の execution_mode は subprocess を起動せず reject する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "50fca3e530d6645e9788cf8f235caac930dcfacdd2fdf1d36ffcafb4b8f6ccc1",
+      "evidence_hash": "998f089ed95c490d4391f3884992b04c9f54678ff0821068bea77e35f13a1b9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "claude は agent 定義の `tools:` と profile と一致する `model:` の存在を preflight し、欠如または不一致を reject する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ClaudeCapabilityAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "provider ごとの adapter 定義を、capability 定義への適合と実行権限の権威として扱う。codex は skill の sandbox 宣言を subprocess の sandbox 制約へ反映し、未宣言時は read-only とする。claude は agent 定義の `tools:` と profile と一致する `model:` の存在を preflight し、欠如または不一致を reject する。CLI と profile に権限を緩和または重複宣言する経路を設けない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "50fca3e530d6645e9788cf8f235caac930dcfacdd2fdf1d36ffcafb4b8f6ccc1",
+      "evidence_hash": "0979a692e06b6e516307b4e09cdb21e3a999b86add9b9f9d8039f587e34fbab9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--host` を runtime の呼び出し元 provider の必須自己申告として扱う。claude==claude かつ全 preflight が通る場合だけ subprocess を起動しない in-host 委譲指示を返し、codex==codex と cross-provider の場合は adapter による subprocess dispatch を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ClaudeCapabilityAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`--host` を runtime の呼び出し元 provider の必須自己申告として扱う。claude==claude かつ全 preflight が通る場合だけ subprocess を起動しない in-host 委譲指示を返し、codex==codex と cross-provider の場合は adapter による subprocess dispatch を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "50fca3e530d6645e9788cf8f235caac930dcfacdd2fdf1d36ffcafb4b8f6ccc1",
+      "evidence_hash": "04f6dd57d920e7771ed61b9d951a12d2b8b3de305b6efd2c9b1e2343d5df8d97",
+      "verdict": {
+        "kind": "pass",
+        "citation": "subprocess dispatch では provider-native adapter を使う。claude は検証済み agent 定義を `claude -p --agent <name>` で"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ClaudeCapabilityAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "subprocess dispatch では provider-native adapter を使う。claude は検証済み agent 定義を `claude -p --agent <name>` で、codex は存在確認済み skill を明示的な `$<name>` mention と profile model で起動する。native adapter の非対話適合を確認できない場合や定義が欠ける場合に、raw definition の prompt 注入などへ fallback しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "50fca3e530d6645e9788cf8f235caac930dcfacdd2fdf1d36ffcafb4b8f6ccc1",
+      "evidence_hash": "f74e979af4dd5a464dfee4ba535e2106bf09f41e9cfdc29e03e5c1729436b651",
+      "verdict": {
+        "kind": "pass",
+        "citation": "subprocess dispatch が claude では検証済み agent を `claude -p --agent <name>` で、codex では profile model と明示的な `$<name>` skill mention を用いて起動することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ClaudeCapabilityAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "subprocess dispatch が claude では検証済み agent を `claude -p --agent <name>` で、codex では profile model と明示的な `$<name>` skill mention を用いて起動することを検証する。いずれの provider subprocess に渡す prompt にも、検証済み briefing path から変換した instruction と、読み込み・検証済みの固定 discipline template 本文の両方が含まれることを確認する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f89597b390eb42149bac547077ac55c9e5e5b6a3d2ff0a2e6b38d16850bdb8cb",
+      "evidence_hash": "998f089ed95c490d4391f3884992b04c9f54678ff0821068bea77e35f13a1b9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex は skill の sandbox 宣言を subprocess の sandbox 制約へ反映し、未宣言時は read-only とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CodexCapabilityAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "provider ごとの adapter 定義を、capability 定義への適合と実行権限の権威として扱う。codex は skill の sandbox 宣言を subprocess の sandbox 制約へ反映し、未宣言時は read-only とする。claude は agent 定義の `tools:` と profile と一致する `model:` の存在を preflight し、欠如または不一致を reject する。CLI と profile に権限を緩和または重複宣言する経路を設けない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f89597b390eb42149bac547077ac55c9e5e5b6a3d2ff0a2e6b38d16850bdb8cb",
+      "evidence_hash": "0979a692e06b6e516307b4e09cdb21e3a999b86add9b9f9d8039f587e34fbab9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex==codex と cross-provider の場合は adapter による subprocess dispatch を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CodexCapabilityAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`--host` を runtime の呼び出し元 provider の必須自己申告として扱う。claude==claude かつ全 preflight が通る場合だけ subprocess を起動しない in-host 委譲指示を返し、codex==codex と cross-provider の場合は adapter による subprocess dispatch を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f89597b390eb42149bac547077ac55c9e5e5b6a3d2ff0a2e6b38d16850bdb8cb",
+      "evidence_hash": "04f6dd57d920e7771ed61b9d951a12d2b8b3de305b6efd2c9b1e2343d5df8d97",
+      "verdict": {
+        "kind": "pass",
+        "citation": "subprocess dispatch では provider-native adapter を使う。claude は検証済み agent 定義を `claude -p --agent <name>` で、codex は存在確認済み skill を明示的な `$<name>` mention と profile model で起動する。native adapter の非対話適合を確認できない場合や定義が欠ける場合に、raw definition の prompt 注入などへ fallback しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CodexCapabilityAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "subprocess dispatch では provider-native adapter を使う。claude は検証済み agent 定義を `claude -p --agent <name>` で、codex は存在確認済み skill を明示的な `$<name>` mention と profile model で起動する。native adapter の非対話適合を確認できない場合や定義が欠ける場合に、raw definition の prompt 注入などへ fallback しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f89597b390eb42149bac547077ac55c9e5e5b6a3d2ff0a2e6b38d16850bdb8cb",
+      "evidence_hash": "f74e979af4dd5a464dfee4ba535e2106bf09f41e9cfdc29e03e5c1729436b651",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex では profile model と明示的な `$<name>` skill mention を用いて起動する。いずれの provider subprocess に渡す prompt にも、検証済み briefing path から変換した instruction と、読み込み・検証済みの固定 discipline template 本文の両方が含まれることを確認する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CodexCapabilityAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "subprocess dispatch が claude では検証済み agent を `claude -p --agent <name>` で、codex では profile model と明示的な `$<name>` skill mention を用いて起動することを検証する。いずれの provider subprocess に渡す prompt にも、検証済み briefing path から変換した instruction と、読み込み・検証済みの固定 discipline template 本文の両方が含まれることを確認する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4bab1c872d86d1293462702e5e599298ea575a38cc1ba35225e06cddca7e8eed",
+      "evidence_hash": "055aa4529d888e2564f44e8c780bcd817139155198e6629f8a71425e03677ea1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`execution_mode: orchestrator-output` の entry だけを通す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ExecutionModeDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "dispatch 対象を profile の capability entry から解決し、`execution_mode: orchestrator-output` の entry だけを通す。存在しない capability、`typed-pipeline`、execution_mode の欠如、または未知の execution_mode は subprocess を起動せず reject する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4bab1c872d86d1293462702e5e599298ea575a38cc1ba35225e06cddca7e8eed",
+      "evidence_hash": "f2f190a6a43bf040c34e4bdd0aa9c034729cfe637979e166e5a5462f39200fdb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "profile は capability の universe、routing、model、execution mode の唯一の権威とし"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ExecutionModeDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "profile は capability の universe、routing、model、execution mode の唯一の権威とし、adapter 定義は capability への適合と provider 固有権限の唯一の権威とする。capability 名の whitelist、個別 runner、model fallback、または profile と adapter の暗黙優先によってこの分担を迂回しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b8e1585da36802672c9c7fae2a08150b29a586e64fdc4655fbfb3cb1b5744ecc",
+      "evidence_hash": "72421957db1280b4c0e9c5f1dd2edc7ba33df6086e52f9a4429a3874b14bc66e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "briefing file と固定 discipline template を分岐判定より前に読み込み、通常ファイル性、読み取り可能性、UTF-8、非空内容を検証する。検証済み briefing と discipline を subprocess prompt に合成し、in-host 委譲では briefing path と読み込み済み discipline 本文の両方を必須 payload として返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsCapabilitySourceAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "briefing file と固定 discipline template を分岐判定より前に読み込み、通常ファイル性、読み取り可能性、UTF-8、非空内容を検証する。検証済み briefing と discipline を subprocess prompt に合成し、in-host 委譲では briefing path と読み込み済み discipline 本文の両方を必須 payload として返す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b8e1585da36802672c9c7fae2a08150b29a586e64fdc4655fbfb3cb1b5744ecc",
+      "evidence_hash": "1330e71e343ebcfd5fd95d3d4f059bf13f53fd47d1fa3995e330e19e4dffe1a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "すべての dispatch 分岐で、検証済みの briefing と同一の discipline を適用する。discipline の政策文面は Rust に複製せず固定 template から読み込み、native adapter を使えないときに raw definition を prompt 又は system prompt へ注入する代替経路を設けない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsCapabilitySourceAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "すべての dispatch 分岐で、検証済みの briefing と同一の discipline を適用する。discipline の政策文面は Rust に複製せず固定 template から読み込み、native adapter を使えないときに raw definition を prompt 又は system prompt へ注入する代替経路を設けない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc21df454216444405eb4f87545726164c1734b8a0b0984b1a2ef4ef07e45721",
+      "evidence_hash": "0fd3869418db22a14ffdb93b7a193348d3ef3a1435647bab7ef36dc283bcd5ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "profile から provider と単一の model を解決し、claude と codex の provider arm だけを provider-generic な入口から dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ModelNameDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "profile から provider と単一の model を解決し、claude と codex の provider arm だけを provider-generic な入口から dispatch する。未対応または未知の provider、model 欠如、または provider-native adapter 定義との model 不一致は dispatch 前に reject する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc21df454216444405eb4f87545726164c1734b8a0b0984b1a2ef4ef07e45721",
+      "evidence_hash": "f2f190a6a43bf040c34e4bdd0aa9c034729cfe637979e166e5a5462f39200fdb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "profile は capability の universe、routing、model、execution mode の唯一の権威とし"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ModelNameDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "profile は capability の universe、routing、model、execution mode の唯一の権威とし、adapter 定義は capability への適合と provider 固有権限の唯一の権威とする。capability 名の whitelist、個別 runner、model fallback、または profile と adapter の暗黙優先によってこの分担を迂回しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c566d8ef1418e116dabe3746cdb3df856c2d2aabb183e2ff50f8e8f4e83fc40d",
+      "evidence_hash": "0fd3869418db22a14ffdb93b7a193348d3ef3a1435647bab7ef36dc283bcd5ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "profile から provider と単一の model を解決し、claude と codex の provider arm だけを provider-generic な入口から dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ProviderNameDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "profile から provider と単一の model を解決し、claude と codex の provider arm だけを provider-generic な入口から dispatch する。未対応または未知の provider、model 欠如、または provider-native adapter 定義との model 不一致は dispatch 前に reject する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c566d8ef1418e116dabe3746cdb3df856c2d2aabb183e2ff50f8e8f4e83fc40d",
+      "evidence_hash": "f2f190a6a43bf040c34e4bdd0aa9c034729cfe637979e166e5a5462f39200fdb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "profile は capability の universe、routing、model、execution mode の唯一の権威とし、adapter 定義は capability への適合と provider 固有権限の唯一の権威とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ProviderNameDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "profile は capability の universe、routing、model、execution mode の唯一の権威とし、adapter 定義は capability への適合と provider 固有権限の唯一の権威とする。capability 名の whitelist、個別 runner、model fallback、または profile と adapter の暗黙優先によってこの分担を迂回しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "067b7e1ab59abc121d6d7ffc14a24370b0143259b775323163d3dfc9b84cf3a7",
+      "evidence_hash": "998f089ed95c490d4391f3884992b04c9f54678ff0821068bea77e35f13a1b9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex は skill の sandbox 宣言を subprocess の sandbox 制約へ反映し、未宣言時は read-only とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SandboxMode"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "provider ごとの adapter 定義を、capability 定義への適合と実行権限の権威として扱う。codex は skill の sandbox 宣言を subprocess の sandbox 制約へ反映し、未宣言時は read-only とする。claude は agent 定義の `tools:` と profile と一致する `model:` の存在を preflight し、欠如または不一致を reject する。CLI と profile に権限を緩和または重複宣言する経路を設けない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "067b7e1ab59abc121d6d7ffc14a24370b0143259b775323163d3dfc9b84cf3a7",
+      "evidence_hash": "feed1fdb691bf730dcbdc9df09d87b46541f633df2d7e8821fa6cc5eebe32679",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex skill の sandbox 未宣言時は read-only が適用され、CLI 引数による権限緩和はできないことを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SandboxMode"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "codex skill の sandbox 未宣言時は read-only が適用され、CLI 引数による権限緩和はできないことを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "471f6cc4a8eb4b74e112f34d0d168e3a48f955f91390862a06b19c9fd998fd45",
+      "evidence_hash": "759353985a2bffd1570e4cbb85415534dbaedd660c5a2d0b824468bea9e8d51e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp plan codex-local` の CLI、driver、usecase、infrastructure adapter と、それを正規経路として示す規約・command・設定・skill の参照を撤去し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CodexPlannerAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`sotp plan codex-local` の CLI、driver、usecase、infrastructure adapter と、それを正規経路として示す規約・command・設定・skill の参照を撤去し、writer capability への案内を `capability exec` の経路へ差し替える。"
+        }
+      }
+    }
+  ]
+}

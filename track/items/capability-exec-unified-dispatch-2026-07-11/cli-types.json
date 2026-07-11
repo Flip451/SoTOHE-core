@@ -1,0 +1,124 @@
+{
+  "crate_name": "cli",
+  "functions": {},
+  "layer": "cli",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "CapabilityCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "for_type": "CapabilityCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityCommand": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Exec",
+            "payload": {
+              "fields": [
+                "CapabilityExecArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecArgs": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "cli_driver::capability::CapabilityNameArg"
+            },
+            {
+              "name": "host",
+              "ty": "cli_driver::capability::ProviderNameArg"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "PlanCodexLocalArgs": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "commands::plan",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "PlanCommand": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "commands::plan",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    }
+  }
+}

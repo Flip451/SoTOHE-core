@@ -1,0 +1,75 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "runtime_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "capability_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::capability::CapabilityDriver"
+        }
+      ],
+      "type_name": "CapabilityCompositionRoot"
+    }
+  ],
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "CapabilityCompositionRoot": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "PlanCompositionRoot": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "plan",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    }
+  }
+}

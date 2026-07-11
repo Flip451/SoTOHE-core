@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "ae589b38800016cb24b1abc4381e59a642a2e46f656db5b27cfb1e41fb5132ce",
+  "signals": [
+    {
+      "type_name": "AgentProfilesCapabilityAdapter",
+      "signal": "blue",
+      "entry_hash": "1a271acd384b91a688daa72b1c50c1356e476bcf88f7a00c28cfc771e8283960"
+    },
+    {
+      "type_name": "CapabilityConfigDto",
+      "signal": "blue",
+      "entry_hash": "e59e9bb6071a848cf7d89ff8bc03346e5f0958740300dcd91262552ea7a5e54d"
+    },
+    {
+      "type_name": "ClaudeCapabilityAdapter",
+      "signal": "blue",
+      "entry_hash": "50fca3e530d6645e9788cf8f235caac930dcfacdd2fdf1d36ffcafb4b8f6ccc1"
+    },
+    {
+      "type_name": "CodexCapabilityAdapter",
+      "signal": "blue",
+      "entry_hash": "f89597b390eb42149bac547077ac55c9e5e5b6a3d2ff0a2e6b38d16850bdb8cb"
+    },
+    {
+      "type_name": "ExecutionModeDto",
+      "signal": "blue",
+      "entry_hash": "4bab1c872d86d1293462702e5e599298ea575a38cc1ba35225e06cddca7e8eed"
+    },
+    {
+      "type_name": "FsCapabilitySourceAdapter",
+      "signal": "blue",
+      "entry_hash": "b8e1585da36802672c9c7fae2a08150b29a586e64fdc4655fbfb3cb1b5744ecc"
+    },
+    {
+      "type_name": "ModelNameDto",
+      "signal": "blue",
+      "entry_hash": "cc21df454216444405eb4f87545726164c1734b8a0b0984b1a2ef4ef07e45721"
+    },
+    {
+      "type_name": "ProviderNameDto",
+      "signal": "blue",
+      "entry_hash": "c566d8ef1418e116dabe3746cdb3df856c2d2aabb183e2ff50f8e8f4e83fc40d"
+    },
+    {
+      "type_name": "SandboxMode",
+      "signal": "blue",
+      "entry_hash": "067b7e1ab59abc121d6d7ffc14a24370b0143259b775323163d3dfc9b84cf3a7"
+    },
+    {
+      "type_name": "CodexPlannerAdapter",
+      "signal": "blue",
+      "entry_hash": "471f6cc4a8eb4b74e112f34d0d168e3a48f955f91390862a06b19c9fd998fd45"
+    }
+  ]
+}

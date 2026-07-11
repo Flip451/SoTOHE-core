@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "02d673e73ae7ef5506fe11f395ee450a00d1ff5765747060e0f0b1c6d4901710",
+  "signals": [
+    {
+      "type_name": "CapabilityCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "f64d2083ea2a658f0164c7efd6c882c7d401e7b7d5d64005a45347148bf37627"
+    },
+    {
+      "type_name": "PlanCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "4c9f90f062a02b02bc8c5506abb1078eac7f6dd229482c88351daddd37a905ab"
+    }
+  ]
+}

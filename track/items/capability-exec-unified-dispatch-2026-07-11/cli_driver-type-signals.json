@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-11T23:13:15Z",
+  "declaration_hash": "cae2a9d5c73e4e6130839650a57cdc88143141ac6df3370d411d520137b98fad",
+  "signals": [
+    {
+      "type_name": "CapabilityDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CapabilityExecDriverInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CapabilityNameArg",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::str::FromStr"
+      ]
+    },
+    {
+      "type_name": "ProviderNameArg",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::str::FromStr"
+      ]
+    },
+    {
+      "type_name": "PlanDriver",
+      "kind_tag": "unknown",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "PlanInput",
+      "kind_tag": "unknown",
+      "signal": "yellow",
+      "found_type": true
+    }
+  ]
+}

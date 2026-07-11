@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "cae2a9d5c73e4e6130839650a57cdc88143141ac6df3370d411d520137b98fad",
+  "signals": [
+    {
+      "type_name": "CapabilityDriver",
+      "signal": "blue",
+      "entry_hash": "2636a3b54aaff5187d7afdc8c399c26fb3b20871ba539d18f7043133ba50f4cf"
+    },
+    {
+      "type_name": "CapabilityExecDriverInput",
+      "signal": "blue",
+      "entry_hash": "4ca5cf7f696a8e935908945095427993214cda6d81f7acdedc7d0c3373fc2aae"
+    },
+    {
+      "type_name": "CapabilityNameArg",
+      "signal": "blue",
+      "entry_hash": "4ec64de9b5a2280fa33ea664d989c6782afba0b61ec89b80335c8679ce70eb7d"
+    },
+    {
+      "type_name": "ProviderNameArg",
+      "signal": "blue",
+      "entry_hash": "2b31612c933fde30f12df0953f75c1e9e2f94f61cbfd80b1eff9f4b49a7e7663"
+    },
+    {
+      "type_name": "PlanDriver",
+      "signal": "blue",
+      "entry_hash": "4c9f90f062a02b02bc8c5506abb1078eac7f6dd229482c88351daddd37a905ab"
+    },
+    {
+      "type_name": "PlanInput",
+      "signal": "blue",
+      "entry_hash": "4c9f90f062a02b02bc8c5506abb1078eac7f6dd229482c88351daddd37a905ab"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-11T23:13:18Z",
+  "declaration_hash": "66dcfa01470b835383ac54416f0ce3988a65d2d4b49d947363be81879fe9901a",
+  "signals": [
+    {
+      "type_name": "CapabilityCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "clap_builder::derive::FromArgMatches",
+        "clap_builder::derive::Subcommand",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CapabilityExecArgs",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "clap_builder::derive::Args",
+        "clap_builder::derive::FromArgMatches",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "PlanCodexLocalArgs",
+      "kind_tag": "unknown",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "clap_builder::derive::Args",
+        "clap_builder::derive::FromArgMatches",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "PlanCommand",
+      "kind_tag": "unknown",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "clap_builder::derive::FromArgMatches",
+        "clap_builder::derive::Subcommand",
+        "core::fmt::Debug"
+      ]
+    }
+  ]
+}

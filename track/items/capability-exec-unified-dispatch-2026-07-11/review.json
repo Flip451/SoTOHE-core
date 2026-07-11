@@ -114,6 +114,288 @@
           "at": "2026-07-11T21:00:23Z"
         }
       ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
+          "at": "2026-07-11T21:56:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 は briefing 規律を全 dispatch 経路で保証するとしているが、subprocess prompt に検証済み briefing と discipline 本文が含まれることを証明する AC がない。AC-03 は事前検証、AC-05 は in-host payload、AC-06 は native adapter の起動形式しか確認しないため、subprocess が両本文を欠落させても全 AC を満たせる。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+              "line": 34,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
+          "at": "2026-07-11T21:58:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0449a9512e852388b258d529303c95fbb6bff22f07b51d72522c021854c4b4c8",
+          "at": "2026-07-11T22:02:33Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 claims it will “expose the profile/source/provider ports,” but task-contract.json attributes CapabilityProfilePort, CapabilityProviderPort, and CapabilitySourcePort only to T002. Align the description and attribution so the executable task boundary is unambiguous.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/task-contract.json",
+              "line": 24,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T001 restates upstream behavior in “validated request” and “port-boundary validation failures”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 restates the behavior contract in “validate briefing and discipline,” “resolve profiles without capability-specific branching,” “reject invalid execution mode,” and “fail-closed”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates upstream design rationale in “Keep routing/model authority in profiles and provider-specific permissions in adapters”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 restates input-validation behavior in “regular readable UTF-8 nonblank inputs” and “without fallback”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 restates provider execution behavior in “preflight provider-native definitions,” “verified native invocation contracts,” “read-only default,” and “no raw-definition fallback”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 restates outcome and error behavior in “discriminated execution and in-host outcomes,” “non-success error rendering,” and “outcome discrimination”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T007 restates CLI behavior in “argument absence,” “dispatch forwarding,” and “rejection of the retired command”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T008 restates end-to-end behavior in “valid dispatch,” “in-host delegation,” “rejection-before-spawn,” and “preservation of typed pipelines”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 48,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T009 restates operational behavior in “writer route remains available while the retired planner path is absent”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 54,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 restates upstream type-design rationale in “validated-value, enum-first, and port-boundary decisions”; retain only sequencing and task references.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 76,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 restates upstream behavior and rationale in “fixed discipline path,” “fail-closed preflight tests,” and “D10 provider-native execution contract”; retain only sequencing and task references.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 87,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S4 restates the safety/behavior contract in “proves the replacement route,” “removal ... safe,” and “no live writer guidance remains orphaned”; retain only sequencing and task references.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 112,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:b58ff214a5b741669126f272f46e2f6e6aaa60a2a4c661277f547a5385d2eece",
+          "at": "2026-07-11T23:02:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ae89ce08e9c2ef19755fa83813e2d023014bd0c780aac48eb8c6aceab09301a",
+          "at": "2026-07-11T23:08:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ae89ce08e9c2ef19755fa83813e2d023014bd0c780aac48eb8c6aceab09301a",
+          "at": "2026-07-11T23:11:45Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityExecError::InvalidRequest` is unconstructible: `CapabilityExecService::execute` accepts an already-typed `CapabilityExecRequest`; declared constructors return `CapabilityInputValidationError` directly, and `CapabilityDriver::handle` returns `CommandOutcome`. No declared caller can wrap that error into this variant.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 761,
+              "category": "unconstructible error variant"
+            },
+            {
+              "message": "`CapabilityProfilePort::resolve` returns the broad `CapabilityExecError`, but the declared profile adapter can only produce `ProfileResolution` or `ModelMissing`. The entry does not document this producible subset; `InvalidRequest`, `ExecutionModeRejected`, `UnsupportedProvider`, `SourceValidation`, `AdapterPreflight`, and `DispatchFailed` are structurally unreachable here.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 478,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`CapabilityProviderPort::dispatch` returns the broad `CapabilityExecError`, although the interactor selects a matching provider and the provider adapters can only produce `AdapterPreflight` or `DispatchFailed`. The entry does not document the narrower subset, forcing callers to handle unreachable profile/source/input variants.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 521,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`CapabilitySourcePort::load_briefing` and `load_discipline` return the broad `CapabilityExecError`, although both declared operations can only produce `SourceValidation`. The entry does not document this subset, so callers must handle unrelated profile, provider, and dispatch failures.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 560,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`CapabilityProfilePort::resolve`, `CapabilitySourcePort::load_briefing`, `CapabilitySourcePort::load_discipline`, and `CapabilityProviderPort::dispatch` are all declared synchronous despite performing profile-file, filesystem, and subprocess/provider I/O. Their docs do not acknowledge the synchronous boundary choice, leaving the port color contract underspecified for adapters.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 470,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "`ReasoningEffortDto` is anchored only to `CN-02`, whose scope covers profile capability/routing/model/execution-mode authority and adapter authority; it contains no reasoning-effort contract. The entry therefore declares an unrelated API addition, and its docs restate a behavior not committed by this spec.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 607,
+              "category": "spec_refs off-topic"
+            },
+            {
+              "message": "`CapabilityConfigDto` claims existing reasoning-effort accessors are preserved, but its declared `fast_reasoning_effort` and `final_reasoning_effort` signatures change from the baseline raw-string accessors to `Option<ReasoningEffortDto>`. This is an undeclared compatibility change for existing consumers and contradicts the entry's own docs.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 324,
+              "category": "action/shape inconsistency"
+            },
+            {
+              "message": "The `docs` fields for `BriefingText`, `CapabilityDispatchOutcome`, `CapabilityDispatchRequest`, `CapabilityExecError`, `CapabilityExecInteractor`, `CapabilityExecRequest`, `CapabilityFailureDetail`, `CapabilityFilePath`, `CapabilityInputValidationError`, `CapabilityName`, `CapabilityProfile`, `DisciplineText`, `ExecutionMode`, `ModelName`, `ProviderName`, `CapabilityExecService`, `CapabilityProfilePort`, `CapabilityProviderPort`, and `CapabilitySourcePort` restate upstream validation, routing, branching, and error contracts in prose instead of only citing their anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 437,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `docs` fields for `AgentProfilesCapabilityAdapter`, `CapabilityConfigDto`, `ClaudeCapabilityAdapter`, `CodexCapabilityAdapter`, `ExecutionModeDto`, `FsCapabilitySourceAdapter`, `ModelNameDto`, `ProviderNameDto`, `ReasoningEffortDto`, and `SandboxMode` restate upstream parsing, adapter, sandbox, and conversion behavior in prose instead of only citing their anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 296,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `docs` fields for `CapabilityDriver`, `CapabilityExecDriverInput`, `CapabilityNameArg`, and `ProviderNameArg` restate upstream input-validation, conversion, and rendering behavior in prose instead of only citing their anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+              "line": 150,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `docs` fields for `CapabilityCommand` and `CapabilityExecArgs` restate the generic dispatch and input-validation contract in prose instead of only citing their anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `CapabilityCompositionRoot` docs restate the adapter wiring and dispatch responsibility contract in prose instead of only citing its anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_composition-types.json",
+              "line": 41,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:c102aa4cdd3bbb6b07b3f0a34a9380cf6e137ea95a4e2eca548295e58a9dd20b",
+          "at": "2026-07-11T22:09:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityConfigDto` の `provider` / `model` / `fast_provider` / `fast_model` / `prompt_template_path` は baseline の `&str` / `Option<&str>` から DTO・`Path` 型へ変更されていますが、entry docs は既存 accessor のシグネチャ維持を宣言しています。破壊的変更を明示するか、baseline 互換の戻り値に戻してください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 300,
+              "category": "action incoherent with diff"
+            },
+            {
+              "message": "`ExecutionMode` の docs が、`TypedPipeline` を起動前に拒否し `OrchestratorOutput` のみ dispatch するという upstream の挙動契約を散文で再掲しています。types docs は upstream anchor の参照に留めてください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 1168,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:a4d34d66410d272528c8d8d842592524e7d76cb5eea332a312135772d34fa467",
+          "at": "2026-07-11T22:42:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d28419e7ac0184b0769fc1e5bfc963384039713fbd867ba4065a90b4fdd3dcf7",
+          "at": "2026-07-11T22:55:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d28419e7ac0184b0769fc1e5bfc963384039713fbd867ba4065a90b4fdd3dcf7",
+          "at": "2026-07-11T22:59:19Z"
+        }
+      ]
     }
   }
 }

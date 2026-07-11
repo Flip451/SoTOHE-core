@@ -1,0 +1,280 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, usecase::capability_exec::CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "CapabilityNameArg"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, usecase::capability_exec::CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "ProviderNameArg"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::capability_exec::CapabilityExecService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "CapabilityExecDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "crate::render::CommandOutcome"
+        }
+      ],
+      "type_name": "CapabilityDriver"
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "CapabilityNameArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityNameArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityNameArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityNameArg",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CapabilityNameArg",
+      "trait_ref": "core::str::FromStr"
+    },
+    {
+      "for_type": "ProviderNameArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ProviderNameArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ProviderNameArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ProviderNameArg",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ProviderNameArg",
+      "trait_ref": "core::str::FromStr"
+    },
+    {
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityDriver": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecDriverInput": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "CapabilityNameArg"
+            },
+            {
+              "name": "host",
+              "ty": "ProviderNameArg"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityNameArg": {
+      "action": "add",
+      "docs": "CLI-boundary mirror of usecase::capability_exec::CapabilityName.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "PlanDriver": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "plan",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "PlanInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "plan",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "ProviderNameArg": {
+      "action": "add",
+      "docs": "CLI-boundary mirror of usecase::capability_exec::ProviderName.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    }
+  }
+}

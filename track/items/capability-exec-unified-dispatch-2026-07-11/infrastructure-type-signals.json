@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-11T23:13:14Z",
+  "declaration_hash": "ae589b38800016cb24b1abc4381e59a642a2e46f656db5b27cfb1e41fb5132ce",
+  "signals": [
+    {
+      "type_name": "AgentProfilesCapabilityAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "CapabilityProfilePort"
+      ]
+    },
+    {
+      "type_name": "CapabilityConfigDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "ClaudeCapabilityAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "CapabilityProviderPort"
+      ]
+    },
+    {
+      "type_name": "CodexCapabilityAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "CapabilityProviderPort"
+      ]
+    },
+    {
+      "type_name": "ExecutionModeDto",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy",
+        "serde_core::de::Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "FsCapabilitySourceAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "CapabilitySourcePort"
+      ]
+    },
+    {
+      "type_name": "ModelNameDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "ProviderNameDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "serde_core::de::Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "SandboxMode",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy",
+        "serde_core::de::Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "CodexPlannerAdapter",
+      "kind_tag": "unknown",
+      "signal": "yellow",
+      "found_type": true,
+      "missing_items": [
+        "PlannerPort"
+      ]
+    }
+  ]
+}

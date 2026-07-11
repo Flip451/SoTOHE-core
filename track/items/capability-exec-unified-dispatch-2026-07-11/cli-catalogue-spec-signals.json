@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "66dcfa01470b835383ac54416f0ce3988a65d2d4b49d947363be81879fe9901a",
+  "signals": [
+    {
+      "type_name": "CapabilityCommand",
+      "signal": "blue",
+      "entry_hash": "6658051c490fc9af0c57139bcfab032e4f4228d312200abe895df169604fb811"
+    },
+    {
+      "type_name": "CapabilityExecArgs",
+      "signal": "blue",
+      "entry_hash": "0c09b708db62d5dd14a395eaf2971267bc1fbf19a4c290a17c1d439ba8f29ba6"
+    },
+    {
+      "type_name": "PlanCodexLocalArgs",
+      "signal": "blue",
+      "entry_hash": "33c42a7f7565e52941bfab2c6f9ebd88cd8f4b170fde9bcd8c724edd9192298e"
+    },
+    {
+      "type_name": "PlanCommand",
+      "signal": "blue",
+      "entry_hash": "33c42a7f7565e52941bfab2c6f9ebd88cd8f4b170fde9bcd8c724edd9192298e"
+    }
+  ]
+}
