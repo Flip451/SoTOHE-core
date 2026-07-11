@@ -15,7 +15,11 @@
 //! catalogue declaration canonicalisation) live here so `derive` and `check`
 //! freeze and compare declaration hashes identically.
 
+mod check_contract;
+mod check_sources;
 mod check_support;
+mod results_status;
+mod status_lanes;
 
 pub mod bindings_skeleton;
 pub mod check;
@@ -67,7 +71,7 @@ impl LoadedCatalogueDocument {
         &self.read_path
     }
 
-    fn matches_file_path(&self, file_path: &str) -> bool {
+    pub(super) fn matches_file_path(&self, file_path: &str) -> bool {
         self.read_file_path == file_path
             || self.artifact_file_path == catalogue_artifact_path(Path::new(file_path))
     }

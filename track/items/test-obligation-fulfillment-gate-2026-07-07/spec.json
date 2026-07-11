@@ -142,7 +142,7 @@
       },
       {
         "id": "IN-08",
-        "text": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。さらに `check` は catalogue × spec × 決定表 config の導出入力から期待義務集合をメモリ上で再導出し、`obligations.json` の内容との一致を検査する。不一致（例: rules 変更で義務が増えた後に `derive` が未実行で artifact が stale の場合）は fail-closed で非零 exit とし、解消は `derive` の再実行だけとする。`check` はこの比較でも artifact を書き換えない。",
+        "text": "`bin/sotp test-obligation check` の実装（pure-read の被覆ゲート）。次の全てを決定論的に検査する: (a) 存在検証: 義務に対応する binding が存在し、binding の指すテストが実在すること（`missing` / `orphaned` の検出）、(b) 全 ref edge が bindings 上で解決宣言されていること（tests または waived の totality）、(c) 各 edge に現行 hash と一致する fulfilled / waived verdict が存在すること。fail-closed で、hash 再計算だけで鮮度を回復する経路はない（回復は `evaluate` の pass のみ）。commit gate / CI 用の pure-read subcommand として `signal check-*` / `task-contract check` と同用法。また `check` は実行時に決定表 config (`.harness/config/test-obligation-rules.json`) を load-validate し、config が malformed または domain validation（D10 が定めるロード時 totality 検証）に失敗する場合は fail-closed で gate を block する（rules を読めない状態で pass に倒さない）。さらに `check` は catalogue × spec × 決定表 config の導出入力から期待義務集合をメモリ上で再導出し、`obligations.json` の内容との一致を検査する。不一致（例: rules 変更で義務が増えた後に `derive` が未実行で artifact が stale の場合）は fail-closed で非零 exit とし、解消は `derive` の再実行だけとする。`check` はこの比較でも artifact を書き換えない。 D15 導入後は、task-contract.json と impl-plan.json を経由して解決した task status で未解消を最終解釈する: done / in_progress 帰属は従来どおり fail-closed で block し、todo 帰属の binding 欠如・verdict 欠如・鮮度失効は 🟡 warning として表示して gate を通す。未帰属 entry、rules load-time totality 違反、malformed artifact などの構造軸は status にかかわらず block し、複数 task 帰属では done > in_progress > todo の strictest-wins を適用する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
@@ -159,6 +159,10 @@
           {
             "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
             "anchor": "D14"
+          },
+          {
+            "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+            "anchor": "D15"
           }
         ]
       },
@@ -639,7 +643,7 @@
     },
     {
       "id": "AC-04",
-      "text": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) fulfillment binding（義務 id ベースの record）はあるが対応する義務が導出されない場合に `orphaned` としてブロックする（D9 の `voluntary_binding`（edge 直接束縛）は義務の導出を前提としない正当な解決宣言であり、`orphaned` の対象外）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。`check` は導出入力（catalogue × spec × 決定表 config）からメモリ上で再導出した期待義務集合と `obligations.json` の一致も合格条件に含める。義務の追加・削除・変更いずれの stale も決定論的に非零 exit でブロックし（fail-closed）、`check` は pure-read のまま artifact を書き換えない（解消は `derive` の再実行のみ — IN-08 と同一の規律）。",
+      "text": "`bin/sotp test-obligation check` が pure-read で fail-closed であり、次の全てのケースでブロックする: (a) 義務に binding がない（`missing`）、(b) fulfillment binding（義務 id ベースの record）はあるが対応する義務が導出されない場合に `orphaned` としてブロックする（D9 の `voluntary_binding`（edge 直接束縛）は義務の導出を前提としない正当な解決宣言であり、`orphaned` の対象外）、(c) 全 edge が bindings 上で解決宣言されていない（totality 違反）、(d) `spec_changed` / `decl_changed` / `test_changed` / `reason_changed` のいずれかで既存 verdict が失効している、(e) obligations は存在するが test-bindings が不在（部分的存在）。合格条件は「全 edge が解決宣言され、現行 hash と一致する fulfilled / waived verdict が存在すること」。`check` は導出入力（catalogue × spec × 決定表 config）からメモリ上で再導出した期待義務集合と `obligations.json` の一致も合格条件に含める。義務の追加・削除・変更いずれの stale も決定論的に非零 exit でブロックし（fail-closed）、`check` は pure-read のまま artifact を書き換えない（解消は `derive` の再実行のみ — IN-08 と同一の規律）。 D15 導入後は、task-contract.json と impl-plan.json を経由して解決した task status で未解消を最終解釈する: done / in_progress 帰属は従来どおり fail-closed で block し、todo 帰属の binding 欠如・verdict 欠如・鮮度失効は 🟡 warning として表示して gate を通す。未帰属 entry、rules load-time totality 違反、malformed artifact などの構造軸は status にかかわらず block し、複数 task 帰属では done > in_progress > todo の strictest-wins を適用する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
@@ -656,6 +660,10 @@
         {
           "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
           "anchor": "D11"
+        },
+        {
+          "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "anchor": "D15"
         }
       ]
     },

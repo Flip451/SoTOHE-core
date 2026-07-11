@@ -7,8 +7,11 @@
 
 use std::sync::Arc;
 
+use domain::SpecDocumentLoaderPort;
+pub use domain::TaskStatusKind;
 use domain::TrackId;
 use domain::tddd::LayerId;
+use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort;
 pub use domain::tddd::semantic_verify::CatalogueEntryKey;
 use domain::tddd::test_obligation::binding::{
     NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument,
@@ -17,13 +20,14 @@ pub use domain::tddd::test_obligation::drift::{
     EdgeResolutionOutcome, EdgeVerdictRecord, TestObligationDrift,
 };
 use domain::tddd::test_obligation::errors::{ArtifactCodecError, ObligationResultsError};
+use domain::tddd::test_obligation::hashes::VerifierPromptFingerprint;
 pub use domain::tddd::test_obligation::ids::{
     TestObligationAnchorId, TestObligationEdgeId, TestObligationId, TestObligationItemIdentifier,
 };
 use domain::tddd::test_obligation::obligations::ObligationsDocument;
 use domain::tddd::test_obligation::ports::{
     ObligationFulfillmentCachePort, ObligationsArtifactPort, TestBindingsArtifactPort,
-    WaiverCachePort,
+    TestSourceScannerPort, WaiverCachePort,
 };
 use domain::tddd::test_obligation::scope::UncitedSpecElementFinding;
 use domain::tddd::test_obligation::verdict::{
@@ -32,7 +36,10 @@ use domain::tddd::test_obligation::verdict::{
 };
 pub use domain::tddd::test_obligation::vocab::{FulfillmentFailCategory, TestObligationKind};
 
+use crate::pre_review_gate::{ImplPlanReaderPort, TaskContractReaderPort};
+
 use super::diag;
+use super::results_status::collect_status_lane_summaries;
 
 /// Verdict-chain lane discriminant for the results output (IN-10 / AC-09).
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -103,6 +110,10 @@ pub struct TestObligationResultsOutput {
     lane_summaries: Vec<TestObligationLaneSummary>,
     records: Vec<EdgeVerdictRecord>,
     uncited_findings: Vec<UncitedSpecElementFinding>,
+    status_lane_summaries: Result<
+        Vec<TestObligationStatusLaneSummary>,
+        domain::tddd::test_obligation::ids::DiagnosticMessage,
+    >,
 }
 
 impl TestObligationResultsOutput {
@@ -112,8 +123,12 @@ impl TestObligationResultsOutput {
         lane_summaries: Vec<TestObligationLaneSummary>,
         records: Vec<EdgeVerdictRecord>,
         uncited_findings: Vec<UncitedSpecElementFinding>,
+        status_lane_summaries: Result<
+            Vec<TestObligationStatusLaneSummary>,
+            domain::tddd::test_obligation::ids::DiagnosticMessage,
+        >,
     ) -> Self {
-        Self { lane_summaries, records, uncited_findings }
+        Self { lane_summaries, records, uncited_findings, status_lane_summaries }
     }
 
     /// Returns the chain × layer lane summaries.
@@ -133,19 +148,77 @@ impl TestObligationResultsOutput {
     pub fn uncited_findings(&self) -> &[UncitedSpecElementFinding] {
         &self.uncited_findings
     }
+
+    /// Returns unresolved findings grouped by task-status lane, or the
+    /// diagnostic explaining why that independent lane is unavailable.
+    pub fn status_lane_summaries(
+        &self,
+    ) -> Result<
+        &[TestObligationStatusLaneSummary],
+        &domain::tddd::test_obligation::ids::DiagnosticMessage,
+    > {
+        self.status_lane_summaries.as_deref()
+    }
+}
+
+/// Informational unresolved counts for one task-status lane.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TestObligationStatusLaneSummary {
+    task_status: TaskStatusKind,
+    missing_count: usize,
+    stale_count: usize,
+    verdict_absent_count: usize,
+}
+
+impl TestObligationStatusLaneSummary {
+    /// Builds a task-status unresolved summary.
+    #[must_use]
+    pub fn new(
+        task_status: TaskStatusKind,
+        missing_count: usize,
+        stale_count: usize,
+        verdict_absent_count: usize,
+    ) -> Self {
+        Self { task_status, missing_count, stale_count, verdict_absent_count }
+    }
+
+    /// Returns the task-status lane represented by this summary.
+    #[must_use]
+    pub fn task_status(&self) -> TaskStatusKind {
+        self.task_status
+    }
+
+    /// Returns the number of missing bindings or test sources in this lane.
+    #[must_use]
+    pub fn missing_count(&self) -> usize {
+        self.missing_count
+    }
+
+    /// Returns the number of hash-stale edges in this lane.
+    #[must_use]
+    pub fn stale_count(&self) -> usize {
+        self.stale_count
+    }
+
+    /// Returns the number of edges lacking a current verdict in this lane.
+    #[must_use]
+    pub fn verdict_absent_count(&self) -> usize {
+        self.verdict_absent_count
+    }
 }
 
 /// Command input for [`TestObligationResultsApplicationService`] (IN-10).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TestObligationResultsCommand {
     track_id: TrackId,
+    catalogue_paths: Vec<std::path::PathBuf>,
 }
 
 impl TestObligationResultsCommand {
     /// Builds a [`TestObligationResultsCommand`].
     #[must_use]
-    pub fn new(track_id: TrackId) -> Self {
-        Self { track_id }
+    pub fn new(track_id: TrackId, catalogue_paths: Vec<std::path::PathBuf>) -> Self {
+        Self { track_id, catalogue_paths }
     }
 }
 
@@ -167,20 +240,47 @@ pub trait TestObligationResultsApplicationService {
 pub struct TestObligationResultsInteractor {
     obligations_port: Arc<dyn ObligationsArtifactPort + Send + Sync>,
     bindings_port: Arc<dyn TestBindingsArtifactPort + Send + Sync>,
+    source_scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
     fulfillment_cache: Arc<dyn ObligationFulfillmentCachePort + Send + Sync>,
     waiver_cache: Arc<dyn WaiverCachePort + Send + Sync>,
+    fulfillment_verifier_fingerprint: VerifierPromptFingerprint,
+    waiver_verifier_fingerprint: VerifierPromptFingerprint,
+    spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
+    catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+    task_contract_reader: Arc<dyn TaskContractReaderPort>,
+    impl_plan_reader: Arc<dyn ImplPlanReaderPort>,
 }
 
 impl TestObligationResultsInteractor {
     /// Builds a [`TestObligationResultsInteractor`] from its injected ports.
+    #[allow(clippy::too_many_arguments)]
     #[must_use]
     pub fn new(
         obligations_port: Arc<dyn ObligationsArtifactPort + Send + Sync>,
         bindings_port: Arc<dyn TestBindingsArtifactPort + Send + Sync>,
+        source_scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
         fulfillment_cache: Arc<dyn ObligationFulfillmentCachePort + Send + Sync>,
         waiver_cache: Arc<dyn WaiverCachePort + Send + Sync>,
+        fulfillment_verifier_fingerprint: VerifierPromptFingerprint,
+        waiver_verifier_fingerprint: VerifierPromptFingerprint,
+        spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
+        catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+        task_contract_reader: Arc<dyn TaskContractReaderPort>,
+        impl_plan_reader: Arc<dyn ImplPlanReaderPort>,
     ) -> Self {
-        Self { obligations_port, bindings_port, fulfillment_cache, waiver_cache }
+        Self {
+            obligations_port,
+            bindings_port,
+            source_scanner,
+            fulfillment_cache,
+            waiver_cache,
+            fulfillment_verifier_fingerprint,
+            waiver_verifier_fingerprint,
+            spec_reader,
+            catalogue_reader,
+            task_contract_reader,
+            impl_plan_reader,
+        }
     }
 }
 
@@ -210,7 +310,39 @@ impl TestObligationResultsApplicationService for TestObligationResultsInteractor
             );
         }
 
-        Ok(TestObligationResultsOutput::new(lane_summaries, records, Vec::new()))
+        let status_lane_summaries = collect_status_lane_summaries(
+            &cmd.track_id,
+            &cmd.catalogue_paths,
+            obligations.as_ref(),
+            bindings.as_ref(),
+            fulfillment.as_ref(),
+            waiver.as_ref(),
+            self.source_scanner.as_ref(),
+            &self.fulfillment_verifier_fingerprint,
+            &self.waiver_verifier_fingerprint,
+            self.spec_reader.as_ref(),
+            self.catalogue_reader.as_ref(),
+            self.task_contract_reader.as_ref(),
+            self.impl_plan_reader.as_ref(),
+        )
+        .map_err(status_lane_diagnostic);
+
+        Ok(TestObligationResultsOutput::new(
+            lane_summaries,
+            records,
+            Vec::new(),
+            status_lane_summaries,
+        ))
+    }
+}
+
+/// Extracts the validated diagnostic for an independently unavailable status lane.
+fn status_lane_diagnostic(
+    error: ObligationResultsError,
+) -> domain::tddd::test_obligation::ids::DiagnosticMessage {
+    match error {
+        ObligationResultsError::IoError(message)
+        | ObligationResultsError::MalformedArtifact(message) => message,
     }
 }
 

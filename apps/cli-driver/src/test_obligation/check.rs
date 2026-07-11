@@ -84,11 +84,27 @@ impl TestObligationCheckHandler {
         };
         let command = CheckTestObligationsCommand::new(command_input);
         match self.service.execute(&command) {
-            Ok(output) => CommandOutcome::success(Some(format!(
-                "[OK] test-obligation check passed: resolved_edges={} uncited_findings={}",
-                output.resolved_edges().len(),
-                output.uncited_findings().len()
-            ))),
+            Ok(output) => {
+                let mut text = format!(
+                    "[OK] test-obligation check passed: resolved_edges={} uncited_findings={}",
+                    output.resolved_edges().len(),
+                    output.uncited_findings().len()
+                );
+                if let Some(todo) = output.status_lane_summaries().iter().find(|summary| {
+                    summary.task_status() == usecase::test_obligation::results::TaskStatusKind::Todo
+                        && (summary.missing_count() > 0
+                            || summary.stale_count() > 0
+                            || summary.verdict_absent_count() > 0)
+                }) {
+                    text.push_str(&format!(
+                        "\n[WARN] todo-lane unresolved: missing={} stale={} verdict_absent={}",
+                        todo.missing_count(),
+                        todo.stale_count(),
+                        todo.verdict_absent_count()
+                    ));
+                }
+                CommandOutcome::success(Some(text))
+            }
             Err(
                 usecase::test_obligation::errors::ObligationCheckError::StaleObligationsArtifact {
                     detail,
@@ -137,6 +153,43 @@ mod tests {
 
         assert_eq!(outcome.exit_code, 0);
         assert!(outcome.stdout.unwrap().contains("resolved_edges=0"));
+    }
+
+    #[test]
+    fn test_check_handler_renders_todo_lane_warning_without_failure() {
+        struct TodoWarningService;
+
+        impl CheckTestObligationsApplicationService for TodoWarningService {
+            fn execute(
+                &self,
+                _cmd: &CheckTestObligationsCommand,
+            ) -> Result<
+                usecase::test_obligation::check::CheckTestObligationsOutcome,
+                usecase::test_obligation::errors::ObligationCheckError,
+            > {
+                Ok(usecase::test_obligation::check::CheckTestObligationsOutcome::new_verified_scope(
+                    Vec::new(),
+                    Vec::new(),
+                    vec![usecase::test_obligation::results::TestObligationStatusLaneSummary::new(
+                        usecase::test_obligation::results::TaskStatusKind::Todo,
+                        1,
+                        2,
+                        3,
+                    )],
+                ))
+            }
+        }
+
+        let handler =
+            TestObligationCheckHandler::new(Arc::new(TodoWarningService), PathBuf::from("/repo"));
+        let branch = DiagnosticMessage::try_new("track/test-track".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationCheckInput::new(None, branch));
+
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.unwrap();
+        assert!(stdout.contains("[WARN] todo-lane unresolved"));
+        assert!(stdout.contains("missing=1 stale=2 verdict_absent=3"));
     }
 
     #[test]
@@ -204,6 +257,35 @@ mod tests {
 
         assert_ne!(outcome.exit_code, 0);
         assert!(outcome.stderr.unwrap().contains("BindingsAbsent"));
+    }
+
+    #[test]
+    fn test_check_handler_with_stale_artifact_returns_nonzero() {
+        struct StaleArtifactService;
+
+        impl CheckTestObligationsApplicationService for StaleArtifactService {
+            fn execute(
+                &self,
+                _cmd: &CheckTestObligationsCommand,
+            ) -> Result<
+                usecase::test_obligation::check::CheckTestObligationsOutcome,
+                usecase::test_obligation::errors::ObligationCheckError,
+            > {
+                Err(usecase::test_obligation::errors::ObligationCheckError::StaleObligationsArtifact {
+                    detail: DiagnosticMessage::try_new("verdict stale for skipped entry".to_owned())
+                        .unwrap(),
+                })
+            }
+        }
+
+        let handler =
+            TestObligationCheckHandler::new(Arc::new(StaleArtifactService), PathBuf::from("/repo"));
+        let branch = DiagnosticMessage::try_new("track/test-track".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationCheckInput::new(None, branch));
+
+        assert_ne!(outcome.exit_code, 0);
+        assert!(outcome.stderr.unwrap().contains("stale obligations artifact"));
     }
 
     #[test]

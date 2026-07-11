@@ -165,6 +165,9 @@ pub enum ObligationCheckError {
     SourceScan(TestSourceScanError),
     /// Reading a verdict cache failed.
     CacheIo(VerifyCacheError),
+    /// A derived obligation or cited edge could not be attributed to a task
+    /// status through the track's task-contract and implementation plan.
+    TaskAttribution(DiagnosticMessage),
 }
 
 /// Failure of `test-obligation evaluate` (IN-09 / IN-12 / AC-06 / AC-07).
@@ -365,8 +368,9 @@ mod tests {
             ObligationCheckError::ArtifactCodec(ArtifactCodecError::MalformedJson(diag("bad"))),
             ObligationCheckError::SourceScan(TestSourceScanError::Io(diag("io"))),
             ObligationCheckError::CacheIo(VerifyCacheError::Io(diag("io"))),
+            ObligationCheckError::TaskAttribution(diag("entry has no task attribution")),
         ];
-        assert_eq!(variants.len(), 12);
+        assert_eq!(variants.len(), 13);
         assert!(variants.iter().all(|v| !format!("{v:?}").is_empty()));
     }
 

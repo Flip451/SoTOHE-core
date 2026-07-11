@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "22c32ae9cc88dfc213b4dd12cb3ff614068a77e08c6fd1943c45606db3470502",
+  "signals": [
+    {
+      "type_name": "ObligationCheckError",
+      "signal": "blue",
+      "entry_hash": "176c3834aafa373b96561bc7dae96de05c99b853eee9638098b88fc854f0c515"
+    },
+    {
+      "type_name": "TaskStatusKind",
+      "signal": "blue",
+      "entry_hash": "857aca75d3d4aa7df187b41e5e17c1bc7307cceeb537963ca1473c7cca61d687"
+    }
+  ]
+}

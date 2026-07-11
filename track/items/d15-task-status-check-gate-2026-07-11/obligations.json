@@ -1,0 +1,93 @@
+{
+  "track_id": "d15-task-status-check-gate-2026-07-11",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "CheckTestObligationsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of CheckTestObligationsInteractor",
+      "declaration_hash": "162994d7e4a0013ec6869f3d920049eff5aa6559cd39d2047b0d13bc36f8001c",
+      "spec_refs": [
+        {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "TestObligationResultsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of TestObligationResultsInteractor",
+      "declaration_hash": "e1c71c3cf27e79e2fdda0466640d565653aa9474daa31580d45a216752e84af7",
+      "spec_refs": [
+        {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "AC-07"
+        },
+        {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        }
+      ]
+    }
+  ]
+}

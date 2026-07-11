@@ -328,7 +328,12 @@ mod tests {
     }
 
     fn fixture_workspace(track_files: &[&str]) -> tempfile::TempDir {
-        let temp = tempfile::tempdir().unwrap();
+        let temp_root = source_root().canonicalize().unwrap().join("tmp");
+        fs::create_dir_all(&temp_root).unwrap();
+        let temp = tempfile::Builder::new()
+            .prefix("sotp-cli-test-obligation-")
+            .tempdir_in(temp_root)
+            .unwrap();
         let workspace_root = temp.path().join("workspace");
         let config_path = workspace_root.join(".harness/config/test-obligation-rules.json");
         fs::create_dir_all(config_path.parent().unwrap()).unwrap();
@@ -742,6 +747,15 @@ mod tests {
             "test-bindings.json",
             "obligation-fulfillment-cache.json",
             "waiver-cache.json",
+            "spec.json",
+            "domain-types.json",
+            "usecase-types.json",
+            "infrastructure-types.json",
+            "cli_composition-types.json",
+            "cli_driver-types.json",
+            "cli-types.json",
+            "task-contract.json",
+            "impl-plan.json",
         ]);
         let workspace_root = temp.path().join("workspace");
         let exit = execute_results_with(
@@ -757,7 +771,7 @@ mod tests {
             |root, input| {
                 let outcome = root.results_handler().handle(input);
                 let stdout = outcome.stdout.as_deref().unwrap();
-                assert!(stdout.contains("Fulfillment:"));
+                assert!(stdout.contains("Fulfillment:"), "expected lane summary: {stdout}");
                 assert!(stdout.contains("records="));
                 driver_outcome_to_exit(outcome)
             },

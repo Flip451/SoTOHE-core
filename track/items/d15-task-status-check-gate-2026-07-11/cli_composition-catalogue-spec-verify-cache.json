@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "layer": "cli_composition",
+  "entries": [
+    {
+      "claim_hash": "ad221507da17dd27447fbbd195be23f39e93bc26e924c4011585f286b151b37e",
+      "evidence_hash": "bc158e06ed55944625414c0898b23c8ce4ec06fa400242afd81e856cc87b0d82",
+      "verdict": {
+        "kind": "pass",
+        "citation": "義務または edge の task 帰属を、`obligations.json` の target entry から `task-contract.json` の entry 帰属、さらに `impl-plan.json` の task status（todo / in_progress / done）へ至る既存 artifact の合成で解決する。同一 entry が複数 task に帰属するときは、done または in_progress があれば todo より strict lane を適用する（strictest-wins）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "義務または edge の task 帰属を、`obligations.json` の target entry から `task-contract.json` の entry 帰属、さらに `impl-plan.json` の task status（todo / in_progress / done）へ至る既存 artifact の合成で解決する。同一 entry が複数 task に帰属するときは、done または in_progress があれば todo より strict lane を適用する（strictest-wins）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ad221507da17dd27447fbbd195be23f39e93bc26e924c4011585f286b151b37e",
+      "evidence_hash": "171ed15d30bb3095d50e7c8f02bc3d3b642f74e5b4ff537383f460dd89a2e8bc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp test-obligation results` に、todo / in_progress / done lane ごとの unresolved 件数と、各 lane の missing / stale / verdict 欠如の内訳を表示する informational 集計を追加する。gate の pass/fail は引き続き `check` だけが担い、`results` は read error を含め常に exit 0 とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`sotp test-obligation results` に、todo / in_progress / done lane ごとの unresolved 件数と、各 lane の missing / stale / verdict 欠如の内訳を表示する informational 集計を追加する。gate の pass/fail は引き続き `check` だけが担い、`results` は read error を含め常に exit 0 とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ad221507da17dd27447fbbd195be23f39e93bc26e924c4011585f286b151b37e",
+      "evidence_hash": "8baf291b46a4087ffc3a1aeb546af10b6cb11c5e187072fc5e82861f2b888b59",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`results` は `skipped` を独立した informational lane として集計表示し、exit は常に 0、pass/fail の判定は `check` だけが担う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "strictest-wins の task 帰属解決で `skipped` となる義務は、`todo` より厳しい独立 lane に置き、status 順序 `done > in_progress > skipped > todo` に従う。binding 欠如、verdict 欠如、または鮮度失効の未解消は `check` が fail-closed に block する。`results` は `skipped` を独立した informational lane として集計表示し、exit は常に 0、pass/fail の判定は `check` だけが担う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ad221507da17dd27447fbbd195be23f39e93bc26e924c4011585f286b151b37e",
+      "evidence_hash": "1edb0d52acaefd8e8ad7c86369615c845b6a102565b59c74ebd592edf5eeb42e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "strictest-wins の task 帰属解決が `skipped` となる missing、stale、または verdict 欠如は、todo 猶予として warning にせず、`check` が非零 exit で fail-closed に block することを検証する。`results` が skipped の未解消を独立 lane として表示し、unresolved や read error の有無にかかわらず exit 0 を維持することも検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "strictest-wins の task 帰属解決が `skipped` となる missing、stale、または verdict 欠如は、todo 猶予として warning にせず、`check` が非零 exit で fail-closed に block することを検証する。`results` が skipped の未解消を独立 lane として表示し、unresolved や read error の有無にかかわらず exit 0 を維持することも検証する。"
+        }
+      }
+    }
+  ]
+}

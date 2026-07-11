@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "track_id": "d15-task-status-check-gate-2026-07-11",
+  "entries": {
+    "T001": [
+      { "layer": "domain", "entry_key": "ObligationCheckError" }
+    ],
+    "T002": [
+      { "layer": "domain", "entry_key": "TaskStatusKind" },
+      { "layer": "usecase", "entry_key": "ImplPlanReaderPort" },
+      { "layer": "usecase", "entry_key": "TaskContractReaderPort" },
+      { "layer": "usecase", "entry_key": "CheckTestObligationsInteractor" },
+      { "layer": "usecase", "entry_key": "CheckTestObligationsOutcome" },
+      { "layer": "usecase", "entry_key": "PreReviewGateError" }
+    ],
+    "T003": [
+      { "layer": "usecase", "entry_key": "TestObligationResultsCommand" },
+      { "layer": "usecase", "entry_key": "TestObligationResultsInteractor" },
+      { "layer": "usecase", "entry_key": "TestObligationResultsOutput" },
+      { "layer": "usecase", "entry_key": "TestObligationStatusLaneSummary" }
+    ],
+    "T004": [
+      { "layer": "cli_driver", "entry_key": "TestObligationCheckHandler" }
+    ],
+    "T005": [
+      { "layer": "cli_driver", "entry_key": "TestObligationResultsHandler" }
+    ],
+    "T006": [
+      { "layer": "cli_composition", "entry_key": "TestObligationCompositionRoot" }
+    ]
+  }
+}

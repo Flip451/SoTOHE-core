@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Target libs/domain/src/tddd/test_obligation/errors.rs and colocated unit tests. Update ObligationCheckError (IN-04/CN-02/AC-02).",
+      "status": "done",
+      "commit_hash": "5141873e2eb9e20622e52c540b85d85adf84eac2"
+    },
+    {
+      "id": "T002",
+      "description": "Target libs/usecase/src/test_obligation/{mod.rs,check.rs}, libs/usecase/src/pre_review_gate.rs, and their unit tests. Implement explicit-constructor status-lane interpretation in CheckTestObligationsInteractor and PreReviewGate using TaskStatusKind (IN-01/IN-02/IN-03/IN-04/IN-06/IN-07/OUT-01/OUT-02/OUT-03/OUT-04/CN-01/CN-02/CN-03/CN-04/AC-01/AC-02/AC-03/AC-04/AC-06/AC-07).",
+      "status": "done",
+      "commit_hash": "5141873e2eb9e20622e52c540b85d85adf84eac2"
+    },
+    {
+      "id": "T003",
+      "description": "Target libs/usecase/src/test_obligation/results.rs and its unit tests. Implement TestObligationResultsInteractor status-lane aggregation (IN-01/IN-05/IN-06/IN-07/OUT-01/OUT-02/OUT-04/CN-02/CN-03/AC-05/AC-07).",
+      "status": "done",
+      "commit_hash": "5141873e2eb9e20622e52c540b85d85adf84eac2"
+    },
+    {
+      "id": "T004",
+      "description": "Target apps/cli-driver/src/test_obligation/check.rs and its adapter tests. Implement TestObligationCheckHandler rendering (IN-02/IN-04/IN-07/CN-01/CN-02/CN-04/AC-01/AC-02/AC-04/AC-06/AC-07).",
+      "status": "done",
+      "commit_hash": "5141873e2eb9e20622e52c540b85d85adf84eac2"
+    },
+    {
+      "id": "T005",
+      "description": "Target apps/cli-driver/src/test_obligation/results.rs and its adapter tests. Implement TestObligationResultsHandler rendering (IN-05/IN-07/CN-02/AC-05/AC-07).",
+      "status": "done",
+      "commit_hash": "5141873e2eb9e20622e52c540b85d85adf84eac2"
+    },
+    {
+      "id": "T006",
+      "description": "Target apps/cli-composition/src/test_obligation/*, track/items/d15-task-status-check-gate-2026-07-11/test-bindings.json, and composition tests. Wire TestObligationCompositionRoot for the check and results handlers, and update implementation-batch test-obligation bindings (IN-01/IN-05/OUT-01/OUT-03/AC-05).",
+      "status": "done",
+      "commit_hash": "5141873e2eb9e20622e52c540b85d85adf84eac2"
+    }
+  ],
+  "plan": {
+    "summary": [
+      "Goal coverage note: task-coverage.json maps in_scope, out_of_scope, constraints, and acceptance_criteria only. GO-01 is carried by T002/T006; GO-02 is carried by T001/T002/T003/T004/T005/T006. Goal mappings are recorded here because task-coverage.json has no goal section."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Domain error vocabulary",
+        "description": [
+          "Target domain vocabulary definitions; update their implementation (IN-04/CN-02/AC-02)."
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Usecase status-lane interpretation",
+        "description": [
+          "Target usecase check and results modules; implement status-lane changes (IN-01/IN-02/IN-03/IN-04/IN-05/IN-06/IN-07/OUT-01/OUT-02/OUT-03/OUT-04/CN-01/CN-02/CN-03/CN-04/AC-01/AC-02/AC-03/AC-04/AC-05/AC-06/AC-07)."
+        ],
+        "task_ids": [
+          "T002",
+          "T003"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "CLI-driver rendering",
+        "description": [
+          "Target CLI-driver check and results handlers; implement rendering changes (IN-02/IN-04/IN-05/IN-07/CN-01/CN-02/CN-04/AC-01/AC-02/AC-04/AC-05/AC-06/AC-07)."
+        ],
+        "task_ids": [
+          "T004",
+          "T005"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Composition wiring and incremental obligation fulfillment",
+        "description": [
+          "Target TestObligationCompositionRoot and test-bindings.json; wire handlers and update test-obligation bindings (IN-01/IN-05/OUT-01/OUT-03/AC-05)."
+        ],
+        "task_ids": [
+          "T006"
+        ]
+      }
+    ]
+  }
+}

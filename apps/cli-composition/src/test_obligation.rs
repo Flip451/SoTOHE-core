@@ -13,7 +13,9 @@ use domain::tddd::test_obligation::verdict::{
     ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, WaiverCacheKey, WaiverVerdict,
 };
 use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles};
+use infrastructure::impl_plan_reader::FsImplPlanReader;
 use infrastructure::spec::FsSpecDocumentLoader;
+use infrastructure::task_contract_reader::FsTaskContractReader;
 use infrastructure::tddd::tddd_catalogue_document_loader::FsCatalogueDocumentLoader;
 use infrastructure::test_obligation::bindings_codec::JsonTestBindingsCodec;
 use infrastructure::test_obligation::fulfillment_cache_codec::JsonObligationFulfillmentCacheCodec;
@@ -31,6 +33,7 @@ use infrastructure::test_obligation::waiver_escalation_driver::WaiverEscalationD
 use infrastructure::test_obligation::waiver_verifier::{
     FailingWaiverVerifier, WaiverVerifierAdapter, waiver_verifier_fingerprint,
 };
+use usecase::pre_review_gate::{ImplPlanReaderPort, TaskContractReaderPort};
 use usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort;
 use usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig;
 use usecase::test_obligation::bindings_skeleton::TestBindingsSkeletonInteractor;
@@ -115,6 +118,8 @@ impl TestObligationCompositionRoot {
     /// Wires the check handler.
     #[must_use]
     pub fn check_handler(&self) -> cli_driver::test_obligation::check::TestObligationCheckHandler {
+        let task_contract_reader = self.task_contract_reader();
+        let impl_plan_reader = self.impl_plan_reader();
         let service = Arc::new(CheckTestObligationsInteractor::new(
             self.rules_loader(),
             self.obligations_codec(),
@@ -126,6 +131,8 @@ impl TestObligationCompositionRoot {
             waiver_verifier_fingerprint(),
             self.spec_loader(),
             self.catalogue_loader(),
+            task_contract_reader,
+            impl_plan_reader,
         ));
         cli_driver::test_obligation::check::TestObligationCheckHandler::new(
             service,
@@ -174,13 +181,25 @@ impl TestObligationCompositionRoot {
     pub fn results_handler(
         &self,
     ) -> cli_driver::test_obligation::results::TestObligationResultsHandler {
+        let task_contract_reader = self.task_contract_reader();
+        let impl_plan_reader = self.impl_plan_reader();
         let service = Arc::new(TestObligationResultsInteractor::new(
             self.obligations_codec(),
             self.bindings_codec(),
+            self.source_scanner(),
             self.fulfillment_cache(),
             self.waiver_cache(),
+            fulfillment_verifier_fingerprint(),
+            waiver_verifier_fingerprint(),
+            self.spec_loader(),
+            self.catalogue_loader(),
+            task_contract_reader,
+            impl_plan_reader,
         ));
-        cli_driver::test_obligation::results::TestObligationResultsHandler::new(service)
+        cli_driver::test_obligation::results::TestObligationResultsHandler::new(
+            service,
+            self.workspace_root.clone(),
+        )
     }
 
     fn items_dir(&self) -> PathBuf {
@@ -207,6 +226,14 @@ impl TestObligationCompositionRoot {
         &self,
     ) -> Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync> {
         Arc::new(JsonTestBindingsCodec::new(self.items_dir()))
+    }
+
+    fn task_contract_reader(&self) -> Arc<dyn TaskContractReaderPort> {
+        Arc::new(FsTaskContractReader::new(self.items_dir()))
+    }
+
+    fn impl_plan_reader(&self) -> Arc<dyn ImplPlanReaderPort> {
+        Arc::new(FsImplPlanReader::new(self.items_dir()))
     }
 
     fn fulfillment_cache(
@@ -313,6 +340,7 @@ fn default_probe_config() -> SemanticCalibrationProbeConfig {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use cli_driver::test_obligation::check::TestObligationCheckInput;
+    use cli_driver::test_obligation::results::TestObligationResultsInput;
     use domain::ModelTier;
     use infrastructure::agent_profiles::RoundType;
 
@@ -477,6 +505,273 @@ mod tests {
         )
         .unwrap();
         assert_ne!(root.check_handler().handle(invalid_rules_input).exit_code, 0);
+    }
+
+    #[test]
+    fn test_composition_root_results_wires_informational_status_lanes() {
+        const TRACK_ID: &str = "d15-task-status-check-gate-2026-07-11";
+
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
+        let workspace = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(workspace.path(), &format!("track/{TRACK_ID}"));
+        crate::test_support::run_in_dir(workspace.path(), || {
+            let workspace_root = workspace.path();
+            let source_root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+            let source_track = source_root.join("track/items").join(TRACK_ID);
+            let target_track = workspace_root.join("track/items").join(TRACK_ID);
+            let rules_path = workspace_root.join(TEST_OBLIGATION_RULES_PATH);
+
+            std::fs::create_dir_all(rules_path.parent().unwrap()).unwrap();
+            std::fs::create_dir_all(&target_track).unwrap();
+            std::fs::copy(source_root.join(TEST_OBLIGATION_RULES_PATH), &rules_path).unwrap();
+            for artifact in [
+                "obligations.json",
+                "task-contract.json",
+                "impl-plan.json",
+                "spec.json",
+                "domain-types.json",
+                "usecase-types.json",
+                "infrastructure-types.json",
+                "cli-types.json",
+                "cli_driver-types.json",
+                "cli_composition-types.json",
+            ] {
+                std::fs::copy(source_track.join(artifact), target_track.join(artifact)).unwrap();
+            }
+            std::fs::write(
+                target_track.join("test-bindings.json"),
+                format!(r#"{{"records":[],"track_id":"{TRACK_ID}"}}"#),
+            )
+            .unwrap();
+
+            let impl_plan_path = target_track.join("impl-plan.json");
+            let mut impl_plan: serde_json::Value =
+                serde_json::from_str(&std::fs::read_to_string(&impl_plan_path).unwrap()).unwrap();
+            let tasks =
+                impl_plan.get_mut("tasks").and_then(serde_json::Value::as_array_mut).unwrap();
+            for task in tasks {
+                let task_fields = task.as_object_mut().unwrap();
+                match task_fields.get("id").and_then(serde_json::Value::as_str) {
+                    Some("T002") => {
+                        task_fields.insert("status".to_owned(), serde_json::json!("in_progress"));
+                        task_fields.insert("commit_hash".to_owned(), serde_json::Value::Null);
+                    }
+                    Some("T003") => {
+                        task_fields.insert("status".to_owned(), serde_json::json!("todo"));
+                        task_fields.insert("commit_hash".to_owned(), serde_json::Value::Null);
+                    }
+                    _ => {}
+                }
+            }
+            std::fs::write(&impl_plan_path, serde_json::to_string_pretty(&impl_plan).unwrap())
+                .unwrap();
+
+            let root = TestObligationCompositionRoot::new(workspace_root.to_path_buf(), rules_path);
+            let outcome = root.results_handler().handle(TestObligationResultsInput::new(Some(
+                domain::TrackId::try_new(TRACK_ID.to_owned()).unwrap(),
+            )));
+
+            assert_eq!(outcome.exit_code, 0);
+            let stdout = outcome.stdout.unwrap();
+            assert!(stdout.contains("status:todo missing=11 stale=0 verdict_absent=0"));
+            assert!(stdout.contains("status:in_progress missing=4 stale=0 verdict_absent=0"));
+            assert!(stdout.contains("status:done missing=11 stale=0 verdict_absent=0"));
+        });
+    }
+
+    #[test]
+    fn test_composition_root_results_empty_workspace_has_no_status_lanes() {
+        let workspace = tempfile::tempdir().unwrap();
+        let root = TestObligationCompositionRoot::new(
+            workspace.path().to_path_buf(),
+            workspace.path().join(TEST_OBLIGATION_RULES_PATH),
+        );
+        let input = TestObligationResultsInput::new(Some(
+            domain::TrackId::try_new("informational-results".to_owned()).unwrap(),
+        ));
+
+        let outcome = root.results_handler().handle(input);
+
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.unwrap();
+        assert!(!stdout.contains("status:"));
+        assert!(stdout.ends_with("records=0 uncited_findings=0"));
+    }
+
+    #[test]
+    fn test_composition_root_wires_status_artifacts_for_check_and_results() {
+        const TRACK_ID: &str = "d15-task-status-check-gate-2026-07-11";
+
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
+        let workspace = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(workspace.path(), &format!("track/{TRACK_ID}"));
+        crate::test_support::run_in_dir(workspace.path(), || {
+            let workspace_root = workspace.path();
+            let source_root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+            let source_track = source_root.join("track/items").join(TRACK_ID);
+            let target_track = workspace_root.join("track/items").join(TRACK_ID);
+            let rules_path = workspace_root.join(TEST_OBLIGATION_RULES_PATH);
+
+            std::fs::create_dir_all(rules_path.parent().unwrap()).unwrap();
+            std::fs::create_dir_all(&target_track).unwrap();
+            std::fs::copy(source_root.join(TEST_OBLIGATION_RULES_PATH), &rules_path).unwrap();
+            for artifact in [
+                "obligations.json",
+                "task-contract.json",
+                "impl-plan.json",
+                "spec.json",
+                "domain-types.json",
+                "usecase-types.json",
+                "infrastructure-types.json",
+                "cli-types.json",
+                "cli_driver-types.json",
+                "cli_composition-types.json",
+            ] {
+                std::fs::copy(source_track.join(artifact), target_track.join(artifact)).unwrap();
+            }
+            std::fs::write(
+                target_track.join("test-bindings.json"),
+                format!(r#"{{"records":[],"track_id":"{TRACK_ID}"}}"#),
+            )
+            .unwrap();
+            let impl_plan_path = target_track.join("impl-plan.json");
+            let mut skipped_plan: serde_json::Value =
+                serde_json::from_str(&std::fs::read_to_string(&impl_plan_path).unwrap()).unwrap();
+            let original_plan = skipped_plan.clone();
+            let tasks =
+                skipped_plan.get_mut("tasks").and_then(serde_json::Value::as_array_mut).unwrap();
+            for task in tasks {
+                let task_fields = task.as_object_mut().unwrap();
+                if task_fields.get("status").and_then(serde_json::Value::as_str) == Some("done") {
+                    task_fields.insert("status".to_owned(), serde_json::json!("skipped"));
+                    task_fields.insert("commit_hash".to_owned(), serde_json::Value::Null);
+                }
+            }
+            assert_ne!(skipped_plan, original_plan);
+            std::fs::write(&impl_plan_path, serde_json::to_string_pretty(&skipped_plan).unwrap())
+                .unwrap();
+
+            let root = TestObligationCompositionRoot::new(workspace_root.to_path_buf(), rules_path);
+            let check_input = TestObligationCheckInput::try_from_raw(
+                Some(TRACK_ID.to_owned()),
+                "detached-but-explicit-track".to_owned(),
+            )
+            .unwrap();
+            let check = root.check_handler().handle(check_input);
+            assert_ne!(check.exit_code, 0);
+
+            let results = root.results_handler().handle(TestObligationResultsInput::new(Some(
+                domain::TrackId::try_new(TRACK_ID.to_owned()).unwrap(),
+            )));
+            assert_eq!(results.exit_code, 0);
+            let stdout = results.stdout.unwrap();
+            assert!(stdout.contains("status:skipped missing="));
+            assert!(
+                !stdout.contains("status:skipped missing=0 stale=0 verdict_absent=0"),
+                "expected unresolved skipped findings, got: {stdout}"
+            );
+        });
+    }
+
+    #[test]
+    fn test_composition_root_resolves_shared_entry_to_in_progress_lane() {
+        const TRACK_ID: &str = "d15-task-status-check-gate-2026-07-11";
+
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
+        let workspace = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(workspace.path(), &format!("track/{TRACK_ID}"));
+        crate::test_support::run_in_dir(workspace.path(), || {
+            let workspace_root = workspace.path();
+            let source_root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+            let source_track = source_root.join("track/items").join(TRACK_ID);
+            let target_track = workspace_root.join("track/items").join(TRACK_ID);
+            let rules_path = workspace_root.join(TEST_OBLIGATION_RULES_PATH);
+
+            std::fs::create_dir_all(rules_path.parent().unwrap()).unwrap();
+            std::fs::create_dir_all(&target_track).unwrap();
+            std::fs::copy(source_root.join(TEST_OBLIGATION_RULES_PATH), &rules_path).unwrap();
+            for artifact in [
+                "obligations.json",
+                "task-contract.json",
+                "impl-plan.json",
+                "spec.json",
+                "domain-types.json",
+                "usecase-types.json",
+                "infrastructure-types.json",
+                "cli-types.json",
+                "cli_driver-types.json",
+                "cli_composition-types.json",
+            ] {
+                std::fs::copy(source_track.join(artifact), target_track.join(artifact)).unwrap();
+            }
+            std::fs::write(
+                target_track.join("test-bindings.json"),
+                format!(r#"{{"records":[],"track_id":"{TRACK_ID}"}}"#),
+            )
+            .unwrap();
+
+            let task_contract_path = target_track.join("task-contract.json");
+            let mut task_contract: serde_json::Value =
+                serde_json::from_str(&std::fs::read_to_string(&task_contract_path).unwrap())
+                    .unwrap();
+            let entries = task_contract
+                .get_mut("entries")
+                .and_then(serde_json::Value::as_object_mut)
+                .unwrap();
+            entries.get_mut("T003").and_then(serde_json::Value::as_array_mut).unwrap().push(
+                serde_json::json!({
+                    "layer": "usecase",
+                    "entry_key": "CheckTestObligationsInteractor",
+                }),
+            );
+            std::fs::write(
+                &task_contract_path,
+                serde_json::to_string_pretty(&task_contract).unwrap(),
+            )
+            .unwrap();
+
+            let impl_plan_path = target_track.join("impl-plan.json");
+            let mut impl_plan: serde_json::Value =
+                serde_json::from_str(&std::fs::read_to_string(&impl_plan_path).unwrap()).unwrap();
+            let tasks =
+                impl_plan.get_mut("tasks").and_then(serde_json::Value::as_array_mut).unwrap();
+            for task in tasks {
+                let task_fields = task.as_object_mut().unwrap();
+                match task_fields.get("id").and_then(serde_json::Value::as_str) {
+                    Some("T002") => {
+                        task_fields.insert("status".to_owned(), serde_json::json!("in_progress"));
+                        task_fields.insert("commit_hash".to_owned(), serde_json::Value::Null);
+                    }
+                    Some("T003") => {
+                        task_fields.insert("status".to_owned(), serde_json::json!("todo"));
+                        task_fields.insert("commit_hash".to_owned(), serde_json::Value::Null);
+                    }
+                    _ => {}
+                }
+            }
+            std::fs::write(&impl_plan_path, serde_json::to_string_pretty(&impl_plan).unwrap())
+                .unwrap();
+
+            let root = TestObligationCompositionRoot::new(workspace_root.to_path_buf(), rules_path);
+            let check_input = TestObligationCheckInput::try_from_raw(
+                Some(TRACK_ID.to_owned()),
+                "detached-but-explicit-track".to_owned(),
+            )
+            .unwrap();
+            let check = root.check_handler().handle(check_input);
+            assert_ne!(check.exit_code, 0);
+
+            let results = root.results_handler().handle(TestObligationResultsInput::new(Some(
+                domain::TrackId::try_new(TRACK_ID.to_owned()).unwrap(),
+            )));
+            assert_eq!(results.exit_code, 0);
+            let stdout = results.stdout.unwrap();
+            assert!(stdout.contains("status:in_progress missing="));
+            assert!(
+                !stdout.contains("status:in_progress missing=0 stale=0 verdict_absent=0"),
+                "expected the shared entry to resolve to an unresolved in-progress lane, got: {stdout}"
+            );
+        });
     }
 
     #[test]
