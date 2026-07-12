@@ -49,7 +49,8 @@
       "execution_mode": "typed-pipeline"
     },
     "researcher": {
-      "provider": "gemini",
+      "provider": "claude",
+      "model": "claude-opus-4-7[1m]",
       "execution_mode": "orchestrator-output"
     }
   }
