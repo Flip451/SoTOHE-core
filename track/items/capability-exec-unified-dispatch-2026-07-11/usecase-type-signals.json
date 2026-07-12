@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-11T23:13:08Z",
-  "declaration_hash": "4d39bf8abf1a1fbc19d91c57750760cd90805ebb27e16c04d2c694fa733ea483",
+  "generated_at": "2026-07-12T00:18:17Z",
+  "declaration_hash": "330ce4ab06705e3000c46f1cdaea9ed98241013b4e18f08962ecafb658d31b27",
   "signals": [
     {
       "type_name": "BriefingText",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -42,9 +42,9 @@
     {
       "type_name": "CapabilityExecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -62,9 +62,9 @@
     {
       "type_name": "CapabilityExecRequest",
       "kind_tag": "command",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -80,9 +80,9 @@
     {
       "type_name": "CapabilityFailureDetail",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -93,9 +93,9 @@
     {
       "type_name": "CapabilityFilePath",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -106,9 +106,9 @@
     {
       "type_name": "CapabilityInputValidationError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::error::Error",
         "core::fmt::Debug",
         "core::fmt::Display"
@@ -117,9 +117,9 @@
     {
       "type_name": "CapabilityProfile",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -147,9 +147,9 @@
     {
       "type_name": "DisciplineText",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -159,9 +159,9 @@
     {
       "type_name": "ExecutionMode",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -172,9 +172,9 @@
     {
       "type_name": "ModelName",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -185,9 +185,9 @@
     {
       "type_name": "ProviderName",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",

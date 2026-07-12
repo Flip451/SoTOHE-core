@@ -5,26 +5,26 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CapabilityDispatchOutcome | enum | add | Executed, DelegateInHost | 🟡 | 🔵 |
-| ExecutionMode | enum | add | OrchestratorOutput, TypedPipeline | 🟡 | 🔵 |
+| ExecutionMode | enum | add | OrchestratorOutput, TypedPipeline | 🔵 | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BriefingText | value_object | add | — | 🟡 | 🔵 |
-| CapabilityFailureDetail | value_object | add | — | 🟡 | 🔵 |
-| CapabilityFilePath | value_object | add | — | 🟡 | 🔵 |
+| BriefingText | value_object | add | — | 🔵 | 🔵 |
+| CapabilityFailureDetail | value_object | add | — | 🔵 | 🔵 |
+| CapabilityFilePath | value_object | add | — | 🔵 | 🔵 |
 | CapabilityName | value_object | reference | — | 🔵 | 🔵 |
-| DisciplineText | value_object | add | — | 🟡 | 🔵 |
-| ModelName | value_object | add | — | 🟡 | 🔵 |
-| ProviderName | value_object | add | — | 🟡 | 🔵 |
+| DisciplineText | value_object | add | — | 🔵 | 🔵 |
+| ModelName | value_object | add | — | 🔵 | 🔵 |
+| ProviderName | value_object | add | — | 🔵 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityExecError | error_type | add | ProfileResolution, ExecutionModeRejected, ModelMissing, UnsupportedProvider, SourceValidation, AdapterPreflight, DispatchFailed | 🟡 | 🔵 |
-| CapabilityInputValidationError | error_type | add | EmptyCapabilityName, EmptyProviderName, EmptyModelName, EmptyFilePath, EmptyContent | 🟡 | 🔵 |
+| CapabilityExecError | error_type | add | ProfileResolution, ExecutionModeRejected, ModelMissing, UnsupportedProvider, SourceValidation, AdapterPreflight, DispatchFailed | 🔵 | 🔵 |
+| CapabilityInputValidationError | error_type | add | EmptyCapabilityName, EmptyProviderName, EmptyModelName, EmptyFilePath, EmptyContent | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -51,11 +51,11 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CapabilityDispatchRequest | dto | add | — | 🟡 | 🔵 |
-| CapabilityProfile | dto | add | — | 🟡 | 🔵 |
+| CapabilityProfile | dto | add | — | 🔵 | 🔵 |
 
 ## Commands
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityExecRequest | command | add | — | 🟡 | 🔵 |
+| CapabilityExecRequest | command | add | — | 🔵 | 🔵 |
 

@@ -13,13 +13,13 @@ T007: add the CLI command surface and remove plan codex-local parsing.
 T008: wire composition, remove the legacy root, rebuild bin/sotp, and exercise end-to-end behavior.
 T009: retarget live operational references after the new route is available.
 
-## Tasks (0/9 resolved)
+## Tasks (1/9 resolved)
 
 ### S1 — Usecase: typed generic dispatch contract and orchestration
 
 > Run T001 before T002.
 
-- [ ] **T001**: Usecase capability_exec values, errors, and profile entries — implement the T001 task-contract catalogue entries and reuse CapabilityName. Add independent unit tests and matching test-obligation bindings (IN-01, IN-02, IN-03, IN-05, IN-06, CN-01, CN-02, CN-03, OUT-01, OUT-03, AC-03).
+- [x] **T001**: Usecase capability_exec values, errors, and profile entries — implement the T001 task-contract catalogue entries and reuse CapabilityName. Add independent unit tests and matching test-obligation bindings (IN-01, IN-02, IN-03, IN-05, IN-06, CN-01, CN-02, CN-03, OUT-01, OUT-03, AC-03).
 - [ ] **T002**: Usecase capability_exec orchestration — implement the T002 task-contract catalogue entries and remove the obsolete planner usecase stack. Add mock-port tests and matching test-obligation bindings (GO-01, GO-02, IN-01 through IN-09, CN-01 through CN-04, OUT-01 through OUT-03, AC-01 through AC-08).
 
 ### S2 — Runtime policy and infrastructure adapters

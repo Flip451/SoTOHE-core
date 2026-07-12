@@ -1,0 +1,214 @@
+{
+  "track_id": "capability-exec-unified-dispatch-2026-07-11",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "d4767635578b3ba1af7ef75be7fb21f42629e243cfc80afcd0a69254f584cc9f",
+        "declaration_hash": "34502e7c5fa6798b4ccc0c2265e6bc20a2718e9d80b76f623a505238963d94cd",
+        "anchor_text_hash": "1fc48eb1b622a351fa6bb6938ddb140c3349c38fe2c9c952f4bba8c16200624a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase-layer error vocabulary; adapter diagnostics use the opaque CapabilityFailureDetail carrier."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "832d5ae98966f99c38ba244be45fcffbc5fb3e7a9c129a926b5ee67e876b9eb5",
+        "declaration_hash": "34502e7c5fa6798b4ccc0c2265e6bc20a2718e9d80b76f623a505238963d94cd",
+        "anchor_text_hash": "4ce8472bd25b91d34e514ba472a635bdd2175b2856320dda6e2856e563ad10ef"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase-layer error vocabulary; adapter diagnostics use the opaque CapabilityFailureDetail carrier."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "7c22096f80c38ef5283944bf62c3c491679063a49decc3f6150d0b0490aa693a",
+        "declaration_hash": "34502e7c5fa6798b4ccc0c2265e6bc20a2718e9d80b76f623a505238963d94cd",
+        "anchor_text_hash": "3b55ba62c9fb530458ffe3d4da02bdcf5c8a0041d7479e8a73cadf6598207422"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase-layer error vocabulary; adapter diagnostics use the opaque CapabilityFailureDetail carrier."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "60f3a1e9edf3a739c84cfc1c7156fe19260c67efe152c8ba000dc3922ed09449",
+        "declaration_hash": "34502e7c5fa6798b4ccc0c2265e6bc20a2718e9d80b76f623a505238963d94cd",
+        "anchor_text_hash": "c1a70dd07f696ffef2203308fd31f22f3a9359ae5e517572619a120190d49858"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase-layer error vocabulary; adapter diagnostics use the opaque CapabilityFailureDetail carrier."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityFailureDetail",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "8ee569bafda6020a7ba37ce84a0a1b57cb8721078f6aad3c81820907c6793a7f",
+        "declaration_hash": "9aeb10e5aac8bfcba1e8a9bafbdc770ed3ed0f3c23f4db184fe1cf06024e6467",
+        "anchor_text_hash": "1fc48eb1b622a351fa6bb6938ddb140c3349c38fe2c9c952f4bba8c16200624a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Unconstrained presentation-only diagnostic text; raw String is intentional because no domain concept is represented."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityInputValidationError",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "e1261499412d40ded891c9fc11c84d2a865bf0bca7d1a74318443bc140908d42",
+        "declaration_hash": "33d2de00e6cf9ee4909488edf752b0879bd005c8ce40cade897fa86208f45a59",
+        "anchor_text_hash": "1fc48eb1b622a351fa6bb6938ddb140c3349c38fe2c9c952f4bba8c16200624a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "DisciplineText",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "34a0c53bd05ed03985ff2d46bb7d150df5eb8b5b60a30dfe80c0f9c0e0545a3a",
+        "declaration_hash": "d190186cfc0810d85c50ae00c78d73c87df349613fe9818f2b564a33b96aeffe",
+        "anchor_text_hash": "eb1cc8bcd9f2491cdb46edf244d5e90fdd4d0cf8c9b8e5c36a179e7af26fdc9b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase-layer validated technical policy-text value; not domain language."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ExecutionMode",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "4b87167a570b9a7ad54b3ced70682af81aefbd307895d213e635090a2462c38c",
+        "declaration_hash": "c39b4d40a1ac8278d7056551be026e1ea49f07d90d9e77e96e0cf86ca1903c3e",
+        "anchor_text_hash": "4ce8472bd25b91d34e514ba472a635bdd2175b2856320dda6e2856e563ad10ef"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase-layer finite profile execution-mode vocabulary with no state-transition semantics."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ModelName",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "2e445b32056b5a31c9c7556e94ca3a894eb6abb56cfb3f07ae9a614f014d8c82",
+        "declaration_hash": "eba0abf055ea02e94dff772bc322680a4d86d866f8660d5b544a7b363dfd920b",
+        "anchor_text_hash": "4dc838c0a42ee3797b87a099ced1fc3e18d2976fe1591367959776480e417813"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase-layer validated technical identifier; not domain language."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderName",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "7321dbec6368e56e70db72efc630ff6ef217096c8c71f227de68cbbe87c8e41a",
+        "declaration_hash": "2d84595a189e6dc6487ff361f2f0c5580c189eef7cb33620d2d3bbe335db56d3",
+        "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "invariants: [], methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderName",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "37bab7e0cef1bc3b58b80319e57edde997977cfa225749640937212eb040d63b",
+        "declaration_hash": "2d84595a189e6dc6487ff361f2f0c5580c189eef7cb33620d2d3bbe335db56d3",
+        "anchor_text_hash": "1fc48eb1b622a351fa6bb6938ddb140c3349c38fe2c9c952f4bba8c16200624a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "docs: Some(DocString(\"Usecase-layer validated technical provider identifier; not domain language.\")), invariants: [], methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "BriefingText", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-05"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_briefing_text_whitespace_rejected"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_briefing_text_valid_content_preserved"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "BriefingText", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-03"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_briefing_text_whitespace_rejected"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_briefing_text_valid_content_preserved"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CapabilityExecError", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-01"}},
+      "reason": "At CapabilityExecError x CN-01, this error vocabulary carries type-level failure classification only; it makes no condition-to-observable-result promise. Fail-closed dispatch behavior is owned by the T002 interactor and its ports."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CapabilityExecError", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "AC-02"}},
+      "reason": "At CapabilityExecError x AC-02, this error vocabulary carries type-level failure classification only; it makes no condition-to-observable-result promise. Rejection without provider dispatch is owned by the T002 interactor and its ports."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CapabilityExecError", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "AC-03"}},
+      "reason": "At CapabilityExecError x AC-03, this error vocabulary carries type-level failure classification only; it makes no condition-to-observable-result promise. Source validation before dispatch is owned by the T002 interactor and its source port."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CapabilityExecError", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "AC-04"}},
+      "reason": "At CapabilityExecError x AC-04, this error vocabulary carries type-level failure classification only; it makes no condition-to-observable-result promise. Adapter preflight rejection is owned by the T002 interactor and provider port."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityExecRequest", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_request_shared_capability_name_retained"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityExecRequest", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-06"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_request_shared_capability_name_retained"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CapabilityFailureDetail", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-01"}},
+      "reason": "At CapabilityFailureDetail x CN-01, this opaque detail value carries diagnostics only; it makes no condition-to-observable-result promise. Fail-closed behavior is owned by the T002 interactor and its ports."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityFilePath", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-01"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_file_path_empty_path_rejected"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_file_path_valid_path_preserved"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CapabilityInputValidationError", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-01"}},
+      "reason": "At CapabilityInputValidationError x CN-01, this enum only classifies invalid input values; it makes no condition-to-observable-result promise about blocking delegation or subprocess execution. Fail-closed dispatch is owned by the T002 interactor and its ports."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityProfile", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-02"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_profile_valid_values_retained"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_execution_mode_distinct_variants_retained"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityProfile", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_profile_valid_values_retained"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "DisciplineText", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-05"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_discipline_text_whitespace_rejected"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_discipline_text_valid_content_preserved"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "DisciplineText", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-03"}},
+      "reason": "At DisciplineText x CN-03, this value object only represents already-loaded nonblank policy text; it makes no provenance, template-location, prompt-composition, or fallback-path promise. The fixed template and source adapter are owned by T003 and T004, while branch application is owned by T002."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ExecutionMode", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_execution_mode_distinct_variants_retained"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "ExecutionMode", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "AC-02"}},
+      "reason": "At ExecutionMode x AC-02, this finite vocabulary explicitly has no state-transition semantics; it makes no rejection or no-execution promise. Typed-pipeline rejection and the absence of delegation or subprocess activity are owned by the T002 interactor and its ports."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "ModelName", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-02"}},
+      "reason": "At ModelName x CN-02, this value object only carries a validated model identifier; it establishes no authority relationship between a profile and an adapter and offers no fallback behavior. Profile and adapter authority are enforced by the T002 interactor with the T004 and T005 adapters."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "ProviderName", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-03"}},
+      "reason": "At ProviderName x IN-03, this value object only represents a nonblank provider identifier; it makes no supported-provider, model-compatibility, or pre-dispatch rejection promise. Provider-arm selection belongs to the T002 interactor and T005 provider adapters."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "ProviderName", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-01"}},
+      "reason": "At ProviderName x CN-01, this value object only validates identifier presence; it makes no condition-to-observable-result promise about blocking delegation or subprocess execution. Fail-closed dispatch is owned by the T002 interactor and its ports."
+    }
+  ],
+  "track_id": "capability-exec-unified-dispatch-2026-07-11"
+}

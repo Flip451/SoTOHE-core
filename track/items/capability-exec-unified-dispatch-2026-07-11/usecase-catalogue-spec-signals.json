@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "4d39bf8abf1a1fbc19d91c57750760cd90805ebb27e16c04d2c694fa733ea483",
+  "catalogue_declaration_hash": "330ce4ab06705e3000c46f1cdaea9ed98241013b4e18f08962ecafb658d31b27",
   "signals": [
     {
       "type_name": "BriefingText",
@@ -40,7 +40,7 @@
     {
       "type_name": "CapabilityFilePath",
       "signal": "blue",
-      "entry_hash": "0ecb964b67fc06bad9bc2a169d07364d3fbef798c4edf39118ded988a3adfa7f"
+      "entry_hash": "8633a5f4cc2d445bbacd1318997ed30f7cf571fc85b296d2f5cf26b05ceb7c7a"
     },
     {
       "type_name": "CapabilityInputValidationError",
@@ -70,7 +70,7 @@
     {
       "type_name": "ModelName",
       "signal": "blue",
-      "entry_hash": "97ffe12f8702205848f01ba07cdfde22b84e9a567e854165a4c3d0b6e2899206"
+      "entry_hash": "c737cea29cdd7219c7c0a90782f8fcda5ac080918c5933b57df71d9d352686b9"
     },
     {
       "type_name": "ProviderName",

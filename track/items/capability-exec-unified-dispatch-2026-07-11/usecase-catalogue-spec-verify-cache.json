@@ -387,11 +387,11 @@
       }
     },
     {
-      "claim_hash": "0ecb964b67fc06bad9bc2a169d07364d3fbef798c4edf39118ded988a3adfa7f",
+      "claim_hash": "8633a5f4cc2d445bbacd1318997ed30f7cf571fc85b296d2f5cf26b05ceb7c7a",
       "evidence_hash": "be50f31c85d765d3d4a710a4fddbba8d44f71dc326bc075d3057cbb15f277061",
       "verdict": {
         "kind": "pass",
-        "citation": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
+        "citation": "必須の `--briefing-file`"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -407,30 +407,6 @@
           "section": "in_scope",
           "element_id": "IN-01",
           "text_label": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
-        }
-      }
-    },
-    {
-      "claim_hash": "0ecb964b67fc06bad9bc2a169d07364d3fbef798c4edf39118ded988a3adfa7f",
-      "evidence_hash": "72421957db1280b4c0e9c5f1dd2edc7ba33df6086e52f9a4429a3874b14bc66e",
-      "verdict": {
-        "kind": "pass",
-        "citation": "briefing file と固定 discipline template を分岐判定より前に読み込み、通常ファイル性、読み取り可能性、UTF-8、非空内容を検証する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "CapabilityFilePath"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-05",
-          "text_label": "briefing file と固定 discipline template を分岐判定より前に読み込み、通常ファイル性、読み取り可能性、UTF-8、非空内容を検証する。検証済み briefing と discipline を subprocess prompt に合成し、in-host 委譲では briefing path と読み込み済み discipline 本文の両方を必須 payload として返す。"
         }
       }
     },
@@ -627,31 +603,7 @@
       }
     },
     {
-      "claim_hash": "97ffe12f8702205848f01ba07cdfde22b84e9a567e854165a4c3d0b6e2899206",
-      "evidence_hash": "0fd3869418db22a14ffdb93b7a193348d3ef3a1435647bab7ef36dc283bcd5ed",
-      "verdict": {
-        "kind": "pass",
-        "citation": "profile から provider と単一の model を解決し、claude と codex の provider arm だけを provider-generic な入口から dispatch する。未対応または未知の provider、model 欠如、または provider-native adapter 定義との model 不一致は dispatch 前に reject する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "ModelName"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-03",
-          "text_label": "profile から provider と単一の model を解決し、claude と codex の provider arm だけを provider-generic な入口から dispatch する。未対応または未知の provider、model 欠如、または provider-native adapter 定義との model 不一致は dispatch 前に reject する。"
-        }
-      }
-    },
-    {
-      "claim_hash": "97ffe12f8702205848f01ba07cdfde22b84e9a567e854165a4c3d0b6e2899206",
+      "claim_hash": "c737cea29cdd7219c7c0a90782f8fcda5ac080918c5933b57df71d9d352686b9",
       "evidence_hash": "f2f190a6a43bf040c34e4bdd0aa9c034729cfe637979e166e5a5462f39200fdb",
       "verdict": {
         "kind": "pass",

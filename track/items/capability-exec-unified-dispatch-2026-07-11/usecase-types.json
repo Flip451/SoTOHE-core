@@ -997,10 +997,6 @@
         {
           "anchor": "IN-01",
           "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
-        },
-        {
-          "anchor": "IN-05",
-          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
         }
       ]
     },
@@ -1214,10 +1210,6 @@
         "ValueObject": {}
       },
       "spec_refs": [
-        {
-          "anchor": "IN-03",
-          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
-        },
         {
           "anchor": "CN-02",
           "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"

@@ -115,36 +115,21 @@
         }
       ]
     },
-    "spec": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
-          "at": "2026-07-11T21:56:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-02 は briefing 規律を全 dispatch 経路で保証するとしているが、subprocess prompt に検証済み briefing と discipline 本文が含まれることを証明する AC がない。AC-03 は事前検証、AC-05 は in-host payload、AC-06 は native adapter の起動形式しか確認しないため、subprocess が両本文を欠落させても全 AC を満たせる。",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
-              "line": 34,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
-          "at": "2026-07-11T21:58:04Z"
+          "hash": "rvw1:sha256:ede1b72159ac1af4186d488aa5a9e0df80bd8540adbaaf1576eaafe0b5ebfb66",
+          "at": "2026-07-12T00:15:18Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0449a9512e852388b258d529303c95fbb6bff22f07b51d72522c021854c4b4c8",
-          "at": "2026-07-11T22:02:33Z"
+          "hash": "rvw1:sha256:ede1b72159ac1af4186d488aa5a9e0df80bd8540adbaaf1576eaafe0b5ebfb66",
+          "at": "2026-07-12T00:17:31Z"
         }
       ]
     },
@@ -262,6 +247,71 @@
           "findings": [],
           "hash": "rvw1:sha256:8ae89ce08e9c2ef19755fa83813e2d023014bd0c780aac48eb8c6aceab09301a",
           "at": "2026-07-11T23:11:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94c85f481b568e80b03255d91aeeba224a51ed6016e9d7a54651d6249c85a0a9",
+          "at": "2026-07-12T00:09:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94c85f481b568e80b03255d91aeeba224a51ed6016e9d7a54651d6249c85a0a9",
+          "at": "2026-07-12T00:10:34Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
+          "at": "2026-07-11T21:56:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 は briefing 規律を全 dispatch 経路で保証するとしているが、subprocess prompt に検証済み briefing と discipline 本文が含まれることを証明する AC がない。AC-03 は事前検証、AC-05 は in-host payload、AC-06 は native adapter の起動形式しか確認しないため、subprocess が両本文を欠落させても全 AC を満たせる。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+              "line": 34,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
+          "at": "2026-07-11T21:58:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0449a9512e852388b258d529303c95fbb6bff22f07b51d72522c021854c4b4c8",
+          "at": "2026-07-11T22:02:33Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9402f549356acdb25d90df0acdb50f49d3e02200a8243f9381337505da9c077",
+          "at": "2026-07-12T00:04:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9402f549356acdb25d90df0acdb50f49d3e02200a8243f9381337505da9c077",
+          "at": "2026-07-12T00:05:44Z"
         }
       ]
     },
@@ -394,6 +444,20 @@
           "findings": [],
           "hash": "rvw1:sha256:d28419e7ac0184b0769fc1e5bfc963384039713fbd867ba4065a90b4fdd3dcf7",
           "at": "2026-07-11T22:59:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19eca2d6e54c2cdf8c6b4515f47c080dd48d035a6db3bfe664bf2d9d9a1aeae5",
+          "at": "2026-07-12T00:07:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19eca2d6e54c2cdf8c6b4515f47c080dd48d035a6db3bfe664bf2d9d9a1aeae5",
+          "at": "2026-07-12T00:08:32Z"
         }
       ]
     }
