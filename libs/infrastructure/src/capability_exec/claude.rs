@@ -9,6 +9,7 @@ use usecase::capability_exec::{
     CapabilityExecError, CapabilityProviderPort, ProviderName,
 };
 
+use super::path_guard::capability_name_path_segment;
 use super::{
     ProviderProcessRunner, adapter_preflight_error, capability_prompt,
     parse_provider_definition_front_matter, read_front_matter, read_utf8_file,
@@ -44,18 +45,17 @@ impl ClaudeCapabilityAdapter {
         Self { repo_root, runtime_dir, provider: CLAUDE_PROVIDER_NAME.clone(), process_runner }
     }
 
-    fn agent_path(&self, request: &CapabilityDispatchRequest) -> PathBuf {
-        self.repo_root
-            .join(".claude")
-            .join("agents")
-            .join(format!("{}.md", request.request.capability.as_str()))
+    fn agent_path(&self, capability: &str) -> PathBuf {
+        self.repo_root.join(".claude").join("agents").join(format!("{capability}.md"))
     }
 
     fn validate_agent(
         &self,
         request: &CapabilityDispatchRequest,
     ) -> Result<(), CapabilityExecError> {
-        let path = self.agent_path(request);
+        let capability = capability_name_path_segment(request.request.capability.as_str())
+            .map_err(|detail| adapter_preflight_error(request, &self.provider, detail))?;
+        let path = self.agent_path(capability);
         let definition = read_utf8_file(&path, &self.repo_root)
             .map_err(|detail| adapter_preflight_error(request, &self.provider, detail))?;
         validate_agent_definition(&definition, request.profile.model.as_str())
@@ -350,6 +350,32 @@ mod tests {
             adapter.dispatch(&request_from_host("claude")?),
             Err(CapabilityExecError::AdapterPreflight { .. })
         ));
+        assert!(runner.invocations.lock().expect("test process recorder lock").is_empty());
+        Ok(())
+    }
+
+    #[test]
+    fn test_claude_capability_adapter_parent_segment_name_rejected_before_process()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        fs::create_dir_all(directory.path().join(".claude/agents"))?;
+        fs::write(
+            directory.path().join(".claude/outside.md"),
+            "---\nname: outside\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let adapter = ClaudeCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+
+        let error = adapter
+            .dispatch(&request_with_capability_from_host("../outside", "codex")?)
+            .expect_err("parent component capability names must fail preflight");
+
+        assert!(matches!(error, CapabilityExecError::AdapterPreflight { .. }));
+        assert!(error.to_string().contains("single path segment"));
         assert!(runner.invocations.lock().expect("test process recorder lock").is_empty());
         Ok(())
     }

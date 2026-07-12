@@ -7,6 +7,26 @@
 
 use std::path::{Component, Path, PathBuf};
 
+/// Validates a capability name before it is embedded in a provider-definition path.
+///
+/// Provider definitions are addressed by a single repository-owned path segment.
+/// The shared capability value object deliberately allows names used by other
+/// consumers, so this narrower invariant is enforced only at this filesystem
+/// boundary.
+pub(crate) fn capability_name_path_segment(value: &str) -> Result<&str, &'static str> {
+    let path = Path::new(value);
+    let mut components = path.components();
+
+    match (components.next(), components.next()) {
+        (Some(Component::Normal(component)), None)
+            if component == std::ffi::OsStr::new(value) && !value.contains(['/', '\\']) =>
+        {
+            Ok(value)
+        }
+        _ => Err("capability name must be a single path segment"),
+    }
+}
+
 /// Lexically normalizes a path without resolving or inspecting filesystem components.
 pub(crate) fn lexically_normalize(path: &Path) -> PathBuf {
     let mut normalized = PathBuf::new();
@@ -93,5 +113,25 @@ fn reject_symlinked_component(component: &Path, trusted_root: &Path) -> Result<(
         Ok(_) => Ok(()),
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
         Err(error) => Err(error),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::capability_name_path_segment;
+
+    #[test]
+    fn test_capability_name_path_segment_with_plain_name_returns_name() {
+        assert_eq!(capability_name_path_segment("review-fix-lead"), Ok("review-fix-lead"));
+    }
+
+    #[test]
+    fn test_capability_name_path_segment_with_path_syntax_returns_error() {
+        for name in [".", "..", "../outside", "nested/name", "nested\\name", "/absolute", "name/"] {
+            assert!(
+                capability_name_path_segment(name).is_err(),
+                "'{name}' must not be accepted as a provider-definition path segment"
+            );
+        }
     }
 }

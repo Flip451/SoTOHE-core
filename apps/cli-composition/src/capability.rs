@@ -8,9 +8,12 @@ use infrastructure::capability_exec::{
     agent_profiles::AgentProfilesCapabilityAdapter, claude::ClaudeCapabilityAdapter,
     codex::CodexCapabilityAdapter, source::FsCapabilitySourceAdapter,
 };
+use infrastructure::git_cli::SystemGitRepo;
 use usecase::capability_exec::{
     CapabilityExecInteractor, CapabilityProfilePort, CapabilityProviderPort, CapabilitySourcePort,
 };
+
+const CAPABILITY_RUNTIME_DIR: &str = "tmp/capability-runtime";
 
 /// Composition root for `sotp capability` commands.
 pub struct CapabilityCompositionRoot {
@@ -23,6 +26,20 @@ impl CapabilityCompositionRoot {
     #[must_use]
     pub fn new(repo_root: PathBuf, runtime_dir: PathBuf) -> Self {
         Self { repo_root, runtime_dir }
+    }
+
+    /// Discovers the current git worktree and builds the default root.
+    ///
+    /// # Errors
+    ///
+    /// Returns an infrastructure error when the current directory is not inside
+    /// a discoverable git worktree.
+    pub fn discover() -> Result<Self, crate::CompositionError> {
+        let repo = SystemGitRepo::discover().map_err(|e| {
+            crate::CompositionError::Infrastructure(format!("cannot discover git repo: {e}"))
+        })?;
+        let repo_root = repo.root().to_path_buf();
+        Ok(Self::new(repo_root.clone(), repo_root.join(CAPABILITY_RUNTIME_DIR)))
     }
 
     /// Builds the generic capability driver with both supported provider adapters.
@@ -52,10 +69,12 @@ impl CapabilityCompositionRoot {
 #[allow(clippy::expect_used)]
 mod tests {
     use std::fs;
-    use std::path::PathBuf;
+    use std::path::{Path, PathBuf};
+    use std::process::Command;
     use std::str::FromStr;
+    use std::sync::{Mutex, OnceLock};
 
-    use super::CapabilityCompositionRoot;
+    use super::{CAPABILITY_RUNTIME_DIR, CapabilityCompositionRoot};
     use cli_driver::capability::{
         CapabilityExecDriverInput, CapabilityFilePathArg, CapabilityNameArg, ProviderNameArg,
     };
@@ -102,6 +121,34 @@ mod tests {
         Ok(())
     }
 
+    fn cwd_lock() -> &'static Mutex<()> {
+        static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+        LOCK.get_or_init(|| Mutex::new(()))
+    }
+
+    struct CurrentDirGuard {
+        original: PathBuf,
+    }
+
+    impl CurrentDirGuard {
+        fn change_to(path: &Path) -> Result<Self, std::io::Error> {
+            let original = std::env::current_dir()?;
+            std::env::set_current_dir(path)?;
+            Ok(Self { original })
+        }
+    }
+
+    impl Drop for CurrentDirGuard {
+        fn drop(&mut self) {
+            let _ = std::env::set_current_dir(&self.original);
+        }
+    }
+
+    fn initialize_git_repository(root: &Path) -> Result<(), Box<dyn std::error::Error>> {
+        let status = Command::new("git").args(["init", "-q"]).current_dir(root).status()?;
+        if status.success() { Ok(()) } else { Err(format!("git init failed with {status}").into()) }
+    }
+
     fn input() -> CapabilityExecDriverInput {
         CapabilityExecDriverInput {
             capability: CapabilityNameArg::from_str("implementer").expect("valid test capability"),
@@ -121,6 +168,46 @@ mod tests {
         let driver = root.capability_driver();
 
         assert!(std::mem::size_of_val(&driver) > 0);
+    }
+
+    #[test]
+    fn test_capability_composition_root_discover_rejects_non_repository_directory()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let _lock = cwd_lock().lock().expect("current directory lock is acquired");
+        let directory = tempfile::tempdir()?;
+        let _cwd = CurrentDirGuard::change_to(directory.path())?;
+
+        let error = match CapabilityCompositionRoot::discover() {
+            Ok(_) => return Err("directory without a git repository must be rejected".into()),
+            Err(error) => error,
+        };
+
+        assert!(matches!(error, crate::CompositionError::Infrastructure(_)));
+        assert!(error.to_string().contains("cannot discover git repo"));
+        Ok(())
+    }
+
+    #[test]
+    fn test_capability_composition_root_discover_uses_repository_root_from_subdirectory()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let _lock = cwd_lock().lock().expect("current directory lock is acquired");
+        let repository = tempfile::tempdir()?;
+        initialize_git_repository(repository.path())?;
+        write_dispatch_fixture(
+            repository.path(),
+            "---\nname: implementer\nmodel: claude-opus\ntools:\n  - Read\n---\nagent body\n",
+        )?;
+        let nested = repository.path().join("nested/workdir");
+        fs::create_dir_all(&nested)?;
+        let _cwd = CurrentDirGuard::change_to(&nested)?;
+
+        let root = CapabilityCompositionRoot::discover()?;
+        let outcome = root.capability_driver().handle(input());
+
+        assert_eq!(root.repo_root, repository.path());
+        assert_eq!(root.runtime_dir, repository.path().join(CAPABILITY_RUNTIME_DIR));
+        assert_eq!(outcome.exit_code, 0);
+        Ok(())
     }
 
     #[test]

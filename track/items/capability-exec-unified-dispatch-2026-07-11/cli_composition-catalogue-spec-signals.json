@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "02d673e73ae7ef5506fe11f395ee450a00d1ff5765747060e0f0b1c6d4901710",
+  "catalogue_declaration_hash": "6649fc3bc78cae35bb722937e200ec169c93adb9a7dcecb8a65e1345e128c07c",
   "signals": [
     {
       "type_name": "CapabilityCompositionRoot",

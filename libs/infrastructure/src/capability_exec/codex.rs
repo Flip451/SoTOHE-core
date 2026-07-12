@@ -10,6 +10,7 @@ use usecase::capability_exec::{
     CapabilityProviderPort, ProviderName,
 };
 
+use super::path_guard::capability_name_path_segment;
 use super::{
     ProviderProcessRunner, adapter_preflight_error, capability_prompt, dispatch_error,
     parse_provider_definition_front_matter, read_front_matter, read_utf8_file,
@@ -72,19 +73,17 @@ impl CodexCapabilityAdapter {
         Self { repo_root, runtime_dir, provider: CODEX_PROVIDER_NAME.clone(), process_runner }
     }
 
-    fn skill_path(&self, request: &CapabilityDispatchRequest) -> PathBuf {
-        self.repo_root
-            .join(".agents")
-            .join("skills")
-            .join(request.request.capability.as_str())
-            .join("SKILL.md")
+    fn skill_path(&self, capability: &str) -> PathBuf {
+        self.repo_root.join(".agents").join("skills").join(capability).join("SKILL.md")
     }
 
     fn sandbox_mode(
         &self,
         request: &CapabilityDispatchRequest,
     ) -> Result<SandboxMode, CapabilityExecError> {
-        let path = self.skill_path(request);
+        let capability = capability_name_path_segment(request.request.capability.as_str())
+            .map_err(|detail| adapter_preflight_error(request, &self.provider, detail))?;
+        let path = self.skill_path(capability);
         let definition = read_utf8_file(&path, &self.repo_root)
             .map_err(|detail| adapter_preflight_error(request, &self.provider, detail))?;
         sandbox_mode_from_skill(&definition)
@@ -351,6 +350,31 @@ mod tests {
             adapter.dispatch(&request_from_host("claude")?),
             Err(CapabilityExecError::AdapterPreflight { .. })
         ));
+        assert!(runner.invocations.lock().expect("test process recorder lock").is_empty());
+        Ok(())
+    }
+
+    #[test]
+    fn test_codex_capability_adapter_parent_segment_name_rejected_before_process()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let escaped_skill = directory.path().join(".agents/outside/SKILL.md");
+        fs::create_dir_all(directory.path().join(".agents/skills"))?;
+        fs::create_dir_all(escaped_skill.parent().ok_or("skill path must have a parent")?)?;
+        fs::write(&escaped_skill, "---\nname: outside\n---\nskill body\n")?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let adapter = CodexCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+
+        let error = adapter
+            .dispatch(&request_with_capability_from_host("../outside", "codex")?)
+            .expect_err("parent component capability names must fail preflight");
+
+        assert!(matches!(error, CapabilityExecError::AdapterPreflight { .. }));
+        assert!(error.to_string().contains("single path segment"));
         assert!(runner.invocations.lock().expect("test process recorder lock").is_empty());
         Ok(())
     }

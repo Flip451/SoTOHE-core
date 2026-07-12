@@ -23,6 +23,14 @@
         {
           "has_default_impl": false,
           "is_async": false,
+          "name": "discover",
+          "docs": "May produce only CompositionError::Infrastructure.",
+          "params": [],
+          "returns": "Result<Self, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
           "name": "capability_driver",
           "params": [],
           "receiver": "&self",

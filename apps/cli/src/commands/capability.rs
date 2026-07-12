@@ -10,8 +10,6 @@ use cli_driver::capability::{
 
 use crate::commands::driver_outcome_to_exit;
 
-const CAPABILITY_RUNTIME_DIR: &str = "tmp/capability-runtime";
-
 /// Generic capability dispatch subcommands.
 #[derive(Debug, Subcommand)]
 pub enum CapabilityCommand {
@@ -47,15 +45,14 @@ fn execute_with(
 }
 
 fn execute_exec(args: CapabilityExecArgs) -> ExitCode {
-    let repo_root = match std::env::current_dir() {
-        Ok(path) => path,
+    let root = match CapabilityCompositionRoot::discover() {
+        Ok(root) => root,
         Err(error) => {
-            eprintln!("failed to resolve current directory: {error}");
+            eprintln!("failed to initialize capability command: {error}");
             return ExitCode::FAILURE;
         }
     };
-    let runtime_dir = repo_root.join(CAPABILITY_RUNTIME_DIR);
-    let driver = CapabilityCompositionRoot::new(repo_root, runtime_dir).capability_driver();
+    let driver = root.capability_driver();
     driver_outcome_to_exit(driver.handle(CapabilityExecDriverInput {
         capability: args.capability,
         host: args.host,
