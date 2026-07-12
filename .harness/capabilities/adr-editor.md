@@ -43,6 +43,8 @@ If the briefing asks for:
 ## Editing rules
 
 - **Working tree only**: use `Edit` to modify the target ADR. Do NOT run `git add`, `git commit`, or `git push`.
+- **No task transitions**: do not run `bin/sotp track transition`; this capability has no
+  task-state transition authority.
 - **No Status field**: do not add a `## Status` section or any artificial state field. The convention (`knowledge/conventions/pre-track-adr-authoring.md`) treats file existence as operational approval.
 - **No illustrative content without markers**: any Rust code or schema examples added to the ADR must carry `<!-- illustrative, non-canonical -->` markers.
 - **No reverse references**: the ADR must not reference track-internal artifacts (`spec.json`, type catalogues, `impl-plan.json`, `task-coverage.json`). Only forward references (ADR ← spec ← type catalogue ← implementation) are valid per the SoT Chain.

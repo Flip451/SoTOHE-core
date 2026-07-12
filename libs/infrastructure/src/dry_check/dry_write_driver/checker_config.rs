@@ -83,15 +83,22 @@ pub(super) fn resolve_dry_checker_config(
     let (fast_model, final_model) = if let Some(m) = explicit_model {
         (m.clone(), m)
     } else {
-        let resolve_model =
-            |rt| profiles.resolve_execution(capability_name, rt).and_then(|r| r.model);
-        let final_model = resolve_model(RoundType::Final).ok_or_else(|| {
-            format!(
-                "[ERROR] no model specified: pass --model or set model in \
+        let final_model = profiles
+            .resolve_model(capability_name, RoundType::Final)
+            .map(str::to_owned)
+            .ok_or_else(|| {
+                format!(
+                    "[ERROR] no model specified: pass --model or set model in \
                  agent-profiles.json '{capability_name}' capability"
-            )
-        })?;
-        (resolve_model(RoundType::Fast).unwrap_or_else(|| final_model.clone()), final_model)
+                )
+            })?;
+        (
+            profiles
+                .resolve_model(capability_name, RoundType::Fast)
+                .map(str::to_owned)
+                .unwrap_or_else(|| final_model.clone()),
+            final_model,
+        )
     };
     let cap = profiles.resolve_capability(capability_name);
     let fast_reasoning_effort = resolve_dry_checker_reasoning_effort(
@@ -117,7 +124,7 @@ fn load_agent_profiles_under_root(root: &Path) -> Result<AgentProfiles, String> 
     reject_symlinks_below(&profiles_path, &canonical_root).map_err(|e| {
         format!("symlink guard agent-profiles.json '{}': {e}", profiles_path.display())
     })?;
-    AgentProfiles::load(&profiles_path)
+    AgentProfiles::load(&canonical_root, &profiles_path)
         .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))
 }
 
@@ -183,7 +190,8 @@ mod tests {
       "model": "final-model-v1",
       "fast_model": "fast-model-v1",
       "fast_reasoning_effort": "low",
-      "final_reasoning_effort": "high"
+      "final_reasoning_effort": "high",
+      "execution_mode": "typed-pipeline"
     }
   }
 }"#,
@@ -214,7 +222,8 @@ mod tests {
       "model": "profile-final-model-v1",
       "fast_model": "profile-fast-model-v1",
       "fast_reasoning_effort": "low",
-      "final_reasoning_effort": "minimal"
+      "final_reasoning_effort": "minimal",
+      "execution_mode": "typed-pipeline"
     }
   }
 }"#,
@@ -246,7 +255,8 @@ mod tests {
   "capabilities": {
     "dry-checker": {
       "provider": "codex",
-      "model": "only-final-model-v1"
+      "model": "only-final-model-v1",
+      "execution_mode": "typed-pipeline"
     }
   }
 }"#,
@@ -277,7 +287,8 @@ mod tests {
   "capabilities": {
     "dry-checker": {
       "provider": "codex",
-      "model": "final-model-v1"
+      "model": "final-model-v1",
+      "execution_mode": "typed-pipeline"
     }
   }
 }"#,
@@ -312,7 +323,8 @@ mod tests {
       "provider": "codex",
       "model": "final-model-v1",
       "fast_reasoning_effort": "{fast_effort}",
-      "final_reasoning_effort": "{final_effort}"
+      "final_reasoning_effort": "{final_effort}",
+      "execution_mode": "typed-pipeline"
     }}
   }}
 }}"#

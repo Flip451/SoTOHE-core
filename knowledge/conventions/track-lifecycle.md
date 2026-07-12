@@ -23,7 +23,7 @@
 
 状態遷移は `bin/sotp track` サブコマンド（Rust CLI）を経由する:
 
-- `bin/sotp track transition`: タスクの状態遷移（todo → in_progress → done / skipped）。done に遷移する際は `--commit-hash <hash>` で記録する。
+- `bin/sotp track transition`: タスクの状態遷移（todo → in_progress → done / skipped）。orchestrator の専管。done 遷移は 2 段階: (1) DFP 通過後・review 前に hash 無しで `done`（DonePending）へ、(2) batch commit 後に `--commit-hash <hash>` で埋め戻して DoneTraced にする。詳細は `task-completion-flow.md`。
 - `bin/sotp track add-task`: 新タスクの追加。
 - `bin/sotp track set-override` / `clear-override`: トラック全体のブロック/キャンセル。
 - `bin/sotp track next-task`: 次の作業対象タスクの取得（JSON 出力）。
@@ -64,7 +64,7 @@
 
 ## Examples
 
-- Good: タスクを終えたら `bin/sotp track transition T003 done --commit-hash <hash>` を実行する。`plan.md` と `track/registry.md` は自動再生成され、手動で行を書き換えない。
+- Good: orchestrator が DFP 通過後・review 前に `bin/sotp track transition T003 done` で DonePending へ、batch commit 後に `bin/sotp track transition T003 done --commit-hash <hash>` で DoneTraced に埋め戻す。`plan.md` と `track/registry.md` は自動再生成され、手動で行を書き換えない。
 - Good: 機械検証不能な dogfood 結果が出た task で `observations.md` に観測対象・手順・実測値・日時を自由フォーマットで追記し、機械検証で AC を満たすタスクでは `observations.md` を作成しない。
 - Bad: `plan.md` の `[ ]` を `[x]` に手編集する（生成ビューを直接編集してはならない。`bin/sotp track transition` 経由で SSoT を変えて再生成する）。
 - Bad: 任意 dogfood ログを `metadata.json` の説明文に詰め込む（identity フィールドに観測値を載せると schema validation や生成ビューに影響する。`observations.md` を使う）。

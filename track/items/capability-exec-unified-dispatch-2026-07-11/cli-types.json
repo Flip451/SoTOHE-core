@@ -1,0 +1,546 @@
+{
+  "crate_name": "cli",
+  "functions": {
+    "cli::commands::capability::execute": {
+      "action": "add",
+      "docs": "Dispatch a generic capability subcommand to its concrete execution helper; see IN-01.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "command",
+          "ty": "CapabilityCommand"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "cli::commands::capability::execute_exec": {
+      "action": "add",
+      "docs": "Execute profile-driven capability dispatch through the composition root and CLI driver; see IN-01.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "CapabilityExecArgs"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "cli::commands::capability::execute_with": {
+      "action": "add",
+      "docs": "Dispatch a generic capability subcommand through an injected execution helper; see IN-01.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "command",
+          "ty": "CapabilityCommand"
+        },
+        {
+          "name": "execute_exec",
+          "ty": "impl FnOnce(CapabilityExecArgs) -> std::process::ExitCode"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "cli::commands::plan::codex_local::execute_codex_local": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "cli::commands::plan::codex_local::plan_input_from_args": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "cli::commands::plan::codex_local::run_execute_codex_local": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "cli::commands::plan::execute": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "cli",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "CapabilityCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "for_type": "CapabilityCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "reference",
+      "for_type": "CliCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "reference",
+      "for_type": "CliCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityCommand": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Exec",
+            "payload": {
+              "fields": [
+                "CapabilityExecArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecArgs": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "cli_driver::capability::CapabilityNameArg"
+            },
+            {
+              "name": "host",
+              "ty": "cli_driver::capability::ProviderNameArg"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "cli_driver::capability::CapabilityFilePathArg"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CliCommand": {
+      "action": "modify",
+      "docs": "Root CLI command discriminant; see IN-01 and IN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Arch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "ArchCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Conventions",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "ConventionsCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Domain",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "DomainCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Guard",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "GuardCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Hook",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "HookCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Track",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TrackCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Git",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "GitCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Pr",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "PrCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Capability",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CapabilityCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Review",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "ReviewCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "File",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "FileCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Verify",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "VerifyCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "FindSimilar",
+            "payload": {
+              "fields": [
+                "FindSimilarArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DupIndex",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "DupIndexCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DupCheck",
+            "payload": {
+              "fields": [
+                "DupCheckArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Telemetry",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TelemetryCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Dry",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "DryCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "RefVerify",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "RefVerifyCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TestObligation",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TestObligationSubcommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Signal",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "SignalCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TaskContract",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TaskContractCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Catalog",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CatalogCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CatalogueLint",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CatalogueLintCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Template",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TemplateCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "PlanCodexLocalArgs": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "commands::plan",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "PlanCommand": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "commands::plan",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    }
+  }
+}

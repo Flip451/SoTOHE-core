@@ -11,16 +11,16 @@ User invokes this command as `/track:implement`. Use `$ARGUMENTS` as optional sc
 ## Claude Code invocation constraints
 
 - **Parallel implementation**: use Agent Teams (multiple subagents with `run_in_background: true`) for independent tasks. Serialize `cargo add` / `cargo update` / `Cargo.lock`-changing steps through a single worker.
-- **Task state transitions**: `bin/sotp track transition <task_id> in_progress` / `done` — do NOT edit `plan.md` directly (read-only view).
+- **Task state transitions**: the calling orchestrator, never the `implementer` capability, performs them; do NOT edit `plan.md` directly (read-only view).
 - **Test validation per worker**: `cargo make test`; reserve full-suite commands for single workers to avoid `target/` build lock contention.
 - **CI gate before reporting**: `cargo make ci`
-- **Commit hash recording**: after `/track:commit`, `bin/sotp track transition <task_id> done --commit-hash <hash>`
+- **Completion timing**: owned by the workflow SSoT (`.harness/workflows/track/implement.md` Step 7 and `full-cycle.md` Step 1d / Step 3) — this adapter does not restate the transition ordering.
 
 ## Report format
 
 After execution, summarize:
 
 1. Implemented scope.
-2. Updated `metadata.json` task states (todo → in_progress → done, or blocked in_progress).
+2. Implementation handoff: implemented task IDs and their verification results (tasks are handed off `in_progress`; the orchestrator owns transitions per the workflow SSoT).
 3. Remaining tasks.
-4. Recommended next command (`/track:review`, `/track:commit <message>`, or `/track:full-cycle`).
+4. Recommended next command: `/track:full-cycle` (it owns the DFP → transition → review → commit ordering defined in the workflow SSoT). Standalone `/track:review` or `/track:commit` straight after implementation is not sanctioned.

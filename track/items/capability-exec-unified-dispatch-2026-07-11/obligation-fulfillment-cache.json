@@ -1,0 +1,1853 @@
+{
+  "track_id": "capability-exec-unified-dispatch-2026-07-11",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "BriefingText",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BriefingText",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "1cc29969fda6dd21fdf5e101d7634fa9723770eff69df0681e2c72e57b171016",
+        "declaration_hash": "c442735bac4251f8804a944209d8005cb35996ffd01d75f06fd8731f94573a62",
+        "anchor_text_hash": "22b3f51b84987472d96029d7397919f22523815d1e56bbd6753deae52a1a47fe"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "BriefingText::try_new(\"\\n  \\t\".to_owned()),\n            Err(CapabilityInputValidationError::EmptyContent)"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BriefingText",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BriefingText",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "1cc29969fda6dd21fdf5e101d7634fa9723770eff69df0681e2c72e57b171016",
+        "declaration_hash": "c442735bac4251f8804a944209d8005cb35996ffd01d75f06fd8731f94573a62",
+        "anchor_text_hash": "eb1cc8bcd9f2491cdb46edf244d5e90fdd4d0cf8c9b8e5c36a179e7af26fdc9b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            BriefingText::try_new(\"\\n  \\t\".to_owned()),\n            Err(CapabilityInputValidationError::EmptyContent)\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecRequest",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "c312345da2c8b297c3b32b93bc0625946b4781158cfc78f8a447dd69d5ac256e",
+        "declaration_hash": "548514d4f55492a3de466d390b5cc480d8a2d58bbde262d020d31cacb0d90100",
+        "anchor_text_hash": "7f1a2797927297a54fa31d32d685ec612e4c42da834648380221724fac13dd27"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let request = CapabilityExecRequest {\n            capability: CapabilityName::try_new(\"implementer\")?,\n            host: ProviderName::try_new(\"codex\")?,\n            briefing_file: CapabilityFilePath::try_new(PathBuf::from(\"tmp/briefing.md\"))?,\n        };\n\n        assert_eq!(request.capability.as_str(), \"implementer\");\n        assert_eq!(request.host.as_str(), \"codex\");\n        assert_eq!(request.briefing_file.as_path(), PathBuf::from(\"tmp/briefing.md\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecRequest",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "c312345da2c8b297c3b32b93bc0625946b4781158cfc78f8a447dd69d5ac256e",
+        "declaration_hash": "548514d4f55492a3de466d390b5cc480d8a2d58bbde262d020d31cacb0d90100",
+        "anchor_text_hash": "a0f6d880357fd09929348103a9289ca96c5c864212648305fa888b968b3d73dc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(request.host.as_str(), \"codex\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityFilePath",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityFilePath",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "d176586f273f55bac1212ddff1613da2cc27a7adea79cbd455e8e3276edcbc18",
+        "declaration_hash": "fabc1b38a81bda25f6b1b8afcaabcaf83c71431fde98a1367eac657849716fe4",
+        "anchor_text_hash": "7f1a2797927297a54fa31d32d685ec612e4c42da834648380221724fac13dd27"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(request.briefing_file.as_path(), PathBuf::from(\"tmp/briefing.md\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProfile",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProfile",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "014e6875f661e8958a38596892813fc4e727e5d4a73894f33ed4d9cf32526a31",
+        "declaration_hash": "515f7b28de7eb0066a2bdfc73251b721ffceedaf68c64a29ba46b5c94c2e5c16",
+        "anchor_text_hash": "93b419fdb13b91a43ef16def48a1207f51ca873a48ab4bdf549912c1bfebea9f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(profile.execution_mode, ExecutionMode::OrchestratorOutput);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProfile",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProfile",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "596a194c5bffd9a5fe16c5a898ca58178dab781a83ada6a14386c1a87d3e0b95",
+        "declaration_hash": "515f7b28de7eb0066a2bdfc73251b721ffceedaf68c64a29ba46b5c94c2e5c16",
+        "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(profile.provider.as_str(), \"codex\");\n        assert_eq!(profile.model.as_str(), \"gpt-5\");\n        assert_eq!(profile.execution_mode, ExecutionMode::OrchestratorOutput);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "DisciplineText",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "DisciplineText",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "96686055ac943cc2167110bddc455240f0dc2cb5e3a67395bf4a84a6a0ffe25d",
+        "declaration_hash": "d190186cfc0810d85c50ae00c78d73c87df349613fe9818f2b564a33b96aeffe",
+        "anchor_text_hash": "22b3f51b84987472d96029d7397919f22523815d1e56bbd6753deae52a1a47fe"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "DisciplineText::try_new(\"\\n  \\t\".to_owned()),\n            Err(CapabilityInputValidationError::EmptyContent)"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ExecutionMode",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ExecutionMode",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "6adf829f2389ab42376521008a0e2130be302d69122156f9c2ed316d0a1843e1",
+        "declaration_hash": "c39b4d40a1ac8278d7056551be026e1ea49f07d90d9e77e96e0cf86ca1903c3e",
+        "anchor_text_hash": "93b419fdb13b91a43ef16def48a1207f51ca873a48ab4bdf549912c1bfebea9f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(ExecutionMode::OrchestratorOutput, ExecutionMode::TypedPipeline);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecInteractor",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "40483ad56287654f8a35a7a901c9e474c1b12116783df9037fa56ecbbd9e51a6",
+        "declaration_hash": "5a308af1e2e2080f5da1f5d4283e751161bf7a9792146622aebee54719fa203a",
+        "anchor_text_hash": "41a99b4a112a12c20eafbcb494dddbb6ecea9e13482b19723b40b48e07a5f32d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(recorded[0].request.capability.as_str(), \"implementer\");\n        assert_eq!(recorded[0].request.host.as_str(), \"codex\");\n        assert_eq!(recorded[0].profile.provider.as_str(), \"codex\");\n        assert_eq!(recorded[0].profile.model.as_str(), \"gpt-5\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecInteractor",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "GO-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "40483ad56287654f8a35a7a901c9e474c1b12116783df9037fa56ecbbd9e51a6",
+        "declaration_hash": "5a308af1e2e2080f5da1f5d4283e751161bf7a9792146622aebee54719fa203a",
+        "anchor_text_hash": "0a26e3d73d619bca62d9fa6535a3ee776ff4642d11f0648dcdf6ba2397b87304"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            interactor.execute(request()?),\n            Err(CapabilityExecError::SourceValidation { .. })\n        ));\n        assert_eq!(source_calls.load(Ordering::SeqCst), 1);\n        assert_eq!(profile_calls.load(Ordering::SeqCst), 0);\n        assert!(dispatches.lock().expect(\"test dispatch recorder lock\").is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecService",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "e984cf2f1dd2ac2f336938d64d61013599405e4d1d6357a0e3031c2013ab5946",
+        "declaration_hash": "26b65221c891917e1acfe0ddd5fc051885cadaefb5c94280c3be4a77b5b181e8",
+        "anchor_text_hash": "41a99b4a112a12c20eafbcb494dddbb6ecea9e13482b19723b40b48e07a5f32d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(recorded.len(), 1); assert_eq!(recorded[0].request.capability.as_str(), \"implementer\"); assert_eq!(recorded[0].request.host.as_str(), \"codex\"); assert_eq!(recorded[0].profile.provider.as_str(), \"codex\"); assert_eq!(recorded[0].profile.model.as_str(), \"gpt-5\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecService",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "GO-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "e984cf2f1dd2ac2f336938d64d61013599405e4d1d6357a0e3031c2013ab5946",
+        "declaration_hash": "26b65221c891917e1acfe0ddd5fc051885cadaefb5c94280c3be4a77b5b181e8",
+        "anchor_text_hash": "0a26e3d73d619bca62d9fa6535a3ee776ff4642d11f0648dcdf6ba2397b87304"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            interactor.execute(request()?),\n            Err(CapabilityExecError::SourceValidation { .. })\n        ));\n        assert_eq!(profile_calls.load(Ordering::SeqCst), 0);\n        assert!(dispatches.lock().expect(\"test dispatch recorder lock\").is_empty());\n\nassert!(matches!(\n            interactor.execute(request()?),\n            Err(CapabilityExecError::ExecutionModeRejected { .. })\n        ));\n        assert!(dispatches.lock().expect(\"test dispatch recorder lock\").is_empty());\n\nassert!(matches!(\n            interactor.execute(request()?),\n            Err(CapabilityExecError::UnsupportedProvider { .. })\n        ));\n        assert!(dispatches.lock().expect(\"test dispatch recorder lock\").is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProfilePort",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProfilePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve"
+      },
+      "key": {
+        "bound_tests_set_hash": "a43f2d3cf0164680d6a233485d11015077e07b7108af02898b3b9235ed9c537f",
+        "declaration_hash": "bcdd97326cdc0885c8e24dfcacbe551b0a4107d73498ba6cc194a5f0ac21dc0e",
+        "anchor_text_hash": "93b419fdb13b91a43ef16def48a1207f51ca873a48ab4bdf549912c1bfebea9f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let profile = adapter.resolve(&capability).expect(\"profile resolves\");\n\nassert_eq!(profile.execution_mode, ExecutionMode::OrchestratorOutput); ... assert!(matches!(\n    adapter.resolve(&capability),\n    Err(CapabilityExecError::ProfileResolution { .. })\n)); ... assert!(matches!(\n    adapter.resolve(&capability),\n    Err(CapabilityExecError::ModelMissing { .. })\n)); ... assert!(matches!(\n    adapter.resolve(&capability),\n    Err(CapabilityExecError::ProfileResolution { .. })\n));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProfilePort",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProfilePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve"
+      },
+      "key": {
+        "bound_tests_set_hash": "a43f2d3cf0164680d6a233485d11015077e07b7108af02898b3b9235ed9c537f",
+        "declaration_hash": "bcdd97326cdc0885c8e24dfcacbe551b0a4107d73498ba6cc194a5f0ac21dc0e",
+        "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let profile = adapter.resolve(&capability).expect(\"profile resolves\");\n\nassert_eq!(profile.provider.as_str(), \"codex\");\nassert_eq!(profile.model.as_str(), \"gpt-5\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProviderPort",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProviderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:provider"
+      },
+      "key": {
+        "bound_tests_set_hash": "c46eb7c8d340fd023fa2aa8b63ffcf7420f68f79b7e7e66774c0603773c308fb",
+        "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
+        "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(profile.provider.as_str(), \"codex\"); assert_eq!(profile.model.as_str(), \"gpt-5\"); assert!(matches!( adapter.resolve(&capability), Err(CapabilityExecError::ModelMissing { .. }) )); assert!(matches!( interactor.execute(request()?), Err(CapabilityExecError::UnsupportedProvider { .. }) )); assert!(dispatches.lock().expect(\"test dispatch recorder lock\").is_empty()); assert!(matches!( adapter.dispatch(&request_from_host(\"claude\")?), Err(CapabilityExecError::AdapterPreflight { .. }) )); assert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProviderPort",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProviderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:provider"
+      },
+      "key": {
+        "bound_tests_set_hash": "c46eb7c8d340fd023fa2aa8b63ffcf7420f68f79b7e7e66774c0603773c308fb",
+        "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
+        "anchor_text_hash": "a0f6d880357fd09929348103a9289ca96c5c864212648305fa888b968b3d73dc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::DelegateInHost {\n                ref capability,\n                ref briefing_file,\n                ref discipline,\n            } if capability.as_str() == \"implementer\"\n                && briefing_file.as_path() == Path::new(\"tmp/briefing.md\")\n                && discipline.as_str() == \"Do not stage changes.\"\n        ));\n        assert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty()); | assert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 17 }\n                if provider.as_str() == \"codex\"\n        ));\n        let invocations = runner.invocations.lock().expect(\"test process recorder lock\");\n        assert_eq!(invocations.len(), 1); | assert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 9 }\n                if provider.as_str() == \"claude\"\n        ));\n        let invocations = runner.invocations.lock().expect(\"test process recorder lock\");\n        assert_eq!(invocations.len(), 1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProviderPort",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProviderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:provider"
+      },
+      "key": {
+        "bound_tests_set_hash": "c46eb7c8d340fd023fa2aa8b63ffcf7420f68f79b7e7e66774c0603773c308fb",
+        "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
+        "anchor_text_hash": "5da406c642e68c838923e1c1fe07bccc77c1def3994621c7bfed07e7ade4f6bc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(invocation.0, \"claude\");\n        assert_eq!(args,\n            [\n                \"-p\",\n                \"--agent\",\n                \"implementer\","
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProviderPort",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProviderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:dispatch"
+      },
+      "key": {
+        "bound_tests_set_hash": "ca4679a4a7f493c9a46ab4b0d5c127fd4a13b99d74bf7f2283f9f284a1bada30",
+        "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
+        "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(profile.provider.as_str(), \"codex\"); assert_eq!(profile.model.as_str(), \"gpt-5\"); assert!(matches!( adapter.resolve(&capability), Err(CapabilityExecError::ModelMissing { .. }) )); assert!(matches!( interactor.execute(request()?), Err(CapabilityExecError::UnsupportedProvider { .. }) )); assert!(dispatches.lock().expect(\"test dispatch recorder lock\").is_empty()); assert!(matches!( adapter.dispatch(&request_from_host(\"claude\")?), Err(CapabilityExecError::AdapterPreflight { .. }) )); assert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty()); assert_eq!(model, \"gpt-5\"); assert_eq!(args, [ \"-p\", \"--agent\", \"implementer\", \"--model\", \"claude-opus\", \"$implementer Briefing: Read tmp/briefing.md and perform the task.\\n\\nDo not stage changes.\", ]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProviderPort",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProviderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:dispatch"
+      },
+      "key": {
+        "bound_tests_set_hash": "ca4679a4a7f493c9a46ab4b0d5c127fd4a13b99d74bf7f2283f9f284a1bada30",
+        "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
+        "anchor_text_hash": "a0f6d880357fd09929348103a9289ca96c5c864212648305fa888b968b3d73dc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::DelegateInHost {\n                ref capability,\n                ref briefing_file,\n                ref discipline,\n            } if capability.as_str() == \"implementer\"\n                && briefing_file.as_path() == Path::new(\"tmp/briefing.md\")\n                && discipline.as_str() == \"Do not stage changes.\"\n        ));\n        assert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty());\n\nassert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 9 }\n                if provider.as_str() == \"claude\"\n        ));\n        let invocations = runner.invocations.lock().expect(\"test process recorder lock\");\n        assert_eq!(invocations.len(), 1);\n\nassert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 17 }\n                if provider.as_str() == \"codex\"\n        ));\n        assert_eq!(invocations.len(), 1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProviderPort",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProviderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:dispatch"
+      },
+      "key": {
+        "bound_tests_set_hash": "ca4679a4a7f493c9a46ab4b0d5c127fd4a13b99d74bf7f2283f9f284a1bada30",
+        "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
+        "anchor_text_hash": "5da406c642e68c838923e1c1fe07bccc77c1def3994621c7bfed07e7ade4f6bc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(model, \"gpt-5\");\nassert!(\n    prompt.contains(\"$implementer Briefing: Read tmp/briefing.md and perform the task.\")\n);\nassert_eq!(\n    args,\n    [\n        \"-p\",\n        \"--agent\",\n        \"implementer\",\n        \"--model\",\n        \"claude-opus\",\n        \"$implementer Briefing: Read tmp/briefing.md and perform the task.\\n\\nDo not stage changes.\",\n    ]\n);\nassert!(matches!(\n    adapter.dispatch(&request_from_host(\"codex\")?),\n    Err(CapabilityExecError::AdapterPreflight { .. })\n));\nassert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilitySourcePort",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilitySourcePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_briefing"
+      },
+      "key": {
+        "bound_tests_set_hash": "67885f1864a5ad7465d8b85041d17a0fff0de1b0b5d39760dec79c09b8b28fe6",
+        "declaration_hash": "6134b7798791dac5eda4f93629296d935b42237f17385054a791e1ce1d294249",
+        "anchor_text_hash": "22b3f51b84987472d96029d7397919f22523815d1e56bbd6753deae52a1a47fe"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            adapter.load_briefing(&empty),\n            Err(CapabilityExecError::SourceValidation { .. })\n        ));\n        assert!(matches!(\n            adapter.load_briefing(&invalid_utf8),\n            Err(CapabilityExecError::SourceValidation { .. })\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilitySourcePort",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilitySourcePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_briefing"
+      },
+      "key": {
+        "bound_tests_set_hash": "67885f1864a5ad7465d8b85041d17a0fff0de1b0b5d39760dec79c09b8b28fe6",
+        "declaration_hash": "6134b7798791dac5eda4f93629296d935b42237f17385054a791e1ce1d294249",
+        "anchor_text_hash": "eb1cc8bcd9f2491cdb46edf244d5e90fdd4d0cf8c9b8e5c36a179e7af26fdc9b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "fs::write(&discipline, \"Do not make direct git writes.\").expect(\"discipline is written\");\n...\nassert_eq!(\n    adapter.load_discipline().expect(\"discipline loads\").as_str(),\n    \"Do not make direct git writes.\"\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilitySourcePort",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilitySourcePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_discipline"
+      },
+      "key": {
+        "bound_tests_set_hash": "acca7b78554e0b730efc5388f1815d3bfd3a95fae45a8a70b345b4dcc6842397",
+        "declaration_hash": "6134b7798791dac5eda4f93629296d935b42237f17385054a791e1ce1d294249",
+        "anchor_text_hash": "22b3f51b84987472d96029d7397919f22523815d1e56bbd6753deae52a1a47fe"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            adapter.load_briefing(&briefing).expect(\"briefing loads\").as_str(),\n            \"Perform the task.\"\n        );\n        assert_eq!(\n            adapter.load_discipline().expect(\"discipline loads\").as_str(),\n            \"Do not make direct git writes.\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilitySourcePort",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilitySourcePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_discipline"
+      },
+      "key": {
+        "bound_tests_set_hash": "acca7b78554e0b730efc5388f1815d3bfd3a95fae45a8a70b345b4dcc6842397",
+        "declaration_hash": "6134b7798791dac5eda4f93629296d935b42237f17385054a791e1ce1d294249",
+        "anchor_text_hash": "eb1cc8bcd9f2491cdb46edf244d5e90fdd4d0cf8c9b8e5c36a179e7af26fdc9b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n    adapter.load_briefing(&briefing).expect(\"briefing loads\").as_str(),\n    \"Perform the task.\"\n);\nassert_eq!(\n    adapter.load_discipline().expect(\"discipline loads\").as_str(),\n    \"Do not make direct git writes.\"\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfilesCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfilesCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProfilePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "d2f56407612d9ebe0779487f2b43966c7fdb447254612c6e39d156a1bdacc42e",
+        "declaration_hash": "1d2d5a0394a4a7f48ccf4958e5caef84887fa6f2637e7a65a816193396c95d83",
+        "anchor_text_hash": "93b419fdb13b91a43ef16def48a1207f51ca873a48ab4bdf549912c1bfebea9f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(profile.execution_mode, ExecutionMode::OrchestratorOutput);\n\nassert!(matches!(\n            adapter.resolve(&capability),\n            Err(CapabilityExecError::ProfileResolution { .. })\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfilesCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfilesCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProfilePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "d2f56407612d9ebe0779487f2b43966c7fdb447254612c6e39d156a1bdacc42e",
+        "declaration_hash": "1d2d5a0394a4a7f48ccf4958e5caef84887fa6f2637e7a65a816193396c95d83",
+        "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(profile.provider.as_str(), \"codex\");\n        assert_eq!(profile.model.as_str(), \"gpt-5\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsCapabilitySourceAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsCapabilitySourceAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilitySourcePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "acca7b78554e0b730efc5388f1815d3bfd3a95fae45a8a70b345b4dcc6842397",
+        "declaration_hash": "89df97d82abbb203438c9597c8c6f92ac40cd440a54429ee5733c3532879ef27",
+        "anchor_text_hash": "22b3f51b84987472d96029d7397919f22523815d1e56bbd6753deae52a1a47fe"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            adapter.load_briefing(&empty),\n            Err(CapabilityExecError::SourceValidation { .. })\n        ));\n        assert!(matches!(\n            adapter.load_briefing(&invalid_utf8),\n            Err(CapabilityExecError::SourceValidation { .. })\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsCapabilitySourceAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsCapabilitySourceAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilitySourcePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "acca7b78554e0b730efc5388f1815d3bfd3a95fae45a8a70b345b4dcc6842397",
+        "declaration_hash": "89df97d82abbb203438c9597c8c6f92ac40cd440a54429ee5733c3532879ef27",
+        "anchor_text_hash": "eb1cc8bcd9f2491cdb46edf244d5e90fdd4d0cf8c9b8e5c36a179e7af26fdc9b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            adapter.load_discipline().expect(\"discipline loads\").as_str(),\n            \"Do not make direct git writes.\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "36e6aac5a2aed34fe34673cff0fd752b6e6a2c80d5ce206de1e06dfa4238a121",
+        "declaration_hash": "b2dbf15ef11d68d716ed1a00d797acfd51cc51c65097503d36f61acd045845ed",
+        "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(invocation.0, \"codex\");\nassert_eq!(model, \"gpt-5\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "36e6aac5a2aed34fe34673cff0fd752b6e6a2c80d5ce206de1e06dfa4238a121",
+        "declaration_hash": "b2dbf15ef11d68d716ed1a00d797acfd51cc51c65097503d36f61acd045845ed",
+        "anchor_text_hash": "a0f6d880357fd09929348103a9289ca96c5c864212648305fa888b968b3d73dc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let outcome = adapter.dispatch(&request_from_host(\"codex\")?)?;\n\nassert!(matches!(\n    outcome,\n    CapabilityDispatchOutcome::Executed { ref provider, exit_code: 17 }\n        if provider.as_str() == \"codex\"\n));\n...\nassert_eq!(invocations.len(), 1);\nlet invocation = invocations.first().expect(\"one process invocation is recorded\");\nassert_eq!(invocation.0, \"codex\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "36e6aac5a2aed34fe34673cff0fd752b6e6a2c80d5ce206de1e06dfa4238a121",
+        "declaration_hash": "b2dbf15ef11d68d716ed1a00d797acfd51cc51c65097503d36f61acd045845ed",
+        "anchor_text_hash": "5da406c642e68c838923e1c1fe07bccc77c1def3994621c7bfed07e7ade4f6bc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            prompt.contains(\"$implementer Briefing: Read tmp/briefing.md and perform the task.\")\n        );\n        assert!(prompt.contains(\"Do not stage changes.\"));\n        assert!(!prompt.contains(\"sandbox: workspace-write\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "49625710670eb937c33fd1266e9d86c31cce0a610ff8827fd4b171877e35aa12",
+        "declaration_hash": "bb64a6b9ee0aceff9f88462be2c78f31d7aad4ef10f2976861a1363e139ca31a",
+        "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let outcome = adapter.dispatch(&request_from_host(\"claude\")?)?;\n\nassert!(matches!(\n    outcome,\n    CapabilityDispatchOutcome::DelegateInHost {"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "49625710670eb937c33fd1266e9d86c31cce0a610ff8827fd4b171877e35aa12",
+        "declaration_hash": "bb64a6b9ee0aceff9f88462be2c78f31d7aad4ef10f2976861a1363e139ca31a",
+        "anchor_text_hash": "a0f6d880357fd09929348103a9289ca96c5c864212648305fa888b968b3d73dc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n    outcome,\n    CapabilityDispatchOutcome::DelegateInHost {\n        ref capability,\n        ref briefing_file,\n        ref discipline,\n    } if capability.as_str() == \"implementer\"\n        && briefing_file.as_path() == Path::new(\"tmp/briefing.md\")\n        && discipline.as_str() == \"Do not stage changes.\"\n));\nassert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty());\n\nassert!(matches!(\n    outcome,\n    CapabilityDispatchOutcome::Executed { ref provider, exit_code: 9 }\n        if provider.as_str() == \"claude\"\n));\nlet invocations = runner.invocations.lock().expect(\"test process recorder lock\");\nassert_eq!(invocations.len(), 1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "49625710670eb937c33fd1266e9d86c31cce0a610ff8827fd4b171877e35aa12",
+        "declaration_hash": "bb64a6b9ee0aceff9f88462be2c78f31d7aad4ef10f2976861a1363e139ca31a",
+        "anchor_text_hash": "5da406c642e68c838923e1c1fe07bccc77c1def3994621c7bfed07e7ade4f6bc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            args,\n            [\n                \"-p\",\n                \"--agent\",\n                \"implementer\",\n                \"--model\",\n                \"claude-opus\",\n                \"$implementer Briefing: Read tmp/briefing.md and perform the task.\\n\\nDo not stage changes.\",\n            ]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "e89df3f5460b2109e637e92f5e55b0b0754daa9e8ae2001961bf7a6e8c3a427b",
+        "declaration_hash": "a8b3723ba2d9eb9ea6c9be0a6ed06b3ff8dabc5e2c542a62108adda9c8925d48",
+        "anchor_text_hash": "1fa3887f5acdc4aaeb3837680e97afb2758a1990f9ff6788022ecc982ae5a9e8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(outcome.stdout.as_deref().is_some_and(|output| output.starts_with(\"CAPABILITY_EXEC_OUTCOME: executed\"))); ... assert!(output.contains(\"CAPABILITY_EXEC_OUTCOME: delegate-in-host\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityDispatchOutcome",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityDispatchOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "87c9266d71f08000a1204757b490acd1cfa9b5af2343a515d4e18819353e222f",
+        "declaration_hash": "a8b3723ba2d9eb9ea6c9be0a6ed06b3ff8dabc5e2c542a62108adda9c8925d48",
+        "anchor_text_hash": "49f21c376c276e34386b1584faccdceef001814544a22f67c5622f4e4ac00e9c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(output.contains(\"CAPABILITY_EXEC_OUTCOME: delegate-in-host\")); assert!(output.contains(\"capability: implementer\")); assert!(output.contains(\"briefing_file: tmp/briefing.md\")); assert!(output.contains(\"no direct git writes\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityDispatchRequest",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityDispatchRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "2405b7f4781823ee59679130f9383dc40d038ee76c1580d3ac746c9b458b499a",
+        "declaration_hash": "1d7bf6f4b292da8a6b9a9ef1c226ca08e2bb5ecc2fa11bf7a72aea2dd84002b0",
+        "anchor_text_hash": "22b3f51b84987472d96029d7397919f22523815d1e56bbd6753deae52a1a47fe"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(recorded[0].briefing.as_str(), \"perform the task\");\n        assert_eq!(recorded[0].discipline.as_str(), \"no direct git writes\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityDispatchRequest",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityDispatchRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "45045dcec1eb0a75ff703c5f157fd8c2fcce5573dfd35b4cdacc5e6fb5e875a2",
+        "declaration_hash": "1d7bf6f4b292da8a6b9a9ef1c226ca08e2bb5ecc2fa11bf7a72aea2dd84002b0",
+        "anchor_text_hash": "a0f6d880357fd09929348103a9289ca96c5c864212648305fa888b968b3d73dc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(recorded[0].request.host.as_str(), \"codex\"); ... assert!(matches!(outcome, CapabilityDispatchOutcome::DelegateInHost { ... })); assert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty()); ... let outcome = adapter.dispatch(&request_from_host(\"codex\")?)?; assert!(matches!(outcome, CapabilityDispatchOutcome::Executed { ref provider, exit_code: 9 } if provider.as_str() == \"claude\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityDispatchRequest",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityDispatchRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "2405b7f4781823ee59679130f9383dc40d038ee76c1580d3ac746c9b458b499a",
+        "declaration_hash": "1d7bf6f4b292da8a6b9a9ef1c226ca08e2bb5ecc2fa11bf7a72aea2dd84002b0",
+        "anchor_text_hash": "5da406c642e68c838923e1c1fe07bccc77c1def3994621c7bfed07e7ade4f6bc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(recorded[0].request.capability.as_str(), \"implementer\");\n        assert_eq!(recorded[0].request.host.as_str(), \"codex\");\n        assert_eq!(recorded[0].profile.provider.as_str(), \"codex\");\n        assert_eq!(recorded[0].profile.model.as_str(), \"gpt-5\");\n        assert_eq!(recorded[0].briefing.as_str(), \"perform the task\");\n        assert_eq!(recorded[0].discipline.as_str(), \"no direct git writes\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityConfigDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "50193c6f040dc638ccb9e9541d0fe90ee1542d5825c018b3bf6ec13bab4ad43a",
+        "declaration_hash": "e137e2b1defbd3edf02404dcfab572706a5da25ef15690484c1cce9b20d20ed6",
+        "anchor_text_hash": "93b419fdb13b91a43ef16def48a1207f51ca873a48ab4bdf549912c1bfebea9f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(implementer.execution_mode(), ExecutionModeDto::OrchestratorOutput); ... assert_eq!(reviewer.execution_mode(), ExecutionModeDto::TypedPipeline); ... assert!(matches!(\n            AgentProfiles::load(directory.path(), &directory.path().join(\"agent-profiles.json\"),),\n            Err(crate::agent_profiles::AgentProfilesError::Parse(_))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfilesError",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfilesError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "d8f70a3e20e77bc72cbf50ef997bbae17a799b2d440102e9754306a05c1863a2",
+        "declaration_hash": "dea20c2bf0910026c70ed36e27d6aa01f061e71e77d2705d576a303f2371d2b9",
+        "anchor_text_hash": "93b419fdb13b91a43ef16def48a1207f51ca873a48ab4bdf549912c1bfebea9f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            AgentProfiles::load(directory.path(), &directory.path().join(\"agent-profiles.json\"),),\n            Err(crate::agent_profiles::AgentProfilesError::Parse(_))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfilesError",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfilesError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "d8f70a3e20e77bc72cbf50ef997bbae17a799b2d440102e9754306a05c1863a2",
+        "declaration_hash": "dea20c2bf0910026c70ed36e27d6aa01f061e71e77d2705d576a303f2371d2b9",
+        "anchor_text_hash": "1fc48eb1b622a351fa6bb6938ddb140c3349c38fe2c9c952f4bba8c16200624a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(err, AgentProfilesError::Symlink { .. }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "5d80a1e91ad99f9b4003296e694d76643a04af6b06557c82d4fda670cf93d1fd",
+        "declaration_hash": "1bbcfca6d24b0c3c02afd7180148e7f71dbf4912e0c34f53fc780117ea54cfd1",
+        "anchor_text_hash": "dc0e5e2b0f7f96ae2ee897b80be8efcabfaa0cc7a10e86150bb67621a21bf7b0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "`assert!(matches!( adapter.dispatch(&request_from_host(\"claude\")?), Err(CapabilityExecError::AdapterPreflight { .. }) ))` and `assert!(matches!( outcome, CapabilityDispatchOutcome::DelegateInHost {`"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "980acf0ddad43fa7e2d8b5b2e3c4abf94c684e05a348ae19fd5a52949c9a9227",
+        "declaration_hash": "1bbcfca6d24b0c3c02afd7180148e7f71dbf4912e0c34f53fc780117ea54cfd1",
+        "anchor_text_hash": "60aadc4947e75761f9f2c823474394fd9151014260e1e8473ec459d5d17b2a3c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "args,\n            [\n                \"-p\",\n                \"--agent\",\n                \"implementer\",\n                \"--model\",\n                \"claude-opus\",\n                \"$implementer Briefing: Read tmp/briefing.md and perform the task.\\n\\nDo not stage changes.\",\n            ]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "ab416e1e0af26b4ff115edc2644eb930fb56dfad45424c8091feb95b4a32d716",
+        "declaration_hash": "622716c1a23bd4fa1e75114be2231b90b1aac0081b672655c082f4bfd19b44e5",
+        "anchor_text_hash": "dc0e5e2b0f7f96ae2ee897b80be8efcabfaa0cc7a10e86150bb67621a21bf7b0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(workspace_write_flag, \"--sandbox\");\n        assert_eq!(workspace_write_sandbox, \"workspace-write\");\n...\nassert_eq!(default_flag, \"--sandbox\");\n        assert_eq!(default_sandbox, \"read-only\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProviderPort",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProviderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:provider"
+      },
+      "key": {
+        "bound_tests_set_hash": "66823796501a28dc0d06a70fbc924522dac007fc17485a0e8152a84a09b23c2b",
+        "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
+        "anchor_text_hash": "5da406c642e68c838923e1c1fe07bccc77c1def3994621c7bfed07e7ade4f6bc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            prompt.contains(\"$implementer Briefing: Read tmp/briefing.md and perform the task.\")\n        );\n        assert!(!prompt.contains(\"sandbox: workspace-write\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "6128062444826755f8777efa95f847533daa74021b34f05de795a5417fa6448e",
+        "declaration_hash": "622716c1a23bd4fa1e75114be2231b90b1aac0081b672655c082f4bfd19b44e5",
+        "anchor_text_hash": "60aadc4947e75761f9f2c823474394fd9151014260e1e8473ec459d5d17b2a3c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(model, \"gpt-5\"); ... assert!(prompt.contains(\"$implementer Briefing: Read tmp/briefing.md and perform the task.\")); ... assert!(prompt.contains(\"Do not stage changes.\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ExecutionModeDto",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ExecutionModeDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "d645a243ac73ca25f1086efcc828b9bc5089e6d17e22c07eefbf56ec8c96ae11",
+        "declaration_hash": "d07bc08d5b459e6baaacb7bfb98ed067a23374f450844741183ea97c225bb633",
+        "anchor_text_hash": "93b419fdb13b91a43ef16def48a1207f51ca873a48ab4bdf549912c1bfebea9f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(profile.execution_mode, ExecutionMode::OrchestratorOutput);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ExecutionModeDto",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ExecutionModeDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "d645a243ac73ca25f1086efcc828b9bc5089e6d17e22c07eefbf56ec8c96ae11",
+        "declaration_hash": "d07bc08d5b459e6baaacb7bfb98ed067a23374f450844741183ea97c225bb633",
+        "anchor_text_hash": "4dc838c0a42ee3797b87a099ced1fc3e18d2976fe1591367959776480e417813"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(profile.execution_mode, ExecutionMode::OrchestratorOutput);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ModelNameDto",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ModelNameDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "d645a243ac73ca25f1086efcc828b9bc5089e6d17e22c07eefbf56ec8c96ae11",
+        "declaration_hash": "700118bc036db1291a51b2b82b42393ede5fd19640028c442b5d72517eb74a8f",
+        "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(profile.model.as_str(), \"gpt-5\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ModelNameDto",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ModelNameDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "d645a243ac73ca25f1086efcc828b9bc5089e6d17e22c07eefbf56ec8c96ae11",
+        "declaration_hash": "700118bc036db1291a51b2b82b42393ede5fd19640028c442b5d72517eb74a8f",
+        "anchor_text_hash": "4dc838c0a42ee3797b87a099ced1fc3e18d2976fe1591367959776480e417813"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(profile.model.as_str(), \"gpt-5\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderNameDto",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderNameDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "d645a243ac73ca25f1086efcc828b9bc5089e6d17e22c07eefbf56ec8c96ae11",
+        "declaration_hash": "5162ae883a3b5d96ac55cd29dc9b1eaaa9f779623159f8a32c9ac1097929d830",
+        "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(profile.provider.as_str(), \"codex\");\n        assert_eq!(profile.model.as_str(), \"gpt-5\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderNameDto",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderNameDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "d645a243ac73ca25f1086efcc828b9bc5089e6d17e22c07eefbf56ec8c96ae11",
+        "declaration_hash": "5162ae883a3b5d96ac55cd29dc9b1eaaa9f779623159f8a32c9ac1097929d830",
+        "anchor_text_hash": "4dc838c0a42ee3797b87a099ced1fc3e18d2976fe1591367959776480e417813"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(profile.provider.as_str(), \"codex\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SandboxMode",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SandboxMode",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "b8325ffb5c76216e205e67531fffc9a8ebeb53a72fb0ad21d191be9ea1d8a700",
+        "declaration_hash": "c76a9b77533d8b8754ae968f1f1a61d1206a3ab9789def69e17c8bc89ebf76b7",
+        "anchor_text_hash": "dc0e5e2b0f7f96ae2ee897b80be8efcabfaa0cc7a10e86150bb67621a21bf7b0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "sandbox_mode_from_skill(definition, \"implementer\"),\n            Ok(SandboxMode::WorkspaceWrite)"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SandboxMode",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SandboxMode",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "a96ab725453e65479bca37380dcc772376b417f2ff5fbade2d6cbc8dd4376bc4",
+        "declaration_hash": "c76a9b77533d8b8754ae968f1f1a61d1206a3ab9789def69e17c8bc89ebf76b7",
+        "anchor_text_hash": "d947cdb1cb242f0db1823885f87b956fa8096b938eea8de22efd0754b473300c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(sandbox_mode_from_skill(definition, \"implementer\"), Ok(SandboxMode::ReadOnly));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityDriver",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "7b4a59cc0ea97a7e898def5457ef7a0a7badf5ce656e88beab4471f5642182aa",
+        "declaration_hash": "f4cd3548df02dd03268fe666c039d4687a3b7ec647cbb06993457d1a9317f317",
+        "anchor_text_hash": "41a99b4a112a12c20eafbcb494dddbb6ecea9e13482b19723b40b48e07a5f32d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(recorded[0].profile.provider.as_str(), \"codex\");\n        assert_eq!(recorded[0].profile.model.as_str(), \"gpt-5\");\n        assert_eq!(recorded[0].request.capability.as_str(), \"implementer\");\n        assert_eq!(recorded[0].request.host.as_str(), \"codex\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityDriver",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "52569cf18e1a5d484813855d9b7e8bb56b40d9bff8579f51319a5620790dff79",
+        "declaration_hash": "f4cd3548df02dd03268fe666c039d4687a3b7ec647cbb06993457d1a9317f317",
+        "anchor_text_hash": "1fa3887f5acdc4aaeb3837680e97afb2758a1990f9ff6788022ecc982ae5a9e8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(output.contains(\"CAPABILITY_EXEC_OUTCOME: delegate-in-host\"));\nassert!(output.contains(\"capability: implementer\"));\nassert!(output.contains(\"briefing_file: tmp/briefing.md\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "42247cd8eb2203fbc3a92155eef88aae83ff02c037b0c33c6fa206cc741c905d",
+        "declaration_hash": "2b97475d553d82b9bb3bd2b7b9752c5129a0bbd32d4e603bfca1ecd46eec268c",
+        "anchor_text_hash": "7f1a2797927297a54fa31d32d685ec612e4c42da834648380221724fac13dd27"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "match cli.command {\n            CapabilityCommand::Exec(CapabilityExecArgs { capability, host, briefing_file }) => {\n                assert_eq!(\n                    capability,\n                    \"implementer\".parse::<CapabilityNameArg>().expect(\"valid test capability\")\n                );\n                assert_eq!(host, \"codex\".parse::<ProviderNameArg>().expect(\"valid test provider\"));\n                assert_eq!(\n                    briefing_file,\n                    \"tmp/briefing.md\"\n                        .parse::<CapabilityFilePathArg>()\n                        .expect(\"valid test briefing path\")\n                );\n            }\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityNameArg",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityNameArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "06bd4f4a7e576d8e13237f4c935dd30639b38aac08f45183ef24f7387f30142c",
+        "declaration_hash": "6b6d1b8bffd33f53e3e31b487193541db56d402ed99f95db843314b2dd330a73",
+        "anchor_text_hash": "7f1a2797927297a54fa31d32d685ec612e4c42da834648380221724fac13dd27"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"sotp\", \"exec\", \"implementer\", \"--host\", \"codex\", \"--briefing-file\", \"tmp/briefing.md\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityNameArg",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityNameArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "7b1cb4528d37d81a2f32f5eba1e1e4f297108b787587c5701fa533764ab2dc16",
+        "declaration_hash": "6b6d1b8bffd33f53e3e31b487193541db56d402ed99f95db843314b2dd330a73",
+        "anchor_text_hash": "1fc48eb1b622a351fa6bb6938ddb140c3349c38fe2c9c952f4bba8c16200624a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(TestCli::try_parse_from([\"sotp\", \"exec\", \"implementer\"]).is_err());\nassert!(\n    TestCli::try_parse_from([\n        \"sotp\",\n        \"exec\",\n        \" \",\n        \"--host\",\n        \"codex\",\n        \"--briefing-file\",\n        \"tmp/briefing.md\",\n    ])\n    .is_err()\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderNameArg",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderNameArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "42247cd8eb2203fbc3a92155eef88aae83ff02c037b0c33c6fa206cc741c905d",
+        "declaration_hash": "e368aa772f0b8826b88475ed29d3e1b9de7cf6c40720ce65ec01e803a939481e",
+        "anchor_text_hash": "7f1a2797927297a54fa31d32d685ec612e4c42da834648380221724fac13dd27"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(host, \"codex\".parse::<ProviderNameArg>().expect(\"valid test provider\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderNameArg",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderNameArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "42247cd8eb2203fbc3a92155eef88aae83ff02c037b0c33c6fa206cc741c905d",
+        "declaration_hash": "e368aa772f0b8826b88475ed29d3e1b9de7cf6c40720ce65ec01e803a939481e",
+        "anchor_text_hash": "a0f6d880357fd09929348103a9289ca96c5c864212648305fa888b968b3d73dc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(host, \"codex\".parse::<ProviderNameArg>().expect(\"valid test provider\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "a9959fc9eefaccd4915800ccb7c673dbc6ef10deb49c71095038a6c0f42214ca",
+        "declaration_hash": "4ef170a36bd947cdfb93e66bdb9b80442f698086948d4e1cbb4d5ebf8acaef73",
+        "anchor_text_hash": "41a99b4a112a12c20eafbcb494dddbb6ecea9e13482b19723b40b48e07a5f32d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let outcome = root.capability_driver().handle(input());\nlet output = outcome.stdout.expect(\"in-host instruction is rendered\");\n\nassert_eq!(outcome.exit_code, 0);\nassert!(output.contains(\"CAPABILITY_EXEC_OUTCOME: delegate-in-host\"));\nassert!(output.contains(\"capability: implementer\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "a2f5988162de301b3d37c8c0c47a5df4d9e24f664881d0b143f9eddc43340ff8",
+        "declaration_hash": "4ef170a36bd947cdfb93e66bdb9b80442f698086948d4e1cbb4d5ebf8acaef73",
+        "anchor_text_hash": "dc0e5e2b0f7f96ae2ee897b80be8efcabfaa0cc7a10e86150bb67621a21bf7b0"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(outcome.exit_code, 0);\n        assert!(outcome.stderr.as_deref().is_some_and(|error| error.contains(\"tools field\")));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityCommand",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "42247cd8eb2203fbc3a92155eef88aae83ff02c037b0c33c6fa206cc741c905d",
+        "declaration_hash": "bee7e7c497f933044122d8b0c8988711bff57fb0719db1c2222e04ff81c54d3c",
+        "anchor_text_hash": "7f1a2797927297a54fa31d32d685ec612e4c42da834648380221724fac13dd27"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let cli = TestCli::try_parse_from([\n            \"sotp\",\n            \"exec\",\n            \"implementer\",\n            \"--host\",\n            \"codex\",\n            \"--briefing-file\",\n            \"tmp/briefing.md\",\n        ])\n        .expect(\"valid capability command parses\");\n\n        match cli.command {\n            CapabilityCommand::Exec(CapabilityExecArgs { capability, host, briefing_file }) => {\n                assert_eq!(\n                    capability,\n                    \"implementer\".parse::<CapabilityNameArg>().expect(\"valid test capability\")\n                );\n                assert_eq!(host, \"codex\".parse::<ProviderNameArg>().expect(\"valid test provider\"));\n                assert_eq!(\n                    briefing_file,\n                    \"tmp/briefing.md\"\n                        .parse::<CapabilityFilePathArg>()\n                        .expect(\"valid test briefing path\")\n                );\n            }\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CliCommand",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CliCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "7683588af24cc1594114ac80a66c0e84463ac7021e4e79fb600aa4e35c32a04f",
+        "declaration_hash": "d6c922d2ebae201a7b290b204148becaa1d08cc82e7cbd774923b5f95ef28fa3",
+        "anchor_text_hash": "7f1a2797927297a54fa31d32d685ec612e4c42da834648380221724fac13dd27"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            matches!(cli.command, Some(CliCommand::Capability { .. })),\n            \"capability exec must select the Capability variant\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CliCommand",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CliCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "8b242d366fa5486724a3582f843a22e9804b7a1191e086a132516ae4a95e8e66",
+        "declaration_hash": "d6c922d2ebae201a7b290b204148becaa1d08cc82e7cbd774923b5f95ef28fa3",
+        "anchor_text_hash": "af315e92c0dd919e74d61ae3dbbfac521365b851a945eaad4f76131955fcd06e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Cli::try_parse_from([\"sotp\", \"plan\", \"codex-local\"]).is_err()"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecArgs",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "42247cd8eb2203fbc3a92155eef88aae83ff02c037b0c33c6fa206cc741c905d",
+        "declaration_hash": "86d80cbf4131d9b8fcbecc6ce7c190cb2192612ec55486180b771be891faf4d0",
+        "anchor_text_hash": "7f1a2797927297a54fa31d32d685ec612e4c42da834648380221724fac13dd27"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "CapabilityCommand::Exec(CapabilityExecArgs { capability, host, briefing_file }) => {\n                assert_eq!(\n                    capability,\n                    \"implementer\".parse::<CapabilityNameArg>().expect(\"valid test capability\")\n                );\n                assert_eq!(host, \"codex\".parse::<ProviderNameArg>().expect(\"valid test provider\"));\n                assert_eq!(\n                    briefing_file,\n                    \"tmp/briefing.md\"\n                        .parse::<CapabilityFilePathArg>()\n                        .expect(\"valid test briefing path\")\n                );\n            }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::capability::execute",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::capability::execute",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "794702efd72f8970f071348916c4ec91293abda0defd673aea56793e7822426c",
+        "declaration_hash": "2dfab6ab05f95b8392cc11d7622d8c5983f325678da0550d97502cb448f8048d",
+        "anchor_text_hash": "7f1a2797927297a54fa31d32d685ec612e4c42da834648380221724fac13dd27"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let args = forwarded.expect(\"Exec variant is forwarded to its execution helper\");\n        assert_eq!(args.capability, \"implementer\".parse::<CapabilityNameArg>().expect(\"valid test capability\"));\n        assert_eq!(args.host, \"codex\".parse::<ProviderNameArg>().expect(\"valid test provider\"));\n        assert_eq!(args.briefing_file, \"tmp/briefing.md\".parse::<CapabilityFilePathArg>().expect(\"valid test briefing path\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::capability::execute_exec",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::capability::execute_exec",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "b38037c4f441c143e0c113431926629eed625abcd8c5913dbd03a26b8b7d9d87",
+        "declaration_hash": "22e16cbdcaf00503f652f84ba5a67a4be1973b2833ed0d4090f97ad7af9dfa9a",
+        "anchor_text_hash": "7f1a2797927297a54fa31d32d685ec612e4c42da834648380221724fac13dd27"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let cli = TestCli::try_parse_from([\n            \"sotp\",\n            \"exec\",\n            \"implementer\",\n            \"--host\",\n            \"codex\",\n            \"--briefing-file\",\n            \"tmp/obligation-test-missing-briefing.md\",\n        ])\n        .expect(\"valid capability command parses\");\n\n        assert_eq!(execute(cli.command), std::process::ExitCode::FAILURE);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::capability::execute_with",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::capability::execute_with",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "0f7d16e68cb3d0c5240ef6e18f0136d615015bb0b65dc02a2f3e33a8ed1675d4",
+        "declaration_hash": "2343e4f2c72c359db84ec6001af3582942d952e0a3a045216a72a5e4ff1fdb25",
+        "anchor_text_hash": "7f1a2797927297a54fa31d32d685ec612e4c42da834648380221724fac13dd27"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let command = CapabilityCommand::Exec(CapabilityExecArgs {\n            capability: \"implementer\".parse().expect(\"valid test capability\"),\n            host: \"codex\".parse().expect(\"valid test provider\"),\n            briefing_file: \"tmp/briefing.md\".parse().expect(\"valid test briefing path\"),\n        });\n        let mut forwarded = None;\n\n        let exit = execute_with(command, |args| {\n            forwarded = Some(args);\n            std::process::ExitCode::SUCCESS\n        });\n\n        assert_eq!(exit, std::process::ExitCode::SUCCESS);\n        let args = forwarded.expect(\"Exec variant is forwarded to its execution helper\");\n        assert_eq!(\n            args.capability,\n            \"implementer\".parse::<CapabilityNameArg>().expect(\"valid test capability\")\n        );\n        assert_eq!(args.host, \"codex\".parse::<ProviderNameArg>().expect(\"valid test provider\"));\n        assert_eq!(\n            args.briefing_file,\n            \"tmp/briefing.md\".parse::<CapabilityFilePathArg>().expect(\"valid test briefing path\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfiles",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfiles",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "6e669ece802a240101a5f441e1895f4fbbfebf9e87d828543ece27d25b3e2b29",
+        "declaration_hash": "a5d2d85f52b537e39ca4c5498ef140e906701bd4be36ed211e356e908ff791ee",
+        "anchor_text_hash": "93b419fdb13b91a43ef16def48a1207f51ca873a48ab4bdf549912c1bfebea9f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"execution_mode\": \"orchestrator-output\"; assert_eq!(profile.execution_mode, ExecutionMode::OrchestratorOutput); \"execution_mode\": \"typed-pipeline\"; Err(CapabilityExecError::ProfileResolution { .. }); \"execution_mode\": \"future-mode\"; Err(CapabilityExecError::ProfileResolution { .. }); Err(crate::agent_profiles::AgentProfilesError::Parse(_)); \"capabilities\": {}"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfiles",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfiles",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "b73c47f38f3120b34c9ce83a813d321b127aa5bff1093efb357b596e5e816ffc",
+        "declaration_hash": "a5d2d85f52b537e39ca4c5498ef140e906701bd4be36ed211e356e908ff791ee",
+        "anchor_text_hash": "1fc48eb1b622a351fa6bb6938ddb140c3349c38fe2c9c952f4bba8c16200624a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            adapter.resolve(&capability),\n            Err(CapabilityExecError::ProfileResolution { .. })\n        ));\n\nassert!(matches!(\n            adapter.resolve(&capability),\n            Err(CapabilityExecError::ModelMissing { .. })\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfilesCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfilesCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "d61548976f59d273a4da47f6611f06769c57f80e7686593757b42a75739381a9",
+        "declaration_hash": "52a98de7c82ccda40ce2e054fa3410d04cd26e5a8e91954aadf0e181c9ca836a",
+        "anchor_text_hash": "1fc48eb1b622a351fa6bb6938ddb140c3349c38fe2c9c952f4bba8c16200624a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            adapter.resolve(&capability),\n            Err(CapabilityExecError::ProfileResolution { .. })\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityFilePathArg",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityFilePathArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "42247cd8eb2203fbc3a92155eef88aae83ff02c037b0c33c6fa206cc741c905d",
+        "declaration_hash": "9e8246ab79cfe15d97b02fd158cedcdc956843fe3816da3339156fd26d9b0194",
+        "anchor_text_hash": "7f1a2797927297a54fa31d32d685ec612e4c42da834648380221724fac13dd27"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "CapabilityCommand::Exec(CapabilityExecArgs { capability, host, briefing_file }) => {\n                assert_eq!(\n                    capability,\n                    \"implementer\".parse::<CapabilityNameArg>().expect(\"valid test capability\")\n                );\n                assert_eq!(host, \"codex\".parse::<ProviderNameArg>().expect(\"valid test provider\"));\n                assert_eq!(\n                    briefing_file,\n                    \"tmp/briefing.md\"\n                        .parse::<CapabilityFilePathArg>()\n                        .expect(\"valid test briefing path\")\n                );\n            }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityFilePathArg",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityFilePathArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "7249bc49fb2e27f23b18baf05e915365b2224dec769fa8cd4197e1f87b6f4137",
+        "declaration_hash": "9e8246ab79cfe15d97b02fd158cedcdc956843fe3816da3339156fd26d9b0194",
+        "anchor_text_hash": "1fc48eb1b622a351fa6bb6938ddb140c3349c38fe2c9c952f4bba8c16200624a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "TestCli::try_parse_from([\n                \"sotp\",\n                \"exec\",\n                \"implementer\",\n                \"--host\",\n                \"codex\",\n                \"--briefing-file\",\n                \"../briefing.md\",\n            ])\n            .is_err()"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ]
+}

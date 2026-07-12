@@ -85,7 +85,7 @@ Apply `knowledge/conventions/prefer-type-safe-abstractions.md` (Newtype / Enum-f
 ## Scope Ownership
 
 - **Writes permitted**: `track/items/<id>/impl-plan.json` (direct), `track/items/<id>/task-coverage.json` (direct), `track/items/<id>/task-contract.json` (direct).
-- **Writes forbidden**: any other track's artifacts, other capabilities' SSoT files (`spec.json`, `<layer>-types.json`, `metadata.json`), `plan.md`, any file under `knowledge/adr/` or `knowledge/conventions/`, any source code.
+- **Writes forbidden**: any other track's artifacts, other capabilities' SSoT files (`spec.json`, `<layer>-types.json`, `metadata.json`), `plan.md`, any file under `knowledge/adr/` or `knowledge/conventions/`, any source code, and track task-state transitions through `bin/sotp track transition`; this capability has no task-state transition authority.
 - **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp verify plan-artifact-refs`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
 - Do not spawn further agents (keep planning deterministic and serial).
 - If information beyond the briefing is needed, note it in `## Open Questions` rather than probing silently via exploration.

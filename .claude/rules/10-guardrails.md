@@ -80,10 +80,10 @@ To avoid unnecessary retries:
 - `codex exec` / `gemini -p`: do not embed prompts containing protected git keywords. Write the prompt to a briefing file first.
 - heredoc / `cat >`: also scanned. Use the Write/Edit tool instead.
 - **New file creation**: The `Write` tool rejects writes to unread files, so first `Read` the target path (an error is returned if the file does not exist). Then `Write` can create it. `touch` is in `FORBIDDEN_ALLOW` and must not be added to `allow`.
-- Fallback: when Codex is blocked by the hook, use the native subcommands with `--briefing-file`:
-  - Planner: `bin/sotp plan codex-local --model {model} --briefing-file <path>`
+- Fallback: when a profile-routed capability is blocked by the hook, use the native subcommands with `--briefing-file`:
+  - Capability: `bin/sotp capability exec <capability> --host claude --briefing-file <path>`
   - Reviewer: `bin/sotp review local --round-type {fast|final} --group {scope} --model {model} --briefing-file <path>`
-  - These subcommands convert the briefing file path to `"Read {path} and perform the task"` internally, keeping git keywords out of the Bash command string.
+  - These subcommands convert the briefing file path to `"Read {path} and perform the task"` internally, keeping git keywords out of the Bash command string. `capability exec` also resolves the profile model, validates the provider-native definition, and applies its declared sandbox and shared discipline.
 
 ## Sandbox and Hook Coverage Warning (External Subprocesses)
 
@@ -108,12 +108,8 @@ Do not use `--full-auto` for `reviewer` or `researcher` — use `--sandbox read-
 
 **Rules for `workspace-write` usage:**
 
-1. Prefer `read-only` for `planner` / `reviewer` / `researcher` — they should never need to write files.
-2. When `implementer` is routed to an external provider with `workspace-write`, instruct it explicitly:
-   - Do not run `git add` or `git commit` directly.
-   - Do not run `git push` under any circumstance.
-   - For selective staging, write repo-relative paths to `tmp/track-commit/add-paths.txt` and run `cargo make track-add-paths`.
-   - For guarded commits, use `/track:commit` or the exact wrappers `cargo make track-commit-message` / `cargo make track-note`.
+1. Prefer `read-only` for `researcher` and `rollback-diagnoser` — they should never need to write files.
+2. When an external `orchestrator-output` capability needs `workspace-write` (for example, `implementer`), invoke it through `bin/sotp capability exec`. The dispatcher derives the sandbox from the provider-native skill and injects the shared no-direct-git discipline; do not bypass that path with a hand-assembled provider command. Typed-pipeline capabilities keep their dedicated routes.
 3. Hook protections apply to all operations performed during autonomous task execution.
    Do not bypass hook coverage by routing through external subprocesses.
 

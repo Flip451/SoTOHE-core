@@ -16,11 +16,10 @@ separate caller decision.
 ## Inputs
 
 - **Current branch** — must match `track/<id>`. If not, stop and report.
-- **`pr-reviewer` provider** — read from `.harness/config/agent-profiles.json`
-  (`capabilities.pr-reviewer`). The provider must support structured PR review output (the
-  current structured provider set is `codex`). If the configured provider is not in the
-  structured set, fail with a clear error and direct the caller to use the `review` workflow
-  instead.
+- **`pr-reviewer` provider** — `sotp pr review-cycle` resolves
+  `capabilities.pr-reviewer` internally from `.harness/config/agent-profiles.json` and
+  fail-closes unless it supports structured PR review output (currently `codex`). On that
+  failure, direct the caller to use the `review` workflow instead.
 - **Local-review provider** — does NOT affect this workflow. Setting `reviewer.provider: claude`
   for local review leaves PR-based review on the `pr-reviewer` provider unchanged.
 - **`gh` CLI** — must be authenticated.
@@ -34,10 +33,9 @@ separate caller decision.
 
 **Step 0: Resolve context**
 
-Resolve the current track from the current git branch (`track/<id>`). Read `metadata.json`
-to confirm track status. Read `.harness/config/agent-profiles.json` to verify the `pr-reviewer`
-provider supports structured output. If the `pr-reviewer` provider is not in the structured
-provider set, fail with a clear error message.
+Resolve the current track from the current git branch (`track/<id>`) and read `metadata.json`
+to confirm track status. `sotp pr review-cycle` performs the `pr-reviewer` structured-output
+preflight internally; surface its fail-closed error if it rejects the configured provider.
 
 **Step 1: Push and ensure PR**
 

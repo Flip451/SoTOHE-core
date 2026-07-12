@@ -196,7 +196,7 @@ mod tests {
         let path = dir.path().join("agent-profiles.json");
         std::fs::write(&path, r#"{ "schema_version": 1, "providers": {}, "capabilities": {} }"#)
             .unwrap();
-        let profile = AgentProfiles::load(&path).unwrap();
+        let profile = AgentProfiles::load(dir.path(), &path).unwrap();
         let err =
             resolve_execution_or_err(&profile, "obligation-fulfillment-verifier", RoundType::Fast)
                 .unwrap_err();

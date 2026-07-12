@@ -402,12 +402,14 @@ mod tests {
     "ref-verifier-chain1": {
       "provider": "claude",
       "model": "claude-test",
-      "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
+      "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md",
+      "execution_mode": "typed-pipeline"
     },
     "ref-verifier-chain2": {
       "provider": "claude",
       "model": "claude-test",
-      "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md"
+      "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md",
+      "execution_mode": "typed-pipeline"
     }
   }
 }"#,

@@ -1,0 +1,2655 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ede1b72159ac1af4186d488aa5a9e0df80bd8540adbaaf1576eaafe0b5ebfb66",
+          "at": "2026-07-12T00:15:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ede1b72159ac1af4186d488aa5a9e0df80bd8540adbaaf1576eaafe0b5ebfb66",
+          "at": "2026-07-12T00:17:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7544c09b23b505f58d22a08e28aefdbde28785ae4b677a0c08ad704ef9ebcf7",
+          "at": "2026-07-12T08:36:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7544c09b23b505f58d22a08e28aefdbde28785ae4b677a0c08ad704ef9ebcf7",
+          "at": "2026-07-12T08:37:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68cd6ab586a21d216f76fe96061607729febdf39f1505cfb1d8d308f0bd805b4",
+          "at": "2026-07-12T09:10:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a67f1053f1fecaca7b2ad9bdbcd7fd6e90eef8d99f16e8ba9a9de0aa6a22b327",
+          "at": "2026-07-12T10:06:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a67f1053f1fecaca7b2ad9bdbcd7fd6e90eef8d99f16e8ba9a9de0aa6a22b327",
+          "at": "2026-07-12T10:08:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b995ff17a44748c94e0211bd843e576b3c21f5186402e3ccfeed053358d43a6",
+          "at": "2026-07-12T11:31:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b995ff17a44748c94e0211bd843e576b3c21f5186402e3ccfeed053358d43a6",
+          "at": "2026-07-12T11:31:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b995ff17a44748c94e0211bd843e576b3c21f5186402e3ccfeed053358d43a6",
+          "at": "2026-07-12T11:33:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The fulfillment cache is stale relative to the current bindings/test bodies. `bin/sotp test-obligation check --track-id capability-exec-unified-dispatch-2026-07-11` fails with `TestChanged` drifts for CapabilityProviderPort edges IN-03 (two obligations), IN-06, IN-07, and CapabilityDriver GO-01. Re-run the host-owned evaluation to freeze verdicts for the current hashes before committing these artifacts.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/obligation-fulfillment-cache.json",
+              "line": 378,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f8cbf93736595ac84dec750cfdc919f7411c68f07a46d3be858736df3676415b",
+          "at": "2026-07-12T18:08:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The frozen verdict cache is stale. `bin/sotp test-obligation check --track-id capability-exec-unified-dispatch-2026-07-11` fails with five `TestChanged` drifts: two for `CapabilityProviderPort × IN-03`, and one each for `CapabilityProviderPort × IN-06`, `CapabilityProviderPort × IN-07`, and `CapabilityDriver × GO-01`. Re-run the host-owned evaluation after the binding/test changes and commit the regenerated cache; the stated 79-edge passing gate is not reproducible from these artifacts.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/obligation-fulfillment-cache.json",
+              "line": 426,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f8cbf93736595ac84dec750cfdc919f7411c68f07a46d3be858736df3676415b",
+          "at": "2026-07-12T18:08:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f76f857a6660af6ecd865c711bcf030eccea5e33e8bfa4cbd59165b6e068487",
+          "at": "2026-07-12T18:11:30Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
+          "at": "2026-07-11T21:56:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 は briefing 規律を全 dispatch 経路で保証するとしているが、subprocess prompt に検証済み briefing と discipline 本文が含まれることを証明する AC がない。AC-03 は事前検証、AC-05 は in-host payload、AC-06 は native adapter の起動形式しか確認しないため、subprocess が両本文を欠落させても全 AC を満たせる。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+              "line": 34,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
+          "at": "2026-07-11T21:58:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0449a9512e852388b258d529303c95fbb6bff22f07b51d72522c021854c4b4c8",
+          "at": "2026-07-11T22:02:33Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D6 は `.harness/prompts/` 配下のテンプレートを読むと決めていますが、正 canonical path/filename や選択規則を定義していません。複数テンプレートが存在し得るため、spec/実装はどの discipline を注入すべきか、欠如時の fail-closed 条件を導出できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+              "line": 98,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D6 の no-git discipline は subprocess dispatch にしか自動注入されず、D7 の Claude==Claude の in-host 分岐は briefing を使った self-invoke 指示だけを返します。したがって、経路に常時注入するという安全方針が分岐によって失われ、in-host 実行では外部 discipline template が適用されません。in-host 分岐への伝播契約を明示してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+              "line": 96,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:8ec8f82332b3fa2d08f5fc185504d64422eef202f37061d3a8455ff8f750befb",
+          "at": "2026-07-11T20:29:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 names codex, claude, and gemini as providers handled by the common dispatch path, but D10 defines adapter/conformance behavior only for claude and codex and requires fail-closed behavior when no adapter registry exists. The ADR does not specify whether Gemini is currently supported or how its adapter, permissions, and invocation contract work.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+              "line": 88,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "The Claude fallback in D10 is incompatible with D3/D5: `--append-system-prompt-file` can inject agent text but does not bind the agent frontmatter's `tools:` permissions or model. If `--agent` fails in headless mode, the specified fallback can therefore run with the wrong model and without the declared tool restrictions. The ADR must either require fail-closed behavior or specify equivalent enforcement for the fallback.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+              "line": 137,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:797e77f7d094a768c4fe92b83a06ff5e5d58da3f90035f8b4ccfee7f4932b43f",
+          "at": "2026-07-11T20:37:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3/D5 は `agent-profiles.json` の capability model を SSoT とする一方、D7/D10 は Claude の agent 定義 frontmatter が per-capability model を束縛すると記述しています。profile model と adapter model が異なる場合の優先順位・一致条件が定義されておらず、in-host と subprocess の実行モデルを spec から一意に導出できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+              "line": 110,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:9938ce851f425c3d03e27923c79be5cd3e0a3c10632fdf4f303d2caf082766a6",
+          "at": "2026-07-11T20:44:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00ab38182354dbcd645cfaa442b1f1a16f8c6ad08a4a2eb68f85656d6704b542",
+          "at": "2026-07-11T20:49:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 は `agent-profiles.json` に存在する全 capability を dispatch 可能な宇宙と定義していますが、D9 は同じ profile に存在する reviewer / dry-checker / ref-verifier / obligation・waiver verifier を本コマンドの対象外としています。対象外 capability を拒否する規則はなく、capability のハードコードも D2 で禁止されているため、下流 spec は `sotp capability exec reviewer` を自由形式で実行するのか fail-closed にするのか決定できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+              "line": 62,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "Rejected Alternative D は CLI sandbox フラグの代わりに「profile field 宣言」を採択したと記述していますが、最終的な D3 は profile に権限 field を設けず adapter 定義ファイルへ置くと決定しています。却下理由が旧設計のままで、Decision と Rejected Alternatives の narrative が矛盾しています。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+              "line": 164,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:00ab38182354dbcd645cfaa442b1f1a16f8c6ad08a4a2eb68f85656d6704b542",
+          "at": "2026-07-11T20:51:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D6 defines fail-closed validation for the discipline template but never defines validation semantics for the user-supplied briefing file itself. In particular, the in-host branch can return a successful delegation instruction containing a missing, unreadable, invalid-UTF-8, or empty briefing path, while the subprocess branch may launch before discovering the same defect. This leaves spec.json unable to derive observable error behavior for invalid briefing input. Specify which briefing conditions are rejected and require validation before either dispatch branch.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+              "line": 100,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:856dedfba99e804c75a410f2ce46cda36cfaebab77c19846edcb6a8b314c64e9",
+          "at": "2026-07-11T20:57:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7319490cbe37ee5d603db16cb8400f8c2fb0486e820b25178c695369a7319b2f",
+          "at": "2026-07-11T21:00:23Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityExecError::InvalidRequest` is unconstructible: `CapabilityExecService::execute` accepts an already-typed `CapabilityExecRequest`; declared constructors return `CapabilityInputValidationError` directly, and `CapabilityDriver::handle` returns `CommandOutcome`. No declared caller can wrap that error into this variant.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 761,
+              "category": "unconstructible error variant"
+            },
+            {
+              "message": "`CapabilityProfilePort::resolve` returns the broad `CapabilityExecError`, but the declared profile adapter can only produce `ProfileResolution` or `ModelMissing`. The entry does not document this producible subset; `InvalidRequest`, `ExecutionModeRejected`, `UnsupportedProvider`, `SourceValidation`, `AdapterPreflight`, and `DispatchFailed` are structurally unreachable here.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 478,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`CapabilityProviderPort::dispatch` returns the broad `CapabilityExecError`, although the interactor selects a matching provider and the provider adapters can only produce `AdapterPreflight` or `DispatchFailed`. The entry does not document the narrower subset, forcing callers to handle unreachable profile/source/input variants.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 521,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`CapabilitySourcePort::load_briefing` and `load_discipline` return the broad `CapabilityExecError`, although both declared operations can only produce `SourceValidation`. The entry does not document this subset, so callers must handle unrelated profile, provider, and dispatch failures.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 560,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`CapabilityProfilePort::resolve`, `CapabilitySourcePort::load_briefing`, `CapabilitySourcePort::load_discipline`, and `CapabilityProviderPort::dispatch` are all declared synchronous despite performing profile-file, filesystem, and subprocess/provider I/O. Their docs do not acknowledge the synchronous boundary choice, leaving the port color contract underspecified for adapters.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 470,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "`ReasoningEffortDto` is anchored only to `CN-02`, whose scope covers profile capability/routing/model/execution-mode authority and adapter authority; it contains no reasoning-effort contract. The entry therefore declares an unrelated API addition, and its docs restate a behavior not committed by this spec.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 607,
+              "category": "spec_refs off-topic"
+            },
+            {
+              "message": "`CapabilityConfigDto` claims existing reasoning-effort accessors are preserved, but its declared `fast_reasoning_effort` and `final_reasoning_effort` signatures change from the baseline raw-string accessors to `Option<ReasoningEffortDto>`. This is an undeclared compatibility change for existing consumers and contradicts the entry's own docs.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 324,
+              "category": "action/shape inconsistency"
+            },
+            {
+              "message": "The `docs` fields for `BriefingText`, `CapabilityDispatchOutcome`, `CapabilityDispatchRequest`, `CapabilityExecError`, `CapabilityExecInteractor`, `CapabilityExecRequest`, `CapabilityFailureDetail`, `CapabilityFilePath`, `CapabilityInputValidationError`, `CapabilityName`, `CapabilityProfile`, `DisciplineText`, `ExecutionMode`, `ModelName`, `ProviderName`, `CapabilityExecService`, `CapabilityProfilePort`, `CapabilityProviderPort`, and `CapabilitySourcePort` restate upstream validation, routing, branching, and error contracts in prose instead of only citing their anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 437,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `docs` fields for `AgentProfilesCapabilityAdapter`, `CapabilityConfigDto`, `ClaudeCapabilityAdapter`, `CodexCapabilityAdapter`, `ExecutionModeDto`, `FsCapabilitySourceAdapter`, `ModelNameDto`, `ProviderNameDto`, `ReasoningEffortDto`, and `SandboxMode` restate upstream parsing, adapter, sandbox, and conversion behavior in prose instead of only citing their anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 296,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `docs` fields for `CapabilityDriver`, `CapabilityExecDriverInput`, `CapabilityNameArg`, and `ProviderNameArg` restate upstream input-validation, conversion, and rendering behavior in prose instead of only citing their anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+              "line": 150,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `docs` fields for `CapabilityCommand` and `CapabilityExecArgs` restate the generic dispatch and input-validation contract in prose instead of only citing their anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `CapabilityCompositionRoot` docs restate the adapter wiring and dispatch responsibility contract in prose instead of only citing its anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_composition-types.json",
+              "line": 41,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:c102aa4cdd3bbb6b07b3f0a34a9380cf6e137ea95a4e2eca548295e58a9dd20b",
+          "at": "2026-07-11T22:09:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityConfigDto` の `provider` / `model` / `fast_provider` / `fast_model` / `prompt_template_path` は baseline の `&str` / `Option<&str>` から DTO・`Path` 型へ変更されていますが、entry docs は既存 accessor のシグネチャ維持を宣言しています。破壊的変更を明示するか、baseline 互換の戻り値に戻してください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 300,
+              "category": "action incoherent with diff"
+            },
+            {
+              "message": "`ExecutionMode` の docs が、`TypedPipeline` を起動前に拒否し `OrchestratorOutput` のみ dispatch するという upstream の挙動契約を散文で再掲しています。types docs は upstream anchor の参照に留めてください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 1168,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:a4d34d66410d272528c8d8d842592524e7d76cb5eea332a312135772d34fa467",
+          "at": "2026-07-11T22:42:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d28419e7ac0184b0769fc1e5bfc963384039713fbd867ba4065a90b4fdd3dcf7",
+          "at": "2026-07-11T22:55:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d28419e7ac0184b0769fc1e5bfc963384039713fbd867ba4065a90b4fdd3dcf7",
+          "at": "2026-07-11T22:59:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19eca2d6e54c2cdf8c6b4515f47c080dd48d035a6db3bfe664bf2d9d9a1aeae5",
+          "at": "2026-07-12T00:07:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19eca2d6e54c2cdf8c6b4515f47c080dd48d035a6db3bfe664bf2d9d9a1aeae5",
+          "at": "2026-07-12T00:08:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `AgentProfiles` entry's `docs` field restates the trusted-root validation and adapter conversion behavior instead of only citing the upstream anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 301,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `AgentProfilesError` entry's `docs` field restates fail-closed security behavior and payload rationale instead of only citing the upstream anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 476,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `CapabilityFilePath` entry's `docs` field restates the upstream path-validation contract instead of only citing its anchor.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 985,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:8ab6517abb1519f989c2b2e5b4425918cb81a5838bcd2e15b5f008b7ecb5869d",
+          "at": "2026-07-12T06:51:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityInputValidationError::EmptyCapabilityName` は構築経路のない dead vocabulary です。catalogue 上の `CapabilityName` は既存型への `reference` であり、その `try_new` は `domain::ValidationError` を返します。また、同 enum を返す新規コンストラクタは provider/model/path/content 用だけです。この variant を削除するか、実際の capability-name 検証境界で構築されるエラー型へ契約を統一してください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 1011,
+              "category": "unconstructible error variant"
+            }
+          ],
+          "hash": "rvw1:sha256:293c1bdc62771cc19da216453592ab74641cdf2a69c4303c774bdb3736ccfff6",
+          "at": "2026-07-12T07:20:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:293c1bdc62771cc19da216453592ab74641cdf2a69c4303c774bdb3736ccfff6",
+          "at": "2026-07-12T07:21:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::AgentProfiles::resolve_model` and `resolve_provider` return owned `Option<String>` despite being read-only lookups over `&self`; this forces cloning/allocation where borrowed `Option<&str>` (or an equivalent borrowed result) would suffice. The catalogue does not justify the ownership boundary.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 373,
+              "category": "ownership signature smell"
+            }
+          ],
+          "hash": "rvw1:sha256:053370a526954072f0d69ea7bfdd2eb351a3a34cdf524f75b059923ac873278c",
+          "at": "2026-07-12T08:34:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05d15a42a3621f3db38671b46ccf980416dbc5781d63b7503f265961f4a6201c",
+          "at": "2026-07-12T09:08:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::capability_exec::{ProviderName, ModelName, CapabilityFilePath, BriefingText, DisciplineText}::try_new` all return the shared `CapabilityInputValidationError`, but each can produce only a small subset of its five variants, and the catalogue methods neither document those subsets nor justify the broad error type. For example, `ProviderName::try_new` can only produce `EmptyProviderName`, while callers must accept file-path and content variants that are structurally impossible. Declare precise errors or document each method's producible subset.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 17,
+              "category": "API shape / per-method error imprecision"
+            },
+            {
+              "message": "`infrastructure::agent_profiles::{ProviderNameDto, ModelNameDto}::try_new` expose the full usecase `CapabilityInputValidationError`, although the wrappers can only propagate `EmptyProviderName` and `EmptyModelName`, respectively. Their catalogue declarations provide no producible-subset documentation, leaving adapter callers with several impossible variants. Use precise errors or document the subset on each method.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 110,
+              "category": "API shape / per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:05d15a42a3621f3db38671b46ccf980416dbc5781d63b7503f265961f4a6201c",
+          "at": "2026-07-12T09:15:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::CliCommand` の `docs` が、IN-01/IN-08 の変更内容（旧 planner command の撤去と generic capability dispatch への置換）をそのまま再記述しています。型固有の事実だけを残し、上流の振る舞いはアンカー参照のみにしてください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+              "line": 218,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:84b4145845addeab48e9a533f7cf893f79c799d7d15ee2a364587cc018323a70",
+          "at": "2026-07-12T09:33:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c6d4c4b0a32b3a4e9d5b55aad70e5764184ca8817f91134fb9f9324ca3d7e40",
+          "at": "2026-07-12T09:44:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f7d0177081856f573887e3ef23819fdecad0bb0f9773edd9f551f3dee82205b",
+          "at": "2026-07-12T12:43:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f7d0177081856f573887e3ef23819fdecad0bb0f9773edd9f551f3dee82205b",
+          "at": "2026-07-12T12:44:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityCompositionRoot::discover` は git worktree の探索失敗しか起こさず、実装上構築できるのは `CompositionError::Infrastructure` だけですが、契約は `ConfigLoad`、`AdapterInit`、`WiringFailed`、`Usecase` も含む共有エラー型を返し、catalogue の `docs` も `null` のため生成可能な subset が明記されていません。専用の狭いエラー型にするか、このメソッドが生成可能な variant を catalogue に明記してください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_composition-types.json",
+              "line": 28,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:2f7d0177081856f573887e3ef23819fdecad0bb0f9773edd9f551f3dee82205b",
+          "at": "2026-07-12T12:47:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8776d6c97c799fe5d820996084f878739d192d4d6479bafd0feb88fa9c75c03",
+          "at": "2026-07-12T12:54:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8776d6c97c799fe5d820996084f878739d192d4d6479bafd0feb88fa9c75c03",
+          "at": "2026-07-12T12:56:09Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
+          "at": "2026-07-12T06:38:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
+          "at": "2026-07-12T06:38:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
+          "at": "2026-07-12T06:41:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
+          "at": "2026-07-12T06:41:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
+          "at": "2026-07-12T08:31:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
+          "at": "2026-07-12T08:38:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
+          "at": "2026-07-12T08:38:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
+          "at": "2026-07-12T08:45:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `.claude/settings.json` case only checks `bin/sotp capability exec`, which is present in the hook prompt; it never verifies the actual allowlist entry (`Bash(bin/sotp capability:*)`). A permission regression would still pass this test. Assert or parse the allowlist separately.",
+              "severity": "P1",
+              "file": "apps/cli/tests/operational_reference_cutover.rs",
+              "line": 59,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:f7246cb19d7a31eaaf75f8f1c85580d074645df597bb57c4ac4f78881ec2e045",
+          "at": "2026-07-12T10:50:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
+          "at": "2026-07-12T10:55:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
+          "at": "2026-07-12T11:02:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "退役参照の検出が連続部分文字列 `plan codex-local` に依存しているため、明示的に保護対象とされた設定面を網羅できません。例えば Codex の旧 prefix rule `['bin/sotp', 'plan', 'codex-local']` は区切り文字のため一致せず、settings の旧 allowlist `Bash(bin/sotp plan:*)` も `codex-local` を含まないため、このテストは新旧ルールが併存していても成功します。各 surface に応じた旧マーカーも検査し、settings allowlist と Codex prefix rules の cutover を実際に保証してください。",
+              "severity": "P1",
+              "file": "apps/cli/tests/operational_reference_cutover.rs",
+              "line": 1,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
+          "at": "2026-07-12T11:02:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
+          "at": "2026-07-12T11:02:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
+          "at": "2026-07-12T11:04:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SystemGitRepo::discover()` performs repository-discovery I/O directly in the thin bin, and the accompanying production dependency on `infrastructure` bypasses `cli_composition`. This violates ADR D8/D5 and `architecture-rules.json`, which restrict `cli` to `cli_composition`/`cli_driver`. Move repository-root discovery behind `CapabilityCompositionRoot` (returning a typed startup error), leaving this handler to parse, obtain the driver, dispatch, and emit.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/capability.rs",
+              "line": 51,
+              "category": "direct I/O in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:3424bafc67616a2a8d7c020976f691d276a582b7f3c9d9b71a0ccb90513c7a49",
+          "at": "2026-07-12T12:23:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SystemGitRepo::discover()` makes the production CLI depend directly on `infrastructure`, bypassing the required `cli_composition`/`cli_driver` boundary. Repository-root discovery is infrastructure I/O and must be exposed through the composition root so this handler remains parse–dispatch–emit only. This violates ADR D5/D8 and `architecture-rules.json`; keep `infrastructure` as a dev dependency and move the discovery/wiring behind `cli_composition`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/capability.rs",
+              "line": 10,
+              "category": "usecase/domain import in production"
+            }
+          ],
+          "hash": "rvw1:sha256:3424bafc67616a2a8d7c020976f691d276a582b7f3c9d9b71a0ccb90513c7a49",
+          "at": "2026-07-12T12:24:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e355eb6cd8981df07fc79c1d9288b95e7265848d3b847c8f0e640df2fe5d21d",
+          "at": "2026-07-12T12:42:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e355eb6cd8981df07fc79c1d9288b95e7265848d3b847c8f0e640df2fe5d21d",
+          "at": "2026-07-12T12:43:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e355eb6cd8981df07fc79c1d9288b95e7265848d3b847c8f0e640df2fe5d21d",
+          "at": "2026-07-12T12:45:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f99cfd7a55517e1993e26db31e9f8bbb1f9252ef38f2022b14bbc052718a8049",
+          "at": "2026-07-12T16:38:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f99cfd7a55517e1993e26db31e9f8bbb1f9252ef38f2022b14bbc052718a8049",
+          "at": "2026-07-12T16:39:54Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9402f549356acdb25d90df0acdb50f49d3e02200a8243f9381337505da9c077",
+          "at": "2026-07-12T00:04:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9402f549356acdb25d90df0acdb50f49d3e02200a8243f9381337505da9c077",
+          "at": "2026-07-12T00:05:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5631660c95330d3d727e0c8655c2b9fe1ce24f00a16e2c900732d21bdd154472",
+          "at": "2026-07-12T06:29:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5631660c95330d3d727e0c8655c2b9fe1ce24f00a16e2c900732d21bdd154472",
+          "at": "2026-07-12T06:31:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:755057a38213543e8fc398bb0a8d146398ab821f82d0e774f430bba4bc01faaa",
+          "at": "2026-07-12T08:17:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:755057a38213543e8fc398bb0a8d146398ab821f82d0e774f430bba4bc01faaa",
+          "at": "2026-07-12T08:19:06Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:34:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:35:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:35:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:36:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`handle` が呼ぶ `into_request` で capability/host を再検証し、未検証の `PathBuf` も検証しているため、入力検証が parse boundary ではなく Driver の invoke フローに入り込んでいます。これは ADR D3/D4 および `hexagonal-architecture.md` の Usecase Layer Purity Rules に反する adapter 内 business logic です。各 Arg 型が検証済み usecase 型を保持し、briefing path にも `FromStr` で検証する型を導入して、`handle` 内の変換を infallible にしてください。",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/capability.rs",
+              "line": 78,
+              "category": "business logic in adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:37:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c8c02f1681fac6ab9df2047ce80a59c37a96f7f4c5f5950bffd3f6527cdcc78",
+          "at": "2026-07-12T07:16:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c8c02f1681fac6ab9df2047ce80a59c37a96f7f4c5f5950bffd3f6527cdcc78",
+          "at": "2026-07-12T07:18:11Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80346e6779b334e25e7ef4c7b95c7932024dbfbb8e2506c39b6d7a3d3d4ed39d",
+          "at": "2026-07-12T06:43:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80346e6779b334e25e7ef4c7b95c7932024dbfbb8e2506c39b6d7a3d3d4ed39d",
+          "at": "2026-07-12T06:44:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf39bd7c7361e177108c6eb51aefedd553247137210c9cce0ef576531b398c7",
+          "at": "2026-07-12T08:32:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf39bd7c7361e177108c6eb51aefedd553247137210c9cce0ef576531b398c7",
+          "at": "2026-07-12T08:33:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf39bd7c7361e177108c6eb51aefedd553247137210c9cce0ef576531b398c7",
+          "at": "2026-07-12T08:33:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c5d99b8da4ed55abda41b6bf9e69205e531cbe907a3d10451801dfd6e318795",
+          "at": "2026-07-12T09:03:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c5d99b8da4ed55abda41b6bf9e69205e531cbe907a3d10451801dfd6e318795",
+          "at": "2026-07-12T09:05:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03ab6ed5e61f3aa21acc644574e6c82503a28c2ffdabc7bb170d8020fb10fbe0",
+          "at": "2026-07-12T12:43:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03ab6ed5e61f3aa21acc644574e6c82503a28c2ffdabc7bb170d8020fb10fbe0",
+          "at": "2026-07-12T12:46:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03ab6ed5e61f3aa21acc644574e6c82503a28c2ffdabc7bb170d8020fb10fbe0",
+          "at": "2026-07-12T12:48:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11b0a4bd39df0f963dfb89915e92d9b22418f1881d5c1e78f5bfe64d91a6410e",
+          "at": "2026-07-12T17:59:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11b0a4bd39df0f963dfb89915e92d9b22418f1881d5c1e78f5bfe64d91a6410e",
+          "at": "2026-07-12T18:00:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11b0a4bd39df0f963dfb89915e92d9b22418f1881d5c1e78f5bfe64d91a6410e",
+          "at": "2026-07-12T18:01:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11b0a4bd39df0f963dfb89915e92d9b22418f1881d5c1e78f5bfe64d91a6410e",
+          "at": "2026-07-12T18:03:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e874d0e120b5d7a0b1c6d537f0bd3fb2fbab37068def0147cda4ad4588e9ca3b",
+          "at": "2026-07-12T18:28:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e874d0e120b5d7a0b1c6d537f0bd3fb2fbab37068def0147cda4ad4588e9ca3b",
+          "at": "2026-07-12T18:29:28Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityFilePath` accepts absolute and `..` paths, and `absolute_path` joins them without containment verification, allowing briefing reads outside `repo_root`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/source.rs",
+              "line": 25,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "`metadata` and `read_to_string` follow symlinks, so a briefing or discipline path can resolve to an external file without boundary rejection.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/source.rs",
+              "line": 34,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The capability name is interpolated into the agent path without verifying the resulting path remains under `repo_root`; `CapabilityName` only rejects empty values, so traversal components can escape the trusted root.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/claude.rs",
+              "line": 46,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The capability name is joined into the skill path without trusted-root containment verification, allowing a traversal-valued capability name to read outside `repo_root`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/codex.rs",
+              "line": 74,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The shared provider-definition loader uses `read_to_string` without rejecting symlinks, so Claude agent and Codex skill definitions can be loaded through symlinked files or ancestors.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 65,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`execution_mode` is contractually required, but `#[serde(default = \"default_execution_mode\")]` silently converts an omitted field into `typed-pipeline` instead of failing configuration parsing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 132,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "The agent-profiles config loader reads the configured file directly with `read_to_string` and does not reject a symlinked config path, unlike the repository's real-file boundary convention.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 265,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:f9c733e35725018325af073b93deae0394e5678d9da4ad99b3171513931a894d",
+          "at": "2026-07-12T03:00:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Front-matter extraction matches keys by trimmed text without parsing YAML structure. Indented/nested declarations such as `metadata:\\n  sandbox: workspace-write` are treated as top-level and can enable `--sandbox workspace-write`; similarly nested `model`/`tools` can bypass Claude preflight. Malformed or structurally invalid provider configuration must fail closed.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 95,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "The symlink guard uses a lexically derived trusted root. A path such as `.../.harness/config/./agent-profiles.json` makes the derived root end in `config/.`, so `reject_symlinks_below` stops before checking the actual `config` ancestor; a symlinked config directory can therefore be followed despite the boundary check.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 285,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:54687dea95d56cb9d0fefa18fb5ba6aa7f5d8f2283899d78d7b29450b95ab558",
+          "at": "2026-07-12T04:30:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`normalize_agent_profiles_path` collapses `link/..` before `reject_symlinks_below`; a path such as `<root>/internal-link/../.harness/config/agent-profiles.json` bypasses symlink rejection. Preserve components for the symlink walk or reject parent traversal before normalization.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 428,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`read_to_string` loads the agent profile without any size limit, allowing a trusted-root file to exhaust memory before JSON parsing. Enforce a bounded read and fail closed when the limit is exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 294,
+              "category": "unbounded read"
+            },
+            {
+              "message": "`read_utf8_file` unconditionally uses unbounded `read_to_string` for Claude/Codex provider definitions. A large repository-controlled definition can cause memory exhaustion; add a maximum byte limit before reading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 84,
+              "category": "unbounded read"
+            },
+            {
+              "message": "Capability briefing and discipline files are read with unbounded `read_to_string`, so a large repository file can exhaust adapter memory. Enforce a bounded read and return a typed source-validation error when exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/source.rs",
+              "line": 80,
+              "category": "unbounded read"
+            }
+          ],
+          "hash": "rvw1:sha256:9f05e848b57f731ac5b3ed8e298d85024fe87d5d99ebcfe834fa0d44701166ea",
+          "at": "2026-07-12T05:00:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd407295994c4c69b5b6a3356d9e511a0133da8108ff8115985f626a0c2fb37e",
+          "at": "2026-07-12T05:22:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AgentProfiles::load` derives `trusted_root` from the path being validated. When the path lacks `.harness/config`, `agent_profiles_parent_root` simply treats its parent as trusted; an arbitrary path therefore authorizes its own location and the containment check cannot reject it. Paths containing an earlier `.harness/config` segment can similarly select an overly broad root. CN-04 requires the trusted workspace root to be supplied independently (as in `is_safe_briefing_path`), then canonical containment and symlink rejection performed against it.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 273,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:cd407295994c4c69b5b6a3356d9e511a0133da8108ff8115985f626a0c2fb37e",
+          "at": "2026-07-12T05:25:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Cross-provider Claude dispatch omits the profile model: `claude` is invoked without `--model <request.profile.model>`, so the configured model is ignored.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/claude.rs",
+              "line": 85,
+              "category": "process-invocation-hygiene"
+            }
+          ],
+          "hash": "rvw1:sha256:6f960b3bb477862ce234144b418c902443ae5f430666dd44e5bf6e773079e80d",
+          "at": "2026-07-12T06:07:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2cdc82e60657e5081378356304c128a03bc711099fa85e4b99e0eac810eb2f7",
+          "at": "2026-07-12T06:23:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2cdc82e60657e5081378356304c128a03bc711099fa85e4b99e0eac810eb2f7",
+          "at": "2026-07-12T06:26:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:341330d8663b6a4a3e39e03724db4a5ec227db8464f9e91edf1cc87de68f385b",
+          "at": "2026-07-12T08:34:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_provider_process` trusts `runtime_dir` and creates the log through it without canonical-containment or symlink checks. In normal wiring this is under the repository, so a checked-out symlink at `tmp` or `tmp/capability-runtime` can redirect `File::create` outside the trusted root and create/truncate an external file. Thread the independent repository root into this boundary and apply the existing fail-closed path guard before writing.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 279,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The bounded reader opens the path before verifying that it is a regular file. A FIFO placed at `agent-profiles.json`, `SKILL.md`, or an agent-definition path causes `File::open`/`read_to_string` to block indefinitely; `take` bounds bytes but not waiting. Reject non-regular files with `symlink_metadata` before opening, as the source adapter already does.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 78,
+              "category": "unbounded I/O path"
+            },
+            {
+              "message": "Provider execution uses blocking `Command::status` with no timeout or process-tree termination, while stderr is written to an unbounded log. A hung or noisy provider can therefore stall `capability exec` indefinitely and exhaust disk. Add bounded spawn/poll/timeout/termination plumbing; ADR D8 explicitly states that the common replacement path retains timeout handling.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 302,
+              "category": "unbounded I/O path"
+            }
+          ],
+          "hash": "rvw1:sha256:c89e5c63df35fb85187fe017d83d5a5b4952f047ac06ec6e7fec357008c5e93e",
+          "at": "2026-07-12T09:09:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
+          "at": "2026-07-12T09:23:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
+          "at": "2026-07-12T09:23:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
+          "at": "2026-07-12T09:23:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
+          "at": "2026-07-12T09:24:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
+          "at": "2026-07-12T10:09:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
+          "at": "2026-07-12T10:10:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
+          "at": "2026-07-12T10:14:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If `Child::try_wait` returns an error, `?` immediately exits the polling loop without terminating or reaping the provider process. The timeout is then abandoned, while the child and stderr-drain thread may continue indefinitely. Terminate/reap the process tree before propagating poll errors so every spawned-process path remains bounded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/process.rs",
+              "line": 378,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
+          "at": "2026-07-12T10:16:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9173178ec1fe86b289c556166f9bfc59ffebf0f56cbf8b0ea9d82adb3d249fc1",
+          "at": "2026-07-12T10:23:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aab2ab0b235b06fe119b4dd7ad674c6b68feaa6ee87098f83cbf545e6f6b0b41",
+          "at": "2026-07-12T11:29:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aab2ab0b235b06fe119b4dd7ad674c6b68feaa6ee87098f83cbf545e6f6b0b41",
+          "at": "2026-07-12T11:35:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:014bbd2c9112a422ee743e055308d6a5951c74ee1ed641fae898f2666d7f2866",
+          "at": "2026-07-12T11:59:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:014bbd2c9112a422ee743e055308d6a5951c74ee1ed641fae898f2666d7f2866",
+          "at": "2026-07-12T12:00:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47920220b0ea09a3c07abba8160e1c1a77331239bc7c7166ec43d4784d8c63b4",
+          "at": "2026-07-12T12:24:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47920220b0ea09a3c07abba8160e1c1a77331239bc7c7166ec43d4784d8c63b4",
+          "at": "2026-07-12T12:25:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a7df86dab83a66c310291188cff8c790d4b700080affdae7854cf8eba2025b2",
+          "at": "2026-07-12T18:00:19Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The shared discipline injected into workspace-write subprocesses forbids only `git add`, `git commit`, and `git push`; it omits other state-changing operations such as `git merge`, `git rebase`, and `git switch`, despite the guardrail's no-direct-git invariant and lack of hook coverage inside external subprocesses. Extend the prohibition to all guarded state-changing Git operations.",
+              "severity": "P1",
+              "file": ".harness/prompts/capability-exec-discipline.md",
+              "line": 5,
+              "category": "hook coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:fae67be039dedcd01e5bac9ec407f0898bb283a5e96d5367120ac200cdb0f7ff",
+          "at": "2026-07-12T06:48:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fae67be039dedcd01e5bac9ec407f0898bb283a5e96d5367120ac200cdb0f7ff",
+          "at": "2026-07-12T06:50:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "共通 discipline は `task-state transitions` を呼び出し元 orchestrator の専有としていますが、implementer の capability SSoT は `bin/sotp track transition` による状態遷移を implementer の許可された書き込みとして明記しています。この discipline は全 dispatch に注入されるため、implementer に相反する所有権指示が渡り、必要な遷移を拒否させる可能性があります。共通 discipline から task-state transition の所有権指定を削除するか、implementer SSoT と workflow の責任境界を一貫して変更してください。",
+              "severity": "P1",
+              "file": ".harness/prompts/capability-exec-discipline.md",
+              "line": 7,
+              "category": "responsibility-boundary cross"
+            }
+          ],
+          "hash": "rvw1:sha256:fae67be039dedcd01e5bac9ec407f0898bb283a5e96d5367120ac200cdb0f7ff",
+          "at": "2026-07-12T07:20:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`orchestrator-output` declares this capability dispatchable, but neither `.agents/skills/orchestrator/SKILL.md` nor `.claude/agents/orchestrator.md` exists. Under ADR D2/D10, `capability exec orchestrator` therefore passes execution-mode validation and then always fails adapter preflight. Since `orchestrator` is host-routing metadata rather than a dispatch target, classify it as `typed-pipeline` (fail-closed refusal), or add the required provider-native adapter surface.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 18,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:fae67be039dedcd01e5bac9ec407f0898bb283a5e96d5367120ac200cdb0f7ff",
+          "at": "2026-07-12T07:20:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`rollback-diagnoser` は専用の machine-consumed pipeline を持たず、ADR D1/D9/D10 では汎用 `capability exec` の対象として明記されています。しかし `typed-pipeline` に分類すると dispatch 前に必ず拒否され、既存の Codex skill を起動できません。`execution_mode` を `orchestrator-output` に変更してください。",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 43,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:fae67be039dedcd01e5bac9ec407f0898bb283a5e96d5367120ac200cdb0f7ff",
+          "at": "2026-07-12T07:21:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`rollback-diagnoser` is incorrectly marked `typed-pipeline`. Unlike reviewer/dry/verifier capabilities, it has no dedicated machine-consumed pipeline; ADR D2/D9 makes `capability exec` reject this mode, while D10 explicitly includes rollback-diagnoser among capabilities needing the generic dispatch path. Codex-routed `/track:diagnose` therefore remains undispatchable. Use `orchestrator-output`.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 43,
+              "category": "capability routing mismatch"
+            },
+            {
+              "message": "The canonical discipline omits the required rule that capability scratch/temporary files must live under `tmp/`. Workspace-write external subprocesses bypass Claude hooks and may write anywhere, as documented by `.claude/rules/10-guardrails.md` §Sandbox and Hook Coverage Warning; the current text only constrains one selective-staging file. Add an explicit general scratch-under-`tmp/` restriction.",
+              "severity": "P1",
+              "file": ".harness/prompts/capability-exec-discipline.md",
+              "line": 3,
+              "category": "hook coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:fae67be039dedcd01e5bac9ec407f0898bb283a5e96d5367120ac200cdb0f7ff",
+          "at": "2026-07-12T07:21:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6116876434e54aa1169763d4127431ff68606c74373c39acd7c2e2202c70a66",
+          "at": "2026-07-12T08:48:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`implementer.provider` が `claude` の場合、このコマンドは capability を実行せず `delegate-in-host` を返すだけです。adapter はその結果を受けて Agent tool で `implementer` を起動する分岐を記述していないため、著作・修復ラウンドが実行されません。`diagnose.md` や `impl-plan.md` と同様に Claude/Codex の起動経路を分けてください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/obligation-fulfillment.md",
+              "line": 17,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:3debc82959cf0fce1ae7eada7c3dbdea6f66c15f04cc3d75d9a5ef6e33b2bc80",
+          "at": "2026-07-12T10:48:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`implementer.provider` が `claude` の場合、この呼び出しは capability を実行せず `CAPABILITY_EXEC_OUTCOME: delegate-in-host` を返すだけです。しかし adapter はその結果を受けて Agent tool で `implementer` を起動する手順を示していないため、著作・修復ラウンドが実行されません。ほかの adapter と同様に Claude provider 用の Agent-tool 分岐を明記してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/obligation-fulfillment.md",
+              "line": 17,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:3debc82959cf0fce1ae7eada7c3dbdea6f66c15f04cc3d75d9a5ef6e33b2bc80",
+          "at": "2026-07-12T10:48:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Codex 経路は診断 briefing を先に書くことを要求しますが、直後でこの command は「no writes」と規定されています。両方を遵守すると必須の `--briefing-file` を準備できず、rollback-diagnoser を dispatch できません。禁止対象を SoT／永続成果物への書き込みに限定するか、`tmp/` の runtime briefing を明示的に例外化してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/diagnose.md",
+              "line": 22,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:fae3e9255e10a3b53b19529f73661041945d983ca4941ffb99992d2181e17418",
+          "at": "2026-07-12T10:55:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The newly added text classifies the direct Codex examples as read-only, but every example still passes `--full-auto`. `.claude/rules/10-guardrails.md` §Sandbox and Hook Coverage Warning states that `--full-auto` forces `workspace-write`, overrides `--sandbox read-only`, and permits writes/git operations outside hook coverage. Remove `--full-auto` from these consultation examples or route them through an enforced read-only path.",
+              "severity": "P1",
+              "file": ".claude/skills/codex-system/SKILL.md",
+              "line": 47,
+              "category": "hook coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:fae3e9255e10a3b53b19529f73661041945d983ca4941ffb99992d2181e17418",
+          "at": "2026-07-12T10:55:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cc3df9adf389c0fc61888e1221ab2771aea4790330ab5e4ed7b7fd98e425ff7",
+          "at": "2026-07-12T10:59:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cc3df9adf389c0fc61888e1221ab2771aea4790330ab5e4ed7b7fd98e425ff7",
+          "at": "2026-07-12T11:00:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cae54197b1051873d0c32c897867e410139f73c7345f8ac25be3f99aee28a583",
+          "at": "2026-07-12T11:32:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cae54197b1051873d0c32c897867e410139f73c7345f8ac25be3f99aee28a583",
+          "at": "2026-07-12T11:33:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2ce814ffaa99602f24c535f01c405ae0a53d3a147724121d5881ee5b3477b14",
+          "at": "2026-07-12T11:54:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2ce814ffaa99602f24c535f01c405ae0a53d3a147724121d5881ee5b3477b14",
+          "at": "2026-07-12T11:55:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2ce814ffaa99602f24c535f01c405ae0a53d3a147724121d5881ee5b3477b14",
+          "at": "2026-07-12T11:55:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2ce814ffaa99602f24c535f01c405ae0a53d3a147724121d5881ee5b3477b14",
+          "at": "2026-07-12T11:56:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 7 は成功タスクをレビュー・コミット後まで `in_progress` に留めるよう指示しており、同じ SSoT の Mission（CI/DFP 後かつレビュー前に `done`）および各 adapter と矛盾します。この経路ではレビューが最終タスク状態を確認できず、レビュー後の状態変更で承認済み diff が無効になります。full-cycle の DFP 完了後・レビュー前に orchestrator が `done` へ遷移し、コミット後は commit hash の backfill のみにしてください。`.claude/commands/track/implement.md:24` と `.claude/commands/track/full-cycle.md:25` の「post-commit done」表現も同期が必要です。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 101,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:b09a313a01b52ab9ee2d08f3830867fad0f305acdd5820c1605e53c6b7e6af71",
+          "at": "2026-07-12T13:32:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Implement workflow の Step 7 は、成功タスクを `in_progress` のまま review と commit を通し、その後に `done` へ遷移すると規定しています。これは同ファイルの Mission、implementer capability、track-implement adapter が規定する「CI・DFP 後かつ review 前に `done`、commit 後は hash のみ backfill」という順序と矛盾します。さらに full-cycle workflow は DFP から review へ直接進み、review 前の orchestrator-owned `done` 遷移を実行する箇所がありません。このままでは review が最終 task state を検査せず、commit 後の状態変更で承認済み diff が stale になります。full-cycle の DFP 成功後・review 前に orchestrator の `done` 遷移を追加し、Step 7、Outputs、failure recovery、および両 Claude adapter の「post-commit done」表現を、commit 後は commit-hash backfill のみとなるよう同期してください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 101,
+              "category": "adapter-SSoT sync"
+            }
+          ],
+          "hash": "rvw1:sha256:b09a313a01b52ab9ee2d08f3830867fad0f305acdd5820c1605e53c6b7e6af71",
+          "at": "2026-07-12T13:33:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The implement workflow now hands successful tasks off as `in_progress` until the enclosing DFP finishes, but this line still says the review/commit workflow follows directly. A standalone `/track:implement` run can therefore route straight to review with no orchestrator `done` transition, contrary to the required pre-review timing. Route the successor through `/track:full-cycle` or explicitly require DFP plus the orchestrator-owned `done` transition before review.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 17,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The Codex adapter's success envelope still reports `<n> tasks done`, although the workflow SSoT now ends with successful tasks remaining `in_progress` pending the enclosing DFP and orchestrator transition. Update the report to describe the implementation handoff rather than claiming the tasks are already done.",
+              "severity": "P1",
+              "file": ".agents/skills/track-implement/SKILL.md",
+              "line": 39,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:4af26b801bbd19b7cf29256c656e2cec9026433dc8d4fec18e1bc9cec37dbea1",
+          "at": "2026-07-12T13:39:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow now requires tasks to become `done` before review, but the formal task-completion convention still mandates `/track:implement → /track:review → /track:commit` before the `done` transition (`knowledge/conventions/task-completion-flow.md:17-23`). This leaves two contradictory lifecycle orders. Either update that convention and its consumers or retain the established ordering here.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 14,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "This adapter explicitly says it must not duplicate workflow state transitions, but the new text embeds the full `done`/DFP/review/commit-hash transition timing. The same logic is duplicated in `.claude/commands/track/implement.md` and `full-cycle.md`, creating multiple adapter copies that can drift from the workflow SSoT. Keep only the provider-specific ownership/invocation detail here and reference the workflow for timing.",
+              "severity": "P1",
+              "file": ".agents/skills/track-implement/SKILL.md",
+              "line": 31,
+              "category": "adapter-SSoT sync"
+            }
+          ],
+          "hash": "rvw1:sha256:4af26b801bbd19b7cf29256c656e2cec9026433dc8d4fec18e1bc9cec37dbea1",
+          "at": "2026-07-12T13:41:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25835a6a432db3427e6b4c226a9573c6d1d890f95a1ca65d3a7708bfcd3c8489",
+          "at": "2026-07-12T13:46:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:implement` now leaves successful tasks `in_progress` until DFP closes, but its report still recommends `/track:review` or `/track:commit` directly. Those paths skip the required DFP and pre-review `done` transition, allowing review against stale task state or causing commit gates to fail. Recommend `/track:dry-check`/`/track:full-cycle`, or make the standalone workflow perform the missing lifecycle steps.",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 26,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The Codex adapter reports `IMPLEMENT_STATUS: completed — <n> tasks done`, but the workflow SSoT now explicitly leaves successful tasks `in_progress` until the enclosing DFP completes. This falsely reports a state transition that the command did not perform; the status should describe implementation handoff/pending DFP instead.",
+              "severity": "P1",
+              "file": ".agents/skills/track-implement/SKILL.md",
+              "line": 39,
+              "category": "adapter-SSoT mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:25835a6a432db3427e6b4c226a9573c6d1d890f95a1ca65d3a7708bfcd3c8489",
+          "at": "2026-07-12T13:48:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The adapter says tasks remain `in_progress` until DFP and the orchestrator's pre-review `done` transition, but still recommends `/track:review` or `/track:commit` directly. Following that handoff bypasses the required DFP and Step 1d transition, allowing review/commit with a non-final task state. Restrict the recommendation to a lifecycle that performs those steps.",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 26,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:ba0f7f9345cd8befe9141a09aeb8f29fb2ad231689d3bf3ab3a0a0ceaa8f21f8",
+          "at": "2026-07-12T13:52:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:implement` は成功タスクを DFP 完了まで `in_progress` のまま引き渡すよう変更されたのに、次コマンド候補に `/track:dry-check` がなく、従来どおり review/commit を案内しています。さらに現行 `/track:dry-check` は完了後そのまま review を案内するため、standalone 経路では orchestrator の pre-review `done` transition が実行されません。`/track:implement` → DFP → orchestrator transition → review の配線を明示し、review/commit を直接案内しないよう同期してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 26,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:ba0f7f9345cd8befe9141a09aeb8f29fb2ad231689d3bf3ab3a0a0ceaa8f21f8",
+          "at": "2026-07-12T13:55:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:720d4bec8d05705ad7f6cbfb67b06ec2a60b9d2d15fcdea5d0a0d430ff4d29ca",
+          "at": "2026-07-12T13:59:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "After standalone `/track:implement`, successful tasks remain `in_progress`. The recommended `/track:full-cycle` path then invokes implementation again for every `in_progress` task, while the alternative `/track:dry-check` → `/track:review` path contains no orchestrator transition between DFP and review. Thus neither documented handoff reliably produces the required pre-review `done` state. Add an explicit resume/transition step or a durable state that lets full-cycle skip already implemented tasks.",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 26,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "This adapter explicitly delegates state-transition logic to the workflow SSoT, but then duplicates the transition command, CI/DFP/review timing, hash-backfill timing, and the same lifecycle rule again in its success-report contract. Keep only Codex-specific ownership/invocation details here and leave transition sequencing in `.harness/workflows/track/implement.md` to avoid adapter drift.",
+              "severity": "P1",
+              "file": ".agents/skills/track-implement/SKILL.md",
+              "line": 32,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:720d4bec8d05705ad7f6cbfb67b06ec2a60b9d2d15fcdea5d0a0d430ff4d29ca",
+          "at": "2026-07-12T14:03:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The sanctioned manual path `/track:dry-check` → `/track:review` → `/track:commit` contains no orchestrator-owned `done` transition. Successful standalone implementation therefore reaches review with tasks still `in_progress`, contrary to the required pre-review completion timing.",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 26,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:ee693f9c6cab3b9e04aca62bce64888d1bf379319ea5d806a639c375febe9be7",
+          "at": "2026-07-12T14:08:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:implement` 終了時、成功タスクは workflow SSoT に従って `in_progress` のままですが、ここで「唯一 sanctioned」とする手動経路 `/track:dry-check` → `/track:review` → `/track:commit` のどの command も pre-review の `done` 遷移を実行しません。そのため、この経路は final task state を作らないまま review/commit に進み、直前の説明と矛盾します。`dry-check` 後に orchestrator の `done` 遷移を明示的に含めるか、手動経路を削除して `/track:full-cycle` のみにしてください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 26,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "この thin adapter は、完了条件、状態遷移の順序、hash backfill、禁止経路、復旧用の手動シーケンスを 17・24・26 行目で重複定義しています。これは冒頭の SSoT 宣言および harness-policy の adapter-SSoT 同期要件（workflow の gate 条件・状態遷移・失敗復旧手順を adapter に長文複製しない）に反します。provider 固有の起動制約と report schema だけを残し、タイミングと次工程の判断は workflow SSoT への参照に戻してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 17,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:ee693f9c6cab3b9e04aca62bce64888d1bf379319ea5d806a639c375febe9be7",
+          "at": "2026-07-12T14:10:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61efd01055ca4744f1537c9906b18b6085c7aa43ac24428b3775928c29bb50f7",
+          "at": "2026-07-12T14:14:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The adapter duplicates provider-independent lifecycle logic from the workflow SSoT: DFP gating, pre-review `done` timing, post-commit hash backfill, prohibited next commands, and the manual recovery sequence. The harness-policy adapter/SSoT rule requires state transitions, gate conditions, and recovery procedures to remain in `.harness/workflows/track/implement.md`; keep only Claude-specific invocation/tool/report framing here.",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 17,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "The new pre-review `done` transition directly contradicts the canonical flow in `knowledge/conventions/task-completion-flow.md:17`, which still prescribes `/track:implement → /track:review → /track:commit` before transitioning tasks to `done`. This leaves two distribution targets specifying opposite lifecycle orderings; update the convention and its examples/checklist to the approved pre-review transition sequence.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 137,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:61efd01055ca4744f1537c9906b18b6085c7aa43ac24428b3775928c29bb50f7",
+          "at": "2026-07-12T14:17:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Claude adapter に workflow SSoT の lifecycle logic が複製されています。done の timing、commit hash backfill、DFP→done→review→commit の順序まで記載されており、SSoT と adapter の同期 drift を招きます。adapter は起動形態・ツール制約・報告形式に限定し、workflow 参照に置き換えるべきです。",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 17,
+              "category": "adapter-SSoT 同期"
+            },
+            {
+              "message": "full-cycle の Claude adapter が workflow SSoT の task-transition timing と権限境界を再記載しています。workflow 側の Step 1d/3 が責務を持つため、adapter には provider 固有の起動・ツール制約だけを残してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/full-cycle.md",
+              "line": 25,
+              "category": "adapter-SSoT 同期"
+            }
+          ],
+          "hash": "rvw1:sha256:d3c5171d676a5d463921f090da19b7539e39c7ffba3f38230550fffb186d38ba",
+          "at": "2026-07-12T14:22:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new canonical flow transitions tasks to `done` without a hash, but `knowledge/conventions/track-lifecycle.md:26` still requires `--commit-hash` when entering `done` (and line 67 reinforces that rule). This leaves two conventions prescribing incompatible transition sequences. Update the lifecycle convention to describe DonePending followed by post-commit backfill.",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 24,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "The recommended `/track:full-cycle` continuation is not resume-safe after `/track:implement`: successful tasks remain `in_progress`, while the full-cycle workflow sends every `in_progress` task through implementation again (`.harness/workflows/track/full-cycle.md:91-95`). It may therefore repeat already-completed implementation work. Define a continuation that starts at DFP, or add an explicit handoff state the full-cycle workflow recognizes.",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 26,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The thin adapter now duplicates provider-independent lifecycle logic: line 17 restates transition timing, and line 26 embeds the DFP → transition → review → commit sequence plus failure-avoidance guidance. This conflicts with the adapter/SSoT rule that state transitions and recovery procedures live only in `.harness/workflows/track/implement.md`. Keep the adapter to Claude-specific invocation and reporting, and reference the workflow for continuation logic.",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 17,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:d3c5171d676a5d463921f090da19b7539e39c7ffba3f38230550fffb186d38ba",
+          "at": "2026-07-12T14:24:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The adapter still duplicates workflow state-machine logic: it spells out the post-CI/DFP `done` timing and embeds the manual DFP → transition → review → commit sequence. Keep this adapter limited to Claude invocation/tool/reporting details and leave ordering in the workflow SSoT to prevent drift.",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 26,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:a60ddb4f878551784929ba7783db96e6e298bb0b2983da23d967cdb905446610",
+          "at": "2026-07-12T14:30:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Claude adapter が、`done` 遷移の gate/timing、post-commit backfill、手動復旧シーケンスまで複製しています。これは冒頭の thin-adapter 契約と harness-policy の adapter–SSoT 同期要件に反し、workflow 変更時に意味がドリフトします。adapter には provider 固有の起動制約と報告形式だけを残し、このシーケンスは `.harness/workflows/track/implement.md` への参照に戻してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 17,
+              "category": "adapter-SSoT 同期"
+            }
+          ],
+          "hash": "rvw1:sha256:a60ddb4f878551784929ba7783db96e6e298bb0b2983da23d967cdb905446610",
+          "at": "2026-07-12T14:33:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new canonical flow transitions tasks to `done` without a hash, but `knowledge/conventions/track-lifecycle.md:26` and `:67` still require `--commit-hash` when entering `done`. These conventions prescribe incompatible transition sequences; update the lifecycle convention to describe DonePending followed by post-commit hash backfill.",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 24,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "After standalone `/track:implement`, successful tasks remain `in_progress`, but the recommended `/track:full-cycle` path sends every `in_progress` task through implementation again (`.harness/workflows/track/full-cycle.md:91-95`). This can repeat already-completed implementation work; provide a resume path that starts at DFP/transition or make full-cycle recognize the handoff.",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 26,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:cc9c8e71f8d120b2f26dbe40942e52a9bb70fb67f6077cdebf4193b1b00e08bf",
+          "at": "2026-07-12T14:38:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "DFP の `skipped` / `completed` 分岐が直接 Review (Step 2) へ進むよう指示しており、新設した Step 1d の `done` 遷移を迂回します。この経路では review 時点でも task が `in_progress` のままになるため、両分岐を Step 1d へ接続してください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 127,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "standalone `/track:implement` は成功 task を `in_progress` のまま渡した後に `/track:full-cycle` を推奨していますが、full-cycle は全 `in_progress` task を再び implement workflow に投入します。実装済み task を識別できず再実装するため、DFP 以降だけを再開できる handoff/state、または重複しない継続経路が必要です。",
+              "severity": "P1",
+              "file": ".claude/commands/track/implement.md",
+              "line": 26,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "この Codex adapter は implementation 後に `$track-commit` が続くと案内していますが、更新後の workflow SSoT は DFP → orchestrator の `done` 遷移 → review を commit 前に必須としています。直接 commit するとその lifecycle を迂回するため、Claude adapter と同じ sanctioned continuation に同期してください。",
+              "severity": "P1",
+              "file": ".agents/skills/track-implement/SKILL.md",
+              "line": 24,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "新しい正式フローは review 前に commit hash なしで `done` へ遷移しますが、`knowledge/conventions/track-lifecycle.md` の状態遷移規則と Good example は `done` 遷移時に `--commit-hash` を付けるよう要求しています。二つの convention が同じ操作について矛盾するため、二段階の DonePending → DoneTraced 規則を convention surface 全体へ同期してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 24,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "正式フローと full-cycle SSoT は batch commit 後の hash backfill と lifecycle-tail review/commit を通常手順として要求していますが、Exceptions は backfill を任意としています。これに従うと task が DonePending のまま残り、workflow の出力契約とも食い違うため、必須性を一貫させてください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 82,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:cc9c8e71f8d120b2f26dbe40942e52a9bb70fb67f6077cdebf4193b1b00e08bf",
+          "at": "2026-07-12T14:43:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `skipped` and `completed` DFP branches proceed directly to Review, bypassing the new Step 1d transition. Tasks therefore remain `in_progress` during review, contrary to the required pre-review `done` timing.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/full-cycle.md",
+              "line": 132,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The new flow transitions tasks to `done` without a hash, but `knowledge/conventions/track-lifecycle.md` still requires `--commit-hash` when entering `done`. These conventions prescribe incompatible transition sequences; document the DonePending → post-commit backfill lifecycle consistently.",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 24,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "The formal flow and full-cycle workflow make post-commit hash backfill part of the lifecycle, but the Exceptions section still declares it optional. Following that exception leaves tasks in `DonePending` and contradicts the workflow output contract.",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 82,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "The Codex adapter still says the commit step follows separately via `$track-commit`, which can bypass the required DFP → orchestrator `done` transition → review sequence now defined by the workflow SSoT. Point the handoff to the enclosing full-cycle lifecycle or explicitly include the missing transition phase.",
+              "severity": "P1",
+              "file": ".agents/skills/track-implement/SKILL.md",
+              "line": 24,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:93b390aead8fd5c112e847aaddf55c83a54feba8b1b3ef6285f031be2a9f39bf",
+          "at": "2026-07-12T14:59:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`bin/sotp track transition` updates task status in `impl-plan.json` only; `metadata.json` is explicitly left unchanged. However, Step 2 and the Outputs contract state that the orchestrator records task states in `metadata.json`, and the Codex adapter repeats that claim. This contradicts the impl-plan SSoT and can cause orchestrators to inspect or attribute the wrong artifact. Replace these `metadata.json` references with `impl-plan.json` and update the adapter wording accordingly.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 53,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:93b390aead8fd5c112e847aaddf55c83a54feba8b1b3ef6285f031be2a9f39bf",
+          "at": "2026-07-12T15:02:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated formal flow makes commit-hash backfill part of the lifecycle-tail procedure, and the workflow requires recording hashes for every batch task after commit, but the convention's Exceptions section still states that backfill is optional. Clarify the exception or make the workflow/convention agree; otherwise operators receive contradictory completion instructions.",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 34,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:01d00430c2aebb22b1cffb4237a4bd255666a19e7d10d1e8dda607fb64be78f3",
+          "at": "2026-07-12T15:07:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "新しい正式フローは review 前に commit hash なしで `done` へ遷移させますが、`knowledge/conventions/track-lifecycle.md` の 26・67 行目は `done` 遷移時に `--commit-hash` を指定するよう要求しています。commit 前には対象 hash が存在しないため両規約は同時に実行できず、orchestrator が旧順序を選ぶ可能性があります。`track-lifecycle.md` も DonePending → commit → DoneTraced の二段階フローへ同期してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 24,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "正式フローでは commit 後の hash backfill と lifecycle-tail commit を手順 2 として要求し、`full-cycle` workflow もこれを完了条件にしていますが、同じ文書の Exceptions（82 行目）は backfill を任意としています。任意扱いのままでは orchestrator が DonePending のまま `/track:pr` へ進めるため、backfill が必須か任意かを一貫させてください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 31,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:01d00430c2aebb22b1cffb4237a4bd255666a19e7d10d1e8dda607fb64be78f3",
+          "at": "2026-07-12T15:10:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:039eedd83e0cce0db7e13870b1ee2924bb1ad73f9fe3db996a3375578c1011a8",
+          "at": "2026-07-12T15:13:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The adapter still says `track transition` updates task states in `metadata.json`, but the command persists task status exclusively in `impl-plan.json`. The workflow SSoT repeats this at lines 53–57 and 130–133, while the revised completion convention correctly routes hash-backfill through the `impl-plan` review scope but still describes the merge guard and dirty checks as operating on `metadata.json`. This semantic wiring drift can make orchestration and review-freshness checks target the wrong artifact. Update these references consistently to `impl-plan.json`.",
+              "severity": "P1",
+              "file": ".agents/skills/track-implement/SKILL.md",
+              "line": 22,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:039eedd83e0cce0db7e13870b1ee2924bb1ad73f9fe3db996a3375578c1011a8",
+          "at": "2026-07-12T15:16:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:552f5abe9148a8dca6a59eb3091e7d15be84f213a1d2658b87cdb1495e016bac",
+          "at": "2026-07-12T15:47:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "新しい正式フローでは `done` を commit hash なしで review 前に行い、commit 後に hash を埋め戻しますが、`knowledge/conventions/track-lifecycle.md` は依然として `done` 遷移時に `--commit-hash` を指定するよう要求し、Good 例でも同じ一段階遷移を示しています。どちらに従うかで review の順序が変わるため、convention surface を二段階ライフサイクルへ同期してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 24,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "ここでは `/track:pr` が全タスク完了を検証するとしていますが、同じ変更の 48–58 行では completion gate は merge 時の `sotp pr wait-and-merge` のみで、push/review-cycle は未完了タスクを許可すると明記されています。Purpose、Scope、Bad 例、plan-branch Exception にも旧 push-gate 説明が残っているため、利用者が中間 push を誤って blocked と判断します。push ではなく merge gate に統一してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 35,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:552f5abe9148a8dca6a59eb3091e7d15be84f213a1d2658b87cdb1495e016bac",
+          "at": "2026-07-12T15:50:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a7b7b31cebf33ea780922d6504f54d2df74ab66cd023c6c05dcafe7927ca0cfb",
+          "at": "2026-07-12T16:06:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The formal flow says `/track:pr` verifies that every task is resolved, but this document’s Purpose, guard description, and Note correctly state that only `sotp pr wait-and-merge` enforces completion; `/track:pr` only pushes and creates/reuses the PR. This leaves the convention internally contradictory about where the gate runs.",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 35,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "This exception says `plan/` branch merges skip the completion guard, contradicting the newly documented fail-closed rule at line 51 that every non-`track/<id>` branch is blocked. The cited implementation also explicitly rejects `plan/foo`, so maintainers following this exception will expect a merge path that cannot work.",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 83,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "The new canonical flow transitions tasks to `done` without a commit hash before review, but `knowledge/conventions/track-lifecycle.md` still requires `--commit-hash <hash>` whenever transitioning to `done` and presents the combined transition as the Good example. Update that convention to distinguish DonePending from the later DoneTraced backfill so the two lifecycle rules do not prescribe incompatible commands.",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 24,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a7b7b31cebf33ea780922d6504f54d2df74ab66cd023c6c05dcafe7927ca0cfb",
+          "at": "2026-07-12T16:09:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5e242727ce5a077023d10bf6b0255dc1797f11e703954057c2f72b5b4684051",
+          "at": "2026-07-12T16:13:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/track:pr` does not verify that all tasks are done/skipped; this file itself later states that push and review-cycle permit unresolved tasks and that only `sotp pr wait-and-merge` enforces completion. This contradictory step can mislead operators about where the fail-closed guard runs. Change the annotation to say task completion is verified by `/track:merge`.",
+              "severity": "P1",
+              "file": "knowledge/conventions/task-completion-flow.md",
+              "line": 35,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a5e242727ce5a077023d10bf6b0255dc1797f11e703954057c2f72b5b4684051",
+          "at": "2026-07-12T16:16:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77ef3b218f073e9d492f707973e85208b599b120089cf6a14c5deafacd272d9f",
+          "at": "2026-07-12T16:21:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77ef3b218f073e9d492f707973e85208b599b120089cf6a14c5deafacd272d9f",
+          "at": "2026-07-12T16:23:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad88642e76c9537e6ce430f95a864e5f7000f9cda7cf2c4db73db0c0c47aafed",
+          "at": "2026-07-12T17:05:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad88642e76c9537e6ce430f95a864e5f7000f9cda7cf2c4db73db0c0c47aafed",
+          "at": "2026-07-12T17:06:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The adapter now unconditionally invokes `track-local-dry-fix` and claims it handles the configured provider, but `sotp dry fix-local` still supports only `codex` and explicitly rejects `claude`. A valid Claude-routed `dry-fix-lead` therefore fails instead of using the previous Agent-tool path. Restore provider-specific delegation or migrate this wrapper to the unified dispatcher before removing the Claude branch.",
+              "severity": "P1",
+              "file": ".claude/commands/track/dry-check.md",
+              "line": 13,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:652410cedd8b2cf0f306c8ebea1cb00ea8e832bf19988b5b1b38ed54048754a1",
+          "at": "2026-07-12T18:05:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The adapter now unconditionally invokes `track-local-dry-fix` and claims it handles the configured provider, but `sotp dry fix-local` still supports only `codex` and explicitly rejects `claude`. A valid Claude-routed `dry-fix-lead` therefore fails instead of using the previous Agent-tool path. Restore provider-specific delegation or migrate this wrapper to the unified dispatcher before removing the Claude branch.",
+              "severity": "P1",
+              "file": ".claude/commands/track/dry-check.md",
+              "line": 13,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:652410cedd8b2cf0f306c8ebea1cb00ea8e832bf19988b5b1b38ed54048754a1",
+          "at": "2026-07-12T18:05:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--host` は dispatch 先 provider ではなく現在の orchestrator host の自己申告です。この Codex adapter は ADR D7 と workflow SSoT に従い `--host codex` と固定すべきですが、`<provider>` という曖昧な placeholder に変わっており、profile から解決した provider を渡すと in-host/subprocess 分岐を誤ります。",
+              "severity": "P1",
+              "file": ".agents/skills/rollback-diagnoser/SKILL.md",
+              "line": 18,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "Claude 用の Agent dispatch を削除して常に `track-local-dry-fix` を呼ぶようになっていますが、配下の `sotp dry fix-local` runner は現在 `codex` だけをサポートし、`dry-fix-lead.provider: claude` を明示的に拒否します。設定可能な Claude route が壊れるため、Claude provider 時の native dispatch を残すか wrapper 側を対応させる必要があります。",
+              "severity": "P1",
+              "file": ".claude/commands/track/dry-check.md",
+              "line": 13,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "直前で `bin/sotp capability exec ...` の直接実行を必須にした一方、この行は同じ Claude adapter body からの direct CLI call を禁止しており、実行指示が自己矛盾しています。旧 Claude Agent/Codex CLI 二経路の残存文言なので、capability dispatch を例外として明記するか禁止文を削除してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/impl-plan.md",
+              "line": 20,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:652410cedd8b2cf0f306c8ebea1cb00ea8e832bf19988b5b1b38ed54048754a1",
+          "at": "2026-07-12T18:05:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--host` は routing 先 provider ではなく、呼び出し元ホストの自己申告です。ここで `<provider>` と案内すると、cross-provider 呼び出しで誤って一致扱いされ、正しい subprocess dispatch を迂回し得ます。workflow SSoT の `<current-host>` と同期し、Codex adapter では `--host codex` と固定してください。",
+              "severity": "P1",
+              "file": ".agents/skills/rollback-diagnoser/SKILL.md",
+              "line": 18,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "この変更は Claude provider 用の Agent 経路を削除し、常に `track-local-dry-fix` を実行させていますが、当該 wrapper の実装は `dry-fix-lead.provider == codex` しか受理せず、Claude では `unsupported ... provider 'claude'` になります。Claude routing を維持するか、wrapper が Claude dispatch を実装するまで provider 別経路を残してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/dry-check.md",
+              "line": 13,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:652410cedd8b2cf0f306c8ebea1cb00ea8e832bf19988b5b1b38ed54048754a1",
+          "at": "2026-07-12T18:07:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow calls `track-local-dry-fix` provider-agnostic and says it executes the configured provider, but the adapter states this wrapper only supports Codex and requires direct Agent-tool dispatch for `provider: claude`. A Claude-routed run following this SSoT will therefore use an unsupported path; align the workflow dispatch with the adapter branch or make the wrapper provider-aware.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/dry-check.md",
+              "line": 60,
+              "category": "adapter-SSoT 同期 check"
+            }
+          ],
+          "hash": "rvw1:sha256:f224dc71400683f713da4c90e0bcebe336336b717743c5c996b924e88d967032",
+          "at": "2026-07-12T18:16:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The provider-agnostic workflow unconditionally calls `track-local-dry-fix` and labels it provider-agnostic, but that wrapper explicitly supports only `codex`; the Claude adapter instead requires a direct Agent-tool invocation. A Claude-configured `dry-fix-lead` therefore fails if the workflow SSoT is followed. Keep provider-specific launch selection in the adapters or use a genuinely provider-agnostic dispatcher here.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/dry-check.md",
+              "line": 53,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "This invocation uses `--host <provider>`, contradicting the workflow SSoT's `--host <current-host>` contract. `--host` identifies the invoking orchestrator, while the dispatcher independently resolves the selected provider; conflating them can incorrectly produce an in-host delegation outcome for a cross-provider route. Use `<current-host>` here.",
+              "severity": "P1",
+              "file": ".agents/skills/rollback-diagnoser/SKILL.md",
+              "line": 18,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:f224dc71400683f713da4c90e0bcebe336336b717743c5c996b924e88d967032",
+          "at": "2026-07-12T18:19:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abd657c7dc1252d5e4c3dd714640c49f00d4c31f1faf15f162a17823aa2a105e",
+          "at": "2026-07-12T18:24:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-dry-fix` を provider-agnostic と規定していますが、Claude adapter はこの wrapper が Codex のみ実装し、`provider: claude` では Agent tool を直接使う必要があると明記しています。そのため workflow SSoT に従う Codex adapter は、有効な Claude routing で wrapper が fail-close し、DRY phase を起動できません。起動分岐を adapters 側だけに置いて SSoT を抽象化するか、wrapper を両 provider 対応にしてください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/dry-check.md",
+              "line": 53,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:abd657c7dc1252d5e4c3dd714640c49f00d4c31f1faf15f162a17823aa2a105e",
+          "at": "2026-07-12T18:27:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry-check` の provider 固有起動分岐が provider-agnostic workflow SSoT に記載され、adapter に限定する契約と衝突しています。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/dry-check.md",
+              "line": 54,
+              "category": "adapter-SSoT 同期 check"
+            }
+          ],
+          "hash": "rvw1:sha256:b5854428d89ee101f7ffa58414a10d7f3dae1071ead5601c65b6532dffa29b44",
+          "at": "2026-07-12T18:33:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`capability exec` の `delegate-in-host` は capability を実行せず構造化 payload を返すだけですが、この adapter は「instruction to follow」とするだけで、Claude Agent を起動して briefing と discipline の両方を task prompt に渡す手順を削除しています。Claude provider を選ぶ profile では Phase 1–3/B&F が未実行のまま進行します。同じ欠落が `diagnose.md`、`impl-plan.md`、`obligation-fulfillment.md` にもあります。各 adapter で `delegate-in-host` 後の Agent-tool dispatch と payload 引き渡しを明記してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 21,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "Provider 非依存であるべき workflow SSoT に、Codex 専用 wrapper と Claude subagent の起動分岐、および Codex wrapper 固有のループが記載されています。scope policy の adapter-SSoT 同期規則では provider 固有の起動方法を adapter に限定しているため、この分岐を両 adapter 側へ移し、workflow には抽象的な capability dispatch 契約だけを残してください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/dry-check.md",
+              "line": 54,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:b5854428d89ee101f7ffa58414a10d7f3dae1071ead5601c65b6532dffa29b44",
+          "at": "2026-07-12T18:36:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "この adapter は直前で `bin/sotp capability exec impl-planner ...` の実行を必須化していますが、同じ段落の「No direct CLI calls from this adapter body」がそれを否定しています。Claude 実行時に dispatch を省略する誤読を招くため、古い制約文を削除または更新してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/impl-plan.md",
+              "line": 20,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:a8a17d7f63bd5031bb2dd59a000e4ac529160157f7a1f2075e447858a5e16aab",
+          "at": "2026-07-12T18:42:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The revised adapter requires a direct `bin/sotp capability exec` call on line 15, but line 20 still says the Claude adapter makes no direct CLI calls. Following the latter instruction skips the only documented Phase 3 dispatch path, so `impl-planner` may never run. Exempt the dispatcher call or clarify that only phase/gate CLI operations are delegated.",
+              "severity": "P1",
+              "file": ".claude/commands/track/impl-plan.md",
+              "line": 20,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:a8a17d7f63bd5031bb2dd59a000e4ac529160157f7a1f2075e447858a5e16aab",
+          "at": "2026-07-12T18:45:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When the configured provider is Claude, `capability exec` returns `delegate-in-host` without running the diagnoser. This adapter only says to follow the instruction and does not specify invoking the Agent tool with the returned capability, briefing, and discipline payload, so `/track:diagnose` can continue without a routing decision.",
+              "severity": "P1",
+              "file": ".claude/commands/track/diagnose.md",
+              "line": 17,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "When `impl-planner.provider` is Claude, `capability exec` returns an in-host delegation payload, but this adapter provides no Agent-tool dispatch step or payload handoff. The Phase 3 writer may therefore never run.",
+              "severity": "P1",
+              "file": ".claude/commands/track/impl-plan.md",
+              "line": 15,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "When `implementer.provider` is Claude, the generic dispatcher returns `delegate-in-host`; the adapter does not instruct the orchestrator to launch the Agent tool with the returned briefing and discipline. Obligation authoring can be skipped while the workflow proceeds.",
+              "severity": "P1",
+              "file": ".claude/commands/track/obligation-fulfillment.md",
+              "line": 16,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The phase dispatch instruction does not define how to handle `delegate-in-host`. With a Claude-routed writer, `/track:plan` can receive the payload and proceed without invoking the corresponding Agent tool, leaving the phase artifact unwritten.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 21,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:df6109038205112f1a606b54ce22043d33300cf78a4aecda56ce400f2a509cc7",
+          "at": "2026-07-12T18:51:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`capability exec` が Claude を選んだ場合は capability を実行せず `delegate-in-host` payload を返すだけです。この adapter は返却された capability・briefing・discipline を使って Agent tool を起動する手順を定義していないため、診断が実行されず routing decision を取得できません。`delegate-in-host` 後の Claude subagent dispatch を明記してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/diagnose.md",
+              "line": 18,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "Claude-routed `impl-planner` では `capability exec` は `delegate-in-host` payload を返すだけですが、この adapter は Agent tool への payload 引き渡しと起動手順を定義していません。そのため Phase 3 writer が実行されず、`impl-plan.json` と `task-coverage.json` が生成されません。",
+              "severity": "P1",
+              "file": ".claude/commands/track/impl-plan.md",
+              "line": 15,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "Claude-routed `implementer` では dispatcher は `delegate-in-host` を返して終了しますが、この adapter は返却された briefing と discipline を使って Agent tool を起動しません。そのため obligation の著作・修復ラウンドを実行しないまま後続 gate に進みます。",
+              "severity": "P1",
+              "file": ".claude/commands/track/obligation-fulfillment.md",
+              "line": 16,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "Phase 1–3/B&F の writer が Claude に route された場合、各 `capability exec` は `delegate-in-host` payload を返すだけです。この adapter は対応する Agent tool の起動と briefing・discipline の引き渡しを定義していないため、writer 未実行のまま phase workflow が進行します。4 capability すべてについて `delegate-in-host` 処理を明記してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 21,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:df6109038205112f1a606b54ce22043d33300cf78a4aecda56ce400f2a509cc7",
+          "at": "2026-07-12T18:54:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CAPABILITY_EXEC_OUTCOME: executed` with exit code 0 only proves the provider subprocess exited successfully; it does not prove the phase gate passed. A blocked `impl-planner` run can still emit `IMPL_PLAN_STATUS: blocked` while the provider exits 0, so this instruction can advance `/track:plan` past a failed task-coverage gate. Parse the capability status/gate verdict and complete the phase only on an explicit OK/completed result.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 26,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:82fc48fd5f5091f89a48d9c68059dd0b7723b2560f8e53620e093015d55347ac",
+          "at": "2026-07-12T19:00:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`capability exec --host claude` returns `delegate-in-host` without executing the capability, but this adapter never instructs Claude Code to invoke the `rollback-diagnoser` Agent with the returned briefing and discipline. It can therefore reach the report step without any routing decision. Handle this outcome explicitly, as the plan adapter does.",
+              "severity": "P1",
+              "file": ".claude/commands/track/diagnose.md",
+              "line": 17,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "For the configured Claude provider, the dispatcher only returns `delegate-in-host`; this adapter does not explicitly invoke the `impl-planner` Agent afterward. `/track:impl-plan` can consequently report success while `impl-plan.json` and `task-coverage.json` were never written. Add the mandatory in-host Agent invocation using the returned briefing and discipline.",
+              "severity": "P1",
+              "file": ".claude/commands/track/impl-plan.md",
+              "line": 15,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The implementer dispatch may return `delegate-in-host`, but the adapter neither says to follow it nor specifies the Claude Agent invocation. With a Claude-routed implementer, no authoring/repair occurs before `evaluate` and `check`, so the obligation loop cannot make progress. Explicitly invoke the returned capability with its briefing and discipline.",
+              "severity": "P1",
+              "file": ".claude/commands/track/obligation-fulfillment.md",
+              "line": 16,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:82fc48fd5f5091f89a48d9c68059dd0b7723b2560f8e53620e093015d55347ac",
+          "at": "2026-07-12T19:03:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`delegate-in-host` 時に Claude Agent tool を起動する手順がなく、診断が実行されない可能性があります。",
+              "severity": "P1",
+              "file": ".claude/commands/track/diagnose.md",
+              "line": 21,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "`delegate-in-host` 時の `impl-planner` Agent 起動手順がなく、計画成果物が作成されない可能性があります。",
+              "severity": "P1",
+              "file": ".claude/commands/track/impl-plan.md",
+              "line": 18,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "`delegate-in-host` 時の implementer Agent 起動手順がなく、obligation の authoring/repair が実行されない可能性があります。",
+              "severity": "P1",
+              "file": ".claude/commands/track/obligation-fulfillment.md",
+              "line": 18,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:5408131d5212959ae0d5f3d59a2d536f202b373626b03406db88e15c2b2453b7",
+          "at": "2026-07-12T19:08:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5408131d5212959ae0d5f3d59a2d536f202b373626b03406db88e15c2b2453b7",
+          "at": "2026-07-12T19:11:39Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 claims it will “expose the profile/source/provider ports,” but task-contract.json attributes CapabilityProfilePort, CapabilityProviderPort, and CapabilitySourcePort only to T002. Align the description and attribution so the executable task boundary is unambiguous.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/task-contract.json",
+              "line": 24,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T001 restates upstream behavior in “validated request” and “port-boundary validation failures”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 restates the behavior contract in “validate briefing and discipline,” “resolve profiles without capability-specific branching,” “reject invalid execution mode,” and “fail-closed”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates upstream design rationale in “Keep routing/model authority in profiles and provider-specific permissions in adapters”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 restates input-validation behavior in “regular readable UTF-8 nonblank inputs” and “without fallback”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 restates provider execution behavior in “preflight provider-native definitions,” “verified native invocation contracts,” “read-only default,” and “no raw-definition fallback”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 restates outcome and error behavior in “discriminated execution and in-host outcomes,” “non-success error rendering,” and “outcome discrimination”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T007 restates CLI behavior in “argument absence,” “dispatch forwarding,” and “rejection of the retired command”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T008 restates end-to-end behavior in “valid dispatch,” “in-host delegation,” “rejection-before-spawn,” and “preservation of typed pipelines”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 48,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T009 restates operational behavior in “writer route remains available while the retired planner path is absent”; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 54,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 restates upstream type-design rationale in “validated-value, enum-first, and port-boundary decisions”; retain only sequencing and task references.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 76,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 restates upstream behavior and rationale in “fixed discipline path,” “fail-closed preflight tests,” and “D10 provider-native execution contract”; retain only sequencing and task references.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 87,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S4 restates the safety/behavior contract in “proves the replacement route,” “removal ... safe,” and “no live writer guidance remains orphaned”; retain only sequencing and task references.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/impl-plan.json",
+              "line": 112,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:b58ff214a5b741669126f272f46e2f6e6aaa60a2a4c661277f547a5385d2eece",
+          "at": "2026-07-11T23:02:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ae89ce08e9c2ef19755fa83813e2d023014bd0c780aac48eb8c6aceab09301a",
+          "at": "2026-07-11T23:08:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ae89ce08e9c2ef19755fa83813e2d023014bd0c780aac48eb8c6aceab09301a",
+          "at": "2026-07-11T23:11:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94c85f481b568e80b03255d91aeeba224a51ed6016e9d7a54651d6249c85a0a9",
+          "at": "2026-07-12T00:09:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94c85f481b568e80b03255d91aeeba224a51ed6016e9d7a54651d6249c85a0a9",
+          "at": "2026-07-12T00:10:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:186b72edda46ccac5e5bb2fb72a1ec0f6fb75526f1081034e56be334c557efbd",
+          "at": "2026-07-12T09:04:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:186b72edda46ccac5e5bb2fb72a1ec0f6fb75526f1081034e56be334c557efbd",
+          "at": "2026-07-12T09:04:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:186b72edda46ccac5e5bb2fb72a1ec0f6fb75526f1081034e56be334c557efbd",
+          "at": "2026-07-12T09:05:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:adfa18729d606a42c10f48e41f932af99ea0f1337ec82324481a801f19dc3189",
+          "at": "2026-07-12T10:46:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:adfa18729d606a42c10f48e41f932af99ea0f1337ec82324481a801f19dc3189",
+          "at": "2026-07-12T10:49:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b43b9031892764461ec8792664d7e3a57ca49325eaf162a4830cff2275cd66c",
+          "at": "2026-07-12T11:08:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b43b9031892764461ec8792664d7e3a57ca49325eaf162a4830cff2275cd66c",
+          "at": "2026-07-12T11:09:58Z"
+        }
+      ]
+    }
+  }
+}

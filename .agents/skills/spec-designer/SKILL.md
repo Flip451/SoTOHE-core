@@ -1,5 +1,6 @@
 ---
 name: spec-designer
+sandbox: workspace-write
 description: Use when Codex is assigned the SoTOHE Phase 1 spec-designer capability. Writes the behavioral contract spec.json from ADRs and conventions, regenerates the rendered spec view through the SoTOHE CLI, and reports signal counts.
 ---
 

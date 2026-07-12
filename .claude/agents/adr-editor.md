@@ -2,6 +2,12 @@
 name: adr-editor
 model: claude-opus-4-7[1m]
 effort: max
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Edit
+  - Bash
 description: |
   Back-and-forth ADR editor for /track:plan escalation. Invoked automatically when a downstream SoT Chain signal turns 🔴 and the fix requires editing an existing ADR under knowledge/adr/. Edits the working tree only — never commits inside the loop. Mirrors the `adr-editor` capability in `.harness/config/agent-profiles.json` and declares explicit Opus routing via frontmatter.
 ---

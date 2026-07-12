@@ -10,10 +10,10 @@ User invokes this command as `/track:dry-check`. No arguments.
 
 ## Claude Code invocation constraints
 
-Resolve `capabilities.dry-fix-lead.provider` from `.harness/config/agent-profiles.json`:
+Provider routing is defined by `.harness/config/agent-profiles.json` (`capabilities.dry-fix-lead.provider`); the CLI wrapper below reads it internally. Adapter-specific invocation is required because the wrapper currently implements only the codex path:
 
-- **`provider: claude`**: Agent tool (`subagent_type: "dry-fix-lead"`, `run_in_background: true`). Include track id and the most recent `sotp dry write` findings in the briefing.
-- **`provider: codex`**: `cargo make track-local-dry-fix -- --track-id <id> --briefing-file <path>`
+- **`provider: codex`**: `cargo make track-local-dry-fix -- --track-id <id> --briefing-file <path>` (the wrapper resolves the provider/model internally).
+- **`provider: claude`**: Agent tool (`subagent_type: "dry-fix-lead"`, `run_in_background: true`). Include the track id and the most recent `sotp dry write` findings in the briefing. The wrapper does not yet cover claude; use this direct Agent-tool path.
 
 ## Report format
 

@@ -139,7 +139,8 @@ If the briefing asks for:
 - Source code editing → stop and return `routing_target: "impl"` so the orchestrator dispatches
   a source-edit task
 
-This capability **never** edits any artifact or invokes any writer subagent — it is diagnose-only.
+This capability **never** edits any artifact, runs `bin/sotp track transition`, or invokes any
+writer subagent — it is diagnose-only and has no task-state transition authority.
 
 ## Contract
 

@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "layer": "cli_driver",
+  "entries": [
+    {
+      "claim_hash": "2636a3b54aaff5187d7afdc8c399c26fb3b20871ba539d18f7043133ba50f4cf",
+      "evidence_hash": "237468cb2ff4a151d02d8b4a445f0e33bb28a11011c12070a21e62a759b396fc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "自由形式の成果物を orchestrator が消費する capability の単一かつ profile 駆動の dispatch 入口として提供する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "`bin/sotp capability exec <capability-name> --host <provider> --briefing-file <path>` を、自由形式の成果物を orchestrator が消費する capability の単一かつ profile 駆動の dispatch 入口として提供する。呼び出し可能な capability、provider、model、実行経路は profile と provider-native adapter 定義から解決し、capability 名ごとの専用 runner を増設しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2636a3b54aaff5187d7afdc8c399c26fb3b20871ba539d18f7043133ba50f4cf",
+      "evidence_hash": "909a68f11ff1518bfdb77235fa4622418d828c30f32c8836d125071d022883fa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実行結果と in-host 委譲指示を、呼び出し側が機械判別できる判別子付きの出力として返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "実行結果と in-host 委譲指示を、呼び出し側が機械判別できる判別子付きの出力として返す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2c00af6398a113e64e62f59fcf26b785afd9740e5bf711c42b1f866d2373330a",
+      "evidence_hash": "be50f31c85d765d3d4a710a4fddbba8d44f71dc326bc075d3057cbb15f277061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecDriverInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2fbea112e7a78b98c0872efc83ac9b630582ab464ad4929a3d00ad3f4b752741",
+      "evidence_hash": "be50f31c85d765d3d4a710a4fddbba8d44f71dc326bc075d3057cbb15f277061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityFilePathArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2fbea112e7a78b98c0872efc83ac9b630582ab464ad4929a3d00ad3f4b752741",
+      "evidence_hash": "5d6294cb3b25fad21f56988379de9f88c3a7285807f23cb196ce848700031f0f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "必須引数、briefing、discipline template、profile entry、execution mode、provider、model、adapter definition、adapter preflight のいずれかが無効・欠如・不一致なら"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityFilePathArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "dispatch は fail-closed とする。必須引数、briefing、discipline template、profile entry、execution mode、provider、model、adapter definition、adapter preflight のいずれかが無効・欠如・不一致なら、in-host 委譲指示も subprocess 起動も行わず非成功で終了する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e59922faf44d872beef5c05d07fbbb92fb3c9ffcbffe37966bcd0984d6be863e",
+      "evidence_hash": "be50f31c85d765d3d4a710a4fddbba8d44f71dc326bc075d3057cbb15f277061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "capability 名"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityNameArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e59922faf44d872beef5c05d07fbbb92fb3c9ffcbffe37966bcd0984d6be863e",
+      "evidence_hash": "5d6294cb3b25fad21f56988379de9f88c3a7285807f23cb196ce848700031f0f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "必須引数、briefing、discipline template、profile entry、execution mode、provider、model、adapter definition、adapter preflight のいずれかが無効・欠如・不一致なら"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityNameArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "dispatch は fail-closed とする。必須引数、briefing、discipline template、profile entry、execution mode、provider、model、adapter definition、adapter preflight のいずれかが無効・欠如・不一致なら、in-host 委譲指示も subprocess 起動も行わず非成功で終了する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "331c4bfa814873f685ee366ad37073c9962e7ced4571c4197d4c761c2e6859e1",
+      "evidence_hash": "be50f31c85d765d3d4a710a4fddbba8d44f71dc326bc075d3057cbb15f277061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "capability 名"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ProviderNameArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "331c4bfa814873f685ee366ad37073c9962e7ced4571c4197d4c761c2e6859e1",
+      "evidence_hash": "0979a692e06b6e516307b4e09cdb21e3a999b86add9b9f9d8039f587e34fbab9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--host` を runtime の呼び出し元 provider の必須自己申告として扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ProviderNameArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`--host` を runtime の呼び出し元 provider の必須自己申告として扱う。claude==claude かつ全 preflight が通る場合だけ subprocess を起動しない in-host 委譲指示を返し、codex==codex と cross-provider の場合は adapter による subprocess dispatch を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4c9f90f062a02b02bc8c5506abb1078eac7f6dd229482c88351daddd37a905ab",
+      "evidence_hash": "759353985a2bffd1570e4cbb85415534dbaedd660c5a2d0b824468bea9e8d51e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp plan codex-local` の CLI、driver、usecase、infrastructure adapter と、それを正規経路として示す規約・command・設定・skill の参照を撤去し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "PlanDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`sotp plan codex-local` の CLI、driver、usecase、infrastructure adapter と、それを正規経路として示す規約・command・設定・skill の参照を撤去し、writer capability への案内を `capability exec` の経路へ差し替える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4c9f90f062a02b02bc8c5506abb1078eac7f6dd229482c88351daddd37a905ab",
+      "evidence_hash": "759353985a2bffd1570e4cbb85415534dbaedd660c5a2d0b824468bea9e8d51e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp plan codex-local` の CLI、driver、usecase、infrastructure adapter と、それを正規経路として示す規約・command・設定・skill の参照を撤去し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "PlanInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`sotp plan codex-local` の CLI、driver、usecase、infrastructure adapter と、それを正規経路として示す規約・command・設定・skill の参照を撤去し、writer capability への案内を `capability exec` の経路へ差し替える。"
+        }
+      }
+    }
+  ]
+}

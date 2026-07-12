@@ -42,6 +42,7 @@ an empty list or fails, make no edits and return `failed` with the reason.
 - Files outside the resolved boundary: do NOT modify. Return `blocked_cross_scope` with the
   out-of-scope file list so the orchestrator can re-partition.
 - Cross-scope edits are fail-closed: silent out-of-scope modifications are prohibited.
+- Do not run `bin/sotp track transition`; this capability has no task-state transition authority.
 
 ## Scope-specific severity policy
 

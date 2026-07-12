@@ -7,7 +7,7 @@
 
 ## Mission
 
-Run the autonomous feature-batch implement → DRY check → review → commit loop for the current
+Run the autonomous feature-batch implement → DRY check → task completion → review → commit loop for the current
 track. The default consumption unit is the **feature batch**: all `todo` / `in_progress` tasks
 are implemented in dependency order into the same working tree without intermediate commits,
 then a single DFP + review pass + commit close the batch. The batch is split only when adding
@@ -90,10 +90,15 @@ gates. The order is encoded in the impl-plan sections.
 
 **Step 1: Implement (batch-scoped)**
 
-Invoke the `implement` workflow (`.harness/workflows/track/implement.md`) over every
-`todo` / `in_progress` task in this batch in Step 0c order. For DonePending tasks, skip
-implementation only — keep the task in the batch so its working-tree changes flow through DFP,
-Review, Commit, and post-commit task hash recording. Do NOT commit between tasks in the same batch.
+Invoke the `implement` workflow (`.harness/workflows/track/implement.md`) over every `todo`
+task in this batch in Step 0c order. For an `in_progress` task, first check whether its
+working-tree implementation already exists (a prior standalone `/track:implement` hands tasks
+off `in_progress` without transitioning them): if the task's implementation is already present
+and CI passes, skip re-implementation and carry it forward like a DonePending task; only
+(re-)implement an `in_progress` task whose work is absent or incomplete. For DonePending tasks,
+skip implementation only — keep the task in the batch so its working-tree changes flow through
+DFP, Review, Commit, and post-commit task hash recording. Do NOT commit between tasks in the
+same batch.
 
 **Step 1b: Actual-diff guard (advisory ceiling visibility)**
 
@@ -132,6 +137,13 @@ Branch on the dfl terminal state (four mutually-exclusive outcomes):
   Commit. Escalate for manual resolution.
 - **`failed`**: stop the loop and report the error. Do NOT proceed.
 
+**Step 1d: Orchestrator marks completed tasks done**
+
+After CI passes and DFP reaches `skipped` or `completed`, the orchestrator marks each successfully
+implemented `todo` / `in_progress` task in the batch `done` before Review. DonePending tasks are
+already `done` and require no state transition at this point. The orchestrator does not record a
+commit hash yet; it backfills that hash only after the batch commit in Step 3.
+
 **Step 2: Review (single round per batch)**
 
 Invoke the `review` workflow (`.harness/workflows/track/review.md`) once. Required scopes come
@@ -156,8 +168,8 @@ The `commit` workflow enforces the track-aware gates as hard preconditions via
 `sotp test-obligation check`, and `sotp dry check-approved` before committing).
 A `blocked` DFP or failing test-obligation gate cannot be committed past.
 
-**Post-commit task hash recording**: after the commit succeeds, record the single commit hash
-on every task in this batch (including DonePending tasks) with:
+**Orchestrator post-commit task hash recording**: after the commit succeeds, the orchestrator
+backfills the single commit hash on every task in this batch (including DonePending tasks) with:
 
 ```
 bin/sotp track transition <task_id> done --commit-hash <hash>
@@ -219,7 +231,8 @@ Otherwise, skip (file absence = no observations).
 | Step | Gate | Verdict |
 |------|------|---------|
 | 1 | Track branch and active tasks found | OK / stop |
-| 1c | DFP terminal state | skipped/completed → proceed; blocked/failed → halt |
+| 1c | DFP terminal state | skipped/completed → Step 1d; blocked/failed → halt |
+| 1d | Successful batch tasks marked `done` before review | OK / stop |
 | 2 | Review `zero_findings` all required scopes | completed / blocked / failed |
 | 3 | `cargo make track-commit-message` (CI + track-aware gates + DRY check) | OK / ERROR |
 | 4 | `git status --short` empty | OK / unexpected dirty state |
@@ -237,7 +250,8 @@ Otherwise, skip (file absence = no observations).
 ## Outputs
 
 - Commits on the current `track/<id>` branch, one per batch + optional lifecycle tail
-- Commit hashes recorded on all batch tasks via `bin/sotp track transition done --commit-hash`
+- Commit hashes recorded by the orchestrator on all batch tasks via
+  `bin/sotp track transition done --commit-hash`
 - Optional `track/items/<id>/observations.md`
 - Summary: batches executed (task IDs, commit hash per batch), tasks completed, tasks remaining,
   any failures, recommended next command (`pr-review` workflow)

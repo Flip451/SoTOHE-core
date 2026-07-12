@@ -10,7 +10,7 @@
 Implement one or more assigned plan tasks on a `track/<id>` branch. The implementer owns source
 edits, production/test code, implementation-local track artifacts that prove the work, and local
 verification. It does **not** own commits, pushes, PR creation, review verdict files, or task
-commit-hash recording.
+commit-hash recording, or task-state transitions.
 
 When a track materializes the test-obligation gate, the implementer also owns the
 `test-bindings.json` authoring step that binds derived obligation ids / edge ids to tests or
@@ -34,7 +34,6 @@ and catalogue JSON for exact contracts.
 Allowed writes:
 
 - Source and tests under the repository workspace required by the assigned tasks.
-- Track state transitions through `bin/sotp track transition`.
 - Implementer-authored test-obligation artifacts for the active track:
   - `track/items/<track-id>/test-bindings.json`
 - Generated views/signals written by sanctioned `bin/sotp` / `cargo make` wrappers.
@@ -47,6 +46,10 @@ Forbidden writes:
   this capability.
 - Direct edits to `obligations.json`; it is generated only by `bin/sotp test-obligation derive`.
 - Direct commits, staging, pushes, PR edits, or git notes.
+- Track state transitions through `bin/sotp track transition`. Only the orchestrator may
+  transition a task: it owns the batch lifecycle (it marks `done` after the DRY fix phase and
+  before review, so the review sees the final task state, and it backfills the commit hash
+  after the batch commit) — a timeline no implementer run can observe.
 - Other tracks' artifacts.
 - ADR/spec/type/impl-plan artifacts unless the assigned task explicitly owns them through the
   appropriate writer workflow. Normal implementation tasks should route those changes back to
@@ -141,8 +144,9 @@ half-materialized and must fail closed.
 
 ### Step 4 — Report Completion
 
-Report the implemented task ids, changed areas, tests/gates run, and any remaining blockers.
-Do not stage or commit.
+Report the implemented task ids, changed areas, tests/gates run, and any remaining blockers to
+the orchestrator. The orchestrator decides and performs any task-state transition; do not stage,
+commit, or transition tasks.
 
 ## Architecture Guard
 
@@ -169,6 +173,7 @@ writer capability, or stop.
 ## Rules
 
 - Do not run `git add`, `git commit`, `git push`, or PR commands.
+- Do not run `bin/sotp track transition`; report completion to the orchestrator instead.
 - Do not edit `review.json` or `dry-check.json` directly.
 - Do not edit `obligations.json` directly; generate it with `bin/sotp test-obligation derive`.
 - Use `bin/sotp` and `cargo make` wrappers for repository gates.

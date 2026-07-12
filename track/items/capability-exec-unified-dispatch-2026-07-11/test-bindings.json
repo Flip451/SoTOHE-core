@@ -1,0 +1,558 @@
+{
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "BriefingText", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-05"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_briefing_text_whitespace_rejected"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_briefing_text_valid_content_preserved"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "BriefingText", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-03"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_briefing_text_whitespace_rejected"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_briefing_text_valid_content_preserved"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CapabilityExecError", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-01"}},
+      "reason": "At CapabilityExecError x CN-01, this error vocabulary carries type-level failure classification only; it makes no condition-to-observable-result promise. Fail-closed dispatch behavior is owned by the T002 interactor and its ports."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CapabilityExecError", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "AC-02"}},
+      "reason": "At CapabilityExecError x AC-02, this error vocabulary carries type-level failure classification only; it makes no condition-to-observable-result promise. Rejection without provider dispatch is owned by the T002 interactor and its ports."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CapabilityExecError", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "AC-03"}},
+      "reason": "At CapabilityExecError x AC-03, this error vocabulary carries type-level failure classification only; it makes no condition-to-observable-result promise. Source validation before dispatch is owned by the T002 interactor and its source port."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CapabilityExecError", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "AC-04"}},
+      "reason": "At CapabilityExecError x AC-04, this error vocabulary carries type-level failure classification only; it makes no condition-to-observable-result promise. Adapter preflight rejection is owned by the T002 interactor and provider port."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityExecRequest", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_request_shared_capability_name_retained"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityExecRequest", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-06"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_request_shared_capability_name_retained"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CapabilityFailureDetail", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-01"}},
+      "reason": "At CapabilityFailureDetail x CN-01, this opaque detail value carries diagnostics only; it makes no condition-to-observable-result promise. Fail-closed behavior is owned by the T002 interactor and its ports."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityFilePath", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-01"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_file_path_valid_path_preserved"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_file_path_empty_path_rejected"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_file_path_absolute_and_traversal_paths_rejected"},
+        {"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_exec_missing_briefing_file_is_rejected"},
+        {"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_exec_parses_required_generic_dispatch_inputs"},
+        {"layer": "cli_driver", "module_path": "cli_driver::capability::tests", "test_name": "test_capability_driver_forwards_shared_exec_inputs_to_generic_service"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CapabilityInputValidationError", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-01"}},
+      "reason": "At CapabilityInputValidationError x CN-01, this enum only classifies invalid input values; it makes no condition-to-observable-result promise about blocking delegation or subprocess execution. Fail-closed dispatch is owned by the T002 interactor and its ports."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityProfile", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-02"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_profile_valid_values_retained"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_execution_mode_distinct_variants_retained"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityProfile", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_profile_valid_values_retained"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "DisciplineText", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-05"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_discipline_text_whitespace_rejected"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_discipline_text_valid_content_preserved"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "DisciplineText", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-03"}},
+      "reason": "At DisciplineText x CN-03, this value object only represents already-loaded nonblank policy text; it makes no provenance, template-location, prompt-composition, or fallback-path promise. The fixed template and source adapter are owned by T003 and T004, while branch application is owned by T002."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ExecutionMode", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_execution_mode_distinct_variants_retained"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "ExecutionMode", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "AC-02"}},
+      "reason": "At ExecutionMode x AC-02, this finite vocabulary explicitly has no state-transition semantics; it makes no rejection or no-execution promise. Typed-pipeline rejection and the absence of delegation or subprocess activity are owned by the T002 interactor and its ports."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "ModelName", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-02"}},
+      "reason": "At ModelName x CN-02, this value object only carries a validated model identifier; it establishes no authority relationship between a profile and an adapter and offers no fallback behavior. Profile and adapter authority are enforced by the T002 interactor with the T004 and T005 adapters."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "ProviderName", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-03"}},
+      "reason": "At ProviderName x IN-03, this value object only represents a nonblank provider identifier; it makes no supported-provider, model-compatibility, or pre-dispatch rejection promise. Provider-arm selection belongs to the T002 interactor and T005 provider adapters."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "ProviderName", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-01"}},
+      "reason": "At ProviderName x CN-01, this value object only validates identifier presence; it makes no condition-to-observable-result promise about blocking delegation or subprocess execution. Fail-closed dispatch is owned by the T002 interactor and its ports."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "CapabilityExecInteractor", "item_identifier": "entry", "obligation_kind": "result"},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_valid_orchestrator_output_dispatches_validated_request"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_source_failure_prevents_profile_and_provider_dispatch"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_typed_pipeline_rejected_before_provider_dispatch"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_unsupported_provider_rejected_before_provider_dispatch"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "CapabilityExecService", "item_identifier": "trait_method:execute", "obligation_kind": "result"},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_valid_orchestrator_output_dispatches_validated_request"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_source_failure_prevents_profile_and_provider_dispatch"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_typed_pipeline_rejected_before_provider_dispatch"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_unsupported_provider_rejected_before_provider_dispatch"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_adapter_preflight_failure_returns_without_successful_outcome"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "CapabilityProfilePort", "item_identifier": "trait_method:resolve", "obligation_kind": "contract"},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_capability_returns_profile_resolution"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_model_returns_model_missing"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_typed_pipeline_returns_profile_resolution"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_capability_config_dto_missing_execution_mode_is_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::agent_profiles::tests", "test_name": "test_shipped_sample_profiles_when_loaded_parse_successfully"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_typed_pipeline_rejected_before_provider_dispatch"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_unknown_execution_mode_returns_profile_resolution"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_out_of_root_config_returns_profile_resolution"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "CapabilityProviderPort", "item_identifier": "trait_method:provider", "obligation_kind": "contract"},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_model_returns_model_missing"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_valid_orchestrator_output_dispatches_validated_request"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_claude_provider_dispatches_validated_request"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_unsupported_provider_rejected_before_provider_dispatch"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_same_host_returns_in_host_instruction"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_cross_provider_uses_native_agent_prompt"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_missing_model_rejected_before_process"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_model_mismatch_rejected_before_process"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_missing_skill_rejects_without_raw_definition_prompt_fallback"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "CapabilityProviderPort", "item_identifier": "trait_method:dispatch", "obligation_kind": "contract"},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_model_returns_model_missing"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_unsupported_provider_rejected_before_provider_dispatch"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_missing_skill_rejected_before_process"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_same_host_returns_in_host_instruction"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_cross_provider_uses_native_agent_prompt"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_invalid_agent_rejected_before_process"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_model_mismatch_rejected_before_process"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "CapabilitySourcePort", "item_identifier": "trait_method:load_briefing", "obligation_kind": "contract"},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_valid_files_load_as_validated_text"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_directory_briefing_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_missing_briefing_is_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_rejects_empty_and_non_utf8_briefings"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_rejects_empty_fixed_discipline_template"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_invalid_fixed_discipline_sources_are_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_rejects_symlinked_briefing_and_discipline"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_allows_workspace_root_reached_through_symlink"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "CapabilitySourcePort", "item_identifier": "trait_method:load_discipline", "obligation_kind": "contract"},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_valid_files_load_as_validated_text"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_directory_briefing_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_missing_briefing_is_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_rejects_empty_and_non_utf8_briefings"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_rejects_empty_fixed_discipline_template"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_invalid_fixed_discipline_sources_are_rejected"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "AgentProfilesCapabilityAdapter", "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProfilePort", "obligation_kind": "contract_conformance"},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_typed_pipeline_returns_profile_resolution"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_unknown_execution_mode_returns_profile_resolution"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_out_of_root_config_returns_profile_resolution"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_capability_returns_profile_resolution"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_provider_returns_profile_resolution"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_model_returns_model_missing"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_unsupported_provider_rejected_before_adapter_dispatch"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_capability_config_dto_missing_execution_mode_is_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::agent_profiles::tests", "test_name": "test_shipped_sample_profiles_when_loaded_parse_successfully"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "FsCapabilitySourceAdapter", "item_identifier": "trait_impl:usecase::capability_exec::CapabilitySourcePort", "obligation_kind": "contract_conformance"},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_valid_files_load_as_validated_text"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_directory_briefing_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_missing_briefing_is_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_rejects_empty_and_non_utf8_briefings"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_rejects_empty_fixed_discipline_template"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::source::tests", "test_name": "test_fs_capability_source_adapter_invalid_fixed_discipline_sources_are_rejected"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "CodexCapabilityAdapter", "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort", "obligation_kind": "contract_conformance"},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_cross_provider_dispatches_native_skill"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_missing_skill_rejected_before_process"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_symlinked_skill_rejected_before_process"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_traversal_name_rejected_before_process"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "ClaudeCapabilityAdapter", "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort", "obligation_kind": "contract_conformance"},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_same_host_returns_in_host_instruction"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_cross_provider_uses_native_agent_prompt"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_invalid_agent_rejected_before_process"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_missing_model_rejected_before_process"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_model_mismatch_rejected_before_process"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_unsupported_provider_rejected_before_provider_dispatch"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_symlinked_agent_rejected_before_process"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_traversal_name_rejected_before_process"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityDispatchOutcome", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-09"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::capability::tests", "test_name": "test_capability_driver_executed_outcome_is_machine_discriminated"},
+        {"layer": "cli_driver", "module_path": "cli_driver::capability::tests", "test_name": "test_capability_driver_in_host_outcome_includes_required_payload"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityDispatchOutcome", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "AC-05"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::capability::tests", "test_name": "test_capability_driver_in_host_outcome_includes_required_payload"},
+        {"layer": "cli_composition", "module_path": "cli_composition::capability::tests", "test_name": "test_capability_composition_root_dispatches_valid_claude_host_in_process"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityDispatchRequest", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-05"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_valid_orchestrator_output_dispatches_validated_request"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityDispatchRequest", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-06"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_valid_orchestrator_output_dispatches_validated_request"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_same_host_returns_in_host_instruction"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_cross_provider_uses_native_agent_prompt"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityDispatchRequest", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-07"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_valid_orchestrator_output_dispatches_validated_request"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityConfigDto", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-02"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_capability_config_dto_missing_execution_mode_is_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_capability_config_dto_orchestrator_output_is_distinct_from_typed_pipeline"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_typed_pipeline_returns_profile_resolution"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AgentProfilesError", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-02"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_capability_config_dto_missing_execution_mode_is_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::agent_profiles::tests", "test_name": "test_load_symlinked_file_returns_symlink_error"},
+        {"layer": "infrastructure", "module_path": "infrastructure::agent_profiles::tests", "test_name": "test_capability_config_with_timeout_seconds_is_rejected"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AgentProfilesError", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-01"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_capability_config_dto_missing_execution_mode_is_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::agent_profiles::tests", "test_name": "test_load_symlinked_file_returns_symlink_error"},
+        {"layer": "infrastructure", "module_path": "infrastructure::agent_profiles::tests", "test_name": "test_capability_config_with_timeout_seconds_is_rejected"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ClaudeCapabilityAdapter", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-04"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_same_host_returns_in_host_instruction"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_invalid_agent_rejected_before_process"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_missing_model_rejected_before_process"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_model_mismatch_rejected_before_process"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ClaudeCapabilityAdapter", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "AC-06"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_cross_provider_uses_native_agent_prompt"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CodexCapabilityAdapter", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-04"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_skill_workspace_write_sandbox_is_retained"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_declared_and_default_sandbox_reach_subprocess"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityProviderPort", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-07"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_cross_provider_dispatches_native_skill"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_missing_skill_rejects_without_raw_definition_prompt_fallback"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CodexCapabilityAdapter", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "AC-06"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ExecutionModeDto", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ExecutionModeDto", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-02"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ModelNameDto", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ModelNameDto", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-02"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ProviderNameDto", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-03"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ProviderNameDto", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-02"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SandboxMode", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-04"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_skill_workspace_write_sandbox_is_retained"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_skill_missing_sandbox_defaults_to_read_only"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SandboxMode", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "AC-09"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_skill_missing_sandbox_defaults_to_read_only"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityDriver", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "GO-01"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::capability::tests", "test_name": "test_capability_driver_forwards_shared_exec_inputs_to_generic_service"},
+        {"layer": "cli_composition", "module_path": "cli_composition::capability::tests", "test_name": "test_capability_composition_root_dispatches_valid_claude_host_in_process"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_valid_orchestrator_output_dispatches_validated_request"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt"},
+        {"layer": "cli_composition", "module_path": "cli_composition::capability::tests", "test_name": "test_capability_composition_root_profile_resolution_yields_resolved_in_host_route"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityDriver", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-09"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::capability::tests", "test_name": "test_capability_driver_in_host_outcome_includes_required_payload"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityExecDriverInput", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-01"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_exec_parses_required_generic_dispatch_inputs"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityNameArg", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-01"}},
+      "tests": [
+        {"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_exec_parses_required_generic_dispatch_inputs"},
+        {"layer": "cli_driver", "module_path": "cli_driver::capability::tests", "test_name": "test_capability_driver_forwards_shared_exec_inputs_to_generic_service"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityNameArg", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-01"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_exec_requires_host_and_briefing_file"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ProviderNameArg", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-01"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_exec_parses_required_generic_dispatch_inputs"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ProviderNameArg", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-06"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_exec_parses_required_generic_dispatch_inputs"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityCompositionRoot", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "GO-01"}},
+      "tests": [{"layer": "cli_composition", "module_path": "cli_composition::capability::tests", "test_name": "test_capability_composition_root_dispatches_valid_claude_host_in_process"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityCompositionRoot", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-04"}},
+      "tests": [{"layer": "cli_composition", "module_path": "cli_composition::capability::tests", "test_name": "test_capability_composition_root_rejects_claude_agent_without_tools"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityCommand", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-01"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_exec_parses_required_generic_dispatch_inputs"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CliCommand", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-01"}},
+      "tests": [{"layer": "cli", "module_path": "cli::tests", "test_name": "test_cli_command_capability_exec_parses_to_capability_variant"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CliCommand", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-08"}},
+      "tests": [{"layer": "cli", "module_path": "cli::tests", "test_name": "test_cli_command_retired_plan_codex_local_is_rejected"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityExecArgs", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-01"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_exec_parses_required_generic_dispatch_inputs"}]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "cli::commands::capability::execute", "item_identifier": "entry", "obligation_kind": "logic"},
+      "tests": [
+        {"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_execute_routes_exec_to_concrete_execution_helper"},
+        {"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_execute_missing_briefing_returns_failure_without_provider_dispatch"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "cli::commands::capability::execute_exec", "item_identifier": "entry", "obligation_kind": "logic"},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_execute_missing_briefing_returns_failure_without_provider_dispatch"}]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "cli::commands::capability::execute_with", "item_identifier": "entry", "obligation_kind": "logic"},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_execute_routes_exec_to_concrete_execution_helper"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AgentProfiles", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-02"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_typed_pipeline_returns_profile_resolution"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_unknown_execution_mode_returns_profile_resolution"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_capability_config_dto_missing_execution_mode_is_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_capability_returns_profile_resolution"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AgentProfiles", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-01"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_provider_returns_profile_resolution"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_model_returns_model_missing"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "AgentProfiles", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-04"}},
+      "reason": "At AgentProfiles x CN-04, this loader validates and resolves profile configuration from a trusted path but does not create, select, or observe a canonical capability dispatch entry point. The continued existence of the writer-capability dispatch route is owned by the CLI command, composition root, and interactor."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AgentProfilesCapabilityAdapter", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-01"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_out_of_root_config_returns_profile_resolution"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_unknown_execution_mode_returns_profile_resolution"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_capability_config_dto_missing_execution_mode_is_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_provider_returns_profile_resolution"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_model_returns_model_missing"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "AgentProfilesCapabilityAdapter", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-04"}},
+      "reason": "At AgentProfilesCapabilityAdapter x CN-04, this secondary adapter only maps a verified profile into a usecase value or a profile-resolution error; it neither installs nor observes the CLI command path that dispatches writer capabilities. Canonical dispatch-route existence is owned by the CLI command, composition root, and interactor."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityFilePathArg", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-01"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_exec_parses_required_generic_dispatch_inputs"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityFilePathArg", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "CN-01"}},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_exec_invalid_values_are_rejected_at_parse_boundary"}]
+    }
+  ],
+  "track_id": "capability-exec-unified-dispatch-2026-07-11"
+}

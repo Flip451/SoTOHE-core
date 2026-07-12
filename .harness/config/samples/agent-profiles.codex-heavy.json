@@ -14,48 +14,59 @@
   "capabilities": {
     "orchestrator": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.5",
+      "execution_mode": "typed-pipeline"
     },
     "spec-designer": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.5",
+      "execution_mode": "orchestrator-output"
     },
     "impl-planner": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.5",
+      "execution_mode": "orchestrator-output"
     },
     "type-designer": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.5",
+      "execution_mode": "orchestrator-output"
     },
     "adr-editor": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.5",
+      "execution_mode": "orchestrator-output"
     },
     "implementer": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.5",
+      "execution_mode": "orchestrator-output"
     },
     "reviewer": {
       "provider": "codex",
       "model": "gpt-5.4",
-      "fast_model": "gpt-5.4-mini"
+      "fast_model": "gpt-5.4-mini",
+      "execution_mode": "typed-pipeline"
     },
     "researcher": {
       "provider": "codex",
-      "model": "gpt-5.4-mini"
+      "model": "gpt-5.4-mini",
+      "execution_mode": "orchestrator-output"
     },
     "review-fix-lead": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.5",
+      "execution_mode": "typed-pipeline"
     },
     "dry-checker": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.5",
+      "execution_mode": "typed-pipeline"
     },
     "dry-fix-lead": {
       "provider": "codex",
-      "model": "gpt-5.5"
+      "model": "gpt-5.5",
+      "execution_mode": "typed-pipeline"
     }
   }
 }

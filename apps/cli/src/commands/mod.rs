@@ -6,6 +6,7 @@ use cli_composition::{CommandOutcome, CompositionError};
 use cli_driver::CommandOutcome as DriverOutcome;
 
 pub mod arch;
+pub mod capability;
 pub mod catalog;
 pub mod catalogue_lint;
 pub mod conventions;
@@ -15,7 +16,6 @@ pub mod file;
 pub mod git;
 pub mod guard;
 pub mod hook;
-pub mod plan;
 pub mod pr;
 pub mod ref_verify;
 pub mod review;

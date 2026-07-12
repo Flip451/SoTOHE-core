@@ -1,5 +1,6 @@
 ---
 name: adr-editor
+sandbox: workspace-write
 description: Use when Codex is assigned the SoTOHE ADR editor capability during a back-and-forth planning loop. Edits a target ADR only when a downstream SoT signal needs a persistent decision clarification.
 ---
 

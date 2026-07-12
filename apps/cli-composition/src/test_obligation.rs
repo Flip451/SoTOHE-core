@@ -320,7 +320,8 @@ impl TestObligationCompositionRoot {
 
     fn agent_profiles(&self) -> Result<AgentProfiles, String> {
         let path = self.workspace_root.join(AGENT_PROFILES_PATH);
-        AgentProfiles::load(&path).map_err(|e| format!("cannot load agent-profiles.json: {e}"))
+        AgentProfiles::load(&self.workspace_root, &path)
+            .map_err(|e| format!("cannot load agent-profiles.json: {e}"))
     }
 }
 
@@ -403,14 +404,8 @@ mod tests {
 
         for capability in ["obligation-fulfillment-verifier", "waiver-verifier"] {
             assert!(profiles.resolve_capability(capability).is_some());
-            assert_eq!(
-                profiles.resolve_model(capability, RoundType::Fast).as_deref(),
-                Some("gpt-5.6-luna")
-            );
-            assert_eq!(
-                profiles.resolve_model(capability, RoundType::Final).as_deref(),
-                Some("gpt-5.6-terra")
-            );
+            assert_eq!(profiles.resolve_model(capability, RoundType::Fast), Some("gpt-5.6-luna"));
+            assert_eq!(profiles.resolve_model(capability, RoundType::Final), Some("gpt-5.6-terra"));
         }
     }
 
@@ -433,13 +428,15 @@ mod tests {
                         "provider": "codex",
                         "model": "fulfillment-final",
                         "fast_provider": "claude",
-                        "fast_model": "fulfillment-fast"
+                        "fast_model": "fulfillment-fast",
+                        "execution_mode": "typed-pipeline"
                     },
                     "waiver-verifier": {
                         "provider": "claude",
                         "model": "waiver-final",
                         "fast_provider": "gemini",
-                        "fast_model": "waiver-fast"
+                        "fast_model": "waiver-fast",
+                        "execution_mode": "typed-pipeline"
                     }
                 }
             }"#,
@@ -806,7 +803,7 @@ mod tests {
                 "schema_version": 1,
                 "providers": { "codex": { "label": "Codex" } },
                 "capabilities": {
-                    "unrelated-capability": { "provider": "codex", "model": "unrelated" }
+                    "unrelated-capability": { "provider": "codex", "model": "unrelated", "execution_mode": "typed-pipeline" }
                 }
             }"#,
         )

@@ -772,14 +772,16 @@ This section must not make D2 a valid ADR ref.
                 "model": "claude-opus-4-8",
                 "fast_provider": "claude",
                 "fast_model": "claude-haiku-4-5",
-                "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
+                "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md",
+                "execution_mode": "typed-pipeline"
             },
             "ref-verifier-chain2": {
                 "provider": "claude",
                 "model": "claude-opus-4-8",
                 "fast_provider": "claude",
                 "fast_model": "claude-haiku-4-5",
-                "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md"
+                "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md",
+                "execution_mode": "typed-pipeline"
             }
         }
     }"#;
@@ -788,7 +790,7 @@ This section must not make D2 a valid ADR ref.
     fn agent_ref_verifier_adapter_constructs_with_profiles_and_runner() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_profiles(dir.path(), REF_VERIFIER_CONFIG);
-        let profiles = Arc::new(AgentProfiles::load(&path).unwrap());
+        let profiles = Arc::new(AgentProfiles::load(dir.path(), &path).unwrap());
         let runner: Arc<AgentExecutionRunner> = Arc::new(|_resolved, _prompt| {
             Ok(r#"{"kind": "pass", "citation": "the spec states X"}"#.to_owned())
         });
@@ -842,13 +844,14 @@ This section must not make D2 a valid ADR ref.
                         "model": "claude-opus-4-8",
                         "fast_provider": "claude",
                         "fast_model": "claude-haiku-4-5",
-                        "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
+                        "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md",
+                        "execution_mode": "typed-pipeline"
                     }
                 }
             }"#
         .to_owned();
         let path2 = write_profiles(dir.path(), &profiles_json);
-        let profiles2 = Arc::new(AgentProfiles::load(&path2).unwrap());
+        let profiles2 = Arc::new(AgentProfiles::load(dir.path(), &path2).unwrap());
 
         let adapter = AgentRefVerifierAdapter::new(profiles2, runner, dir.path().to_path_buf());
         let verdict = adapter
@@ -876,7 +879,7 @@ This section must not make D2 a valid ADR ref.
         }"#;
         let dir = tempfile::tempdir().unwrap();
         let path = write_profiles(dir.path(), json);
-        let profiles = Arc::new(AgentProfiles::load(&path).unwrap());
+        let profiles = Arc::new(AgentProfiles::load(dir.path(), &path).unwrap());
         let runner: Arc<AgentExecutionRunner> = Arc::new(|_, _| Ok(String::new()));
         let adapter = AgentRefVerifierAdapter::new(profiles, runner, dir.path().to_path_buf());
         let err = adapter
@@ -909,13 +912,14 @@ This section must not make D2 a valid ADR ref.
                         "model": "claude-opus-4-8",
                         "fast_provider": "claude",
                         "fast_model": "claude-haiku-4-5",
-                        "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
+                        "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md",
+                        "execution_mode": "typed-pipeline"
                     }
                 }
             }"#
         .to_owned();
         let path = write_profiles(dir.path(), &profiles_json);
-        let profiles = Arc::new(AgentProfiles::load(&path).unwrap());
+        let profiles = Arc::new(AgentProfiles::load(dir.path(), &path).unwrap());
         let runner: Arc<AgentExecutionRunner> = Arc::new(|_, _| {
             Ok(r#"{"kind": "pass", "citation": "the spec states X explicitly", "reason": null}"#
                 .to_owned())
@@ -945,13 +949,14 @@ This section must not make D2 a valid ADR ref.
                     "ref-verifier-chain1": {
                         "provider": "claude",
                         "model": "claude-opus-4-8",
-                        "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
+                        "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md",
+                        "execution_mode": "typed-pipeline"
                     }
                 }
             }"#
         .to_owned();
         let path = write_profiles(dir.path(), &profiles_json);
-        let profiles = Arc::new(AgentProfiles::load(&path).unwrap());
+        let profiles = Arc::new(AgentProfiles::load(dir.path(), &path).unwrap());
         let runner: Arc<AgentExecutionRunner> = Arc::new(|_, _| Ok("not json at all".to_owned()));
         let adapter = AgentRefVerifierAdapter::new(profiles, runner, dir.path().to_path_buf());
         let err = adapter
@@ -978,13 +983,14 @@ This section must not make D2 a valid ADR ref.
                     "ref-verifier-chain1": {
                         "provider": "claude",
                         "model": "claude-opus-4-8",
-                        "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
+                        "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md",
+                        "execution_mode": "typed-pipeline"
                     }
                 }
             }"#
         .to_owned();
         let path = write_profiles(dir.path(), &profiles_json);
-        let profiles = Arc::new(AgentProfiles::load(&path).unwrap());
+        let profiles = Arc::new(AgentProfiles::load(dir.path(), &path).unwrap());
         // Pass with empty citation — should fail-closed.
         let runner: Arc<AgentExecutionRunner> =
             Arc::new(|_, _| Ok(r#"{"kind": "pass", "citation": "", "reason": null}"#.to_owned()));
@@ -1033,13 +1039,14 @@ This section must not make D2 a valid ADR ref.
                         "model": "claude-opus-4-8-chain2",
                         "fast_provider": "claude",
                         "fast_model": "claude-haiku-4-5-chain2",
-                        "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md"
+                        "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md",
+                        "execution_mode": "typed-pipeline"
                     }
                 }
             }"#
         .to_owned();
         let path = write_profiles(dir.path(), &profiles_json);
-        let profiles = Arc::new(AgentProfiles::load(&path).unwrap());
+        let profiles = Arc::new(AgentProfiles::load(dir.path(), &path).unwrap());
 
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let adapter = AgentRefVerifierAdapter::new(profiles, runner, dir.path().to_path_buf());

@@ -33,7 +33,9 @@ launch constraints live in the provider adapters).
 - Current `track/<id>` branch.
 - `track/items/<id>/obligations.json` (created by Step 1 if absent) and the track's
   catalogues + `spec.json` (triangulation sources).
-- `.harness/config/agent-profiles.json` — implementer and verifier routing/models.
+- **Capability and verifier routing** — `bin/sotp capability exec` resolves the implementer
+  profile internally from `.harness/config/agent-profiles.json`; `bin/sotp test-obligation
+  evaluate` resolves its verifier profiles internally from the same routing SSoT.
 
 ## Sequence
 

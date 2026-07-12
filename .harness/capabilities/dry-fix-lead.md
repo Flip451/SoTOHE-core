@@ -38,6 +38,8 @@ Files this capability must NOT edit, regardless of DRY findings:
   impl-plan / task-coverage / review.json / dry-check.json / rendered `*.md`),
   `.harness/config/agent-profiles.json`, `.gitignore`.
 - Any other track under `track/items/<other-track>/`.
+- Track task-state transitions through `bin/sotp track transition`; this capability has no
+  task-state transition authority.
 
 If a genuine violation can only be resolved by editing an out-of-boundary file, return `blocked`
 with the file list and rationale.

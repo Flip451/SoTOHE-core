@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "2497bbc91dcea554f4d5fea604b393201e27f67b2e3b802f3ae52e06eab64757",
+  "signals": [
+    {
+      "type_name": "BriefingText",
+      "signal": "blue",
+      "entry_hash": "b1213fb6a7218522651b8d746c6d0f62f4f42b8ac64de370a57630279274bdb1"
+    },
+    {
+      "type_name": "CapabilityDispatchOutcome",
+      "signal": "blue",
+      "entry_hash": "94c50ba1f16056a6457c58f87b901e0536c18e6accff1cc891cdca7d084919c4"
+    },
+    {
+      "type_name": "CapabilityDispatchRequest",
+      "signal": "blue",
+      "entry_hash": "5b1f0e38c5d0227f0f01956d5f579da852310b0abd869328b059823a7d778ab5"
+    },
+    {
+      "type_name": "CapabilityExecError",
+      "signal": "blue",
+      "entry_hash": "32aef7e8c6b32d59fc88b86261b3d6ebadc911f40207f01f57192ad2e0ed713a"
+    },
+    {
+      "type_name": "CapabilityExecInteractor",
+      "signal": "blue",
+      "entry_hash": "abf48ba62305d61352130b38ae70b89384b7e9470d86df9e281eeb91bde731dd"
+    },
+    {
+      "type_name": "CapabilityExecRequest",
+      "signal": "blue",
+      "entry_hash": "41fd5cf166660d4e40222826b0c47deb4250902afcba6272e72355a6d5087116"
+    },
+    {
+      "type_name": "CapabilityFailureDetail",
+      "signal": "blue",
+      "entry_hash": "4fa2b6536dc70031f7ea016da343f92ed7e1a3705a248725cfc17b8a79bd92b9"
+    },
+    {
+      "type_name": "CapabilityFilePath",
+      "signal": "blue",
+      "entry_hash": "a438ba58994ac901a2515886160f01dbd3567a480c64bc613abb0967a38aebd7"
+    },
+    {
+      "type_name": "CapabilityInputValidationError",
+      "signal": "blue",
+      "entry_hash": "3c4f81b740538da76dba01fd8718197d0bfb026f63412c6e1b6c08f6b3279230"
+    },
+    {
+      "type_name": "CapabilityName",
+      "signal": "blue",
+      "entry_hash": "5756f0c6c4a7e22cfd8842fa6fee03bf51cebf1525204a5a4cc5cdb0a782a1aa"
+    },
+    {
+      "type_name": "CapabilityProfile",
+      "signal": "blue",
+      "entry_hash": "2d6073e49508f55203c755905470b7137d443102aad41ce1f47a4ef886e43e02"
+    },
+    {
+      "type_name": "DisciplineText",
+      "signal": "blue",
+      "entry_hash": "11414fb753a59e395d2b2b42917fa003316a4a745121ed5b5afc9c61f1aff2ed"
+    },
+    {
+      "type_name": "ExecutionMode",
+      "signal": "blue",
+      "entry_hash": "88ce22f2d6dea9a9bbb98423a0337429beedcf7a784f6dc02580936dc721a993"
+    },
+    {
+      "type_name": "ModelName",
+      "signal": "blue",
+      "entry_hash": "c737cea29cdd7219c7c0a90782f8fcda5ac080918c5933b57df71d9d352686b9"
+    },
+    {
+      "type_name": "ProviderName",
+      "signal": "blue",
+      "entry_hash": "a98723f2084059ebf6c5d0e876a18c200a399d39a515d53591186cfebf933018"
+    },
+    {
+      "type_name": "CapabilityExecService",
+      "signal": "blue",
+      "entry_hash": "659d6086e09cde36ba7d7b34a13754a1e10467ae62b3a38263b772aa1d2509e7"
+    },
+    {
+      "type_name": "CapabilityProfilePort",
+      "signal": "blue",
+      "entry_hash": "a1710a7734bb55642c0c87994fa04154d3884198a8312021b589036321218e6b"
+    },
+    {
+      "type_name": "CapabilityProviderPort",
+      "signal": "blue",
+      "entry_hash": "fb68684b88f8409b675a519742ed736986ec2fe5e41cd161c9ec39b4d85dc437"
+    },
+    {
+      "type_name": "CapabilitySourcePort",
+      "signal": "blue",
+      "entry_hash": "6beb567c6502bee59a40c19f199285beddae4fb599237456e77b6419668ee4f7"
+    },
+    {
+      "type_name": "PlanRunOutput",
+      "signal": "blue",
+      "entry_hash": "8db705df854d00295713302f22448c4e1e2ceca070f793934c7e3b43ed275627"
+    },
+    {
+      "type_name": "PlannerInteractor",
+      "signal": "blue",
+      "entry_hash": "8db705df854d00295713302f22448c4e1e2ceca070f793934c7e3b43ed275627"
+    },
+    {
+      "type_name": "PlannerPortError",
+      "signal": "blue",
+      "entry_hash": "8db705df854d00295713302f22448c4e1e2ceca070f793934c7e3b43ed275627"
+    },
+    {
+      "type_name": "PlannerPort",
+      "signal": "blue",
+      "entry_hash": "8db705df854d00295713302f22448c4e1e2ceca070f793934c7e3b43ed275627"
+    },
+    {
+      "type_name": "PlannerService",
+      "signal": "blue",
+      "entry_hash": "8db705df854d00295713302f22448c4e1e2ceca070f793934c7e3b43ed275627"
+    }
+  ]
+}

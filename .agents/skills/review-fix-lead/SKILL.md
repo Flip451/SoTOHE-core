@@ -1,5 +1,6 @@
 ---
 name: review-fix-lead
+sandbox: workspace-write
 description: Use this skill whenever you act as the review-fix-lead for a code/plan review scope in this repository (any task whose prompt assigns a scope, a round_type of fast or final, and a briefing file). Follows the canonical review + fix + re-review loop defined in the capability SSoT.
 ---
 

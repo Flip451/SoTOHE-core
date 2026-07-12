@@ -1,0 +1,917 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "trusted_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "AgentProfilesCapabilityAdapter"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FsCapabilitySourceAdapter"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "runtime_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "CodexCapabilityAdapter"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "runtime_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "ClaudeCapabilityAdapter"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "usecase::capability_exec::ExecutionMode"
+        }
+      ],
+      "type_name": "ExecutionModeDto"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "docs": "May produce only usecase::capability_exec::CapabilityInputValidationError::EmptyProviderName.",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, usecase::capability_exec::CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "usecase::capability_exec::ProviderName"
+        }
+      ],
+      "type_name": "ProviderNameDto"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "docs": "May produce only usecase::capability_exec::CapabilityInputValidationError::EmptyModelName.",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, usecase::capability_exec::CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "usecase::capability_exec::ModelName"
+        }
+      ],
+      "type_name": "ModelNameDto"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "AgentProfilesError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "AgentProfilesError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "AgentProfilesError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "AgentProfilesError",
+      "trait_ref": "core::convert::From<serde_json::Error>"
+    },
+    {
+      "for_type": "ExecutionModeDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ExecutionModeDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ExecutionModeDto",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "ExecutionModeDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ExecutionModeDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ExecutionModeDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "SandboxMode",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SandboxMode",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SandboxMode",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "SandboxMode",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SandboxMode",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SandboxMode",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityConfigDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityConfigDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityConfigDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "AgentProfilesCapabilityAdapter",
+      "trait_ref": "usecase::capability_exec::CapabilityProfilePort"
+    },
+    {
+      "for_type": "FsCapabilitySourceAdapter",
+      "trait_ref": "usecase::capability_exec::CapabilitySourcePort"
+    },
+    {
+      "for_type": "CodexCapabilityAdapter",
+      "trait_ref": "usecase::capability_exec::CapabilityProviderPort"
+    },
+    {
+      "for_type": "ClaudeCapabilityAdapter",
+      "trait_ref": "usecase::capability_exec::CapabilityProviderPort"
+    },
+    {
+      "for_type": "ProviderNameDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "ModelNameDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "ProviderNameDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ProviderNameDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ProviderNameDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ProviderNameDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ModelNameDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ModelNameDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ModelNameDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ModelNameDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AgentProfiles",
+      "trait_ref": "core::fmt::Debug"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "AgentProfiles": {
+      "action": "modify",
+      "docs": "Agent-profile configuration secondary adapter (IN-02, CN-01, CN-04).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+          {
+            "name": "trusted_root",
+            "ty": "&std::path::Path"
+          },
+          {
+            "name": "path",
+            "ty": "&std::path::Path"
+            }
+          ],
+          "returns": "Result<Self, AgentProfilesError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_capability",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&CapabilityConfigDto>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_execution",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&str"
+            },
+            {
+              "name": "round_type",
+              "ty": "RoundType"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<ResolvedExecution>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_model",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&str"
+            },
+            {
+              "name": "round_type",
+              "ty": "RoundType"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&str>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_provider",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&str"
+            },
+            {
+              "name": "round_type",
+              "ty": "RoundType"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&str>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provider_label",
+          "params": [
+            {
+              "name": "provider",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&str>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_prompt_template_path",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&str"
+            }
+        ],
+        "receiver": "&self",
+        "returns": "Option<std::path::PathBuf>"
+        }
+      ],
+      "module_path": "agent_profiles",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "AgentProfilesCapabilityAdapter": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec::agent_profiles",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "AgentProfilesError": {
+      "action": "modify",
+      "docs": "Agent-profile configuration error type (IN-02, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                },
+                {
+                  "name": "source",
+                  "ty": "std::io::Error"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Symlink",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "PathOutsideTrustedRoot",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                },
+                {
+                  "name": "root",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Parse",
+            "payload": {
+              "fields": [
+                "serde_json::Error"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "fields": [
+                {
+                  "name": "found",
+                  "ty": "u32"
+                },
+                {
+                  "name": "expected",
+                  "ty": "u32"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidCapability",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                },
+                {
+                  "name": "reason",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "agent_profiles",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityConfigDto": {
+      "action": "modify",
+      "docs": "Adds the IN-02 execution_mode field and accessor. All seven baseline accessor identities and signatures remain unchanged; provider/model/path typed mirrors are additive DTO internals, and reasoning-effort values remain opaque strings for compatibility.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provider",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "model",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&str>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_provider",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&str>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_model",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&str>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "prompt_template_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&str>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_reasoning_effort",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&str>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "final_reasoning_effort",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&str>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execution_mode",
+          "params": [],
+          "receiver": "&self",
+          "returns": "ExecutionModeDto"
+        }
+      ],
+      "module_path": "agent_profiles",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "ClaudeCapabilityAdapter": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec::claude",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CodexCapabilityAdapter": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec::codex",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CodexPlannerAdapter": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "codex_planner",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "ExecutionModeDto": {
+      "action": "add",
+      "docs": "Serde-boundary mirror of usecase::capability_exec::ExecutionMode.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OrchestratorOutput",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TypedPipeline",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "agent_profiles",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "FsCapabilitySourceAdapter": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec::source",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "ModelNameDto": {
+      "action": "add",
+      "docs": "Serde-boundary mirror of usecase::capability_exec::ModelName.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "agent_profiles",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "ProviderNameDto": {
+      "action": "add",
+      "docs": "Serde-boundary mirror of usecase::capability_exec::ProviderName.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "agent_profiles",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "SandboxMode": {
+      "action": "add",
+      "docs": "Adapter-layer finite sandbox vocabulary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ReadOnly",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "WorkspaceWrite",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec::codex",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    }
+  }
+}

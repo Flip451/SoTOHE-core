@@ -121,7 +121,7 @@ fn load_dry_fix_agent_profiles(repo_root: &Path) -> Result<AgentProfiles, String
     reject_symlinks_below(&profiles_path, &canonical_root).map_err(|e| {
         format!("symlink guard agent-profiles.json '{}': {e}", profiles_path.display())
     })?;
-    AgentProfiles::load(&profiles_path)
+    AgentProfiles::load(&canonical_root, &profiles_path)
         .map_err(|e| format!("[ERROR] failed to load agent-profiles.json: {e}"))
 }
 
@@ -465,7 +465,8 @@ mod tests {
   "capabilities": {{
     "dry-fix-lead": {{
       "provider": "{provider}",
-      "model": "{profile_model}"
+      "model": "{profile_model}",
+      "execution_mode": "typed-pipeline"
     }}
   }}
 }}"#

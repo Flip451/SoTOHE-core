@@ -112,10 +112,11 @@ pub(super) struct LocalTestError(String);
 /// is not defined, or the provider is unsupported.
 #[cfg(test)]
 pub(super) fn resolve_reviewer_for_test(
+    trusted_root: &std::path::Path,
     profiles_path: &std::path::Path,
     round_type: CodexRoundTypeArg,
 ) -> Result<infrastructure::agent_profiles::ResolvedExecution, LocalTestError> {
-    let profiles = infrastructure::agent_profiles::AgentProfiles::load(profiles_path)
+    let profiles = infrastructure::agent_profiles::AgentProfiles::load(trusted_root, profiles_path)
         .map_err(|e| LocalTestError(format!("[ERROR] failed to load agent-profiles.json: {e}")))?;
     let infra_round_type = match round_type {
         CodexRoundTypeArg::Fast => infrastructure::agent_profiles::RoundType::Fast,
