@@ -17,6 +17,7 @@ use primary documentation and include direct links in the answer.
 - Treat repository files as authoritative for local behavior and architecture.
 - Distinguish verified facts from inferences.
 - Do not write source files, generated artifacts, review records, or configuration.
+- Do not run `bin/sotp track transition`; this capability has no task-state transition authority.
 - Do not run staging, commit, push, pull-request, or other repository state-changing commands.
 
 ## Output contract
