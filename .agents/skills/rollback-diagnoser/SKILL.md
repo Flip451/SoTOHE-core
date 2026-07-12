@@ -14,9 +14,10 @@ provider-agnostic contract for this capability. Do not duplicate it here.
 - Invoked when Codex is assigned the `rollback-diagnoser` capability
   (`.codex/agents/rollback-diagnoser.toml`).
 - Triggered from `/track:diagnose` (`.claude/commands/track/diagnose.md`) via the same
-  capability-resolution path used by the Claude subagent (the orchestrator host resolves
-  `capabilities.rollback-diagnoser.provider` from `.harness/config/agent-profiles.json` and
-  dispatches accordingly).
+  capability-resolution path used by the Claude subagent (dispatched by `bin/sotp capability
+  exec rollback-diagnoser --host <current-host> --briefing-file <path>`, where
+  `<current-host>` is the invoking orchestrator's own provider identity — the dispatcher
+  resolves the selected capability's provider independently from the routing SSoT).
 - This skill is **diagnose-only**: it must not write to any SoT artifact, must not invoke any
   writer agent, and must not run any mutating `bin/sotp` subcommand, including `signal calc-*`
   refreshes. Signal refresh is orchestrator-owned before invocation; this skill may only read

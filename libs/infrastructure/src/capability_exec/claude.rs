@@ -58,7 +58,7 @@ impl ClaudeCapabilityAdapter {
         let path = self.agent_path(capability);
         let definition = read_utf8_file(&path, &self.repo_root)
             .map_err(|detail| adapter_preflight_error(request, &self.provider, detail))?;
-        validate_agent_definition(&definition, request.profile.model.as_str())
+        validate_agent_definition(&definition, capability, request.profile.model.as_str())
             .map_err(|detail| adapter_preflight_error(request, &self.provider, detail))
     }
 }
@@ -98,10 +98,15 @@ impl CapabilityProviderPort for ClaudeCapabilityAdapter {
     }
 }
 
-fn validate_agent_definition(definition: &str, profile_model: &str) -> Result<(), String> {
+fn validate_agent_definition(
+    definition: &str,
+    expected_capability: &str,
+    profile_model: &str,
+) -> Result<(), String> {
     let front_matter = read_front_matter(definition)?
         .ok_or_else(|| "Claude agent definition has no YAML front matter".to_owned())?;
     let front_matter = parse_provider_definition_front_matter(front_matter)?;
+    front_matter.validate_identity(expected_capability, "Claude agent definition")?;
     if !front_matter.has_tools() {
         return Err("Claude agent definition must declare a non-empty tools field".to_owned());
     }
@@ -202,38 +207,37 @@ mod tests {
 
     #[test]
     fn test_claude_agent_matching_model_and_tools_is_valid() {
-        let definition =
-            "---\nname: implementer\nmodel: claude-opus\ntools:\n  - Read\n---\nbody\n";
+        let definition = "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools:\n  - Read\n---\nbody\n";
 
-        assert_eq!(validate_agent_definition(definition, "claude-opus"), Ok(()));
+        assert_eq!(validate_agent_definition(definition, "implementer", "claude-opus"), Ok(()));
     }
 
     #[test]
     fn test_claude_agent_missing_tools_is_rejected() {
-        let definition = "---\nname: implementer\nmodel: claude-opus\n---\nbody\n";
+        let definition = "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\n---\nbody\n";
 
-        assert!(validate_agent_definition(definition, "claude-opus").is_err());
+        assert!(validate_agent_definition(definition, "implementer", "claude-opus").is_err());
     }
 
     #[test]
     fn test_claude_agent_model_mismatch_is_rejected() {
-        let definition = "---\nname: implementer\nmodel: claude-haiku\ntools: Read\n---\nbody\n";
+        let definition = "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-haiku\ntools: Read\n---\nbody\n";
 
-        assert!(validate_agent_definition(definition, "claude-opus").is_err());
+        assert!(validate_agent_definition(definition, "implementer", "claude-opus").is_err());
     }
 
     #[test]
     fn test_claude_agent_nested_model_and_tools_are_rejected() {
-        let definition = "---\nmetadata:\n  model: claude-opus\n  tools: Read\n---\nbody\n";
+        let definition = "---\nname: implementer\ndescription: Implements assigned tasks.\nmetadata:\n  model: claude-opus\n  tools: Read\n---\nbody\n";
 
-        assert!(validate_agent_definition(definition, "claude-opus").is_err());
+        assert!(validate_agent_definition(definition, "implementer", "claude-opus").is_err());
     }
 
     #[test]
     fn test_claude_agent_malformed_front_matter_is_rejected() {
         let definition = "---\nmodel: [claude-opus\ntools: Read\n---\nbody\n";
 
-        assert!(validate_agent_definition(definition, "claude-opus").is_err());
+        assert!(validate_agent_definition(definition, "implementer", "claude-opus").is_err());
     }
 
     #[test]
@@ -264,7 +268,7 @@ mod tests {
         let directory = tempfile::tempdir()?;
         write_agent(
             directory.path(),
-            "---\nname: implementer\nmodel: claude-opus\ntools:\n  - Read\n---\nagent body\n",
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools:\n  - Read\n---\nagent body\n",
         )?;
         let runner = Arc::new(RecordingProcessRunner::default());
         let adapter = ClaudeCapabilityAdapter::with_process_runner(
@@ -295,7 +299,7 @@ mod tests {
         let directory = tempfile::tempdir()?;
         write_agent(
             directory.path(),
-            "---\nname: implementer\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
         )?;
         let runner = Arc::new(RecordingProcessRunner { exit_code: 9, ..Default::default() });
         let adapter = ClaudeCapabilityAdapter::with_process_runner(
@@ -337,7 +341,53 @@ mod tests {
         let directory = tempfile::tempdir()?;
         write_agent(
             directory.path(),
-            "---\nname: implementer\nmodel: claude-opus\n---\nagent body\n",
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\n---\nagent body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let adapter = ClaudeCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+
+        assert!(matches!(
+            adapter.dispatch(&request_from_host("claude")?),
+            Err(CapabilityExecError::AdapterPreflight { .. })
+        ));
+        assert!(runner.invocations.lock().expect("test process recorder lock").is_empty());
+        Ok(())
+    }
+
+    #[test]
+    fn test_claude_capability_adapter_missing_name_rejected_before_in_host_delegation()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_agent(
+            directory.path(),
+            "---\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let adapter = ClaudeCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+
+        assert!(matches!(
+            adapter.dispatch(&request_from_host("claude")?),
+            Err(CapabilityExecError::AdapterPreflight { .. })
+        ));
+        assert!(runner.invocations.lock().expect("test process recorder lock").is_empty());
+        Ok(())
+    }
+
+    #[test]
+    fn test_claude_capability_adapter_mismatched_name_rejected_before_in_host_delegation()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_agent(
+            directory.path(),
+            "---\nname: researcher\ndescription: Researches the workspace.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
         )?;
         let runner = Arc::new(RecordingProcessRunner::default());
         let adapter = ClaudeCapabilityAdapter::with_process_runner(
@@ -361,7 +411,7 @@ mod tests {
         fs::create_dir_all(directory.path().join(".claude/agents"))?;
         fs::write(
             directory.path().join(".claude/outside.md"),
-            "---\nname: outside\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+            "---\nname: outside\ndescription: Outside agent.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
         )?;
         let runner = Arc::new(RecordingProcessRunner::default());
         let adapter = ClaudeCapabilityAdapter::with_process_runner(
@@ -384,7 +434,10 @@ mod tests {
     fn test_claude_capability_adapter_missing_model_rejected_before_process()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
-        write_agent(directory.path(), "---\nname: implementer\ntools: Read\n---\nagent body\n")?;
+        write_agent(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\ntools: Read\n---\nagent body\n",
+        )?;
         let runner = Arc::new(RecordingProcessRunner::default());
         let adapter = ClaudeCapabilityAdapter::with_process_runner(
             directory.path().to_owned(),
@@ -428,7 +481,7 @@ mod tests {
         let directory = tempfile::tempdir()?;
         write_agent(
             directory.path(),
-            "---\nname: implementer\nmodel: claude-haiku\ntools: Read\n---\nagent body\n",
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-haiku\ntools: Read\n---\nagent body\n",
         )?;
         let runner = Arc::new(RecordingProcessRunner::default());
         let adapter = ClaudeCapabilityAdapter::with_process_runner(
@@ -455,7 +508,7 @@ mod tests {
         let external_agent = workspace.path().join("outside.md");
         fs::write(
             &external_agent,
-            "---\nname: implementer\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
         )?;
         std::os::unix::fs::symlink(
             &external_agent,
@@ -484,7 +537,7 @@ mod tests {
         fs::create_dir_all(&repository)?;
         fs::write(
             workspace.path().join("outside.md"),
-            "---\nname: outside\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+            "---\nname: outside\ndescription: Outside agent.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
         )?;
         let runner = Arc::new(RecordingProcessRunner::default());
         let adapter = ClaudeCapabilityAdapter::with_process_runner(

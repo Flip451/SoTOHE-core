@@ -96,20 +96,38 @@ mod tests {
         root: &std::path::Path,
         agent_definition: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
+        write_profile_dispatch_fixture(
+            root,
+            "implementer",
+            "claude",
+            "claude-opus",
+            agent_definition,
+        )
+    }
+
+    fn write_profile_dispatch_fixture(
+        root: &std::path::Path,
+        capability: &str,
+        provider: &str,
+        model: &str,
+        agent_definition: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         write_file(
             root,
             ".harness/config/agent-profiles.json",
-            r#"{
+            &format!(
+                r#"{{
                 "schema_version": 1,
-                "providers": {},
-                "capabilities": {
-                    "implementer": {
-                        "provider": "claude",
-                        "model": "claude-opus",
+                "providers": {{}},
+                "capabilities": {{
+                    "{capability}": {{
+                        "provider": "{provider}",
+                        "model": "{model}",
                         "execution_mode": "orchestrator-output"
-                    }
-                }
-            }"#,
+                    }}
+                }}
+            }}"#,
+            ),
         )?;
         write_file(
             root,
@@ -117,7 +135,7 @@ mod tests {
             "Do not stage changes.",
         )?;
         write_file(root, "tmp/briefing.md", "Implement the assigned task.")?;
-        write_file(root, ".claude/agents/implementer.md", agent_definition)?;
+        write_file(root, &format!(".claude/agents/{capability}.md"), agent_definition)?;
         Ok(())
     }
 
@@ -149,13 +167,17 @@ mod tests {
         if status.success() { Ok(()) } else { Err(format!("git init failed with {status}").into()) }
     }
 
-    fn input() -> CapabilityExecDriverInput {
+    fn input_for(capability: &str, host: &str) -> CapabilityExecDriverInput {
         CapabilityExecDriverInput {
-            capability: CapabilityNameArg::from_str("implementer").expect("valid test capability"),
-            host: ProviderNameArg::from_str("claude").expect("valid test provider"),
+            capability: CapabilityNameArg::from_str(capability).expect("valid test capability"),
+            host: ProviderNameArg::from_str(host).expect("valid test provider"),
             briefing_file: CapabilityFilePathArg::from_str("tmp/briefing.md")
                 .expect("valid test briefing path"),
         }
+    }
+
+    fn input() -> CapabilityExecDriverInput {
+        input_for("implementer", "claude")
     }
 
     #[test]
@@ -195,7 +217,7 @@ mod tests {
         initialize_git_repository(repository.path())?;
         write_dispatch_fixture(
             repository.path(),
-            "---\nname: implementer\nmodel: claude-opus\ntools:\n  - Read\n---\nagent body\n",
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools:\n  - Read\n---\nagent body\n",
         )?;
         let nested = repository.path().join("nested/workdir");
         fs::create_dir_all(&nested)?;
@@ -216,7 +238,7 @@ mod tests {
         let directory = tempfile::tempdir()?;
         write_dispatch_fixture(
             directory.path(),
-            "---\nname: implementer\nmodel: claude-opus\ntools:\n  - Read\n---\nagent body\n",
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools:\n  - Read\n---\nagent body\n",
         )?;
         let root = CapabilityCompositionRoot::new(
             directory.path().to_owned(),
@@ -235,12 +257,37 @@ mod tests {
     }
 
     #[test]
+    fn test_capability_composition_root_profile_resolution_yields_resolved_in_host_route()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_profile_dispatch_fixture(
+            directory.path(),
+            "researcher",
+            "claude",
+            "claude-profile-model",
+            "---\nname: researcher\ndescription: Researches the workspace.\nmodel: claude-profile-model\ntools:\n  - Read\n---\nagent body\n",
+        )?;
+        let root = CapabilityCompositionRoot::new(
+            directory.path().to_owned(),
+            directory.path().join("tmp/capability-runtime"),
+        );
+
+        let outcome = root.capability_driver().handle(input_for("researcher", "claude"));
+        let output = outcome.stdout.expect("resolved in-host instruction is rendered");
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(output.contains("CAPABILITY_EXEC_OUTCOME: delegate-in-host"));
+        assert!(output.contains("capability: researcher"));
+        Ok(())
+    }
+
+    #[test]
     fn test_capability_composition_root_rejects_claude_agent_without_tools()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
         write_dispatch_fixture(
             directory.path(),
-            "---\nname: implementer\nmodel: claude-opus\n---\nagent body\n",
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\n---\nagent body\n",
         )?;
         let root = CapabilityCompositionRoot::new(
             directory.path().to_owned(),

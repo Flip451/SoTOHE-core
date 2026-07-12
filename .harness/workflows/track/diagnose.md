@@ -25,8 +25,6 @@ output schema, and boundary with other capabilities).
   (`adr` / `spec` / `types` / `impl-plan`), or a free-form reviewer comment. May be passed
   inline or via a `--briefing-file <path>` reference. If empty, ask the user for the
   diagnostic input and stop.
-- **`.harness/config/agent-profiles.json`** — must be readable for
-  `capabilities.rollback-diagnoser` provider / model resolution.
 
 ## Trigger scenarios
 
@@ -44,19 +42,20 @@ Invoke from the orchestrator's main loop in one of these scenarios (see also
 
 ## Sequence
 
-**Step 1: Resolve the capability provider**
+**Step 1: Dispatch the rollback-diagnoser capability**
 
-Resolve the active provider from `.harness/config/agent-profiles.json`
-(`capabilities.rollback-diagnoser`). Both Claude and Codex hosts route through this single
-capability resolution.
+Create a diagnostic briefing and invoke:
 
-**Step 2: Dispatch the rollback-diagnoser capability**
+```
+bin/sotp capability exec rollback-diagnoser --host <current-host> --briefing-file <path>
+```
 
-Invoke the resolved provider via its adapter (provider-specific invocation details live in the
-host adapters; the capability must run strictly read-only — never grant it a write-capable
-sandbox or invocation path).
+The dispatcher resolves the provider and model internally from
+`.harness/config/agent-profiles.json`, validates the provider-native definition, and keeps the
+capability read-only. A `delegate-in-host` outcome is an instruction for the current host;
+otherwise the dispatcher performs the provider subprocess execution.
 
-**Step 3: Receive the structured routing decision**
+**Step 2: Receive the structured routing decision**
 
 ```
 {
@@ -66,7 +65,7 @@ sandbox or invocation path).
 }
 ```
 
-**Step 4: Orchestrator dispatch (outside this workflow)**
+**Step 3: Orchestrator dispatch (outside this workflow)**
 
 The calling orchestrator inspects `routing_target` and dispatches:
 
@@ -83,8 +82,8 @@ convincing. Diagnose-only outputs are recommendations, not contracts on the orch
 
 | Step | Gate | Verdict |
 |------|------|---------|
-| 1 | `capabilities.rollback-diagnoser` resolves to a provider | OK / ERROR (fail-closed) |
-| 3 | Capability returns a parseable routing decision | OK / retry (up to 2) / report |
+| 1 | `sotp capability exec rollback-diagnoser` preflight | OK / ERROR (fail-closed) |
+| 2 | Capability returns a parseable routing decision | OK / retry (up to 2) / report |
 
 ## Constraints
 

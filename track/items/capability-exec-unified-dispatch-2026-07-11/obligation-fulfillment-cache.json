@@ -375,13 +375,13 @@
         "item_identifier": "trait_method:provider"
       },
       "key": {
-        "bound_tests_set_hash": "5c966a2b6f2431e42d685e979c06bb97b4946e5906c26076d98671e187c020be",
+        "bound_tests_set_hash": "c46eb7c8d340fd023fa2aa8b63ffcf7420f68f79b7e7e66774c0603773c308fb",
         "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
         "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(profile.provider.as_str(), \"codex\");\nassert_eq!(profile.model.as_str(), \"gpt-5\");\n\nassert!(matches!(\n    adapter.resolve(&capability),\n    Err(CapabilityExecError::ModelMissing { .. })\n));\n\nassert!(matches!(\n    interactor.execute(request()?),\n    Err(CapabilityExecError::UnsupportedProvider { .. })\n));\nassert!(dispatches.lock().expect(\"test dispatch recorder lock\").is_empty());\n\nassert!(matches!(\n    outcome,\n    CapabilityDispatchOutcome::Executed { ref provider, exit_code: 17 }\n        if provider.as_str() == \"codex\"\n));\n\nassert!(matches!(\n    outcome,\n    CapabilityDispatchOutcome::Executed { ref provider, exit_code: 9 }\n        if provider.as_str() == \"claude\"\n));\n\nassert!(matches!(\n    adapter.dispatch(&request_from_host(\"codex\")?),\n    Err(CapabilityExecError::AdapterPreflight { .. })\n));\nassert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty());"
+        "citation": "assert_eq!(profile.provider.as_str(), \"codex\"); assert_eq!(profile.model.as_str(), \"gpt-5\"); assert!(matches!( adapter.resolve(&capability), Err(CapabilityExecError::ModelMissing { .. }) )); assert!(matches!( interactor.execute(request()?), Err(CapabilityExecError::UnsupportedProvider { .. }) )); assert!(dispatches.lock().expect(\"test dispatch recorder lock\").is_empty()); assert!(matches!( adapter.dispatch(&request_from_host(\"claude\")?), Err(CapabilityExecError::AdapterPreflight { .. }) )); assert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -399,13 +399,13 @@
         "item_identifier": "trait_method:provider"
       },
       "key": {
-        "bound_tests_set_hash": "5c966a2b6f2431e42d685e979c06bb97b4946e5906c26076d98671e187c020be",
+        "bound_tests_set_hash": "c46eb7c8d340fd023fa2aa8b63ffcf7420f68f79b7e7e66774c0603773c308fb",
         "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
         "anchor_text_hash": "a0f6d880357fd09929348103a9289ca96c5c864212648305fa888b968b3d73dc"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(recorded[0].request.host.as_str(), \"codex\");\nassert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty());\nassert!(matches!(outcome, CapabilityDispatchOutcome::DelegateInHost { .. }));\nassert_eq!(invocations.len(), 1);"
+        "citation": "assert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::DelegateInHost {\n                ref capability,\n                ref briefing_file,\n                ref discipline,\n            } if capability.as_str() == \"implementer\"\n                && briefing_file.as_path() == Path::new(\"tmp/briefing.md\")\n                && discipline.as_str() == \"Do not stage changes.\"\n        ));\n        assert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty()); | assert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 17 }\n                if provider.as_str() == \"codex\"\n        ));\n        let invocations = runner.invocations.lock().expect(\"test process recorder lock\");\n        assert_eq!(invocations.len(), 1); | assert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 9 }\n                if provider.as_str() == \"claude\"\n        ));\n        let invocations = runner.invocations.lock().expect(\"test process recorder lock\");\n        assert_eq!(invocations.len(), 1);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -423,13 +423,13 @@
         "item_identifier": "trait_method:provider"
       },
       "key": {
-        "bound_tests_set_hash": "5c966a2b6f2431e42d685e979c06bb97b4946e5906c26076d98671e187c020be",
+        "bound_tests_set_hash": "c46eb7c8d340fd023fa2aa8b63ffcf7420f68f79b7e7e66774c0603773c308fb",
         "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
         "anchor_text_hash": "5da406c642e68c838923e1c1fe07bccc77c1def3994621c7bfed07e7ade4f6bc"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            args,\n            [\n                \"-p\",\n                \"--agent\",\n                \"implementer\",\n                \"--model\",\n                \"claude-opus\",\n                \"$implementer Briefing: Read tmp/briefing.md and perform the task.\\n\\nDo not stage changes.\",\n            ]\n        );"
+        "citation": "assert_eq!(invocation.0, \"claude\");\n        assert_eq!(args,\n            [\n                \"-p\",\n                \"--agent\",\n                \"implementer\","
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -447,13 +447,13 @@
         "item_identifier": "trait_method:dispatch"
       },
       "key": {
-        "bound_tests_set_hash": "68bd900c244aea9bf4e203129e1346a39e958c69667fbe2f3e976edacde77633",
+        "bound_tests_set_hash": "ca4679a4a7f493c9a46ab4b0d5c127fd4a13b99d74bf7f2283f9f284a1bada30",
         "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
         "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            interactor.execute(request()?),\n            Err(CapabilityExecError::UnsupportedProvider { .. })\n        ));\n        assert!(dispatches.lock().expect(\"test dispatch recorder lock\").is_empty());"
+        "citation": "assert_eq!(profile.provider.as_str(), \"codex\"); assert_eq!(profile.model.as_str(), \"gpt-5\"); assert!(matches!( adapter.resolve(&capability), Err(CapabilityExecError::ModelMissing { .. }) )); assert!(matches!( interactor.execute(request()?), Err(CapabilityExecError::UnsupportedProvider { .. }) )); assert!(dispatches.lock().expect(\"test dispatch recorder lock\").is_empty()); assert!(matches!( adapter.dispatch(&request_from_host(\"claude\")?), Err(CapabilityExecError::AdapterPreflight { .. }) )); assert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty()); assert_eq!(model, \"gpt-5\"); assert_eq!(args, [ \"-p\", \"--agent\", \"implementer\", \"--model\", \"claude-opus\", \"$implementer Briefing: Read tmp/briefing.md and perform the task.\\n\\nDo not stage changes.\", ]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -471,13 +471,13 @@
         "item_identifier": "trait_method:dispatch"
       },
       "key": {
-        "bound_tests_set_hash": "68bd900c244aea9bf4e203129e1346a39e958c69667fbe2f3e976edacde77633",
+        "bound_tests_set_hash": "ca4679a4a7f493c9a46ab4b0d5c127fd4a13b99d74bf7f2283f9f284a1bada30",
         "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
         "anchor_text_hash": "a0f6d880357fd09929348103a9289ca96c5c864212648305fa888b968b3d73dc"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::DelegateInHost {\n                ref capability,\n                ref briefing_file,\n                ref discipline,\n            } if capability.as_str() == \"implementer\"\n                && briefing_file.as_path() == Path::new(\"tmp/briefing.md\")\n                && discipline.as_str() == \"Do not stage changes.\"\n        ));\n        assert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty());"
+        "citation": "assert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::DelegateInHost {\n                ref capability,\n                ref briefing_file,\n                ref discipline,\n            } if capability.as_str() == \"implementer\"\n                && briefing_file.as_path() == Path::new(\"tmp/briefing.md\")\n                && discipline.as_str() == \"Do not stage changes.\"\n        ));\n        assert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty());\n\nassert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 9 }\n                if provider.as_str() == \"claude\"\n        ));\n        let invocations = runner.invocations.lock().expect(\"test process recorder lock\");\n        assert_eq!(invocations.len(), 1);\n\nassert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 17 }\n                if provider.as_str() == \"codex\"\n        ));\n        assert_eq!(invocations.len(), 1);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -495,13 +495,13 @@
         "item_identifier": "trait_method:dispatch"
       },
       "key": {
-        "bound_tests_set_hash": "68bd900c244aea9bf4e203129e1346a39e958c69667fbe2f3e976edacde77633",
+        "bound_tests_set_hash": "ca4679a4a7f493c9a46ab4b0d5c127fd4a13b99d74bf7f2283f9f284a1bada30",
         "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
         "anchor_text_hash": "5da406c642e68c838923e1c1fe07bccc77c1def3994621c7bfed07e7ade4f6bc"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(invocation.0, \"codex\"); ... assert_eq!(model, \"gpt-5\"); ... assert!(prompt.contains(\"$implementer Briefing: Read tmp/briefing.md and perform the task.\")); ... assert!(!prompt.contains(\"sandbox: workspace-write\")); / assert_eq!(args, [\"-p\", \"--agent\", \"implementer\", \"--model\", \"claude-opus\", \"$implementer Briefing: Read tmp/briefing.md and perform the task.\\n\\nDo not stage changes.\"]); / assert!(matches!( adapter.dispatch(&request_from_host(\"claude\")?), Err(CapabilityExecError::AdapterPreflight { .. }) )); assert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty());"
+        "citation": "assert_eq!(model, \"gpt-5\");\nassert!(\n    prompt.contains(\"$implementer Briefing: Read tmp/briefing.md and perform the task.\")\n);\nassert_eq!(\n    args,\n    [\n        \"-p\",\n        \"--agent\",\n        \"implementer\",\n        \"--model\",\n        \"claude-opus\",\n        \"$implementer Briefing: Read tmp/briefing.md and perform the task.\\n\\nDo not stage changes.\",\n    ]\n);\nassert!(matches!(\n    adapter.dispatch(&request_from_host(\"codex\")?),\n    Err(CapabilityExecError::AdapterPreflight { .. })\n));\nassert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -711,13 +711,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "ee8a7183f5073befb94740627fa2ccf9169da5d067ae1bba7a244091a090bbb1",
+        "bound_tests_set_hash": "36e6aac5a2aed34fe34673cff0fd752b6e6a2c80d5ce206de1e06dfa4238a121",
         "declaration_hash": "b2dbf15ef11d68d716ed1a00d797acfd51cc51c65097503d36f61acd045845ed",
         "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let outcome = adapter.dispatch(&request_from_host(\"codex\")?)?;\n\n        assert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 17 }\n                if provider.as_str() == \"codex\"\n        ));\n        let invocations = runner.invocations.lock().expect(\"test process recorder lock\");\n        assert_eq!(invocations.len(), 1);\n        let invocation = invocations.first().expect(\"one process invocation is recorded\");\n        assert_eq!(invocation.0, \"codex\");"
+        "citation": "assert_eq!(invocation.0, \"codex\");\nassert_eq!(model, \"gpt-5\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -735,13 +735,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "ee8a7183f5073befb94740627fa2ccf9169da5d067ae1bba7a244091a090bbb1",
+        "bound_tests_set_hash": "36e6aac5a2aed34fe34673cff0fd752b6e6a2c80d5ce206de1e06dfa4238a121",
         "declaration_hash": "b2dbf15ef11d68d716ed1a00d797acfd51cc51c65097503d36f61acd045845ed",
         "anchor_text_hash": "a0f6d880357fd09929348103a9289ca96c5c864212648305fa888b968b3d73dc"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let outcome = adapter.dispatch(&request_from_host(\"codex\")?)?;\n\nassert!(matches!(\n    outcome,\n    CapabilityDispatchOutcome::Executed { ref provider, exit_code: 17 }\n        if provider.as_str() == \"codex\"\n));\nlet invocations = runner.invocations.lock().expect(\"test process recorder lock\");\nassert_eq!(invocations.len(), 1);"
+        "citation": "let outcome = adapter.dispatch(&request_from_host(\"codex\")?)?;\n\nassert!(matches!(\n    outcome,\n    CapabilityDispatchOutcome::Executed { ref provider, exit_code: 17 }\n        if provider.as_str() == \"codex\"\n));\n...\nassert_eq!(invocations.len(), 1);\nlet invocation = invocations.first().expect(\"one process invocation is recorded\");\nassert_eq!(invocation.0, \"codex\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -759,13 +759,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "ee8a7183f5073befb94740627fa2ccf9169da5d067ae1bba7a244091a090bbb1",
+        "bound_tests_set_hash": "36e6aac5a2aed34fe34673cff0fd752b6e6a2c80d5ce206de1e06dfa4238a121",
         "declaration_hash": "b2dbf15ef11d68d716ed1a00d797acfd51cc51c65097503d36f61acd045845ed",
         "anchor_text_hash": "5da406c642e68c838923e1c1fe07bccc77c1def3994621c7bfed07e7ade4f6bc"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(invocation.0, \"codex\");\n        assert_eq!(command, \"exec\");\n        assert_eq!(model_flag, \"-m\");\n        assert_eq!(model, \"gpt-5\");\n        assert!(\n            prompt.contains(\"$implementer Briefing: Read tmp/briefing.md and perform the task.\")\n        );\n        assert!(!prompt.contains(\"sandbox: workspace-write\"));"
+        "citation": "assert!(\n            prompt.contains(\"$implementer Briefing: Read tmp/briefing.md and perform the task.\")\n        );\n        assert!(prompt.contains(\"Do not stage changes.\"));\n        assert!(!prompt.contains(\"sandbox: workspace-write\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -783,13 +783,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "403144846f41949b2cee163182b78c36b4a276e67d21175722b8fb9879898cd3",
+        "bound_tests_set_hash": "49625710670eb937c33fd1266e9d86c31cce0a610ff8827fd4b171877e35aa12",
         "declaration_hash": "bb64a6b9ee0aceff9f88462be2c78f31d7aad4ef10f2976861a1363e139ca31a",
         "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            adapter.dispatch(&request_from_host(\"codex\")?),\n            Err(CapabilityExecError::AdapterPreflight { .. })\n        ));\n        assert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty());"
+        "citation": "let outcome = adapter.dispatch(&request_from_host(\"claude\")?)?;\n\nassert!(matches!(\n    outcome,\n    CapabilityDispatchOutcome::DelegateInHost {"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -807,13 +807,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "403144846f41949b2cee163182b78c36b4a276e67d21175722b8fb9879898cd3",
+        "bound_tests_set_hash": "49625710670eb937c33fd1266e9d86c31cce0a610ff8827fd4b171877e35aa12",
         "declaration_hash": "bb64a6b9ee0aceff9f88462be2c78f31d7aad4ef10f2976861a1363e139ca31a",
         "anchor_text_hash": "a0f6d880357fd09929348103a9289ca96c5c864212648305fa888b968b3d73dc"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            outcome,\n            CapabilityDispatchOutcome::DelegateInHost {"
+        "citation": "assert!(matches!(\n    outcome,\n    CapabilityDispatchOutcome::DelegateInHost {\n        ref capability,\n        ref briefing_file,\n        ref discipline,\n    } if capability.as_str() == \"implementer\"\n        && briefing_file.as_path() == Path::new(\"tmp/briefing.md\")\n        && discipline.as_str() == \"Do not stage changes.\"\n));\nassert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty());\n\nassert!(matches!(\n    outcome,\n    CapabilityDispatchOutcome::Executed { ref provider, exit_code: 9 }\n        if provider.as_str() == \"claude\"\n));\nlet invocations = runner.invocations.lock().expect(\"test process recorder lock\");\nassert_eq!(invocations.len(), 1);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -831,7 +831,7 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "403144846f41949b2cee163182b78c36b4a276e67d21175722b8fb9879898cd3",
+        "bound_tests_set_hash": "49625710670eb937c33fd1266e9d86c31cce0a610ff8827fd4b171877e35aa12",
         "declaration_hash": "bb64a6b9ee0aceff9f88462be2c78f31d7aad4ef10f2976861a1363e139ca31a",
         "anchor_text_hash": "5da406c642e68c838923e1c1fe07bccc77c1def3994621c7bfed07e7ade4f6bc"
       },
@@ -879,13 +879,13 @@
         "item_identifier": "voluntary:AC-05"
       },
       "key": {
-        "bound_tests_set_hash": "bef620a739cc0ebcfcd3762e49e9434b15ae974ecc129ea26d11569eaab4bff2",
+        "bound_tests_set_hash": "87c9266d71f08000a1204757b490acd1cfa9b5af2343a515d4e18819353e222f",
         "declaration_hash": "a8b3723ba2d9eb9ea6c9be0a6ed06b3ff8dabc5e2c542a62108adda9c8925d48",
         "anchor_text_hash": "49f21c376c276e34386b1584faccdceef001814544a22f67c5622f4e4ac00e9c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "outcome: CapabilityDispatchOutcome::DelegateInHost {\n                capability: CapabilityName::try_new(\"implementer\").expect(\"valid test capability\"),\n                briefing_file: usecase::capability_exec::CapabilityFilePath::try_new(\n                    PathBuf::from(\"tmp/briefing.md\"),\n                )\n                .expect(\"valid test briefing\"),\n                discipline: DisciplineText::try_new(\"no direct git writes\".to_owned())\n                    .expect(\"valid test discipline\"),\n            },\n...\nassert!(output.contains(\"capability: implementer\"));\nassert!(output.contains(\"briefing_file: tmp/briefing.md\"));\nassert!(output.contains(\"no direct git writes\"));"
+        "citation": "assert!(output.contains(\"CAPABILITY_EXEC_OUTCOME: delegate-in-host\")); assert!(output.contains(\"capability: implementer\")); assert!(output.contains(\"briefing_file: tmp/briefing.md\")); assert!(output.contains(\"no direct git writes\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -927,13 +927,13 @@
         "item_identifier": "voluntary:IN-06"
       },
       "key": {
-        "bound_tests_set_hash": "53ab902496c0e8efa2db6fc25ba4d71b8dc81b5110ae20ff49db45650b14824e",
+        "bound_tests_set_hash": "45045dcec1eb0a75ff703c5f157fd8c2fcce5573dfd35b4cdacc5e6fb5e875a2",
         "declaration_hash": "1d7bf6f4b292da8a6b9a9ef1c226ca08e2bb5ecc2fa11bf7a72aea2dd84002b0",
         "anchor_text_hash": "a0f6d880357fd09929348103a9289ca96c5c864212648305fa888b968b3d73dc"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(recorded[0].request.host.as_str(), \"codex\");"
+        "citation": "assert_eq!(recorded[0].request.host.as_str(), \"codex\"); ... assert!(matches!(outcome, CapabilityDispatchOutcome::DelegateInHost { ... })); assert!(runner.invocations.lock().expect(\"test process recorder lock\").is_empty()); ... let outcome = adapter.dispatch(&request_from_host(\"codex\")?)?; assert!(matches!(outcome, CapabilityDispatchOutcome::Executed { ref provider, exit_code: 9 } if provider.as_str() == \"claude\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1047,13 +1047,13 @@
         "item_identifier": "voluntary:IN-04"
       },
       "key": {
-        "bound_tests_set_hash": "deb61f13d4e41fbd109ed78a64bac0f67fbc8347ed596ed93a5d07da256d099b",
+        "bound_tests_set_hash": "5d80a1e91ad99f9b4003296e694d76643a04af6b06557c82d4fda670cf93d1fd",
         "declaration_hash": "1bbcfca6d24b0c3c02afd7180148e7f71dbf4912e0c34f53fc780117ea54cfd1",
         "anchor_text_hash": "dc0e5e2b0f7f96ae2ee897b80be8efcabfaa0cc7a10e86150bb67621a21bf7b0"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(outcome, CapabilityDispatchOutcome::DelegateInHost { ... } if capability.as_str() == \"implementer\" ... )); ... assert!(matches!( adapter.dispatch(&request_from_host(\"claude\")?), Err(CapabilityExecError::AdapterPreflight { .. }) )); ... assert!(matches!( adapter.dispatch(&request_from_host(\"codex\")?), Err(CapabilityExecError::AdapterPreflight { .. }) ));"
+        "citation": "`assert!(matches!( adapter.dispatch(&request_from_host(\"claude\")?), Err(CapabilityExecError::AdapterPreflight { .. }) ))` and `assert!(matches!( outcome, CapabilityDispatchOutcome::DelegateInHost {`"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1071,13 +1071,13 @@
         "item_identifier": "voluntary:AC-06"
       },
       "key": {
-        "bound_tests_set_hash": "c5e7cc80cef6bd3d175fba5518edd1da570525c739d418dfbfc7fd8b2ddb1479",
+        "bound_tests_set_hash": "980acf0ddad43fa7e2d8b5b2e3c4abf94c684e05a348ae19fd5a52949c9a9227",
         "declaration_hash": "1bbcfca6d24b0c3c02afd7180148e7f71dbf4912e0c34f53fc780117ea54cfd1",
         "anchor_text_hash": "60aadc4947e75761f9f2c823474394fd9151014260e1e8473ec459d5d17b2a3c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(invocation.0, \"claude\");\n        assert_eq!(\n            args,\n            [\n                \"-p\",\n                \"--agent\",\n                \"implementer\",\n                \"--model\",\n                \"claude-opus\",\n                \"$implementer Briefing: Read tmp/briefing.md and perform the task.\\n\\nDo not stage changes.\",\n            ]\n        );"
+        "citation": "args,\n            [\n                \"-p\",\n                \"--agent\",\n                \"implementer\",\n                \"--model\",\n                \"claude-opus\",\n                \"$implementer Briefing: Read tmp/briefing.md and perform the task.\\n\\nDo not stage changes.\",\n            ]"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1095,13 +1095,37 @@
         "item_identifier": "voluntary:IN-04"
       },
       "key": {
-        "bound_tests_set_hash": "6614a9a8f4582163966b9a6c52d005e1692c076327ca4ff0263be763039befcd",
+        "bound_tests_set_hash": "ab416e1e0af26b4ff115edc2644eb930fb56dfad45424c8091feb95b4a32d716",
         "declaration_hash": "622716c1a23bd4fa1e75114be2231b90b1aac0081b672655c082f4bfd19b44e5",
         "anchor_text_hash": "dc0e5e2b0f7f96ae2ee897b80be8efcabfaa0cc7a10e86150bb67621a21bf7b0"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(sandbox_mode_from_skill(definition), Ok(SandboxMode::WorkspaceWrite));"
+        "citation": "assert_eq!(workspace_write_flag, \"--sandbox\");\n        assert_eq!(workspace_write_sandbox, \"workspace-write\");\n...\nassert_eq!(default_flag, \"--sandbox\");\n        assert_eq!(default_sandbox, \"read-only\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProviderPort",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProviderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:provider"
+      },
+      "key": {
+        "bound_tests_set_hash": "66823796501a28dc0d06a70fbc924522dac007fc17485a0e8152a84a09b23c2b",
+        "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
+        "anchor_text_hash": "5da406c642e68c838923e1c1fe07bccc77c1def3994621c7bfed07e7ade4f6bc"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            prompt.contains(\"$implementer Briefing: Read tmp/briefing.md and perform the task.\")\n        );\n        assert!(!prompt.contains(\"sandbox: workspace-write\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1119,13 +1143,13 @@
         "item_identifier": "voluntary:AC-06"
       },
       "key": {
-        "bound_tests_set_hash": "a7f2324d64644202f7d480ba553b19e1094089f8af90c2e228b2ce8ee7c90466",
+        "bound_tests_set_hash": "6128062444826755f8777efa95f847533daa74021b34f05de795a5417fa6448e",
         "declaration_hash": "622716c1a23bd4fa1e75114be2231b90b1aac0081b672655c082f4bfd19b44e5",
         "anchor_text_hash": "60aadc4947e75761f9f2c823474394fd9151014260e1e8473ec459d5d17b2a3c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(model, \"gpt-5\");\n        assert_eq!(sandbox_flag, \"--sandbox\");\n        assert_eq!(sandbox, \"workspace-write\");\n        assert!(\n            prompt.contains(\"$implementer Briefing: Read tmp/briefing.md and perform the task.\")\n        );\n        assert!(prompt.contains(\"Do not stage changes.\"));"
+        "citation": "assert_eq!(model, \"gpt-5\"); ... assert!(prompt.contains(\"$implementer Briefing: Read tmp/briefing.md and perform the task.\")); ... assert!(prompt.contains(\"Do not stage changes.\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1287,13 +1311,13 @@
         "item_identifier": "voluntary:IN-04"
       },
       "key": {
-        "bound_tests_set_hash": "6614a9a8f4582163966b9a6c52d005e1692c076327ca4ff0263be763039befcd",
+        "bound_tests_set_hash": "b8325ffb5c76216e205e67531fffc9a8ebeb53a72fb0ad21d191be9ea1d8a700",
         "declaration_hash": "c76a9b77533d8b8754ae968f1f1a61d1206a3ab9789def69e17c8bc89ebf76b7",
         "anchor_text_hash": "dc0e5e2b0f7f96ae2ee897b80be8efcabfaa0cc7a10e86150bb67621a21bf7b0"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(sandbox_mode_from_skill(definition), Ok(SandboxMode::WorkspaceWrite));"
+        "citation": "sandbox_mode_from_skill(definition, \"implementer\"),\n            Ok(SandboxMode::WorkspaceWrite)"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1311,13 +1335,13 @@
         "item_identifier": "voluntary:AC-09"
       },
       "key": {
-        "bound_tests_set_hash": "7b31eac84ce67193133e436cbece82a40895233ae9cf791b69010c072808979e",
+        "bound_tests_set_hash": "a96ab725453e65479bca37380dcc772376b417f2ff5fbade2d6cbc8dd4376bc4",
         "declaration_hash": "c76a9b77533d8b8754ae968f1f1a61d1206a3ab9789def69e17c8bc89ebf76b7",
         "anchor_text_hash": "d947cdb1cb242f0db1823885f87b956fa8096b938eea8de22efd0754b473300c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(sandbox_mode_from_skill(definition), Ok(SandboxMode::ReadOnly));"
+        "citation": "assert_eq!(sandbox_mode_from_skill(definition, \"implementer\"), Ok(SandboxMode::ReadOnly));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1335,13 +1359,13 @@
         "item_identifier": "voluntary:GO-01"
       },
       "key": {
-        "bound_tests_set_hash": "c5919b4ce82ff9fa89bb98ebedf1f7b414ab79aee672406d3bd6134105fdb526",
+        "bound_tests_set_hash": "7b4a59cc0ea97a7e898def5457ef7a0a7badf5ce656e88beab4471f5642182aa",
         "declaration_hash": "f4cd3548df02dd03268fe666c039d4687a3b7ec647cbb06993457d1a9317f317",
         "anchor_text_hash": "41a99b4a112a12c20eafbcb494dddbb6ecea9e13482b19723b40b48e07a5f32d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(request.capability.as_str(), \"implementer\");\n        assert_eq!(request.host.as_str(), \"claude\");\n        assert_eq!(request.briefing_file.as_path(), PathBuf::from(\"tmp/briefing.md\"));"
+        "citation": "assert_eq!(recorded[0].profile.provider.as_str(), \"codex\");\n        assert_eq!(recorded[0].profile.model.as_str(), \"gpt-5\");\n        assert_eq!(recorded[0].request.capability.as_str(), \"implementer\");\n        assert_eq!(recorded[0].request.host.as_str(), \"codex\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1503,13 +1527,13 @@
         "item_identifier": "voluntary:GO-01"
       },
       "key": {
-        "bound_tests_set_hash": "bd2a5d7a8bf71b2f599f863c552599cdc8c76001291d227bee8a6640e153afcd",
+        "bound_tests_set_hash": "a9959fc9eefaccd4915800ccb7c673dbc6ef10deb49c71095038a6c0f42214ca",
         "declaration_hash": "4ef170a36bd947cdfb93e66bdb9b80442f698086948d4e1cbb4d5ebf8acaef73",
         "anchor_text_hash": "41a99b4a112a12c20eafbcb494dddbb6ecea9e13482b19723b40b48e07a5f32d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let outcome = root.capability_driver().handle(input());\n        let output = outcome.stdout.expect(\"in-host instruction is rendered\");\n\n        assert_eq!(outcome.exit_code, 0);\n        assert!(output.contains(\"CAPABILITY_EXEC_OUTCOME: delegate-in-host\"));\n        assert!(output.contains(\"capability: implementer\"));\n        assert!(output.contains(\"briefing_file: tmp/briefing.md\"));\n        assert!(output.contains(\"Do not stage changes.\"));"
+        "citation": "let outcome = root.capability_driver().handle(input());\nlet output = outcome.stdout.expect(\"in-host instruction is rendered\");\n\nassert_eq!(outcome.exit_code, 0);\nassert!(output.contains(\"CAPABILITY_EXEC_OUTCOME: delegate-in-host\"));\nassert!(output.contains(\"capability: implementer\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1527,7 +1551,7 @@
         "item_identifier": "voluntary:IN-04"
       },
       "key": {
-        "bound_tests_set_hash": "306815cc259d9f143c250942b4ae688758e78fcb0e1370ea3a5d9a759ae93542",
+        "bound_tests_set_hash": "a2f5988162de301b3d37c8c0c47a5df4d9e24f664881d0b143f9eddc43340ff8",
         "declaration_hash": "4ef170a36bd947cdfb93e66bdb9b80442f698086948d4e1cbb4d5ebf8acaef73",
         "anchor_text_hash": "dc0e5e2b0f7f96ae2ee897b80be8efcabfaa0cc7a10e86150bb67621a21bf7b0"
       },

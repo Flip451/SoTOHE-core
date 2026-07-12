@@ -168,7 +168,8 @@
         {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_same_host_returns_in_host_instruction"},
         {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_cross_provider_uses_native_agent_prompt"},
         {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_missing_model_rejected_before_process"},
-        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_model_mismatch_rejected_before_process"}
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_model_mismatch_rejected_before_process"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_missing_skill_rejects_without_raw_definition_prompt_fallback"}
       ]
     },
     {
@@ -346,7 +347,20 @@
     {
       "kind": "voluntary_binding",
       "edge_id": {"entry_key": "CodexCapabilityAdapter", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-04"}},
-      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_skill_workspace_write_sandbox_is_retained"}]
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_skill_workspace_write_sandbox_is_retained"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_declared_and_default_sandbox_reach_subprocess"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CapabilityProviderPort", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-07"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_cross_provider_dispatches_native_skill"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_missing_skill_rejects_without_raw_definition_prompt_fallback"}
+      ]
     },
     {
       "kind": "voluntary_binding",
@@ -386,7 +400,10 @@
     {
       "kind": "voluntary_binding",
       "edge_id": {"entry_key": "SandboxMode", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "IN-04"}},
-      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_skill_workspace_write_sandbox_is_retained"}]
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_skill_workspace_write_sandbox_is_retained"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_skill_missing_sandbox_defaults_to_read_only"}
+      ]
     },
     {
       "kind": "voluntary_binding",
@@ -398,7 +415,11 @@
       "edge_id": {"entry_key": "CapabilityDriver", "anchor_id": {"file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json", "element_id": "GO-01"}},
       "tests": [
         {"layer": "cli_driver", "module_path": "cli_driver::capability::tests", "test_name": "test_capability_driver_forwards_shared_exec_inputs_to_generic_service"},
-        {"layer": "cli_composition", "module_path": "cli_composition::capability::tests", "test_name": "test_capability_composition_root_dispatches_valid_claude_host_in_process"}
+        {"layer": "cli_composition", "module_path": "cli_composition::capability::tests", "test_name": "test_capability_composition_root_dispatches_valid_claude_host_in_process"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_orchestrator_output_resolves_profile"},
+        {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_valid_orchestrator_output_dispatches_validated_request"},
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt"},
+        {"layer": "cli_composition", "module_path": "cli_composition::capability::tests", "test_name": "test_capability_composition_root_profile_resolution_yields_resolved_in_host_route"}
       ]
     },
     {

@@ -11,7 +11,8 @@ Plan a feature via the canonical track planning workflow — a state-machine orc
 drives Phase 0 → Phase 1 → Phase 2 → Phase 3 through the four independent phase workflows,
 delegating each phase to its writer capability. The pre-track stage must have authored an ADR
 under `knowledge/adr/` beforehand. Back-and-forth escalation is triggered automatically when
-a downstream gate fails. Provider routing is resolved via `.harness/config/agent-profiles.json`.
+a downstream gate fails. Each capability dispatch command resolves provider routing internally
+from `.harness/config/agent-profiles.json`.
 
 Sub-workflows used:
 
@@ -32,7 +33,6 @@ Sub-workflows used:
 - **Current branch** — must be compatible with the operation: the configured base branch
   (`.harness/config/branch-strategy.json#base_branch`) for a new track, `track/<id>` for a
   track already initialized.
-- **`.harness/config/agent-profiles.json`** — must be readable for capability routing.
 
 ## Sequence
 

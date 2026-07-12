@@ -14,16 +14,11 @@ User (or the orchestrator's main loop) invokes this command as `/track:diagnose`
 
 ## Claude Code invocation constraints
 
-- Provider resolution: read `.harness/config/agent-profiles.json`
-  (`capabilities.rollback-diagnoser.provider` / `model`).
-  - **provider: claude** — invoke the Claude subagent via the Agent tool with
-    `subagent_type: "rollback-diagnoser"`. The subagent reads the operational SSoT
-    (`.harness/capabilities/rollback-diagnoser.md`) and executes the routing judgment.
-  - **provider: codex** — write the diagnostic briefing first, then run
-    `bin/sotp capability exec rollback-diagnoser --host claude --briefing-file <path>`. The
-    dispatcher resolves the profile model and validates the Codex skill's declared read-only
-    sandbox before invoking it. The codex skill (`.agents/skills/rollback-diagnoser/SKILL.md`)
-    reads the same operational SSoT.
+- Write the diagnostic briefing, then run
+  `bin/sotp capability exec rollback-diagnoser --host claude --briefing-file <path>`. The
+  dispatcher resolves the provider and model internally from
+  `.harness/config/agent-profiles.json`, validates the provider-native read-only definition,
+  and either completes the dispatch or returns the in-host delegation instruction to follow.
 - This command performs no writes: no SoT artifact edits, no staging/commits, no writer
   subagent invocation, no mutating `bin/sotp` subcommands (see the workflow SSoT's
   Constraints section).
@@ -40,7 +35,7 @@ After execution, return the structured routing decision verbatim to the caller:
 }
 ```
 
-The orchestrator then dispatches per the workflow SSoT's "Step 4" table and may override the
+The orchestrator then dispatches per the workflow SSoT's "Step 3" table and may override the
 suggested target if it judges `reason` insufficiently convincing.
 
 ## References
@@ -49,4 +44,4 @@ suggested target if it judges `reason` insufficiently convincing.
 - `.harness/capabilities/rollback-diagnoser.md` — capability operational contract
 - `.claude/agents/rollback-diagnoser.md` — Claude subagent wrapper
 - `.agents/skills/rollback-diagnoser/SKILL.md` — Codex skill wrapper
-- `.harness/config/agent-profiles.json` — `capabilities.rollback-diagnoser` provider routing
+- `.harness/config/agent-profiles.json` — `capabilities.rollback-diagnoser` routing SSoT

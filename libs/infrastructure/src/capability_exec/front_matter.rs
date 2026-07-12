@@ -18,11 +18,15 @@ pub(crate) fn read_front_matter(content: &str) -> Result<Option<&str>, String> {
 /// Structurally validated YAML front matter from a provider-native definition.
 ///
 /// Fields whose values influence provider dispatch are decoded only from the
-/// top-level mapping.  Additional definition fields must be scalar, which
-/// prevents a nested mapping from hiding a `sandbox`, `model`, or `tools`
-/// declaration that a line-oriented parser might accidentally accept.
+/// top-level mapping. Additional definition fields must be scalar, which
+/// prevents a nested mapping from hiding an identity, `sandbox`, `model`, or
+/// `tools` declaration that a line-oriented parser might accidentally accept.
 #[derive(Debug, Deserialize)]
 pub(crate) struct ProviderDefinitionFrontMatter {
+    #[serde(default)]
+    name: Option<String>,
+    #[serde(default)]
+    description: Option<String>,
     #[serde(default)]
     sandbox: SandboxDeclaration,
     #[serde(default)]
@@ -95,6 +99,30 @@ impl<'de> Deserialize<'de> for SandboxDeclaration {
 }
 
 impl ProviderDefinitionFrontMatter {
+    /// Ensures this definition is discoverable and registered for the expected capability.
+    ///
+    /// Both supported provider formats require `name` and `description` for discovery.
+    pub(crate) fn validate_identity(
+        &self,
+        expected_capability: &str,
+        definition_kind: &str,
+    ) -> Result<(), String> {
+        let name = self
+            .name
+            .as_deref()
+            .filter(|value| !value.trim().is_empty())
+            .ok_or_else(|| format!("{definition_kind} must declare a non-empty name field"))?;
+        if name != expected_capability {
+            return Err(format!(
+                "{definition_kind} name '{name}' does not match requested capability '{expected_capability}'"
+            ));
+        }
+        if self.description.as_deref().is_none_or(|value| value.trim().is_empty()) {
+            return Err(format!("{definition_kind} must declare a non-empty description field"));
+        }
+        Ok(())
+    }
+
     pub(crate) fn sandbox(&self) -> Result<Option<&str>, String> {
         match &self.sandbox {
             SandboxDeclaration::Absent => Ok(None),

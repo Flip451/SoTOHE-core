@@ -12,12 +12,11 @@ User invokes this command as `/track:obligation-fulfillment`. 引数は不要（
 
 ## Claude Code invocation constraints
 
-- **役割分担**: 著作/修復ラウンドは `implementer` capability に委譲する（provider は
-  `.harness/config/agent-profiles.json` で解決 — `provider: claude` では briefing file を先に
-  書いて Agent tool（`subagent_type: "implementer"`, `run_in_background: true`）を起動する。
-  `provider: codex` では `bin/sotp capability exec implementer --host claude --briefing-file
-  <path>` で dispatch する。dispatcher が profile model と provider-native skill の sandbox を
-  解決し、briefing にはラウンド固有の差分のみを書く）。`bin/sotp test-obligation
+- **役割分担**: 著作/修復ラウンドは `implementer` capability に委譲する。briefing にはラウンド
+  固有の差分のみを書き、`bin/sotp capability exec implementer --host claude --briefing-file
+  <path>` で dispatch する。dispatcher が `.harness/config/agent-profiles.json` から profile
+  model と provider-native skill の sandbox を内部解決し、dispatch を完了するか in-host 委譲指示を
+  返す。`bin/sotp test-obligation
   evaluate` は **orchestrator（このセッション）が実行**する（host 所有 — 委譲プロバイダの
   sandbox 内では provider verifier subprocess を起動できないため）。
 - ループの手順・ゲート条件・file-safety・キャッシュ有効性の規律はすべて workflow SSoT に

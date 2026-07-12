@@ -236,11 +236,46 @@ mod tests {
 
     #[test]
     fn test_provider_front_matter_top_level_tools_list_is_detected() {
-        let front_matter = "name: implementer\ntools:\n  - Read\n  - Edit";
+        let front_matter = "name: implementer\ndescription: Implements assigned tasks.\ntools:\n  - Read\n  - Edit";
         let parsed = parse_provider_definition_front_matter(front_matter)
             .expect("top-level tools list parses");
 
         assert!(parsed.has_tools());
+        assert_eq!(parsed.validate_identity("implementer", "provider definition"), Ok(()));
+    }
+
+    #[test]
+    fn test_provider_front_matter_identity_rejects_missing_empty_and_mismatched_fields() {
+        let missing_name = parse_provider_definition_front_matter(
+            "description: Implements assigned tasks.\nsandbox: read-only",
+        )
+        .expect("front matter without a name still decodes for validation");
+        assert!(missing_name.validate_identity("implementer", "provider definition").is_err());
+
+        let empty_name = parse_provider_definition_front_matter(
+            "name: '  '\ndescription: Implements assigned tasks.",
+        )
+        .expect("front matter with an empty name still decodes for validation");
+        assert!(empty_name.validate_identity("implementer", "provider definition").is_err());
+
+        let mismatched_name = parse_provider_definition_front_matter(
+            "name: researcher\ndescription: Researches the workspace.",
+        )
+        .expect("front matter with a different name still decodes for validation");
+        assert!(mismatched_name.validate_identity("implementer", "provider definition").is_err());
+
+        let missing_description = parse_provider_definition_front_matter("name: implementer")
+            .expect("front matter without a description still decodes for validation");
+        assert!(
+            missing_description.validate_identity("implementer", "provider definition").is_err()
+        );
+    }
+
+    #[test]
+    fn test_provider_front_matter_malformed_name_is_rejected() {
+        let front_matter = "name:\n  nested: implementer\ndescription: Implements assigned tasks.";
+
+        assert!(parse_provider_definition_front_matter(front_matter).is_err());
     }
 
     #[test]

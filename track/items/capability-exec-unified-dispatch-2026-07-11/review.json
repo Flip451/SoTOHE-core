@@ -1,6 +1,150 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ede1b72159ac1af4186d488aa5a9e0df80bd8540adbaaf1576eaafe0b5ebfb66",
+          "at": "2026-07-12T00:15:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ede1b72159ac1af4186d488aa5a9e0df80bd8540adbaaf1576eaafe0b5ebfb66",
+          "at": "2026-07-12T00:17:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7544c09b23b505f58d22a08e28aefdbde28785ae4b677a0c08ad704ef9ebcf7",
+          "at": "2026-07-12T08:36:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7544c09b23b505f58d22a08e28aefdbde28785ae4b677a0c08ad704ef9ebcf7",
+          "at": "2026-07-12T08:37:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68cd6ab586a21d216f76fe96061607729febdf39f1505cfb1d8d308f0bd805b4",
+          "at": "2026-07-12T09:10:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a67f1053f1fecaca7b2ad9bdbcd7fd6e90eef8d99f16e8ba9a9de0aa6a22b327",
+          "at": "2026-07-12T10:06:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a67f1053f1fecaca7b2ad9bdbcd7fd6e90eef8d99f16e8ba9a9de0aa6a22b327",
+          "at": "2026-07-12T10:08:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b995ff17a44748c94e0211bd843e576b3c21f5186402e3ccfeed053358d43a6",
+          "at": "2026-07-12T11:31:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b995ff17a44748c94e0211bd843e576b3c21f5186402e3ccfeed053358d43a6",
+          "at": "2026-07-12T11:31:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b995ff17a44748c94e0211bd843e576b3c21f5186402e3ccfeed053358d43a6",
+          "at": "2026-07-12T11:33:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The fulfillment cache is stale relative to the current bindings/test bodies. `bin/sotp test-obligation check --track-id capability-exec-unified-dispatch-2026-07-11` fails with `TestChanged` drifts for CapabilityProviderPort edges IN-03 (two obligations), IN-06, IN-07, and CapabilityDriver GO-01. Re-run the host-owned evaluation to freeze verdicts for the current hashes before committing these artifacts.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/obligation-fulfillment-cache.json",
+              "line": 378,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f8cbf93736595ac84dec750cfdc919f7411c68f07a46d3be858736df3676415b",
+          "at": "2026-07-12T18:08:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The frozen verdict cache is stale. `bin/sotp test-obligation check --track-id capability-exec-unified-dispatch-2026-07-11` fails with five `TestChanged` drifts: two for `CapabilityProviderPort × IN-03`, and one each for `CapabilityProviderPort × IN-06`, `CapabilityProviderPort × IN-07`, and `CapabilityDriver × GO-01`. Re-run the host-owned evaluation after the binding/test changes and commit the regenerated cache; the stated 79-edge passing gate is not reproducible from these artifacts.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/obligation-fulfillment-cache.json",
+              "line": 426,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:f8cbf93736595ac84dec750cfdc919f7411c68f07a46d3be858736df3676415b",
+          "at": "2026-07-12T18:08:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3f76f857a6660af6ecd865c711bcf030eccea5e33e8bfa4cbd59165b6e068487",
+          "at": "2026-07-12T18:11:30Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
+          "at": "2026-07-11T21:56:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 は briefing 規律を全 dispatch 経路で保証するとしているが、subprocess prompt に検証済み briefing と discipline 本文が含まれることを証明する AC がない。AC-03 は事前検証、AC-05 は in-host payload、AC-06 は native adapter の起動形式しか確認しないため、subprocess が両本文を欠落させても全 AC を満たせる。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+              "line": 34,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
+          "at": "2026-07-11T21:58:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0449a9512e852388b258d529303c95fbb6bff22f07b51d72522c021854c4b4c8",
+          "at": "2026-07-11T22:02:33Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -112,6 +256,1044 @@
           "findings": [],
           "hash": "rvw1:sha256:7319490cbe37ee5d603db16cb8400f8c2fb0486e820b25178c695369a7319b2f",
           "at": "2026-07-11T21:00:23Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityExecError::InvalidRequest` is unconstructible: `CapabilityExecService::execute` accepts an already-typed `CapabilityExecRequest`; declared constructors return `CapabilityInputValidationError` directly, and `CapabilityDriver::handle` returns `CommandOutcome`. No declared caller can wrap that error into this variant.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 761,
+              "category": "unconstructible error variant"
+            },
+            {
+              "message": "`CapabilityProfilePort::resolve` returns the broad `CapabilityExecError`, but the declared profile adapter can only produce `ProfileResolution` or `ModelMissing`. The entry does not document this producible subset; `InvalidRequest`, `ExecutionModeRejected`, `UnsupportedProvider`, `SourceValidation`, `AdapterPreflight`, and `DispatchFailed` are structurally unreachable here.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 478,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`CapabilityProviderPort::dispatch` returns the broad `CapabilityExecError`, although the interactor selects a matching provider and the provider adapters can only produce `AdapterPreflight` or `DispatchFailed`. The entry does not document the narrower subset, forcing callers to handle unreachable profile/source/input variants.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 521,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`CapabilitySourcePort::load_briefing` and `load_discipline` return the broad `CapabilityExecError`, although both declared operations can only produce `SourceValidation`. The entry does not document this subset, so callers must handle unrelated profile, provider, and dispatch failures.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 560,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`CapabilityProfilePort::resolve`, `CapabilitySourcePort::load_briefing`, `CapabilitySourcePort::load_discipline`, and `CapabilityProviderPort::dispatch` are all declared synchronous despite performing profile-file, filesystem, and subprocess/provider I/O. Their docs do not acknowledge the synchronous boundary choice, leaving the port color contract underspecified for adapters.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 470,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "`ReasoningEffortDto` is anchored only to `CN-02`, whose scope covers profile capability/routing/model/execution-mode authority and adapter authority; it contains no reasoning-effort contract. The entry therefore declares an unrelated API addition, and its docs restate a behavior not committed by this spec.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 607,
+              "category": "spec_refs off-topic"
+            },
+            {
+              "message": "`CapabilityConfigDto` claims existing reasoning-effort accessors are preserved, but its declared `fast_reasoning_effort` and `final_reasoning_effort` signatures change from the baseline raw-string accessors to `Option<ReasoningEffortDto>`. This is an undeclared compatibility change for existing consumers and contradicts the entry's own docs.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 324,
+              "category": "action/shape inconsistency"
+            },
+            {
+              "message": "The `docs` fields for `BriefingText`, `CapabilityDispatchOutcome`, `CapabilityDispatchRequest`, `CapabilityExecError`, `CapabilityExecInteractor`, `CapabilityExecRequest`, `CapabilityFailureDetail`, `CapabilityFilePath`, `CapabilityInputValidationError`, `CapabilityName`, `CapabilityProfile`, `DisciplineText`, `ExecutionMode`, `ModelName`, `ProviderName`, `CapabilityExecService`, `CapabilityProfilePort`, `CapabilityProviderPort`, and `CapabilitySourcePort` restate upstream validation, routing, branching, and error contracts in prose instead of only citing their anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 437,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `docs` fields for `AgentProfilesCapabilityAdapter`, `CapabilityConfigDto`, `ClaudeCapabilityAdapter`, `CodexCapabilityAdapter`, `ExecutionModeDto`, `FsCapabilitySourceAdapter`, `ModelNameDto`, `ProviderNameDto`, `ReasoningEffortDto`, and `SandboxMode` restate upstream parsing, adapter, sandbox, and conversion behavior in prose instead of only citing their anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 296,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `docs` fields for `CapabilityDriver`, `CapabilityExecDriverInput`, `CapabilityNameArg`, and `ProviderNameArg` restate upstream input-validation, conversion, and rendering behavior in prose instead of only citing their anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+              "line": 150,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `docs` fields for `CapabilityCommand` and `CapabilityExecArgs` restate the generic dispatch and input-validation contract in prose instead of only citing their anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `CapabilityCompositionRoot` docs restate the adapter wiring and dispatch responsibility contract in prose instead of only citing its anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_composition-types.json",
+              "line": 41,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:c102aa4cdd3bbb6b07b3f0a34a9380cf6e137ea95a4e2eca548295e58a9dd20b",
+          "at": "2026-07-11T22:09:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityConfigDto` の `provider` / `model` / `fast_provider` / `fast_model` / `prompt_template_path` は baseline の `&str` / `Option<&str>` から DTO・`Path` 型へ変更されていますが、entry docs は既存 accessor のシグネチャ維持を宣言しています。破壊的変更を明示するか、baseline 互換の戻り値に戻してください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 300,
+              "category": "action incoherent with diff"
+            },
+            {
+              "message": "`ExecutionMode` の docs が、`TypedPipeline` を起動前に拒否し `OrchestratorOutput` のみ dispatch するという upstream の挙動契約を散文で再掲しています。types docs は upstream anchor の参照に留めてください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 1168,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:a4d34d66410d272528c8d8d842592524e7d76cb5eea332a312135772d34fa467",
+          "at": "2026-07-11T22:42:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d28419e7ac0184b0769fc1e5bfc963384039713fbd867ba4065a90b4fdd3dcf7",
+          "at": "2026-07-11T22:55:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d28419e7ac0184b0769fc1e5bfc963384039713fbd867ba4065a90b4fdd3dcf7",
+          "at": "2026-07-11T22:59:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19eca2d6e54c2cdf8c6b4515f47c080dd48d035a6db3bfe664bf2d9d9a1aeae5",
+          "at": "2026-07-12T00:07:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19eca2d6e54c2cdf8c6b4515f47c080dd48d035a6db3bfe664bf2d9d9a1aeae5",
+          "at": "2026-07-12T00:08:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `AgentProfiles` entry's `docs` field restates the trusted-root validation and adapter conversion behavior instead of only citing the upstream anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 301,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `AgentProfilesError` entry's `docs` field restates fail-closed security behavior and payload rationale instead of only citing the upstream anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 476,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `CapabilityFilePath` entry's `docs` field restates the upstream path-validation contract instead of only citing its anchor.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 985,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:8ab6517abb1519f989c2b2e5b4425918cb81a5838bcd2e15b5f008b7ecb5869d",
+          "at": "2026-07-12T06:51:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityInputValidationError::EmptyCapabilityName` は構築経路のない dead vocabulary です。catalogue 上の `CapabilityName` は既存型への `reference` であり、その `try_new` は `domain::ValidationError` を返します。また、同 enum を返す新規コンストラクタは provider/model/path/content 用だけです。この variant を削除するか、実際の capability-name 検証境界で構築されるエラー型へ契約を統一してください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 1011,
+              "category": "unconstructible error variant"
+            }
+          ],
+          "hash": "rvw1:sha256:293c1bdc62771cc19da216453592ab74641cdf2a69c4303c774bdb3736ccfff6",
+          "at": "2026-07-12T07:20:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:293c1bdc62771cc19da216453592ab74641cdf2a69c4303c774bdb3736ccfff6",
+          "at": "2026-07-12T07:21:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::AgentProfiles::resolve_model` and `resolve_provider` return owned `Option<String>` despite being read-only lookups over `&self`; this forces cloning/allocation where borrowed `Option<&str>` (or an equivalent borrowed result) would suffice. The catalogue does not justify the ownership boundary.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 373,
+              "category": "ownership signature smell"
+            }
+          ],
+          "hash": "rvw1:sha256:053370a526954072f0d69ea7bfdd2eb351a3a34cdf524f75b059923ac873278c",
+          "at": "2026-07-12T08:34:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05d15a42a3621f3db38671b46ccf980416dbc5781d63b7503f265961f4a6201c",
+          "at": "2026-07-12T09:08:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::capability_exec::{ProviderName, ModelName, CapabilityFilePath, BriefingText, DisciplineText}::try_new` all return the shared `CapabilityInputValidationError`, but each can produce only a small subset of its five variants, and the catalogue methods neither document those subsets nor justify the broad error type. For example, `ProviderName::try_new` can only produce `EmptyProviderName`, while callers must accept file-path and content variants that are structurally impossible. Declare precise errors or document each method's producible subset.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 17,
+              "category": "API shape / per-method error imprecision"
+            },
+            {
+              "message": "`infrastructure::agent_profiles::{ProviderNameDto, ModelNameDto}::try_new` expose the full usecase `CapabilityInputValidationError`, although the wrappers can only propagate `EmptyProviderName` and `EmptyModelName`, respectively. Their catalogue declarations provide no producible-subset documentation, leaving adapter callers with several impossible variants. Use precise errors or document the subset on each method.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 110,
+              "category": "API shape / per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:05d15a42a3621f3db38671b46ccf980416dbc5781d63b7503f265961f4a6201c",
+          "at": "2026-07-12T09:15:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::CliCommand` の `docs` が、IN-01/IN-08 の変更内容（旧 planner command の撤去と generic capability dispatch への置換）をそのまま再記述しています。型固有の事実だけを残し、上流の振る舞いはアンカー参照のみにしてください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+              "line": 218,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:84b4145845addeab48e9a533f7cf893f79c799d7d15ee2a364587cc018323a70",
+          "at": "2026-07-12T09:33:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c6d4c4b0a32b3a4e9d5b55aad70e5764184ca8817f91134fb9f9324ca3d7e40",
+          "at": "2026-07-12T09:44:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f7d0177081856f573887e3ef23819fdecad0bb0f9773edd9f551f3dee82205b",
+          "at": "2026-07-12T12:43:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f7d0177081856f573887e3ef23819fdecad0bb0f9773edd9f551f3dee82205b",
+          "at": "2026-07-12T12:44:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityCompositionRoot::discover` は git worktree の探索失敗しか起こさず、実装上構築できるのは `CompositionError::Infrastructure` だけですが、契約は `ConfigLoad`、`AdapterInit`、`WiringFailed`、`Usecase` も含む共有エラー型を返し、catalogue の `docs` も `null` のため生成可能な subset が明記されていません。専用の狭いエラー型にするか、このメソッドが生成可能な variant を catalogue に明記してください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_composition-types.json",
+              "line": 28,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:2f7d0177081856f573887e3ef23819fdecad0bb0f9773edd9f551f3dee82205b",
+          "at": "2026-07-12T12:47:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8776d6c97c799fe5d820996084f878739d192d4d6479bafd0feb88fa9c75c03",
+          "at": "2026-07-12T12:54:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8776d6c97c799fe5d820996084f878739d192d4d6479bafd0feb88fa9c75c03",
+          "at": "2026-07-12T12:56:09Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
+          "at": "2026-07-12T06:38:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
+          "at": "2026-07-12T06:38:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
+          "at": "2026-07-12T06:41:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
+          "at": "2026-07-12T06:41:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
+          "at": "2026-07-12T08:31:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
+          "at": "2026-07-12T08:38:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
+          "at": "2026-07-12T08:38:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
+          "at": "2026-07-12T08:45:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `.claude/settings.json` case only checks `bin/sotp capability exec`, which is present in the hook prompt; it never verifies the actual allowlist entry (`Bash(bin/sotp capability:*)`). A permission regression would still pass this test. Assert or parse the allowlist separately.",
+              "severity": "P1",
+              "file": "apps/cli/tests/operational_reference_cutover.rs",
+              "line": 59,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:f7246cb19d7a31eaaf75f8f1c85580d074645df597bb57c4ac4f78881ec2e045",
+          "at": "2026-07-12T10:50:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
+          "at": "2026-07-12T10:55:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
+          "at": "2026-07-12T11:02:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "退役参照の検出が連続部分文字列 `plan codex-local` に依存しているため、明示的に保護対象とされた設定面を網羅できません。例えば Codex の旧 prefix rule `['bin/sotp', 'plan', 'codex-local']` は区切り文字のため一致せず、settings の旧 allowlist `Bash(bin/sotp plan:*)` も `codex-local` を含まないため、このテストは新旧ルールが併存していても成功します。各 surface に応じた旧マーカーも検査し、settings allowlist と Codex prefix rules の cutover を実際に保証してください。",
+              "severity": "P1",
+              "file": "apps/cli/tests/operational_reference_cutover.rs",
+              "line": 1,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
+          "at": "2026-07-12T11:02:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
+          "at": "2026-07-12T11:02:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
+          "at": "2026-07-12T11:04:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SystemGitRepo::discover()` performs repository-discovery I/O directly in the thin bin, and the accompanying production dependency on `infrastructure` bypasses `cli_composition`. This violates ADR D8/D5 and `architecture-rules.json`, which restrict `cli` to `cli_composition`/`cli_driver`. Move repository-root discovery behind `CapabilityCompositionRoot` (returning a typed startup error), leaving this handler to parse, obtain the driver, dispatch, and emit.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/capability.rs",
+              "line": 51,
+              "category": "direct I/O in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:3424bafc67616a2a8d7c020976f691d276a582b7f3c9d9b71a0ccb90513c7a49",
+          "at": "2026-07-12T12:23:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SystemGitRepo::discover()` makes the production CLI depend directly on `infrastructure`, bypassing the required `cli_composition`/`cli_driver` boundary. Repository-root discovery is infrastructure I/O and must be exposed through the composition root so this handler remains parse–dispatch–emit only. This violates ADR D5/D8 and `architecture-rules.json`; keep `infrastructure` as a dev dependency and move the discovery/wiring behind `cli_composition`.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/capability.rs",
+              "line": 10,
+              "category": "usecase/domain import in production"
+            }
+          ],
+          "hash": "rvw1:sha256:3424bafc67616a2a8d7c020976f691d276a582b7f3c9d9b71a0ccb90513c7a49",
+          "at": "2026-07-12T12:24:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e355eb6cd8981df07fc79c1d9288b95e7265848d3b847c8f0e640df2fe5d21d",
+          "at": "2026-07-12T12:42:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e355eb6cd8981df07fc79c1d9288b95e7265848d3b847c8f0e640df2fe5d21d",
+          "at": "2026-07-12T12:43:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e355eb6cd8981df07fc79c1d9288b95e7265848d3b847c8f0e640df2fe5d21d",
+          "at": "2026-07-12T12:45:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f99cfd7a55517e1993e26db31e9f8bbb1f9252ef38f2022b14bbc052718a8049",
+          "at": "2026-07-12T16:38:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f99cfd7a55517e1993e26db31e9f8bbb1f9252ef38f2022b14bbc052718a8049",
+          "at": "2026-07-12T16:39:54Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9402f549356acdb25d90df0acdb50f49d3e02200a8243f9381337505da9c077",
+          "at": "2026-07-12T00:04:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9402f549356acdb25d90df0acdb50f49d3e02200a8243f9381337505da9c077",
+          "at": "2026-07-12T00:05:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5631660c95330d3d727e0c8655c2b9fe1ce24f00a16e2c900732d21bdd154472",
+          "at": "2026-07-12T06:29:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5631660c95330d3d727e0c8655c2b9fe1ce24f00a16e2c900732d21bdd154472",
+          "at": "2026-07-12T06:31:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:755057a38213543e8fc398bb0a8d146398ab821f82d0e774f430bba4bc01faaa",
+          "at": "2026-07-12T08:17:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:755057a38213543e8fc398bb0a8d146398ab821f82d0e774f430bba4bc01faaa",
+          "at": "2026-07-12T08:19:06Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:34:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:35:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:35:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:36:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`handle` が呼ぶ `into_request` で capability/host を再検証し、未検証の `PathBuf` も検証しているため、入力検証が parse boundary ではなく Driver の invoke フローに入り込んでいます。これは ADR D3/D4 および `hexagonal-architecture.md` の Usecase Layer Purity Rules に反する adapter 内 business logic です。各 Arg 型が検証済み usecase 型を保持し、briefing path にも `FromStr` で検証する型を導入して、`handle` 内の変換を infallible にしてください。",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/capability.rs",
+              "line": 78,
+              "category": "business logic in adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:37:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c8c02f1681fac6ab9df2047ce80a59c37a96f7f4c5f5950bffd3f6527cdcc78",
+          "at": "2026-07-12T07:16:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c8c02f1681fac6ab9df2047ce80a59c37a96f7f4c5f5950bffd3f6527cdcc78",
+          "at": "2026-07-12T07:18:11Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80346e6779b334e25e7ef4c7b95c7932024dbfbb8e2506c39b6d7a3d3d4ed39d",
+          "at": "2026-07-12T06:43:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80346e6779b334e25e7ef4c7b95c7932024dbfbb8e2506c39b6d7a3d3d4ed39d",
+          "at": "2026-07-12T06:44:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf39bd7c7361e177108c6eb51aefedd553247137210c9cce0ef576531b398c7",
+          "at": "2026-07-12T08:32:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf39bd7c7361e177108c6eb51aefedd553247137210c9cce0ef576531b398c7",
+          "at": "2026-07-12T08:33:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf39bd7c7361e177108c6eb51aefedd553247137210c9cce0ef576531b398c7",
+          "at": "2026-07-12T08:33:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c5d99b8da4ed55abda41b6bf9e69205e531cbe907a3d10451801dfd6e318795",
+          "at": "2026-07-12T09:03:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c5d99b8da4ed55abda41b6bf9e69205e531cbe907a3d10451801dfd6e318795",
+          "at": "2026-07-12T09:05:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03ab6ed5e61f3aa21acc644574e6c82503a28c2ffdabc7bb170d8020fb10fbe0",
+          "at": "2026-07-12T12:43:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03ab6ed5e61f3aa21acc644574e6c82503a28c2ffdabc7bb170d8020fb10fbe0",
+          "at": "2026-07-12T12:46:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03ab6ed5e61f3aa21acc644574e6c82503a28c2ffdabc7bb170d8020fb10fbe0",
+          "at": "2026-07-12T12:48:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11b0a4bd39df0f963dfb89915e92d9b22418f1881d5c1e78f5bfe64d91a6410e",
+          "at": "2026-07-12T17:59:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11b0a4bd39df0f963dfb89915e92d9b22418f1881d5c1e78f5bfe64d91a6410e",
+          "at": "2026-07-12T18:00:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11b0a4bd39df0f963dfb89915e92d9b22418f1881d5c1e78f5bfe64d91a6410e",
+          "at": "2026-07-12T18:01:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11b0a4bd39df0f963dfb89915e92d9b22418f1881d5c1e78f5bfe64d91a6410e",
+          "at": "2026-07-12T18:03:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e874d0e120b5d7a0b1c6d537f0bd3fb2fbab37068def0147cda4ad4588e9ca3b",
+          "at": "2026-07-12T18:28:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e874d0e120b5d7a0b1c6d537f0bd3fb2fbab37068def0147cda4ad4588e9ca3b",
+          "at": "2026-07-12T18:29:28Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityFilePath` accepts absolute and `..` paths, and `absolute_path` joins them without containment verification, allowing briefing reads outside `repo_root`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/source.rs",
+              "line": 25,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "`metadata` and `read_to_string` follow symlinks, so a briefing or discipline path can resolve to an external file without boundary rejection.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/source.rs",
+              "line": 34,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The capability name is interpolated into the agent path without verifying the resulting path remains under `repo_root`; `CapabilityName` only rejects empty values, so traversal components can escape the trusted root.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/claude.rs",
+              "line": 46,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The capability name is joined into the skill path without trusted-root containment verification, allowing a traversal-valued capability name to read outside `repo_root`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/codex.rs",
+              "line": 74,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The shared provider-definition loader uses `read_to_string` without rejecting symlinks, so Claude agent and Codex skill definitions can be loaded through symlinked files or ancestors.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 65,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`execution_mode` is contractually required, but `#[serde(default = \"default_execution_mode\")]` silently converts an omitted field into `typed-pipeline` instead of failing configuration parsing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 132,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "The agent-profiles config loader reads the configured file directly with `read_to_string` and does not reject a symlinked config path, unlike the repository's real-file boundary convention.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 265,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:f9c733e35725018325af073b93deae0394e5678d9da4ad99b3171513931a894d",
+          "at": "2026-07-12T03:00:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Front-matter extraction matches keys by trimmed text without parsing YAML structure. Indented/nested declarations such as `metadata:\\n  sandbox: workspace-write` are treated as top-level and can enable `--sandbox workspace-write`; similarly nested `model`/`tools` can bypass Claude preflight. Malformed or structurally invalid provider configuration must fail closed.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 95,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "The symlink guard uses a lexically derived trusted root. A path such as `.../.harness/config/./agent-profiles.json` makes the derived root end in `config/.`, so `reject_symlinks_below` stops before checking the actual `config` ancestor; a symlinked config directory can therefore be followed despite the boundary check.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 285,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:54687dea95d56cb9d0fefa18fb5ba6aa7f5d8f2283899d78d7b29450b95ab558",
+          "at": "2026-07-12T04:30:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`normalize_agent_profiles_path` collapses `link/..` before `reject_symlinks_below`; a path such as `<root>/internal-link/../.harness/config/agent-profiles.json` bypasses symlink rejection. Preserve components for the symlink walk or reject parent traversal before normalization.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 428,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`read_to_string` loads the agent profile without any size limit, allowing a trusted-root file to exhaust memory before JSON parsing. Enforce a bounded read and fail closed when the limit is exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 294,
+              "category": "unbounded read"
+            },
+            {
+              "message": "`read_utf8_file` unconditionally uses unbounded `read_to_string` for Claude/Codex provider definitions. A large repository-controlled definition can cause memory exhaustion; add a maximum byte limit before reading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 84,
+              "category": "unbounded read"
+            },
+            {
+              "message": "Capability briefing and discipline files are read with unbounded `read_to_string`, so a large repository file can exhaust adapter memory. Enforce a bounded read and return a typed source-validation error when exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/source.rs",
+              "line": 80,
+              "category": "unbounded read"
+            }
+          ],
+          "hash": "rvw1:sha256:9f05e848b57f731ac5b3ed8e298d85024fe87d5d99ebcfe834fa0d44701166ea",
+          "at": "2026-07-12T05:00:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd407295994c4c69b5b6a3356d9e511a0133da8108ff8115985f626a0c2fb37e",
+          "at": "2026-07-12T05:22:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AgentProfiles::load` derives `trusted_root` from the path being validated. When the path lacks `.harness/config`, `agent_profiles_parent_root` simply treats its parent as trusted; an arbitrary path therefore authorizes its own location and the containment check cannot reject it. Paths containing an earlier `.harness/config` segment can similarly select an overly broad root. CN-04 requires the trusted workspace root to be supplied independently (as in `is_safe_briefing_path`), then canonical containment and symlink rejection performed against it.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 273,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:cd407295994c4c69b5b6a3356d9e511a0133da8108ff8115985f626a0c2fb37e",
+          "at": "2026-07-12T05:25:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Cross-provider Claude dispatch omits the profile model: `claude` is invoked without `--model <request.profile.model>`, so the configured model is ignored.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/claude.rs",
+              "line": 85,
+              "category": "process-invocation-hygiene"
+            }
+          ],
+          "hash": "rvw1:sha256:6f960b3bb477862ce234144b418c902443ae5f430666dd44e5bf6e773079e80d",
+          "at": "2026-07-12T06:07:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2cdc82e60657e5081378356304c128a03bc711099fa85e4b99e0eac810eb2f7",
+          "at": "2026-07-12T06:23:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2cdc82e60657e5081378356304c128a03bc711099fa85e4b99e0eac810eb2f7",
+          "at": "2026-07-12T06:26:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:341330d8663b6a4a3e39e03724db4a5ec227db8464f9e91edf1cc87de68f385b",
+          "at": "2026-07-12T08:34:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_provider_process` trusts `runtime_dir` and creates the log through it without canonical-containment or symlink checks. In normal wiring this is under the repository, so a checked-out symlink at `tmp` or `tmp/capability-runtime` can redirect `File::create` outside the trusted root and create/truncate an external file. Thread the independent repository root into this boundary and apply the existing fail-closed path guard before writing.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 279,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The bounded reader opens the path before verifying that it is a regular file. A FIFO placed at `agent-profiles.json`, `SKILL.md`, or an agent-definition path causes `File::open`/`read_to_string` to block indefinitely; `take` bounds bytes but not waiting. Reject non-regular files with `symlink_metadata` before opening, as the source adapter already does.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 78,
+              "category": "unbounded I/O path"
+            },
+            {
+              "message": "Provider execution uses blocking `Command::status` with no timeout or process-tree termination, while stderr is written to an unbounded log. A hung or noisy provider can therefore stall `capability exec` indefinitely and exhaust disk. Add bounded spawn/poll/timeout/termination plumbing; ADR D8 explicitly states that the common replacement path retains timeout handling.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 302,
+              "category": "unbounded I/O path"
+            }
+          ],
+          "hash": "rvw1:sha256:c89e5c63df35fb85187fe017d83d5a5b4952f047ac06ec6e7fec357008c5e93e",
+          "at": "2026-07-12T09:09:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
+          "at": "2026-07-12T09:23:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
+          "at": "2026-07-12T09:23:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
+          "at": "2026-07-12T09:23:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
+          "at": "2026-07-12T09:24:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
+          "at": "2026-07-12T10:09:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
+          "at": "2026-07-12T10:10:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
+          "at": "2026-07-12T10:14:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If `Child::try_wait` returns an error, `?` immediately exits the polling loop without terminating or reaping the provider process. The timeout is then abandoned, while the child and stderr-drain thread may continue indefinitely. Terminate/reap the process tree before propagating poll errors so every spawned-process path remains bounded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/process.rs",
+              "line": 378,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
+          "at": "2026-07-12T10:16:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9173178ec1fe86b289c556166f9bfc59ffebf0f56cbf8b0ea9d82adb3d249fc1",
+          "at": "2026-07-12T10:23:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aab2ab0b235b06fe119b4dd7ad674c6b68feaa6ee87098f83cbf545e6f6b0b41",
+          "at": "2026-07-12T11:29:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aab2ab0b235b06fe119b4dd7ad674c6b68feaa6ee87098f83cbf545e6f6b0b41",
+          "at": "2026-07-12T11:35:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:014bbd2c9112a422ee743e055308d6a5951c74ee1ed641fae898f2666d7f2866",
+          "at": "2026-07-12T11:59:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:014bbd2c9112a422ee743e055308d6a5951c74ee1ed641fae898f2666d7f2866",
+          "at": "2026-07-12T12:00:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47920220b0ea09a3c07abba8160e1c1a77331239bc7c7166ec43d4784d8c63b4",
+          "at": "2026-07-12T12:24:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47920220b0ea09a3c07abba8160e1c1a77331239bc7c7166ec43d4784d8c63b4",
+          "at": "2026-07-12T12:25:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a7df86dab83a66c310291188cff8c790d4b700080affdae7854cf8eba2025b2",
+          "at": "2026-07-12T18:00:19Z"
         }
       ]
     },
@@ -927,373 +2109,365 @@
           "findings": [],
           "hash": "rvw1:sha256:ad88642e76c9537e6ce430f95a864e5f7000f9cda7cf2c4db73db0c0c47aafed",
           "at": "2026-07-12T17:06:52Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CapabilityExecError::InvalidRequest` is unconstructible: `CapabilityExecService::execute` accepts an already-typed `CapabilityExecRequest`; declared constructors return `CapabilityInputValidationError` directly, and `CapabilityDriver::handle` returns `CommandOutcome`. No declared caller can wrap that error into this variant.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
-              "line": 761,
-              "category": "unconstructible error variant"
-            },
-            {
-              "message": "`CapabilityProfilePort::resolve` returns the broad `CapabilityExecError`, but the declared profile adapter can only produce `ProfileResolution` or `ModelMissing`. The entry does not document this producible subset; `InvalidRequest`, `ExecutionModeRejected`, `UnsupportedProvider`, `SourceValidation`, `AdapterPreflight`, and `DispatchFailed` are structurally unreachable here.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
-              "line": 478,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "`CapabilityProviderPort::dispatch` returns the broad `CapabilityExecError`, although the interactor selects a matching provider and the provider adapters can only produce `AdapterPreflight` or `DispatchFailed`. The entry does not document the narrower subset, forcing callers to handle unreachable profile/source/input variants.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
-              "line": 521,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "`CapabilitySourcePort::load_briefing` and `load_discipline` return the broad `CapabilityExecError`, although both declared operations can only produce `SourceValidation`. The entry does not document this subset, so callers must handle unrelated profile, provider, and dispatch failures.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
-              "line": 560,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "`CapabilityProfilePort::resolve`, `CapabilitySourcePort::load_briefing`, `CapabilitySourcePort::load_discipline`, and `CapabilityProviderPort::dispatch` are all declared synchronous despite performing profile-file, filesystem, and subprocess/provider I/O. Their docs do not acknowledge the synchronous boundary choice, leaving the port color contract underspecified for adapters.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
-              "line": 470,
-              "category": "sync/async color mismatch"
-            },
-            {
-              "message": "`ReasoningEffortDto` is anchored only to `CN-02`, whose scope covers profile capability/routing/model/execution-mode authority and adapter authority; it contains no reasoning-effort contract. The entry therefore declares an unrelated API addition, and its docs restate a behavior not committed by this spec.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
-              "line": 607,
-              "category": "spec_refs off-topic"
-            },
-            {
-              "message": "`CapabilityConfigDto` claims existing reasoning-effort accessors are preserved, but its declared `fast_reasoning_effort` and `final_reasoning_effort` signatures change from the baseline raw-string accessors to `Option<ReasoningEffortDto>`. This is an undeclared compatibility change for existing consumers and contradicts the entry's own docs.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
-              "line": 324,
-              "category": "action/shape inconsistency"
-            },
-            {
-              "message": "The `docs` fields for `BriefingText`, `CapabilityDispatchOutcome`, `CapabilityDispatchRequest`, `CapabilityExecError`, `CapabilityExecInteractor`, `CapabilityExecRequest`, `CapabilityFailureDetail`, `CapabilityFilePath`, `CapabilityInputValidationError`, `CapabilityName`, `CapabilityProfile`, `DisciplineText`, `ExecutionMode`, `ModelName`, `ProviderName`, `CapabilityExecService`, `CapabilityProfilePort`, `CapabilityProviderPort`, and `CapabilitySourcePort` restate upstream validation, routing, branching, and error contracts in prose instead of only citing their anchors.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
-              "line": 437,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The `docs` fields for `AgentProfilesCapabilityAdapter`, `CapabilityConfigDto`, `ClaudeCapabilityAdapter`, `CodexCapabilityAdapter`, `ExecutionModeDto`, `FsCapabilitySourceAdapter`, `ModelNameDto`, `ProviderNameDto`, `ReasoningEffortDto`, and `SandboxMode` restate upstream parsing, adapter, sandbox, and conversion behavior in prose instead of only citing their anchors.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
-              "line": 296,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The `docs` fields for `CapabilityDriver`, `CapabilityExecDriverInput`, `CapabilityNameArg`, and `ProviderNameArg` restate upstream input-validation, conversion, and rendering behavior in prose instead of only citing their anchors.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
-              "line": 150,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The `docs` fields for `CapabilityCommand` and `CapabilityExecArgs` restate the generic dispatch and input-validation contract in prose instead of only citing their anchors.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
-              "line": 36,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The `CapabilityCompositionRoot` docs restate the adapter wiring and dispatch responsibility contract in prose instead of only citing its anchors.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_composition-types.json",
-              "line": 41,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:c102aa4cdd3bbb6b07b3f0a34a9380cf6e137ea95a4e2eca548295e58a9dd20b",
-          "at": "2026-07-11T22:09:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CapabilityConfigDto` の `provider` / `model` / `fast_provider` / `fast_model` / `prompt_template_path` は baseline の `&str` / `Option<&str>` から DTO・`Path` 型へ変更されていますが、entry docs は既存 accessor のシグネチャ維持を宣言しています。破壊的変更を明示するか、baseline 互換の戻り値に戻してください。",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
-              "line": 300,
-              "category": "action incoherent with diff"
-            },
-            {
-              "message": "`ExecutionMode` の docs が、`TypedPipeline` を起動前に拒否し `OrchestratorOutput` のみ dispatch するという upstream の挙動契約を散文で再掲しています。types docs は upstream anchor の参照に留めてください。",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
-              "line": 1168,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:a4d34d66410d272528c8d8d842592524e7d76cb5eea332a312135772d34fa467",
-          "at": "2026-07-11T22:42:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d28419e7ac0184b0769fc1e5bfc963384039713fbd867ba4065a90b4fdd3dcf7",
-          "at": "2026-07-11T22:55:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d28419e7ac0184b0769fc1e5bfc963384039713fbd867ba4065a90b4fdd3dcf7",
-          "at": "2026-07-11T22:59:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19eca2d6e54c2cdf8c6b4515f47c080dd48d035a6db3bfe664bf2d9d9a1aeae5",
-          "at": "2026-07-12T00:07:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19eca2d6e54c2cdf8c6b4515f47c080dd48d035a6db3bfe664bf2d9d9a1aeae5",
-          "at": "2026-07-12T00:08:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `AgentProfiles` entry's `docs` field restates the trusted-root validation and adapter conversion behavior instead of only citing the upstream anchors.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
-              "line": 301,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The `AgentProfilesError` entry's `docs` field restates fail-closed security behavior and payload rationale instead of only citing the upstream anchors.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
-              "line": 476,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The `CapabilityFilePath` entry's `docs` field restates the upstream path-validation contract instead of only citing its anchor.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
-              "line": 985,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:8ab6517abb1519f989c2b2e5b4425918cb81a5838bcd2e15b5f008b7ecb5869d",
-          "at": "2026-07-12T06:51:29Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`CapabilityInputValidationError::EmptyCapabilityName` は構築経路のない dead vocabulary です。catalogue 上の `CapabilityName` は既存型への `reference` であり、その `try_new` は `domain::ValidationError` を返します。また、同 enum を返す新規コンストラクタは provider/model/path/content 用だけです。この variant を削除するか、実際の capability-name 検証境界で構築されるエラー型へ契約を統一してください。",
+              "message": "The adapter now unconditionally invokes `track-local-dry-fix` and claims it handles the configured provider, but `sotp dry fix-local` still supports only `codex` and explicitly rejects `claude`. A valid Claude-routed `dry-fix-lead` therefore fails instead of using the previous Agent-tool path. Restore provider-specific delegation or migrate this wrapper to the unified dispatcher before removing the Claude branch.",
               "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
-              "line": 1011,
-              "category": "unconstructible error variant"
+              "file": ".claude/commands/track/dry-check.md",
+              "line": 13,
+              "category": "command wiring breakage"
             }
           ],
-          "hash": "rvw1:sha256:293c1bdc62771cc19da216453592ab74641cdf2a69c4303c774bdb3736ccfff6",
-          "at": "2026-07-12T07:20:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:293c1bdc62771cc19da216453592ab74641cdf2a69c4303c774bdb3736ccfff6",
-          "at": "2026-07-12T07:21:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`infrastructure::AgentProfiles::resolve_model` and `resolve_provider` return owned `Option<String>` despite being read-only lookups over `&self`; this forces cloning/allocation where borrowed `Option<&str>` (or an equivalent borrowed result) would suffice. The catalogue does not justify the ownership boundary.",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
-              "line": 373,
-              "category": "ownership signature smell"
-            }
-          ],
-          "hash": "rvw1:sha256:053370a526954072f0d69ea7bfdd2eb351a3a34cdf524f75b059923ac873278c",
-          "at": "2026-07-12T08:34:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:05d15a42a3621f3db38671b46ccf980416dbc5781d63b7503f265961f4a6201c",
-          "at": "2026-07-12T09:08:36Z"
+          "hash": "rvw1:sha256:652410cedd8b2cf0f306c8ebea1cb00ea8e832bf19988b5b1b38ed54048754a1",
+          "at": "2026-07-12T18:05:23Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`usecase::capability_exec::{ProviderName, ModelName, CapabilityFilePath, BriefingText, DisciplineText}::try_new` all return the shared `CapabilityInputValidationError`, but each can produce only a small subset of its five variants, and the catalogue methods neither document those subsets nor justify the broad error type. For example, `ProviderName::try_new` can only produce `EmptyProviderName`, while callers must accept file-path and content variants that are structurally impossible. Declare precise errors or document each method's producible subset.",
+              "message": "The adapter now unconditionally invokes `track-local-dry-fix` and claims it handles the configured provider, but `sotp dry fix-local` still supports only `codex` and explicitly rejects `claude`. A valid Claude-routed `dry-fix-lead` therefore fails instead of using the previous Agent-tool path. Restore provider-specific delegation or migrate this wrapper to the unified dispatcher before removing the Claude branch.",
               "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "file": ".claude/commands/track/dry-check.md",
+              "line": 13,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:652410cedd8b2cf0f306c8ebea1cb00ea8e832bf19988b5b1b38ed54048754a1",
+          "at": "2026-07-12T18:05:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--host` は dispatch 先 provider ではなく現在の orchestrator host の自己申告です。この Codex adapter は ADR D7 と workflow SSoT に従い `--host codex` と固定すべきですが、`<provider>` という曖昧な placeholder に変わっており、profile から解決した provider を渡すと in-host/subprocess 分岐を誤ります。",
+              "severity": "P1",
+              "file": ".agents/skills/rollback-diagnoser/SKILL.md",
+              "line": 18,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "Claude 用の Agent dispatch を削除して常に `track-local-dry-fix` を呼ぶようになっていますが、配下の `sotp dry fix-local` runner は現在 `codex` だけをサポートし、`dry-fix-lead.provider: claude` を明示的に拒否します。設定可能な Claude route が壊れるため、Claude provider 時の native dispatch を残すか wrapper 側を対応させる必要があります。",
+              "severity": "P1",
+              "file": ".claude/commands/track/dry-check.md",
+              "line": 13,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "直前で `bin/sotp capability exec ...` の直接実行を必須にした一方、この行は同じ Claude adapter body からの direct CLI call を禁止しており、実行指示が自己矛盾しています。旧 Claude Agent/Codex CLI 二経路の残存文言なので、capability dispatch を例外として明記するか禁止文を削除してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/impl-plan.md",
+              "line": 20,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:652410cedd8b2cf0f306c8ebea1cb00ea8e832bf19988b5b1b38ed54048754a1",
+          "at": "2026-07-12T18:05:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--host` は routing 先 provider ではなく、呼び出し元ホストの自己申告です。ここで `<provider>` と案内すると、cross-provider 呼び出しで誤って一致扱いされ、正しい subprocess dispatch を迂回し得ます。workflow SSoT の `<current-host>` と同期し、Codex adapter では `--host codex` と固定してください。",
+              "severity": "P1",
+              "file": ".agents/skills/rollback-diagnoser/SKILL.md",
+              "line": 18,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "この変更は Claude provider 用の Agent 経路を削除し、常に `track-local-dry-fix` を実行させていますが、当該 wrapper の実装は `dry-fix-lead.provider == codex` しか受理せず、Claude では `unsupported ... provider 'claude'` になります。Claude routing を維持するか、wrapper が Claude dispatch を実装するまで provider 別経路を残してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/dry-check.md",
+              "line": 13,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:652410cedd8b2cf0f306c8ebea1cb00ea8e832bf19988b5b1b38ed54048754a1",
+          "at": "2026-07-12T18:07:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow calls `track-local-dry-fix` provider-agnostic and says it executes the configured provider, but the adapter states this wrapper only supports Codex and requires direct Agent-tool dispatch for `provider: claude`. A Claude-routed run following this SSoT will therefore use an unsupported path; align the workflow dispatch with the adapter branch or make the wrapper provider-aware.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/dry-check.md",
+              "line": 60,
+              "category": "adapter-SSoT 同期 check"
+            }
+          ],
+          "hash": "rvw1:sha256:f224dc71400683f713da4c90e0bcebe336336b717743c5c996b924e88d967032",
+          "at": "2026-07-12T18:16:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The provider-agnostic workflow unconditionally calls `track-local-dry-fix` and labels it provider-agnostic, but that wrapper explicitly supports only `codex`; the Claude adapter instead requires a direct Agent-tool invocation. A Claude-configured `dry-fix-lead` therefore fails if the workflow SSoT is followed. Keep provider-specific launch selection in the adapters or use a genuinely provider-agnostic dispatcher here.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/dry-check.md",
+              "line": 53,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "This invocation uses `--host <provider>`, contradicting the workflow SSoT's `--host <current-host>` contract. `--host` identifies the invoking orchestrator, while the dispatcher independently resolves the selected provider; conflating them can incorrectly produce an in-host delegation outcome for a cross-provider route. Use `<current-host>` here.",
+              "severity": "P1",
+              "file": ".agents/skills/rollback-diagnoser/SKILL.md",
+              "line": 18,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:f224dc71400683f713da4c90e0bcebe336336b717743c5c996b924e88d967032",
+          "at": "2026-07-12T18:19:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abd657c7dc1252d5e4c3dd714640c49f00d4c31f1faf15f162a17823aa2a105e",
+          "at": "2026-07-12T18:24:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-dry-fix` を provider-agnostic と規定していますが、Claude adapter はこの wrapper が Codex のみ実装し、`provider: claude` では Agent tool を直接使う必要があると明記しています。そのため workflow SSoT に従う Codex adapter は、有効な Claude routing で wrapper が fail-close し、DRY phase を起動できません。起動分岐を adapters 側だけに置いて SSoT を抽象化するか、wrapper を両 provider 対応にしてください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/dry-check.md",
+              "line": 53,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:abd657c7dc1252d5e4c3dd714640c49f00d4c31f1faf15f162a17823aa2a105e",
+          "at": "2026-07-12T18:27:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry-check` の provider 固有起動分岐が provider-agnostic workflow SSoT に記載され、adapter に限定する契約と衝突しています。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/dry-check.md",
+              "line": 54,
+              "category": "adapter-SSoT 同期 check"
+            }
+          ],
+          "hash": "rvw1:sha256:b5854428d89ee101f7ffa58414a10d7f3dae1071ead5601c65b6532dffa29b44",
+          "at": "2026-07-12T18:33:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`capability exec` の `delegate-in-host` は capability を実行せず構造化 payload を返すだけですが、この adapter は「instruction to follow」とするだけで、Claude Agent を起動して briefing と discipline の両方を task prompt に渡す手順を削除しています。Claude provider を選ぶ profile では Phase 1–3/B&F が未実行のまま進行します。同じ欠落が `diagnose.md`、`impl-plan.md`、`obligation-fulfillment.md` にもあります。各 adapter で `delegate-in-host` 後の Agent-tool dispatch と payload 引き渡しを明記してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 21,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "Provider 非依存であるべき workflow SSoT に、Codex 専用 wrapper と Claude subagent の起動分岐、および Codex wrapper 固有のループが記載されています。scope policy の adapter-SSoT 同期規則では provider 固有の起動方法を adapter に限定しているため、この分岐を両 adapter 側へ移し、workflow には抽象的な capability dispatch 契約だけを残してください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/dry-check.md",
+              "line": 54,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:b5854428d89ee101f7ffa58414a10d7f3dae1071ead5601c65b6532dffa29b44",
+          "at": "2026-07-12T18:36:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "この adapter は直前で `bin/sotp capability exec impl-planner ...` の実行を必須化していますが、同じ段落の「No direct CLI calls from this adapter body」がそれを否定しています。Claude 実行時に dispatch を省略する誤読を招くため、古い制約文を削除または更新してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/impl-plan.md",
+              "line": 20,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:a8a17d7f63bd5031bb2dd59a000e4ac529160157f7a1f2075e447858a5e16aab",
+          "at": "2026-07-12T18:42:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The revised adapter requires a direct `bin/sotp capability exec` call on line 15, but line 20 still says the Claude adapter makes no direct CLI calls. Following the latter instruction skips the only documented Phase 3 dispatch path, so `impl-planner` may never run. Exempt the dispatcher call or clarify that only phase/gate CLI operations are delegated.",
+              "severity": "P1",
+              "file": ".claude/commands/track/impl-plan.md",
+              "line": 20,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:a8a17d7f63bd5031bb2dd59a000e4ac529160157f7a1f2075e447858a5e16aab",
+          "at": "2026-07-12T18:45:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When the configured provider is Claude, `capability exec` returns `delegate-in-host` without running the diagnoser. This adapter only says to follow the instruction and does not specify invoking the Agent tool with the returned capability, briefing, and discipline payload, so `/track:diagnose` can continue without a routing decision.",
+              "severity": "P1",
+              "file": ".claude/commands/track/diagnose.md",
               "line": 17,
-              "category": "API shape / per-method error imprecision"
+              "category": "command wiring breakage"
             },
             {
-              "message": "`infrastructure::agent_profiles::{ProviderNameDto, ModelNameDto}::try_new` expose the full usecase `CapabilityInputValidationError`, although the wrappers can only propagate `EmptyProviderName` and `EmptyModelName`, respectively. Their catalogue declarations provide no producible-subset documentation, leaving adapter callers with several impossible variants. Use precise errors or document the subset on each method.",
+              "message": "When `impl-planner.provider` is Claude, `capability exec` returns an in-host delegation payload, but this adapter provides no Agent-tool dispatch step or payload handoff. The Phase 3 writer may therefore never run.",
               "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
-              "line": 110,
-              "category": "API shape / per-method error imprecision"
+              "file": ".claude/commands/track/impl-plan.md",
+              "line": 15,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "When `implementer.provider` is Claude, the generic dispatcher returns `delegate-in-host`; the adapter does not instruct the orchestrator to launch the Agent tool with the returned briefing and discipline. Obligation authoring can be skipped while the workflow proceeds.",
+              "severity": "P1",
+              "file": ".claude/commands/track/obligation-fulfillment.md",
+              "line": 16,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The phase dispatch instruction does not define how to handle `delegate-in-host`. With a Claude-routed writer, `/track:plan` can receive the payload and proceed without invoking the corresponding Agent tool, leaving the phase artifact unwritten.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 21,
+              "category": "command wiring breakage"
             }
           ],
-          "hash": "rvw1:sha256:05d15a42a3621f3db38671b46ccf980416dbc5781d63b7503f265961f4a6201c",
-          "at": "2026-07-12T09:15:39Z"
+          "hash": "rvw1:sha256:df6109038205112f1a606b54ce22043d33300cf78a4aecda56ce400f2a509cc7",
+          "at": "2026-07-12T18:51:47Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`cli::CliCommand` の `docs` が、IN-01/IN-08 の変更内容（旧 planner command の撤去と generic capability dispatch への置換）をそのまま再記述しています。型固有の事実だけを残し、上流の振る舞いはアンカー参照のみにしてください。",
+              "message": "`capability exec` が Claude を選んだ場合は capability を実行せず `delegate-in-host` payload を返すだけです。この adapter は返却された capability・briefing・discipline を使って Agent tool を起動する手順を定義していないため、診断が実行されず routing decision を取得できません。`delegate-in-host` 後の Claude subagent dispatch を明記してください。",
               "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
-              "line": 218,
-              "category": "upstream_restatement"
+              "file": ".claude/commands/track/diagnose.md",
+              "line": 18,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "Claude-routed `impl-planner` では `capability exec` は `delegate-in-host` payload を返すだけですが、この adapter は Agent tool への payload 引き渡しと起動手順を定義していません。そのため Phase 3 writer が実行されず、`impl-plan.json` と `task-coverage.json` が生成されません。",
+              "severity": "P1",
+              "file": ".claude/commands/track/impl-plan.md",
+              "line": 15,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "Claude-routed `implementer` では dispatcher は `delegate-in-host` を返して終了しますが、この adapter は返却された briefing と discipline を使って Agent tool を起動しません。そのため obligation の著作・修復ラウンドを実行しないまま後続 gate に進みます。",
+              "severity": "P1",
+              "file": ".claude/commands/track/obligation-fulfillment.md",
+              "line": 16,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "Phase 1–3/B&F の writer が Claude に route された場合、各 `capability exec` は `delegate-in-host` payload を返すだけです。この adapter は対応する Agent tool の起動と briefing・discipline の引き渡しを定義していないため、writer 未実行のまま phase workflow が進行します。4 capability すべてについて `delegate-in-host` 処理を明記してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 21,
+              "category": "command wiring breakage"
             }
           ],
-          "hash": "rvw1:sha256:84b4145845addeab48e9a533f7cf893f79c799d7d15ee2a364587cc018323a70",
-          "at": "2026-07-12T09:33:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c6d4c4b0a32b3a4e9d5b55aad70e5764184ca8817f91134fb9f9324ca3d7e40",
-          "at": "2026-07-12T09:44:35Z"
+          "hash": "rvw1:sha256:df6109038205112f1a606b54ce22043d33300cf78a4aecda56ce400f2a509cc7",
+          "at": "2026-07-12T18:54:20Z"
         },
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2f7d0177081856f573887e3ef23819fdecad0bb0f9773edd9f551f3dee82205b",
-          "at": "2026-07-12T12:43:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2f7d0177081856f573887e3ef23819fdecad0bb0f9773edd9f551f3dee82205b",
-          "at": "2026-07-12T12:44:40Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CAPABILITY_EXEC_OUTCOME: executed` with exit code 0 only proves the provider subprocess exited successfully; it does not prove the phase gate passed. A blocked `impl-planner` run can still emit `IMPL_PLAN_STATUS: blocked` while the provider exits 0, so this instruction can advance `/track:plan` past a failed task-coverage gate. Parse the capability status/gate verdict and complete the phase only on an explicit OK/completed result.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 26,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:82fc48fd5f5091f89a48d9c68059dd0b7723b2560f8e53620e093015d55347ac",
+          "at": "2026-07-12T19:00:54Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`CapabilityCompositionRoot::discover` は git worktree の探索失敗しか起こさず、実装上構築できるのは `CompositionError::Infrastructure` だけですが、契約は `ConfigLoad`、`AdapterInit`、`WiringFailed`、`Usecase` も含む共有エラー型を返し、catalogue の `docs` も `null` のため生成可能な subset が明記されていません。専用の狭いエラー型にするか、このメソッドが生成可能な variant を catalogue に明記してください。",
+              "message": "`capability exec --host claude` returns `delegate-in-host` without executing the capability, but this adapter never instructs Claude Code to invoke the `rollback-diagnoser` Agent with the returned briefing and discipline. It can therefore reach the report step without any routing decision. Handle this outcome explicitly, as the plan adapter does.",
               "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_composition-types.json",
-              "line": 28,
-              "category": "per-method error imprecision"
+              "file": ".claude/commands/track/diagnose.md",
+              "line": 17,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "For the configured Claude provider, the dispatcher only returns `delegate-in-host`; this adapter does not explicitly invoke the `impl-planner` Agent afterward. `/track:impl-plan` can consequently report success while `impl-plan.json` and `task-coverage.json` were never written. Add the mandatory in-host Agent invocation using the returned briefing and discipline.",
+              "severity": "P1",
+              "file": ".claude/commands/track/impl-plan.md",
+              "line": 15,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The implementer dispatch may return `delegate-in-host`, but the adapter neither says to follow it nor specifies the Claude Agent invocation. With a Claude-routed implementer, no authoring/repair occurs before `evaluate` and `check`, so the obligation loop cannot make progress. Explicitly invoke the returned capability with its briefing and discipline.",
+              "severity": "P1",
+              "file": ".claude/commands/track/obligation-fulfillment.md",
+              "line": 16,
+              "category": "command wiring breakage"
             }
           ],
-          "hash": "rvw1:sha256:2f7d0177081856f573887e3ef23819fdecad0bb0f9773edd9f551f3dee82205b",
-          "at": "2026-07-12T12:47:16Z"
+          "hash": "rvw1:sha256:82fc48fd5f5091f89a48d9c68059dd0b7723b2560f8e53620e093015d55347ac",
+          "at": "2026-07-12T19:03:58Z"
         },
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c8776d6c97c799fe5d820996084f878739d192d4d6479bafd0feb88fa9c75c03",
-          "at": "2026-07-12T12:54:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c8776d6c97c799fe5d820996084f878739d192d4d6479bafd0feb88fa9c75c03",
-          "at": "2026-07-12T12:56:09Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
-          "at": "2026-07-12T06:34:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
-          "at": "2026-07-12T06:35:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
-          "at": "2026-07-12T06:35:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
-          "at": "2026-07-12T06:36:23Z"
-        },
-        {
-          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`handle` が呼ぶ `into_request` で capability/host を再検証し、未検証の `PathBuf` も検証しているため、入力検証が parse boundary ではなく Driver の invoke フローに入り込んでいます。これは ADR D3/D4 および `hexagonal-architecture.md` の Usecase Layer Purity Rules に反する adapter 内 business logic です。各 Arg 型が検証済み usecase 型を保持し、briefing path にも `FromStr` で検証する型を導入して、`handle` 内の変換を infallible にしてください。",
+              "message": "`delegate-in-host` 時に Claude Agent tool を起動する手順がなく、診断が実行されない可能性があります。",
               "severity": "P1",
-              "file": "apps/cli-driver/src/capability.rs",
-              "line": 78,
-              "category": "business logic in adapter"
+              "file": ".claude/commands/track/diagnose.md",
+              "line": 21,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "`delegate-in-host` 時の `impl-planner` Agent 起動手順がなく、計画成果物が作成されない可能性があります。",
+              "severity": "P1",
+              "file": ".claude/commands/track/impl-plan.md",
+              "line": 18,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "`delegate-in-host` 時の implementer Agent 起動手順がなく、obligation の authoring/repair が実行されない可能性があります。",
+              "severity": "P1",
+              "file": ".claude/commands/track/obligation-fulfillment.md",
+              "line": 18,
+              "category": "command wiring breakage"
             }
           ],
-          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
-          "at": "2026-07-12T06:37:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c8c02f1681fac6ab9df2047ce80a59c37a96f7f4c5f5950bffd3f6527cdcc78",
-          "at": "2026-07-12T07:16:19Z"
+          "hash": "rvw1:sha256:5408131d5212959ae0d5f3d59a2d536f202b373626b03406db88e15c2b2453b7",
+          "at": "2026-07-12T19:08:15Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4c8c02f1681fac6ab9df2047ce80a59c37a96f7f4c5f5950bffd3f6527cdcc78",
-          "at": "2026-07-12T07:18:11Z"
+          "hash": "rvw1:sha256:5408131d5212959ae0d5f3d59a2d536f202b373626b03406db88e15c2b2453b7",
+          "at": "2026-07-12T19:11:39Z"
         }
       ]
     },
@@ -1474,735 +2648,6 @@
           "findings": [],
           "hash": "rvw1:sha256:9b43b9031892764461ec8792664d7e3a57ca49325eaf162a4830cff2275cd66c",
           "at": "2026-07-12T11:09:58Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CapabilityFilePath` accepts absolute and `..` paths, and `absolute_path` joins them without containment verification, allowing briefing reads outside `repo_root`.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/capability_exec/source.rs",
-              "line": 25,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "`metadata` and `read_to_string` follow symlinks, so a briefing or discipline path can resolve to an external file without boundary rejection.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/capability_exec/source.rs",
-              "line": 34,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "The capability name is interpolated into the agent path without verifying the resulting path remains under `repo_root`; `CapabilityName` only rejects empty values, so traversal components can escape the trusted root.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/capability_exec/claude.rs",
-              "line": 46,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "The capability name is joined into the skill path without trusted-root containment verification, allowing a traversal-valued capability name to read outside `repo_root`.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/capability_exec/codex.rs",
-              "line": 74,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "The shared provider-definition loader uses `read_to_string` without rejecting symlinks, so Claude agent and Codex skill definitions can be loaded through symlinked files or ancestors.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/capability_exec/mod.rs",
-              "line": 65,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`execution_mode` is contractually required, but `#[serde(default = \"default_execution_mode\")]` silently converts an omitted field into `typed-pipeline` instead of failing configuration parsing closed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 132,
-              "category": "non-fail-closed config"
-            },
-            {
-              "message": "The agent-profiles config loader reads the configured file directly with `read_to_string` and does not reject a symlinked config path, unlike the repository's real-file boundary convention.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 265,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:f9c733e35725018325af073b93deae0394e5678d9da4ad99b3171513931a894d",
-          "at": "2026-07-12T03:00:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Front-matter extraction matches keys by trimmed text without parsing YAML structure. Indented/nested declarations such as `metadata:\\n  sandbox: workspace-write` are treated as top-level and can enable `--sandbox workspace-write`; similarly nested `model`/`tools` can bypass Claude preflight. Malformed or structurally invalid provider configuration must fail closed.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/capability_exec/mod.rs",
-              "line": 95,
-              "category": "non-fail-closed config"
-            },
-            {
-              "message": "The symlink guard uses a lexically derived trusted root. A path such as `.../.harness/config/./agent-profiles.json` makes the derived root end in `config/.`, so `reject_symlinks_below` stops before checking the actual `config` ancestor; a symlinked config directory can therefore be followed despite the boundary check.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 285,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:54687dea95d56cb9d0fefa18fb5ba6aa7f5d8f2283899d78d7b29450b95ab558",
-          "at": "2026-07-12T04:30:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`normalize_agent_profiles_path` collapses `link/..` before `reject_symlinks_below`; a path such as `<root>/internal-link/../.harness/config/agent-profiles.json` bypasses symlink rejection. Preserve components for the symlink walk or reject parent traversal before normalization.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 428,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`read_to_string` loads the agent profile without any size limit, allowing a trusted-root file to exhaust memory before JSON parsing. Enforce a bounded read and fail closed when the limit is exceeded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 294,
-              "category": "unbounded read"
-            },
-            {
-              "message": "`read_utf8_file` unconditionally uses unbounded `read_to_string` for Claude/Codex provider definitions. A large repository-controlled definition can cause memory exhaustion; add a maximum byte limit before reading.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/capability_exec/mod.rs",
-              "line": 84,
-              "category": "unbounded read"
-            },
-            {
-              "message": "Capability briefing and discipline files are read with unbounded `read_to_string`, so a large repository file can exhaust adapter memory. Enforce a bounded read and return a typed source-validation error when exceeded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/capability_exec/source.rs",
-              "line": 80,
-              "category": "unbounded read"
-            }
-          ],
-          "hash": "rvw1:sha256:9f05e848b57f731ac5b3ed8e298d85024fe87d5d99ebcfe834fa0d44701166ea",
-          "at": "2026-07-12T05:00:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cd407295994c4c69b5b6a3356d9e511a0133da8108ff8115985f626a0c2fb37e",
-          "at": "2026-07-12T05:22:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AgentProfiles::load` derives `trusted_root` from the path being validated. When the path lacks `.harness/config`, `agent_profiles_parent_root` simply treats its parent as trusted; an arbitrary path therefore authorizes its own location and the containment check cannot reject it. Paths containing an earlier `.harness/config` segment can similarly select an overly broad root. CN-04 requires the trusted workspace root to be supplied independently (as in `is_safe_briefing_path`), then canonical containment and symlink rejection performed against it.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/agent_profiles.rs",
-              "line": 273,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:cd407295994c4c69b5b6a3356d9e511a0133da8108ff8115985f626a0c2fb37e",
-          "at": "2026-07-12T05:25:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Cross-provider Claude dispatch omits the profile model: `claude` is invoked without `--model <request.profile.model>`, so the configured model is ignored.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/capability_exec/claude.rs",
-              "line": 85,
-              "category": "process-invocation-hygiene"
-            }
-          ],
-          "hash": "rvw1:sha256:6f960b3bb477862ce234144b418c902443ae5f430666dd44e5bf6e773079e80d",
-          "at": "2026-07-12T06:07:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c2cdc82e60657e5081378356304c128a03bc711099fa85e4b99e0eac810eb2f7",
-          "at": "2026-07-12T06:23:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c2cdc82e60657e5081378356304c128a03bc711099fa85e4b99e0eac810eb2f7",
-          "at": "2026-07-12T06:26:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:341330d8663b6a4a3e39e03724db4a5ec227db8464f9e91edf1cc87de68f385b",
-          "at": "2026-07-12T08:34:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`run_provider_process` trusts `runtime_dir` and creates the log through it without canonical-containment or symlink checks. In normal wiring this is under the repository, so a checked-out symlink at `tmp` or `tmp/capability-runtime` can redirect `File::create` outside the trusted root and create/truncate an external file. Thread the independent repository root into this boundary and apply the existing fail-closed path guard before writing.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/capability_exec/mod.rs",
-              "line": 279,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "The bounded reader opens the path before verifying that it is a regular file. A FIFO placed at `agent-profiles.json`, `SKILL.md`, or an agent-definition path causes `File::open`/`read_to_string` to block indefinitely; `take` bounds bytes but not waiting. Reject non-regular files with `symlink_metadata` before opening, as the source adapter already does.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/capability_exec/mod.rs",
-              "line": 78,
-              "category": "unbounded I/O path"
-            },
-            {
-              "message": "Provider execution uses blocking `Command::status` with no timeout or process-tree termination, while stderr is written to an unbounded log. A hung or noisy provider can therefore stall `capability exec` indefinitely and exhaust disk. Add bounded spawn/poll/timeout/termination plumbing; ADR D8 explicitly states that the common replacement path retains timeout handling.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/capability_exec/mod.rs",
-              "line": 302,
-              "category": "unbounded I/O path"
-            }
-          ],
-          "hash": "rvw1:sha256:c89e5c63df35fb85187fe017d83d5a5b4952f047ac06ec6e7fec357008c5e93e",
-          "at": "2026-07-12T09:09:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
-          "at": "2026-07-12T09:23:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
-          "at": "2026-07-12T09:23:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
-          "at": "2026-07-12T09:23:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
-          "at": "2026-07-12T09:24:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
-          "at": "2026-07-12T10:09:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
-          "at": "2026-07-12T10:10:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
-          "at": "2026-07-12T10:14:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "If `Child::try_wait` returns an error, `?` immediately exits the polling loop without terminating or reaping the provider process. The timeout is then abandoned, while the child and stderr-drain thread may continue indefinitely. Terminate/reap the process tree before propagating poll errors so every spawned-process path remains bounded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/capability_exec/process.rs",
-              "line": 378,
-              "category": "missing error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
-          "at": "2026-07-12T10:16:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9173178ec1fe86b289c556166f9bfc59ffebf0f56cbf8b0ea9d82adb3d249fc1",
-          "at": "2026-07-12T10:23:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aab2ab0b235b06fe119b4dd7ad674c6b68feaa6ee87098f83cbf545e6f6b0b41",
-          "at": "2026-07-12T11:29:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aab2ab0b235b06fe119b4dd7ad674c6b68feaa6ee87098f83cbf545e6f6b0b41",
-          "at": "2026-07-12T11:35:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:014bbd2c9112a422ee743e055308d6a5951c74ee1ed641fae898f2666d7f2866",
-          "at": "2026-07-12T11:59:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:014bbd2c9112a422ee743e055308d6a5951c74ee1ed641fae898f2666d7f2866",
-          "at": "2026-07-12T12:00:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47920220b0ea09a3c07abba8160e1c1a77331239bc7c7166ec43d4784d8c63b4",
-          "at": "2026-07-12T12:24:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47920220b0ea09a3c07abba8160e1c1a77331239bc7c7166ec43d4784d8c63b4",
-          "at": "2026-07-12T12:25:14Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
-          "at": "2026-07-12T06:38:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
-          "at": "2026-07-12T06:38:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
-          "at": "2026-07-12T06:41:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
-          "at": "2026-07-12T06:41:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
-          "at": "2026-07-12T08:31:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
-          "at": "2026-07-12T08:38:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
-          "at": "2026-07-12T08:38:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
-          "at": "2026-07-12T08:45:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `.claude/settings.json` case only checks `bin/sotp capability exec`, which is present in the hook prompt; it never verifies the actual allowlist entry (`Bash(bin/sotp capability:*)`). A permission regression would still pass this test. Assert or parse the allowlist separately.",
-              "severity": "P1",
-              "file": "apps/cli/tests/operational_reference_cutover.rs",
-              "line": 59,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:f7246cb19d7a31eaaf75f8f1c85580d074645df597bb57c4ac4f78881ec2e045",
-          "at": "2026-07-12T10:50:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
-          "at": "2026-07-12T10:55:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
-          "at": "2026-07-12T11:02:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "退役参照の検出が連続部分文字列 `plan codex-local` に依存しているため、明示的に保護対象とされた設定面を網羅できません。例えば Codex の旧 prefix rule `['bin/sotp', 'plan', 'codex-local']` は区切り文字のため一致せず、settings の旧 allowlist `Bash(bin/sotp plan:*)` も `codex-local` を含まないため、このテストは新旧ルールが併存していても成功します。各 surface に応じた旧マーカーも検査し、settings allowlist と Codex prefix rules の cutover を実際に保証してください。",
-              "severity": "P1",
-              "file": "apps/cli/tests/operational_reference_cutover.rs",
-              "line": 1,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
-          "at": "2026-07-12T11:02:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
-          "at": "2026-07-12T11:02:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:26139138b460697ee45a2bb89737f75a1666ec3d1ff1c4fe26c254d4fa51a4fc",
-          "at": "2026-07-12T11:04:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SystemGitRepo::discover()` performs repository-discovery I/O directly in the thin bin, and the accompanying production dependency on `infrastructure` bypasses `cli_composition`. This violates ADR D8/D5 and `architecture-rules.json`, which restrict `cli` to `cli_composition`/`cli_driver`. Move repository-root discovery behind `CapabilityCompositionRoot` (returning a typed startup error), leaving this handler to parse, obtain the driver, dispatch, and emit.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/capability.rs",
-              "line": 51,
-              "category": "direct I/O in bin"
-            }
-          ],
-          "hash": "rvw1:sha256:3424bafc67616a2a8d7c020976f691d276a582b7f3c9d9b71a0ccb90513c7a49",
-          "at": "2026-07-12T12:23:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SystemGitRepo::discover()` makes the production CLI depend directly on `infrastructure`, bypassing the required `cli_composition`/`cli_driver` boundary. Repository-root discovery is infrastructure I/O and must be exposed through the composition root so this handler remains parse–dispatch–emit only. This violates ADR D5/D8 and `architecture-rules.json`; keep `infrastructure` as a dev dependency and move the discovery/wiring behind `cli_composition`.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/capability.rs",
-              "line": 10,
-              "category": "usecase/domain import in production"
-            }
-          ],
-          "hash": "rvw1:sha256:3424bafc67616a2a8d7c020976f691d276a582b7f3c9d9b71a0ccb90513c7a49",
-          "at": "2026-07-12T12:24:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e355eb6cd8981df07fc79c1d9288b95e7265848d3b847c8f0e640df2fe5d21d",
-          "at": "2026-07-12T12:42:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e355eb6cd8981df07fc79c1d9288b95e7265848d3b847c8f0e640df2fe5d21d",
-          "at": "2026-07-12T12:43:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e355eb6cd8981df07fc79c1d9288b95e7265848d3b847c8f0e640df2fe5d21d",
-          "at": "2026-07-12T12:45:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f99cfd7a55517e1993e26db31e9f8bbb1f9252ef38f2022b14bbc052718a8049",
-          "at": "2026-07-12T16:38:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f99cfd7a55517e1993e26db31e9f8bbb1f9252ef38f2022b14bbc052718a8049",
-          "at": "2026-07-12T16:39:54Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ede1b72159ac1af4186d488aa5a9e0df80bd8540adbaaf1576eaafe0b5ebfb66",
-          "at": "2026-07-12T00:15:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ede1b72159ac1af4186d488aa5a9e0df80bd8540adbaaf1576eaafe0b5ebfb66",
-          "at": "2026-07-12T00:17:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b7544c09b23b505f58d22a08e28aefdbde28785ae4b677a0c08ad704ef9ebcf7",
-          "at": "2026-07-12T08:36:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b7544c09b23b505f58d22a08e28aefdbde28785ae4b677a0c08ad704ef9ebcf7",
-          "at": "2026-07-12T08:37:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68cd6ab586a21d216f76fe96061607729febdf39f1505cfb1d8d308f0bd805b4",
-          "at": "2026-07-12T09:10:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a67f1053f1fecaca7b2ad9bdbcd7fd6e90eef8d99f16e8ba9a9de0aa6a22b327",
-          "at": "2026-07-12T10:06:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a67f1053f1fecaca7b2ad9bdbcd7fd6e90eef8d99f16e8ba9a9de0aa6a22b327",
-          "at": "2026-07-12T10:08:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5b995ff17a44748c94e0211bd843e576b3c21f5186402e3ccfeed053358d43a6",
-          "at": "2026-07-12T11:31:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5b995ff17a44748c94e0211bd843e576b3c21f5186402e3ccfeed053358d43a6",
-          "at": "2026-07-12T11:31:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5b995ff17a44748c94e0211bd843e576b3c21f5186402e3ccfeed053358d43a6",
-          "at": "2026-07-12T11:33:49Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
-          "at": "2026-07-11T21:56:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-02 は briefing 規律を全 dispatch 経路で保証するとしているが、subprocess prompt に検証済み briefing と discipline 本文が含まれることを証明する AC がない。AC-03 は事前検証、AC-05 は in-host payload、AC-06 は native adapter の起動形式しか確認しないため、subprocess が両本文を欠落させても全 AC を満たせる。",
-              "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
-              "line": 34,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
-          "at": "2026-07-11T21:58:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0449a9512e852388b258d529303c95fbb6bff22f07b51d72522c021854c4b4c8",
-          "at": "2026-07-11T22:02:33Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80346e6779b334e25e7ef4c7b95c7932024dbfbb8e2506c39b6d7a3d3d4ed39d",
-          "at": "2026-07-12T06:43:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80346e6779b334e25e7ef4c7b95c7932024dbfbb8e2506c39b6d7a3d3d4ed39d",
-          "at": "2026-07-12T06:44:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2bf39bd7c7361e177108c6eb51aefedd553247137210c9cce0ef576531b398c7",
-          "at": "2026-07-12T08:32:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2bf39bd7c7361e177108c6eb51aefedd553247137210c9cce0ef576531b398c7",
-          "at": "2026-07-12T08:33:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2bf39bd7c7361e177108c6eb51aefedd553247137210c9cce0ef576531b398c7",
-          "at": "2026-07-12T08:33:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c5d99b8da4ed55abda41b6bf9e69205e531cbe907a3d10451801dfd6e318795",
-          "at": "2026-07-12T09:03:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c5d99b8da4ed55abda41b6bf9e69205e531cbe907a3d10451801dfd6e318795",
-          "at": "2026-07-12T09:05:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:03ab6ed5e61f3aa21acc644574e6c82503a28c2ffdabc7bb170d8020fb10fbe0",
-          "at": "2026-07-12T12:43:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:03ab6ed5e61f3aa21acc644574e6c82503a28c2ffdabc7bb170d8020fb10fbe0",
-          "at": "2026-07-12T12:46:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:03ab6ed5e61f3aa21acc644574e6c82503a28c2ffdabc7bb170d8020fb10fbe0",
-          "at": "2026-07-12T12:48:43Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9402f549356acdb25d90df0acdb50f49d3e02200a8243f9381337505da9c077",
-          "at": "2026-07-12T00:04:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9402f549356acdb25d90df0acdb50f49d3e02200a8243f9381337505da9c077",
-          "at": "2026-07-12T00:05:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5631660c95330d3d727e0c8655c2b9fe1ce24f00a16e2c900732d21bdd154472",
-          "at": "2026-07-12T06:29:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5631660c95330d3d727e0c8655c2b9fe1ce24f00a16e2c900732d21bdd154472",
-          "at": "2026-07-12T06:31:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:755057a38213543e8fc398bb0a8d146398ab821f82d0e774f430bba4bc01faaa",
-          "at": "2026-07-12T08:17:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:755057a38213543e8fc398bb0a8d146398ab821f82d0e774f430bba4bc01faaa",
-          "at": "2026-07-12T08:19:06Z"
         }
       ]
     }

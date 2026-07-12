@@ -86,7 +86,7 @@ impl CodexCapabilityAdapter {
         let path = self.skill_path(capability);
         let definition = read_utf8_file(&path, &self.repo_root)
             .map_err(|detail| adapter_preflight_error(request, &self.provider, detail))?;
-        sandbox_mode_from_skill(&definition)
+        sandbox_mode_from_skill(&definition, capability)
             .map_err(|detail| adapter_preflight_error(request, &self.provider, detail))
     }
 }
@@ -115,11 +115,14 @@ impl CapabilityProviderPort for CodexCapabilityAdapter {
     }
 }
 
-fn sandbox_mode_from_skill(definition: &str) -> Result<SandboxMode, String> {
-    let Some(front_matter) = read_front_matter(definition)? else {
-        return Ok(SandboxMode::ReadOnly);
-    };
+fn sandbox_mode_from_skill(
+    definition: &str,
+    expected_capability: &str,
+) -> Result<SandboxMode, String> {
+    let front_matter = read_front_matter(definition)?
+        .ok_or_else(|| "Codex skill definition has no YAML front matter".to_owned())?;
     let front_matter = parse_provider_definition_front_matter(front_matter)?;
+    front_matter.validate_identity(expected_capability, "Codex skill definition")?;
     match front_matter.sandbox()? {
         None => Ok(SandboxMode::ReadOnly),
         Some("read-only") => Ok(SandboxMode::ReadOnly),
@@ -214,30 +217,34 @@ mod tests {
 
     #[test]
     fn test_codex_skill_missing_sandbox_defaults_to_read_only() {
-        let definition = "---\nname: implementer\n---\nbody\n";
+        let definition =
+            "---\nname: implementer\ndescription: Implements assigned tasks.\n---\nbody\n";
 
-        assert_eq!(sandbox_mode_from_skill(definition), Ok(SandboxMode::ReadOnly));
+        assert_eq!(sandbox_mode_from_skill(definition, "implementer"), Ok(SandboxMode::ReadOnly));
     }
 
     #[test]
     fn test_codex_skill_workspace_write_sandbox_is_retained() {
-        let definition = "---\nname: implementer\nsandbox: workspace-write\n---\nbody\n";
+        let definition = "---\nname: implementer\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nbody\n";
 
-        assert_eq!(sandbox_mode_from_skill(definition), Ok(SandboxMode::WorkspaceWrite));
+        assert_eq!(
+            sandbox_mode_from_skill(definition, "implementer"),
+            Ok(SandboxMode::WorkspaceWrite)
+        );
     }
 
     #[test]
     fn test_codex_skill_nested_sandbox_is_rejected() {
-        let definition = "---\nmetadata:\n  sandbox: workspace-write\n---\nbody\n";
+        let definition = "---\nname: implementer\ndescription: Implements assigned tasks.\nmetadata:\n  sandbox: workspace-write\n---\nbody\n";
 
-        assert!(sandbox_mode_from_skill(definition).is_err());
+        assert!(sandbox_mode_from_skill(definition, "implementer").is_err());
     }
 
     #[test]
     fn test_codex_skill_malformed_front_matter_is_rejected() {
         let definition = "---\nsandbox: [workspace-write\n---\nbody\n";
 
-        assert!(sandbox_mode_from_skill(definition).is_err());
+        assert!(sandbox_mode_from_skill(definition, "implementer").is_err());
     }
 
     #[test]
@@ -268,7 +275,7 @@ mod tests {
         let directory = tempfile::tempdir()?;
         write_skill(
             directory.path(),
-            "---\nname: implementer\nsandbox: workspace-write\n---\nskill body\n",
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nskill body\n",
         )?;
         let runner = Arc::new(RecordingProcessRunner { exit_code: 17, ..Default::default() });
         let adapter = CodexCapabilityAdapter::with_process_runner(
@@ -312,7 +319,7 @@ mod tests {
         let directory = tempfile::tempdir()?;
         write_skill(
             directory.path(),
-            "---\nname: implementer\nsandbox: workspace-write\n---\nskill body\n",
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nskill body\n",
         )?;
         let runner = Arc::new(RecordingProcessRunner::default());
         let adapter = CodexCapabilityAdapter::with_process_runner(
@@ -336,6 +343,52 @@ mod tests {
     }
 
     #[test]
+    fn test_codex_capability_adapter_missing_name_rejected_before_process()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_skill(
+            directory.path(),
+            "---\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nskill body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let adapter = CodexCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+
+        assert!(matches!(
+            adapter.dispatch(&request_from_host("codex")?),
+            Err(CapabilityExecError::AdapterPreflight { .. })
+        ));
+        assert!(runner.invocations.lock().expect("test process recorder lock").is_empty());
+        Ok(())
+    }
+
+    #[test]
+    fn test_codex_capability_adapter_mismatched_name_rejected_before_process()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_skill(
+            directory.path(),
+            "---\nname: researcher\ndescription: Researches the workspace.\nsandbox: workspace-write\n---\nskill body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let adapter = CodexCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+
+        assert!(matches!(
+            adapter.dispatch(&request_from_host("codex")?),
+            Err(CapabilityExecError::AdapterPreflight { .. })
+        ));
+        assert!(runner.invocations.lock().expect("test process recorder lock").is_empty());
+        Ok(())
+    }
+
+    #[test]
     fn test_codex_capability_adapter_missing_skill_rejected_before_process()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
@@ -355,13 +408,106 @@ mod tests {
     }
 
     #[test]
+    fn test_codex_capability_adapter_missing_skill_rejects_without_raw_definition_prompt_fallback()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let raw_definition = directory.path().join(".harness/capabilities/implementer.md");
+        fs::create_dir_all(raw_definition.parent().ok_or("raw definition has a parent")?)?;
+        fs::write(&raw_definition, "raw capability definition")?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let adapter = CodexCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+
+        let error = adapter
+            .dispatch(&request_from_host("claude")?)
+            .expect_err("a missing native skill must reject at preflight");
+
+        assert!(matches!(error, CapabilityExecError::AdapterPreflight { .. }));
+        assert!(
+            runner.invocations.lock().expect("test process recorder lock").is_empty(),
+            "a raw definition must not be injected into a fallback provider prompt"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_codex_capability_adapter_declared_and_default_sandbox_reach_subprocess()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let workspace_write_directory = tempfile::tempdir()?;
+        write_skill(
+            workspace_write_directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nskill body\n",
+        )?;
+        let workspace_write_runner = Arc::new(RecordingProcessRunner::default());
+        let workspace_write_adapter = CodexCapabilityAdapter::with_process_runner(
+            workspace_write_directory.path().to_owned(),
+            workspace_write_directory.path().join("runtime"),
+            workspace_write_runner.clone(),
+        );
+
+        workspace_write_adapter.dispatch(&request_from_host("codex")?)?;
+
+        let workspace_write_invocations =
+            workspace_write_runner.invocations.lock().expect("test process recorder lock");
+        let workspace_write_invocation = workspace_write_invocations
+            .first()
+            .ok_or("workspace-write dispatch must invoke the provider")?;
+        let workspace_write_args: Vec<_> = workspace_write_invocation
+            .1
+            .iter()
+            .map(|value| value.to_string_lossy().into_owned())
+            .collect();
+        let [_, _, _, workspace_write_flag, workspace_write_sandbox, _] =
+            workspace_write_args.as_slice()
+        else {
+            return Err("workspace-write invocation must have six arguments".into());
+        };
+        assert_eq!(workspace_write_flag, "--sandbox");
+        assert_eq!(workspace_write_sandbox, "workspace-write");
+
+        let default_directory = tempfile::tempdir()?;
+        write_skill(
+            default_directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\n---\nskill body\n",
+        )?;
+        let default_runner = Arc::new(RecordingProcessRunner::default());
+        let default_adapter = CodexCapabilityAdapter::with_process_runner(
+            default_directory.path().to_owned(),
+            default_directory.path().join("runtime"),
+            default_runner.clone(),
+        );
+
+        default_adapter.dispatch(&request_from_host("codex")?)?;
+
+        let default_invocations =
+            default_runner.invocations.lock().expect("test process recorder lock");
+        let default_invocation = default_invocations
+            .first()
+            .ok_or("undeclared sandbox dispatch must invoke the provider")?;
+        let default_args: Vec<_> =
+            default_invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();
+        let [_, _, _, default_flag, default_sandbox, _] = default_args.as_slice() else {
+            return Err("undeclared sandbox invocation must have six arguments".into());
+        };
+        assert_eq!(default_flag, "--sandbox");
+        assert_eq!(default_sandbox, "read-only");
+        Ok(())
+    }
+
+    #[test]
     fn test_codex_capability_adapter_parent_segment_name_rejected_before_process()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
         let escaped_skill = directory.path().join(".agents/outside/SKILL.md");
         fs::create_dir_all(directory.path().join(".agents/skills"))?;
         fs::create_dir_all(escaped_skill.parent().ok_or("skill path must have a parent")?)?;
-        fs::write(&escaped_skill, "---\nname: outside\n---\nskill body\n")?;
+        fs::write(
+            &escaped_skill,
+            "---\nname: outside\ndescription: Outside skill.\n---\nskill body\n",
+        )?;
         let runner = Arc::new(RecordingProcessRunner::default());
         let adapter = CodexCapabilityAdapter::with_process_runner(
             directory.path().to_owned(),
@@ -409,7 +555,10 @@ mod tests {
         let repository = workspace.path().join("repository");
         fs::create_dir_all(repository.join(".agents/skills/implementer"))?;
         let external_skill = workspace.path().join("outside-skill.md");
-        fs::write(&external_skill, "---\nname: implementer\n---\nskill body\n")?;
+        fs::write(
+            &external_skill,
+            "---\nname: implementer\ndescription: Implements assigned tasks.\n---\nskill body\n",
+        )?;
         std::os::unix::fs::symlink(
             &external_skill,
             repository.join(".agents/skills/implementer/SKILL.md"),
@@ -437,7 +586,10 @@ mod tests {
         fs::create_dir_all(&repository)?;
         let external_skill = workspace.path().join("outside/SKILL.md");
         fs::create_dir_all(external_skill.parent().expect("skill has parent"))?;
-        fs::write(&external_skill, "---\nname: outside\n---\nskill body\n")?;
+        fs::write(
+            &external_skill,
+            "---\nname: outside\ndescription: Outside skill.\n---\nskill body\n",
+        )?;
         let runner = Arc::new(RecordingProcessRunner::default());
         let adapter = CodexCapabilityAdapter::with_process_runner(
             repository,

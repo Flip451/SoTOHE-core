@@ -10,12 +10,14 @@ User invokes this command as `/track:impl-plan`. No arguments.
 
 ## Claude Code invocation constraints
 
-Provider routing from `.harness/config/agent-profiles.json` (`capabilities.impl-planner.provider`):
+Write a briefing containing the track id, paths to `spec.json` and each `<layer>-types.json`,
+and paths to the related ADR(s) and conventions. Then run
+`bin/sotp capability exec impl-planner --host claude --briefing-file tmp/impl-planner-briefing.md`.
+The dispatcher resolves `capabilities.impl-planner` internally from
+`.harness/config/agent-profiles.json` and either completes the dispatch or returns the
+in-host delegation instruction to follow.
 
-- **Claude (default)**: Agent tool (`subagent_type: "impl-planner"`, `run_in_background: true`). Briefing must include: track id, paths to `spec.json` and each `<layer>-types.json`, paths to related ADR(s) and conventions.
-- **Codex**: `bin/sotp capability exec impl-planner --host claude --briefing-file tmp/impl-planner-briefing.md`
-
-The subagent owns: writing `impl-plan.json` and `task-coverage.json`, and evaluating the task-coverage binary gate (OK / ERROR). No direct CLI calls from this adapter body (Claude path).
+The subagent owns: writing `impl-plan.json` and `task-coverage.json`, and evaluating the task-coverage binary gate (OK / ERROR).
 
 ## Report format
 

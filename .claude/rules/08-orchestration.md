@@ -57,7 +57,8 @@ Always invoke `/track:plan` before implementation, regardless of task difficulty
 
 ## Delegation Rules
 
-Use the minimum capable capability first, then resolve it via `.harness/config/agent-profiles.json`.
+Use the minimum capable capability first, then dispatch it through the CLI or wrapper that
+resolves its profile internally.
 
 - Claude Code or Codex (`orchestrator` host):
   - normal edits
@@ -73,7 +74,8 @@ Use the minimum capable capability first, then resolve it via `.harness/config/a
   - `implementer`: difficult Rust implementation, refactoring, performance-oriented edits
   - `reviewer`: code review, correctness analysis, idiomatic Rust checks
   - `researcher`: crate research, codebase-wide analysis, external research
-- provider resolution (from `.harness/config/agent-profiles.json`):
+- provider-routing SSoT (`.harness/config/agent-profiles.json`; resolved internally by the
+  relevant CLI or dispatcher):
   - `orchestrator` → `capabilities.orchestrator.provider`
   - `spec-designer` / `type-designer` / `impl-planner` / `adr-editor` / `implementer` → their own capability provider entries
   - `reviewer` / `review-fix-lead` / `dry-checker` / `dry-fix-lead` → their own capability provider entries
