@@ -824,13 +824,15 @@ mod tests {
       "provider": "{provider}",
       "model": "review-final",
       "fast_provider": "{provider}",
-      "fast_model": "review-fast"
+      "fast_model": "review-fast",
+      "execution_mode": "typed-pipeline"
     }},
     "review-fix-lead": {{
       "provider": "{provider}",
       "model": "gpt-final",
       "fast_provider": "{provider}",
-      "fast_model": "gpt-fast"
+      "fast_model": "gpt-fast",
+      "execution_mode": "typed-pipeline"
     }}
   }}
 }}

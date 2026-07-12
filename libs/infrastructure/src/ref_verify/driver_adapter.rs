@@ -213,7 +213,7 @@ fn load_ref_verify_config(
 fn load_agent_profiles(project_root: &Path) -> Result<AgentProfiles, RefVerifyAdapterError> {
     let profiles_path = project_root.join(AGENT_PROFILES_PATH);
     reject_workspace_symlinks(&profiles_path, project_root, "agent-profiles.json")?;
-    AgentProfiles::load(&profiles_path)
+    AgentProfiles::load(project_root, &profiles_path)
         .map_err(|e| RefVerifyAdapterError(format!("cannot load agent-profiles.json: {e}")))
 }
 

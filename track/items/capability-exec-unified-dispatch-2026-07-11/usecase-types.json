@@ -8,6 +8,7 @@
           "has_default_impl": false,
           "is_async": false,
           "name": "try_new",
+          "docs": "May produce only CapabilityInputValidationError::EmptyProviderName.",
           "params": [
             {
               "name": "value",
@@ -33,6 +34,7 @@
           "has_default_impl": false,
           "is_async": false,
           "name": "try_new",
+          "docs": "May produce only CapabilityInputValidationError::EmptyModelName.",
           "params": [
             {
               "name": "value",
@@ -58,6 +60,7 @@
           "has_default_impl": false,
           "is_async": false,
           "name": "try_new",
+          "docs": "May produce only CapabilityInputValidationError::EmptyFilePath or CapabilityInputValidationError::InvalidFilePath.",
           "params": [
             {
               "name": "path",
@@ -83,6 +86,7 @@
           "has_default_impl": false,
           "is_async": false,
           "name": "try_new",
+          "docs": "May produce only CapabilityInputValidationError::EmptyContent.",
           "params": [
             {
               "name": "value",
@@ -108,6 +112,7 @@
           "has_default_impl": false,
           "is_async": false,
           "name": "try_new",
+          "docs": "May produce only CapabilityInputValidationError::EmptyContent.",
           "params": [
             {
               "name": "value",
@@ -982,7 +987,7 @@
     },
     "CapabilityFilePath": {
       "action": "add",
-      "docs": "Usecase-layer validated technical path value; not domain language.",
+      "docs": "Usecase-layer technical path value object (IN-01).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1004,18 +1009,12 @@
       "action": "add",
       "docs": null,
       "informal_grounds": [],
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "EmptyCapabilityName",
-            "payload": {
-              "kind": "unit"
-            }
-          },
-          {
-            "name": "EmptyProviderName",
-            "payload": {
+    "kind": {
+      "kind": "enum",
+      "variants": [
+        {
+          "name": "EmptyProviderName",
+          "payload": {
               "kind": "unit"
             }
           },
@@ -1027,6 +1026,12 @@
           },
           {
             "name": "EmptyFilePath",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidFilePath",
             "payload": {
               "kind": "unit"
             }

@@ -388,7 +388,7 @@ impl PrCompositionRoot {
         let git_repo =
             SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         let profiles_path = git_repo.root().join(AGENT_PROFILES_PATH);
-        let profiles = AgentProfiles::load(&profiles_path)
+        let profiles = AgentProfiles::load(git_repo.root(), &profiles_path)
             .map_err(|e| CompositionError::ConfigLoad(format!("{e}")))?;
         let resolved =
             profiles.resolve_execution("pr-reviewer", RoundType::Final).ok_or_else(|| {
@@ -499,7 +499,7 @@ impl PrCompositionRoot {
             SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
 
         let profiles_path = repo.root().join(AGENT_PROFILES_PATH);
-        let profiles = AgentProfiles::load(&profiles_path)
+        let profiles = AgentProfiles::load(repo.root(), &profiles_path)
             .map_err(|e| CompositionError::ConfigLoad(format!("{e}")))?;
         let resolved =
             profiles.resolve_execution("pr-reviewer", RoundType::Final).ok_or_else(|| {

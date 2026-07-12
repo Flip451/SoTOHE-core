@@ -106,7 +106,7 @@
       },
       "key": {
         "waived_reason_hash": "e1261499412d40ded891c9fc11c84d2a865bf0bca7d1a74318443bc140908d42",
-        "declaration_hash": "33d2de00e6cf9ee4909488edf752b0879bd005c8ce40cade897fa86208f45a59",
+        "declaration_hash": "f3e08a8988e50a7bc700174131c0cd487c179a213976e9173f4d7a0b60ae13ea",
         "anchor_text_hash": "1fc48eb1b622a351fa6bb6938ddb140c3349c38fe2c9c952f4bba8c16200624a"
       },
       "verdict": {
@@ -207,6 +207,44 @@
       "verdict": {
         "kind": "waived",
         "citation": "docs: Some(DocString(\"Usecase-layer validated technical provider identifier; not domain language.\")), invariants: [], methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfiles",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "7e791c115549dbcc932d86e1562c1e41887fe802e6421680b1ae136da855f555",
+        "declaration_hash": "a5d2d85f52b537e39ca4c5498ef140e906701bd4be36ed211e356e908ff791ee",
+        "anchor_text_hash": "86c3181347a722f5d32300ad6a0fedf69b9cee7184858ee5678ac1933f377c18"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Agent-profile configuration secondary adapter"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfilesCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "f86628dc9c0506a66d4962871a1ec4f4ca1566350aeb94ced42e70408334f9da",
+        "declaration_hash": "52a98de7c82ccda40ce2e054fa3410d04cd26e5a8e91954aadf0e181c9ca836a",
+        "anchor_text_hash": "86c3181347a722f5d32300ad6a0fedf69b9cee7184858ee5678ac1933f377c18"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: SecondaryAdapter, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }

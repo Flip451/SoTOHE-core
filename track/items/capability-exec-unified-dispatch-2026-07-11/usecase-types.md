@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityDispatchOutcome | enum | add | Executed, DelegateInHost | 🟡 | 🔵 |
+| CapabilityDispatchOutcome | enum | add | Executed, DelegateInHost | 🔵 | 🔵 |
 | ExecutionMode | enum | add | OrchestratorOutput, TypedPipeline | 🔵 | 🔵 |
 
 ## Value Objects
@@ -24,33 +24,33 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CapabilityExecError | error_type | add | ProfileResolution, ExecutionModeRejected, ModelMissing, UnsupportedProvider, SourceValidation, AdapterPreflight, DispatchFailed | 🔵 | 🔵 |
-| CapabilityInputValidationError | error_type | add | EmptyCapabilityName, EmptyProviderName, EmptyModelName, EmptyFilePath, EmptyContent | 🔵 | 🔵 |
+| CapabilityInputValidationError | error_type | add | EmptyProviderName, EmptyModelName, EmptyFilePath, InvalidFilePath, EmptyContent | 🔵 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityProfilePort | secondary_port | add | fn resolve(&self, capability: &CapabilityName) -> Result<CapabilityProfile, CapabilityExecError> | 🟡 | 🔵 |
-| CapabilityProviderPort | secondary_port | add | fn provider(&self) -> &ProviderName, fn dispatch(&self, request: &CapabilityDispatchRequest) -> Result<CapabilityDispatchOutcome, CapabilityExecError> | 🟡 | 🔵 |
-| CapabilitySourcePort | secondary_port | add | fn load_briefing(&self, path: &CapabilityFilePath) -> Result<BriefingText, CapabilityExecError>, fn load_discipline(&self) -> Result<DisciplineText, CapabilityExecError> | 🟡 | 🔵 |
+| CapabilityProfilePort | secondary_port | add | fn resolve(&self, capability: &CapabilityName) -> Result<CapabilityProfile, CapabilityExecError> | 🔵 | 🔵 |
+| CapabilityProviderPort | secondary_port | add | fn provider(&self) -> &ProviderName, fn dispatch(&self, request: &CapabilityDispatchRequest) -> Result<CapabilityDispatchOutcome, CapabilityExecError> | 🔵 | 🔵 |
+| CapabilitySourcePort | secondary_port | add | fn load_briefing(&self, path: &CapabilityFilePath) -> Result<BriefingText, CapabilityExecError>, fn load_discipline(&self) -> Result<DisciplineText, CapabilityExecError> | 🔵 | 🔵 |
 
 ## Application Services
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityExecService | application_service | add | fn execute(&self, request: CapabilityExecRequest) -> Result<CapabilityDispatchOutcome, CapabilityExecError> | 🟡 | 🔵 |
+| CapabilityExecService | application_service | add | fn execute(&self, request: CapabilityExecRequest) -> Result<CapabilityDispatchOutcome, CapabilityExecError> | 🔵 | 🔵 |
 
 ## Interactors
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityExecInteractor | interactor | add | — | 🟡 | 🔵 |
+| CapabilityExecInteractor | interactor | add | — | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityDispatchRequest | dto | add | — | 🟡 | 🔵 |
+| CapabilityDispatchRequest | dto | add | — | 🔵 | 🔵 |
 | CapabilityProfile | dto | add | — | 🔵 | 🔵 |
 
 ## Commands

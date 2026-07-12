@@ -7,56 +7,6 @@
         {
           "has_default_impl": false,
           "is_async": false,
-          "name": "try_new",
-          "params": [
-            {
-              "name": "value",
-              "ty": "String"
-            }
-          ],
-          "returns": "Result<Self, usecase::capability_exec::CapabilityInputValidationError>"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "as_str",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&str"
-        }
-      ],
-      "type_name": "CapabilityNameArg"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "try_new",
-          "params": [
-            {
-              "name": "value",
-              "ty": "String"
-            }
-          ],
-          "returns": "Result<Self, usecase::capability_exec::CapabilityInputValidationError>"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "as_str",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&str"
-        }
-      ],
-      "type_name": "ProviderNameArg"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
           "name": "new",
           "params": [
             {
@@ -104,7 +54,7 @@
     },
     {
       "for_type": "CapabilityNameArg",
-      "trait_ref": "core::str::FromStr"
+      "trait_ref": "core::str::traits::FromStr"
     },
     {
       "for_type": "ProviderNameArg",
@@ -124,7 +74,7 @@
     },
     {
       "for_type": "ProviderNameArg",
-      "trait_ref": "core::str::FromStr"
+      "trait_ref": "core::str::traits::FromStr"
     },
     {
       "for_type": "CapabilityExecDriverInput",
@@ -141,6 +91,26 @@
     {
       "for_type": "CapabilityExecDriverInput",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CapabilityFilePathArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityFilePathArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityFilePathArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityFilePathArg",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CapabilityFilePathArg",
+      "trait_ref": "core::str::traits::FromStr"
     }
   ],
   "traits": {},
@@ -151,7 +121,11 @@
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
-        "shape": { "kind": "plain", "fields": [], "has_stripped_fields": true }
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
       },
       "methods": [],
       "module_path": "capability",
@@ -187,7 +161,7 @@
             },
             {
               "name": "briefing_file",
-              "ty": "std::path::PathBuf"
+              "ty": "CapabilityFilePathArg"
             }
           ],
           "has_stripped_fields": false,
@@ -206,13 +180,45 @@
         }
       ]
     },
-    "CapabilityNameArg": {
+    "CapabilityFilePathArg": {
       "action": "add",
-      "docs": "CLI-boundary mirror of usecase::capability_exec::CapabilityName.",
+      "docs": "CLI-boundary holder of validated usecase::capability_exec::CapabilityFilePath.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
-        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CapabilityNameArg": {
+      "action": "add",
+      "docs": "CLI-boundary holder of validated usecase::dry_write_driver::CapabilityName.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
       },
       "methods": [],
       "module_path": "capability",
@@ -254,11 +260,15 @@
     },
     "ProviderNameArg": {
       "action": "add",
-      "docs": "CLI-boundary mirror of usecase::capability_exec::ProviderName.",
+      "docs": "CLI-boundary holder of validated usecase::capability_exec::ProviderName.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
-        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
       },
       "methods": [],
       "module_path": "capability",

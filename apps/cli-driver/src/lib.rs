@@ -11,6 +11,7 @@
 //! apps/cli main.rs wiring) per CN-06.
 
 pub mod arch;
+pub mod capability;
 pub mod catalog_gen;
 pub mod conventions;
 pub mod demo;
@@ -20,7 +21,6 @@ pub mod file;
 pub mod git;
 pub mod guard;
 pub mod hook;
-pub mod plan;
 pub mod pr;
 pub mod ref_verify;
 pub mod render;

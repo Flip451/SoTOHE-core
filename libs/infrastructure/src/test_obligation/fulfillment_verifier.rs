@@ -237,7 +237,8 @@ mod tests {
                 "provider": "claude",
                 "model": "claude-opus-4-8",
                 "fast_provider": "claude",
-                "fast_model": "claude-haiku-4-5"
+                "fast_model": "claude-haiku-4-5",
+                "execution_mode": "typed-pipeline"
             }
         }
     }"#;
@@ -246,7 +247,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("agent-profiles.json");
         std::fs::write(&path, CONFIG).unwrap();
-        AgentProfiles::load(&path).unwrap()
+        AgentProfiles::load(dir.path(), &path).unwrap()
     }
 
     fn codex_profiles() -> AgentProfiles {
@@ -260,13 +261,14 @@ mod tests {
                 "capabilities": {
                     "obligation-fulfillment-verifier": {
                         "provider": "codex",
-                        "model": "gpt-5"
+                        "model": "gpt-5",
+                        "execution_mode": "typed-pipeline"
                     }
                 }
             }"#,
         )
         .unwrap();
-        AgentProfiles::load(&path).unwrap()
+        AgentProfiles::load(dir.path(), &path).unwrap()
     }
 
     fn stub_runner(output: &'static str) -> Arc<SemanticVerifierRunner> {
@@ -452,7 +454,7 @@ mod tests {
         let path = dir.path().join("agent-profiles.json");
         std::fs::write(&path, r#"{ "schema_version": 1, "providers": {}, "capabilities": {} }"#)
             .unwrap();
-        let profile = AgentProfiles::load(&path).unwrap();
+        let profile = AgentProfiles::load(dir.path(), &path).unwrap();
         let adapter = ObligationFulfillmentVerifierAdapter::with_runner(profile, stub_runner("{}"));
         let err = adapter.verify_pair("tests", "decl", "anchor", ModelTier::Final).unwrap_err();
         let SemanticVerifierError::VerifierPort(message) = err;

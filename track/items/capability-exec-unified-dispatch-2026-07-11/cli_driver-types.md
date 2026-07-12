@@ -4,13 +4,14 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityExecDriverInput | dto | add | — | 🟡 | 🔵 |
-| CapabilityNameArg | dto | add | — | 🟡 | 🔵 |
-| ProviderNameArg | dto | add | — | 🟡 | 🔵 |
+| CapabilityExecDriverInput | dto | add | — | 🔵 | 🔵 |
+| CapabilityFilePathArg | dto | add | — | 🔵 | 🔵 |
+| CapabilityNameArg | dto | add | — | 🔵 | 🔵 |
+| ProviderNameArg | dto | add | — | 🔵 | 🔵 |
 
 ## Primary Adapters
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityDriver | primary_adapter | add | — | 🟡 | 🔵 |
+| CapabilityDriver | primary_adapter | add | — | 🔵 | 🔵 |
 

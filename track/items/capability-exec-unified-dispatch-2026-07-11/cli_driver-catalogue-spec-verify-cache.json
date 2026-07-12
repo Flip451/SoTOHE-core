@@ -51,7 +51,7 @@
       }
     },
     {
-      "claim_hash": "4ca5cf7f696a8e935908945095427993214cda6d81f7acdedc7d0c3373fc2aae",
+      "claim_hash": "2c00af6398a113e64e62f59fcf26b785afd9740e5bf711c42b1f866d2373330a",
       "evidence_hash": "be50f31c85d765d3d4a710a4fddbba8d44f71dc326bc075d3057cbb15f277061",
       "verdict": {
         "kind": "pass",
@@ -75,11 +75,59 @@
       }
     },
     {
-      "claim_hash": "4ec64de9b5a2280fa33ea664d989c6782afba0b61ec89b80335c8679ce70eb7d",
+      "claim_hash": "2fbea112e7a78b98c0872efc83ac9b630582ab464ad4929a3d00ad3f4b752741",
       "evidence_hash": "be50f31c85d765d3d4a710a4fddbba8d44f71dc326bc075d3057cbb15f277061",
       "verdict": {
         "kind": "pass",
         "citation": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityFilePathArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2fbea112e7a78b98c0872efc83ac9b630582ab464ad4929a3d00ad3f4b752741",
+      "evidence_hash": "5d6294cb3b25fad21f56988379de9f88c3a7285807f23cb196ce848700031f0f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "必須引数、briefing、discipline template、profile entry、execution mode、provider、model、adapter definition、adapter preflight のいずれかが無効・欠如・不一致なら"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityFilePathArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "dispatch は fail-closed とする。必須引数、briefing、discipline template、profile entry、execution mode、provider、model、adapter definition、adapter preflight のいずれかが無効・欠如・不一致なら、in-host 委譲指示も subprocess 起動も行わず非成功で終了する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e59922faf44d872beef5c05d07fbbb92fb3c9ffcbffe37966bcd0984d6be863e",
+      "evidence_hash": "be50f31c85d765d3d4a710a4fddbba8d44f71dc326bc075d3057cbb15f277061",
+      "verdict": {
+        "kind": "pass",
+        "citation": "capability 名"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -99,11 +147,11 @@
       }
     },
     {
-      "claim_hash": "4ec64de9b5a2280fa33ea664d989c6782afba0b61ec89b80335c8679ce70eb7d",
+      "claim_hash": "e59922faf44d872beef5c05d07fbbb92fb3c9ffcbffe37966bcd0984d6be863e",
       "evidence_hash": "5d6294cb3b25fad21f56988379de9f88c3a7285807f23cb196ce848700031f0f",
       "verdict": {
         "kind": "pass",
-        "citation": "dispatch は fail-closed とする。必須引数、briefing、discipline template、profile entry、execution mode、provider、model、adapter definition、adapter preflight のいずれかが無効・欠如・不一致なら、in-host 委譲指示も subprocess 起動も行わず非成功で終了する。"
+        "citation": "必須引数、briefing、discipline template、profile entry、execution mode、provider、model、adapter definition、adapter preflight のいずれかが無効・欠如・不一致なら"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -123,11 +171,11 @@
       }
     },
     {
-      "claim_hash": "2b31612c933fde30f12df0953f75c1e9e2f94f61cbfd80b1eff9f4b49a7e7663",
+      "claim_hash": "331c4bfa814873f685ee366ad37073c9962e7ced4571c4197d4c761c2e6859e1",
       "evidence_hash": "be50f31c85d765d3d4a710a4fddbba8d44f71dc326bc075d3057cbb15f277061",
       "verdict": {
         "kind": "pass",
-        "citation": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。"
+        "citation": "capability 名"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -147,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "2b31612c933fde30f12df0953f75c1e9e2f94f61cbfd80b1eff9f4b49a7e7663",
+      "claim_hash": "331c4bfa814873f685ee366ad37073c9962e7ced4571c4197d4c761c2e6859e1",
       "evidence_hash": "0979a692e06b6e516307b4e09cdb21e3a999b86add9b9f9d8039f587e34fbab9",
       "verdict": {
         "kind": "pass",

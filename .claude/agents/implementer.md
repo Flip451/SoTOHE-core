@@ -1,6 +1,13 @@
 ---
 name: implementer
 model: claude-opus-4-7[1m]
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Write
+  - Edit
+  - Bash
 description: Claude subagent adapter for implementer when routing dispatches the Claude path.
 ---
 

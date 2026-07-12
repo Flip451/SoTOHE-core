@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-12T00:18:17Z",
-  "declaration_hash": "330ce4ab06705e3000c46f1cdaea9ed98241013b4e18f08962ecafb658d31b27",
+  "generated_at": "2026-07-12T10:25:39Z",
+  "declaration_hash": "2497bbc91dcea554f4d5fea604b393201e27f67b2e3b802f3ae52e06eab64757",
   "signals": [
     {
       "type_name": "BriefingText",
@@ -18,9 +18,9 @@
     {
       "type_name": "CapabilityDispatchOutcome",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -30,9 +30,9 @@
     {
       "type_name": "CapabilityDispatchRequest",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -53,9 +53,9 @@
     {
       "type_name": "CapabilityExecInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "CapabilityExecService"
       ]
     },
@@ -74,8 +74,8 @@
     {
       "type_name": "CapabilityExecService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CapabilityFailureDetail",
@@ -129,20 +129,20 @@
     {
       "type_name": "CapabilityProfilePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CapabilityProviderPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CapabilitySourcePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "DisciplineText",
@@ -198,46 +198,32 @@
     {
       "type_name": "PlanRunOutput",
       "kind_tag": "unknown",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
-      ]
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "PlannerInteractor",
       "kind_tag": "unknown",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "PlannerService"
-      ]
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "PlannerPort",
       "kind_tag": "unknown",
-      "signal": "yellow",
-      "found_type": true
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "PlannerPortError",
       "kind_tag": "unknown",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "core::error::Error",
-        "core::fmt::Debug",
-        "core::fmt::Display"
-      ]
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "PlannerService",
       "kind_tag": "unknown",
-      "signal": "yellow",
-      "found_type": true
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "CapabilityName",

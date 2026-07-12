@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cae2a9d5c73e4e6130839650a57cdc88143141ac6df3370d411d520137b98fad",
+  "catalogue_declaration_hash": "3166bdcd21683657cf337425d12b891b879854d1089b6d3a882cef52c6c6e98d",
   "signals": [
     {
       "type_name": "CapabilityDriver",
@@ -10,17 +10,22 @@
     {
       "type_name": "CapabilityExecDriverInput",
       "signal": "blue",
-      "entry_hash": "4ca5cf7f696a8e935908945095427993214cda6d81f7acdedc7d0c3373fc2aae"
+      "entry_hash": "2c00af6398a113e64e62f59fcf26b785afd9740e5bf711c42b1f866d2373330a"
+    },
+    {
+      "type_name": "CapabilityFilePathArg",
+      "signal": "blue",
+      "entry_hash": "2fbea112e7a78b98c0872efc83ac9b630582ab464ad4929a3d00ad3f4b752741"
     },
     {
       "type_name": "CapabilityNameArg",
       "signal": "blue",
-      "entry_hash": "4ec64de9b5a2280fa33ea664d989c6782afba0b61ec89b80335c8679ce70eb7d"
+      "entry_hash": "e59922faf44d872beef5c05d07fbbb92fb3c9ffcbffe37966bcd0984d6be863e"
     },
     {
       "type_name": "ProviderNameArg",
       "signal": "blue",
-      "entry_hash": "2b31612c933fde30f12df0953f75c1e9e2f94f61cbfd80b1eff9f4b49a7e7663"
+      "entry_hash": "331c4bfa814873f685ee366ad37073c9962e7ced4571c4197d4c761c2e6859e1"
     },
     {
       "type_name": "PlanDriver",

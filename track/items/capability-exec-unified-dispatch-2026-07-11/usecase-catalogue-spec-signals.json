@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "330ce4ab06705e3000c46f1cdaea9ed98241013b4e18f08962ecafb658d31b27",
+  "catalogue_declaration_hash": "2497bbc91dcea554f4d5fea604b393201e27f67b2e3b802f3ae52e06eab64757",
   "signals": [
     {
       "type_name": "BriefingText",
@@ -40,12 +40,12 @@
     {
       "type_name": "CapabilityFilePath",
       "signal": "blue",
-      "entry_hash": "8633a5f4cc2d445bbacd1318997ed30f7cf571fc85b296d2f5cf26b05ceb7c7a"
+      "entry_hash": "a438ba58994ac901a2515886160f01dbd3567a480c64bc613abb0967a38aebd7"
     },
     {
       "type_name": "CapabilityInputValidationError",
       "signal": "blue",
-      "entry_hash": "9fe3475bf9e1fafe14d2c6afb41bfa3fdcb32a283bccf2b6cc80104c2390f312"
+      "entry_hash": "3c4f81b740538da76dba01fd8718197d0bfb026f63412c6e1b6c08f6b3279230"
     },
     {
       "type_name": "CapabilityName",

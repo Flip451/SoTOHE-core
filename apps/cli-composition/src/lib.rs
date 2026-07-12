@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------
 
 mod arch;
+mod capability;
 mod catalog;
 mod cmd_outcome;
 mod conventions;
@@ -21,7 +22,6 @@ mod file;
 mod git;
 mod guard;
 mod hook;
-mod plan;
 mod pr;
 mod ref_verify;
 pub mod review_v2;
@@ -70,6 +70,7 @@ pub use telemetry::TelemetryReportInput;
 // ---------------------------------------------------------------------------
 
 pub use arch::ArchCompositionRoot;
+pub use capability::CapabilityCompositionRoot;
 pub use catalog::CatalogCompositionRoot;
 pub use conventions::ConventionsCompositionRoot;
 pub use demo::DemoCompositionRoot;
@@ -79,7 +80,6 @@ pub use file::FileCompositionRoot;
 pub use git::GitCompositionRoot;
 pub use guard::GuardCompositionRoot;
 pub use hook::HookCompositionRoot;
-pub use plan::PlanCompositionRoot;
 pub use pr::PrCompositionRoot;
 pub use ref_verify::RefVerifyCompositionRoot;
 pub use review_v2::ReviewCompositionRoot;

@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-12T00:18:28Z",
+  "generated_at": "2026-07-12T10:25:52Z",
   "declaration_hash": "02d673e73ae7ef5506fe11f395ee450a00d1ff5765747060e0f0b1c6d4901710",
   "signals": [
     {
       "type_name": "CapabilityCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "PlanCompositionRoot",
       "kind_tag": "unknown",
-      "signal": "yellow",
-      "found_type": true
+      "signal": "blue",
+      "found_type": false
     }
   ]
 }

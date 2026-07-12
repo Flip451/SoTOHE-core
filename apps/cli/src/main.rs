@@ -65,10 +65,10 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::pr::PrCommand,
     },
-    /// Local planner workflow wrappers.
-    Plan {
+    /// Generic profile-driven capability dispatch.
+    Capability {
         #[command(subcommand)]
-        cmd: commands::plan::PlanCommand,
+        cmd: commands::capability::CapabilityCommand,
     },
     /// Local review workflow wrappers.
     Review {
@@ -170,7 +170,7 @@ fn run_cli_with(
         Some(CliCommand::Track { cmd }) => execute_track_with_telemetry(cmd),
         Some(CliCommand::Git { cmd }) => commands::git::execute(cmd),
         Some(CliCommand::Pr { cmd }) => commands::pr::execute(cmd),
-        Some(CliCommand::Plan { cmd }) => commands::plan::execute(cmd),
+        Some(CliCommand::Capability { cmd }) => commands::capability::execute(cmd),
         Some(CliCommand::Review { cmd }) => commands::review::execute(cmd),
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
         Some(CliCommand::Verify { cmd }) => execute_verify_with_telemetry(cmd),
@@ -590,6 +590,34 @@ mod tests {
         assert_eq!(outcome.exit_code, 0, "demo failed: {:?}", outcome.stderr);
         let msg = outcome.stdout.unwrap_or_default();
         assert!(msg.contains("planned"), "expected 'planned' in output: {msg}");
+    }
+
+    #[test]
+    fn test_cli_command_capability_exec_parses_to_capability_variant() {
+        let cli = Cli::try_parse_from([
+            "sotp",
+            "capability",
+            "exec",
+            "implementer",
+            "--host",
+            "codex",
+            "--briefing-file",
+            "tmp/briefing.md",
+        ])
+        .expect("capability exec must parse at the top-level command boundary");
+
+        assert!(
+            matches!(cli.command, Some(CliCommand::Capability { .. })),
+            "capability exec must select the Capability variant"
+        );
+    }
+
+    #[test]
+    fn test_cli_command_retired_plan_codex_local_is_rejected() {
+        assert!(
+            Cli::try_parse_from(["sotp", "plan", "codex-local"]).is_err(),
+            "the retired plan codex-local command must not parse"
+        );
     }
 
     // ── CliCommand::Dry entrypoint dispatch routing ───────────────────────────

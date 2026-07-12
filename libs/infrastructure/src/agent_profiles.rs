@@ -8,7 +8,16 @@
 use std::collections::HashMap;
 use std::path::Path;
 
-use serde::Deserialize;
+use domain::FreeText;
+use serde::{Deserialize, Deserializer};
+use usecase::capability_exec::{
+    CapabilityInputValidationError, ExecutionMode, ModelName, ProviderName,
+};
+
+use crate::capability_exec::{
+    bounded_read_utf8_file,
+    path_guard::{lexically_normalize, normalize_path_rejecting_symlinked_components},
+};
 
 /// Default path for the agent profiles configuration file.
 pub const AGENT_PROFILES_PATH: &str = ".harness/config/agent-profiles.json";
@@ -22,7 +31,15 @@ pub const AGENT_PROFILES_PATH: &str = ".harness/config/agent-profiles.json";
 pub enum AgentProfilesError {
     /// The configuration file could not be read.
     #[error("failed to read agent profiles at {path}: {source}")]
-    Io { path: String, source: std::io::Error },
+    Io { path: FreeText, source: std::io::Error },
+
+    /// The configuration file is a symbolic link and cannot be trusted.
+    #[error("refusing to load agent profiles through a symlink: {path}")]
+    Symlink { path: FreeText },
+
+    /// The configuration path resolves outside its trusted workspace root.
+    #[error("agent profiles path {path} escapes trusted root {root}")]
+    PathOutsideTrustedRoot { path: FreeText, root: FreeText },
 
     /// The configuration file contains invalid JSON.
     #[error("failed to parse agent profiles: {0}")]
@@ -34,7 +51,7 @@ pub enum AgentProfilesError {
 
     /// A capability entry has an invalid configuration (e.g., empty provider name).
     #[error("invalid capability '{capability}': {reason}")]
-    InvalidCapability { capability: String, reason: String },
+    InvalidCapability { capability: FreeText, reason: FreeText },
 }
 
 // ---------------------------------------------------------------------------
@@ -113,8 +130,8 @@ struct ProviderMetadataDto {
 #[derive(Debug, Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct CapabilityConfigDto {
-    provider: String,
-    model: Option<String>,
+    provider: ProviderNameDto,
+    model: Option<ModelNameDto>,
     fast_provider: Option<String>,
     fast_model: Option<String>,
     /// Optional path to the prompt template for this capability.
@@ -125,6 +142,107 @@ pub struct CapabilityConfigDto {
     /// Optional reasoning effort for the final-round dry-checker (D4 / IN-08).
     /// `None` means no override; the composition root supplies a built-in default.
     final_reasoning_effort: Option<String>,
+    /// Required dispatch category used by the generic capability-exec entrypoint.
+    execution_mode: ExecutionModeDto,
+}
+
+/// Serde-boundary mirror of a generic capability dispatch execution category.
+#[derive(Debug, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ExecutionModeDto {
+    /// The orchestrator consumes the capability's free-form output.
+    OrchestratorOutput,
+    /// A dedicated pipeline machine-consumes the capability's output.
+    TypedPipeline,
+}
+
+impl Copy for ExecutionModeDto {}
+
+impl Clone for ExecutionModeDto {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl ExecutionModeDto {
+    /// Converts this serde DTO into the usecase execution category.
+    #[must_use]
+    pub fn into_domain(self) -> ExecutionMode {
+        match self {
+            Self::OrchestratorOutput => ExecutionMode::OrchestratorOutput,
+            Self::TypedPipeline => ExecutionMode::TypedPipeline,
+        }
+    }
+}
+
+/// Serde-boundary mirror of a validated capability provider identifier.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProviderNameDto(ProviderName);
+
+impl ProviderNameDto {
+    /// Validates a provider identifier at the infrastructure boundary.
+    ///
+    /// # Errors
+    ///
+    /// Returns the usecase validation error when `value` is blank.
+    pub fn try_new(value: String) -> Result<Self, CapabilityInputValidationError> {
+        ProviderName::try_new(value).map(Self)
+    }
+
+    /// Converts this DTO into its validated usecase value.
+    #[must_use]
+    pub fn into_domain(self) -> ProviderName {
+        self.0
+    }
+
+    fn as_str(&self) -> &str {
+        self.0.as_str()
+    }
+}
+
+impl<'de> Deserialize<'de> for ProviderNameDto {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        Self::try_new(value).map_err(serde::de::Error::custom)
+    }
+}
+
+/// Serde-boundary mirror of a validated capability model identifier.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModelNameDto(ModelName);
+
+impl ModelNameDto {
+    /// Validates a model identifier at the infrastructure boundary.
+    ///
+    /// # Errors
+    ///
+    /// Returns the usecase validation error when `value` is blank.
+    pub fn try_new(value: String) -> Result<Self, CapabilityInputValidationError> {
+        ModelName::try_new(value).map(Self)
+    }
+
+    /// Converts this DTO into its validated usecase value.
+    #[must_use]
+    pub fn into_domain(self) -> ModelName {
+        self.0
+    }
+
+    fn as_str(&self) -> &str {
+        self.0.as_str()
+    }
+}
+
+impl<'de> Deserialize<'de> for ModelNameDto {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        Self::try_new(value).map_err(serde::de::Error::custom)
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -141,17 +259,45 @@ pub struct AgentProfiles {
 }
 
 impl AgentProfiles {
-    /// Loads agent profiles from a JSON file.
+    /// Loads agent profiles from a JSON file within a trusted workspace root.
     ///
     /// # Errors
     ///
-    /// Returns [`AgentProfilesError::Io`] if the file cannot be read, or
-    /// [`AgentProfilesError::Parse`] if the JSON is invalid.
-    pub fn load(path: &Path) -> Result<Self, AgentProfilesError> {
+    /// Returns [`AgentProfilesError::PathOutsideTrustedRoot`] if `path` does
+    /// not remain inside `trusted_root`, [`AgentProfilesError::Io`] if the
+    /// file cannot be read, or [`AgentProfilesError::Parse`] if the JSON is
+    /// invalid.
+    pub fn load(trusted_root: &Path, path: &Path) -> Result<Self, AgentProfilesError> {
         const SUPPORTED_SCHEMA_VERSION: u32 = 1;
 
-        let content = std::fs::read_to_string(path)
-            .map_err(|e| AgentProfilesError::Io { path: path.display().to_string(), source: e })?;
+        let trusted_root = lexically_normalize(trusted_root);
+        let normalized_path = normalize_path_rejecting_symlinked_components(path, &trusted_root)
+            .map_err(|_| AgentProfilesError::Symlink {
+                path: FreeText::new(path.display().to_string()),
+            })?;
+        if !normalized_path.starts_with(&trusted_root) {
+            return Err(AgentProfilesError::PathOutsideTrustedRoot {
+                path: FreeText::new(normalized_path.display().to_string()),
+                root: FreeText::new(trusted_root.display().to_string()),
+            });
+        }
+        let canonical_root =
+            trusted_root.canonicalize().map_err(|source| AgentProfilesError::Io {
+                path: FreeText::new(trusted_root.display().to_string()),
+                source,
+            })?;
+        let canonical_path = normalized_path.canonicalize().map_err(|source| {
+            AgentProfilesError::Io { path: FreeText::new(path.display().to_string()), source }
+        })?;
+        if !canonical_path.starts_with(&canonical_root) {
+            return Err(AgentProfilesError::PathOutsideTrustedRoot {
+                path: FreeText::new(path.display().to_string()),
+                root: FreeText::new(canonical_root.display().to_string()),
+            });
+        }
+        let content = bounded_read_utf8_file(&normalized_path).map_err(|e| {
+            AgentProfilesError::Io { path: FreeText::new(path.display().to_string()), source: e }
+        })?;
         // Parse schema_version first (without deny_unknown_fields) so future
         // schema versions produce UnsupportedSchemaVersion, not a Parse error.
         let envelope: SchemaVersionEnvelope = serde_json::from_str(&content)?;
@@ -166,31 +312,31 @@ impl AgentProfiles {
         let mut capabilities = dto.capabilities;
         for (name, config) in &mut capabilities {
             // Reject empty provider / fast_provider.
-            if config.provider.trim().is_empty() {
+            if config.provider.as_str().trim().is_empty() {
                 return Err(AgentProfilesError::InvalidCapability {
-                    capability: name.clone(),
-                    reason: "provider must not be empty".to_owned(),
+                    capability: FreeText::new(name.clone()),
+                    reason: FreeText::new("provider must not be empty"),
                 });
             }
             if let Some(fp) = &config.fast_provider {
                 if fp.trim().is_empty() {
                     return Err(AgentProfilesError::InvalidCapability {
-                        capability: name.clone(),
-                        reason: "fast_provider must not be empty when specified".to_owned(),
+                        capability: FreeText::new(name.clone()),
+                        reason: FreeText::new("fast_provider must not be empty when specified"),
                     });
                 }
             }
             // Reject empty model/fast_model strings (must be non-empty when specified).
-            if config.model.as_deref().is_some_and(|s| s.trim().is_empty()) {
+            if config.model.as_ref().is_some_and(|model| model.as_str().trim().is_empty()) {
                 return Err(AgentProfilesError::InvalidCapability {
-                    capability: name.clone(),
-                    reason: "model must not be empty when specified".to_owned(),
+                    capability: FreeText::new(name.clone()),
+                    reason: FreeText::new("model must not be empty when specified"),
                 });
             }
             if config.fast_model.as_deref().is_some_and(|s| s.trim().is_empty()) {
                 return Err(AgentProfilesError::InvalidCapability {
-                    capability: name.clone(),
-                    reason: "fast_model must not be empty when specified".to_owned(),
+                    capability: FreeText::new(name.clone()),
+                    reason: FreeText::new("fast_model must not be empty when specified"),
                 });
             }
         }
@@ -219,13 +365,20 @@ impl AgentProfiles {
         let config = self.capabilities.get(capability)?;
         match round_type {
             RoundType::Final => Some(ResolvedExecution {
-                provider: config.provider.clone(),
-                model: config.model.clone(),
+                provider: config.provider.as_str().to_owned(),
+                model: config.model.as_ref().map(|model| model.as_str().to_owned()),
             }),
             RoundType::Fast => Some(ResolvedExecution {
-                provider: config.fast_provider.clone().unwrap_or_else(|| config.provider.clone()),
+                provider: config
+                    .fast_provider
+                    .clone()
+                    .unwrap_or_else(|| config.provider.as_str().to_owned()),
                 model: Some(
-                    config.fast_model.clone().or_else(|| config.model.clone()).unwrap_or_default(),
+                    config
+                        .fast_model
+                        .clone()
+                        .or_else(|| config.model.as_ref().map(|model| model.as_str().to_owned()))
+                        .unwrap_or_default(),
                 )
                 .filter(|s| !s.is_empty()),
             }),
@@ -234,14 +387,27 @@ impl AgentProfiles {
 
     /// Shortcut: resolve just the model name for a capability and round type.
     #[must_use]
-    pub fn resolve_model(&self, capability: &str, round_type: RoundType) -> Option<String> {
-        self.resolve_execution(capability, round_type).and_then(|r| r.model)
+    pub fn resolve_model(&self, capability: &str, round_type: RoundType) -> Option<&str> {
+        let config = self.capabilities.get(capability)?;
+        match round_type {
+            RoundType::Final => config.model.as_ref().map(ModelNameDto::as_str),
+            RoundType::Fast => config
+                .fast_model
+                .as_deref()
+                .or_else(|| config.model.as_ref().map(ModelNameDto::as_str)),
+        }
     }
 
     /// Shortcut: resolve just the provider name for a capability and round type.
     #[must_use]
-    pub fn resolve_provider(&self, capability: &str, round_type: RoundType) -> Option<String> {
-        self.resolve_execution(capability, round_type).map(|r| r.provider)
+    pub fn resolve_provider(&self, capability: &str, round_type: RoundType) -> Option<&str> {
+        let config = self.capabilities.get(capability)?;
+        Some(match round_type {
+            RoundType::Final => config.provider.as_str(),
+            RoundType::Fast => {
+                config.fast_provider.as_deref().unwrap_or_else(|| config.provider.as_str())
+            }
+        })
     }
 
     /// Returns the provider label (human-readable name) for a provider key.
@@ -268,13 +434,13 @@ impl CapabilityConfigDto {
     /// The provider name.
     #[must_use]
     pub fn provider(&self) -> &str {
-        &self.provider
+        self.provider.as_str()
     }
 
     /// The default model name, if set.
     #[must_use]
     pub fn model(&self) -> Option<&str> {
-        self.model.as_deref()
+        self.model.as_ref().map(ModelNameDto::as_str)
     }
 
     /// The fast-round provider override, if set.
@@ -312,6 +478,12 @@ impl CapabilityConfigDto {
     pub fn final_reasoning_effort(&self) -> Option<&str> {
         self.final_reasoning_effort.as_deref()
     }
+
+    /// The execution category declared for this capability.
+    #[must_use]
+    pub fn execution_mode(&self) -> ExecutionModeDto {
+        self.execution_mode
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -339,18 +511,54 @@ mod tests {
             "gemini": { "label": "Gemini CLI" }
         },
         "capabilities": {
-            "orchestrator": { "provider": "claude", "model": "claude-opus-4-7" },
-            "planner": { "provider": "claude", "model": "claude-opus-4-7" },
-            "reviewer": { "provider": "codex", "model": "gpt-5.4", "fast_model": "gpt-5.4-mini" },
-            "researcher": { "provider": "gemini" }
+            "orchestrator": { "provider": "claude", "model": "claude-opus-4-7", "execution_mode": "typed-pipeline" },
+            "planner": { "provider": "claude", "model": "claude-opus-4-7", "execution_mode": "typed-pipeline" },
+            "reviewer": { "provider": "codex", "model": "gpt-5.4", "fast_model": "gpt-5.4-mini", "execution_mode": "typed-pipeline" },
+            "researcher": { "provider": "gemini", "execution_mode": "typed-pipeline" }
         }
     }"#;
+
+    #[test]
+    fn test_agent_profiles_error_free_text_payloads_preserve_display() {
+        let io = AgentProfilesError::Io {
+            path: FreeText::new("agent-profiles.json"),
+            source: std::io::Error::other("read denied"),
+        };
+        assert_eq!(
+            io.to_string(),
+            "failed to read agent profiles at agent-profiles.json: read denied"
+        );
+
+        let symlink = AgentProfilesError::Symlink { path: FreeText::new("linked-profiles.json") };
+        assert_eq!(
+            symlink.to_string(),
+            "refusing to load agent profiles through a symlink: linked-profiles.json"
+        );
+
+        let outside_root = AgentProfilesError::PathOutsideTrustedRoot {
+            path: FreeText::new("/tmp/outside/agent-profiles.json"),
+            root: FreeText::new("/workspace"),
+        };
+        assert_eq!(
+            outside_root.to_string(),
+            "agent profiles path /tmp/outside/agent-profiles.json escapes trusted root /workspace"
+        );
+
+        let invalid_capability = AgentProfilesError::InvalidCapability {
+            capability: FreeText::new("reviewer"),
+            reason: FreeText::new("provider must not be empty"),
+        };
+        assert_eq!(
+            invalid_capability.to_string(),
+            "invalid capability 'reviewer': provider must not be empty"
+        );
+    }
 
     #[test]
     fn test_load_and_parse_valid_config() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), FULL_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
         assert_eq!(profiles.capabilities.len(), 4);
         assert_eq!(profiles.providers.len(), 3);
         assert_eq!(profiles.provider_label("claude"), Some("Claude Code"));
@@ -360,7 +568,7 @@ mod tests {
     fn test_resolve_final_returns_provider_and_model() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), FULL_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         let resolved = profiles.resolve_execution("orchestrator", RoundType::Final).unwrap();
         assert_eq!(resolved.provider, "claude");
@@ -371,7 +579,7 @@ mod tests {
     fn test_resolve_fast_with_fast_model_only() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), FULL_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         // reviewer has fast_model but no fast_provider → provider stays "codex"
         let resolved = profiles.resolve_execution("reviewer", RoundType::Fast).unwrap();
@@ -392,13 +600,14 @@ mod tests {
                     "provider": "claude",
                     "model": "claude-opus-4-7",
                     "fast_provider": "codex",
-                    "fast_model": "gpt-5.4-mini"
+                    "fast_model": "gpt-5.4-mini",
+                    "execution_mode": "typed-pipeline"
                 }
             }
         }"#;
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), json);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         let final_exec = profiles.resolve_execution("reviewer", RoundType::Final).unwrap();
         assert_eq!(final_exec.provider, "claude");
@@ -407,13 +616,18 @@ mod tests {
         let fast_exec = profiles.resolve_execution("reviewer", RoundType::Fast).unwrap();
         assert_eq!(fast_exec.provider, "codex");
         assert_eq!(fast_exec.model.as_deref(), Some("gpt-5.4-mini"));
+
+        let fast_model: Option<&str> = profiles.resolve_model("reviewer", RoundType::Fast);
+        let fast_provider: Option<&str> = profiles.resolve_provider("reviewer", RoundType::Fast);
+        assert_eq!(fast_model, Some("gpt-5.4-mini"));
+        assert_eq!(fast_provider, Some("codex"));
     }
 
     #[test]
     fn test_resolve_unknown_capability_returns_none() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), FULL_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         assert!(profiles.resolve_execution("nonexistent", RoundType::Final).is_none());
     }
@@ -422,15 +636,155 @@ mod tests {
     fn test_load_invalid_json_returns_parse_error() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), "not valid json");
-        let err = AgentProfiles::load(&path).unwrap_err();
+        let err = AgentProfiles::load(dir.path(), &path).unwrap_err();
         assert!(matches!(err, AgentProfilesError::Parse(_)));
     }
 
     #[test]
     fn test_load_missing_file_returns_io_error() {
-        let path = std::path::Path::new("/nonexistent/agent-profiles.json");
-        let err = AgentProfiles::load(path).unwrap_err();
+        let trusted_root = std::path::Path::new("/nonexistent");
+        let path = trusted_root.join("agent-profiles.json");
+        let err = AgentProfiles::load(trusted_root, &path).unwrap_err();
         assert!(matches!(err, AgentProfilesError::Io { .. }));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_load_symlinked_file_returns_symlink_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let target = write_json(dir.path(), FULL_CONFIG);
+        let link = dir.path().join("linked-agent-profiles.json");
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+
+        let err = AgentProfiles::load(dir.path(), &link).unwrap_err();
+
+        assert!(matches!(err, AgentProfilesError::Symlink { .. }));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_load_symlinked_config_parent_returns_symlink_error() {
+        let workspace = tempfile::tempdir().unwrap();
+        let repository = workspace.path().join("repository");
+        let external_config = repository.join("real-config");
+        std::fs::create_dir_all(&repository).unwrap();
+        std::fs::create_dir_all(&external_config).unwrap();
+        write_json(&external_config, FULL_CONFIG);
+        std::fs::create_dir_all(repository.join(".harness")).unwrap();
+        std::os::unix::fs::symlink(&external_config, repository.join(".harness/config")).unwrap();
+
+        let err = AgentProfiles::load(
+            &repository,
+            &repository.join(".harness/config/agent-profiles.json"),
+        )
+        .unwrap_err();
+
+        assert!(matches!(err, AgentProfilesError::Symlink { .. }));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_load_dot_laden_config_path_rejects_symlinked_config_parent() {
+        let workspace = tempfile::tempdir().unwrap();
+        let repository = workspace.path().join("repository");
+        let external_config = repository.join("real-config");
+        std::fs::create_dir_all(&repository).unwrap();
+        std::fs::create_dir_all(&external_config).unwrap();
+        write_json(&external_config, FULL_CONFIG);
+        std::fs::create_dir_all(repository.join(".harness")).unwrap();
+        std::os::unix::fs::symlink(&external_config, repository.join(".harness/config")).unwrap();
+        let path = repository.join(".harness/config/./agent-profiles.json");
+
+        let err = AgentProfiles::load(&repository, &path).unwrap_err();
+
+        assert!(matches!(err, AgentProfilesError::Symlink { .. }));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_load_symlinked_component_before_parent_is_rejected() {
+        let workspace = tempfile::tempdir().unwrap();
+        let repository = workspace.path().join("repository");
+        let config_dir = repository.join(".harness/config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        write_json(&config_dir, FULL_CONFIG);
+        let outside = workspace.path().join("outside");
+        std::fs::create_dir_all(&outside).unwrap();
+        std::os::unix::fs::symlink(&outside, repository.join("internal-link")).unwrap();
+        let path = repository.join("internal-link/../.harness/config/agent-profiles.json");
+
+        let err = AgentProfiles::load(&repository, &path).unwrap_err();
+
+        assert!(matches!(err, AgentProfilesError::Symlink { .. }));
+    }
+
+    #[test]
+    fn test_load_oversize_config_returns_io_error() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("agent-profiles.json");
+        std::fs::File::create(&path)
+            .unwrap()
+            .set_len(crate::capability_exec::MAX_CAPABILITY_EXEC_TEXT_BYTES + 1)
+            .unwrap();
+
+        let error = AgentProfiles::load(directory.path(), &path).unwrap_err();
+
+        assert!(matches!(
+            error,
+            AgentProfilesError::Io { source, .. }
+                if source.kind() == std::io::ErrorKind::InvalidData
+        ));
+    }
+
+    #[test]
+    fn test_load_parent_dir_within_trusted_root_uses_normalized_path() {
+        let workspace = tempfile::tempdir().unwrap();
+        let repository = workspace.path().join("repository");
+        let config_dir = repository.join(".harness/config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::create_dir_all(repository.join("apps/cli-composition")).unwrap();
+        write_json(&config_dir, FULL_CONFIG);
+        let path =
+            repository.join("apps/cli-composition/../../.harness/config/agent-profiles.json");
+
+        let profiles = AgentProfiles::load(&repository, &path).unwrap();
+
+        assert_eq!(profiles.capabilities.len(), 4);
+    }
+
+    #[test]
+    fn test_load_arbitrary_path_outside_independent_trusted_root_returns_path_outside_error() {
+        let workspace = tempfile::tempdir().unwrap();
+        let repository = workspace.path().join("repository");
+        std::fs::create_dir_all(&repository).unwrap();
+        let outside = workspace.path().join("outside");
+        std::fs::create_dir_all(&outside).unwrap();
+        write_json(&outside, FULL_CONFIG);
+        let path = outside.join("agent-profiles.json");
+
+        let err = AgentProfiles::load(&repository, &path).unwrap_err();
+
+        assert!(matches!(err, AgentProfilesError::PathOutsideTrustedRoot { .. }));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_load_accepts_workspace_root_reached_through_symlink() {
+        let workspace = tempfile::tempdir().unwrap();
+        let repository = workspace.path().join("repository");
+        let config_dir = repository.join(".harness/config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        write_json(&config_dir, FULL_CONFIG);
+        let workspace_link = workspace.path().join("workspace-link");
+        std::os::unix::fs::symlink(&repository, &workspace_link).unwrap();
+
+        let profiles = AgentProfiles::load(
+            &workspace_link,
+            &workspace_link.join(".harness/config/agent-profiles.json"),
+        )
+        .unwrap();
+
+        assert_eq!(profiles.capabilities.len(), 4);
     }
 
     #[test]
@@ -438,7 +792,7 @@ mod tests {
         // orchestrator has no fast_model or fast_provider → fallback to provider + model
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), FULL_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         let resolved = profiles.resolve_execution("orchestrator", RoundType::Fast).unwrap();
         assert_eq!(resolved.provider, "claude");
@@ -450,7 +804,7 @@ mod tests {
         // researcher has provider=gemini but no model
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), FULL_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         let resolved = profiles.resolve_execution("researcher", RoundType::Final).unwrap();
         assert_eq!(resolved.provider, "gemini");
@@ -466,7 +820,7 @@ mod tests {
         }"#;
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), json);
-        let err = AgentProfiles::load(&path).unwrap_err();
+        let err = AgentProfiles::load(dir.path(), &path).unwrap_err();
         assert!(
             matches!(err, AgentProfilesError::UnsupportedSchemaVersion { found: 2, expected: 1 }),
             "unexpected error variant: {err}"
@@ -474,54 +828,53 @@ mod tests {
     }
 
     #[test]
-    fn test_shortcut_resolve_model_and_provider() {
+    fn test_shortcut_resolution_fast_and_final_returns_borrowed_config_values() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), FULL_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
+        assert_eq!(profiles.resolve_model("reviewer", RoundType::Fast), Some("gpt-5.4-mini"));
         assert_eq!(
-            profiles.resolve_model("reviewer", RoundType::Fast).as_deref(),
-            Some("gpt-5.4-mini")
+            profiles.resolve_model("orchestrator", RoundType::Fast),
+            Some("claude-opus-4-7")
         );
-        assert_eq!(
-            profiles.resolve_provider("reviewer", RoundType::Final).as_deref(),
-            Some("codex")
-        );
+        assert_eq!(profiles.resolve_provider("reviewer", RoundType::Fast), Some("codex"));
+        assert_eq!(profiles.resolve_provider("reviewer", RoundType::Final), Some("codex"));
         assert!(profiles.resolve_model("researcher", RoundType::Final).is_none());
     }
 
     #[test]
-    fn test_load_empty_provider_returns_invalid_capability() {
+    fn test_load_empty_provider_returns_parse_error() {
         let json = r#"{
             "schema_version": 1,
             "providers": {},
             "capabilities": {
-                "reviewer": { "provider": "", "model": "gpt-5.4" }
+                "reviewer": { "provider": "", "model": "gpt-5.4", "execution_mode": "typed-pipeline" }
             }
         }"#;
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), json);
-        let err = AgentProfiles::load(&path).unwrap_err();
+        let err = AgentProfiles::load(dir.path(), &path).unwrap_err();
         assert!(
-            matches!(err, AgentProfilesError::InvalidCapability { .. }),
+            matches!(err, AgentProfilesError::Parse(ref error) if error.to_string().contains("provider name must not be empty")),
             "unexpected error: {err}"
         );
     }
 
     #[test]
-    fn test_load_empty_model_returns_invalid_capability() {
+    fn test_load_empty_model_returns_parse_error() {
         let json = r#"{
             "schema_version": 1,
             "providers": {},
             "capabilities": {
-                "reviewer": { "provider": "codex", "model": "" }
+                "reviewer": { "provider": "codex", "model": "", "execution_mode": "typed-pipeline" }
             }
         }"#;
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), json);
-        let err = AgentProfiles::load(&path).unwrap_err();
+        let err = AgentProfiles::load(dir.path(), &path).unwrap_err();
         assert!(
-            matches!(err, AgentProfilesError::InvalidCapability { .. }),
+            matches!(err, AgentProfilesError::Parse(ref error) if error.to_string().contains("model name must not be empty")),
             "unexpected error: {err}"
         );
     }
@@ -532,12 +885,12 @@ mod tests {
             "schema_version": 1,
             "providers": {},
             "capabilities": {
-                "reviewer": { "provider": "codex", "fast_model": " " }
+                "reviewer": { "provider": "codex", "fast_model": " ", "execution_mode": "typed-pipeline" }
             }
         }"#;
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), json);
-        let err = AgentProfiles::load(&path).unwrap_err();
+        let err = AgentProfiles::load(dir.path(), &path).unwrap_err();
         assert!(
             matches!(err, AgentProfilesError::InvalidCapability { .. }),
             "unexpected error: {err}"
@@ -556,7 +909,7 @@ mod tests {
         }"#;
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), json);
-        let err = AgentProfiles::load(&path).unwrap_err();
+        let err = AgentProfiles::load(dir.path(), &path).unwrap_err();
         assert!(
             matches!(err, AgentProfilesError::UnsupportedSchemaVersion { found: 99, .. }),
             "expected UnsupportedSchemaVersion, got: {err}"
@@ -569,12 +922,12 @@ mod tests {
             "schema_version": 1,
             "providers": {},
             "capabilities": {
-                "reviewer": { "provider": "codex", "fast_provider": " " }
+                "reviewer": { "provider": "codex", "fast_provider": " ", "execution_mode": "typed-pipeline" }
             }
         }"#;
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), json);
-        let err = AgentProfiles::load(&path).unwrap_err();
+        let err = AgentProfiles::load(dir.path(), &path).unwrap_err();
         assert!(
             matches!(err, AgentProfilesError::InvalidCapability { .. }),
             "unexpected error: {err}"
@@ -597,21 +950,24 @@ mod tests {
                 "provider": "codex",
                 "model": "gpt-5.5",
                 "fast_model": "gpt-5.4-mini",
-                "prompt_template_path": ".harness/prompts/reviewer.md"
+                "prompt_template_path": ".harness/prompts/reviewer.md",
+                "execution_mode": "typed-pipeline"
             },
             "ref-verifier-chain1": {
                 "provider": "claude",
                 "model": "claude-opus-4-8",
                 "fast_provider": "claude",
                 "fast_model": "claude-haiku-4-5",
-                "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md"
+                "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md",
+                "execution_mode": "typed-pipeline"
             },
             "ref-verifier-chain2": {
                 "provider": "claude",
                 "model": "claude-opus-4-8",
                 "fast_provider": "claude",
                 "fast_model": "claude-haiku-4-5",
-                "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md"
+                "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md",
+                "execution_mode": "typed-pipeline"
             }
         }
     }"#;
@@ -620,7 +976,7 @@ mod tests {
     fn test_load_ref_verifier_chain_capabilities_are_loaded() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
         assert!(profiles.resolve_capability("ref-verifier-chain1").is_some());
         assert!(profiles.resolve_capability("ref-verifier-chain2").is_some());
     }
@@ -629,7 +985,7 @@ mod tests {
     fn test_resolve_ref_verifier_chain1_fast_returns_fast_provider_and_fast_model() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         let fast = profiles.resolve_execution("ref-verifier-chain1", RoundType::Fast).unwrap();
         assert_eq!(fast.provider, "claude");
@@ -640,7 +996,7 @@ mod tests {
     fn test_resolve_ref_verifier_chain1_final_returns_provider_and_model() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         let final_exec =
             profiles.resolve_execution("ref-verifier-chain1", RoundType::Final).unwrap();
@@ -652,7 +1008,7 @@ mod tests {
     fn test_ref_verifier_chain_prompt_template_paths_are_independent() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         let chain1_path = profiles.resolve_prompt_template_path("ref-verifier-chain1").unwrap();
         let chain2_path = profiles.resolve_prompt_template_path("ref-verifier-chain2").unwrap();
@@ -666,7 +1022,7 @@ mod tests {
     fn test_resolve_prompt_template_path_returns_none_for_missing_capability() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), REF_VERIFIER_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         assert!(profiles.resolve_prompt_template_path("nonexistent").is_none());
     }
@@ -676,7 +1032,7 @@ mod tests {
         // orchestrator entry has no prompt_template_path field
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), FULL_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         assert!(profiles.resolve_prompt_template_path("orchestrator").is_none());
     }
@@ -692,13 +1048,14 @@ mod tests {
                 "ref-verifier-chain1": {
                     "provider": "claude",
                     "model": "claude-opus-4-8",
+                    "execution_mode": "typed-pipeline",
                     "timeout_seconds": 120
                 }
             }
         }"#;
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), json);
-        let err = AgentProfiles::load(&path).unwrap_err();
+        let err = AgentProfiles::load(dir.path(), &path).unwrap_err();
         assert!(
             err.to_string().contains("timeout_seconds"),
             "expected unknown-field rejection, got: {err}"
@@ -719,13 +1076,15 @@ mod tests {
                 "provider": "codex",
                 "model": "gpt-5.5",
                 "fast_provider": "codex",
-                "fast_model": "gpt-5.4-mini"
+                "fast_model": "gpt-5.4-mini",
+                "execution_mode": "typed-pipeline"
             },
             "waiver-verifier": {
                 "provider": "codex",
                 "model": "gpt-5.5",
                 "fast_provider": "codex",
-                "fast_model": "gpt-5.4-mini"
+                "fast_model": "gpt-5.4-mini",
+                "execution_mode": "typed-pipeline"
             }
         }
     }"#;
@@ -734,7 +1093,7 @@ mod tests {
     fn test_resolve_test_obligation_verifier_capabilities_fast_and_final() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), TEST_OBLIGATION_VERIFIER_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         for capability in ["obligation-fulfillment-verifier", "waiver-verifier"] {
             let fast = profiles.resolve_execution(capability, RoundType::Fast).unwrap();
@@ -754,7 +1113,8 @@ mod tests {
             .parent()
             .and_then(std::path::Path::parent)
             .expect("infrastructure crate must live under libs/infrastructure");
-        let profiles = AgentProfiles::load(&workspace_root.join(AGENT_PROFILES_PATH)).unwrap();
+        let profiles =
+            AgentProfiles::load(workspace_root, &workspace_root.join(AGENT_PROFILES_PATH)).unwrap();
 
         for capability in ["obligation-fulfillment-verifier", "waiver-verifier"] {
             assert!(profiles.resolve_capability(capability).is_some());
@@ -779,7 +1139,8 @@ mod tests {
                 "model": "gpt-5.5",
                 "fast_model": "gpt-5.4-mini",
                 "fast_reasoning_effort": "medium",
-                "final_reasoning_effort": "high"
+                "final_reasoning_effort": "high",
+                "execution_mode": "typed-pipeline"
             }
         }
     }"#;
@@ -788,7 +1149,7 @@ mod tests {
     fn test_dry_checker_fast_round_returns_fast_model() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), DRY_CHECKER_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         let fast = profiles.resolve_execution("dry-checker", RoundType::Fast).unwrap();
         assert_eq!(fast.provider, "codex");
@@ -799,7 +1160,7 @@ mod tests {
     fn test_dry_checker_final_round_returns_primary_model() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), DRY_CHECKER_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         let final_exec = profiles.resolve_execution("dry-checker", RoundType::Final).unwrap();
         assert_eq!(final_exec.provider, "codex");
@@ -813,7 +1174,7 @@ mod tests {
         // Verify that the new fast_reasoning_effort accessor returns the configured value.
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), DRY_CHECKER_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         let capability = profiles.resolve_capability("dry-checker").unwrap();
         assert_eq!(
@@ -828,7 +1189,7 @@ mod tests {
         // Verify that the new final_reasoning_effort accessor returns the configured value.
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), DRY_CHECKER_CONFIG);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         let capability = profiles.resolve_capability("dry-checker").unwrap();
         assert_eq!(
@@ -848,13 +1209,14 @@ mod tests {
                 "dry-checker": {
                     "provider": "codex",
                     "model": "gpt-5.5",
-                    "fast_model": "gpt-5.4-mini"
+                    "fast_model": "gpt-5.4-mini",
+                    "execution_mode": "typed-pipeline"
                 }
             }
         }"#;
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), json);
-        let profiles = AgentProfiles::load(&path).unwrap();
+        let profiles = AgentProfiles::load(dir.path(), &path).unwrap();
 
         let capability = profiles.resolve_capability("dry-checker").unwrap();
         assert!(

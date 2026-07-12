@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityCompositionRoot | composition_root | add | — | 🟡 | 🔵 |
+| CapabilityCompositionRoot | composition_root | add | — | 🔵 | 🔵 |
 

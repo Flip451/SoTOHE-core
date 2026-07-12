@@ -324,6 +324,78 @@
           "element_id": "IN-07"
         }
       ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::capability::execute",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::capability::execute"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::capability::execute",
+      "declaration_hash": "2dfab6ab05f95b8392cc11d7622d8c5983f325678da0550d97502cb448f8048d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::capability::execute_exec",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::capability::execute_exec"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::capability::execute_exec",
+      "declaration_hash": "22e16cbdcaf00503f652f84ba5a67a4be1973b2833ed0d4090f97ad7af9dfa9a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::capability::execute_with",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::capability::execute_with"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::capability::execute_with",
+      "declaration_hash": "2343e4f2c72c359db84ec6001af3582942d952e0a3a045216a72a5e4ff1fdb25",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      ]
     }
   ]
 }

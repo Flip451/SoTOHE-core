@@ -3,11 +3,83 @@
   "layer": "infrastructure",
   "entries": [
     {
-      "claim_hash": "1a271acd384b91a688daa72b1c50c1356e476bcf88f7a00c28cfc771e8283960",
+      "claim_hash": "e8eabb1253bfa6fd638f294e998b7074cb164ba8caccfa0cd87e3ebb30abe296",
       "evidence_hash": "055aa4529d888e2564f44e8c780bcd817139155198e6629f8a71425e03677ea1",
       "verdict": {
         "kind": "pass",
-        "citation": "dispatch 対象を profile の capability entry から解決し、`execution_mode: orchestrator-output` の entry だけを通す。"
+        "citation": "dispatch 対象を profile の capability entry から解決し、`execution_mode: orchestrator-output` の entry だけを通す。存在しない capability、`typed-pipeline`、execution_mode の欠如、または未知の execution_mode は subprocess を起動せず reject する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "AgentProfiles"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "dispatch 対象を profile の capability entry から解決し、`execution_mode: orchestrator-output` の entry だけを通す。存在しない capability、`typed-pipeline`、execution_mode の欠如、または未知の execution_mode は subprocess を起動せず reject する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e8eabb1253bfa6fd638f294e998b7074cb164ba8caccfa0cd87e3ebb30abe296",
+      "evidence_hash": "5d6294cb3b25fad21f56988379de9f88c3a7285807f23cb196ce848700031f0f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "必須引数、briefing、discipline template、profile entry、execution mode、provider、model、adapter definition、adapter preflight のいずれかが無効・欠如・不一致なら、in-host 委譲指示も subprocess 起動も行わず非成功で終了する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "AgentProfiles"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "dispatch は fail-closed とする。必須引数、briefing、discipline template、profile entry、execution mode、provider、model、adapter definition、adapter preflight のいずれかが無効・欠如・不一致なら、in-host 委譲指示も subprocess 起動も行わず非成功で終了する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e8eabb1253bfa6fd638f294e998b7074cb164ba8caccfa0cd87e3ebb30abe296",
+      "evidence_hash": "29e4186381e98767b8dea9585c3693ace8a9675a685cfc15a0f6b4d845694713",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 command の導入と `plan codex-local` の撤去によって、profile が routing する writer capability の正規 dispatch 経路が存在しない状態を作らない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "AgentProfiles"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "新 command の導入と `plan codex-local` の撤去によって、profile が routing する writer capability の正規 dispatch 経路が存在しない状態を作らない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "afa5f22da1838d75dd44feca7cb5358dbd9976164f708aa5317337849665434c",
+      "evidence_hash": "055aa4529d888e2564f44e8c780bcd817139155198e6629f8a71425e03677ea1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "dispatch 対象を profile の capability entry から解決し、`execution_mode: orchestrator-output` の entry だけを通す。存在しない capability、`typed-pipeline`、execution_mode の欠如、または未知の execution_mode は subprocess を起動せず reject する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -27,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "1a271acd384b91a688daa72b1c50c1356e476bcf88f7a00c28cfc771e8283960",
+      "claim_hash": "afa5f22da1838d75dd44feca7cb5358dbd9976164f708aa5317337849665434c",
       "evidence_hash": "0fd3869418db22a14ffdb93b7a193348d3ef3a1435647bab7ef36dc283bcd5ed",
       "verdict": {
         "kind": "pass",
@@ -47,6 +119,102 @@
           "section": "in_scope",
           "element_id": "IN-03",
           "text_label": "profile から provider と単一の model を解決し、claude と codex の provider arm だけを provider-generic な入口から dispatch する。未対応または未知の provider、model 欠如、または provider-native adapter 定義との model 不一致は dispatch 前に reject する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "afa5f22da1838d75dd44feca7cb5358dbd9976164f708aa5317337849665434c",
+      "evidence_hash": "5d6294cb3b25fad21f56988379de9f88c3a7285807f23cb196ce848700031f0f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "必須引数、briefing、discipline template、profile entry、execution mode、provider、model、adapter definition、adapter preflight のいずれかが無効・欠如・不一致なら、in-host 委譲指示も subprocess 起動も行わず非成功で終了する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "AgentProfilesCapabilityAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "dispatch は fail-closed とする。必須引数、briefing、discipline template、profile entry、execution mode、provider、model、adapter definition、adapter preflight のいずれかが無効・欠如・不一致なら、in-host 委譲指示も subprocess 起動も行わず非成功で終了する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "afa5f22da1838d75dd44feca7cb5358dbd9976164f708aa5317337849665434c",
+      "evidence_hash": "29e4186381e98767b8dea9585c3693ace8a9675a685cfc15a0f6b4d845694713",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 command の導入と `plan codex-local` の撤去によって、profile が routing する writer capability の正規 dispatch 経路が存在しない状態を作らない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "AgentProfilesCapabilityAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "新 command の導入と `plan codex-local` の撤去によって、profile が routing する writer capability の正規 dispatch 経路が存在しない状態を作らない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "112b4f86590e6dc7485d0fc7faeb80c4a1d7f6c2aede9bb1471bcd4f2ddc3a7f",
+      "evidence_hash": "055aa4529d888e2564f44e8c780bcd817139155198e6629f8a71425e03677ea1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "存在しない capability、`typed-pipeline`、execution_mode の欠如、または未知の execution_mode は subprocess を起動せず reject する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "AgentProfilesError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "dispatch 対象を profile の capability entry から解決し、`execution_mode: orchestrator-output` の entry だけを通す。存在しない capability、`typed-pipeline`、execution_mode の欠如、または未知の execution_mode は subprocess を起動せず reject する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "112b4f86590e6dc7485d0fc7faeb80c4a1d7f6c2aede9bb1471bcd4f2ddc3a7f",
+      "evidence_hash": "5d6294cb3b25fad21f56988379de9f88c3a7285807f23cb196ce848700031f0f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "いずれかが無効・欠如・不一致なら、in-host 委譲指示も subprocess 起動も行わず非成功で終了する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "AgentProfilesError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "dispatch は fail-closed とする。必須引数、briefing、discipline template、profile entry、execution mode、provider、model、adapter definition、adapter preflight のいずれかが無効・欠如・不一致なら、in-host 委譲指示も subprocess 起動も行わず非成功で終了する。"
         }
       }
     },

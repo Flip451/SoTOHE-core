@@ -10,6 +10,10 @@
           "name": "new",
           "params": [
             {
+              "name": "trusted_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
               "name": "path",
               "ty": "std::path::PathBuf"
             }
@@ -97,6 +101,7 @@
           "has_default_impl": false,
           "is_async": false,
           "name": "try_new",
+          "docs": "May produce only usecase::capability_exec::CapabilityInputValidationError::EmptyProviderName.",
           "params": [
             {
               "name": "value",
@@ -122,6 +127,7 @@
           "has_default_impl": false,
           "is_async": false,
           "name": "try_new",
+          "docs": "May produce only usecase::capability_exec::CapabilityInputValidationError::EmptyModelName.",
           "params": [
             {
               "name": "value",
@@ -145,6 +151,26 @@
   "layer": "infrastructure",
   "schema_version": 5,
   "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "AgentProfilesError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "AgentProfilesError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "AgentProfilesError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "AgentProfilesError",
+      "trait_ref": "core::convert::From<serde_json::Error>"
+    },
     {
       "for_type": "ExecutionModeDto",
       "trait_ref": "core::fmt::Debug"
@@ -263,10 +289,154 @@
     {
       "for_type": "ModelNameDto",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AgentProfiles",
+      "trait_ref": "core::fmt::Debug"
     }
   ],
   "traits": {},
   "types": {
+    "AgentProfiles": {
+      "action": "modify",
+      "docs": "Agent-profile configuration secondary adapter (IN-02, CN-01, CN-04).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+          {
+            "name": "trusted_root",
+            "ty": "&std::path::Path"
+          },
+          {
+            "name": "path",
+            "ty": "&std::path::Path"
+            }
+          ],
+          "returns": "Result<Self, AgentProfilesError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_capability",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&CapabilityConfigDto>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_execution",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&str"
+            },
+            {
+              "name": "round_type",
+              "ty": "RoundType"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<ResolvedExecution>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_model",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&str"
+            },
+            {
+              "name": "round_type",
+              "ty": "RoundType"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&str>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_provider",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&str"
+            },
+            {
+              "name": "round_type",
+              "ty": "RoundType"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&str>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provider_label",
+          "params": [
+            {
+              "name": "provider",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&str>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_prompt_template_path",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&str"
+            }
+        ],
+        "receiver": "&self",
+        "returns": "Option<std::path::PathBuf>"
+        }
+      ],
+      "module_path": "agent_profiles",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
     "AgentProfilesCapabilityAdapter": {
       "action": "add",
       "docs": null,
@@ -291,6 +461,124 @@
         },
         {
           "anchor": "IN-03",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "AgentProfilesError": {
+      "action": "modify",
+      "docs": "Agent-profile configuration error type (IN-02, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                },
+                {
+                  "name": "source",
+                  "ty": "std::io::Error"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Symlink",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "PathOutsideTrustedRoot",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                },
+                {
+                  "name": "root",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Parse",
+            "payload": {
+              "fields": [
+                "serde_json::Error"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "fields": [
+                {
+                  "name": "found",
+                  "ty": "u32"
+                },
+                {
+                  "name": "expected",
+                  "ty": "u32"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidCapability",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                },
+                {
+                  "name": "reason",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "agent_profiles",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "CN-01",
           "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json"
         }
       ]
@@ -538,7 +826,11 @@
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
-        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
       },
       "methods": [],
       "module_path": "agent_profiles",
@@ -562,7 +854,11 @@
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
-        "shape": { "kind": "tuple", "fields": [], "has_stripped_fields": true }
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
       },
       "methods": [],
       "module_path": "agent_profiles",

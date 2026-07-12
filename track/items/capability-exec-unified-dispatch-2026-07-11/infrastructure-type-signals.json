@@ -1,47 +1,59 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-12T00:18:22Z",
-  "declaration_hash": "ae589b38800016cb24b1abc4381e59a642a2e46f656db5b27cfb1e41fb5132ce",
+  "generated_at": "2026-07-12T10:25:45Z",
+  "declaration_hash": "f067c7b1d3f9f57c2f45020b13b88c41ab0bfe7f067694034df2afb68e4437d7",
   "signals": [
+    {
+      "type_name": "AgentProfiles",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "AgentProfilesCapabilityAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "CapabilityProfilePort"
       ]
     },
     {
+      "type_name": "AgentProfilesError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "CapabilityConfigDto",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "ClaudeCapabilityAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "CapabilityProviderPort"
       ]
     },
     {
       "type_name": "CodexCapabilityAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "CapabilityProviderPort"
       ]
     },
     {
       "type_name": "ExecutionModeDto",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -53,18 +65,18 @@
     {
       "type_name": "FsCapabilitySourceAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "CapabilitySourcePort"
       ]
     },
     {
       "type_name": "ModelNameDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -75,9 +87,9 @@
     {
       "type_name": "ProviderNameDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -88,9 +100,9 @@
     {
       "type_name": "SandboxMode",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -102,11 +114,8 @@
     {
       "type_name": "CodexPlannerAdapter",
       "kind_tag": "unknown",
-      "signal": "yellow",
-      "found_type": true,
-      "missing_items": [
-        "PlannerPort"
-      ]
+      "signal": "blue",
+      "found_type": false
     }
   ]
 }

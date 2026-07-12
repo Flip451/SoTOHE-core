@@ -536,7 +536,7 @@ pub(crate) fn load_agent_profiles_from_repo(
         })?
     };
     let profiles_path = repo.root().join(infrastructure::agent_profiles::AGENT_PROFILES_PATH);
-    infrastructure::agent_profiles::AgentProfiles::load(&profiles_path).map_err(|e| {
+    infrastructure::agent_profiles::AgentProfiles::load(repo.root(), &profiles_path).map_err(|e| {
         ReviewSharedError::Config(format!("[ERROR] failed to load agent-profiles.json: {e}"))
     })
 }

@@ -1,11 +1,21 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "ae589b38800016cb24b1abc4381e59a642a2e46f656db5b27cfb1e41fb5132ce",
+  "catalogue_declaration_hash": "f067c7b1d3f9f57c2f45020b13b88c41ab0bfe7f067694034df2afb68e4437d7",
   "signals": [
+    {
+      "type_name": "AgentProfiles",
+      "signal": "blue",
+      "entry_hash": "e8eabb1253bfa6fd638f294e998b7074cb164ba8caccfa0cd87e3ebb30abe296"
+    },
     {
       "type_name": "AgentProfilesCapabilityAdapter",
       "signal": "blue",
-      "entry_hash": "1a271acd384b91a688daa72b1c50c1356e476bcf88f7a00c28cfc771e8283960"
+      "entry_hash": "afa5f22da1838d75dd44feca7cb5358dbd9976164f708aa5317337849665434c"
+    },
+    {
+      "type_name": "AgentProfilesError",
+      "signal": "blue",
+      "entry_hash": "112b4f86590e6dc7485d0fc7faeb80c4a1d7f6c2aede9bb1471bcd4f2ddc3a7f"
     },
     {
       "type_name": "CapabilityConfigDto",

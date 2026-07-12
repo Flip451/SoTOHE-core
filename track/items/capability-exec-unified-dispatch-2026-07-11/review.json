@@ -1,6 +1,245 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80346e6779b334e25e7ef4c7b95c7932024dbfbb8e2506c39b6d7a3d3d4ed39d",
+          "at": "2026-07-12T06:43:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80346e6779b334e25e7ef4c7b95c7932024dbfbb8e2506c39b6d7a3d3d4ed39d",
+          "at": "2026-07-12T06:44:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf39bd7c7361e177108c6eb51aefedd553247137210c9cce0ef576531b398c7",
+          "at": "2026-07-12T08:32:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf39bd7c7361e177108c6eb51aefedd553247137210c9cce0ef576531b398c7",
+          "at": "2026-07-12T08:33:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf39bd7c7361e177108c6eb51aefedd553247137210c9cce0ef576531b398c7",
+          "at": "2026-07-12T08:33:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c5d99b8da4ed55abda41b6bf9e69205e531cbe907a3d10451801dfd6e318795",
+          "at": "2026-07-12T09:03:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c5d99b8da4ed55abda41b6bf9e69205e531cbe907a3d10451801dfd6e318795",
+          "at": "2026-07-12T09:05:47Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The shared discipline injected into workspace-write subprocesses forbids only `git add`, `git commit`, and `git push`; it omits other state-changing operations such as `git merge`, `git rebase`, and `git switch`, despite the guardrail's no-direct-git invariant and lack of hook coverage inside external subprocesses. Extend the prohibition to all guarded state-changing Git operations.",
+              "severity": "P1",
+              "file": ".harness/prompts/capability-exec-discipline.md",
+              "line": 5,
+              "category": "hook coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:fae67be039dedcd01e5bac9ec407f0898bb283a5e96d5367120ac200cdb0f7ff",
+          "at": "2026-07-12T06:48:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fae67be039dedcd01e5bac9ec407f0898bb283a5e96d5367120ac200cdb0f7ff",
+          "at": "2026-07-12T06:50:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "共通 discipline は `task-state transitions` を呼び出し元 orchestrator の専有としていますが、implementer の capability SSoT は `bin/sotp track transition` による状態遷移を implementer の許可された書き込みとして明記しています。この discipline は全 dispatch に注入されるため、implementer に相反する所有権指示が渡り、必要な遷移を拒否させる可能性があります。共通 discipline から task-state transition の所有権指定を削除するか、implementer SSoT と workflow の責任境界を一貫して変更してください。",
+              "severity": "P1",
+              "file": ".harness/prompts/capability-exec-discipline.md",
+              "line": 7,
+              "category": "responsibility-boundary cross"
+            }
+          ],
+          "hash": "rvw1:sha256:fae67be039dedcd01e5bac9ec407f0898bb283a5e96d5367120ac200cdb0f7ff",
+          "at": "2026-07-12T07:20:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`orchestrator-output` declares this capability dispatchable, but neither `.agents/skills/orchestrator/SKILL.md` nor `.claude/agents/orchestrator.md` exists. Under ADR D2/D10, `capability exec orchestrator` therefore passes execution-mode validation and then always fails adapter preflight. Since `orchestrator` is host-routing metadata rather than a dispatch target, classify it as `typed-pipeline` (fail-closed refusal), or add the required provider-native adapter surface.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 18,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:fae67be039dedcd01e5bac9ec407f0898bb283a5e96d5367120ac200cdb0f7ff",
+          "at": "2026-07-12T07:20:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`rollback-diagnoser` は専用の machine-consumed pipeline を持たず、ADR D1/D9/D10 では汎用 `capability exec` の対象として明記されています。しかし `typed-pipeline` に分類すると dispatch 前に必ず拒否され、既存の Codex skill を起動できません。`execution_mode` を `orchestrator-output` に変更してください。",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 43,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:fae67be039dedcd01e5bac9ec407f0898bb283a5e96d5367120ac200cdb0f7ff",
+          "at": "2026-07-12T07:21:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`rollback-diagnoser` is incorrectly marked `typed-pipeline`. Unlike reviewer/dry/verifier capabilities, it has no dedicated machine-consumed pipeline; ADR D2/D9 makes `capability exec` reject this mode, while D10 explicitly includes rollback-diagnoser among capabilities needing the generic dispatch path. Codex-routed `/track:diagnose` therefore remains undispatchable. Use `orchestrator-output`.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 43,
+              "category": "capability routing mismatch"
+            },
+            {
+              "message": "The canonical discipline omits the required rule that capability scratch/temporary files must live under `tmp/`. Workspace-write external subprocesses bypass Claude hooks and may write anywhere, as documented by `.claude/rules/10-guardrails.md` §Sandbox and Hook Coverage Warning; the current text only constrains one selective-staging file. Add an explicit general scratch-under-`tmp/` restriction.",
+              "severity": "P1",
+              "file": ".harness/prompts/capability-exec-discipline.md",
+              "line": 3,
+              "category": "hook coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:fae67be039dedcd01e5bac9ec407f0898bb283a5e96d5367120ac200cdb0f7ff",
+          "at": "2026-07-12T07:21:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6116876434e54aa1169763d4127431ff68606c74373c39acd7c2e2202c70a66",
+          "at": "2026-07-12T08:48:10Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ede1b72159ac1af4186d488aa5a9e0df80bd8540adbaaf1576eaafe0b5ebfb66",
+          "at": "2026-07-12T00:15:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ede1b72159ac1af4186d488aa5a9e0df80bd8540adbaaf1576eaafe0b5ebfb66",
+          "at": "2026-07-12T00:17:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7544c09b23b505f58d22a08e28aefdbde28785ae4b677a0c08ad704ef9ebcf7",
+          "at": "2026-07-12T08:36:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7544c09b23b505f58d22a08e28aefdbde28785ae4b677a0c08ad704ef9ebcf7",
+          "at": "2026-07-12T08:37:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68cd6ab586a21d216f76fe96061607729febdf39f1505cfb1d8d308f0bd805b4",
+          "at": "2026-07-12T09:10:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a67f1053f1fecaca7b2ad9bdbcd7fd6e90eef8d99f16e8ba9a9de0aa6a22b327",
+          "at": "2026-07-12T10:06:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a67f1053f1fecaca7b2ad9bdbcd7fd6e90eef8d99f16e8ba9a9de0aa6a22b327",
+          "at": "2026-07-12T10:08:36Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
+          "at": "2026-07-11T21:56:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 は briefing 規律を全 dispatch 経路で保証するとしているが、subprocess prompt に検証済み briefing と discipline 本文が含まれることを証明する AC がない。AC-03 は事前検証、AC-05 は in-host payload、AC-06 は native adapter の起動形式しか確認しないため、subprocess が両本文を欠落させても全 AC を満たせる。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+              "line": 34,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
+          "at": "2026-07-11T21:58:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0449a9512e852388b258d529303c95fbb6bff22f07b51d72522c021854c4b4c8",
+          "at": "2026-07-11T22:02:33Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -115,21 +354,63 @@
         }
       ]
     },
-    "other": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ede1b72159ac1af4186d488aa5a9e0df80bd8540adbaaf1576eaafe0b5ebfb66",
-          "at": "2026-07-12T00:15:18Z"
+          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
+          "at": "2026-07-12T06:38:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
+          "at": "2026-07-12T06:38:50Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ede1b72159ac1af4186d488aa5a9e0df80bd8540adbaaf1576eaafe0b5ebfb66",
-          "at": "2026-07-12T00:17:31Z"
+          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
+          "at": "2026-07-12T06:41:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:83eb6f07845d9bbd9040123940915e56425b8ef5a7099216516ecb4a58b0822c",
+          "at": "2026-07-12T06:41:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
+          "at": "2026-07-12T08:31:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
+          "at": "2026-07-12T08:38:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
+          "at": "2026-07-12T08:38:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e143f13035ef57edbc551411a7b8435cf9b5a520c410dd8636497b94fe6bceb",
+          "at": "2026-07-12T08:45:23Z"
         }
       ]
     },
@@ -261,39 +542,365 @@
           "findings": [],
           "hash": "rvw1:sha256:94c85f481b568e80b03255d91aeeba224a51ed6016e9d7a54651d6249c85a0a9",
           "at": "2026-07-12T00:10:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:186b72edda46ccac5e5bb2fb72a1ec0f6fb75526f1081034e56be334c557efbd",
+          "at": "2026-07-12T09:04:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:186b72edda46ccac5e5bb2fb72a1ec0f6fb75526f1081034e56be334c557efbd",
+          "at": "2026-07-12T09:04:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:186b72edda46ccac5e5bb2fb72a1ec0f6fb75526f1081034e56be334c557efbd",
+          "at": "2026-07-12T09:05:32Z"
         }
       ]
     },
-    "spec": {
+    "cli_driver": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
-          "at": "2026-07-11T21:56:27Z"
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:34:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:35:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:35:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:36:23Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "GO-02 は briefing 規律を全 dispatch 経路で保証するとしているが、subprocess prompt に検証済み briefing と discipline 本文が含まれることを証明する AC がない。AC-03 は事前検証、AC-05 は in-host payload、AC-06 は native adapter の起動形式しか確認しないため、subprocess が両本文を欠落させても全 AC を満たせる。",
+              "message": "`handle` が呼ぶ `into_request` で capability/host を再検証し、未検証の `PathBuf` も検証しているため、入力検証が parse boundary ではなく Driver の invoke フローに入り込んでいます。これは ADR D3/D4 および `hexagonal-architecture.md` の Usecase Layer Purity Rules に反する adapter 内 business logic です。各 Arg 型が検証済み usecase 型を保持し、briefing path にも `FromStr` で検証する型を導入して、`handle` 内の変換を infallible にしてください。",
               "severity": "P1",
-              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
-              "line": 34,
-              "category": "missing AC coverage for a stated goal"
+              "file": "apps/cli-driver/src/capability.rs",
+              "line": 78,
+              "category": "business logic in adapter"
             }
           ],
-          "hash": "rvw1:sha256:a4a205be05f82af086af991f4073ad866effab5cefb4fd1cb638da769d8f4498",
-          "at": "2026-07-11T21:58:04Z"
+          "hash": "rvw1:sha256:8b893fa221ad56cd3f630e0e57785aa0002aa1179cfe51738e9352b15c8a26c2",
+          "at": "2026-07-12T06:37:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c8c02f1681fac6ab9df2047ce80a59c37a96f7f4c5f5950bffd3f6527cdcc78",
+          "at": "2026-07-12T07:16:19Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0449a9512e852388b258d529303c95fbb6bff22f07b51d72522c021854c4b4c8",
-          "at": "2026-07-11T22:02:33Z"
+          "hash": "rvw1:sha256:4c8c02f1681fac6ab9df2047ce80a59c37a96f7f4c5f5950bffd3f6527cdcc78",
+          "at": "2026-07-12T07:18:11Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityFilePath` accepts absolute and `..` paths, and `absolute_path` joins them without containment verification, allowing briefing reads outside `repo_root`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/source.rs",
+              "line": 25,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "`metadata` and `read_to_string` follow symlinks, so a briefing or discipline path can resolve to an external file without boundary rejection.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/source.rs",
+              "line": 34,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The capability name is interpolated into the agent path without verifying the resulting path remains under `repo_root`; `CapabilityName` only rejects empty values, so traversal components can escape the trusted root.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/claude.rs",
+              "line": 46,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The capability name is joined into the skill path without trusted-root containment verification, allowing a traversal-valued capability name to read outside `repo_root`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/codex.rs",
+              "line": 74,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The shared provider-definition loader uses `read_to_string` without rejecting symlinks, so Claude agent and Codex skill definitions can be loaded through symlinked files or ancestors.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 65,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`execution_mode` is contractually required, but `#[serde(default = \"default_execution_mode\")]` silently converts an omitted field into `typed-pipeline` instead of failing configuration parsing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 132,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "The agent-profiles config loader reads the configured file directly with `read_to_string` and does not reject a symlinked config path, unlike the repository's real-file boundary convention.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 265,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:f9c733e35725018325af073b93deae0394e5678d9da4ad99b3171513931a894d",
+          "at": "2026-07-12T03:00:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Front-matter extraction matches keys by trimmed text without parsing YAML structure. Indented/nested declarations such as `metadata:\\n  sandbox: workspace-write` are treated as top-level and can enable `--sandbox workspace-write`; similarly nested `model`/`tools` can bypass Claude preflight. Malformed or structurally invalid provider configuration must fail closed.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 95,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "The symlink guard uses a lexically derived trusted root. A path such as `.../.harness/config/./agent-profiles.json` makes the derived root end in `config/.`, so `reject_symlinks_below` stops before checking the actual `config` ancestor; a symlinked config directory can therefore be followed despite the boundary check.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 285,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:54687dea95d56cb9d0fefa18fb5ba6aa7f5d8f2283899d78d7b29450b95ab558",
+          "at": "2026-07-12T04:30:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`normalize_agent_profiles_path` collapses `link/..` before `reject_symlinks_below`; a path such as `<root>/internal-link/../.harness/config/agent-profiles.json` bypasses symlink rejection. Preserve components for the symlink walk or reject parent traversal before normalization.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 428,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`read_to_string` loads the agent profile without any size limit, allowing a trusted-root file to exhaust memory before JSON parsing. Enforce a bounded read and fail closed when the limit is exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 294,
+              "category": "unbounded read"
+            },
+            {
+              "message": "`read_utf8_file` unconditionally uses unbounded `read_to_string` for Claude/Codex provider definitions. A large repository-controlled definition can cause memory exhaustion; add a maximum byte limit before reading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 84,
+              "category": "unbounded read"
+            },
+            {
+              "message": "Capability briefing and discipline files are read with unbounded `read_to_string`, so a large repository file can exhaust adapter memory. Enforce a bounded read and return a typed source-validation error when exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/source.rs",
+              "line": 80,
+              "category": "unbounded read"
+            }
+          ],
+          "hash": "rvw1:sha256:9f05e848b57f731ac5b3ed8e298d85024fe87d5d99ebcfe834fa0d44701166ea",
+          "at": "2026-07-12T05:00:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd407295994c4c69b5b6a3356d9e511a0133da8108ff8115985f626a0c2fb37e",
+          "at": "2026-07-12T05:22:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AgentProfiles::load` derives `trusted_root` from the path being validated. When the path lacks `.harness/config`, `agent_profiles_parent_root` simply treats its parent as trusted; an arbitrary path therefore authorizes its own location and the containment check cannot reject it. Paths containing an earlier `.harness/config` segment can similarly select an overly broad root. CN-04 requires the trusted workspace root to be supplied independently (as in `is_safe_briefing_path`), then canonical containment and symlink rejection performed against it.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/agent_profiles.rs",
+              "line": 273,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:cd407295994c4c69b5b6a3356d9e511a0133da8108ff8115985f626a0c2fb37e",
+          "at": "2026-07-12T05:25:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Cross-provider Claude dispatch omits the profile model: `claude` is invoked without `--model <request.profile.model>`, so the configured model is ignored.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/claude.rs",
+              "line": 85,
+              "category": "process-invocation-hygiene"
+            }
+          ],
+          "hash": "rvw1:sha256:6f960b3bb477862ce234144b418c902443ae5f430666dd44e5bf6e773079e80d",
+          "at": "2026-07-12T06:07:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2cdc82e60657e5081378356304c128a03bc711099fa85e4b99e0eac810eb2f7",
+          "at": "2026-07-12T06:23:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2cdc82e60657e5081378356304c128a03bc711099fa85e4b99e0eac810eb2f7",
+          "at": "2026-07-12T06:26:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:341330d8663b6a4a3e39e03724db4a5ec227db8464f9e91edf1cc87de68f385b",
+          "at": "2026-07-12T08:34:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_provider_process` trusts `runtime_dir` and creates the log through it without canonical-containment or symlink checks. In normal wiring this is under the repository, so a checked-out symlink at `tmp` or `tmp/capability-runtime` can redirect `File::create` outside the trusted root and create/truncate an external file. Thread the independent repository root into this boundary and apply the existing fail-closed path guard before writing.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 279,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The bounded reader opens the path before verifying that it is a regular file. A FIFO placed at `agent-profiles.json`, `SKILL.md`, or an agent-definition path causes `File::open`/`read_to_string` to block indefinitely; `take` bounds bytes but not waiting. Reject non-regular files with `symlink_metadata` before opening, as the source adapter already does.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 78,
+              "category": "unbounded I/O path"
+            },
+            {
+              "message": "Provider execution uses blocking `Command::status` with no timeout or process-tree termination, while stderr is written to an unbounded log. A hung or noisy provider can therefore stall `capability exec` indefinitely and exhaust disk. Add bounded spawn/poll/timeout/termination plumbing; ADR D8 explicitly states that the common replacement path retains timeout handling.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/mod.rs",
+              "line": 302,
+              "category": "unbounded I/O path"
+            }
+          ],
+          "hash": "rvw1:sha256:c89e5c63df35fb85187fe017d83d5a5b4952f047ac06ec6e7fec357008c5e93e",
+          "at": "2026-07-12T09:09:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
+          "at": "2026-07-12T09:23:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
+          "at": "2026-07-12T09:23:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
+          "at": "2026-07-12T09:23:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ad1b66876974648d761a5751cbe2c429c9bcc0193c551967908fffe3d99204b",
+          "at": "2026-07-12T09:24:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
+          "at": "2026-07-12T10:09:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
+          "at": "2026-07-12T10:10:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
+          "at": "2026-07-12T10:14:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "If `Child::try_wait` returns an error, `?` immediately exits the polling loop without terminating or reaping the provider process. The timeout is then abandoned, while the child and stderr-drain thread may continue indefinitely. Terminate/reap the process tree before propagating poll errors so every spawned-process path remains bounded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/process.rs",
+              "line": 378,
+              "category": "missing error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:ace626d2a2042c96b830e7e3ae4fe944c925f789c9b63d6fea5c9777ac13d410",
+          "at": "2026-07-12T10:16:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9173178ec1fe86b289c556166f9bfc59ffebf0f56cbf8b0ea9d82adb3d249fc1",
+          "at": "2026-07-12T10:23:31Z"
         }
       ]
     },
@@ -312,6 +919,34 @@
           "findings": [],
           "hash": "rvw1:sha256:f9402f549356acdb25d90df0acdb50f49d3e02200a8243f9381337505da9c077",
           "at": "2026-07-12T00:05:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5631660c95330d3d727e0c8655c2b9fe1ce24f00a16e2c900732d21bdd154472",
+          "at": "2026-07-12T06:29:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5631660c95330d3d727e0c8655c2b9fe1ce24f00a16e2c900732d21bdd154472",
+          "at": "2026-07-12T06:31:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:755057a38213543e8fc398bb0a8d146398ab821f82d0e774f430bba4bc01faaa",
+          "at": "2026-07-12T08:17:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:755057a38213543e8fc398bb0a8d146398ab821f82d0e774f430bba4bc01faaa",
+          "at": "2026-07-12T08:19:06Z"
         }
       ]
     },
@@ -458,6 +1093,123 @@
           "findings": [],
           "hash": "rvw1:sha256:19eca2d6e54c2cdf8c6b4515f47c080dd48d035a6db3bfe664bf2d9d9a1aeae5",
           "at": "2026-07-12T00:08:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `AgentProfiles` entry's `docs` field restates the trusted-root validation and adapter conversion behavior instead of only citing the upstream anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 301,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `AgentProfilesError` entry's `docs` field restates fail-closed security behavior and payload rationale instead of only citing the upstream anchors.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 476,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `CapabilityFilePath` entry's `docs` field restates the upstream path-validation contract instead of only citing its anchor.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 985,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:8ab6517abb1519f989c2b2e5b4425918cb81a5838bcd2e15b5f008b7ecb5869d",
+          "at": "2026-07-12T06:51:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityInputValidationError::EmptyCapabilityName` は構築経路のない dead vocabulary です。catalogue 上の `CapabilityName` は既存型への `reference` であり、その `try_new` は `domain::ValidationError` を返します。また、同 enum を返す新規コンストラクタは provider/model/path/content 用だけです。この variant を削除するか、実際の capability-name 検証境界で構築されるエラー型へ契約を統一してください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 1011,
+              "category": "unconstructible error variant"
+            }
+          ],
+          "hash": "rvw1:sha256:293c1bdc62771cc19da216453592ab74641cdf2a69c4303c774bdb3736ccfff6",
+          "at": "2026-07-12T07:20:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:293c1bdc62771cc19da216453592ab74641cdf2a69c4303c774bdb3736ccfff6",
+          "at": "2026-07-12T07:21:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::AgentProfiles::resolve_model` and `resolve_provider` return owned `Option<String>` despite being read-only lookups over `&self`; this forces cloning/allocation where borrowed `Option<&str>` (or an equivalent borrowed result) would suffice. The catalogue does not justify the ownership boundary.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 373,
+              "category": "ownership signature smell"
+            }
+          ],
+          "hash": "rvw1:sha256:053370a526954072f0d69ea7bfdd2eb351a3a34cdf524f75b059923ac873278c",
+          "at": "2026-07-12T08:34:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05d15a42a3621f3db38671b46ccf980416dbc5781d63b7503f265961f4a6201c",
+          "at": "2026-07-12T09:08:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::capability_exec::{ProviderName, ModelName, CapabilityFilePath, BriefingText, DisciplineText}::try_new` all return the shared `CapabilityInputValidationError`, but each can produce only a small subset of its five variants, and the catalogue methods neither document those subsets nor justify the broad error type. For example, `ProviderName::try_new` can only produce `EmptyProviderName`, while callers must accept file-path and content variants that are structurally impossible. Declare precise errors or document each method's producible subset.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+              "line": 17,
+              "category": "API shape / per-method error imprecision"
+            },
+            {
+              "message": "`infrastructure::agent_profiles::{ProviderNameDto, ModelNameDto}::try_new` expose the full usecase `CapabilityInputValidationError`, although the wrappers can only propagate `EmptyProviderName` and `EmptyModelName`, respectively. Their catalogue declarations provide no producible-subset documentation, leaving adapter callers with several impossible variants. Use precise errors or document the subset on each method.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+              "line": 110,
+              "category": "API shape / per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:05d15a42a3621f3db38671b46ccf980416dbc5781d63b7503f265961f4a6201c",
+          "at": "2026-07-12T09:15:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::CliCommand` の `docs` が、IN-01/IN-08 の変更内容（旧 planner command の撤去と generic capability dispatch への置換）をそのまま再記述しています。型固有の事実だけを残し、上流の振る舞いはアンカー参照のみにしてください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+              "line": 218,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:84b4145845addeab48e9a533f7cf893f79c799d7d15ee2a364587cc018323a70",
+          "at": "2026-07-12T09:33:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c6d4c4b0a32b3a4e9d5b55aad70e5764184ca8817f91134fb9f9324ca3d7e40",
+          "at": "2026-07-12T09:44:35Z"
         }
       ]
     }

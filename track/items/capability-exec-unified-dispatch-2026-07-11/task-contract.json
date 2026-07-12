@@ -32,7 +32,9 @@
     ],
     "T003": [],
     "T004": [
+      {"layer": "infrastructure", "entry_key": "AgentProfiles"},
       {"layer": "infrastructure", "entry_key": "AgentProfilesCapabilityAdapter"},
+      {"layer": "infrastructure", "entry_key": "AgentProfilesError"},
       {"layer": "infrastructure", "entry_key": "CapabilityConfigDto"},
       {"layer": "infrastructure", "entry_key": "ExecutionModeDto"},
       {"layer": "infrastructure", "entry_key": "FsCapabilitySourceAdapter"},
@@ -48,6 +50,7 @@
     "T006": [
       {"layer": "cli_driver", "entry_key": "CapabilityDriver"},
       {"layer": "cli_driver", "entry_key": "CapabilityExecDriverInput"},
+      {"layer": "cli_driver", "entry_key": "CapabilityFilePathArg"},
       {"layer": "cli_driver", "entry_key": "CapabilityNameArg"},
       {"layer": "cli_driver", "entry_key": "PlanDriver"},
       {"layer": "cli_driver", "entry_key": "PlanInput"},
@@ -56,6 +59,14 @@
     "T007": [
       {"layer": "cli", "entry_key": "CapabilityCommand"},
       {"layer": "cli", "entry_key": "CapabilityExecArgs"},
+      {"layer": "cli", "entry_key": "CliCommand"},
+      {"layer": "cli", "entry_key": "cli::commands::capability::execute"},
+      {"layer": "cli", "entry_key": "cli::commands::capability::execute_exec"},
+      {"layer": "cli", "entry_key": "cli::commands::capability::execute_with"},
+      {"layer": "cli", "entry_key": "cli::commands::plan::codex_local::execute_codex_local"},
+      {"layer": "cli", "entry_key": "cli::commands::plan::codex_local::plan_input_from_args"},
+      {"layer": "cli", "entry_key": "cli::commands::plan::codex_local::run_execute_codex_local"},
+      {"layer": "cli", "entry_key": "cli::commands::plan::execute"},
       {"layer": "cli", "entry_key": "PlanCodexLocalArgs"},
       {"layer": "cli", "entry_key": "PlanCommand"}
     ],
