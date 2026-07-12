@@ -13,7 +13,7 @@ T007: add the CLI command surface and remove plan codex-local parsing.
 T008: wire composition, remove the legacy root, rebuild bin/sotp, and exercise end-to-end behavior.
 T009: retarget live operational references after the new route is available.
 
-## Tasks (8/9 resolved)
+## Tasks (9/9 resolved)
 
 ### S1 — Usecase: typed generic dispatch contract and orchestration
 
@@ -43,4 +43,4 @@ T009: retarget live operational references after the new route is available.
 
 > Run T009 after T008.
 
-- [~] **T009**: Live policy and workflow reference migration — retarget D8 reference surfaces in Claude rules, track commands, settings hook allowlist text, Codex rules, and Codex-system guidance from plan codex-local to the briefing-file route. Add a dead-reference regression check and matching test-obligation bindings (IN-08, CN-04, AC-07).
+- [x] **T009**: Live policy and workflow reference migration — retarget D8 reference surfaces in Claude rules, track commands, settings hook allowlist text, Codex rules, and Codex-system guidance from plan codex-local to the briefing-file route. Add a dead-reference regression check and matching test-obligation bindings (IN-08, CN-04, AC-07). (`e386f30e9dbf48645eb1f899ce41a7769803d338`)

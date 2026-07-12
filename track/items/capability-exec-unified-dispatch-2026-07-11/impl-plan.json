@@ -52,7 +52,8 @@
     {
       "id": "T009",
       "description": "Live policy and workflow reference migration — retarget D8 reference surfaces in Claude rules, track commands, settings hook allowlist text, Codex rules, and Codex-system guidance from plan codex-local to the briefing-file route. Add a dead-reference regression check and matching test-obligation bindings (IN-08, CN-04, AC-07).",
-      "status": "in_progress"
+      "status": "done",
+      "commit_hash": "e386f30e9dbf48645eb1f899ce41a7769803d338"
     }
   ],
   "plan": {
