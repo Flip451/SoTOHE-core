@@ -18,7 +18,7 @@ prefix_rule(pattern=["cargo", "make", "track-local-review-fix"], decision="allow
 prefix_rule(pattern=["cargo", "make", "track-local-review"], decision="allow")
 prefix_rule(pattern=["cargo", "make", "track-local-dry-fix"], decision="allow")
 prefix_rule(pattern=["bin/sotp", "ref-verify", "run"], decision="allow")
-prefix_rule(pattern=["bin/sotp", "plan", "codex-local"], decision="allow")
+prefix_rule(pattern=["bin/sotp", "capability", "exec"], decision="allow")
 prefix_rule(pattern=["bin/sotp", "review", "local"], decision="allow")
 prefix_rule(pattern=["git", "status"], decision="allow")
 prefix_rule(pattern=["git", "diff"], decision="allow")

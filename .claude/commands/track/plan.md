@@ -22,10 +22,10 @@ User invokes this command as `/track:plan`. `$ARGUMENTS`:
 
 | Phase | Capability | Claude path | Codex path |
 |---|---|---|---|
-| 1 | spec-designer | Agent tool (`subagent_type: "spec-designer"`, `run_in_background: true`) | `bin/sotp plan codex-local --model {model} --briefing-file tmp/spec-designer-briefing.md` |
-| 2 | type-designer | Agent tool (`subagent_type: "type-designer"`, `run_in_background: true`) | — |
-| 3 | impl-planner | Agent tool (`subagent_type: "impl-planner"`, `run_in_background: true`) | `bin/sotp plan codex-local --model {model} --briefing-file tmp/impl-planner-briefing.md` |
-| B&F | adr-editor | Agent tool (`subagent_type: "adr-editor"`, `run_in_background: true`) | — |
+| 1 | spec-designer | Agent tool (`subagent_type: "spec-designer"`, `run_in_background: true`) | `bin/sotp capability exec spec-designer --host claude --briefing-file tmp/spec-designer-briefing.md` |
+| 2 | type-designer | Agent tool (`subagent_type: "type-designer"`, `run_in_background: true`) | `bin/sotp capability exec type-designer --host claude --briefing-file tmp/type-designer-briefing.md` |
+| 3 | impl-planner | Agent tool (`subagent_type: "impl-planner"`, `run_in_background: true`) | `bin/sotp capability exec impl-planner --host claude --briefing-file tmp/impl-planner-briefing.md` |
+| B&F | adr-editor | Agent tool (`subagent_type: "adr-editor"`, `run_in_background: true`) | `bin/sotp capability exec adr-editor --host claude --briefing-file tmp/adr-editor-briefing.md` |
 
 - **Semantic review check**: `bin/sotp ref-verify run`
 

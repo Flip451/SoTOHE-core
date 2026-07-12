@@ -13,7 +13,7 @@ User invokes this command as `/track:impl-plan`. No arguments.
 Provider routing from `.harness/config/agent-profiles.json` (`capabilities.impl-planner.provider`):
 
 - **Claude (default)**: Agent tool (`subagent_type: "impl-planner"`, `run_in_background: true`). Briefing must include: track id, paths to `spec.json` and each `<layer>-types.json`, paths to related ADR(s) and conventions.
-- **Codex**: `bin/sotp plan codex-local --model {model} --briefing-file tmp/impl-planner-briefing.md`
+- **Codex**: `bin/sotp capability exec impl-planner --host claude --briefing-file tmp/impl-planner-briefing.md`
 
 The subagent owns: writing `impl-plan.json` and `task-coverage.json`, and evaluating the task-coverage binary gate (OK / ERROR). No direct CLI calls from this adapter body (Claude path).
 

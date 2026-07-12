@@ -10,42 +10,49 @@
     {
       "id": "T002",
       "description": "Usecase capability_exec orchestration — implement the T002 task-contract catalogue entries and remove the obsolete planner usecase stack. Add mock-port tests and matching test-obligation bindings (GO-01, GO-02, IN-01 through IN-09, CN-01 through CN-04, OUT-01 through OUT-03, AC-01 through AC-08).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "9ae323ddb2dc97ffa9ef8551eba84a92814bc71c"
     },
     {
       "id": "T003",
       "description": "Runtime dispatch configuration and agent-definition surfaces — update agent-profiles, the capability-exec discipline template, Codex skills, and Claude agents, including the implementer and researcher definition surfaces. Add fixture or conformance tests and matching test-obligation bindings (IN-02, IN-03, IN-04, IN-05, IN-07, CN-01, CN-02, CN-03, OUT-04, AC-04, AC-09).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "9ae323ddb2dc97ffa9ef8551eba84a92814bc71c"
     },
     {
       "id": "T004",
       "description": "Infrastructure profile and source adapters — implement the T004 task-contract catalogue entries. Add adapter tests and matching test-obligation bindings (IN-02, IN-03, IN-05, CN-01, CN-02, CN-03, AC-01, AC-02, AC-03).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "9ae323ddb2dc97ffa9ef8551eba84a92814bc71c"
     },
     {
       "id": "T005",
       "description": "Infrastructure provider adapters — implement the T005 task-contract catalogue entries and delete CodexPlannerAdapter. Add process-boundary tests and matching test-obligation bindings (IN-03, IN-04, IN-05, IN-06, IN-07, IN-08, CN-01, CN-02, CN-03, CN-04, OUT-02, OUT-04, AC-02, AC-04 through AC-07, AC-09).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "9ae323ddb2dc97ffa9ef8551eba84a92814bc71c"
     },
     {
       "id": "T006",
       "description": "CLI-driver capability boundary — implement the T006 task-contract catalogue entries and remove PlanDriver and PlanInput. Add driver tests and matching test-obligation bindings (IN-01, IN-06, IN-08, IN-09, CN-01, OUT-03, OUT-04, AC-01 through AC-03, AC-05, AC-07).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "9ae323ddb2dc97ffa9ef8551eba84a92814bc71c"
     },
     {
       "id": "T007",
       "description": "CLI primary adapter — implement the T007 task-contract catalogue entries and remove PlanCommand and PlanCodexLocalArgs. Add CLI-level tests and matching test-obligation bindings (IN-01, IN-06, IN-08, CN-01, OUT-03, OUT-04, AC-01, AC-03, AC-05, AC-07).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "9ae323ddb2dc97ffa9ef8551eba84a92814bc71c"
     },
     {
       "id": "T008",
       "description": "CLI composition and executable integration — implement the T008 task-contract catalogue entries and remove PlanCompositionRoot. Rebuild with cargo make build-sotp before binary-facing checks; add end-to-end fixtures and matching test-obligation bindings (GO-01, GO-02, IN-01 through IN-09, CN-01 through CN-04, OUT-01 through OUT-04, AC-01 through AC-09).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "9ae323ddb2dc97ffa9ef8551eba84a92814bc71c"
     },
     {
       "id": "T009",
       "description": "Live policy and workflow reference migration — retarget D8 reference surfaces in Claude rules, track commands, settings hook allowlist text, Codex rules, and Codex-system guidance from plan codex-local to the briefing-file route. Add a dead-reference regression check and matching test-obligation bindings (IN-08, CN-04, AC-07).",
-      "status": "todo"
+      "status": "in_progress"
     }
   ],
   "plan": {

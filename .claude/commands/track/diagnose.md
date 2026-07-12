@@ -19,12 +19,11 @@ User (or the orchestrator's main loop) invokes this command as `/track:diagnose`
   - **provider: claude** — invoke the Claude subagent via the Agent tool with
     `subagent_type: "rollback-diagnoser"`. The subagent reads the operational SSoT
     (`.harness/capabilities/rollback-diagnoser.md`) and executes the routing judgment.
-  - **provider: codex** — invoke the Codex specialist agent
-    (`.codex/agents/rollback-diagnoser.toml`) through a repo-owned wrapper that forces a
-    read-only sandbox. If a direct CLI fallback is unavoidable, it must use
-    `codex exec --sandbox read-only`; never use `--full-auto`, `--sandbox workspace-write`, or
-    any invocation path that allows writes for this diagnose-only capability. The codex skill
-    (`.agents/skills/rollback-diagnoser/SKILL.md`) reads the same operational SSoT.
+  - **provider: codex** — write the diagnostic briefing first, then run
+    `bin/sotp capability exec rollback-diagnoser --host claude --briefing-file <path>`. The
+    dispatcher resolves the profile model and validates the Codex skill's declared read-only
+    sandbox before invoking it. The codex skill (`.agents/skills/rollback-diagnoser/SKILL.md`)
+    reads the same operational SSoT.
 - This command performs no writes: no SoT artifact edits, no staging/commits, no writer
   subagent invocation, no mutating `bin/sotp` subcommands (see the workflow SSoT's
   Constraints section).
@@ -50,5 +49,4 @@ suggested target if it judges `reason` insufficiently convincing.
 - `.harness/capabilities/rollback-diagnoser.md` — capability operational contract
 - `.claude/agents/rollback-diagnoser.md` — Claude subagent wrapper
 - `.agents/skills/rollback-diagnoser/SKILL.md` — Codex skill wrapper
-- `.codex/agents/rollback-diagnoser.toml` — Codex agent TOML
 - `.harness/config/agent-profiles.json` — `capabilities.rollback-diagnoser` provider routing

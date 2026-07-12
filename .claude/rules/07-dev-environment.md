@@ -91,7 +91,7 @@ bin/sotp conventions verify-index
 bin/sotp pr status <pr>
 bin/sotp pr wait-and-merge <pr>
 bin/sotp pr ensure-pr
-bin/sotp plan codex-local --model <model> --briefing-file tmp/planner-runtime/briefing.md
+bin/sotp capability exec <capability> --host <provider> --briefing-file tmp/capability-runtime/briefing.md
 ```
 
 ### `bin/sotp` バイナリ管理
