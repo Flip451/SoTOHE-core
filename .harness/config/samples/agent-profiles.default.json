@@ -19,27 +19,27 @@
     },
     "spec-designer": {
       "provider": "claude",
-      "model": "claude-opus-4-7",
+      "model": "claude-opus-4-7[1m]",
       "execution_mode": "orchestrator-output"
     },
     "impl-planner": {
       "provider": "claude",
-      "model": "claude-opus-4-7",
+      "model": "claude-opus-4-7[1m]",
       "execution_mode": "orchestrator-output"
     },
     "type-designer": {
       "provider": "claude",
-      "model": "claude-opus-4-7",
+      "model": "claude-opus-4-7[1m]",
       "execution_mode": "orchestrator-output"
     },
     "adr-editor": {
       "provider": "claude",
-      "model": "claude-opus-4-7",
+      "model": "claude-opus-4-7[1m]",
       "execution_mode": "orchestrator-output"
     },
     "implementer": {
       "provider": "claude",
-      "model": "claude-opus-4-7",
+      "model": "claude-opus-4-7[1m]",
       "execution_mode": "orchestrator-output"
     },
     "reviewer": {

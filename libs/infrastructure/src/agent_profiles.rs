@@ -496,6 +496,8 @@ mod tests {
     use super::*;
     use std::io::Write as _;
 
+    use crate::capability_exec::{parse_provider_definition_front_matter, read_front_matter};
+
     fn write_json(dir: &std::path::Path, content: &str) -> std::path::PathBuf {
         let path = dir.join("agent-profiles.json");
         let mut f = std::fs::File::create(&path).unwrap();
@@ -578,6 +580,59 @@ mod tests {
             let result = AgentProfiles::load(&workspace_root, &path);
 
             assert!(result.is_ok(), "shipped sample {sample} must load: {result:?}");
+        }
+    }
+
+    #[test]
+    fn test_shipped_claude_output_profiles_when_preflighted_pass_agent_validation() {
+        let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let samples_dir = workspace_root.join(".harness/config/samples");
+
+        for sample in ["agent-profiles.default.json", "agent-profiles.claude-heavy.json"] {
+            let profiles = AgentProfiles::load(&workspace_root, &samples_dir.join(sample))
+                .expect("shipped sample profile must load");
+            let claude_outputs: Vec<_> = profiles
+                .capabilities
+                .iter()
+                .filter(|(_, config)| {
+                    config.provider() == "claude"
+                        && config.execution_mode() == ExecutionModeDto::OrchestratorOutput
+                })
+                .collect();
+
+            assert!(
+                !claude_outputs.is_empty(),
+                "shipped sample {sample} must contain a Claude orchestrator-output capability"
+            );
+
+            for (capability, config) in claude_outputs {
+                let path =
+                    workspace_root.join(".claude").join("agents").join(format!("{capability}.md"));
+                let definition = std::fs::read_to_string(&path).unwrap_or_else(|error| {
+                    panic!("{sample} {capability} agent must exist: {error}")
+                });
+                let yaml = read_front_matter(&definition)
+                    .unwrap_or_else(|error| {
+                        panic!("{sample} {capability} agent front matter must parse: {error}")
+                    })
+                    .unwrap_or_else(|| {
+                        panic!("{sample} {capability} agent must declare YAML front matter")
+                    });
+                let front_matter =
+                    parse_provider_definition_front_matter(yaml).unwrap_or_else(|error| {
+                        panic!("{sample} {capability} agent YAML must parse: {error}")
+                    });
+
+                assert!(
+                    front_matter.has_tools(),
+                    "{sample} {capability} agent must declare non-empty tools"
+                );
+                assert_eq!(
+                    front_matter.model(),
+                    config.model(),
+                    "{sample} {capability} agent model must match the profile exactly"
+                );
+            }
         }
     }
 
