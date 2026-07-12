@@ -565,6 +565,23 @@ mod tests {
     }
 
     #[test]
+    fn test_shipped_sample_profiles_when_loaded_parse_successfully() {
+        let workspace_root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let samples_dir = workspace_root.join(".harness/config/samples");
+
+        for sample in [
+            "agent-profiles.default.json",
+            "agent-profiles.claude-heavy.json",
+            "agent-profiles.codex-heavy.json",
+        ] {
+            let path = samples_dir.join(sample);
+            let result = AgentProfiles::load(&workspace_root, &path);
+
+            assert!(result.is_ok(), "shipped sample {sample} must load: {result:?}");
+        }
+    }
+
+    #[test]
     fn test_resolve_final_returns_provider_and_model() {
         let dir = tempfile::tempdir().unwrap();
         let path = write_json(dir.path(), FULL_CONFIG);

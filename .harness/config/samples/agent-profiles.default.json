@@ -14,35 +14,43 @@
   "capabilities": {
     "orchestrator": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-7",
+      "execution_mode": "typed-pipeline"
     },
     "spec-designer": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-7",
+      "execution_mode": "orchestrator-output"
     },
     "impl-planner": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-7",
+      "execution_mode": "orchestrator-output"
     },
     "type-designer": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-7",
+      "execution_mode": "orchestrator-output"
     },
     "adr-editor": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-7",
+      "execution_mode": "orchestrator-output"
     },
     "implementer": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-7",
+      "execution_mode": "orchestrator-output"
     },
     "reviewer": {
       "provider": "codex",
       "model": "gpt-5.4",
-      "fast_model": "gpt-5.4-mini"
+      "fast_model": "gpt-5.4-mini",
+      "execution_mode": "typed-pipeline"
     },
     "researcher": {
-      "provider": "gemini"
+      "provider": "gemini",
+      "execution_mode": "orchestrator-output"
     }
   }
 }

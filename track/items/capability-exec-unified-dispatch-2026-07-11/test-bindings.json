@@ -149,6 +149,7 @@
         {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_model_returns_model_missing"},
         {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_typed_pipeline_returns_profile_resolution"},
         {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_capability_config_dto_missing_execution_mode_is_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::agent_profiles::tests", "test_name": "test_shipped_sample_profiles_when_loaded_parse_successfully"},
         {"layer": "usecase", "module_path": "usecase::capability_exec::tests", "test_name": "test_capability_exec_typed_pipeline_rejected_before_provider_dispatch"},
         {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_unknown_execution_mode_returns_profile_resolution"},
         {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_out_of_root_config_returns_profile_resolution"}
@@ -223,7 +224,8 @@
         {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_provider_returns_profile_resolution"},
         {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_missing_model_returns_model_missing"},
         {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_agent_profiles_adapter_unsupported_provider_rejected_before_adapter_dispatch"},
-        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_capability_config_dto_missing_execution_mode_is_rejected"}
+        {"layer": "infrastructure", "module_path": "infrastructure::capability_exec::agent_profiles::tests", "test_name": "test_capability_config_dto_missing_execution_mode_is_rejected"},
+        {"layer": "infrastructure", "module_path": "infrastructure::agent_profiles::tests", "test_name": "test_shipped_sample_profiles_when_loaded_parse_successfully"}
       ]
     },
     {

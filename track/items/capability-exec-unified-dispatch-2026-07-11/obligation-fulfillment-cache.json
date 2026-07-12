@@ -327,13 +327,13 @@
         "item_identifier": "trait_method:resolve"
       },
       "key": {
-        "bound_tests_set_hash": "e2c6946fc99aba9d0ec39a9af7bf1ad2d60b30ad3fc64d14d9157f5f20447413",
+        "bound_tests_set_hash": "a43f2d3cf0164680d6a233485d11015077e07b7108af02898b3b9235ed9c537f",
         "declaration_hash": "bcdd97326cdc0885c8e24dfcacbe551b0a4107d73498ba6cc194a5f0ac21dc0e",
         "anchor_text_hash": "93b419fdb13b91a43ef16def48a1207f51ca873a48ab4bdf549912c1bfebea9f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let profile = adapter.resolve(&capability).expect(\"profile resolves\");\n\nassert_eq!(profile.execution_mode, ExecutionMode::OrchestratorOutput);\n\nassert!(matches!(\n    adapter.resolve(&capability),\n    Err(CapabilityExecError::ProfileResolution { .. })\n));"
+        "citation": "let profile = adapter.resolve(&capability).expect(\"profile resolves\");\n\nassert_eq!(profile.execution_mode, ExecutionMode::OrchestratorOutput); ... assert!(matches!(\n    adapter.resolve(&capability),\n    Err(CapabilityExecError::ProfileResolution { .. })\n)); ... assert!(matches!(\n    adapter.resolve(&capability),\n    Err(CapabilityExecError::ModelMissing { .. })\n)); ... assert!(matches!(\n    adapter.resolve(&capability),\n    Err(CapabilityExecError::ProfileResolution { .. })\n));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -351,7 +351,7 @@
         "item_identifier": "trait_method:resolve"
       },
       "key": {
-        "bound_tests_set_hash": "e2c6946fc99aba9d0ec39a9af7bf1ad2d60b30ad3fc64d14d9157f5f20447413",
+        "bound_tests_set_hash": "a43f2d3cf0164680d6a233485d11015077e07b7108af02898b3b9235ed9c537f",
         "declaration_hash": "bcdd97326cdc0885c8e24dfcacbe551b0a4107d73498ba6cc194a5f0ac21dc0e",
         "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
       },
@@ -615,13 +615,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProfilePort"
       },
       "key": {
-        "bound_tests_set_hash": "5e398eddb8c039b6f686d7c0aa657a63902d275d17e99ea2dc97f9517884c67d",
+        "bound_tests_set_hash": "d2f56407612d9ebe0779487f2b43966c7fdb447254612c6e39d156a1bdacc42e",
         "declaration_hash": "1d2d5a0394a4a7f48ccf4958e5caef84887fa6f2637e7a65a816193396c95d83",
         "anchor_text_hash": "93b419fdb13b91a43ef16def48a1207f51ca873a48ab4bdf549912c1bfebea9f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(profile.execution_mode, ExecutionMode::OrchestratorOutput); assert!(matches!( adapter.resolve(&capability), Err(CapabilityExecError::ProfileResolution { .. }) )); Err(crate::agent_profiles::AgentProfilesError::Parse(_))"
+        "citation": "assert_eq!(profile.execution_mode, ExecutionMode::OrchestratorOutput);\n\nassert!(matches!(\n            adapter.resolve(&capability),\n            Err(CapabilityExecError::ProfileResolution { .. })\n        ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -639,7 +639,7 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProfilePort"
       },
       "key": {
-        "bound_tests_set_hash": "5e398eddb8c039b6f686d7c0aa657a63902d275d17e99ea2dc97f9517884c67d",
+        "bound_tests_set_hash": "d2f56407612d9ebe0779487f2b43966c7fdb447254612c6e39d156a1bdacc42e",
         "declaration_hash": "1d2d5a0394a4a7f48ccf4958e5caef84887fa6f2637e7a65a816193396c95d83",
         "anchor_text_hash": "e13dd60c0870e747ea08541ae02f3fde9f2977197a7590a9c9bd8b73ebf3db45"
       },
