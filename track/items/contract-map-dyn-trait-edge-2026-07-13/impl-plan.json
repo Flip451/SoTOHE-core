@@ -4,12 +4,14 @@
     {
       "id": "T001",
       "description": "Modify libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_ref.rs (candidate collection, resolve_type_ref_node_ids, resolve_trait_subgraph, and the extracted shared trait resolver), render/emit.rs (all resolve_type_ref_node_ids and resolve_method_type_refs call sites), and render/mod.rs (trait-index propagation); migrate affected renderer unit tests. GO-01, GO-02; IN-01..IN-08; OUT-01..OUT-05; CN-01..CN-04.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "335e45ce8322edede4dd71e67af6e16d870464ba"
     },
     {
       "id": "T002",
       "description": "Add the ADR §D5 regression tests and shared test helper in libs/infrastructure/src/tddd/contract_map_renderer_adapter/mod.rs #[cfg(test)] mod tests. IN-09; AC-01..AC-07; CN-01..CN-04.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "335e45ce8322edede4dd71e67af6e16d870464ba"
     }
   ],
   "plan": {

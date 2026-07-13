@@ -1,6 +1,105 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a3e4f1999abb36bd0afa442f06252f6657e69b0a02dac6e66155385d8886269",
+          "at": "2026-07-13T14:32:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a3e4f1999abb36bd0afa442f06252f6657e69b0a02dac6e66155385d8886269",
+          "at": "2026-07-13T14:36:37Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 is not deterministically observable as written: both occurrences resolve to the same `DeclaredType` node, while CN-03 requires deduplicating identical node IDs into one edge. The rendered view cannot prove that both the generic argument and associated-type binding were traversed.",
+              "severity": "P1",
+              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/spec.json",
+              "line": 258,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:db4eafde661e5a155dfdcfbbe765c9163f22afc2a93eaaf88084882ea8a8624a",
+          "at": "2026-07-13T13:57:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 claims `dyn Trait` edges are handled across TypeRef positions and common hexagonal injection patterns, but AC-01..07 do not deterministically cover field, variant payload, type alias, function parameter, or method parameter positions. An implementation could omit those call paths while satisfying every AC.",
+              "severity": "P1",
+              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/spec.json",
+              "line": 8,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:9214f78342496bade359921fb1001e511bad5dbdcdda1efd80c892d01b311cdc",
+          "at": "2026-07-13T14:02:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4115774dda4bf51729bedbe28c76c8f0937475ce45e885f97079c8f8c7688587",
+          "at": "2026-07-13T14:05:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 は trait 解決の共通化によって二重実装と drift を防ぐことを目標にしていますが、AC-06/AC-07 は両経路の挙動だけを検証するため、別々の resolver 実装でも合格できます。共通 resolver の利用を決定的に確認できる AC がなく、GO-02 の構造的な意図を完了時に証明できません。",
+              "severity": "P1",
+              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/spec.json",
+              "line": 18,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:4115774dda4bf51729bedbe28c76c8f0937475ce45e885f97079c8f8c7688587",
+          "at": "2026-07-13T14:10:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ba9427253c6b9f02e4640950bc2de4e23c3c46eb763ea89f30defe18834564e",
+          "at": "2026-07-13T14:12:56Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70b6b70222c456ae77239cd53cbc7292c901659bd5abc8a27fbc24b2e157ff30",
+          "at": "2026-07-13T13:56:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70b6b70222c456ae77239cd53cbc7292c901659bd5abc8a27fbc24b2e157ff30",
+          "at": "2026-07-13T14:01:24Z"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -95,24 +194,20 @@
           "findings": [],
           "hash": "rvw1:sha256:67a7aeb6cb309ffe6620d5fc412b83cedc31dc45b822c63fc6e32837ee53bc02",
           "at": "2026-07-13T14:34:48Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4a3e4f1999abb36bd0afa442f06252f6657e69b0a02dac6e66155385d8886269",
-          "at": "2026-07-13T14:32:52Z"
+          "hash": "rvw1:sha256:e1f118f251270f20d7751aeba20b3aaeb58ef8692523e6b62451443711d42a51",
+          "at": "2026-07-13T14:42:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4a3e4f1999abb36bd0afa442f06252f6657e69b0a02dac6e66155385d8886269",
-          "at": "2026-07-13T14:36:37Z"
+          "hash": "rvw1:sha256:e1f118f251270f20d7751aeba20b3aaeb58ef8692523e6b62451443711d42a51",
+          "at": "2026-07-13T14:45:40Z"
         }
       ]
     },
@@ -198,87 +293,6 @@
           "findings": [],
           "hash": "rvw1:sha256:d695afec3b8f04bf03479c1bc7da4a5d338643d3ce0f4c3e1f42b0ba4caf9e95",
           "at": "2026-07-13T13:10:07Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-05 is not deterministically observable as written: both occurrences resolve to the same `DeclaredType` node, while CN-03 requires deduplicating identical node IDs into one edge. The rendered view cannot prove that both the generic argument and associated-type binding were traversed.",
-              "severity": "P1",
-              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/spec.json",
-              "line": 258,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:db4eafde661e5a155dfdcfbbe765c9163f22afc2a93eaaf88084882ea8a8624a",
-          "at": "2026-07-13T13:57:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 claims `dyn Trait` edges are handled across TypeRef positions and common hexagonal injection patterns, but AC-01..07 do not deterministically cover field, variant payload, type alias, function parameter, or method parameter positions. An implementation could omit those call paths while satisfying every AC.",
-              "severity": "P1",
-              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/spec.json",
-              "line": 8,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:9214f78342496bade359921fb1001e511bad5dbdcdda1efd80c892d01b311cdc",
-          "at": "2026-07-13T14:02:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4115774dda4bf51729bedbe28c76c8f0937475ce45e885f97079c8f8c7688587",
-          "at": "2026-07-13T14:05:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-02 は trait 解決の共通化によって二重実装と drift を防ぐことを目標にしていますが、AC-06/AC-07 は両経路の挙動だけを検証するため、別々の resolver 実装でも合格できます。共通 resolver の利用を決定的に確認できる AC がなく、GO-02 の構造的な意図を完了時に証明できません。",
-              "severity": "P1",
-              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/spec.json",
-              "line": 18,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:4115774dda4bf51729bedbe28c76c8f0937475ce45e885f97079c8f8c7688587",
-          "at": "2026-07-13T14:10:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6ba9427253c6b9f02e4640950bc2de4e23c3c46eb763ea89f30defe18834564e",
-          "at": "2026-07-13T14:12:56Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70b6b70222c456ae77239cd53cbc7292c901659bd5abc8a27fbc24b2e157ff30",
-          "at": "2026-07-13T13:56:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:70b6b70222c456ae77239cd53cbc7292c901659bd5abc8a27fbc24b2e157ff30",
-          "at": "2026-07-13T14:01:24Z"
         }
       ]
     }

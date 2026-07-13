@@ -13,11 +13,11 @@ Both tasks belong to a single Rust feature batch — the resolver signature chan
 
 > T001 updates type_ref.rs candidate collection, resolve_type_ref_node_ids, resolve_trait_subgraph, and the extracted shared trait resolver, plus render/mod.rs and render/emit.rs call-site wiring. GO-01, GO-02; IN-01..IN-08; OUT-01..OUT-05; CN-01..CN-04.
 
-- [x] **T001**: Modify libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_ref.rs (candidate collection, resolve_type_ref_node_ids, resolve_trait_subgraph, and the extracted shared trait resolver), render/emit.rs (all resolve_type_ref_node_ids and resolve_method_type_refs call sites), and render/mod.rs (trait-index propagation); migrate affected renderer unit tests. GO-01, GO-02; IN-01..IN-08; OUT-01..OUT-05; CN-01..CN-04.
+- [x] **T001**: Modify libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_ref.rs (candidate collection, resolve_type_ref_node_ids, resolve_trait_subgraph, and the extracted shared trait resolver), render/emit.rs (all resolve_type_ref_node_ids and resolve_method_type_refs call sites), and render/mod.rs (trait-index propagation); migrate affected renderer unit tests. GO-01, GO-02; IN-01..IN-08; OUT-01..OUT-05; CN-01..CN-04. (`335e45ce8322edede4dd71e67af6e16d870464ba`)
 
 ### S2 — S2: seven regression tests for AC-01 through AC-07
 
 > T002 adds the ADR §D5 regression tests and shared test helper to contract_map_renderer_adapter/mod.rs #[cfg(test)] mod tests. IN-09; AC-01..AC-07; CN-01..CN-04.
 > T001 and T002 must be prepared and reviewed as one feature batch: T001's resolver-signature change is compile-blocking until T002 exercises the new shape (or existing tests are migrated in T001), so the batch is verified together before the single Rust CI run.
 
-- [x] **T002**: Add the ADR §D5 regression tests and shared test helper in libs/infrastructure/src/tddd/contract_map_renderer_adapter/mod.rs #[cfg(test)] mod tests. IN-09; AC-01..AC-07; CN-01..CN-04.
+- [x] **T002**: Add the ADR §D5 regression tests and shared test helper in libs/infrastructure/src/tddd/contract_map_renderer_adapter/mod.rs #[cfg(test)] mod tests. IN-09; AC-01..AC-07; CN-01..CN-04. (`335e45ce8322edede4dd71e67af6e16d870464ba`)
