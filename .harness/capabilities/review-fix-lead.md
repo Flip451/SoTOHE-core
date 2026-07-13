@@ -78,6 +78,12 @@ cargo make track-local-review -- --round-type {round_type} --group {scope} --bri
 
 Do NOT pass `--track-id`; the wrapper auto-resolves the active track from the current git branch.
 
+The reviewer subprocess legitimately runs for many minutes (`bin/sotp review local` allows it
+1800 seconds). When your provider's shell tool enforces a per-call timeout, set that timeout
+parameter to at least 1,920,000 ms for this invocation, including time for the cargo-make gates
+that run before the reviewer subprocess. Do not conclude reviewer failure from a shell-tool
+timeout shorter than that; a timed-out invocation kills the in-flight round and records nothing.
+
 ### Verdict parsing and confirmation
 
 After each reviewer invocation, parse the verdict from command output:

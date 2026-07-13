@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:64a0038442610edadf97909b2eefcc2cb0361772a9c81bdaacae374829d8b609",
+          "at": "2026-07-13T04:21:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:64a0038442610edadf97909b2eefcc2cb0361772a9c81bdaacae374829d8b609",
+          "at": "2026-07-13T04:25:00Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 の `lib target は package 名のまま` という対応規則は Cargo の rustdoc root 規則として不完全です。`[lib] name` が package 名と異なる場合や、ハイフンを含む名前の crate 名正規化を定義しておらず、schema export・catalog import・signal evaluator 間で root が不一致になり得ます。選択した target の metadata name と正規化規則、および曖昧な target 選択時の fail-closed 規則を明記しないと、下流 spec が決定的な受入条件を導出できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+              "line": 47,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:0ccffe9d28a6b5d4013d9075644d1f0ae7df7b9142223a27af2aeb1b8ff17f37",
+          "at": "2026-07-13T04:21:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79c5b39b145c5a402312edb538da4121c7caf7345e71f328cd5fa1eca00a2386",
+          "at": "2026-07-13T04:25:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:79c5b39b145c5a402312edb538da4121c7caf7345e71f328cd5fa1eca00a2386",
+          "at": "2026-07-13T04:28:21Z"
+        }
+      ]
+    }
+  }
+}
