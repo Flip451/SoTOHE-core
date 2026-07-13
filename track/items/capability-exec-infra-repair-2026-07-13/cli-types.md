@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityExecArgs | dto | modify | — | 🟡 | 🔵 |
+| CapabilityExecArgs | dto | modify | — | 🔵 | 🔵 |
 

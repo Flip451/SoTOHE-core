@@ -76,7 +76,7 @@ pub(crate) fn check_dangling_ids(
                     }
                     // Rule 2b: A-side local id not remapped by Phase 1.45.
                     let a_name = a_ps.path.last().map(|s| s.as_str()).unwrap_or("<unknown>");
-                    return Err(Phase1Error::DanglingId(format!(
+                    return Err(Phase1Error::dangling_id(format!(
                         "{item_name} -> Id({}) is an A-side local ref to '{}' which is not present in S \
                          (the type may have been deleted or was never declared in the catalogue)",
                         referenced_id.0, a_name
@@ -89,13 +89,13 @@ pub(crate) fn check_dangling_ids(
                         continue;
                     }
                     // Rule 4: B-side local deleted.
-                    return Err(Phase1Error::DanglingId(format!(
+                    return Err(Phase1Error::dangling_id(format!(
                         "{item_name} -> Id({}) not found in S (may have been deleted in Phase 1)",
                         referenced_id.0
                     )));
                 }
                 // Rule 5: stale or unknown.
-                return Err(Phase1Error::DanglingId(format!(
+                return Err(Phase1Error::dangling_id(format!(
                     "{item_name} -> Id({}) is not in S and not in A or B paths (stale reference or unknown id)",
                     referenced_id.0
                 )));
@@ -107,13 +107,13 @@ pub(crate) fn check_dangling_ids(
                         continue;
                     }
                     // Rule 3: B-side local deleted.
-                    return Err(Phase1Error::DanglingId(format!(
+                    return Err(Phase1Error::dangling_id(format!(
                         "{item_name} -> Id({}) not found in S (may have been deleted in Phase 1)",
                         referenced_id.0
                     )));
                 }
                 // Rule 4: stale or unknown.
-                return Err(Phase1Error::DanglingId(format!(
+                return Err(Phase1Error::dangling_id(format!(
                     "{item_name} -> Id({}) is not in S and not in B paths (stale reference or unknown id)",
                     referenced_id.0
                 )));

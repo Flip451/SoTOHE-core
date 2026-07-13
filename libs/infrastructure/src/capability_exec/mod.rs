@@ -149,7 +149,7 @@ mod tests {
             &repository,
             &repository.join("tmp/capability-runtime"),
             &provider,
-            Duration::from_secs(1),
+            Some(Duration::from_secs(1)),
         )
         .expect_err("symlinked runtime directory is rejected before process spawn");
 
@@ -171,11 +171,32 @@ mod tests {
             repository.path(),
             &repository.path().join("tmp/capability-runtime"),
             &provider,
-            Duration::from_millis(1),
+            Some(Duration::from_millis(1)),
         )
         .expect_err("provider process exceeds timeout");
 
         assert!(error.to_string().contains("timed out"));
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_run_provider_process_without_timeout_waits_for_completion()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let repository = tempfile::tempdir()?;
+        let provider = ProviderName::try_new("codex")?;
+        let args = [OsString::from("-c"), OsString::from("sleep 0.2; exit 7")];
+
+        let exit_code = run_provider_process_with_timeout(
+            "sh",
+            &args,
+            repository.path(),
+            &repository.path().join("tmp/capability-runtime"),
+            &provider,
+            None,
+        )?;
+
+        assert_eq!(exit_code, 7);
         Ok(())
     }
 
@@ -194,7 +215,7 @@ mod tests {
             repository.path(),
             &repository.path().join("tmp/capability-runtime"),
             &provider,
-            Duration::from_secs(1),
+            Some(Duration::from_secs(1)),
         )
         .expect_err("a detached stderr holder must not hang dispatch");
 

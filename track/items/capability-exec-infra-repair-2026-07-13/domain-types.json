@@ -1,6 +1,73 @@
 {
   "crate_name": "domain",
   "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "action_contradiction",
+          "params": [
+            {
+              "name": "detail",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "unresolved_type_ref",
+          "params": [
+            {
+              "name": "detail",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "dangling_id",
+          "params": [
+            {
+              "name": "detail",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "rustdoc_root_resolution",
+          "params": [
+            {
+              "name": "detail",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "type_name": "Phase1Error"
+    }
+  ],
   "layer": "domain",
   "schema_version": 5,
   "trait_impls": [
@@ -157,7 +224,7 @@
     },
     "Phase1Error": {
       "action": "modify",
-      "docs": "Phase1Error extended with the rustdoc-root resolution failure case (IN-05, AC-09).",
+      "docs": "Modified Phase1Error declaration: adds RustdocRootResolution and replaces diagnostic payload fields with DiagnosticMessage (IN-05, AC-09, IN-07).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",

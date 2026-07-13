@@ -26,7 +26,7 @@ use usecase::catalog_gen::{CatalogError, CatalogImportCommand};
 
 use super::fs_access::{port_error, schema_error};
 use super::validate::spec_refs_value;
-use crate::schema_export::RustdocSchemaExporter;
+use crate::schema_export::{RustdocSchemaExporter, resolve_rustdoc_root_name};
 
 /// The rustdoc-resolved current shape of an existing type.
 pub(super) struct ImportedShape {
@@ -55,11 +55,20 @@ pub(super) fn resolve_shape(
     let schema = exporter.export(&crate_name).map_err(|err| {
         port_error(format!("rustdoc extraction for crate `{crate_name}` failed: {err}"))
     })?;
-    let type_info = select_type(&schema, &crate_name, &module, &name).ok_or_else(|| {
+    let package_name = CrateName::new(crate_name.clone()).map_err(|error| {
         schema_error(format!(
-            "type `{type_path}` not found in crate `{crate_name}` at that exact module path"
+            "type path `{type_path}` has invalid crate name `{crate_name}`: {error}"
         ))
     })?;
+    let rustdoc_root = resolve_rustdoc_root_name(workspace_root, &package_name).map_err(|err| {
+        port_error(format!("rustdoc root resolution for crate `{crate_name}` failed: {err}"))
+    })?;
+    let type_info = select_type(&schema, rustdoc_root.rustdoc_root_name().as_str(), &module, &name)
+        .ok_or_else(|| {
+            schema_error(format!(
+                "type `{type_path}` not found in crate `{crate_name}` at that exact module path"
+            ))
+        })?;
     let kind = kind_value(type_info);
     let methods = collect_methods(&schema, &name, type_info.module_path());
     Ok(ImportedShape { module_path: module, name, kind, methods })
@@ -170,30 +179,30 @@ pub(super) fn parse_type_path(type_path: &str) -> Result<(String, String, String
 }
 
 /// Select the [`TypeInfo`] whose short name is `name` and whose crate-qualified
-/// module path matches `crate_name` + `module` exactly, segment for segment.
+/// module path matches the rustdoc root + `module` exactly, segment for segment.
 ///
-/// Rustdoc module paths are crate-qualified (e.g. `domain::tddd`), so the
-/// requested crate and module are compared as one segment list against the
+/// Rustdoc module paths are root-qualified (e.g. `domain::tddd`), so the
+/// translated rustdoc root and requested module are compared as one segment list against the
 /// type's module path. There is no short-name fallback and no `ends_with`
 /// suffix matching: a request that does not name the exact module resolves to
 /// `None` rather than an arbitrary same-named type elsewhere in the crate
 /// (which would otherwise let `foo::Order` collide with `bar_foo::Order`).
 fn select_type<'a>(
     schema: &'a SchemaExport,
-    crate_name: &str,
+    rustdoc_root: &str,
     module: &str,
     name: &str,
 ) -> Option<&'a TypeInfo> {
-    let expected = expected_module_segments(crate_name, module);
+    let expected = expected_module_segments(rustdoc_root, module);
     schema.types().iter().find(|type_info| {
         type_info.name() == name && module_segments(type_info.module_path()) == expected
     })
 }
 
-/// The crate-qualified module segments a requested `crate_name` + `module`
-/// denotes (the crate is always the leading segment).
-fn expected_module_segments<'a>(crate_name: &'a str, module: &'a str) -> Vec<&'a str> {
-    let mut segments = vec![crate_name];
+/// The rustdoc-root-qualified module segments a requested module denotes (the
+/// rustdoc root is always the leading segment).
+fn expected_module_segments<'a>(rustdoc_root: &'a str, module: &'a str) -> Vec<&'a str> {
+    let mut segments = vec![rustdoc_root];
     segments.extend(path_segments(module));
     segments
 }
@@ -579,6 +588,26 @@ mod tests {
         assert!(select_type(&schema, "domain", "review", "LayerId").is_none());
         assert!(select_type(&schema, "domain", "", "LayerId").is_none());
         assert!(select_type(&schema, "domain", "tddd", "LayerId").is_some());
+    }
+
+    #[test]
+    fn test_select_type_matches_bin_rustdoc_root_for_package_qualified_import() {
+        let ti = TypeInfo::with_module_path(
+            "VerifyCommand".to_owned(),
+            TypeKind::Struct,
+            None,
+            vec![],
+            "renamed_binary::commands::verify".to_owned(),
+        );
+        let schema =
+            SchemaExport::new("renamed_binary".to_owned(), vec![ti], vec![], vec![], vec![]);
+
+        // `cli::commands::verify::VerifyCommand` remains the user and
+        // catalogue-facing path. The caller translates only this comparison
+        // root from Cargo metadata before reaching this pure matcher.
+        let selected = select_type(&schema, "renamed_binary", "commands::verify", "VerifyCommand");
+
+        assert!(selected.is_some());
     }
 
     // Finding 2: inherent methods must be attributed by the target type's exact

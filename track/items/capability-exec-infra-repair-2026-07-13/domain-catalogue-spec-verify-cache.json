@@ -27,11 +27,11 @@
       }
     },
     {
-      "claim_hash": "54b6187b2c57d0878ed7872f174666d2b209e4d7fad0858e67c66565bf1bd779",
+      "claim_hash": "ab20b3c76beb1ff7d55fd1b0265c2ac3266852bf23cadcf7a20499e828a0f260",
       "evidence_hash": "9376ae729d1fac6bf061f4c7d1dc531e589b8978d97f2a3d57a62170074e0013",
       "verdict": {
         "kind": "pass",
-        "citation": "選択した metadata target の name を rustdoc 実行 target とし、その `-` を `_` に正規化した値を rustdoc crate root とする。"
+        "citation": "選択した metadata target の name を rustdoc 実行 target とし、その `-` を `_` に正規化した値を rustdoc crate root とする。schema export、catalog import の型照合、signal 評価器の identity key 正規化はこの同じ翻訳機構を使用し、catalogue 利用者向けの型 path は package 名 root のまま維持する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -51,7 +51,7 @@
       }
     },
     {
-      "claim_hash": "54b6187b2c57d0878ed7872f174666d2b209e4d7fad0858e67c66565bf1bd779",
+      "claim_hash": "ab20b3c76beb1ff7d55fd1b0265c2ac3266852bf23cadcf7a20499e828a0f260",
       "evidence_hash": "1adc55e60c077cfdc79d0b48f55be7da6aa29292b2bbda75a2f09152b2a7315c",
       "verdict": {
         "kind": "pass",
@@ -75,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "54b6187b2c57d0878ed7872f174666d2b209e4d7fad0858e67c66565bf1bd779",
+      "claim_hash": "ab20b3c76beb1ff7d55fd1b0265c2ac3266852bf23cadcf7a20499e828a0f260",
       "evidence_hash": "e80f90842d6a4c32970a634a0cdb2e16bf838318ff84f0d5f429306f55197670",
       "verdict": {
         "kind": "pass",

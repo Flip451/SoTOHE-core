@@ -166,6 +166,7 @@ mod tests {
             capability: CapabilityName::try_new("implementer")?,
             host: ProviderName::try_new("codex")?,
             briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
+            timeout: None,
         };
 
         assert!(matches!(

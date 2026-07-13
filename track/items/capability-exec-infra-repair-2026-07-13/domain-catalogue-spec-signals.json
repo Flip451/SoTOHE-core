@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "4513c0e469e0a0e96bc5ba5e33808ee4a87d1a7c74ec63a26d6798000ea69051",
+  "catalogue_declaration_hash": "e1dc7de8f4a2852fed6e6d2a17cf2648a1f467b193e6b4b5aefabf5c47c92afc",
   "signals": [
     {
       "type_name": "DiagnosticMessage",
@@ -10,7 +10,7 @@
     {
       "type_name": "Phase1Error",
       "signal": "blue",
-      "entry_hash": "54b6187b2c57d0878ed7872f174666d2b209e4d7fad0858e67c66565bf1bd779"
+      "entry_hash": "ab20b3c76beb1ff7d55fd1b0265c2ac3266852bf23cadcf7a20499e828a0f260"
     },
     {
       "type_name": "SignalEvaluatorPort",

@@ -10,7 +10,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| Phase1Error | error_type | modify | ActionContradiction, UnresolvedTypeRef, DanglingId, RustdocRootResolution | 🟡 | 🔵 |
+| Phase1Error | error_type | modify | ActionContradiction, UnresolvedTypeRef, DanglingId, RustdocRootResolution | 🔵 | 🔵 |
 
 ## Secondary Ports
 

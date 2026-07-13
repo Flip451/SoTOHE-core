@@ -4,6 +4,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityExecDriverInput | dto | modify | — | 🟡 | 🔵 |
-| TimeoutSecondsArg | dto | add | — | 🟡 | 🔵 |
+| CapabilityExecDriverInput | dto | modify | — | 🔵 | 🔵 |
+| TimeoutSecondsArg | dto | add | — | 🔵 | 🔵 |
 

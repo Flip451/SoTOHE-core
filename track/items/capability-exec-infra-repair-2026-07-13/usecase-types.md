@@ -4,17 +4,17 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TimeoutSeconds | value_object | add | — | 🟡 | 🔵 |
+| TimeoutSeconds | value_object | add | — | 🔵 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityInputValidationError | error_type | modify | EmptyProviderName, EmptyModelName, EmptyFilePath, InvalidFilePath, EmptyContent, ZeroTimeoutSeconds | 🟡 | 🔵 |
+| CapabilityInputValidationError | error_type | modify | EmptyProviderName, EmptyModelName, EmptyFilePath, InvalidFilePath, EmptyContent, ZeroTimeoutSeconds | 🔵 | 🔵 |
 
 ## Commands
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityExecRequest | command | modify | — | 🟡 | 🔵 |
+| CapabilityExecRequest | command | modify | — | 🔵 | 🔵 |
 

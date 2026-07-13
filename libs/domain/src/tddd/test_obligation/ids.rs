@@ -86,6 +86,13 @@ impl DiagnosticMessage {
     }
 }
 
+/// Returns a non-empty fallback detail for error paths that cannot retain their
+/// original diagnostic text.
+#[must_use]
+pub(crate) fn unavailable_diagnostic_message() -> DiagnosticMessage {
+    DiagnosticMessage("diagnostic detail unavailable".to_owned())
+}
+
 /// Validated non-empty item identifier component of a [`TestObligationId`].
 ///
 /// Distinguishes the specific declaration facet (method name, invariant label,

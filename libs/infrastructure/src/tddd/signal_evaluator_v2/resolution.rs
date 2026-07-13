@@ -80,7 +80,7 @@ pub(super) fn resolve_unresolved_in_item(
                             trait_path.id = resolved_id;
                         }
                     } else {
-                        return Err(Phase1Error::UnresolvedTypeRef(trait_path.path.clone()));
+                        return Err(Phase1Error::unresolved_type_ref(trait_path.path.clone()));
                     }
                 }
                 let new_args = match trait_path.args {

@@ -46,7 +46,7 @@
     },
     {
       "for_type": "TimeoutSecondsArg",
-      "trait_ref": "core::str::FromStr"
+      "trait_ref": "core::str::traits::FromStr"
     }
   ],
   "traits": {},

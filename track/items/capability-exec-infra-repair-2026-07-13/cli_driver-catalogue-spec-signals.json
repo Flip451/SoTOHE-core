@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "066041d0ca7717efdd7bd9c7f9408d84db952bfd7716474538f9ee8e7197f350",
+  "catalogue_declaration_hash": "40f552c23b277526dbabe93125245838003fc3fee579acb1ab3b09946a1c5159",
   "signals": [
     {
       "type_name": "CapabilityExecDriverInput",

@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-13T07:27:12Z",
-  "declaration_hash": "4513c0e469e0a0e96bc5ba5e33808ee4a87d1a7c74ec63a26d6798000ea69051",
+  "generated_at": "2026-07-13T08:55:50Z",
+  "declaration_hash": "e1dc7de8f4a2852fed6e6d2a17cf2648a1f467b193e6b4b5aefabf5c47c92afc",
   "signals": [
     {
       "type_name": "Phase1Error",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {

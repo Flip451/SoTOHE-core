@@ -27,6 +27,9 @@ pub enum CapabilityInputValidationError {
     /// The supplied technical text was empty or whitespace-only.
     #[error("content must not be empty")]
     EmptyContent,
+    /// The supplied timeout was zero seconds.
+    #[error("timeout seconds must be greater than zero")]
+    ZeroTimeoutSeconds,
 }
 
 /// Validated technical provider identifier for capability dispatch.
@@ -236,6 +239,39 @@ impl Clone for ExecutionMode {
     }
 }
 
+/// Validated positive provider-process timeout in seconds.
+#[derive(Debug, PartialEq, Eq)]
+pub struct TimeoutSeconds(u64);
+
+impl Copy for TimeoutSeconds {}
+
+impl Clone for TimeoutSeconds {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl TimeoutSeconds {
+    /// Validates and wraps a timeout value.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`CapabilityInputValidationError::ZeroTimeoutSeconds`] when
+    /// `value` is zero.
+    pub fn try_new(value: u64) -> Result<Self, CapabilityInputValidationError> {
+        if value == 0 {
+            return Err(CapabilityInputValidationError::ZeroTimeoutSeconds);
+        }
+        Ok(Self(value))
+    }
+
+    /// Returns the validated timeout in seconds.
+    #[must_use]
+    pub fn as_secs(&self) -> u64 {
+        self.0
+    }
+}
+
 /// Request values supplied to generic capability dispatch.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CapabilityExecRequest {
@@ -245,6 +281,8 @@ pub struct CapabilityExecRequest {
     pub host: ProviderName,
     /// Validated path to the capability briefing.
     pub briefing_file: CapabilityFilePath,
+    /// Provider-process timeout; `None` waits without a time limit.
+    pub timeout: Option<TimeoutSeconds>,
 }
 
 /// Typed routing data resolved from the capability profile.
@@ -479,7 +517,7 @@ mod tests {
         CapabilityExecInteractor, CapabilityExecRequest, CapabilityExecService,
         CapabilityFailureDetail, CapabilityFilePath, CapabilityInputValidationError,
         CapabilityProfile, CapabilityProfilePort, CapabilityProviderPort, CapabilitySourcePort,
-        DisciplineText, ExecutionMode, ModelName, ProviderName,
+        DisciplineText, ExecutionMode, ModelName, ProviderName, TimeoutSeconds,
     };
     use crate::dry_write_driver::CapabilityName;
 
@@ -576,6 +614,7 @@ mod tests {
             capability: CapabilityName::try_new("implementer")?,
             host: ProviderName::try_new("codex")?,
             briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
+            timeout: None,
         })
     }
 
@@ -699,12 +738,30 @@ mod tests {
             capability: CapabilityName::try_new("implementer")?,
             host: ProviderName::try_new("codex")?,
             briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
+            timeout: Some(TimeoutSeconds::try_new(1800)?),
         };
 
         assert_eq!(request.capability.as_str(), "implementer");
         assert_eq!(request.host.as_str(), "codex");
         assert_eq!(request.briefing_file.as_path(), PathBuf::from("tmp/briefing.md"));
+        assert_eq!(request.timeout.map(|timeout| timeout.as_secs()), Some(1800));
         Ok(())
+    }
+
+    #[test]
+    fn test_timeout_seconds_zero_rejected() {
+        assert!(matches!(
+            TimeoutSeconds::try_new(0),
+            Err(CapabilityInputValidationError::ZeroTimeoutSeconds)
+        ));
+    }
+
+    #[test]
+    fn test_timeout_seconds_positive_value_preserved() {
+        assert!(matches!(
+            TimeoutSeconds::try_new(600),
+            Ok(timeout) if timeout.as_secs() == 600
+        ));
     }
 
     #[test]

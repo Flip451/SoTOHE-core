@@ -8,23 +8,26 @@
 //! - `c`: `rustdoc_types::Crate` — TypeGraph C (Current, pure rustdoc output).
 //!
 //! And produces either a `ThreeWayEvaluationReport` (success) or a `Phase1Error`
-//! (catalogue declare inconsistency detected during S / D construction).
+//! (a catalogue declare inconsistency detected during S / D construction, or a
+//! failure to resolve the rustdoc root needed for function-path comparison).
 //!
 //! ## Why Phase 1 error is the only error kind
 //!
 //! Phase 2 (3-way evaluation of S / D / C) is a total function — every item in
 //! S, D, and C is classified into exactly one of the 12 `SignalRegion` variants.
-//! No errors can arise in Phase 2 itself; all error conditions (action
+//! No errors can arise in Phase 2 itself; catalogue error conditions (action
 //! contradictions, unresolved type references, dangling ids) are fully
-//! exhausted in Phase 1.  Therefore the port's `Result` error variant is
-//! `Phase1Error` only.
+//! exhausted in Phase 1. Rustdoc-root resolution is performed before that work
+//! when function paths require it. Therefore the port's `Result` error variant
+//! is `Phase1Error` only.
 //!
 //! ## Implementation note
 //!
 //! The algorithm (Phase 1 S / D construction + Phase 2 evaluation) lives in the
 //! infrastructure layer (`SignalEvaluatorV2`, T007).  The domain layer only
 //! declares this port trait, keeping the domain free of `rustdoc` parsing and
-//! I/O dependencies.
+//! I/O dependencies. The port is synchronous: when package-root translation is
+//! needed, its infrastructure adapter can block while running cargo metadata.
 //!
 //! No serde derives — per ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`,
 //! the domain layer is serialization-free.
@@ -58,7 +61,8 @@ use crate::tddd::signal_evaluator::region::ThreeWayEvaluationReport;
 /// are omitted from the report to reduce noise (ADR 3 D3).
 ///
 /// Returns `Err(Phase1Error)` if Phase 1 S / D construction detects an
-/// inconsistency in the catalogue declarations.
+/// inconsistency in the catalogue declarations or if rustdoc-root resolution
+/// cannot prepare function-path comparison.
 ///
 /// # Errors
 ///
@@ -71,6 +75,11 @@ use crate::tddd::signal_evaluator::region::ThreeWayEvaluationReport;
 ///
 /// Returns `Err(Phase1Error::DanglingId)` when an `Id` inside S refers to a
 /// deleted item after unresolved-marker resolution.
+///
+/// Returns `Err(Phase1Error::RustdocRootResolution)` when the evaluator cannot
+/// resolve the package-to-rustdoc-root translation needed for function-path
+/// comparison. The port is synchronous; the infrastructure adapter may block
+/// on cargo metadata I/O while attempting this resolution.
 pub trait SignalEvaluatorPort: Send + Sync {
     /// Runs Phase 1 (S / D construction) and Phase 2 (3-way evaluation).
     ///
@@ -135,7 +144,7 @@ mod tests {
             _b: Crate,
             _c: Crate,
         ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
-            Err(Phase1Error::ActionContradiction("stub contradiction".into()))
+            Err(Phase1Error::action_contradiction("stub contradiction"))
         }
     }
 
@@ -225,7 +234,7 @@ mod tests {
                 _b: Crate,
                 _c: Crate,
             ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
-                Err(Phase1Error::UnresolvedTypeRef("MissingType".into()))
+                Err(Phase1Error::unresolved_type_ref("MissingType"))
             }
         }
         let a = ExtendedCrate::new(empty_crate(), BTreeMap::new());
@@ -243,7 +252,7 @@ mod tests {
                 _b: Crate,
                 _c: Crate,
             ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
-                Err(Phase1Error::DanglingId("Order.user_id -> deleted UserId".into()))
+                Err(Phase1Error::dangling_id("Order.user_id -> deleted UserId"))
             }
         }
         let a = ExtendedCrate::new(empty_crate(), BTreeMap::new());

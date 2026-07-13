@@ -156,7 +156,7 @@ impl SignalEvaluatorPort for FailingEvaluator {
         _b: Crate,
         _c: Crate,
     ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
-        Err(Phase1Error::ActionContradiction("stub contradiction".to_owned()))
+        Err(Phase1Error::action_contradiction("stub contradiction"))
     }
 }
 
