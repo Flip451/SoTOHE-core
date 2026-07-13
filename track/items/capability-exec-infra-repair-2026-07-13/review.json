@@ -1,56 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3dcbdea2f7120ea1661d63601d7db0d8f04cd05cec615a007b224ba995b7c31b",
-          "at": "2026-07-13T05:23:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3dcbdea2f7120ea1661d63601d7db0d8f04cd05cec615a007b224ba995b7c31b",
-          "at": "2026-07-13T05:26:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9fcedc958ba7d6e51520cad44464136995a3277604357bdf404e6d78a6012dc2",
-          "at": "2026-07-13T06:54:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9fcedc958ba7d6e51520cad44464136995a3277604357bdf404e6d78a6012dc2",
-          "at": "2026-07-13T06:56:55Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fed503ff4d740a9ac9adb5493279720e7e762a966b03abdb7d89f5158aeed425",
-          "at": "2026-07-13T08:30:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fed503ff4d740a9ac9adb5493279720e7e762a966b03abdb7d89f5158aeed425",
-          "at": "2026-07-13T08:37:08Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -87,57 +37,6 @@
         }
       ]
     },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fb6eaede2c919f17a457c6b83e9e885da9d3bfa10716fcd86fcdeaa71314ac4c",
-          "at": "2026-07-13T08:29:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fb6eaede2c919f17a457c6b83e9e885da9d3bfa10716fcd86fcdeaa71314ac4c",
-          "at": "2026-07-13T08:35:06Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 の `lib target は package 名のまま` という対応規則は Cargo の rustdoc root 規則として不完全です。`[lib] name` が package 名と異なる場合や、ハイフンを含む名前の crate 名正規化を定義しておらず、schema export・catalog import・signal evaluator 間で root が不一致になり得ます。選択した target の metadata name と正規化規則、および曖昧な target 選択時の fail-closed 規則を明記しないと、下流 spec が決定的な受入条件を導出できません。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
-              "line": 47,
-              "category": "decision underspecified for downstream consumption"
-            }
-          ],
-          "hash": "rvw1:sha256:0ccffe9d28a6b5d4013d9075644d1f0ae7df7b9142223a27af2aeb1b8ff17f37",
-          "at": "2026-07-13T04:21:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79c5b39b145c5a402312edb538da4121c7caf7345e71f328cd5fa1eca00a2386",
-          "at": "2026-07-13T04:25:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:79c5b39b145c5a402312edb538da4121c7caf7345e71f328cd5fa1eca00a2386",
-          "at": "2026-07-13T04:28:21Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -153,6 +52,64 @@
           "findings": [],
           "hash": "rvw1:sha256:86a005ec888514b98f01fbdcbfbf6443584a3ca50eb00d68b8d7620538fccfc0",
           "at": "2026-07-13T08:37:19Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc1287ce02ed5fa04f1dbb8a84b96555d6d1c93e4807b6abd3d9ff5050712c63",
+          "at": "2026-07-13T08:30:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc1287ce02ed5fa04f1dbb8a84b96555d6d1c93e4807b6abd3d9ff5050712c63",
+          "at": "2026-07-13T08:37:46Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The module and enum documentation still says every Phase1Error is caused by a catalogue declaration inconsistency, but RustdocRootResolution represents cargo metadata/root-resolution failure. This factual contract mismatch can misdirect callers to edit the catalogue. Document the fourth variant and distinguish metadata failures.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signal_evaluator/phase1_error.rs",
+              "line": 19,
+              "category": "factual error"
+            },
+            {
+              "message": "The SignalEvaluatorPort # Errors documentation lists only three variants and omits RustdocRootResolution, which evaluate can return during rustdoc-root resolution. It also does not state that the synchronous adapter may perform blocking cargo metadata I/O, leaving the public port contract incomplete.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signal_evaluator/port.rs",
+              "line": 63,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:d379ca7d8f13537a53e659940f77c12fa2c311a95aeb2614a11ecd2ad4c5fb6b",
+          "at": "2026-07-13T08:31:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c4fbd98abae4c801c5c41cbafe646438ee556b0914ba01c77977192f8d93a37",
+          "at": "2026-07-13T08:37:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c4fbd98abae4c801c5c41cbafe646438ee556b0914ba01c77977192f8d93a37",
+          "at": "2026-07-13T08:41:43Z"
         }
       ]
     },
@@ -294,6 +251,88 @@
           "findings": [],
           "hash": "rvw1:sha256:530e3c8db3c8d8a3ec430d63336d274c221749495ad29b8586e262fd70c99f44",
           "at": "2026-07-13T08:38:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55d22035fd9dc50c8f90306b9c528388d1b88bba961da7fd1fe23bd773f0c381",
+          "at": "2026-07-13T09:00:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55d22035fd9dc50c8f90306b9c528388d1b88bba961da7fd1fe23bd773f0c381",
+          "at": "2026-07-13T09:04:13Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb6eaede2c919f17a457c6b83e9e885da9d3bfa10716fcd86fcdeaa71314ac4c",
+          "at": "2026-07-13T08:29:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb6eaede2c919f17a457c6b83e9e885da9d3bfa10716fcd86fcdeaa71314ac4c",
+          "at": "2026-07-13T08:35:06Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dcbdea2f7120ea1661d63601d7db0d8f04cd05cec615a007b224ba995b7c31b",
+          "at": "2026-07-13T05:23:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dcbdea2f7120ea1661d63601d7db0d8f04cd05cec615a007b224ba995b7c31b",
+          "at": "2026-07-13T05:26:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9fcedc958ba7d6e51520cad44464136995a3277604357bdf404e6d78a6012dc2",
+          "at": "2026-07-13T06:54:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9fcedc958ba7d6e51520cad44464136995a3277604357bdf404e6d78a6012dc2",
+          "at": "2026-07-13T06:56:55Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fed503ff4d740a9ac9adb5493279720e7e762a966b03abdb7d89f5158aeed425",
+          "at": "2026-07-13T08:30:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fed503ff4d740a9ac9adb5493279720e7e762a966b03abdb7d89f5158aeed425",
+          "at": "2026-07-13T08:37:08Z"
         }
       ]
     },
@@ -495,61 +534,36 @@
         }
       ]
     },
-    "domain": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The module and enum documentation still says every Phase1Error is caused by a catalogue declaration inconsistency, but RustdocRootResolution represents cargo metadata/root-resolution failure. This factual contract mismatch can misdirect callers to edit the catalogue. Document the fourth variant and distinguish metadata failures.",
+              "message": "D3 の `lib target は package 名のまま` という対応規則は Cargo の rustdoc root 規則として不完全です。`[lib] name` が package 名と異なる場合や、ハイフンを含む名前の crate 名正規化を定義しておらず、schema export・catalog import・signal evaluator 間で root が不一致になり得ます。選択した target の metadata name と正規化規則、および曖昧な target 選択時の fail-closed 規則を明記しないと、下流 spec が決定的な受入条件を導出できません。",
               "severity": "P1",
-              "file": "libs/domain/src/tddd/signal_evaluator/phase1_error.rs",
-              "line": 19,
-              "category": "factual error"
-            },
-            {
-              "message": "The SignalEvaluatorPort # Errors documentation lists only three variants and omits RustdocRootResolution, which evaluate can return during rustdoc-root resolution. It also does not state that the synchronous adapter may perform blocking cargo metadata I/O, leaving the public port contract incomplete.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signal_evaluator/port.rs",
-              "line": 63,
-              "category": "factual error"
+              "file": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+              "line": 47,
+              "category": "decision underspecified for downstream consumption"
             }
           ],
-          "hash": "rvw1:sha256:d379ca7d8f13537a53e659940f77c12fa2c311a95aeb2614a11ecd2ad4c5fb6b",
-          "at": "2026-07-13T08:31:12Z"
+          "hash": "rvw1:sha256:0ccffe9d28a6b5d4013d9075644d1f0ae7df7b9142223a27af2aeb1b8ff17f37",
+          "at": "2026-07-13T04:21:39Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4c4fbd98abae4c801c5c41cbafe646438ee556b0914ba01c77977192f8d93a37",
-          "at": "2026-07-13T08:37:23Z"
+          "hash": "rvw1:sha256:79c5b39b145c5a402312edb538da4121c7caf7345e71f328cd5fa1eca00a2386",
+          "at": "2026-07-13T04:25:56Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4c4fbd98abae4c801c5c41cbafe646438ee556b0914ba01c77977192f8d93a37",
-          "at": "2026-07-13T08:41:43Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc1287ce02ed5fa04f1dbb8a84b96555d6d1c93e4807b6abd3d9ff5050712c63",
-          "at": "2026-07-13T08:30:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc1287ce02ed5fa04f1dbb8a84b96555d6d1c93e4807b6abd3d9ff5050712c63",
-          "at": "2026-07-13T08:37:46Z"
+          "hash": "rvw1:sha256:79c5b39b145c5a402312edb538da4121c7caf7345e71f328cd5fa1eca00a2386",
+          "at": "2026-07-13T04:28:21Z"
         }
       ]
     }
