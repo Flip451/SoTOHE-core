@@ -535,7 +535,7 @@ impl TrackCompositionRoot {
 
         let catalogue_loader = Arc::new(FsCatalogueDocumentLoader::new());
         let ext_crate_codec = Arc::new(CatalogueToExtendedCrateCodec::new());
-        let evaluator = Arc::new(SignalEvaluatorV2::new());
+        let evaluator = Arc::new(SignalEvaluatorV2::with_workspace_root(workspace_root.clone()));
         let rustdoc_crate_port = Arc::new(RustdocCrateAdapter::new(workspace_root.clone()));
         let layer_bindings_port = Arc::new(FsTdddLayerBindingsAdapter::new());
         let symlink_guard = Arc::new(FsSymlinkGuard::new());

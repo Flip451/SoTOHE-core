@@ -1,115 +1,21 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
+    "cli_driver": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:64a0038442610edadf97909b2eefcc2cb0361772a9c81bdaacae374829d8b609",
-          "at": "2026-07-13T04:21:45Z"
+          "hash": "rvw1:sha256:fed503ff4d740a9ac9adb5493279720e7e762a966b03abdb7d89f5158aeed425",
+          "at": "2026-07-13T08:30:29Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:64a0038442610edadf97909b2eefcc2cb0361772a9c81bdaacae374829d8b609",
-          "at": "2026-07-13T04:25:00Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c1280309d1010aa99337a56b7f2229d13f3629e83f4a38bfb046fa7d934d717f",
-          "at": "2026-07-13T08:33:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c1280309d1010aa99337a56b7f2229d13f3629e83f4a38bfb046fa7d934d717f",
-          "at": "2026-07-13T08:40:51Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86a005ec888514b98f01fbdcbfbf6443584a3ca50eb00d68b8d7620538fccfc0",
-          "at": "2026-07-13T08:30:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:86a005ec888514b98f01fbdcbfbf6443584a3ca50eb00d68b8d7620538fccfc0",
-          "at": "2026-07-13T08:37:19Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc1287ce02ed5fa04f1dbb8a84b96555d6d1c93e4807b6abd3d9ff5050712c63",
-          "at": "2026-07-13T08:30:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc1287ce02ed5fa04f1dbb8a84b96555d6d1c93e4807b6abd3d9ff5050712c63",
-          "at": "2026-07-13T08:37:46Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The module and enum documentation still says every Phase1Error is caused by a catalogue declaration inconsistency, but RustdocRootResolution represents cargo metadata/root-resolution failure. This factual contract mismatch can misdirect callers to edit the catalogue. Document the fourth variant and distinguish metadata failures.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signal_evaluator/phase1_error.rs",
-              "line": 19,
-              "category": "factual error"
-            },
-            {
-              "message": "The SignalEvaluatorPort # Errors documentation lists only three variants and omits RustdocRootResolution, which evaluate can return during rustdoc-root resolution. It also does not state that the synchronous adapter may perform blocking cargo metadata I/O, leaving the public port contract incomplete.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/signal_evaluator/port.rs",
-              "line": 63,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:d379ca7d8f13537a53e659940f77c12fa2c311a95aeb2614a11ecd2ad4c5fb6b",
-          "at": "2026-07-13T08:31:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c4fbd98abae4c801c5c41cbafe646438ee556b0914ba01c77977192f8d93a37",
-          "at": "2026-07-13T08:37:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c4fbd98abae4c801c5c41cbafe646438ee556b0914ba01c77977192f8d93a37",
-          "at": "2026-07-13T08:41:43Z"
+          "hash": "rvw1:sha256:fed503ff4d740a9ac9adb5493279720e7e762a966b03abdb7d89f5158aeed425",
+          "at": "2026-07-13T08:37:08Z"
         }
       ]
     },
@@ -268,21 +174,39 @@
         }
       ]
     },
-    "usecase": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fb6eaede2c919f17a457c6b83e9e885da9d3bfa10716fcd86fcdeaa71314ac4c",
-          "at": "2026-07-13T08:29:56Z"
+          "hash": "rvw1:sha256:64a0038442610edadf97909b2eefcc2cb0361772a9c81bdaacae374829d8b609",
+          "at": "2026-07-13T04:21:45Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fb6eaede2c919f17a457c6b83e9e885da9d3bfa10716fcd86fcdeaa71314ac4c",
-          "at": "2026-07-13T08:35:06Z"
+          "hash": "rvw1:sha256:64a0038442610edadf97909b2eefcc2cb0361772a9c81bdaacae374829d8b609",
+          "at": "2026-07-13T04:25:00Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c1280309d1010aa99337a56b7f2229d13f3629e83f4a38bfb046fa7d934d717f",
+          "at": "2026-07-13T08:33:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c1280309d1010aa99337a56b7f2229d13f3629e83f4a38bfb046fa7d934d717f",
+          "at": "2026-07-13T08:40:51Z"
         }
       ]
     },
@@ -318,21 +242,75 @@
         }
       ]
     },
-    "cli_driver": {
+    "domain": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The module and enum documentation still says every Phase1Error is caused by a catalogue declaration inconsistency, but RustdocRootResolution represents cargo metadata/root-resolution failure. This factual contract mismatch can misdirect callers to edit the catalogue. Document the fourth variant and distinguish metadata failures.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signal_evaluator/phase1_error.rs",
+              "line": 19,
+              "category": "factual error"
+            },
+            {
+              "message": "The SignalEvaluatorPort # Errors documentation lists only three variants and omits RustdocRootResolution, which evaluate can return during rustdoc-root resolution. It also does not state that the synchronous adapter may perform blocking cargo metadata I/O, leaving the public port contract incomplete.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/signal_evaluator/port.rs",
+              "line": 63,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:d379ca7d8f13537a53e659940f77c12fa2c311a95aeb2614a11ecd2ad4c5fb6b",
+          "at": "2026-07-13T08:31:12Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fed503ff4d740a9ac9adb5493279720e7e762a966b03abdb7d89f5158aeed425",
-          "at": "2026-07-13T08:30:29Z"
+          "hash": "rvw1:sha256:4c4fbd98abae4c801c5c41cbafe646438ee556b0914ba01c77977192f8d93a37",
+          "at": "2026-07-13T08:37:23Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fed503ff4d740a9ac9adb5493279720e7e762a966b03abdb7d89f5158aeed425",
-          "at": "2026-07-13T08:37:08Z"
+          "hash": "rvw1:sha256:4c4fbd98abae4c801c5c41cbafe646438ee556b0914ba01c77977192f8d93a37",
+          "at": "2026-07-13T08:41:43Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc1287ce02ed5fa04f1dbb8a84b96555d6d1c93e4807b6abd3d9ff5050712c63",
+          "at": "2026-07-13T08:30:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc1287ce02ed5fa04f1dbb8a84b96555d6d1c93e4807b6abd3d9ff5050712c63",
+          "at": "2026-07-13T08:37:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:260ba13eaddf22177b599bf61bbc4a05318079764ee9879668452e3c40c3cdd4",
+          "at": "2026-07-13T09:21:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:260ba13eaddf22177b599bf61bbc4a05318079764ee9879668452e3c40c3cdd4",
+          "at": "2026-07-13T09:24:57Z"
         }
       ]
     },
@@ -531,6 +509,42 @@
           "findings": [],
           "hash": "rvw1:sha256:f9d6490386aa8df0a6876550a80abe2a58428e9291cdf776b156740aaab2bb57",
           "at": "2026-07-13T08:53:43Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb6eaede2c919f17a457c6b83e9e885da9d3bfa10716fcd86fcdeaa71314ac4c",
+          "at": "2026-07-13T08:29:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb6eaede2c919f17a457c6b83e9e885da9d3bfa10716fcd86fcdeaa71314ac4c",
+          "at": "2026-07-13T08:35:06Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86a005ec888514b98f01fbdcbfbf6443584a3ca50eb00d68b8d7620538fccfc0",
+          "at": "2026-07-13T08:30:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:86a005ec888514b98f01fbdcbfbf6443584a3ca50eb00d68b8d7620538fccfc0",
+          "at": "2026-07-13T08:37:19Z"
         }
       ]
     },
