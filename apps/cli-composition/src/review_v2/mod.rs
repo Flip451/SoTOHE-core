@@ -47,7 +47,9 @@ use shared::{build_scope_query_interactor_no_diff_str, build_scope_query_interac
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
+use infrastructure::agent_profiles::ResolvedExecution;
 use infrastructure::review_v2::{ClaudeReviewer, CodexReviewer};
+use usecase::dry_write_driver::CapabilityName;
 
 use crate::{CommandOutcome, error::CompositionError};
 
@@ -294,22 +296,19 @@ impl ReviewCompositionRoot {
             .map_err(|e| CompositionError::ConfigLoad(e.to_string()))?;
         let infra_round_type = shared::parse_round_type(&input.round_type)
             .map_err(|e| CompositionError::WiringFailed(e.to_string()))?;
-        let mut resolved =
-            profiles.resolve_execution("reviewer", infra_round_type).ok_or_else(|| {
-                CompositionError::ConfigLoad(
-                    "[ERROR] reviewer capability not defined in agent-profiles.json".to_owned(),
-                )
-            })?;
+        let capability = CapabilityName::try_new("reviewer")
+            .map_err(|error| CompositionError::ConfigLoad(error.to_string()))?;
+        let resolved = profiles
+            .resolve_execution(&capability, infra_round_type)
+            .map_err(|error| CompositionError::ConfigLoad(error.to_string()))?;
+        let ResolvedExecution::ProviderCli { provider, model: profile_model, .. } = resolved else {
+            return Err(CompositionError::ConfigLoad(
+                "[ERROR] reviewer must resolve to a provider CLI execution".to_owned(),
+            ));
+        };
+        let model = input.model.unwrap_or_else(|| profile_model.as_str().to_owned());
 
-        if let Some(model_override) = input.model {
-            resolved.model = Some(model_override);
-        }
-
-        eprintln!(
-            "[sotp review local] provider={} model={}",
-            resolved.provider,
-            resolved.model.as_deref().unwrap_or("<none>")
-        );
+        eprintln!("[sotp review local] provider={} model={}", provider, model);
 
         let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)?;
         let group = input.group.trim().to_owned();
@@ -343,14 +342,8 @@ impl ReviewCompositionRoot {
         let timeout = Duration::from_secs(input.timeout_seconds);
 
         let round_start = std::time::Instant::now();
-        let (run_result, provider_name, effective_model) = match resolved.provider.as_str() {
+        let (run_result, provider_name, effective_model) = match provider.as_str() {
             "codex" => {
-                let model = resolved.model.ok_or_else(|| {
-                    CompositionError::ConfigLoad(
-                        "[ERROR] codex reviewer requires a model (set model in agent-profiles.json)"
-                            .to_owned(),
-                    )
-                })?;
                 let reviewer =
                     CodexReviewer::new(&model, timeout, base_prompt).with_scope_label(&group);
                 let result = run_codex_review_str(
@@ -363,12 +356,6 @@ impl ReviewCompositionRoot {
                 (result, "codex".to_owned(), model)
             }
             "claude" => {
-                let model = resolved.model.ok_or_else(|| {
-                    CompositionError::ConfigLoad(
-                        "[ERROR] claude reviewer requires a model (set model in agent-profiles.json)"
-                            .to_owned(),
-                    )
-                })?;
                 let reviewer =
                     ClaudeReviewer::new(&model, timeout, base_prompt).with_scope_label(&group);
                 let result = run_claude_review_str(
@@ -825,6 +812,8 @@ mod tests {
       "model": "review-final",
       "fast_provider": "{provider}",
       "fast_model": "review-fast",
+      "reasoning_effort": "high",
+      "fast_reasoning_effort": "low",
       "execution_mode": "typed-pipeline"
     }},
     "review-fix-lead": {{
@@ -832,6 +821,8 @@ mod tests {
       "model": "gpt-final",
       "fast_provider": "{provider}",
       "fast_model": "gpt-fast",
+      "reasoning_effort": "high",
+      "fast_reasoning_effort": "low",
       "execution_mode": "typed-pipeline"
     }}
   }}

@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-13T19:32:10Z",
-  "declaration_hash": "9d1f5fe953d662580dbadaabd26d16e9cd695b0f106db61ef9082b7936834c48",
+  "generated_at": "2026-07-13T23:24:28Z",
+  "declaration_hash": "b1b57b7792a1e25c2b07b2dc8b05f454eb9fd93f84894e5c8a858c237007a47a",
   "signals": [
     {
       "type_name": "AgentProfiles",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::fmt::Debug"
@@ -15,7 +15,7 @@
     {
       "type_name": "AgentProfilesError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::convert::From<Error>",
@@ -27,7 +27,7 @@
     {
       "type_name": "CapabilityConfigDto",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -83,9 +83,9 @@
     {
       "type_name": "ReasoningEffortDto",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "core::clone::Clone",
         "core::cmp::Eq",
         "core::cmp::PartialEq",
@@ -97,7 +97,7 @@
     {
       "type_name": "ResolvedExecution",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "core::clone::Clone",
@@ -127,6 +127,24 @@
         "core::fmt::Debug",
         "core::fmt::Display"
       ]
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::tddd::type_signals_codec::declaration_hash",

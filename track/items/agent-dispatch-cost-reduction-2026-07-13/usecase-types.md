@@ -7,7 +7,7 @@
 | CapabilityDispatchOutcome | enum | reference | Executed, DelegateInHost | 🔵 | 🔵 |
 | CapabilityResumeRequest | enum | add | Fresh, ResumeWithoutTarget, Resume | 🟡 | 🔵 |
 | ProviderSessionCacheKey | enum | add | Review, TrackCapability, WorkspaceCapability | 🟡 | 🔵 |
-| ReasoningEffort | enum | add | Low, Medium, High, XHigh, Max | 🟡 | 🔵 |
+| ReasoningEffort | enum | add | Low, Medium, High, XHigh, Max | 🔵 | 🔵 |
 
 ## Value Objects
 
@@ -30,7 +30,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityExecError | error_type | modify | ProfileResolution, ExecutionModeRejected, ModelMissing, EffortMissing, UnsupportedProvider, SourceValidation, AdapterPreflight, DispatchFailed | 🟡 | 🔵 |
+| CapabilityExecError | error_type | modify | ProfileResolution, ExecutionModeRejected, ModelMissing, EffortMissing, UnsupportedProvider, SourceValidation, AdapterPreflight, DispatchFailed | 🔵 | 🔵 |
 | CapabilityInputValidationError | error_type | modify | EmptyProviderName, EmptyModelName, EmptyFilePath, InvalidFilePath, EmptyContent, ZeroTimeoutSeconds, EmptyTargetArtifactSet | 🟡 | 🔵 |
 | ProviderSessionCacheError | error_type | add | Io, Codec, Symlink, Path | 🟡 | 🔵 |
 | TypeSignalsExecutionError | error_type | add | — | 🟡 | 🔵 |
@@ -64,7 +64,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CapabilityDispatchRequest | dto | reference | — | 🔵 | 🔵 |
-| CapabilityProfile | dto | modify | — | 🟡 | 🔵 |
+| CapabilityProfile | dto | modify | — | 🔵 | 🔵 |
 
 ## Commands
 

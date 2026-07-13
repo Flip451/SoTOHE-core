@@ -681,7 +681,7 @@ fn resolve_reviewer_fails_closed_when_provider_is_unsupported() {
   "schema_version": 1,
   "providers": { "gemini": { "label": "Gemini CLI" } },
   "capabilities": {
-    "reviewer": { "provider": "gemini", "model": "gemini-2.5-pro", "execution_mode": "typed-pipeline" }
+    "reviewer": { "provider": "gemini", "model": "gemini-2.5-pro", "reasoning_effort": "high", "execution_mode": "typed-pipeline" }
   }
 }"#,
     );
@@ -704,7 +704,7 @@ fn resolve_reviewer_succeeds_for_codex_provider() {
   "schema_version": 1,
   "providers": { "codex": { "label": "Codex CLI" } },
   "capabilities": {
-    "reviewer": { "provider": "codex", "model": "gpt-5.4", "execution_mode": "typed-pipeline" }
+    "reviewer": { "provider": "codex", "model": "gpt-5.4", "reasoning_effort": "high", "execution_mode": "typed-pipeline" }
   }
 }"#,
     );
@@ -725,7 +725,7 @@ fn resolve_reviewer_succeeds_for_claude_provider() {
   "schema_version": 1,
   "providers": { "claude": { "label": "Claude Code" } },
   "capabilities": {
-    "reviewer": { "provider": "claude", "model": "claude-sonnet-4-6", "execution_mode": "typed-pipeline" }
+    "reviewer": { "provider": "claude", "model": "claude-sonnet-4-6", "reasoning_effort": "high", "execution_mode": "typed-pipeline" }
   }
 }"#,
     );
@@ -747,7 +747,7 @@ fn resolve_reviewer_fast_round_uses_fast_model_from_codex_provider() {
   "schema_version": 1,
   "providers": { "codex": { "label": "Codex CLI" } },
   "capabilities": {
-    "reviewer": { "provider": "codex", "model": "gpt-5.4", "fast_model": "gpt-5.4-mini", "execution_mode": "typed-pipeline" }
+    "reviewer": { "provider": "codex", "model": "gpt-5.4", "fast_model": "gpt-5.4-mini", "reasoning_effort": "xhigh", "fast_reasoning_effort": "low", "execution_mode": "typed-pipeline" }
   }
 }"#,
     );
@@ -780,6 +780,8 @@ fn resolve_reviewer_fast_round_mixed_provider_selects_fast_provider() {
       "model": "claude-opus-4-7",
       "fast_provider": "codex",
       "fast_model": "gpt-5.4-mini",
+      "reasoning_effort": "max",
+      "fast_reasoning_effort": "low",
       "execution_mode": "typed-pipeline"
     }
   }

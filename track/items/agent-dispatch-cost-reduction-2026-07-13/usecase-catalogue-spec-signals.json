@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "5469c2f8d2b6a755f600617372271f04a2732f61cfad0ff4acef04d56b7c2e5c",
+  "catalogue_declaration_hash": "57bd9ee32fba3f84929edba516e8556816ff4abcead7b8ec6ffa7cdcf9306642",
   "signals": [
     {
       "type_name": "CapabilityDispatchOutcome",
@@ -15,7 +15,7 @@
     {
       "type_name": "CapabilityExecError",
       "signal": "blue",
-      "entry_hash": "5a0bb7632054e5e03b01bbbb9cac61e8b224dc9fb56b62645bde41445dba7dc9"
+      "entry_hash": "f4cd9dd4d70c1404c4c26804724855e14002490614e8f8eab8a712bea00d088f"
     },
     {
       "type_name": "CapabilityExecRequest",

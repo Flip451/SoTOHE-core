@@ -1,0 +1,43 @@
+{
+  "track_id": "agent-dispatch-cost-reduction-2026-07-13",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProfile",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "0e36fd1ef76ef8b0140185ab6cfde4b3f53214e6340b58aa60a823404eed6bb5",
+        "declaration_hash": "00adb8aa6c38615467378e09c596bb95f29cf68136a1ed94c4a2e00bb920e1a1",
+        "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Fully resolved provider, model, effort, and execution mode for one capability dispatch."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReasoningEffort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "c0178880f876f5e2370fca27271ef0cd2ae893be994dca6375c662053939c03d",
+        "declaration_hash": "d74eb19499b3b982d3f1ee5c9d8cca9dc5debdbc9c94e758385b5b9c25189154",
+        "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Closed provider-independent vocabulary for explicitly configured reasoning effort."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ]
+}

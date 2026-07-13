@@ -12,6 +12,7 @@ use infrastructure::review_v2::{
     SystemReviewHasher, load_v2_scope_config,
 };
 use thiserror::Error;
+use usecase::dry_write_driver::CapabilityName;
 use usecase::review_v2::{ReviewCycle, ScopeQueryInteractor};
 
 use super::null_reviewer::NullReviewer;
@@ -559,19 +560,20 @@ pub(crate) fn resolve_agent_execution(
     model_override: Option<&str>,
 ) -> Result<ResolvedAgentExecution, ReviewSharedError> {
     let profiles = load_agent_profiles_from_repo(items_dir)?;
-    let resolved = profiles.resolve_execution(capability, round_type).ok_or_else(|| {
-        ReviewSharedError::Config(format!(
-            "[ERROR] {capability} capability not defined in agent-profiles.json"
-        ))
-    })?;
-    let model =
-        model_override.map(str::to_owned).or_else(|| resolved.model.clone()).ok_or_else(|| {
-            ReviewSharedError::Config(format!(
-                "[ERROR] no model specified: pass --model or set model in agent-profiles.json \
-                 {capability} capability"
-            ))
-        })?;
-    Ok(ResolvedAgentExecution { provider: resolved.provider.clone(), model })
+    let capability_name = CapabilityName::try_new(capability)
+        .map_err(|error| ReviewSharedError::InvalidInput(error.to_string()))?;
+    let resolved = profiles
+        .resolve_execution(&capability_name, round_type)
+        .map_err(|error| ReviewSharedError::Config(error.to_string()))?;
+    let infrastructure::agent_profiles::ResolvedExecution::ProviderCli { provider, model, .. } =
+        resolved
+    else {
+        return Err(ReviewSharedError::Config(format!(
+            "[ERROR] {capability} must resolve to a provider CLI execution"
+        )));
+    };
+    let model = model_override.map(str::to_owned).unwrap_or_else(|| model.as_str().to_owned());
+    Ok(ResolvedAgentExecution { provider: provider.as_str().to_owned(), model })
 }
 
 /// Parses a `round_type` string (`"fast"` or `"final"`) into the infra

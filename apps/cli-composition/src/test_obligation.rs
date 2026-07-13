@@ -343,7 +343,8 @@ mod tests {
     use cli_driver::test_obligation::check::TestObligationCheckInput;
     use cli_driver::test_obligation::results::TestObligationResultsInput;
     use domain::ModelTier;
-    use infrastructure::agent_profiles::RoundType;
+    use infrastructure::agent_profiles::{ResolvedExecution, RoundType};
+    use usecase::dry_write_driver::CapabilityName;
 
     use super::*;
 
@@ -403,9 +404,16 @@ mod tests {
         let profiles = root.agent_profiles().unwrap();
 
         for capability in ["obligation-fulfillment-verifier", "waiver-verifier"] {
-            assert!(profiles.resolve_capability(capability).is_some());
-            assert_eq!(profiles.resolve_model(capability, RoundType::Fast), Some("gpt-5.6-luna"));
-            assert_eq!(profiles.resolve_model(capability, RoundType::Final), Some("gpt-5.6-terra"));
+            let capability = CapabilityName::try_new(capability).unwrap();
+            assert!(profiles.resolve_capability(&capability).is_some());
+            assert!(matches!(
+                profiles.resolve_execution(&capability, RoundType::Fast),
+                Ok(ResolvedExecution::ProviderCli { model, .. }) if model.as_str() == "gpt-5.6-luna"
+            ));
+            assert!(matches!(
+                profiles.resolve_execution(&capability, RoundType::Final),
+                Ok(ResolvedExecution::ProviderCli { model, .. }) if model.as_str() == "gpt-5.6-terra"
+            ));
         }
     }
 
@@ -429,6 +437,8 @@ mod tests {
                         "model": "fulfillment-final",
                         "fast_provider": "claude",
                         "fast_model": "fulfillment-fast",
+                        "reasoning_effort": "high",
+                        "fast_reasoning_effort": "low",
                         "execution_mode": "typed-pipeline"
                     },
                     "waiver-verifier": {
@@ -436,6 +446,8 @@ mod tests {
                         "model": "waiver-final",
                         "fast_provider": "gemini",
                         "fast_model": "waiver-fast",
+                        "reasoning_effort": "high",
+                        "fast_reasoning_effort": "high",
                         "execution_mode": "typed-pipeline"
                     }
                 }
@@ -448,22 +460,33 @@ mod tests {
         );
         let profiles = root.agent_profiles().unwrap();
 
-        let fulfillment_fast =
-            profiles.resolve_execution("obligation-fulfillment-verifier", RoundType::Fast).unwrap();
-        let fulfillment_final = profiles
-            .resolve_execution("obligation-fulfillment-verifier", RoundType::Final)
-            .unwrap();
-        let waiver_fast = profiles.resolve_execution("waiver-verifier", RoundType::Fast).unwrap();
-        let waiver_final = profiles.resolve_execution("waiver-verifier", RoundType::Final).unwrap();
+        let fulfillment = CapabilityName::try_new("obligation-fulfillment-verifier").unwrap();
+        let waiver = CapabilityName::try_new("waiver-verifier").unwrap();
+        let fulfillment_fast = profiles.resolve_execution(&fulfillment, RoundType::Fast).unwrap();
+        let fulfillment_final = profiles.resolve_execution(&fulfillment, RoundType::Final).unwrap();
+        let waiver_fast = profiles.resolve_execution(&waiver, RoundType::Fast).unwrap();
+        let waiver_final = profiles.resolve_execution(&waiver, RoundType::Final).unwrap();
 
-        assert_eq!(fulfillment_fast.provider, "claude");
-        assert_eq!(fulfillment_fast.model.as_deref(), Some("fulfillment-fast"));
-        assert_eq!(fulfillment_final.provider, "codex");
-        assert_eq!(fulfillment_final.model.as_deref(), Some("fulfillment-final"));
-        assert_eq!(waiver_fast.provider, "gemini");
-        assert_eq!(waiver_fast.model.as_deref(), Some("waiver-fast"));
-        assert_eq!(waiver_final.provider, "claude");
-        assert_eq!(waiver_final.model.as_deref(), Some("waiver-final"));
+        assert!(matches!(
+            fulfillment_fast,
+            ResolvedExecution::ProviderCli { provider, model, .. }
+                if provider.as_str() == "claude" && model.as_str() == "fulfillment-fast"
+        ));
+        assert!(matches!(
+            fulfillment_final,
+            ResolvedExecution::ProviderCli { provider, model, .. }
+                if provider.as_str() == "codex" && model.as_str() == "fulfillment-final"
+        ));
+        assert!(matches!(
+            waiver_fast,
+            ResolvedExecution::ProviderCli { provider, model, .. }
+                if provider.as_str() == "gemini" && model.as_str() == "waiver-fast"
+        ));
+        assert!(matches!(
+            waiver_final,
+            ResolvedExecution::ProviderCli { provider, model, .. }
+                if provider.as_str() == "claude" && model.as_str() == "waiver-final"
+        ));
     }
 
     #[test]
@@ -814,8 +837,18 @@ mod tests {
         );
 
         let profiles = root.agent_profiles().unwrap();
-        assert!(profiles.resolve_capability("obligation-fulfillment-verifier").is_none());
-        assert!(profiles.resolve_capability("waiver-verifier").is_none());
+        assert!(
+            profiles
+                .resolve_capability(
+                    &CapabilityName::try_new("obligation-fulfillment-verifier").unwrap()
+                )
+                .is_none()
+        );
+        assert!(
+            profiles
+                .resolve_capability(&CapabilityName::try_new("waiver-verifier").unwrap())
+                .is_none()
+        );
 
         let fulfillment_error = root
             .fulfillment_verifier()

@@ -381,22 +381,29 @@ impl PrCompositionRoot {
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
     pub fn pr_trigger_review(&self, pr: String) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
+        use infrastructure::agent_profiles::{
+            AGENT_PROFILES_PATH, AgentProfiles, ResolvedExecution, RoundType,
+        };
         use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
         use infrastructure::git_cli::SystemGitRepo;
+        use usecase::dry_write_driver::CapabilityName;
 
         let git_repo =
             SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         let profiles_path = git_repo.root().join(AGENT_PROFILES_PATH);
         let profiles = AgentProfiles::load(git_repo.root(), &profiles_path)
             .map_err(|e| CompositionError::ConfigLoad(format!("{e}")))?;
-        let resolved =
-            profiles.resolve_execution("pr-reviewer", RoundType::Final).ok_or_else(|| {
-                CompositionError::WiringFailed(
-                    "pr-reviewer capability not defined in agent-profiles.json".to_owned(),
-                )
-            })?;
-        usecase::pr_review::validate_reviewer_provider(&resolved.provider)
+        let capability = CapabilityName::try_new("pr-reviewer")
+            .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+        let resolved = profiles
+            .resolve_execution(&capability, RoundType::Final)
+            .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+        let ResolvedExecution::HostedService { provider } = resolved else {
+            return Err(CompositionError::WiringFailed(
+                "pr-reviewer must use a hosted-service execution profile".to_owned(),
+            ));
+        };
+        usecase::pr_review::validate_reviewer_provider(provider.as_str())
             .map_err(|e| CompositionError::WiringFailed(e.to_string()))?;
 
         let client = SystemGhClient;
@@ -491,9 +498,12 @@ impl PrCompositionRoot {
         track_id: Option<String>,
         resume: bool,
     ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
+        use infrastructure::agent_profiles::{
+            AGENT_PROFILES_PATH, AgentProfiles, ResolvedExecution, RoundType,
+        };
         use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
         use infrastructure::git_cli::SystemGitRepo;
+        use usecase::dry_write_driver::CapabilityName;
 
         let repo =
             SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
@@ -501,13 +511,17 @@ impl PrCompositionRoot {
         let profiles_path = repo.root().join(AGENT_PROFILES_PATH);
         let profiles = AgentProfiles::load(repo.root(), &profiles_path)
             .map_err(|e| CompositionError::ConfigLoad(format!("{e}")))?;
-        let resolved =
-            profiles.resolve_execution("pr-reviewer", RoundType::Final).ok_or_else(|| {
-                CompositionError::WiringFailed(
-                    "pr-reviewer capability not defined in agent-profiles.json".to_owned(),
-                )
-            })?;
-        usecase::pr_review::validate_reviewer_provider(&resolved.provider)
+        let capability = CapabilityName::try_new("pr-reviewer")
+            .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+        let resolved = profiles
+            .resolve_execution(&capability, RoundType::Final)
+            .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+        let ResolvedExecution::HostedService { provider } = resolved else {
+            return Err(CompositionError::WiringFailed(
+                "pr-reviewer must use a hosted-service execution profile".to_owned(),
+            ));
+        };
+        usecase::pr_review::validate_reviewer_provider(provider.as_str())
             .map_err(|e| CompositionError::WiringFailed(e.to_string()))?;
 
         let branch = repo

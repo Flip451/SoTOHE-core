@@ -1,6 +1,122 @@
 {
   "crate_name": "infrastructure",
   "functions": {
+    "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args": {
+      "action": "modify",
+      "docs": "Builds Claude ref-verifier argv with the resolved typed effort injected explicitly; model is an upstream-resolved opaque provider CLI token and prompt is unconstrained opaque text.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "model",
+          "ty": "&str"
+        },
+        {
+          "name": "effort",
+          "ty": "usecase::capability_exec::ReasoningEffort"
+        },
+        {
+          "name": "prompt",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Vec<std::ffi::OsString>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args": {
+      "action": "modify",
+      "docs": "Builds sandboxed Codex ref-verifier argv with typed effort and structured-output paths; model is an upstream-resolved opaque provider CLI token and prompt is unconstrained opaque text.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "model",
+          "ty": "&str"
+        },
+        {
+          "name": "effort",
+          "ty": "usecase::capability_exec::ReasoningEffort"
+        },
+        {
+          "name": "prompt",
+          "ty": "&str"
+        },
+        {
+          "name": "output_schema",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "output_last_message",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "Vec<std::ffi::OsString>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args": {
+      "action": "modify",
+      "docs": "Builds Gemini ref-verifier argv; produces only RefVerifyError::VerifierPort. Model and prompt are unconstrained opaque provider CLI text.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "model",
+          "ty": "&str"
+        },
+        {
+          "name": "effort",
+          "ty": "usecase::capability_exec::ReasoningEffort"
+        },
+        {
+          "name": "prompt",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Result<Vec<std::ffi::OsString>, usecase::ref_verify::RefVerifyError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
     "infrastructure::tddd::type_signals_codec::declaration_hash": {
       "action": "modify",
       "docs": "Hashes opaque catalogue bytes into the typed declaration freshness identity.",
@@ -540,29 +656,44 @@
             "name": "Io",
             "payload": {
               "fields": [
-                "domain::FreeText",
-                "std::io::Error"
+                {
+                  "name": "path",
+                  "ty": "domain::FreeText"
+                },
+                {
+                  "name": "source",
+                  "ty": "std::io::Error"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "Symlink",
             "payload": {
               "fields": [
-                "domain::FreeText"
+                {
+                  "name": "path",
+                  "ty": "domain::FreeText"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "PathOutsideTrustedRoot",
             "payload": {
               "fields": [
-                "domain::FreeText",
-                "domain::FreeText"
+                {
+                  "name": "path",
+                  "ty": "domain::FreeText"
+                },
+                {
+                  "name": "root",
+                  "ty": "domain::FreeText"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
@@ -578,20 +709,32 @@
             "name": "UnsupportedSchemaVersion",
             "payload": {
               "fields": [
-                "u32",
-                "u32"
+                {
+                  "name": "found",
+                  "ty": "u32"
+                },
+                {
+                  "name": "expected",
+                  "ty": "u32"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "InvalidCapability",
             "payload": {
               "fields": [
-                "domain::FreeText",
-                "domain::FreeText"
+                {
+                  "name": "capability",
+                  "ty": "domain::FreeText"
+                },
+                {
+                  "name": "reason",
+                  "ty": "domain::FreeText"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {

@@ -9,7 +9,7 @@
 
 use std::path::Path;
 
-use crate::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles};
+use crate::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, ResolvedExecution};
 use crate::dry_check::DryCheckConfig as InfraDryCheckConfig;
 use crate::track::symlink_guard::reject_symlinks_below;
 
@@ -47,72 +47,48 @@ pub(super) fn build_usecase_dry_check_config(
     ))
 }
 
-pub(super) const DEFAULT_FAST_REASONING_EFFORT: &str = "medium";
-pub(super) const DEFAULT_FINAL_REASONING_EFFORT: &str = "high";
-const ALLOWED_DRY_CHECKER_REASONING_EFFORTS: &[&str] = &["low", "medium", "high", "minimal"];
-
-pub(super) fn resolve_dry_checker_reasoning_effort(
-    capability_name: &str,
-    field: &str,
-    configured: Option<&str>,
-    default_value: &str,
-) -> Result<String, String> {
-    let value = configured.unwrap_or(default_value);
-    if ALLOWED_DRY_CHECKER_REASONING_EFFORTS.contains(&value) {
-        Ok(value.to_owned())
-    } else {
-        Err(format!(
-            "[ERROR] invalid reasoning_effort in agent-profiles.json capability \
-             '{capability_name}' field '{field}': '{value}' (allowed: low, medium, high, minimal)"
-        ))
-    }
-}
-
 /// Resolve `(fast_model, final_model, fast_reasoning_effort,
 /// final_reasoning_effort)` for the `dry-checker` capability. Explicit
-/// `--model` overrides both model fields. Reasoning effort comes from
-/// `CapabilityConfigDto` accessors, is validated against the Codex allowed
-/// values, and absent fields fall back to `"medium"` (fast) / `"high"` (final).
+/// `--model` overrides both model fields. Both rounds resolve through the
+/// fail-closed profile API so the process never falls back to provider effort
+/// defaults.
 pub(super) fn resolve_dry_checker_config(
     root: &Path,
     capability_name: &str,
     explicit_model: Option<String>,
 ) -> Result<(String, String, String, String), String> {
     use crate::agent_profiles::RoundType;
+    use usecase::capability_exec::ReasoningEffort;
+    use usecase::dry_write_driver::CapabilityName;
     let profiles = load_agent_profiles_under_root(root)?;
-    let (fast_model, final_model) = if let Some(m) = explicit_model {
-        (m.clone(), m)
-    } else {
-        let final_model = profiles
-            .resolve_model(capability_name, RoundType::Final)
-            .map(str::to_owned)
-            .ok_or_else(|| {
-                format!(
-                    "[ERROR] no model specified: pass --model or set model in \
-                 agent-profiles.json '{capability_name}' capability"
-                )
-            })?;
-        (
-            profiles
-                .resolve_model(capability_name, RoundType::Fast)
-                .map(str::to_owned)
-                .unwrap_or_else(|| final_model.clone()),
-            final_model,
-        )
+    let capability = CapabilityName::try_new(capability_name)
+        .map_err(|error| format!("[ERROR] invalid dry-checker capability name: {error}"))?;
+    let resolve_cli = |round_type| {
+        let resolved = profiles
+            .resolve_execution(&capability, round_type)
+            .map_err(|error| format!("[ERROR] failed to resolve '{capability_name}': {error}"))?;
+        match resolved {
+            ResolvedExecution::ProviderCli { model, effort, .. } => Ok((model, effort)),
+            ResolvedExecution::HostedService { .. } => {
+                Err(format!("[ERROR] '{capability_name}' must resolve to a provider CLI execution"))
+            }
+        }
     };
-    let cap = profiles.resolve_capability(capability_name);
-    let fast_reasoning_effort = resolve_dry_checker_reasoning_effort(
-        capability_name,
-        "fast_reasoning_effort",
-        cap.and_then(|c| c.fast_reasoning_effort()),
-        DEFAULT_FAST_REASONING_EFFORT,
-    )?;
-    let final_reasoning_effort = resolve_dry_checker_reasoning_effort(
-        capability_name,
-        "final_reasoning_effort",
-        cap.and_then(|c| c.final_reasoning_effort()),
-        DEFAULT_FINAL_REASONING_EFFORT,
-    )?;
+    let (fast_profile_model, fast_effort) = resolve_cli(RoundType::Fast)?;
+    let (final_profile_model, final_effort) = resolve_cli(RoundType::Final)?;
+    let (fast_model, final_model) = explicit_model.map_or_else(
+        || (fast_profile_model.as_str().to_owned(), final_profile_model.as_str().to_owned()),
+        |model| (model.clone(), model),
+    );
+    let effort_text = |effort| match effort {
+        ReasoningEffort::Low => "low",
+        ReasoningEffort::Medium => "medium",
+        ReasoningEffort::High => "high",
+        ReasoningEffort::XHigh => "xhigh",
+        ReasoningEffort::Max => "max",
+    };
+    let fast_reasoning_effort = effort_text(fast_effort).to_owned();
+    let final_reasoning_effort = effort_text(final_effort).to_owned();
     Ok((fast_model, final_model, fast_reasoning_effort, final_reasoning_effort))
 }
 
@@ -222,7 +198,7 @@ mod tests {
       "model": "profile-final-model-v1",
       "fast_model": "profile-fast-model-v1",
       "fast_reasoning_effort": "low",
-      "final_reasoning_effort": "minimal",
+      "reasoning_effort": "high",
       "execution_mode": "typed-pipeline"
     }
   }
@@ -240,11 +216,11 @@ mod tests {
         assert_eq!(fast_model, "explicit-model-v1");
         assert_eq!(final_model, "explicit-model-v1");
         assert_eq!(fast_effort, "low");
-        assert_eq!(final_effort, "minimal");
+        assert_eq!(final_effort, "high");
     }
 
     #[test]
-    fn test_resolve_dry_checker_config_fast_falls_back_to_final_when_not_set() {
+    fn test_resolve_dry_checker_config_fast_uses_generic_effort_when_not_overridden() {
         let dir = tempfile::tempdir().unwrap();
         std::fs::create_dir_all(dir.path().join(".harness/config")).unwrap();
         std::fs::write(
@@ -256,6 +232,7 @@ mod tests {
     "dry-checker": {
       "provider": "codex",
       "model": "only-final-model-v1",
+      "reasoning_effort": "high",
       "execution_mode": "typed-pipeline"
     }
   }
@@ -268,7 +245,7 @@ mod tests {
 
         assert_eq!(fast_model, "only-final-model-v1");
         assert_eq!(final_model, "only-final-model-v1");
-        assert_eq!(fast_effort, "medium");
+        assert_eq!(fast_effort, "high");
         assert_eq!(final_effort, "high");
     }
 
@@ -304,12 +281,9 @@ mod tests {
 
     #[test]
     fn test_resolve_dry_checker_config_invalid_reasoning_effort_returns_error() {
-        let cases = [
-            ("turbo", "high", "fast_reasoning_effort", "turbo"),
-            ("medium", "ultra", "final_reasoning_effort", "ultra"),
-        ];
+        let cases = [("turbo", "high", "turbo"), ("medium", "ultra", "ultra")];
 
-        for (fast_effort, final_effort, expected_field, expected_value) in cases {
+        for (fast_effort, final_effort, expected_value) in cases {
             let dir = tempfile::tempdir().unwrap();
             std::fs::create_dir_all(dir.path().join(".harness/config")).unwrap();
             std::fs::write(
@@ -333,7 +307,6 @@ mod tests {
             .unwrap();
 
             let err = resolve_dry_checker_config(dir.path(), "dry-checker", None).unwrap_err();
-            assert!(err.contains(expected_field), "got: {err}");
             assert!(err.contains(expected_value), "got: {err}");
         }
     }

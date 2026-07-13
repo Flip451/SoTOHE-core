@@ -49,6 +49,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use usecase::capability_exec::ReasoningEffort;
 use usecase::ref_verify::RefVerifyError;
 
 use crate::agent_profiles::ResolvedExecution;
@@ -147,34 +148,25 @@ fn run_ref_verifier_agent(
     prompt: String,
     codex_output_schema: &str,
 ) -> Result<String, RefVerifyError> {
-    match resolved.provider.as_str() {
-        "claude" => {
-            let model = require_ref_verifier_model("claude", resolved.model.as_deref())?;
-            run_claude_ref_verifier(project_root, model, &prompt)
-        }
-        "codex" => {
-            let model = require_ref_verifier_model("codex", resolved.model.as_deref())?;
-            run_codex_ref_verifier(project_root, model, &prompt, codex_output_schema)
-        }
-        "gemini" => {
-            let model = require_ref_verifier_model("gemini", resolved.model.as_deref())?;
-            run_gemini_ref_verifier(project_root, model, &prompt)
-        }
+    let ResolvedExecution::ProviderCli { provider, model, effort } = resolved else {
+        return Err(ref_verify_runner_error(
+            "hosted-service execution cannot run a reference verifier".to_owned(),
+        ));
+    };
+    match provider.as_str() {
+        "claude" => run_claude_ref_verifier(project_root, model.as_str(), effort, &prompt),
+        "codex" => run_codex_ref_verifier(
+            project_root,
+            model.as_str(),
+            effort,
+            &prompt,
+            codex_output_schema,
+        ),
+        "gemini" => run_gemini_ref_verifier(project_root, model.as_str(), effort, &prompt),
         other => {
             Err(ref_verify_runner_error(format!("unsupported ref-verifier provider '{other}'")))
         }
     }
-}
-
-fn require_ref_verifier_model<'a>(
-    provider: &str,
-    model: Option<&'a str>,
-) -> Result<&'a str, RefVerifyError> {
-    model.ok_or_else(|| {
-        ref_verify_runner_error(format!(
-            "ref-verifier provider '{provider}' requires a configured model"
-        ))
-    })
 }
 
 // ── claude ───────────────────────────────────────────────────────────────────
@@ -200,10 +192,11 @@ const CLAUDE_REF_VERIFIER_DISALLOWED_TOOLS: &[&str] =
 fn run_claude_ref_verifier(
     project_root: &Path,
     model: &str,
+    effort: ReasoningEffort,
     prompt: &str,
 ) -> Result<String, RefVerifyError> {
     let bin: OsString = "claude".into();
-    let args = build_claude_ref_verifier_args(model, prompt);
+    let args = build_claude_ref_verifier_args(model, effort, prompt);
     let outcome = run_process_retryable(&bin, &args, project_root, "claude ref-verifier")?;
     extract_claude_ref_verifier_output(&outcome.stdout)
         .or_else(|| nonempty_trimmed(&outcome.stdout))
@@ -212,13 +205,19 @@ fn run_claude_ref_verifier(
 
 /// Build the argv for the `claude` ref-verifier subprocess.
 #[must_use]
-pub fn build_claude_ref_verifier_args(model: &str, prompt: &str) -> Vec<OsString> {
+pub fn build_claude_ref_verifier_args(
+    model: &str,
+    effort: ReasoningEffort,
+    prompt: &str,
+) -> Vec<OsString> {
     let mut args = CLAUDE_REF_VERIFIER_STATIC_ARGS.iter().map(OsString::from).collect::<Vec<_>>();
     args.extend(CLAUDE_REF_VERIFIER_DISALLOWED_TOOLS.iter().map(OsString::from));
     args.push(OsString::from("--output-format"));
     args.push(OsString::from("json"));
     args.push(OsString::from("--model"));
     args.push(OsString::from(model));
+    args.push(OsString::from("--effort"));
+    args.push(OsString::from(reasoning_effort_value(effort)));
     args.push(OsString::from(prompt));
     args
 }
@@ -247,6 +246,7 @@ fn extract_claude_output_from_json(text: &str) -> Option<String> {
 fn run_codex_ref_verifier(
     project_root: &Path,
     model: &str,
+    effort: ReasoningEffort,
     prompt: &str,
     output_schema: &str,
 ) -> Result<String, RefVerifyError> {
@@ -259,7 +259,8 @@ fn run_codex_ref_verifier(
     let last_message = AutoCleanupFile::create(project_root, "codex-ref-verify-last", "txt", &[])?;
 
     let bin: OsString = "codex".into();
-    let args = build_codex_ref_verifier_args(model, prompt, schema.path(), last_message.path());
+    let args =
+        build_codex_ref_verifier_args(model, effort, prompt, schema.path(), last_message.path());
     run_process_retryable(&bin, &args, project_root, "codex ref-verifier")?;
 
     // Codex writes the final structured message to `--output-last-message`.
@@ -282,14 +283,15 @@ fn run_codex_ref_verifier(
 /// Constraints:
 /// - `--sandbox read-only` plus `--config sandbox_workspace_write_roots=[]`:
 ///   the verifier must not perform filesystem mutation.
-/// - `--config model_reasoning_effort="high"`: match the dry-checker
-///   pattern so the verifier reasons hard before emitting Pass.
+/// - `--config model_reasoning_effort="<resolved-effort>"`: makes the profile
+///   reasoning depth explicit rather than falling back to Codex's default.
 /// - `--output-schema <path>` + `--output-last-message <path>`: structured
 ///   output is enforced and routed to a transient file instead of stdout
 ///   (so codex's tail-output formatting cannot corrupt the JSON).
 #[must_use]
 pub fn build_codex_ref_verifier_args(
     model: &str,
+    effort: ReasoningEffort,
     prompt: &str,
     output_schema: &Path,
     output_last_message: &Path,
@@ -301,7 +303,7 @@ pub fn build_codex_ref_verifier_args(
         OsString::from("--config"),
         OsString::from("sandbox_workspace_write_roots=[]"),
         OsString::from("--config"),
-        OsString::from("model_reasoning_effort=\"high\""),
+        OsString::from(format!("model_reasoning_effort=\"{}\"", reasoning_effort_value(effort))),
         OsString::from("--model"),
         OsString::from(model),
         OsString::from("--output-schema"),
@@ -317,19 +319,45 @@ pub fn build_codex_ref_verifier_args(
 fn run_gemini_ref_verifier(
     project_root: &Path,
     model: &str,
+    effort: ReasoningEffort,
     prompt: &str,
 ) -> Result<String, RefVerifyError> {
     let bin: OsString = "gemini".into();
-    let args = build_gemini_ref_verifier_args(model, prompt);
+    let args = build_gemini_ref_verifier_args(model, effort, prompt)?;
     let outcome = run_process_retryable(&bin, &args, project_root, "gemini ref-verifier")?;
     nonempty_trimmed(&outcome.stdout)
         .ok_or_else(|| ref_verify_runner_error("gemini ref-verifier produced no output"))
 }
 
 /// Build the argv for the `gemini` ref-verifier subprocess.
-#[must_use]
-pub fn build_gemini_ref_verifier_args(model: &str, prompt: &str) -> Vec<OsString> {
-    vec![OsString::from("-m"), OsString::from(model), OsString::from("-p"), OsString::from(prompt)]
+///
+/// Gemini CLI has no invocation-scoped reasoning-effort flag. Refusing this
+/// execution is safer than launching with an implicit provider default.
+///
+/// # Errors
+///
+/// Always returns an error until Gemini CLI exposes an invocation-scoped
+/// effort setting that can be passed without mutating persistent user config.
+pub fn build_gemini_ref_verifier_args(
+    model: &str,
+    effort: ReasoningEffort,
+    prompt: &str,
+) -> Result<Vec<OsString>, RefVerifyError> {
+    let _ = (model, prompt);
+    Err(ref_verify_runner_error(format!(
+        "Gemini ref-verifier cannot inject resolved reasoning effort '{}' without a provider default",
+        reasoning_effort_value(effort)
+    )))
+}
+
+fn reasoning_effort_value(effort: ReasoningEffort) -> &'static str {
+    match effort {
+        ReasoningEffort::Low => "low",
+        ReasoningEffort::Medium => "medium",
+        ReasoningEffort::High => "high",
+        ReasoningEffort::XHigh => "xhigh",
+        ReasoningEffort::Max => "max",
+    }
 }
 
 // ── subprocess core ──────────────────────────────────────────────────────────
@@ -666,10 +694,12 @@ fn ref_verify_runtime_path(
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
+    use usecase::capability_exec::{ModelName, ProviderName, ReasoningEffort};
 
     #[test]
     fn build_claude_ref_verifier_args_denies_local_tools() {
-        let args = build_claude_ref_verifier_args("claude-opus-4-8", "the prompt");
+        let args =
+            build_claude_ref_verifier_args("claude-opus-4-8", ReasoningEffort::Max, "the prompt");
         let strs: Vec<&str> = args.iter().filter_map(|s| s.to_str()).collect();
         assert!(strs.contains(&"--disallowedTools"));
         for tool in ["Read", "Grep", "Glob", "Bash", "Edit", "Write"] {
@@ -677,12 +707,15 @@ mod tests {
         }
         assert!(strs.contains(&"the prompt"));
         assert!(strs.contains(&"claude-opus-4-8"));
+        assert!(strs.contains(&"--effort"));
+        assert!(strs.contains(&"max"));
     }
 
     #[test]
     fn build_codex_ref_verifier_args_includes_schema_and_reasoning_effort() {
         let args = build_codex_ref_verifier_args(
             "gpt-5",
+            ReasoningEffort::Low,
             "the prompt",
             Path::new("/tmp/schema.json"),
             Path::new("/tmp/last.txt"),
@@ -692,17 +725,22 @@ mod tests {
         assert!(strs.contains(&"--sandbox"));
         assert!(strs.contains(&"read-only"));
         assert!(strs.contains(&"sandbox_workspace_write_roots=[]"));
-        assert!(strs.contains(&"model_reasoning_effort=\"high\""));
+        assert!(strs.contains(&"model_reasoning_effort=\"low\""));
         assert!(strs.contains(&"--output-schema"));
         assert!(strs.contains(&"--output-last-message"));
         assert!(strs.contains(&"the prompt"));
     }
 
     #[test]
-    fn build_gemini_ref_verifier_args_uses_short_flags() {
-        let args = build_gemini_ref_verifier_args("gemini-2.5-pro", "the prompt");
-        let strs: Vec<&str> = args.iter().filter_map(|s| s.to_str()).collect();
-        assert_eq!(strs, vec!["-m", "gemini-2.5-pro", "-p", "the prompt"]);
+    fn build_gemini_ref_verifier_args_rejects_provider_default_effort() {
+        let error =
+            build_gemini_ref_verifier_args("gemini-2.5-pro", ReasoningEffort::Low, "the prompt")
+                .expect_err("Gemini execution must fail closed when effort cannot be injected");
+        let RefVerifyError::VerifierPort { message } = error else {
+            panic!("expected VerifierPort, got {error:?}");
+        };
+        assert!(message.contains("reasoning effort 'low'"), "got: {message}");
+        assert!(message.contains("provider default"), "got: {message}");
     }
 
     #[test]
@@ -733,8 +771,11 @@ mod tests {
     #[test]
     fn run_ref_verifier_agent_rejects_unsupported_provider() {
         let dir = tempfile::tempdir().unwrap();
-        let resolved =
-            ResolvedExecution { provider: "unsupported".to_owned(), model: Some("m".to_owned()) };
+        let resolved = ResolvedExecution::ProviderCli {
+            provider: ProviderName::try_new("unsupported").unwrap(),
+            model: ModelName::try_new("m").unwrap(),
+            effort: ReasoningEffort::High,
+        };
         let err =
             run_ref_verifier_agent(dir.path(), resolved, "prompt".to_owned(), CODEX_OUTPUT_SCHEMA)
                 .unwrap_err();
@@ -745,16 +786,17 @@ mod tests {
     }
 
     #[test]
-    fn run_ref_verifier_agent_rejects_provider_without_model() {
+    fn run_ref_verifier_agent_rejects_hosted_service_execution() {
         let dir = tempfile::tempdir().unwrap();
-        let resolved = ResolvedExecution { provider: "claude".to_owned(), model: None };
+        let resolved =
+            ResolvedExecution::HostedService { provider: ProviderName::try_new("claude").unwrap() };
         let err =
             run_ref_verifier_agent(dir.path(), resolved, "prompt".to_owned(), CODEX_OUTPUT_SCHEMA)
                 .unwrap_err();
         let RefVerifyError::VerifierPort { message } = err else {
             panic!("expected VerifierPort, got {err:?}");
         };
-        assert!(message.contains("requires a configured model"));
+        assert!(message.contains("hosted-service execution"));
     }
 
     // ── structured-output schema shape ────────────────────────────────────────
@@ -871,9 +913,10 @@ mod tests {
     fn make_ref_verifier_process_runner_returns_callable_runner() {
         let dir = tempfile::tempdir().unwrap();
         let runner = make_ref_verifier_process_runner(dir.path().to_path_buf());
-        let resolved = ResolvedExecution {
-            provider: "claude".to_owned(),
-            model: Some("claude-opus-4-8".to_owned()),
+        let resolved = ResolvedExecution::ProviderCli {
+            provider: ProviderName::try_new("claude").unwrap(),
+            model: ModelName::try_new("claude-opus-4-8").unwrap(),
+            effort: ReasoningEffort::Max,
         };
         // The "claude" binary is not available in unit-test CI, so the spawn will fail with
         // "No such file or directory" (or equivalent). That error path proves the runner

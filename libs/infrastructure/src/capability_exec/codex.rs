@@ -8,7 +8,7 @@ use std::time::Duration;
 use serde::Deserialize;
 use usecase::capability_exec::{
     CODEX_PROVIDER_NAME, CapabilityDispatchOutcome, CapabilityDispatchRequest, CapabilityExecError,
-    CapabilityProviderPort, ProviderName,
+    CapabilityProviderPort, ProviderName, ReasoningEffort,
 };
 
 use super::path_guard::capability_name_path_segment;
@@ -103,7 +103,12 @@ impl CapabilityProviderPort for CodexCapabilityAdapter {
     ) -> Result<CapabilityDispatchOutcome, CapabilityExecError> {
         let sandbox = self.sandbox_mode(request)?;
         let prompt = capability_prompt(request);
-        let args = build_codex_args(request.profile.model.as_str(), sandbox, &prompt);
+        let args = build_codex_args(
+            request.profile.model.as_str(),
+            request.profile.effort,
+            sandbox,
+            &prompt,
+        );
         let timeout = request.request.timeout.map(|timeout| Duration::from_secs(timeout.as_secs()));
         let exit_code = self
             .process_runner
@@ -133,15 +138,32 @@ fn sandbox_mode_from_skill(
     }
 }
 
-fn build_codex_args(model: &str, sandbox: SandboxMode, prompt: &str) -> Vec<OsString> {
+fn build_codex_args(
+    model: &str,
+    effort: ReasoningEffort,
+    sandbox: SandboxMode,
+    prompt: &str,
+) -> Vec<OsString> {
     vec![
         OsString::from("exec"),
         OsString::from("-m"),
         OsString::from(model),
+        OsString::from("--config"),
+        OsString::from(format!("model_reasoning_effort=\"{}\"", reasoning_effort_value(effort))),
         OsString::from("--sandbox"),
         OsString::from(sandbox.as_cli_value()),
         OsString::from(prompt),
     ]
+}
+
+fn reasoning_effort_value(effort: ReasoningEffort) -> &'static str {
+    match effort {
+        ReasoningEffort::Low => "low",
+        ReasoningEffort::Medium => "medium",
+        ReasoningEffort::High => "high",
+        ReasoningEffort::XHigh => "xhigh",
+        ReasoningEffort::Max => "max",
+    }
 }
 
 #[cfg(test)]
@@ -158,7 +180,7 @@ mod tests {
     use usecase::capability_exec::{
         BriefingText, CapabilityDispatchOutcome, CapabilityDispatchRequest, CapabilityExecError,
         CapabilityExecRequest, CapabilityFilePath, CapabilityProfile, CapabilityProviderPort,
-        DisciplineText, ExecutionMode, ModelName, ProviderName, TimeoutSeconds,
+        DisciplineText, ExecutionMode, ModelName, ProviderName, ReasoningEffort, TimeoutSeconds,
     };
     use usecase::dry_write_driver::CapabilityName;
 
@@ -203,6 +225,7 @@ mod tests {
             profile: CapabilityProfile {
                 provider: ProviderName::try_new("codex")?,
                 model: ModelName::try_new("gpt-5")?,
+                effort: ReasoningEffort::High,
                 execution_mode: ExecutionMode::OrchestratorOutput,
             },
             briefing: BriefingText::try_new("Implement the assigned task.".to_owned())?,
@@ -256,9 +279,10 @@ mod tests {
     }
 
     #[test]
-    fn test_codex_args_explicit_skill_prompt_uses_profile_model_and_sandbox() {
+    fn test_codex_args_explicit_skill_prompt_uses_profile_model_effort_and_sandbox() {
         let args = build_codex_args(
             "gpt-5",
+            ReasoningEffort::XHigh,
             SandboxMode::WorkspaceWrite,
             "$implementer Briefing: Read tmp/briefing.md and perform the task.",
         );
@@ -270,6 +294,8 @@ mod tests {
                 "exec",
                 "-m",
                 "gpt-5",
+                "--config",
+                "model_reasoning_effort=\"xhigh\"",
                 "--sandbox",
                 "workspace-write",
                 "$implementer Briefing: Read tmp/briefing.md and perform the task.",
@@ -305,12 +331,16 @@ mod tests {
         assert_eq!(invocation.0, "codex");
         let args: Vec<_> =
             invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();
-        let [command, model_flag, model, sandbox_flag, sandbox, prompt] = args.as_slice() else {
-            return Err("Codex invocation must have six arguments".into());
+        let [command, model_flag, model, config_flag, config, sandbox_flag, sandbox, prompt] =
+            args.as_slice()
+        else {
+            return Err("Codex invocation must have eight arguments".into());
         };
         assert_eq!(command, "exec");
         assert_eq!(model_flag, "-m");
         assert_eq!(model, "gpt-5");
+        assert_eq!(config_flag, "--config");
+        assert_eq!(config, "model_reasoning_effort=\"high\"");
         assert_eq!(sandbox_flag, "--sandbox");
         assert_eq!(sandbox, "workspace-write");
         assert!(
@@ -494,11 +524,13 @@ mod tests {
             .iter()
             .map(|value| value.to_string_lossy().into_owned())
             .collect();
-        let [_, _, _, workspace_write_flag, workspace_write_sandbox, _] =
+        let [_, _, _, config_flag, config, workspace_write_flag, workspace_write_sandbox, _] =
             workspace_write_args.as_slice()
         else {
-            return Err("workspace-write invocation must have six arguments".into());
+            return Err("workspace-write invocation must have eight arguments".into());
         };
+        assert_eq!(config_flag, "--config");
+        assert_eq!(config, "model_reasoning_effort=\"high\"");
         assert_eq!(workspace_write_flag, "--sandbox");
         assert_eq!(workspace_write_sandbox, "workspace-write");
 
@@ -523,9 +555,13 @@ mod tests {
             .ok_or("undeclared sandbox dispatch must invoke the provider")?;
         let default_args: Vec<_> =
             default_invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();
-        let [_, _, _, default_flag, default_sandbox, _] = default_args.as_slice() else {
-            return Err("undeclared sandbox invocation must have six arguments".into());
+        let [_, _, _, config_flag, config, default_flag, default_sandbox, _] =
+            default_args.as_slice()
+        else {
+            return Err("undeclared sandbox invocation must have eight arguments".into());
         };
+        assert_eq!(config_flag, "--config");
+        assert_eq!(config, "model_reasoning_effort=\"high\"");
         assert_eq!(default_flag, "--sandbox");
         assert_eq!(default_sandbox, "read-only");
         Ok(())

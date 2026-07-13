@@ -239,6 +239,27 @@ impl Clone for ExecutionMode {
     }
 }
 
+/// Provider-independent reasoning effort selected by a capability profile.
+#[derive(Debug, Copy, PartialEq, Eq)]
+pub enum ReasoningEffort {
+    /// Lowest supported reasoning effort.
+    Low,
+    /// Medium reasoning effort.
+    Medium,
+    /// High reasoning effort.
+    High,
+    /// Codex's maximum reasoning effort vocabulary.
+    XHigh,
+    /// Claude's maximum reasoning effort vocabulary.
+    Max,
+}
+
+impl Clone for ReasoningEffort {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
 /// Validated positive provider-process timeout in seconds.
 #[derive(Debug, PartialEq, Eq)]
 pub struct TimeoutSeconds(u64);
@@ -292,6 +313,8 @@ pub struct CapabilityProfile {
     pub provider: ProviderName,
     /// Single model selected by the profile.
     pub model: ModelName,
+    /// Explicit reasoning effort selected by the profile.
+    pub effort: ReasoningEffort,
     /// Execution category selected by the profile.
     pub execution_mode: ExecutionMode,
 }
@@ -350,8 +373,8 @@ pub trait CapabilityProfilePort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Implementations may return only [`CapabilityExecError::ProfileResolution`]
-    /// or [`CapabilityExecError::ModelMissing`].
+    /// Implementations may return only [`CapabilityExecError::ProfileResolution`],
+    /// [`CapabilityExecError::ModelMissing`], or [`CapabilityExecError::EffortMissing`].
     fn resolve(
         &self,
         capability: &CapabilityName,
@@ -469,6 +492,9 @@ pub enum CapabilityExecError {
         /// Capability whose profile omitted its model.
         capability: CapabilityName,
     },
+    /// A provider-CLI profile omitted the effort required for dispatch.
+    #[error("capability profile has no reasoning effort for '{0}'")]
+    EffortMissing(CapabilityName),
     /// A provider has no supported generic-dispatch adapter.
     #[error("unsupported capability provider '{provider}'")]
     UnsupportedProvider {
@@ -517,7 +543,7 @@ mod tests {
         CapabilityExecInteractor, CapabilityExecRequest, CapabilityExecService,
         CapabilityFailureDetail, CapabilityFilePath, CapabilityInputValidationError,
         CapabilityProfile, CapabilityProfilePort, CapabilityProviderPort, CapabilitySourcePort,
-        DisciplineText, ExecutionMode, ModelName, ProviderName, TimeoutSeconds,
+        DisciplineText, ExecutionMode, ModelName, ProviderName, ReasoningEffort, TimeoutSeconds,
     };
     use crate::dry_write_driver::CapabilityName;
 
@@ -622,6 +648,7 @@ mod tests {
         Ok(CapabilityProfile {
             provider: ProviderName::try_new("codex")?,
             model: ModelName::try_new("gpt-5")?,
+            effort: ReasoningEffort::High,
             execution_mode: mode,
         })
     }
@@ -722,11 +749,13 @@ mod tests {
         let profile = CapabilityProfile {
             provider: ProviderName::try_new("codex")?,
             model: ModelName::try_new("gpt-5")?,
+            effort: ReasoningEffort::High,
             execution_mode: ExecutionMode::OrchestratorOutput,
         };
 
         assert_eq!(profile.provider.as_str(), "codex");
         assert_eq!(profile.model.as_str(), "gpt-5");
+        assert_eq!(profile.effort, ReasoningEffort::High);
         assert_eq!(profile.execution_mode, ExecutionMode::OrchestratorOutput);
         Ok(())
     }
@@ -866,6 +895,7 @@ mod tests {
                 profile: CapabilityProfile {
                     provider: provider.clone(),
                     model: ModelName::try_new("claude-opus")?,
+                    effort: ReasoningEffort::High,
                     execution_mode: ExecutionMode::OrchestratorOutput,
                 },
                 calls: Arc::new(AtomicUsize::new(0)),
@@ -976,6 +1006,7 @@ mod tests {
                 profile: CapabilityProfile {
                     provider: ProviderName::try_new("unsupported-provider")?,
                     model: ModelName::try_new("model-x")?,
+                    effort: ReasoningEffort::High,
                     execution_mode: ExecutionMode::OrchestratorOutput,
                 },
                 calls: Arc::new(AtomicUsize::new(0)),

@@ -99,11 +99,11 @@
       }
     },
     {
-      "claim_hash": "5a0bb7632054e5e03b01bbbb9cac61e8b224dc9fb56b62645bde41445dba7dc9",
+      "claim_hash": "f4cd9dd4d70c1404c4c26804724855e14002490614e8f8eab8a712bea00d088f",
       "evidence_hash": "7420d40ec830a018aba34515fcb62a45a3143123c691b9dde68835175403c5e4",
       "verdict": {
         "kind": "pass",
-        "citation": "effort が profile から解決できない dispatch を拒否し、provider の暗黙既定 effort で実行しない。"
+        "citation": "effort が profile から解決できない dispatch を拒否し、provider の暗黙既定 effort で実行しない"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -123,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "5a0bb7632054e5e03b01bbbb9cac61e8b224dc9fb56b62645bde41445dba7dc9",
+      "claim_hash": "f4cd9dd4d70c1404c4c26804724855e14002490614e8f8eab8a712bea00d088f",
       "evidence_hash": "df77e0175c0d8974890d6c7d2c75e7e4baf12b3533df9123f79411592be09c09",
       "verdict": {
         "kind": "pass",
@@ -147,7 +147,7 @@
       }
     },
     {
-      "claim_hash": "5a0bb7632054e5e03b01bbbb9cac61e8b224dc9fb56b62645bde41445dba7dc9",
+      "claim_hash": "f4cd9dd4d70c1404c4c26804724855e14002490614e8f8eab8a712bea00d088f",
       "evidence_hash": "69e2999da7c83d00e768a075d9ba500cec59144f1fc22a4cd33017c5d36afd4e",
       "verdict": {
         "kind": "pass",

@@ -21,7 +21,10 @@
       {"layer": "infrastructure", "entry_key": "ProviderNameDto"},
       {"layer": "infrastructure", "entry_key": "ReasoningEffortDto"},
       {"layer": "infrastructure", "entry_key": "ResolvedExecution"},
-      {"layer": "infrastructure", "entry_key": "RoundType"}
+      {"layer": "infrastructure", "entry_key": "RoundType"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args"}
     ],
     "T003": [
       {"layer": "domain", "entry_key": "RoundType"},

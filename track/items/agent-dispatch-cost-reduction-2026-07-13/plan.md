@@ -8,15 +8,15 @@ GO-02 → T003, T004, T007, T008, T009.
 GO-03 → T005, T006.
 GO-04 → T001, T002, T003, T004, T005, T006, T007, T008, T009.
 
-## Tasks (0/9 resolved)
+## Tasks (2/9 resolved)
 
 ### S1 — Explicit dispatch profile resolution
 
 > Run T001 before T002.
 > T003, T004, and T007 depend on the resolved profile contract from this section.
 
-- [ ] **T001**: Modify `libs/usecase/src/capability_exec.rs` (`ReasoningEffort`, `CapabilityProfile`, `CapabilityProfilePort::resolve`, and `CapabilityExecError`) and its unit-test module; add the corresponding bindings in `track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json`. IN-01, IN-02, CN-01, CN-02, AC-01, AC-02.
-- [ ] **T002**: Modify `libs/infrastructure/src/agent_profiles.rs` (`AgentProfiles`, `AgentProfilesError` error mapping, `CapabilityConfigDto`, `ExecutionModeDto`, `ResolvedExecution`, and routing DTOs) and `libs/infrastructure/src/capability_exec/agent_profiles.rs` (`AgentProfilesCapabilityAdapter::resolve`); update `.harness/config/agent-profiles.json` and `.harness/config/samples/agent-profiles.default.json`, their fixtures, and `track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json`. IN-01, IN-02, CN-01, AC-01, AC-02.
+- [x] **T001**: Modify `libs/usecase/src/capability_exec.rs` (`ReasoningEffort`, `CapabilityProfile`, `CapabilityProfilePort::resolve`, and `CapabilityExecError`) and its unit-test module; add the corresponding bindings in `track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json`. IN-01, IN-02, CN-01, CN-02, AC-01, AC-02.
+- [x] **T002**: Modify `libs/infrastructure/src/agent_profiles.rs` (`AgentProfiles`, `AgentProfilesError` error mapping, `CapabilityConfigDto`, `ExecutionModeDto`, `ResolvedExecution`, and routing DTOs), `libs/infrastructure/src/capability_exec/agent_profiles.rs` (`AgentProfilesCapabilityAdapter::resolve`), and `libs/infrastructure/src/ref_verify/process_runner.rs` (the Claude, Codex, and Gemini ref-verifier argument builders); update `.harness/config/agent-profiles.json` and `.harness/config/samples/agent-profiles.default.json`, their fixtures, and `track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json`. IN-01, IN-02, CN-01, AC-01, AC-02.
 
 ### S2 — Safe reviewer session reuse
 

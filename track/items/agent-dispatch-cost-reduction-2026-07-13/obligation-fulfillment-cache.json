@@ -1,0 +1,1085 @@
+{
+  "track_id": "agent-dispatch-cost-reduction-2026-07-13",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "717022607e60be4e3b70e153d9245c9cdfcd4b31fa1869b6bf0857d0c645a075",
+        "declaration_hash": "a71dd27a0b8d3ec2852ee627d5905fefb8cbcd637dae8194555229b2505d4b61",
+        "anchor_text_hash": "93d6ff4c2137f72a2076b35580339d839412c1bb906130d28150247303177736"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            error,\n            CapabilityExecError::EffortMissing(capability) if capability.as_str() == \"implementer\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "717022607e60be4e3b70e153d9245c9cdfcd4b31fa1869b6bf0857d0c645a075",
+        "declaration_hash": "a71dd27a0b8d3ec2852ee627d5905fefb8cbcd637dae8194555229b2505d4b61",
+        "anchor_text_hash": "533bb22502cc654a9c16417a378d2c3df774aae024c4166a61cd678e59b8f744"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "error,\n            CapabilityExecError::EffortMissing(capability) if capability.as_str() == \"implementer\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "717022607e60be4e3b70e153d9245c9cdfcd4b31fa1869b6bf0857d0c645a075",
+        "declaration_hash": "a71dd27a0b8d3ec2852ee627d5905fefb8cbcd637dae8194555229b2505d4b61",
+        "anchor_text_hash": "1988ccf2d47e04233646906e7323bc6576f1f8e445a022cd522f9bd8d94a6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"CapabilityExecError::EffortMissing(capability) if capability.as_str() == \\\"implementer\\\"\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProfile",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProfile",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "81659d3ad6a02fb42f75b1045c96625149b888078fde2490f1c14c9e1f499a66",
+        "declaration_hash": "00adb8aa6c38615467378e09c596bb95f29cf68136a1ed94c4a2e00bb920e1a1",
+        "anchor_text_hash": "85ab0ceeb85a57efb1d96b6253f4bb1a6d5e578a3fe5f53d2833fbabedd0e923"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(profile.effort, ReasoningEffort::High);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProfile",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProfile",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "717022607e60be4e3b70e153d9245c9cdfcd4b31fa1869b6bf0857d0c645a075",
+        "declaration_hash": "00adb8aa6c38615467378e09c596bb95f29cf68136a1ed94c4a2e00bb920e1a1",
+        "anchor_text_hash": "93d6ff4c2137f72a2076b35580339d839412c1bb906130d28150247303177736"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let error = resolve_profile(\n    r#\"{\n        \"schema_version\": 1,\n        \"providers\": { \"codex\": { \"label\": \"Codex CLI\" } },\n        \"capabilities\": {\n            \"implementer\": {\n                \"provider\": \"codex\",\n                \"model\": \"gpt-5.6-terra\",\n                \"execution_mode\": \"orchestrator-output\"\n            }\n        }\n    }\"#,\n)\n.expect_err(\"profile without effort is rejected\");\n\nassert!(matches!(\n    error,\n    CapabilityExecError::EffortMissing(capability) if capability.as_str() == \"implementer\"\n));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProfile",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProfile",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "717022607e60be4e3b70e153d9245c9cdfcd4b31fa1869b6bf0857d0c645a075",
+        "declaration_hash": "00adb8aa6c38615467378e09c596bb95f29cf68136a1ed94c4a2e00bb920e1a1",
+        "anchor_text_hash": "533bb22502cc654a9c16417a378d2c3df774aae024c4166a61cd678e59b8f744"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "CapabilityExecError::EffortMissing(capability) if capability.as_str() == \"implementer\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProfile",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProfile",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "502fc2610f58714b4e584ab70ca3b90c6bbd8fd9b472a790f0fb835242c6e8d0",
+        "declaration_hash": "00adb8aa6c38615467378e09c596bb95f29cf68136a1ed94c4a2e00bb920e1a1",
+        "anchor_text_hash": "ee8fe926da5c4652fe116d979eda3b0c854b2799298c3014c22057423bcb6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n        ));\n        assert!(matches!(\n            profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Final),\n            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityProfile",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityProfile",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "717022607e60be4e3b70e153d9245c9cdfcd4b31fa1869b6bf0857d0c645a075",
+        "declaration_hash": "00adb8aa6c38615467378e09c596bb95f29cf68136a1ed94c4a2e00bb920e1a1",
+        "anchor_text_hash": "1988ccf2d47e04233646906e7323bc6576f1f8e445a022cd522f9bd8d94a6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "CapabilityExecError::EffortMissing(capability) if capability.as_str() == \"implementer\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReasoningEffort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReasoningEffort",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "502fc2610f58714b4e584ab70ca3b90c6bbd8fd9b472a790f0fb835242c6e8d0",
+        "declaration_hash": "d74eb19499b3b982d3f1ee5c9d8cca9dc5debdbc9c94e758385b5b9c25189154",
+        "anchor_text_hash": "85ab0ceeb85a57efb1d96b6253f4bb1a6d5e578a3fe5f53d2833fbabedd0e923"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n                resolved,\n                Ok(ResolvedExecution::ProviderCli {\n                    effort: ReasoningEffort::Low\n                        | ReasoningEffort::Medium\n                        | ReasoningEffort::High\n                        | ReasoningEffort::XHigh\n                        | ReasoningEffort::Max,\n                    ..\n                })\n            ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReasoningEffort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReasoningEffort",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "717022607e60be4e3b70e153d9245c9cdfcd4b31fa1869b6bf0857d0c645a075",
+        "declaration_hash": "d74eb19499b3b982d3f1ee5c9d8cca9dc5debdbc9c94e758385b5b9c25189154",
+        "anchor_text_hash": "93d6ff4c2137f72a2076b35580339d839412c1bb906130d28150247303177736"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "`.expect_err(\"profile without effort is rejected\");` and `CapabilityExecError::EffortMissing(capability) if capability.as_str() == \"implementer\"`"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReasoningEffort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReasoningEffort",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "717022607e60be4e3b70e153d9245c9cdfcd4b31fa1869b6bf0857d0c645a075",
+        "declaration_hash": "d74eb19499b3b982d3f1ee5c9d8cca9dc5debdbc9c94e758385b5b9c25189154",
+        "anchor_text_hash": "533bb22502cc654a9c16417a378d2c3df774aae024c4166a61cd678e59b8f744"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            error,\n            CapabilityExecError::EffortMissing(capability) if capability.as_str() == \"implementer\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReasoningEffort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReasoningEffort",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "502fc2610f58714b4e584ab70ca3b90c6bbd8fd9b472a790f0fb835242c6e8d0",
+        "declaration_hash": "d74eb19499b3b982d3f1ee5c9d8cca9dc5debdbc9c94e758385b5b9c25189154",
+        "anchor_text_hash": "ee8fe926da5c4652fe116d979eda3b0c854b2799298c3014c22057423bcb6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Ok(ResolvedExecution::ProviderCli {\n                    effort: ReasoningEffort::Low\n                        | ReasoningEffort::Medium\n                        | ReasoningEffort::High\n                        | ReasoningEffort::XHigh\n                        | ReasoningEffort::Max,\n                    ..\n                })"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReasoningEffort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReasoningEffort",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "717022607e60be4e3b70e153d9245c9cdfcd4b31fa1869b6bf0857d0c645a075",
+        "declaration_hash": "d74eb19499b3b982d3f1ee5c9d8cca9dc5debdbc9c94e758385b5b9c25189154",
+        "anchor_text_hash": "1988ccf2d47e04233646906e7323bc6576f1f8e445a022cd522f9bd8d94a6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let error = resolve_profile(\n            r#\"{\n                \"schema_version\": 1,\n                \"providers\": { \"codex\": { \"label\": \"Codex CLI\" } },\n                \"capabilities\": {\n                    \"implementer\": {\n                        \"provider\": \"codex\",\n                        \"model\": \"gpt-5.6-terra\",\n                        \"execution_mode\": \"orchestrator-output\"\n                    }\n                }\n            }\"#,\n        )\n        .expect_err(\"profile without effort is rejected\");\n\n        assert!(matches!(\n            error,\n            CapabilityExecError::EffortMissing(capability) if capability.as_str() == \"implementer\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfiles",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfiles",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "5e761b91dec296811249284c35bab4fe6fd207a2122cf9f364c3b8e87857b691",
+        "declaration_hash": "2e1f51505569a0704e763c82e31b3c7a56c0ab7c263558a10c55aed81d9afe0c",
+        "anchor_text_hash": "85ab0ceeb85a57efb1d96b6253f4bb1a6d5e578a3fe5f53d2833fbabedd0e923"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            profiles.resolve_execution(&capability(capability_name), RoundType::Final),\n            Ok(ResolvedExecution::ProviderCli { .. })\n        ));\n\nassert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n    ));\nassert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfiles",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfiles",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "08b93994eecae4ef8a7ee6e5835decfc4e59ba26b71e1525ee062a155a172864",
+        "declaration_hash": "2e1f51505569a0704e763c82e31b3c7a56c0ab7c263558a10c55aed81d9afe0c",
+        "anchor_text_hash": "93d6ff4c2137f72a2076b35580339d839412c1bb906130d28150247303177736"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Err(AgentProfilesError::EffortMissing(name, RoundType::Fast)) if name.as_str() == \"reviewer\"\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfiles",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfiles",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "08b93994eecae4ef8a7ee6e5835decfc4e59ba26b71e1525ee062a155a172864",
+        "declaration_hash": "2e1f51505569a0704e763c82e31b3c7a56c0ab7c263558a10c55aed81d9afe0c",
+        "anchor_text_hash": "533bb22502cc654a9c16417a378d2c3df774aae024c4166a61cd678e59b8f744"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Err(AgentProfilesError::EffortMissing(name, RoundType::Fast)) if name.as_str() == \"reviewer\"\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfiles",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfiles",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "5e761b91dec296811249284c35bab4fe6fd207a2122cf9f364c3b8e87857b691",
+        "declaration_hash": "2e1f51505569a0704e763c82e31b3c7a56c0ab7c263558a10c55aed81d9afe0c",
+        "anchor_text_hash": "ee8fe926da5c4652fe116d979eda3b0c854b2799298c3014c22057423bcb6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n        ));\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n    ));\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"pr-reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::HostedService { .. })\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfiles",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfiles",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "1c518ee64e8b2acbcbce2235ed24707a10598314e72c78454e47c4e16aecaa03",
+        "declaration_hash": "2e1f51505569a0704e763c82e31b3c7a56c0ab7c263558a10c55aed81d9afe0c",
+        "anchor_text_hash": "1988ccf2d47e04233646906e7323bc6576f1f8e445a022cd522f9bd8d94a6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        profiles.resolve_execution(&capability(\"pr-reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::HostedService { provider }) if provider.as_str() == \"codex\"\n    ));\n\nassert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Err(AgentProfilesError::EffortMissing(name, RoundType::Fast)) if name.as_str() == \"reviewer\"\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfilesError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfilesError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "4f9b89ee0b86e0dc3c3f81f75dde678499d799dad531d08ee80cf066b1256d3b",
+        "declaration_hash": "56c57733ba7e5b66ca5f8be4e427447a5576fbc4dbe5b85c810931cba8c0ed19",
+        "anchor_text_hash": "85ab0ceeb85a57efb1d96b6253f4bb1a6d5e578a3fe5f53d2833fbabedd0e923"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n                resolved,\n                Ok(ResolvedExecution::ProviderCli {\n                    effort: ReasoningEffort::Low\n                        | ReasoningEffort::Medium\n                        | ReasoningEffort::High\n                        | ReasoningEffort::XHigh\n                        | ReasoningEffort::Max,\n                    ..\n                })\n            ));\n        }\n        assert!(matches!(\n            profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n        ));\n        assert!(matches!(\n            profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Final),\n            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfilesError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfilesError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "08b93994eecae4ef8a7ee6e5835decfc4e59ba26b71e1525ee062a155a172864",
+        "declaration_hash": "56c57733ba7e5b66ca5f8be4e427447a5576fbc4dbe5b85c810931cba8c0ed19",
+        "anchor_text_hash": "93d6ff4c2137f72a2076b35580339d839412c1bb906130d28150247303177736"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Err(AgentProfilesError::EffortMissing(name, RoundType::Fast)) if name.as_str() == \"reviewer\"\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfilesError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfilesError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "08b93994eecae4ef8a7ee6e5835decfc4e59ba26b71e1525ee062a155a172864",
+        "declaration_hash": "56c57733ba7e5b66ca5f8be4e427447a5576fbc4dbe5b85c810931cba8c0ed19",
+        "anchor_text_hash": "533bb22502cc654a9c16417a378d2c3df774aae024c4166a61cd678e59b8f744"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Err(AgentProfilesError::EffortMissing(name, RoundType::Fast)) if name.as_str() == \"reviewer\"\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfilesError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfilesError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "5e761b91dec296811249284c35bab4fe6fd207a2122cf9f364c3b8e87857b691",
+        "declaration_hash": "56c57733ba7e5b66ca5f8be4e427447a5576fbc4dbe5b85c810931cba8c0ed19",
+        "anchor_text_hash": "ee8fe926da5c4652fe116d979eda3b0c854b2799298c3014c22057423bcb6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n    ));\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n    ));\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"pr-reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::HostedService { .. })\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AgentProfilesError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AgentProfilesError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "b1819368e37c0ab977caa1a52e1898a92e18a9dff8daed529da27cdb7d64592b",
+        "declaration_hash": "56c57733ba7e5b66ca5f8be4e427447a5576fbc4dbe5b85c810931cba8c0ed19",
+        "anchor_text_hash": "1988ccf2d47e04233646906e7323bc6576f1f8e445a022cd522f9bd8d94a6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        profiles.resolve_execution(&capability(\"implementer\"), RoundType::Final),\n        Err(AgentProfilesError::EffortMissing(name, RoundType::Final))\n            if name.as_str() == \"implementer\"\n    ));\n\nassert!(matches!(\n        profiles.resolve_execution(&capability(\"pr-reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::HostedService { provider }) if provider.as_str() == \"codex\"\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityConfigDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "46b26d7b57b6c5667c6c920ace906aa8d392d22a2eb02c8a052839462db17926",
+        "declaration_hash": "5015171fdb388b9e869277fdf89efca3c9fd753cfdd161bd61dde69c1cd0f0be",
+        "anchor_text_hash": "85ab0ceeb85a57efb1d96b6253f4bb1a6d5e578a3fe5f53d2833fbabedd0e923"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(config.effort(), Some(ReasoningEffortDto::High));\n    assert_eq!(config.fast_effort(), Some(ReasoningEffortDto::Medium));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityConfigDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "08b93994eecae4ef8a7ee6e5835decfc4e59ba26b71e1525ee062a155a172864",
+        "declaration_hash": "5015171fdb388b9e869277fdf89efca3c9fd753cfdd161bd61dde69c1cd0f0be",
+        "anchor_text_hash": "93d6ff4c2137f72a2076b35580339d839412c1bb906130d28150247303177736"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Err(AgentProfilesError::EffortMissing(name, RoundType::Fast)) if name.as_str() == \"reviewer\"\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityConfigDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "5e761b91dec296811249284c35bab4fe6fd207a2122cf9f364c3b8e87857b691",
+        "declaration_hash": "5015171fdb388b9e869277fdf89efca3c9fd753cfdd161bd61dde69c1cd0f0be",
+        "anchor_text_hash": "ee8fe926da5c4652fe116d979eda3b0c854b2799298c3014c22057423bcb6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n    ));\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n    ));\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"pr-reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::HostedService { .. })\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityConfigDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "d8d614ae1db785da8180f8131ab8361d632dd87591b09e304e9f5676053173e2",
+        "declaration_hash": "5015171fdb388b9e869277fdf89efca3c9fd753cfdd161bd61dde69c1cd0f0be",
+        "anchor_text_hash": "1988ccf2d47e04233646906e7323bc6576f1f8e445a022cd522f9bd8d94a6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"capabilities\": {\n                \"pr-reviewer\": {\n                    \"provider\": \"codex\",\n                    \"execution_mode\": \"typed-pipeline\"\n                }\n            }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReasoningEffortDto",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReasoningEffortDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "d06f7e278e0522dc3009ff77b7b8d671e46781839ff86b242209513c631fb95d",
+        "declaration_hash": "3c3a0e08678f04d630f8cb05b437e113b9328fe618a3aec546ab81b6ba1792b7",
+        "anchor_text_hash": "85ab0ceeb85a57efb1d96b6253f4bb1a6d5e578a3fe5f53d2833fbabedd0e923"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for (encoded, expected) in [\n        (r#\"\"low\"\"#, ReasoningEffortDto::Low),\n        (r#\"\"medium\"\"#, ReasoningEffortDto::Medium),\n        (r#\"\"high\"\"#, ReasoningEffortDto::High),\n        (r#\"\"xhigh\"\"#, ReasoningEffortDto::XHigh),\n        (r#\"\"max\"\"#, ReasoningEffortDto::Max),\n    ]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReasoningEffortDto",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReasoningEffortDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "d62d96c42fd887bf6b8d4358936f5f1eba1cbe785602d487b52f3e5b08a36b3f",
+        "declaration_hash": "3c3a0e08678f04d630f8cb05b437e113b9328fe618a3aec546ab81b6ba1792b7",
+        "anchor_text_hash": "93d6ff4c2137f72a2076b35580339d839412c1bb906130d28150247303177736"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(serde_json::from_str::<ReasoningEffortDto>(r#\"\"provider-default\"\"#).is_err());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReasoningEffortDto",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReasoningEffortDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "5e761b91dec296811249284c35bab4fe6fd207a2122cf9f364c3b8e87857b691",
+        "declaration_hash": "3c3a0e08678f04d630f8cb05b437e113b9328fe618a3aec546ab81b6ba1792b7",
+        "anchor_text_hash": "ee8fe926da5c4652fe116d979eda3b0c854b2799298c3014c22057423bcb6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n    ));\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n    ));\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"pr-reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::HostedService { .. })\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReasoningEffortDto",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReasoningEffortDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "08b93994eecae4ef8a7ee6e5835decfc4e59ba26b71e1525ee062a155a172864",
+        "declaration_hash": "3c3a0e08678f04d630f8cb05b437e113b9328fe618a3aec546ab81b6ba1792b7",
+        "anchor_text_hash": "1988ccf2d47e04233646906e7323bc6576f1f8e445a022cd522f9bd8d94a6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Err(AgentProfilesError::EffortMissing(name, RoundType::Fast)) if name.as_str() == \"reviewer\"\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedExecution",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedExecution",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "502fc2610f58714b4e584ab70ca3b90c6bbd8fd9b472a790f0fb835242c6e8d0",
+        "declaration_hash": "29d50bbf04f32dba92d7ed040be9427615dcbab1986e8f9e6e4f8e4cb256cabb",
+        "anchor_text_hash": "85ab0ceeb85a57efb1d96b6253f4bb1a6d5e578a3fe5f53d2833fbabedd0e923"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n                resolved,\n                Ok(ResolvedExecution::ProviderCli {\n                    effort: ReasoningEffort::Low\n                        | ReasoningEffort::Medium\n                        | ReasoningEffort::High\n                        | ReasoningEffort::XHigh\n                        | ReasoningEffort::Max,\n                    ..\n                })\n            ));\n\nassert!(matches!(\n            profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n        ));\nassert!(matches!(\n            profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Final),\n            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n        ));\n\nfor capability_name in [\"ref-verifier-chain1\", \"ref-verifier-chain2\"] {\n        assert!(matches!(\n            committed.resolve_execution(&capability(capability_name), RoundType::Fast),\n            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n        ));\n        assert!(matches!(\n            committed.resolve_execution(&capability(capability_name), RoundType::Final),\n            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n        ));\n    }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedExecution",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedExecution",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "d8d614ae1db785da8180f8131ab8361d632dd87591b09e304e9f5676053173e2",
+        "declaration_hash": "29d50bbf04f32dba92d7ed040be9427615dcbab1986e8f9e6e4f8e4cb256cabb",
+        "anchor_text_hash": "93d6ff4c2137f72a2076b35580339d839412c1bb906130d28150247303177736"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Ok(ResolvedExecution::HostedService { provider }) if provider.as_str() == \"codex\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedExecution",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedExecution",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "08b93994eecae4ef8a7ee6e5835decfc4e59ba26b71e1525ee062a155a172864",
+        "declaration_hash": "29d50bbf04f32dba92d7ed040be9427615dcbab1986e8f9e6e4f8e4cb256cabb",
+        "anchor_text_hash": "533bb22502cc654a9c16417a378d2c3df774aae024c4166a61cd678e59b8f744"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Err(AgentProfilesError::EffortMissing(name, RoundType::Fast)) if name.as_str() == \"reviewer\"\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedExecution",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedExecution",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "a6753d7af9a4ce77f38d8a62a3bf1cf170afade83a22bf1bc06d71b047715bcc",
+        "declaration_hash": "29d50bbf04f32dba92d7ed040be9427615dcbab1986e8f9e6e4f8e4cb256cabb",
+        "anchor_text_hash": "ee8fe926da5c4652fe116d979eda3b0c854b2799298c3014c22057423bcb6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n    profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n    Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n));\nassert!(matches!(\n    profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Final),\n    Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n));\n\nfor capability_name in [\"ref-verifier-chain1\", \"ref-verifier-chain2\"] {\n    assert!(matches!(\n        committed.resolve_execution(&capability(capability_name), RoundType::Fast),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n    ));\n    assert!(matches!(\n        committed.resolve_execution(&capability(capability_name), RoundType::Final),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n    ));\n}"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedExecution",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedExecution",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "d8d614ae1db785da8180f8131ab8361d632dd87591b09e304e9f5676053173e2",
+        "declaration_hash": "29d50bbf04f32dba92d7ed040be9427615dcbab1986e8f9e6e4f8e4cb256cabb",
+        "anchor_text_hash": "1988ccf2d47e04233646906e7323bc6576f1f8e445a022cd522f9bd8d94a6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"pr-reviewer\": {\n                    \"provider\": \"codex\",\n                    \"execution_mode\": \"typed-pipeline\"\n                }\n            }\n        }\"#,\n    );\n\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"pr-reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::HostedService { provider }) if provider.as_str() == \"codex\"\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "094453201becbc44eb4eed2ee29deff15e2239e9b045f91aa3d04df3d93bfbb2",
+        "declaration_hash": "6f37dbf12094ea18b4ad0ac904bdf1a44d3d8b80beab3f72eb437b3399d35b4c",
+        "anchor_text_hash": "85ab0ceeb85a57efb1d96b6253f4bb1a6d5e578a3fe5f53d2833fbabedd0e923"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(strs.contains(&\"--effort\"));\n        assert!(strs.contains(&\"max\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "094453201becbc44eb4eed2ee29deff15e2239e9b045f91aa3d04df3d93bfbb2",
+        "declaration_hash": "6f37dbf12094ea18b4ad0ac904bdf1a44d3d8b80beab3f72eb437b3399d35b4c",
+        "anchor_text_hash": "93d6ff4c2137f72a2076b35580339d839412c1bb906130d28150247303177736"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(strs.contains(&\"--effort\"));\n        assert!(strs.contains(&\"max\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "094453201becbc44eb4eed2ee29deff15e2239e9b045f91aa3d04df3d93bfbb2",
+        "declaration_hash": "6f37dbf12094ea18b4ad0ac904bdf1a44d3d8b80beab3f72eb437b3399d35b4c",
+        "anchor_text_hash": "533bb22502cc654a9c16417a378d2c3df774aae024c4166a61cd678e59b8f744"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(strs.contains(&\"--effort\"));\nassert!(strs.contains(&\"max\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "0ed958b82a9e242147f9f06fe0e671f709f8b1370eafefd476376410f33defef",
+        "declaration_hash": "bfeb6c433283cc04162eae114bdad833335f40226d7d17f6822af02a8fc66d2a",
+        "anchor_text_hash": "85ab0ceeb85a57efb1d96b6253f4bb1a6d5e578a3fe5f53d2833fbabedd0e923"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(strs.contains(&\"model_reasoning_effort=\\\"low\\\"\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "0ed958b82a9e242147f9f06fe0e671f709f8b1370eafefd476376410f33defef",
+        "declaration_hash": "bfeb6c433283cc04162eae114bdad833335f40226d7d17f6822af02a8fc66d2a",
+        "anchor_text_hash": "93d6ff4c2137f72a2076b35580339d839412c1bb906130d28150247303177736"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(strs.contains(&\"model_reasoning_effort=\\\"low\\\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "0ed958b82a9e242147f9f06fe0e671f709f8b1370eafefd476376410f33defef",
+        "declaration_hash": "bfeb6c433283cc04162eae114bdad833335f40226d7d17f6822af02a8fc66d2a",
+        "anchor_text_hash": "533bb22502cc654a9c16417a378d2c3df774aae024c4166a61cd678e59b8f744"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(strs.contains(&\"model_reasoning_effort=\\\"low\\\"\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "54cfb4f0a9094cff59b50139a528169d806b700f24c95a8412a3847db851b697",
+        "declaration_hash": "33720dcf2b44b51c33d4bb90bf1d25eb47a5622ba27871025e2bf4349a0353e2",
+        "anchor_text_hash": "85ab0ceeb85a57efb1d96b6253f4bb1a6d5e578a3fe5f53d2833fbabedd0e923"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for capability_name in [\"ref-verifier-chain1\", \"ref-verifier-chain2\"] {\n        assert!(matches!(\n            committed.resolve_execution(&capability(capability_name), RoundType::Fast),\n            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n        ));\n        assert!(matches!(\n            committed.resolve_execution(&capability(capability_name), RoundType::Final),\n            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n        ));\n    }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "54cfb4f0a9094cff59b50139a528169d806b700f24c95a8412a3847db851b697",
+        "declaration_hash": "33720dcf2b44b51c33d4bb90bf1d25eb47a5622ba27871025e2bf4349a0353e2",
+        "anchor_text_hash": "93d6ff4c2137f72a2076b35580339d839412c1bb906130d28150247303177736"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"let error =\n            build_gemini_ref_verifier_args(\"gemini-2.5-pro\", ReasoningEffort::Low, \"the prompt\")\n                .expect_err(\"Gemini execution must fail closed when effort cannot be injected\");\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "54cfb4f0a9094cff59b50139a528169d806b700f24c95a8412a3847db851b697",
+        "declaration_hash": "33720dcf2b44b51c33d4bb90bf1d25eb47a5622ba27871025e2bf4349a0353e2",
+        "anchor_text_hash": "533bb22502cc654a9c16417a378d2c3df774aae024c4166a61cd678e59b8f744"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "build_gemini_ref_verifier_args(\"gemini-2.5-pro\", ReasoningEffort::Low, \"the prompt\")\n                .expect_err(\"Gemini execution must fail closed when effort cannot be injected\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ]
+}

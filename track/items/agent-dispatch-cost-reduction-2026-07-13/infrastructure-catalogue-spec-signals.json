@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "9d1f5fe953d662580dbadaabd26d16e9cd695b0f106db61ef9082b7936834c48",
+  "catalogue_declaration_hash": "b1b57b7792a1e25c2b07b2dc8b05f454eb9fd93f84894e5c8a858c237007a47a",
   "signals": [
     {
       "type_name": "AgentProfiles",
@@ -15,7 +15,7 @@
     {
       "type_name": "AgentProfilesError",
       "signal": "blue",
-      "entry_hash": "bb000a430c9bc2330253e41fab6b8de1e16e257f8b986cd3d9b6c018b4849bd8"
+      "entry_hash": "96dca7d91fa39f6608fb59e98a1542b149eebde52ef3953ccc75fcca4a0a71b9"
     },
     {
       "type_name": "CapabilityConfigDto",
@@ -96,6 +96,21 @@
       "type_name": "TypeSignalsExecutorAdapter",
       "signal": "blue",
       "entry_hash": "71b749ae70051d08d279c4cbc62befda14649302ff6b922cef6ba02964b9e604"
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args",
+      "signal": "blue",
+      "entry_hash": "d15208ae5485e5314a56c00de6ef25f47fbb5f0dcc54d345aaf8f14c565fef3f"
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args",
+      "signal": "blue",
+      "entry_hash": "a42ded0545a8b4c286806917f66a1ae8ce641414000e51c719f28b8e66cfa9b4"
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args",
+      "signal": "blue",
+      "entry_hash": "c6b700fbc93f51d9763b1adc91be0b98c980b5de1d3fcea1cacf37a629ad7abc"
     },
     {
       "type_name": "infrastructure::tddd::type_signals_codec::declaration_hash",

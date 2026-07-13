@@ -195,11 +195,11 @@
       }
     },
     {
-      "claim_hash": "bb000a430c9bc2330253e41fab6b8de1e16e257f8b986cd3d9b6c018b4849bd8",
+      "claim_hash": "96dca7d91fa39f6608fb59e98a1542b149eebde52ef3953ccc75fcca4a0a71b9",
       "evidence_hash": "b20f39db4c989a6936e63c5a0ef62679886d7325712d976818effec685462aaa",
       "verdict": {
         "kind": "pass",
-        "citation": "capability routing profile に、provider CLI subprocess を起動する全 capability の effort を宣言する。reviewer-like capability は fast/final ごとに宣言し、default profile の reviewer fast は low、final は各 provider の最大段階とする。semantic reference 検証の ref-verifier-chain1 / ref-verifier-chain2 も対象に含める。"
+        "citation": "capability routing profile に、provider CLI subprocess を起動する全 capability の effort を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -219,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "bb000a430c9bc2330253e41fab6b8de1e16e257f8b986cd3d9b6c018b4849bd8",
+      "claim_hash": "96dca7d91fa39f6608fb59e98a1542b149eebde52ef3953ccc75fcca4a0a71b9",
       "evidence_hash": "7420d40ec830a018aba34515fcb62a45a3143123c691b9dde68835175403c5e4",
       "verdict": {
         "kind": "pass",
@@ -243,7 +243,7 @@
       }
     },
     {
-      "claim_hash": "bb000a430c9bc2330253e41fab6b8de1e16e257f8b986cd3d9b6c018b4849bd8",
+      "claim_hash": "96dca7d91fa39f6608fb59e98a1542b149eebde52ef3953ccc75fcca4a0a71b9",
       "evidence_hash": "df77e0175c0d8974890d6c7d2c75e7e4baf12b3533df9123f79411592be09c09",
       "verdict": {
         "kind": "pass",
@@ -267,7 +267,7 @@
       }
     },
     {
-      "claim_hash": "bb000a430c9bc2330253e41fab6b8de1e16e257f8b986cd3d9b6c018b4849bd8",
+      "claim_hash": "96dca7d91fa39f6608fb59e98a1542b149eebde52ef3953ccc75fcca4a0a71b9",
       "evidence_hash": "34d0becc38f51a0862903a7c929c7000dce6f79fa0fb59c7c9476a87ede2f0b7",
       "verdict": {
         "kind": "pass",
@@ -291,11 +291,11 @@
       }
     },
     {
-      "claim_hash": "bb000a430c9bc2330253e41fab6b8de1e16e257f8b986cd3d9b6c018b4849bd8",
+      "claim_hash": "96dca7d91fa39f6608fb59e98a1542b149eebde52ef3953ccc75fcca4a0a71b9",
       "evidence_hash": "69e2999da7c83d00e768a075d9ba500cec59144f1fc22a4cd33017c5d36afd4e",
       "verdict": {
         "kind": "pass",
-        "citation": "対象 capability の effort が欠ける dispatch は provider の既定値で起動せず拒否され、pr-reviewer は effort 未指定でもこの拒否検査の対象にならない。"
+        "citation": "対象 capability の effort が欠ける dispatch は provider の既定値で起動せず拒否され"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2015,6 +2015,222 @@
           "section": "acceptance_criteria",
           "element_id": "AC-07",
           "text_label": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d15208ae5485e5314a56c00de6ef25f47fbb5f0dcc54d345aaf8f14c565fef3f",
+      "evidence_hash": "b20f39db4c989a6936e63c5a0ef62679886d7325712d976818effec685462aaa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "capability routing profile に、provider CLI subprocess を起動する全 capability の effort を宣言する。semantic reference 検証の ref-verifier-chain1 / ref-verifier-chain2 も対象に含める。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "capability routing profile に、provider CLI subprocess を起動する全 capability の effort を宣言する。reviewer-like capability は fast/final ごとに宣言し、default profile の reviewer fast は low、final は各 provider の最大段階とする。semantic reference 検証の ref-verifier-chain1 / ref-verifier-chain2 も対象に含める。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d15208ae5485e5314a56c00de6ef25f47fbb5f0dcc54d345aaf8f14c565fef3f",
+      "evidence_hash": "7420d40ec830a018aba34515fcb62a45a3143123c691b9dde68835175403c5e4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対象 capability（reviewer は round 種別ごと）の effort が profile から解決できない dispatch を拒否し、provider の暗黙既定 effort で実行しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "対象 capability（reviewer は round 種別ごと）の effort が profile から解決できない dispatch を拒否し、provider の暗黙既定 effort で実行しない。hosted service 側で実行される pr-reviewer は effort 宣言とこの拒否検査の対象外とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d15208ae5485e5314a56c00de6ef25f47fbb5f0dcc54d345aaf8f14c565fef3f",
+      "evidence_hash": "df77e0175c0d8974890d6c7d2c75e7e4baf12b3533df9123f79411592be09c09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対象 capability の effort が未指定の dispatch を暗黙の provider 既定で実行せず、dispatch を拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "対象 capability の effort が未指定の dispatch を暗黙の provider 既定で実行せず、dispatch を拒否する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a42ded0545a8b4c286806917f66a1ae8ce641414000e51c719f28b8e66cfa9b4",
+      "evidence_hash": "b20f39db4c989a6936e63c5a0ef62679886d7325712d976818effec685462aaa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "capability routing profile に、provider CLI subprocess を起動する全 capability の effort を宣言する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "capability routing profile に、provider CLI subprocess を起動する全 capability の effort を宣言する。reviewer-like capability は fast/final ごとに宣言し、default profile の reviewer fast は low、final は各 provider の最大段階とする。semantic reference 検証の ref-verifier-chain1 / ref-verifier-chain2 も対象に含める。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a42ded0545a8b4c286806917f66a1ae8ce641414000e51c719f28b8e66cfa9b4",
+      "evidence_hash": "7420d40ec830a018aba34515fcb62a45a3143123c691b9dde68835175403c5e4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対象 capability（reviewer は round 種別ごとの）の effort が profile から解決できない dispatch を拒否し、provider の暗黙既定 effort で実行しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "対象 capability（reviewer は round 種別ごと）の effort が profile から解決できない dispatch を拒否し、provider の暗黙既定 effort で実行しない。hosted service 側で実行される pr-reviewer は effort 宣言とこの拒否検査の対象外とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a42ded0545a8b4c286806917f66a1ae8ce641414000e51c719f28b8e66cfa9b4",
+      "evidence_hash": "df77e0175c0d8974890d6c7d2c75e7e4baf12b3533df9123f79411592be09c09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対象 capability の effort が未指定の dispatch を暗黙の provider 既定で実行せず、dispatch を拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "対象 capability の effort が未指定の dispatch を暗黙の provider 既定で実行せず、dispatch を拒否する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6b700fbc93f51d9763b1adc91be0b98c980b5de1d3fcea1cacf37a629ad7abc",
+      "evidence_hash": "b20f39db4c989a6936e63c5a0ef62679886d7325712d976818effec685462aaa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "capability routing profile に、provider CLI subprocess を起動する全 capability の effort を宣言する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "capability routing profile に、provider CLI subprocess を起動する全 capability の effort を宣言する。reviewer-like capability は fast/final ごとに宣言し、default profile の reviewer fast は low、final は各 provider の最大段階とする。semantic reference 検証の ref-verifier-chain1 / ref-verifier-chain2 も対象に含める。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6b700fbc93f51d9763b1adc91be0b98c980b5de1d3fcea1cacf37a629ad7abc",
+      "evidence_hash": "7420d40ec830a018aba34515fcb62a45a3143123c691b9dde68835175403c5e4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "effort が profile から解決できない dispatch を拒否し、provider の暗黙既定 effort で実行しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "対象 capability（reviewer は round 種別ごと）の effort が profile から解決できない dispatch を拒否し、provider の暗黙既定 effort で実行しない。hosted service 側で実行される pr-reviewer は effort 宣言とこの拒否検査の対象外とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6b700fbc93f51d9763b1adc91be0b98c980b5de1d3fcea1cacf37a629ad7abc",
+      "evidence_hash": "df77e0175c0d8974890d6c7d2c75e7e4baf12b3533df9123f79411592be09c09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対象 capability の effort が未指定の dispatch を暗黙の provider 既定で実行せず、dispatch を拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "対象 capability の effort が未指定の dispatch を暗黙の provider 既定で実行せず、dispatch を拒否する。"
         }
       }
     },

@@ -7,7 +7,7 @@ use std::time::Duration;
 
 use usecase::capability_exec::{
     CLAUDE_PROVIDER_NAME, CapabilityDispatchOutcome, CapabilityDispatchRequest,
-    CapabilityExecError, CapabilityProviderPort, ProviderName,
+    CapabilityExecError, CapabilityProviderPort, ProviderName, ReasoningEffort,
 };
 
 use super::path_guard::capability_name_path_segment;
@@ -86,6 +86,7 @@ impl CapabilityProviderPort for ClaudeCapabilityAdapter {
         let args = build_claude_args(
             request.request.capability.as_str(),
             request.profile.model.as_str(),
+            request.profile.effort,
             &prompt,
         );
         let timeout = request.request.timeout.map(|timeout| Duration::from_secs(timeout.as_secs()));
@@ -124,15 +125,32 @@ fn validate_agent_definition(
     Ok(())
 }
 
-fn build_claude_args(capability: &str, model: &str, prompt: &str) -> Vec<OsString> {
+fn build_claude_args(
+    capability: &str,
+    model: &str,
+    effort: ReasoningEffort,
+    prompt: &str,
+) -> Vec<OsString> {
     vec![
         OsString::from("-p"),
         OsString::from("--agent"),
         OsString::from(capability),
         OsString::from("--model"),
         OsString::from(model),
+        OsString::from("--effort"),
+        OsString::from(reasoning_effort_value(effort)),
         OsString::from(prompt),
     ]
+}
+
+fn reasoning_effort_value(effort: ReasoningEffort) -> &'static str {
+    match effort {
+        ReasoningEffort::Low => "low",
+        ReasoningEffort::Medium => "medium",
+        ReasoningEffort::High => "high",
+        ReasoningEffort::XHigh => "xhigh",
+        ReasoningEffort::Max => "max",
+    }
 }
 
 #[cfg(test)]
@@ -149,7 +167,7 @@ mod tests {
     use usecase::capability_exec::{
         BriefingText, CapabilityDispatchOutcome, CapabilityDispatchRequest, CapabilityExecError,
         CapabilityExecRequest, CapabilityFilePath, CapabilityProfile, CapabilityProviderPort,
-        DisciplineText, ExecutionMode, ModelName, ProviderName, TimeoutSeconds,
+        DisciplineText, ExecutionMode, ModelName, ProviderName, ReasoningEffort, TimeoutSeconds,
     };
     use usecase::dry_write_driver::CapabilityName;
 
@@ -194,6 +212,7 @@ mod tests {
             profile: CapabilityProfile {
                 provider: ProviderName::try_new("claude")?,
                 model: ModelName::try_new("claude-opus")?,
+                effort: ReasoningEffort::High,
                 execution_mode: ExecutionMode::OrchestratorOutput,
             },
             briefing: BriefingText::try_new("Implement the assigned task.".to_owned())?,
@@ -250,10 +269,11 @@ mod tests {
     }
 
     #[test]
-    fn test_claude_args_use_native_agent_invocation_with_profile_model() {
+    fn test_claude_args_use_native_agent_invocation_with_profile_model_and_effort() {
         let args = build_claude_args(
             "implementer",
             "claude-opus",
+            ReasoningEffort::Max,
             "Read tmp/briefing.md and perform the task.",
         );
         let values: Vec<_> = args.iter().map(|value| value.to_string_lossy()).collect();
@@ -266,6 +286,8 @@ mod tests {
                 "implementer",
                 "--model",
                 "claude-opus",
+                "--effort",
+                "max",
                 "Read tmp/briefing.md and perform the task.",
             ]
         );
@@ -338,6 +360,8 @@ mod tests {
                 "implementer",
                 "--model",
                 "claude-opus",
+                "--effort",
+                "high",
                 "$implementer Briefing: Read tmp/briefing.md and perform the task.\n\nDo not stage changes.",
             ]
         );

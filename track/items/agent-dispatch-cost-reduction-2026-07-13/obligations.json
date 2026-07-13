@@ -1,0 +1,821 @@
+{
+  "track_id": "agent-dispatch-cost-reduction-2026-07-13",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "functions",
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of domain::tddd::type_signals_doc::decide_type_signals_reuse",
+      "declaration_hash": "84f68c5f5ed94b92d7abed1947cb2a540ae958277bbd64596419c250fd36a6a8",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "TypeSignalsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of TypeSignalsInteractor",
+      "declaration_hash": "da634d72fdf030f16e412195eeaf616e6638b8eb7538e9538605b27e69f36a99",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CapabilityExecutionContractFingerprintPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:capability_fingerprint"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "CapabilityExecutionContractFingerprintPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:capability_fingerprint' of CapabilityExecutionContractFingerprintPort",
+      "declaration_hash": "0219ce26ba79d78942399e11e6ca1e29ea394df4da6bf3b8b620ee93730ade83",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ProviderSessionCachePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load' of ProviderSessionCachePort",
+      "declaration_hash": "da74120dcfe6690be568b150a785e5a7ef8b469f1cedf24cf23237a833b03f08",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-04"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-08"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ProviderSessionCachePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:save' of ProviderSessionCachePort",
+      "declaration_hash": "da74120dcfe6690be568b150a785e5a7ef8b469f1cedf24cf23237a833b03f08",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-04"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-08"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:remove"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ProviderSessionCachePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:remove' of ProviderSessionCachePort",
+      "declaration_hash": "da74120dcfe6690be568b150a785e5a7ef8b469f1cedf24cf23237a833b03f08",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-04"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-08"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewerExecutionContractFingerprintPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:reviewer_fingerprint"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewerExecutionContractFingerprintPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:reviewer_fingerprint' of ReviewerExecutionContractFingerprintPort",
+      "declaration_hash": "7d60498e880e069e98fceb4a8b901f56759098381b8735e78acaf1b00f097913",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-06"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:evaluate_layer"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "TypeSignalsExecutorPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:evaluate_layer' of TypeSignalsExecutorPort",
+      "declaration_hash": "b788bb7f3920bc41416c2c2dffadacabbbfdacd81a0d6bf1058581d071c92387",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args",
+      "declaration_hash": "6f37dbf12094ea18b4ad0ac904bdf1a44d3d8b80beab3f72eb437b3399d35b4c",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args",
+      "declaration_hash": "bfeb6c433283cc04162eae114bdad833335f40226d7d17f6822af02a8fc66d2a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args",
+      "declaration_hash": "33720dcf2b44b51c33d4bb90bf1d25eb47a5622ba27871025e2bf4349a0353e2",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::declaration_hash",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::tddd::type_signals_codec::declaration_hash"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::tddd::type_signals_codec::declaration_hash",
+      "declaration_hash": "6a9c557839f2e3e1a9a8662f4227c3acd557ecd8fcb11718bedb43f79d3c1cda",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "declaration_hash": "3a8cc164b69ab629f4fd8fe50a1f1a3a6e5437b2d42494e302d74a2552677719",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "TypeSignalsExecutorAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort' of TypeSignalsExecutorAdapter",
+      "declaration_hash": "f9a081948ee4bb743fe4b4e84f39a35e76822ccdff105b9a971522e27dc6c5d8",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "CodexCapabilityAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::capability_exec::CapabilityProviderPort' of CodexCapabilityAdapter",
+      "declaration_hash": "d7c1fb987e30e8ab87dac8a90ebc75a7064d6d65aec6e8e1b3dcb5ebb18dbefc",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-02"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-10"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "ClaudeCapabilityAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::capability_exec::CapabilityProviderPort' of ClaudeCapabilityAdapter",
+      "declaration_hash": "6b1b39446fdbc2e10992246043098766cd1602bd809e4827add12361cb67c467",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-02"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-10"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CodexReviewer",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "CodexReviewer"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::Reviewer' of CodexReviewer",
+      "declaration_hash": "316f52253430d2303c9e18f36fcd6bdcd2ec45806866cb925b2a413f2508d1b4",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-03"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ClaudeReviewer",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "ClaudeReviewer"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::Reviewer' of ClaudeReviewer",
+      "declaration_hash": "1ec7b9f5493d1fdfb799c402d091767243e8b8e1ffa9f0d3612106d2a7f9bb9e",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-03"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsProviderSessionCacheAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::provider_session::ProviderSessionCachePort"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsProviderSessionCacheAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::provider_session::ProviderSessionCachePort' of FsProviderSessionCacheAdapter",
+      "declaration_hash": "d67fa7b401c0a20783618c4c0c285ce13681cc1ffe622e92b47d0f79d4176d38",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-04"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-06"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-08"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "Sha256ExecutionContractFingerprintAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::provider_session::CapabilityExecutionContractFingerprintPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "Sha256ExecutionContractFingerprintAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::provider_session::CapabilityExecutionContractFingerprintPort' of Sha256ExecutionContractFingerprintAdapter",
+      "declaration_hash": "73f0b08ec3ded02833d4b0771df4c2e95bb416290c8a79162adbb8c80b399181",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "Sha256ExecutionContractFingerprintAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::provider_session::ReviewerExecutionContractFingerprintPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "Sha256ExecutionContractFingerprintAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::provider_session::ReviewerExecutionContractFingerprintPort' of Sha256ExecutionContractFingerprintAdapter",
+      "declaration_hash": "fc3158fe49bbcca58c535c3c7c1fd2ea1eac0465e9d39ca8e336491f001d2de1",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-06"
+        }
+      ]
+    }
+  ]
+}

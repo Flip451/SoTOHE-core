@@ -123,6 +123,7 @@ mod tests {
                     "{capability}": {{
                         "provider": "{provider}",
                         "model": "{model}",
+                        "reasoning_effort": "high",
                         "execution_mode": "orchestrator-output"
                     }}
                 }}

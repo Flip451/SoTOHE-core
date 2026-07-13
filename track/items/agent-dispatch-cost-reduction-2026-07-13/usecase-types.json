@@ -995,33 +995,48 @@
       "kind": {
         "kind": "enum",
         "variants": [
-          {
-            "name": "ProfileResolution",
-            "payload": {
-              "fields": [
-                "CapabilityName",
-                "CapabilityFailureDetail"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "ExecutionModeRejected",
-            "payload": {
-              "fields": [
-                "CapabilityName",
-                "ExecutionMode"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "ModelMissing",
-            "payload": {
-              "fields": [
-                "CapabilityName"
-              ],
-              "kind": "tuple"
+        {
+          "name": "ProfileResolution",
+          "payload": {
+            "fields": [
+              {
+                "name": "capability",
+                "ty": "CapabilityName"
+              },
+              {
+                "name": "detail",
+                "ty": "CapabilityFailureDetail"
+              }
+            ],
+            "kind": "struct"
+          }
+        },
+        {
+          "name": "ExecutionModeRejected",
+          "payload": {
+            "fields": [
+              {
+                "name": "capability",
+                "ty": "CapabilityName"
+              },
+              {
+                "name": "mode",
+                "ty": "ExecutionMode"
+              }
+            ],
+            "kind": "struct"
+          }
+        },
+        {
+          "name": "ModelMissing",
+          "payload": {
+            "fields": [
+              {
+                "name": "capability",
+                "ty": "CapabilityName"
+              }
+            ],
+            "kind": "struct"
             }
           },
           {
@@ -1033,45 +1048,69 @@
               "kind": "tuple"
             }
           },
-          {
-            "name": "UnsupportedProvider",
-            "payload": {
-              "fields": [
-                "ProviderName"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "SourceValidation",
-            "payload": {
-              "fields": [
-                "CapabilityFilePath",
-                "CapabilityFailureDetail"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "AdapterPreflight",
-            "payload": {
-              "fields": [
-                "CapabilityName",
-                "ProviderName",
-                "CapabilityFailureDetail"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "DispatchFailed",
-            "payload": {
-              "fields": [
-                "ProviderName",
-                "CapabilityFailureDetail"
-              ],
-              "kind": "tuple"
-            }
+        {
+          "name": "UnsupportedProvider",
+          "payload": {
+            "fields": [
+              {
+                "name": "provider",
+                "ty": "ProviderName"
+              }
+            ],
+            "kind": "struct"
+          }
+        },
+        {
+          "name": "SourceValidation",
+          "payload": {
+            "fields": [
+              {
+                "name": "path",
+                "ty": "CapabilityFilePath"
+              },
+              {
+                "name": "detail",
+                "ty": "CapabilityFailureDetail"
+              }
+            ],
+            "kind": "struct"
+          }
+        },
+        {
+          "name": "AdapterPreflight",
+          "payload": {
+            "fields": [
+              {
+                "name": "capability",
+                "ty": "CapabilityName"
+              },
+              {
+                "name": "provider",
+                "ty": "ProviderName"
+              },
+              {
+                "name": "detail",
+                "ty": "CapabilityFailureDetail"
+              }
+            ],
+            "kind": "struct"
+          }
+        },
+        {
+          "name": "DispatchFailed",
+          "payload": {
+            "fields": [
+              {
+                "name": "provider",
+                "ty": "ProviderName"
+              },
+              {
+                "name": "detail",
+                "ty": "CapabilityFailureDetail"
+              }
+            ],
+            "kind": "struct"
+          }
           }
         ]
       },
