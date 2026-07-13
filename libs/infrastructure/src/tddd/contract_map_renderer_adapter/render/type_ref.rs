@@ -10,7 +10,17 @@ use super::node_index::{NodeIndex, strip_generics};
 // syn-based type-expression extraction
 // ---------------------------------------------------------------------------
 
-/// Collect all leaf type-path names from a `syn::Type` AST.
+/// Collected candidates from a `syn::Type` AST.
+///
+/// Type candidates continue through the type-only [`NodeIndex`]. Trait candidates
+/// originate solely in `dyn Trait` bounds and resolve through the separate trait index.
+#[derive(Default)]
+struct TypeRefCandidates {
+    type_names: Vec<String>,
+    trait_names: Vec<String>,
+}
+
+/// Collect all leaf type-path names and `dyn Trait` bounds from a `syn::Type` AST.
 ///
 /// Recurses into `Type::Reference` (`&T`/`&mut T`), `Type::Slice` (`[T]`),
 /// `Type::Array` (`[T; N]`), `Type::Tuple` (`(A, B, …)`), `Type::Group`/`Type::Paren`,
@@ -20,9 +30,11 @@ use super::node_index::{NodeIndex, strip_generics};
 /// full dot-joined path — both forms are tried so that `NodeIndex::resolve` can match
 /// either a qualified (`"domain::MyType"`) or bare (`"MyType"`) catalogue key.
 ///
-/// `ImplTrait`, `TraitObject`, and `Infer`/`Never`/`Verbatim` produce no output
-/// (they cannot be catalogue types).
-fn collect_type_names_from_syn(ty: &syn::Type, out: &mut Vec<String>) {
+/// `ImplTrait` and `Infer`/`Never`/`Verbatim` produce no output (they cannot be
+/// catalogue types). `TraitObject` contributes its bound paths only to the trait
+/// candidate stream; generic arguments and associated-type values still recurse as
+/// ordinary type candidates.
+fn collect_type_names_from_syn(ty: &syn::Type, candidates: &mut TypeRefCandidates) {
     match ty {
         syn::Type::Path(tp) => {
             // Skip UFCS projections such as `<T as Trait>::Assoc` or `Self::Output`.
@@ -34,72 +46,85 @@ fn collect_type_names_from_syn(ty: &syn::Type, out: &mut Vec<String>) {
                 return;
             }
 
-            // Push the full path as a `"::"` joined string so that qualified lookups
-            // (`"domain::MyType"`) have a chance to match.
-            let full_path: String = tp
-                .path
-                .segments
-                .iter()
-                .map(|seg| seg.ident.to_string())
-                .collect::<Vec<_>>()
-                .join("::");
-            out.push(full_path);
-
-            // Recurse into every generic argument (covers `Result<T, E>`, `Vec<T>`, …).
-            for seg in &tp.path.segments {
-                if let syn::PathArguments::AngleBracketed(ref args) = seg.arguments {
-                    for arg in &args.args {
-                        match arg {
-                            syn::GenericArgument::Type(inner_ty) => {
-                                collect_type_names_from_syn(inner_ty, out);
-                            }
-                            // Associated-type bindings: `Iterator<Item = Foo>`.
-                            // The bound type `Foo` must be extracted so edges to
-                            // declared catalogue types inside these bindings are emitted.
-                            syn::GenericArgument::AssocType(assoc) => {
-                                collect_type_names_from_syn(&assoc.ty, out);
-                            }
-                            // Lifetimes, const generics, assoc const — not type paths.
-                            _ => {}
-                        }
-                    }
-                } else if let syn::PathArguments::Parenthesized(ref args) = seg.arguments {
-                    // Fn trait `Fn(A, B) -> C`
-                    for input in &args.inputs {
-                        collect_type_names_from_syn(input, out);
-                    }
-                    if let syn::ReturnType::Type(_, ref ret) = args.output {
-                        collect_type_names_from_syn(ret, out);
-                    }
-                }
-            }
+            collect_path_as_type_candidate(&tp.path, candidates);
         }
         syn::Type::Reference(tr) => {
-            collect_type_names_from_syn(&tr.elem, out);
+            collect_type_names_from_syn(&tr.elem, candidates);
         }
         syn::Type::Slice(ts) => {
-            collect_type_names_from_syn(&ts.elem, out);
+            collect_type_names_from_syn(&ts.elem, candidates);
         }
         syn::Type::Array(ta) => {
-            collect_type_names_from_syn(&ta.elem, out);
+            collect_type_names_from_syn(&ta.elem, candidates);
         }
         syn::Type::Tuple(tt) => {
             for elem in &tt.elems {
-                collect_type_names_from_syn(elem, out);
+                collect_type_names_from_syn(elem, candidates);
             }
         }
         syn::Type::Paren(tp) => {
-            collect_type_names_from_syn(&tp.elem, out);
+            collect_type_names_from_syn(&tp.elem, candidates);
         }
         syn::Type::Group(tg) => {
-            collect_type_names_from_syn(&tg.elem, out);
+            collect_type_names_from_syn(&tg.elem, candidates);
         }
         syn::Type::Ptr(ptr) => {
-            collect_type_names_from_syn(&ptr.elem, out);
+            collect_type_names_from_syn(&ptr.elem, candidates);
         }
-        // ImplTrait, TraitObject, BareFn, Infer, Never, Verbatim, Macro — not catalogue types.
+        syn::Type::TraitObject(trait_object) => {
+            for bound in &trait_object.bounds {
+                if let syn::TypeParamBound::Trait(trait_bound) = bound {
+                    candidates.trait_names.push(path_as_string(&trait_bound.path));
+                    collect_path_generic_type_candidates(&trait_bound.path, candidates);
+                }
+            }
+        }
+        // ImplTrait, BareFn, Infer, Never, Verbatim, Macro — not catalogue types.
         _ => {}
     }
+}
+
+/// Add one path to the ordinary type candidate stream and recurse into its arguments.
+fn collect_path_as_type_candidate(path: &syn::Path, candidates: &mut TypeRefCandidates) {
+    candidates.type_names.push(path_as_string(path));
+    collect_path_generic_type_candidates(path, candidates);
+}
+
+/// Recurse into generic arguments and associated-type values of a path.
+///
+/// This intentionally does not add `path` itself to either stream. It lets a `dyn`
+/// bound contribute the bound only as a trait candidate while retaining type edges for
+/// its generic arguments and associated-type binding values.
+fn collect_path_generic_type_candidates(path: &syn::Path, candidates: &mut TypeRefCandidates) {
+    for seg in &path.segments {
+        if let syn::PathArguments::AngleBracketed(args) = &seg.arguments {
+            for arg in &args.args {
+                match arg {
+                    syn::GenericArgument::Type(inner_ty) => {
+                        collect_type_names_from_syn(inner_ty, candidates);
+                    }
+                    syn::GenericArgument::AssocType(assoc) => {
+                        collect_type_names_from_syn(&assoc.ty, candidates);
+                    }
+                    // Lifetimes, const generics, assoc const — not type paths.
+                    _ => {}
+                }
+            }
+        } else if let syn::PathArguments::Parenthesized(args) = &seg.arguments {
+            // Fn trait `Fn(A, B) -> C`
+            for input in &args.inputs {
+                collect_type_names_from_syn(input, candidates);
+            }
+            if let syn::ReturnType::Type(_, ret) = &args.output {
+                collect_type_names_from_syn(ret, candidates);
+            }
+        }
+    }
+}
+
+/// Return a path in the same `::`-joined form used by catalogue references.
+fn path_as_string(path: &syn::Path) -> String {
+    path.segments.iter().map(|seg| seg.ident.to_string()).collect::<Vec<_>>().join("::")
 }
 
 /// Resolve a `TypeRef` string to **all** rendered mermaid node IDs that it references.
@@ -107,9 +132,11 @@ fn collect_type_names_from_syn(ty: &syn::Type, out: &mut Vec<String>) {
 /// Uses `syn::parse_str::<syn::Type>` to parse the full type expression (handling
 /// `&T`, `&mut T`, `Result<T, E>`, `Vec<T>`, `Option<T>`, `Box<T>`, `Arc<T>`,
 /// `[T]`, `(A, B)`, nested generics, etc.), then walks the resulting AST to collect
-/// every referenced type-path name.  Each candidate is resolved against `node_index`;
-/// only names that map to a **declared** catalogue node produce an entry in the
-/// returned `Vec`.  Undeclared/primitive/generic/external types are silently skipped.
+/// every referenced type-path name and `dyn Trait` bound. Type candidates are resolved
+/// against `node_index`; trait candidates are resolved against `trait_index`. Only names
+/// that map to a **declared** catalogue representative node produce an entry in the
+/// returned `Vec`. Undeclared/primitive/generic/external types and traits are silently
+/// skipped.
 ///
 /// `self_node_id` — when `Some`, the literal name `"Self"` extracted by the syn walk
 /// is substituted with the provided node_id directly, without going through
@@ -129,6 +156,7 @@ fn collect_type_names_from_syn(ty: &syn::Type, out: &mut Vec<String>) {
 pub(crate) fn resolve_type_ref_node_ids(
     type_ref_str: &str,
     node_index: &NodeIndex,
+    trait_index: &BTreeMap<(String, String), String>,
     current_crate: &str,
     self_node_id: Option<&str>,
 ) -> Vec<String> {
@@ -138,39 +166,48 @@ pub(crate) fn resolve_type_ref_node_ids(
         Err(_) => return Vec::new(),
     };
 
-    let mut candidates: Vec<String> = Vec::new();
+    let mut candidates = TypeRefCandidates::default();
     collect_type_names_from_syn(&syn_type, &mut candidates);
 
     // Deduplicate: the same path may appear multiple times (e.g. nested).
-    candidates.sort_unstable();
-    candidates.dedup();
+    candidates.type_names.sort_unstable();
+    candidates.type_names.dedup();
+    candidates.trait_names.sort_unstable();
+    candidates.trait_names.dedup();
 
     // Resolve each candidate against the node index; keep only declared types.
     // The literal name "Self" is substituted directly with `self_node_id` when
     // provided — `NodeIndex` does not hold a "Self" key (OS-04 / correctness).
     let mut resolved: Vec<String> = Vec::new();
-    for candidate in &candidates {
+    for candidate in &candidates.type_names {
         if candidate == "Self" {
             if let Some(id) = self_node_id {
-                let id_str = id.to_string();
-                if !resolved.contains(&id_str) {
-                    resolved.push(id_str);
-                }
+                push_unique_node_id(&mut resolved, id);
             }
             // If self_node_id is None, "Self" has no resolution — silent skip.
             continue;
         }
         if let Some(node_id) = node_index.resolve(candidate, current_crate) {
-            let node_id_str = node_id.to_string();
-            if !resolved.contains(&node_id_str) {
-                resolved.push(node_id_str);
-            }
+            push_unique_node_id(&mut resolved, node_id);
+        }
+    }
+
+    for candidate in &candidates.trait_names {
+        if let Some(node_id) = resolve_trait_ref_node_id(candidate, current_crate, trait_index) {
+            push_unique_node_id(&mut resolved, node_id);
         }
     }
     resolved
 }
 
-/// Resolve a `trait_ref` string to the rendered mermaid subgraph ID for that trait.
+/// Add a node id to the resolved union only once.
+fn push_unique_node_id(resolved: &mut Vec<String>, node_id: &str) {
+    if !resolved.iter().any(|resolved_id| resolved_id == node_id) {
+        resolved.push(node_id.to_string());
+    }
+}
+
+/// Resolve a `trait_ref` string to the rendered representative node ID for that trait.
 ///
 /// Two forms of workspace-internal trait refs are supported (per `TraitImplDeclV2`
 /// schema — ADR `2026-05-20-0048` D2):
@@ -194,29 +231,42 @@ pub(crate) fn resolve_trait_subgraph<'a>(
     current_crate: &str,
     trait_index: &'a BTreeMap<(String, String), String>,
 ) -> Option<&'a str> {
+    resolve_trait_ref_node_id(trait_ref_str, current_crate, trait_index)
+}
+
+/// Resolve a trait reference through the shared four-step trait lookup policy.
+///
+/// Bare names resolve in the current crate. `crate::`, `self::`, and `super::` paths
+/// are normalised to the current crate and their last segment. Other qualified paths
+/// use their first segment as the crate and their last segment as the trait. Missing
+/// entries are workspace-external or undeclared and therefore silently skipped.
+fn resolve_trait_ref_node_id<'a>(
+    trait_ref_str: &str,
+    current_crate: &str,
+    trait_index: &'a BTreeMap<(String, String), String>,
+) -> Option<&'a str> {
     // Strip generic suffix first so that `"MyTrait<crate::Foo>"` is treated as
     // `"MyTrait"` (bare) rather than being classified as qualified because the
     // generic argument contains `::`.
-    let bare_name = strip_generics(trait_ref_str);
-    if bare_name.is_empty() {
+    let trait_path = strip_generics(trait_ref_str);
+    if trait_path.is_empty() {
         return None;
     }
-    if bare_name.contains("::") {
-        // Qualified path (e.g. "domain::tddd::ContractMapRenderer"):
-        // Extract crate (first segment) and trait name (last segment).
-        // Look up (crate, trait_name) in the index. Returns None (silent skip)
-        // if the pair is not in the index — workspace-external trait (CN-10 / AC-06).
-        let mut iter = bare_name.splitn(2, "::");
-        if let (Some(crate_seg), Some(rest)) = (iter.next(), iter.next()) {
-            let trait_name = rest.rsplit("::").next().unwrap_or(rest);
-            let key = (crate_seg.to_string(), trait_name.to_string());
-            return trait_index.get(&key).map(|s| s.as_str());
+
+    let trait_name = trait_path.rsplit("::").next().filter(|name| !name.is_empty())?;
+    let target_crate = if trait_path.contains("::") {
+        if trait_path.starts_with("crate::")
+            || trait_path.starts_with("self::")
+            || trait_path.starts_with("super::")
+        {
+            current_crate
+        } else {
+            trait_path.split("::").next().filter(|name| !name.is_empty())?
         }
-        return None;
-    }
-    // Bare name: self-crate only (TraitImplDeclV2 schema: bare trait_ref = self-crate trait).
-    // Scoped to (current_crate, bare_name) — prevents incorrect wiring when two catalogues
-    // contain a trait with the same short name.
-    let key = (current_crate.to_string(), bare_name.to_string());
-    trait_index.get(&key).map(|s| s.as_str())
+    } else {
+        current_crate
+    };
+
+    let key = (target_crate.to_string(), trait_name.to_string());
+    trait_index.get(&key).map(|node_id| node_id.as_str())
 }

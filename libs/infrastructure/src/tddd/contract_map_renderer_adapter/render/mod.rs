@@ -257,6 +257,7 @@ pub(super) fn render_mermaid(
                     style,
                     &inherent_methods,
                     &node_index,
+                    &trait_index,
                     layer_str_doc,
                     crate_str,
                 )?;
@@ -278,6 +279,7 @@ pub(super) fn render_mermaid(
                         style,
                         &inherent_methods,
                         &node_index,
+                        &trait_index,
                         layer_str_doc,
                         crate_str,
                     )?;

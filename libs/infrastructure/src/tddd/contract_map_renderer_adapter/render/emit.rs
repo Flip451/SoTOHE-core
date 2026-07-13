@@ -48,6 +48,7 @@ pub(super) fn emit_entry<'a>(
         Vec<&'a domain::tddd::catalogue_v2::methods::MethodDeclaration>,
     >,
     node_index: &NodeIndex,
+    trait_index: &BTreeMap<(String, String), String>,
     layer: &str,
     crate_name: &str,
 ) -> Result<(), ContractMapRendererError> {
@@ -125,6 +126,7 @@ pub(super) fn emit_entry<'a>(
                                 let target_ids = resolve_type_ref_node_ids(
                                     tr.as_str(),
                                     node_index,
+                                    trait_index,
                                     crate_name,
                                     None, // variant payloads have no Self context
                                 );
@@ -141,6 +143,7 @@ pub(super) fn emit_entry<'a>(
                                 let target_ids = resolve_type_ref_node_ids(
                                     field.ty.as_str(),
                                     node_index,
+                                    trait_index,
                                     crate_name,
                                     None, // variant fields have no Self context
                                 );
@@ -172,6 +175,7 @@ pub(super) fn emit_entry<'a>(
                 class_attach,
                 style,
                 node_index,
+                trait_index,
                 crate_name,
                 Some(rep_node_id.as_str()),
             )?;
@@ -189,6 +193,7 @@ pub(super) fn emit_entry<'a>(
                     class_attach,
                     style,
                     node_index,
+                    trait_index,
                     crate_name,
                     Some(rep_node_id.as_str()),
                 )?;
@@ -206,6 +211,7 @@ pub(super) fn emit_entry<'a>(
                 let target_ids = resolve_type_ref_node_ids(
                     target.as_str(),
                     node_index,
+                    trait_index,
                     crate_name,
                     None, // type alias targets have no Self context
                 );
@@ -230,6 +236,7 @@ pub(super) fn emit_entry<'a>(
                             let target_ids = resolve_type_ref_node_ids(
                                 field.ty.as_str(),
                                 node_index,
+                                trait_index,
                                 crate_name,
                                 None, // struct fields have no Self context
                             );
@@ -262,6 +269,7 @@ pub(super) fn emit_entry<'a>(
                             let target_ids = resolve_type_ref_node_ids(
                                 field_ty.as_str(),
                                 node_index,
+                                trait_index,
                                 crate_name,
                                 None, // tuple struct fields have no Self context
                             );
@@ -326,6 +334,7 @@ pub(super) fn emit_entry<'a>(
                 class_attach,
                 style,
                 node_index,
+                trait_index,
                 crate_name,
                 None, // Self unresolvable in trait context
             )?;
@@ -395,6 +404,7 @@ pub(super) fn emit_entry<'a>(
                 let target_ids = resolve_type_ref_node_ids(
                     param.ty.as_str(),
                     node_index,
+                    trait_index,
                     crate_name,
                     None, // free functions have no Self context
                 );
@@ -406,6 +416,7 @@ pub(super) fn emit_entry<'a>(
             let ret_targets = resolve_type_ref_node_ids(
                 fn_entry.returns().as_str(),
                 node_index,
+                trait_index,
                 crate_name,
                 None, // free functions have no Self context
             );
@@ -457,13 +468,14 @@ fn build_entry_label(
 fn resolve_method_type_refs(
     type_ref_str: &str,
     node_index: &NodeIndex,
+    trait_index: &BTreeMap<(String, String), String>,
     current_crate: &str,
     self_node_id: Option<&str>,
 ) -> Vec<String> {
     // Delegate to resolve_type_ref_node_ids, forwarding self_node_id so that
     // "Self" in both top-level (`"Self"`) and nested (`"Option<Self>"`,
     // `"Result<Self, E>"`) positions is substituted correctly.
-    resolve_type_ref_node_ids(type_ref_str, node_index, current_crate, self_node_id)
+    resolve_type_ref_node_ids(type_ref_str, node_index, trait_index, current_crate, self_node_id)
 }
 
 /// Emit method nodes inside an entry subgraph.
@@ -483,6 +495,7 @@ pub(super) fn emit_method_nodes<'a>(
     class_attach: &mut Vec<String>,
     style: &StyleConfig,
     node_index: &NodeIndex,
+    trait_index: &BTreeMap<(String, String), String>,
     current_crate: &str,
     // The node_id of the enclosing entry subgraph, used to resolve `"Self"` TypeRef
     // to the current type's node instead of a ghost node (OS-04 / fallback policy).
@@ -517,6 +530,7 @@ pub(super) fn emit_method_nodes<'a>(
             let target_ids = resolve_method_type_refs(
                 param.ty.as_str(),
                 node_index,
+                trait_index,
                 current_crate,
                 self_node_id,
             );
@@ -536,6 +550,7 @@ pub(super) fn emit_method_nodes<'a>(
         let returns_targets = resolve_method_type_refs(
             method.returns.as_str(),
             node_index,
+            trait_index,
             current_crate,
             self_node_id,
         );
