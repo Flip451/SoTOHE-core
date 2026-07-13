@@ -1,0 +1,186 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 の入力 hash は source 内容・Cargo.lock・toolchain 識別子 בלבדで、Cargo.toml の feature/target 設定、rustflags/RUSTDOCFLAGS、その他 rustdoc 出力を変える設定を捕捉することが明示されていません。この変更後も hash が一致して signal 再計算を skip すると、古い type-signals を新しい実装条件に対して再利用できます。実装が hash に含める入力集合と、未モデル化入力時の fail-closed 動作を決定として明記してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 56,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D4 は継続作業を「同じ成果物」への再入に限定していますが、track cache のキーは track × capability だけで対象 artifact を含みません。同一 track 内で同じ capability が別 artifact を扱うと、orchestrator が resume を opt-in した際に前の artifact の session を再利用し、stale context を引き継げます。track cache も artifact/work-unit identity をキーまたは検証条件に含める必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 62,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:e28b1deafd32dbdedacc5da5839fb082192a37692907d9a436c2fa942ea52fec",
+          "at": "2026-07-13T13:37:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 simultaneously requires skipping signal recalculation when implementation inputs are unchanged and re-evaluating when the catalogue/spec changes, but it does not define a retained and validated rustdoc snapshot for that re-evaluation. The downstream implementation cannot safely evaluate a changed catalogue without rerunning rustdoc or specifying a cache, so this can consume absent/stale data.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 54,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "The D3 freshness hash does not explicitly cover all inputs that affect the stored signals: the evaluator also consumes the baseline rustdoc artifact, and rustdoc/evaluation can vary with path-dependency, build-script, or proc-macro source changes not captured by the listed target-crate source and lockfile inputs. Without an explicit complete input closure or fail-closed detection for these cases, an unchanged hash can incorrectly skip recalculation and leave stale signals.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 56,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:8a1936a638f682ff57609a28bc3a52b36cff5ca03ae7efa0a0c54281e1e76ce4",
+          "at": "2026-07-13T13:44:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 is internally inconsistent: it says baseline changes may reuse the live rustdoc snapshot without extraction (lines 54–56), but then requires the current baseline hash to equal the artifact’s recorded baseline hash. Any actual baseline change makes that condition false and forces rustdoc recomputation, so downstream implementation cannot derive the stated skip behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 56,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:905d06f2de81067badcdc312fa215e94cd7949ff9017a2914597fd1e9e3c6aec",
+          "at": "2026-07-13T13:48:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 lists `fresh-every-round` as a rejected candidate, but no Rejected Alternatives entry actually rejects fresh reviewer sessions. H concerns capability dispatches under D4, while C only rejects cross-tier resume, leaving D2's reviewer-session choice without a corresponding rationale.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 10,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:8ea7d58df436321bbdb35e53480a57c0221701d7b5a3c238150ef2153fb0ef4b",
+          "at": "2026-07-13T13:51:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 requires skipping rustdoc extraction and later reusing a verified live snapshot, but it only specifies storing the snapshot hash in the type-signals artifact while explicitly rejecting a separate transient cache. It does not define where the snapshot body is persisted or how it is loaded; regenerating it with Cargo would perform the extraction that D3 intends to skip, while omitting it makes signal recomputation impossible. Downstream implementation/spec cannot derive a working acceptance criterion for this reuse path.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 56,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:c2e7ed3cd7c8d0bee017ad2694fbfd41d43d6708579eecf3828e4be8ad9d6d61",
+          "at": "2026-07-13T13:54:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2/D4 の session cache は provider/model だけで再利用可否を決め、review briefing・severity policy・capability contract の世代変更を無効化または再注入する規則がありません。再起動後や規約更新後に同じ track/scope/artifact で resume すると、古い判断規則・作業契約のまま review/編集を続け得るため、observable な fail-closed 条件を追加してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 48,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D1 の candidate_selection にある `merge-fast-final-tiers` は、Rejected Alternatives A-L または採択 decision に対応する説明がありません。fast/final の effort tier を統合する案を却下したのか、採択方針に含めるのかが decision trace から判定できず、ADR の選択理由と downstream acceptance criteria の根拠が不完全です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 6,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:3e333d9af262e53f830748c286c014c3151f6bbbf735450b4068d2df6a57a0f2",
+          "at": "2026-07-13T13:58:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bfb67537af7ea8afea42eee4449d98aa405cb5f58950cff36073956125483f76",
+          "at": "2026-07-13T14:03:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 fingerprints the contents of the resolved scope files and generated briefing, then invalidates the session on any mismatch. A fixer re-round necessarily changes at least a scoped file—and the briefing may also be regenerated—so the cache always falls back to a new session instead of resuming as D2 requires. Separate stable execution-contract inputs from mutable review inputs.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 48,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "D4 includes the dispatch briefing's contents in the fingerprint and invalidates the session when they change. Since `capability exec` receives each task through that briefing, follow-up or repair work normally requires changing it; the intended continuation therefore becomes a fresh session. The decision must specify which stable contract portion is fingerprinted independently of the changing task payload.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 64,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:bfb67537af7ea8afea42eee4449d98aa405cb5f58950cff36073956125483f76",
+          "at": "2026-07-13T14:06:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 permits skipping signal evaluation when “all inputs” are unchanged, but the defined freshness state covers only the target rustdoc build-input closure, catalogue declaration, baseline, and snapshot. Signal results also depend on the evaluator implementation and its configuration, which can change without changing any of those hashes; downstream spec.json therefore cannot derive an observable invalidation rule, and previously generated signals may remain stale after evaluation semantics change. Specify how the evaluation contract participates in freshness or when reevaluation is mandatory.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 54,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:f8363ba8866e61492d1566bce3aa0d5f5f5ba0dd845b86b3d70393c3504a8307",
+          "at": "2026-07-13T14:11:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は evaluator-contract の変更時にも既存 rustdoc snapshot の再利用を許可していますが、その contract 自体に evaluator 実装の code/build identity を含めています。抽出用の引数・root 解決・JSON 生成方法を担う実装が変わっても、実装側 input hash と旧 snapshot の自己 hash が一致すれば旧 snapshot を再利用できるため、「判定不能なら rustdoc 抽出から再計算する」という fail-closed 方針に反して stale signal を生成し得ます。下流 spec が安全な再利用条件を導出できるよう、抽出結果へ影響する contract の変更を snapshot 無効化条件として明確にしてください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 54,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:2134ab5c76dd93544397956b0f3f593ee1cd539f8bb6c113ad548bebc8937aa3",
+          "at": "2026-07-13T14:15:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e02a12ecad05852e529f05be0bc2b4998b3f6e1f4fee0c2c1eff928d1f24a4df",
+          "at": "2026-07-13T14:19:40Z"
+        }
+      ]
+    }
+  }
+}
