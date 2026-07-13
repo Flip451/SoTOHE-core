@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "5a9634afc398d21929c20916ddc447c6167bcab1564f8b4a031c10dbf3dfd149",
+  "signals": [
+    {
+      "type_name": "CapabilityDriver",
+      "signal": "blue",
+      "entry_hash": "6b699f34c76df97b1864d5e3cd3f7ff062c02842eac2c4bf3cf000cee3a1e936"
+    },
+    {
+      "type_name": "CapabilityExecDriverInput",
+      "signal": "blue",
+      "entry_hash": "3af67028262be63d214db68876c7d065290490de21d7617f2f23b1680296cd64"
+    },
+    {
+      "type_name": "CapabilityResumeArg",
+      "signal": "blue",
+      "entry_hash": "d2f42bea19736d57f528418362dd467817d6f80da9a73a54fcf1bfc5d4846686"
+    },
+    {
+      "type_name": "TargetArtifactPathArg",
+      "signal": "blue",
+      "entry_hash": "8da5b7a76bd6c8a32a4833c1e17faa81ff1e18fa5426b29b9cac9ec2acdc3e7a"
+    }
+  ]
+}

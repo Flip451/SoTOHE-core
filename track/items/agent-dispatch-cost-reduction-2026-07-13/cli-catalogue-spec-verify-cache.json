@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "2c04b235b40686368adbdea61fc02fb10249a9d68e693f46e9461864ed772ec8",
+      "evidence_hash": "63c589b64a63ee081735dcf7dbf38dee057677a09c23dc11c3ec0148e3e3da85",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp capability exec` に orchestrator が選ぶ resume option を追加する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`sotp capability exec` に orchestrator が選ぶ resume option を追加する。同一 track・同一 capability の同一対象成果物への追補、修正再入、中断からの続行だけを対象とし、初回 dispatch と関心事または対象成果物を切り替える dispatch は新規 session とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "dcadc0ecfd795f6f274a29a194ba866e04f66889276a3f72acc4f0dd49ff64f3",
+      "evidence_hash": "63c589b64a63ee081735dcf7dbf38dee057677a09c23dc11c3ec0148e3e3da85",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp capability exec` に orchestrator が選ぶ resume option を追加する。同一 track・同一 capability の同一対象成果物への追補、修正再入、中断からの続行だけを対象とし、初回 dispatch と関心事または対象成果物を切り替える dispatch は新規 session とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`sotp capability exec` に orchestrator が選ぶ resume option を追加する。同一 track・同一 capability の同一対象成果物への追補、修正再入、中断からの続行だけを対象とし、初回 dispatch と関心事または対象成果物を切り替える dispatch は新規 session とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "dcadc0ecfd795f6f274a29a194ba866e04f66889276a3f72acc4f0dd49ff64f3",
+      "evidence_hash": "34454a941205a277b2c984bc867d13e0e6ca67da6c296c2fc2a6b8c46af10326",
+      "verdict": {
+        "kind": "pass",
+        "citation": "capability resume cache を、track 内では track・capability・対象 artifact の repo-relative path（複数は正規化済み順序付き集合）、track 外では workspace transient 配下の capability・対象 artifact path で分離する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "capability resume cache を、track 内では track・capability・対象 artifact の repo-relative path（複数は正規化済み順序付き集合）、track 外では workspace transient 配下の capability・対象 artifact path で分離する。対象 path が未確定の dispatch は cache を使わず記録もしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "dcadc0ecfd795f6f274a29a194ba866e04f66889276a3f72acc4f0dd49ff64f3",
+      "evidence_hash": "b2f850145e47d31c928c7bc422029b1dc79ddf0dfe7ab0022d02ebc3919f8fe3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "orchestrator が同一成果物への継続作業と判断して resume option を指定した provider CLI subprocess dispatch の `sotp capability exec` は、同一 track・capability・正規化済み対象 artifact identity の有効 cache entry だけを再開する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "orchestrator が同一成果物への継続作業と判断して resume option を指定した provider CLI subprocess dispatch の `sotp capability exec` は、同一 track・capability・正規化済み対象 artifact identity の有効 cache entry だけを再開する。track 解決時は track-local cache、track 解決不能時は workspace-local cache を選び、初回 dispatch、関心事を切り替えた dispatch、対象 path 未確定、contract/profile 不一致、または cache・contract/profile の読出し・hash 化不能な dispatch は、同じ対象 artifact でも新規 session で実行して不適切な cache entry を記録しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cdce85cfc427ab98e7657e05936c2041a9963ec3321d69ab1710c1546f57a60c",
+      "evidence_hash": "5ceb5e27f085ca0238a8be48d32f3a5db536584a85022dd551b57fd7a498cc9b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。初回 round と fast から final への escalation は新規 session とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。初回 round と fast から final への escalation は新規 session とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cdce85cfc427ab98e7657e05936c2041a9963ec3321d69ab1710c1546f57a60c",
+      "evidence_hash": "3f4ac830bfbd259c118b6b050210bc74d70e0ec212ca752fba4c05aaa258a6d0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer の初回 round、fast から final への escalation"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "reviewer の初回 round、fast から final への escalation、profile または fingerprint 不一致、contract 読出し・hash 化不能、resume 失敗、または session 期限切れでは、新規 session で round を実行する。resume・新規のどちらでも model・sandbox・effort の全 flag は明示指定される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "48a67d73841c047057f8a23fe7189b1236203cb6cad983ed2da9adaae0cf8e62",
+      "evidence_hash": "63c589b64a63ee081735dcf7dbf38dee057677a09c23dc11c3ec0148e3e3da85",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp capability exec` に orchestrator が選ぶ resume option を追加する。同一 track・同一 capability の同一対象成果物への追補、修正再入、中断からの続行だけを対象とし、初回 dispatch と関心事または対象成果物を切り替える dispatch は新規 session とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::capability::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`sotp capability exec` に orchestrator が選ぶ resume option を追加する。同一 track・同一 capability の同一対象成果物への追補、修正再入、中断からの続行だけを対象とし、初回 dispatch と関心事または対象成果物を切り替える dispatch は新規 session とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "48a67d73841c047057f8a23fe7189b1236203cb6cad983ed2da9adaae0cf8e62",
+      "evidence_hash": "b2f850145e47d31c928c7bc422029b1dc79ddf0dfe7ab0022d02ebc3919f8fe3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "resume option を指定した provider CLI subprocess dispatch の `sotp capability exec` は、同一 track・capability・正規化済み対象 artifact identity の有効 cache entry だけを再開する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::capability::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "orchestrator が同一成果物への継続作業と判断して resume option を指定した provider CLI subprocess dispatch の `sotp capability exec` は、同一 track・capability・正規化済み対象 artifact identity の有効 cache entry だけを再開する。track 解決時は track-local cache、track 解決不能時は workspace-local cache を選び、初回 dispatch、関心事を切り替えた dispatch、対象 path 未確定、contract/profile 不一致、または cache・contract/profile の読出し・hash 化不能な dispatch は、同じ対象 artifact でも新規 session で実行して不適切な cache entry を記録しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7fcf72c7135be197b59ace6eee86b83d1427c61e55c3b2637f3b286ed3deb563",
+      "evidence_hash": "5ceb5e27f085ca0238a8be48d32f3a5db536584a85022dd551b57fd7a498cc9b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track・scope・round 種別に結び付く prior session を resume"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::review::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。初回 round と fast から final への escalation は新規 session とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7fcf72c7135be197b59ace6eee86b83d1427c61e55c3b2637f3b286ed3deb563",
+      "evidence_hash": "3f4ac830bfbd259c118b6b050210bc74d70e0ec212ca752fba4c05aaa258a6d0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer の初回 round、fast から final への escalation、profile または fingerprint 不一致、contract 読出し・hash 化不能、resume 失敗、または session 期限切れでは、新規 session で round を実行する。resume・新規のどちらでも model・sandbox・effort の全 flag は明示指定される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::review::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "reviewer の初回 round、fast から final への escalation、profile または fingerprint 不一致、contract 読出し・hash 化不能、resume 失敗、または session 期限切れでは、新規 session で round を実行する。resume・新規のどちらでも model・sandbox・effort の全 flag は明示指定される。"
+        }
+      }
+    }
+  ]
+}

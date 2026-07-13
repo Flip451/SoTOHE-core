@@ -1,0 +1,1902 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "625c6edc3f17fa012dbdd4853726a5b0823252dd0511a7b4bb70526c170118e7",
+      "evidence_hash": "6c07a808c08de878a2b70f499456f3d07b57191518430f7c9ca07eb54124f353",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "BaselineHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "625c6edc3f17fa012dbdd4853726a5b0823252dd0511a7b4bb70526c170118e7",
+      "evidence_hash": "3d8ca7a4e5f8437ee7166bf4218dfb6a5357d96d0f53a483c8b9fd64fe4d97d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "BaselineHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し、解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。いずれかの評価入力または snapshot 検証が不一致または不明なら、AC-06/AC-07 の条件に従って signal 評価または rustdoc 抽出からの再計算を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5ce8e208e04fab4c42b87b65819f2c8aba05a26c77259db2d8a877910a98a0af",
+      "evidence_hash": "6c07a808c08de878a2b70f499456f3d07b57191518430f7c9ca07eb54124f353",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue declaration"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueDeclarationHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5ce8e208e04fab4c42b87b65819f2c8aba05a26c77259db2d8a877910a98a0af",
+      "evidence_hash": "3d8ca7a4e5f8437ee7166bf4218dfb6a5357d96d0f53a483c8b9fd64fe4d97d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueDeclarationHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し、解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。いずれかの評価入力または snapshot 検証が不一致または不明なら、AC-06/AC-07 の条件に従って signal 評価または rustdoc 抽出からの再計算を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "37661261591a8cc2ee13754ecbb511abf47de5c0a31df00f972670f31f81f139",
+      "evidence_hash": "6c07a808c08de878a2b70f499456f3d07b57191518430f7c9ca07eb54124f353",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "EvaluatorContractHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "37661261591a8cc2ee13754ecbb511abf47de5c0a31df00f972670f31f81f139",
+      "evidence_hash": "4ddbdf94614315742b8e7fd77f2c188e79f6b91af95ef1f88f2d03ea4241a952",
+      "verdict": {
+        "kind": "pass",
+        "citation": "evaluator contract の変化は評価を強制するが、この snapshot 条件を満たす限り rustdoc 抽出だけは再利用できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "EvaluatorContractHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue、baseline、または catalogue↔spec 評価に使う spec だけが変わった layer は、implementation-side input と rustdoc-extraction contract が一致し、解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。evaluator contract の変化は評価を強制するが、この snapshot 条件を満たす限り rustdoc 抽出だけは再利用できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9c2b995953dc9dba59cac8185dcdf36a4830a26866977575d3bb3fe565a6bc52",
+      "evidence_hash": "6c07a808c08de878a2b70f499456f3d07b57191518430f7c9ca07eb54124f353",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側 build-input closure"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ImplementationInputHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9c2b995953dc9dba59cac8185dcdf36a4830a26866977575d3bb3fe565a6bc52",
+      "evidence_hash": "605ebac5f18135706f47d634fdf122b5fb7e14de1f01c3749b082f4dbdd45abf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対象 rustdoc invocation の完全に解決・正規化された build-input closure"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ImplementationInputHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "D3 の reuse 判定は手選別の file list ではなく、対象 rustdoc invocation の完全に解決・正規化された build-input closure と content hash に基づく。判定粒度は layer（crate）単位とし、影響がある layer だけを再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "292384787dd184cf4e4455f6cc033776cfd67be5eaf848a25471851cb2c644bc",
+      "evidence_hash": "605ebac5f18135706f47d634fdf122b5fb7e14de1f01c3749b082f4dbdd45abf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "判定粒度は layer（crate）単位とし、影響がある layer だけを再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "LayerId"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "D3 の reuse 判定は手選別の file list ではなく、対象 rustdoc invocation の完全に解決・正規化された build-input closure と content hash に基づく。判定粒度は layer（crate）単位とし、影響がある layer だけを再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fb33c6acedbddb0732016b4d5b23f4bbd9982a4ea71fae92be6036c90935e2fa",
+      "evidence_hash": "c3b04f861ace9021ceb51a514dfbf39506260bc570806dd1506f0c15ceb20a7e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "LiveRustdocSnapshotHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または baseline の変更時は、現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。rustdoc-extraction contract の変更・不明、実装側 input の不一致・不明、または snapshot 検証不能では rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fb33c6acedbddb0732016b4d5b23f4bbd9982a4ea71fae92be6036c90935e2fa",
+      "evidence_hash": "311e0eb218466efcff988ce152df338433e52d110ecd1ea9dc385a17853dfb62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "LiveRustdocSnapshotHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f0a13d56e5d2c42f51d0fd07de88b47165808d6196dbf3d5b4c50e6043200507",
+      "evidence_hash": "c3b04f861ace9021ceb51a514dfbf39506260bc570806dd1506f0c15ceb20a7e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。rustdoc-extraction contract の変更・不明、実装側 input の不一致・不明、または snapshot 検証不能では rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "LiveRustdocSnapshotStatus"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または baseline の変更時は、現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。rustdoc-extraction contract の変更・不明、実装側 input の不一致・不明、または snapshot 検証不能では rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f0a13d56e5d2c42f51d0fd07de88b47165808d6196dbf3d5b4c50e6043200507",
+      "evidence_hash": "311e0eb218466efcff988ce152df338433e52d110ecd1ea9dc385a17853dfb62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "LiveRustdocSnapshotStatus"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f0a13d56e5d2c42f51d0fd07de88b47165808d6196dbf3d5b4c50e6043200507",
+      "evidence_hash": "4ddbdf94614315742b8e7fd77f2c188e79f6b91af95ef1f88f2d03ea4241a952",
+      "verdict": {
+        "kind": "pass",
+        "citation": "解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "LiveRustdocSnapshotStatus"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue、baseline、または catalogue↔spec 評価に使う spec だけが変わった layer は、implementation-side input と rustdoc-extraction contract が一致し、解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。evaluator contract の変化は評価を強制するが、この snapshot 条件を満たす限り rustdoc 抽出だけは再利用できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f0a13d56e5d2c42f51d0fd07de88b47165808d6196dbf3d5b4c50e6043200507",
+      "evidence_hash": "68e17c1ccece0c75f8f50889fd05215d9b9658a163d791002e3ce1d4dc1876f9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "LiveRustdocSnapshotStatus"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb40b930c444e9521a03f71712d9b4a1e85b0db508e5081dd8ae4905cdb41587",
+      "evidence_hash": "5ceb5e27f085ca0238a8be48d32f3a5db536584a85022dd551b57fd7a498cc9b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。初回 round と fast から final への escalation は新規 session とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "RoundType"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。初回 round と fast から final への escalation は新規 session とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb40b930c444e9521a03f71712d9b4a1e85b0db508e5081dd8ae4905cdb41587",
+      "evidence_hash": "c0cbefa4a3ba523a52db5b860bd64b9a6f5189de0ad613d567e3a9af4d083029",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer は resume 後も scope 全件を再判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "RoundType"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "reviewer は resume 後も scope 全件を再判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb40b930c444e9521a03f71712d9b4a1e85b0db508e5081dd8ae4905cdb41587",
+      "evidence_hash": "5251c561488c6b9ea1fa6eb2bca2f158658b2d64634f805bf423637d58c524bc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "session resume は review judgment と review record の単位を変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "RoundType"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "session resume は review judgment と review record の単位を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "32e9ad4927a6591c24337b64230c92be5a0b91f15babfb8fcc7baee16c62b070",
+      "evidence_hash": "c3b04f861ace9021ceb51a514dfbf39506260bc570806dd1506f0c15ceb20a7e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocExtractionContractHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または baseline の変更時は、現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。rustdoc-extraction contract の変更・不明、実装側 input の不一致・不明、または snapshot 検証不能では rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "32e9ad4927a6591c24337b64230c92be5a0b91f15babfb8fcc7baee16c62b070",
+      "evidence_hash": "68e17c1ccece0c75f8f50889fd05215d9b9658a163d791002e3ce1d4dc1876f9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocExtractionContractHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cfa1fb1d677fc0138f676483e73d061567234422b98f651bdf4b3c7b7cce947b",
+      "evidence_hash": "5ceb5e27f085ca0238a8be48d32f3a5db536584a85022dd551b57fd7a498cc9b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ScopeName"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。初回 round と fast から final への escalation は新規 session とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cfa1fb1d677fc0138f676483e73d061567234422b98f651bdf4b3c7b7cce947b",
+      "evidence_hash": "92afac0bbb659bd97337b4588d798a5c9a57100730c3f1e5997edeb485faca26",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer session cache を provider、model、および capability SSoT・scope-specific severity policy・review-scope 設定・固定 execution-contract briefing 部から得る安定 fingerprint に束縛する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ScopeName"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "reviewer session cache を provider、model、および capability SSoT・scope-specific severity policy・review-scope 設定・固定 execution-contract briefing 部から得る安定 fingerprint に束縛する。profile 解決結果または fingerprint の不一致、読出し・hash 化不能、resume 失敗、または期限切れでは cache を使わず新規 session を開始する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3cdca1b776322b31143de91896e6e5848fd5d5dbc299655800b34f4b88c0926a",
+      "evidence_hash": "878e1860a6cdc6b72117348b0a177487dd1b97ca5d8e218b1844f3257f386a6d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 declaration hash と対称に implementation-side input、baseline、live rustdoc snapshot、evaluator contract、および rustdoc-extraction contract の freshness 情報を保持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256Digest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact を schema version bump し、既存 declaration hash と対称に implementation-side input、baseline、live rustdoc snapshot、evaluator contract、および rustdoc-extraction contract の freshness 情報を保持する。completed track の旧 artifact を migration せず、旧値または必要値が使えない場合は保守的に再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3cdca1b776322b31143de91896e6e5848fd5d5dbc299655800b34f4b88c0926a",
+      "evidence_hash": "311e0eb218466efcff988ce152df338433e52d110ecd1ea9dc385a17853dfb62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256Digest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3cdca1b776322b31143de91896e6e5848fd5d5dbc299655800b34f4b88c0926a",
+      "evidence_hash": "3586a0eb53a01ed37c5ee5d487f84bf5e48e640aca8812c7e26e22efa3f17a69",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256Digest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。completed track の artifact は migration しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "613847554768974e08d8ebff80755dc7b14c46bd3949d0f2f1f74e7dc6c945e1",
+      "evidence_hash": "878e1860a6cdc6b72117348b0a177487dd1b97ca5d8e218b1844f3257f386a6d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 declaration hash と対称に implementation-side input、baseline、live rustdoc snapshot、evaluator contract、および rustdoc-extraction contract の freshness 情報を保持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256DigestError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact を schema version bump し、既存 declaration hash と対称に implementation-side input、baseline、live rustdoc snapshot、evaluator contract、および rustdoc-extraction contract の freshness 情報を保持する。completed track の旧 artifact を migration せず、旧値または必要値が使えない場合は保守的に再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "613847554768974e08d8ebff80755dc7b14c46bd3949d0f2f1f74e7dc6c945e1",
+      "evidence_hash": "311e0eb218466efcff988ce152df338433e52d110ecd1ea9dc385a17853dfb62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256DigestError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "613847554768974e08d8ebff80755dc7b14c46bd3949d0f2f1f74e7dc6c945e1",
+      "evidence_hash": "3586a0eb53a01ed37c5ee5d487f84bf5e48e640aca8812c7e26e22efa3f17a69",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256DigestError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。completed track の artifact は migration しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f81100fbb1fde70f15741f064ce2507477ee3f76c2820cefcaeb046588e2f1ef",
+      "evidence_hash": "311e0eb218466efcff988ce152df338433e52d110ecd1ea9dc385a17853dfb62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TrackBranch"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "211af6f72e52315d4a2c411e0d030ace13afd2d742867bc9396be54c0c5f4072",
+      "evidence_hash": "5ceb5e27f085ca0238a8be48d32f3a5db536584a85022dd551b57fd7a498cc9b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track・scope・round 種別に結び付く prior session を resume し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TrackId"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。初回 round と fast から final への escalation は新規 session とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "211af6f72e52315d4a2c411e0d030ace13afd2d742867bc9396be54c0c5f4072",
+      "evidence_hash": "34454a941205a277b2c984bc867d13e0e6ca67da6c296c2fc2a6b8c46af10326",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track 内では track・capability・対象 artifact の repo-relative path（複数は正規化済み順序付き集合）で分離する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TrackId"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "capability resume cache を、track 内では track・capability・対象 artifact の repo-relative path（複数は正規化済み順序付き集合）、track 外では workspace transient 配下の capability・対象 artifact path で分離する。対象 path が未確定の dispatch は cache を使わず記録もしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "044a83c63990cb62f42ee19c4193763a7ecb4b50222c6c03b77ed62ef3837f17",
+      "evidence_hash": "6c07a808c08de878a2b70f499456f3d07b57191518430f7c9ca07eb54124f353",
+      "verdict": {
+        "kind": "pass",
+        "citation": "すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsCurrentInputs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "044a83c63990cb62f42ee19c4193763a7ecb4b50222c6c03b77ed62ef3837f17",
+      "evidence_hash": "c3b04f861ace9021ceb51a514dfbf39506260bc570806dd1506f0c15ceb20a7e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsCurrentInputs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または baseline の変更時は、現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。rustdoc-extraction contract の変更・不明、実装側 input の不一致・不明、または snapshot 検証不能では rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "044a83c63990cb62f42ee19c4193763a7ecb4b50222c6c03b77ed62ef3837f17",
+      "evidence_hash": "311e0eb218466efcff988ce152df338433e52d110ecd1ea9dc385a17853dfb62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsCurrentInputs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "044a83c63990cb62f42ee19c4193763a7ecb4b50222c6c03b77ed62ef3837f17",
+      "evidence_hash": "3d8ca7a4e5f8437ee7166bf4218dfb6a5357d96d0f53a483c8b9fd64fe4d97d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し、解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsCurrentInputs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し、解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。いずれかの評価入力または snapshot 検証が不一致または不明なら、AC-06/AC-07 の条件に従って signal 評価または rustdoc 抽出からの再計算を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "044a83c63990cb62f42ee19c4193763a7ecb4b50222c6c03b77ed62ef3837f17",
+      "evidence_hash": "4ddbdf94614315742b8e7fd77f2c188e79f6b91af95ef1f88f2d03ea4241a952",
+      "verdict": {
+        "kind": "pass",
+        "citation": "snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsCurrentInputs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue、baseline、または catalogue↔spec 評価に使う spec だけが変わった layer は、implementation-side input と rustdoc-extraction contract が一致し、解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。evaluator contract の変化は評価を強制するが、この snapshot 条件を満たす限り rustdoc 抽出だけは再利用できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "044a83c63990cb62f42ee19c4193763a7ecb4b50222c6c03b77ed62ef3837f17",
+      "evidence_hash": "68e17c1ccece0c75f8f50889fd05215d9b9658a163d791002e3ce1d4dc1876f9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsCurrentInputs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "46eab11d5a3b86f44dd70aa128bbbad1b349fef4db80c27ee8cd29f5eadf4baa",
+      "evidence_hash": "6c07a808c08de878a2b70f499456f3d07b57191518430f7c9ca07eb54124f353",
+      "verdict": {
+        "kind": "pass",
+        "citation": "すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "46eab11d5a3b86f44dd70aa128bbbad1b349fef4db80c27ee8cd29f5eadf4baa",
+      "evidence_hash": "c3b04f861ace9021ceb51a514dfbf39506260bc570806dd1506f0c15ceb20a7e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または baseline の変更時は、現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。rustdoc-extraction contract の変更・不明、実装側 input の不一致・不明、または snapshot 検証不能では rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "46eab11d5a3b86f44dd70aa128bbbad1b349fef4db80c27ee8cd29f5eadf4baa",
+      "evidence_hash": "878e1860a6cdc6b72117348b0a177487dd1b97ca5d8e218b1844f3257f386a6d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact を schema version bump し、既存 declaration hash と対称に implementation-side input、baseline、live rustdoc snapshot、evaluator contract、および rustdoc-extraction contract の freshness 情報を保持する。completed track の旧 artifact を migration せず、旧値または必要値が使えない場合は保守的に再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact を schema version bump し、既存 declaration hash と対称に implementation-side input、baseline、live rustdoc snapshot、evaluator contract、および rustdoc-extraction contract の freshness 情報を保持する。completed track の旧 artifact を migration せず、旧値または必要値が使えない場合は保守的に再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "46eab11d5a3b86f44dd70aa128bbbad1b349fef4db80c27ee8cd29f5eadf4baa",
+      "evidence_hash": "311e0eb218466efcff988ce152df338433e52d110ecd1ea9dc385a17853dfb62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "46eab11d5a3b86f44dd70aa128bbbad1b349fef4db80c27ee8cd29f5eadf4baa",
+      "evidence_hash": "3d8ca7a4e5f8437ee7166bf4218dfb6a5357d96d0f53a483c8b9fd64fe4d97d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し、解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し、解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。いずれかの評価入力または snapshot 検証が不一致または不明なら、AC-06/AC-07 の条件に従って signal 評価または rustdoc 抽出からの再計算を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "46eab11d5a3b86f44dd70aa128bbbad1b349fef4db80c27ee8cd29f5eadf4baa",
+      "evidence_hash": "4ddbdf94614315742b8e7fd77f2c188e79f6b91af95ef1f88f2d03ea4241a952",
+      "verdict": {
+        "kind": "pass",
+        "citation": "解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue、baseline、または catalogue↔spec 評価に使う spec だけが変わった layer は、implementation-side input と rustdoc-extraction contract が一致し、解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。evaluator contract の変化は評価を強制するが、この snapshot 条件を満たす限り rustdoc 抽出だけは再利用できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "46eab11d5a3b86f44dd70aa128bbbad1b349fef4db80c27ee8cd29f5eadf4baa",
+      "evidence_hash": "68e17c1ccece0c75f8f50889fd05215d9b9658a163d791002e3ce1d4dc1876f9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "46eab11d5a3b86f44dd70aa128bbbad1b349fef4db80c27ee8cd29f5eadf4baa",
+      "evidence_hash": "3586a0eb53a01ed37c5ee5d487f84bf5e48e640aca8812c7e26e22efa3f17a69",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。completed track の artifact は migration しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e12daca675fa1242e6a1b65549dffbbadc47cdae1c99b336e330275d439977e3",
+      "evidence_hash": "6c07a808c08de878a2b70f499456f3d07b57191518430f7c9ca07eb54124f353",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsFreshness"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e12daca675fa1242e6a1b65549dffbbadc47cdae1c99b336e330275d439977e3",
+      "evidence_hash": "c3b04f861ace9021ceb51a514dfbf39506260bc570806dd1506f0c15ceb20a7e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue または baseline の変更時は、現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsFreshness"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または baseline の変更時は、現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。rustdoc-extraction contract の変更・不明、実装側 input の不一致・不明、または snapshot 検証不能では rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e12daca675fa1242e6a1b65549dffbbadc47cdae1c99b336e330275d439977e3",
+      "evidence_hash": "878e1860a6cdc6b72117348b0a177487dd1b97ca5d8e218b1844f3257f386a6d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact を schema version bump し、既存 declaration hash と対称に implementation-side input、baseline、live rustdoc snapshot、evaluator contract、および rustdoc-extraction contract の freshness 情報を保持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsFreshness"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact を schema version bump し、既存 declaration hash と対称に implementation-side input、baseline、live rustdoc snapshot、evaluator contract、および rustdoc-extraction contract の freshness 情報を保持する。completed track の旧 artifact を migration せず、旧値または必要値が使えない場合は保守的に再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e12daca675fa1242e6a1b65549dffbbadc47cdae1c99b336e330275d439977e3",
+      "evidence_hash": "605ebac5f18135706f47d634fdf122b5fb7e14de1f01c3749b082f4dbdd45abf",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の reuse 判定は手選別の file list ではなく、対象 rustdoc invocation の完全に解決・正規化された build-input closure と content hash に基づく。判定粒度は layer（crate）単位とし、影響がある layer だけを再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsFreshness"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "D3 の reuse 判定は手選別の file list ではなく、対象 rustdoc invocation の完全に解決・正規化された build-input closure と content hash に基づく。判定粒度は layer（crate）単位とし、影響がある layer だけを再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e12daca675fa1242e6a1b65549dffbbadc47cdae1c99b336e330275d439977e3",
+      "evidence_hash": "311e0eb218466efcff988ce152df338433e52d110ecd1ea9dc385a17853dfb62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsFreshness"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e12daca675fa1242e6a1b65549dffbbadc47cdae1c99b336e330275d439977e3",
+      "evidence_hash": "3d8ca7a4e5f8437ee7166bf4218dfb6a5357d96d0f53a483c8b9fd64fe4d97d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し、解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsFreshness"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し、解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。いずれかの評価入力または snapshot 検証が不一致または不明なら、AC-06/AC-07 の条件に従って signal 評価または rustdoc 抽出からの再計算を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e12daca675fa1242e6a1b65549dffbbadc47cdae1c99b336e330275d439977e3",
+      "evidence_hash": "4ddbdf94614315742b8e7fd77f2c188e79f6b91af95ef1f88f2d03ea4241a952",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue、baseline、または catalogue↔spec 評価に使う spec だけが変わった layer は、implementation-side input と rustdoc-extraction contract が一致し、解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。evaluator contract の変化は評価を強制するが、この snapshot 条件を満たす限り rustdoc 抽出だけは再利用できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsFreshness"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue、baseline、または catalogue↔spec 評価に使う spec だけが変わった layer は、implementation-side input と rustdoc-extraction contract が一致し、解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。evaluator contract の変化は評価を強制するが、この snapshot 条件を満たす限り rustdoc 抽出だけは再利用できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e12daca675fa1242e6a1b65549dffbbadc47cdae1c99b336e330275d439977e3",
+      "evidence_hash": "68e17c1ccece0c75f8f50889fd05215d9b9658a163d791002e3ce1d4dc1876f9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsFreshness"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e12daca675fa1242e6a1b65549dffbbadc47cdae1c99b336e330275d439977e3",
+      "evidence_hash": "3586a0eb53a01ed37c5ee5d487f84bf5e48e640aca8812c7e26e22efa3f17a69",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsFreshness"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。completed track の artifact は migration しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e062f0ad57d26f6a00f9031aff2432f724242114c2a8c1b750709b9587071999",
+      "evidence_hash": "878e1860a6cdc6b72117348b0a177487dd1b97ca5d8e218b1844f3257f386a6d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧値または必要値が使えない場合は保守的に再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsLoadResult"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact を schema version bump し、既存 declaration hash と対称に implementation-side input、baseline、live rustdoc snapshot、evaluator contract、および rustdoc-extraction contract の freshness 情報を保持する。completed track の旧 artifact を migration せず、旧値または必要値が使えない場合は保守的に再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e062f0ad57d26f6a00f9031aff2432f724242114c2a8c1b750709b9587071999",
+      "evidence_hash": "3586a0eb53a01ed37c5ee5d487f84bf5e48e640aca8812c7e26e22efa3f17a69",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。completed track の artifact は migration しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsLoadResult"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。completed track の artifact は migration しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cf3f8f678b334575a34aa7cb236cf49cdc13bb73e62dea25b1b25009a5dc7c0d",
+      "evidence_hash": "6c07a808c08de878a2b70f499456f3d07b57191518430f7c9ca07eb54124f353",
+      "verdict": {
+        "kind": "pass",
+        "citation": "すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsReuseDecision"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cf3f8f678b334575a34aa7cb236cf49cdc13bb73e62dea25b1b25009a5dc7c0d",
+      "evidence_hash": "c3b04f861ace9021ceb51a514dfbf39506260bc570806dd1506f0c15ceb20a7e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue または baseline の変更時は、現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。rustdoc-extraction contract の変更・不明、実装側 input の不一致・不明、または snapshot 検証不能では rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsReuseDecision"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または baseline の変更時は、現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。rustdoc-extraction contract の変更・不明、実装側 input の不一致・不明、または snapshot 検証不能では rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cf3f8f678b334575a34aa7cb236cf49cdc13bb73e62dea25b1b25009a5dc7c0d",
+      "evidence_hash": "311e0eb218466efcff988ce152df338433e52d110ecd1ea9dc385a17853dfb62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsReuseDecision"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cf3f8f678b334575a34aa7cb236cf49cdc13bb73e62dea25b1b25009a5dc7c0d",
+      "evidence_hash": "3d8ca7a4e5f8437ee7166bf4218dfb6a5357d96d0f53a483c8b9fd64fe4d97d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し、解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。いずれかの評価入力または snapshot 検証が不一致または不明なら、AC-06/AC-07 の条件に従って signal 評価または rustdoc 抽出からの再計算を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsReuseDecision"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し、解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。いずれかの評価入力または snapshot 検証が不一致または不明なら、AC-06/AC-07 の条件に従って signal 評価または rustdoc 抽出からの再計算を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cf3f8f678b334575a34aa7cb236cf49cdc13bb73e62dea25b1b25009a5dc7c0d",
+      "evidence_hash": "4ddbdf94614315742b8e7fd77f2c188e79f6b91af95ef1f88f2d03ea4241a952",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue、baseline、または catalogue↔spec 評価に使う spec だけが変わった layer は、implementation-side input と rustdoc-extraction contract が一致し、解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。evaluator contract の変化は評価を強制するが、この snapshot 条件を満たす限り rustdoc 抽出だけは再利用できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsReuseDecision"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue、baseline、または catalogue↔spec 評価に使う spec だけが変わった layer は、implementation-side input と rustdoc-extraction contract が一致し、解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。evaluator contract の変化は評価を強制するが、この snapshot 条件を満たす限り rustdoc 抽出だけは再利用できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cf3f8f678b334575a34aa7cb236cf49cdc13bb73e62dea25b1b25009a5dc7c0d",
+      "evidence_hash": "68e17c1ccece0c75f8f50889fd05215d9b9658a163d791002e3ce1d4dc1876f9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsReuseDecision"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8674d3b804bed0cd21426b90a7b04760978946df5d04dc7005e33add1fcdaabf",
+      "evidence_hash": "878e1860a6cdc6b72117348b0a177487dd1b97ca5d8e218b1844f3257f386a6d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact を schema version bump し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsSchemaVersion"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact を schema version bump し、既存 declaration hash と対称に implementation-side input、baseline、live rustdoc snapshot、evaluator contract、および rustdoc-extraction contract の freshness 情報を保持する。completed track の旧 artifact を migration せず、旧値または必要値が使えない場合は保守的に再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8674d3b804bed0cd21426b90a7b04760978946df5d04dc7005e33add1fcdaabf",
+      "evidence_hash": "3586a0eb53a01ed37c5ee5d487f84bf5e48e640aca8812c7e26e22efa3f17a69",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。completed track の artifact は migration しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsSchemaVersion"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。completed track の artifact は migration しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2efbbd40bf63c22b95ce5ef52fbd3e2bc59981072c858146d1c72fc64a1235be",
+      "evidence_hash": "878e1860a6cdc6b72117348b0a177487dd1b97ca5d8e218b1844f3257f386a6d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact を schema version bump し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsSchemaVersionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact を schema version bump し、既存 declaration hash と対称に implementation-side input、baseline、live rustdoc snapshot、evaluator contract、および rustdoc-extraction contract の freshness 情報を保持する。completed track の旧 artifact を migration せず、旧値または必要値が使えない場合は保守的に再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2efbbd40bf63c22b95ce5ef52fbd3e2bc59981072c858146d1c72fc64a1235be",
+      "evidence_hash": "3586a0eb53a01ed37c5ee5d487f84bf5e48e640aca8812c7e26e22efa3f17a69",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsSchemaVersionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。completed track の artifact は migration しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "121d205ed81c2ced1b61a4df4ae086793e1f3bfaab8582591f893c6b54c66605",
+      "evidence_hash": "6c07a808c08de878a2b70f499456f3d07b57191518430f7c9ca07eb54124f353",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "121d205ed81c2ced1b61a4df4ae086793e1f3bfaab8582591f893c6b54c66605",
+      "evidence_hash": "c3b04f861ace9021ceb51a514dfbf39506260bc570806dd1506f0c15ceb20a7e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または baseline の変更時は、現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。rustdoc-extraction contract の変更・不明、実装側 input の不一致・不明、または snapshot 検証不能では rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "121d205ed81c2ced1b61a4df4ae086793e1f3bfaab8582591f893c6b54c66605",
+      "evidence_hash": "311e0eb218466efcff988ce152df338433e52d110ecd1ea9dc385a17853dfb62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "121d205ed81c2ced1b61a4df4ae086793e1f3bfaab8582591f893c6b54c66605",
+      "evidence_hash": "3d8ca7a4e5f8437ee7166bf4218dfb6a5357d96d0f53a483c8b9fd64fe4d97d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。いずれかの評価入力または snapshot 検証が不一致または不明なら、AC-06/AC-07 の条件に従って signal 評価または rustdoc 抽出からの再計算を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し、解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。いずれかの評価入力または snapshot 検証が不一致または不明なら、AC-06/AC-07 の条件に従って signal 評価または rustdoc 抽出からの再計算を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "121d205ed81c2ced1b61a4df4ae086793e1f3bfaab8582591f893c6b54c66605",
+      "evidence_hash": "4ddbdf94614315742b8e7fd77f2c188e79f6b91af95ef1f88f2d03ea4241a952",
+      "verdict": {
+        "kind": "pass",
+        "citation": "解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。evaluator contract の変化は評価を強制するが、この snapshot 条件を満たす限り rustdoc 抽出だけは再利用できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue、baseline、または catalogue↔spec 評価に使う spec だけが変わった layer は、implementation-side input と rustdoc-extraction contract が一致し、解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。evaluator contract の変化は評価を強制するが、この snapshot 条件を満たす限り rustdoc 抽出だけは再利用できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "121d205ed81c2ced1b61a4df4ae086793e1f3bfaab8582591f893c6b54c66605",
+      "evidence_hash": "68e17c1ccece0c75f8f50889fd05215d9b9658a163d791002e3ce1d4dc1876f9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4af89c4440b20a61f772233b357c0a22a09c5930f40681928c57f5ce641ae8ab",
+      "evidence_hash": "311e0eb218466efcff988ce152df338433e52d110ecd1ea9dc385a17853dfb62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsExecutionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cafbb6ce0143e156cd6332c46d59b2200300c8a5da4cbd70b53746c446d63d79",
+      "evidence_hash": "6c07a808c08de878a2b70f499456f3d07b57191518430f7c9ca07eb54124f353",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "TypeSignalsExecutorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cafbb6ce0143e156cd6332c46d59b2200300c8a5da4cbd70b53746c446d63d79",
+      "evidence_hash": "c3b04f861ace9021ceb51a514dfbf39506260bc570806dd1506f0c15ceb20a7e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "TypeSignalsExecutorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または baseline の変更時は、現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。rustdoc-extraction contract の変更・不明、実装側 input の不一致・不明、または snapshot 検証不能では rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cafbb6ce0143e156cd6332c46d59b2200300c8a5da4cbd70b53746c446d63d79",
+      "evidence_hash": "311e0eb218466efcff988ce152df338433e52d110ecd1ea9dc385a17853dfb62",
+      "verdict": {
+        "kind": "pass",
+        "citation": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "TypeSignalsExecutorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cafbb6ce0143e156cd6332c46d59b2200300c8a5da4cbd70b53746c446d63d79",
+      "evidence_hash": "3d8ca7a4e5f8437ee7166bf4218dfb6a5357d96d0f53a483c8b9fd64fe4d97d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer prelude はその signal 評価を skip する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "TypeSignalsExecutorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し、解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。いずれかの評価入力または snapshot 検証が不一致または不明なら、AC-06/AC-07 の条件に従って signal 評価または rustdoc 抽出からの再計算を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cafbb6ce0143e156cd6332c46d59b2200300c8a5da4cbd70b53746c446d63d79",
+      "evidence_hash": "4ddbdf94614315742b8e7fd77f2c188e79f6b91af95ef1f88f2d03ea4241a952",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue、baseline、または catalogue↔spec 評価に使う spec だけが変わった layer は、implementation-side input と rustdoc-extraction contract が一致し、解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "TypeSignalsExecutorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue、baseline、または catalogue↔spec 評価に使う spec だけが変わった layer は、implementation-side input と rustdoc-extraction contract が一致し、解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。evaluator contract の変化は評価を強制するが、この snapshot 条件を満たす限り rustdoc 抽出だけは再利用できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cafbb6ce0143e156cd6332c46d59b2200300c8a5da4cbd70b53746c446d63d79",
+      "evidence_hash": "68e17c1ccece0c75f8f50889fd05215d9b9658a163d791002e3ce1d4dc1876f9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "TypeSignalsExecutorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+        }
+      }
+    }
+  ]
+}

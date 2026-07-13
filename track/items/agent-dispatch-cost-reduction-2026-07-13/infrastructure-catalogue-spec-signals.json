@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "9d1f5fe953d662580dbadaabd26d16e9cd695b0f106db61ef9082b7936834c48",
+  "signals": [
+    {
+      "type_name": "AgentProfiles",
+      "signal": "blue",
+      "entry_hash": "2e01e4168a080a12a4f2cf79dbd3d9be86efbd427a6ca09d4d6e4386f972ed39"
+    },
+    {
+      "type_name": "AgentProfilesCapabilityAdapter",
+      "signal": "blue",
+      "entry_hash": "4cb359101d27d87a37906f94afb86ae486bac546f4c9ae608f2a82d5fa90e19f"
+    },
+    {
+      "type_name": "AgentProfilesError",
+      "signal": "blue",
+      "entry_hash": "bb000a430c9bc2330253e41fab6b8de1e16e257f8b986cd3d9b6c018b4849bd8"
+    },
+    {
+      "type_name": "CapabilityConfigDto",
+      "signal": "blue",
+      "entry_hash": "9ffdfe74db1f31abdb9e875bb413722ebde792a91819942e03f2617b26101a15"
+    },
+    {
+      "type_name": "ClaudeCapabilityAdapter",
+      "signal": "blue",
+      "entry_hash": "2f2f3aa95a070d57253c51b87ac615d72decec47481fcea35a282accb4fe1f3d"
+    },
+    {
+      "type_name": "ClaudeReviewer",
+      "signal": "blue",
+      "entry_hash": "962328f2dd335e72566e8a637b4b375f90dbe5ff04b22f6287184cf8295774c9"
+    },
+    {
+      "type_name": "CodexCapabilityAdapter",
+      "signal": "blue",
+      "entry_hash": "2cf6593970e47ec083a42adae3b5ee94aa8a1f5e78e3a445bc679bed18c5e86b"
+    },
+    {
+      "type_name": "CodexReviewer",
+      "signal": "blue",
+      "entry_hash": "cada0c5243f475187a396beb9f3997acd2b02b345bb7550fda29e5e64a365361"
+    },
+    {
+      "type_name": "EvaluateSignalsError",
+      "signal": "blue",
+      "entry_hash": "3585c65d47f23fb638e440534afd4fda24ed8adf09cfa8b1a4d28e971517ab1d"
+    },
+    {
+      "type_name": "ExecutionModeDto",
+      "signal": "blue",
+      "entry_hash": "1735faa2a4310b2ab536ae88f18513a411a2709b31000c7d10584df68f611dbd"
+    },
+    {
+      "type_name": "FsProviderSessionCacheAdapter",
+      "signal": "blue",
+      "entry_hash": "30a3f36fd68ca59433fa2617cf31898af3308b1521cab4cdd84229369f83bc48"
+    },
+    {
+      "type_name": "ModelNameDto",
+      "signal": "blue",
+      "entry_hash": "9abd8fbb6762f7144876d9339b3ffa60cc3f8e86b6a8f694d050809ea9b390d6"
+    },
+    {
+      "type_name": "ProviderNameDto",
+      "signal": "blue",
+      "entry_hash": "9fc62f7d61fd075c6113830b813d5edd136da115b4c1c0670a19d21c6116af9f"
+    },
+    {
+      "type_name": "ReasoningEffortDto",
+      "signal": "blue",
+      "entry_hash": "d7b08d1e5b40aaed6a43ad43166af5d0273420252b9e2b6331708b04087317ce"
+    },
+    {
+      "type_name": "ResolvedExecution",
+      "signal": "blue",
+      "entry_hash": "b631b6e0ff8c1b8027e782abd755ee670284722cb6e3b9261a864c544365b0ce"
+    },
+    {
+      "type_name": "RoundType",
+      "signal": "blue",
+      "entry_hash": "ffb9e61b7888840cca62e32c193a15f0be21b642b0fdeb7302084fad2ecca4c4"
+    },
+    {
+      "type_name": "Sha256ExecutionContractFingerprintAdapter",
+      "signal": "blue",
+      "entry_hash": "634a1f050bb5a840fef97129400ad7318918ccc21f00be4e94845012f8aaade5"
+    },
+    {
+      "type_name": "TypeSignalsCodecError",
+      "signal": "blue",
+      "entry_hash": "073a551db5d2278e992f49b71ee3148d9d44d899aae65e4cc31b3fb725badc16"
+    },
+    {
+      "type_name": "TypeSignalsExecutorAdapter",
+      "signal": "blue",
+      "entry_hash": "71b749ae70051d08d279c4cbc62befda14649302ff6b922cef6ba02964b9e604"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_codec::declaration_hash",
+      "signal": "blue",
+      "entry_hash": "b99532057b377a17005d6617e20370f22db0b34ebd6ee0b6aa8b3b87973a2df5"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_codec::decode",
+      "signal": "blue",
+      "entry_hash": "bfef1068aaff2b69c79b3791e4f179178e4feb28804f628346aa6c66cbd975fc"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_codec::encode",
+      "signal": "blue",
+      "entry_hash": "574dc0e9e4878f7825c4be527fd38ba7ae1e794a04eeff6e3ba3af2463cd73ce"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "signal": "blue",
+      "entry_hash": "5dbbc911f7ff1d9e727810ff7569872bd1115d2d338ed50883625fcc7d48bcc1"
+    }
+  ]
+}

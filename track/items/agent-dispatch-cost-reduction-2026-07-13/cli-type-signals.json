@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-13T19:32:14Z",
+  "declaration_hash": "63e08410653b36dfecfd309013c5a28458ad5d405ac25a16ff64ac50ee43af3d",
+  "signals": [
+    {
+      "type_name": "CapabilityExecArgs",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "clap_builder::derive::Args",
+        "clap_builder::derive::FromArgMatches",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CapabilityCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::capability::execute",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::review::execute",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

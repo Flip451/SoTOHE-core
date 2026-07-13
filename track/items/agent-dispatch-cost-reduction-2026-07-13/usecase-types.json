@@ -1,0 +1,2205 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "docs": "Produces only CapabilityInputValidationError::EmptyFilePath or CapabilityInputValidationError::InvalidFilePath; all other variants are unreachable for this constructor.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::path::Path"
+        }
+      ],
+      "type_name": "TargetArtifactPath"
+    },
+    {
+      "methods": [
+        {
+          "docs": "Produces only CapabilityInputValidationError::EmptyTargetArtifactSet; all other variants are unreachable for this constructor.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "paths",
+              "ty": "Vec<TargetArtifactPath>"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_slice",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TargetArtifactPath]"
+        }
+      ],
+      "type_name": "TargetArtifactSet"
+    },
+    {
+      "methods": [
+        {
+          "docs": "Produces only CapabilityInputValidationError::EmptyContent; all other variants are unreachable for this constructor.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "ProviderSessionId"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "digest",
+              "ty": "domain::tddd::type_signals_doc::Sha256Digest"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_digest",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::tddd::type_signals_doc::Sha256Digest"
+        }
+      ],
+      "type_name": "ExecutionContractFingerprint"
+    },
+    {
+      "methods": [
+        {
+          "docs": "Produces only CapabilityInputValidationError::EmptyContent; all other variants are unreachable for this constructor.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "ReviewerPrompt"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "session_id",
+              "ty": "ProviderSessionId"
+            },
+            {
+              "name": "provider",
+              "ty": "ProviderName"
+            },
+            {
+              "name": "model",
+              "ty": "ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "ReasoningEffort"
+            },
+            {
+              "name": "fingerprint",
+              "ty": "ExecutionContractFingerprint"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "session_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ProviderSessionId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provider",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ProviderName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "model",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ModelName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "effort",
+          "params": [],
+          "receiver": "&self",
+          "returns": "ReasoningEffort"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fingerprint",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ExecutionContractFingerprint"
+        }
+      ],
+      "type_name": "ProviderSessionCacheEntry"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsInteractor",
+      "trait_ref": "TypeSignalsService"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityInputValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityInputValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityInputValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityProfile",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityProfile",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityProfile",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityProfile",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ReasoningEffort",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReasoningEffort",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReasoningEffort",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "ReasoningEffort",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReasoningEffort",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TargetArtifactPath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TargetArtifactPath",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TargetArtifactPath",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TargetArtifactPath",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TargetArtifactPath",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "for_type": "TargetArtifactPath",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "for_type": "TargetArtifactPath",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "TargetArtifactSet",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TargetArtifactSet",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TargetArtifactSet",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TargetArtifactSet",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TargetArtifactSet",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "CapabilityResumeRequest",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityResumeRequest",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityResumeRequest",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityResumeRequest",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ProviderSessionId",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ProviderSessionId",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ProviderSessionId",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ProviderSessionId",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ExecutionContractFingerprint",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ExecutionContractFingerprint",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ExecutionContractFingerprint",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ExecutionContractFingerprint",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ReviewerPrompt",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewerPrompt",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewerPrompt",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewerPrompt",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ProviderSessionCacheKey",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ProviderSessionCacheKey",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ProviderSessionCacheKey",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ProviderSessionCacheKey",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ProviderSessionCacheKey",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "ProviderSessionCacheEntry",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ProviderSessionCacheEntry",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ProviderSessionCacheEntry",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ProviderSessionCacheEntry",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ProviderSessionCacheError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ProviderSessionCacheError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ProviderSessionCacheError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "TypeSignalsExecutionError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TypeSignalsExecutionError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TypeSignalsExecutionError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "TypeSignalsExecutionError",
+      "trait_ref": "core::error::Error"
+    }
+  ],
+  "traits": {
+    "CapabilityExecutionContractFingerprintPort": {
+      "action": "add",
+      "docs": "Synchronous capability execution-contract fingerprint port; adapters perform bounded blocking guarded-file reads on the already-synchronous capability dispatch path.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "docs": "Reads guarded capability-contract inputs; error subset: Io, Symlink, Path; never Codec.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "capability_fingerprint",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&CapabilityName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ExecutionContractFingerprint, ProviderSessionCacheError>"
+        }
+      ],
+      "module_path": "provider_session",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "CapabilityProfilePort": {
+      "action": "reference",
+      "docs": "Resolves the typed dispatch profile for a capability.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&CapabilityName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CapabilityProfile, CapabilityExecError>"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "CapabilityProviderPort": {
+      "action": "reference",
+      "docs": "Dispatches a fully resolved capability through a provider-native adapter.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provider",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ProviderName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "dispatch",
+          "params": [
+            {
+              "name": "request",
+              "ty": "&CapabilityDispatchRequest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CapabilityDispatchOutcome, CapabilityExecError>"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ProviderSessionCachePort": {
+      "action": "add",
+      "docs": "Synchronous machine-local cache port; adapters perform bounded blocking filesystem work on the already-synchronous dispatch path.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "key",
+              "ty": "&ProviderSessionCacheKey"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Option<ProviderSessionCacheEntry>, ProviderSessionCacheError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "save",
+          "params": [
+            {
+              "name": "key",
+              "ty": "&ProviderSessionCacheKey"
+            },
+            {
+              "name": "entry",
+              "ty": "&ProviderSessionCacheEntry"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), ProviderSessionCacheError>"
+        },
+        {
+          "docs": "Removes the entry selected by the validated key without encoding or decoding cache contents; error subset: Io, Symlink, Path; never Codec.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "remove",
+          "params": [
+            {
+              "name": "key",
+              "ty": "&ProviderSessionCacheKey"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), ProviderSessionCacheError>"
+        }
+      ],
+      "module_path": "provider_session",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "Reviewer": {
+      "action": "reference",
+      "docs": "Performs fast or final review judgments over a complete typed review target.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&domain::review_v2::ReviewTarget"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(domain::review_v2::Verdict, domain::review_v2::LogInfo), domain::review_v2::ReviewerError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_review",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&domain::review_v2::ReviewTarget"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(domain::review_v2::FastVerdict, domain::review_v2::LogInfo), domain::review_v2::ReviewerError>"
+        }
+      ],
+      "module_path": "review_v2::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ReviewerExecutionContractFingerprintPort": {
+      "action": "add",
+      "docs": "Synchronous reviewer execution-contract fingerprint port; adapters perform bounded blocking guarded-file reads on the already-synchronous reviewer dispatch path.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "docs": "Reads guarded reviewer-contract inputs; error subset: Io, Symlink, Path; never Codec.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "reviewer_fingerprint",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "&domain::review_v2::ScopeName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ExecutionContractFingerprint, ProviderSessionCacheError>"
+        }
+      ],
+      "module_path": "provider_session",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "TypeSignalsExecutorPort": {
+      "action": "add",
+      "docs": "Synchronous application-service port for blocking per-layer rustdoc and filesystem evaluation.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "evaluate_layer",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::ids::TrackId"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "binding",
+              "ty": "&domain::tddd::catalogue_v2::TdddLayerBinding"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), TypeSignalsExecutionError>"
+        }
+      ],
+      "module_path": "type_signals::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "TypeSignalsService": {
+      "action": "reference",
+      "docs": "Runs validated layer-granular type-signal evaluation through injected ports.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run",
+          "params": [
+            {
+              "name": "request",
+              "ty": "TypeSignalsRequest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), TypeSignalsError>"
+        }
+      ],
+      "module_path": "type_signals::service",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "CapabilityDispatchOutcome": {
+      "action": "reference",
+      "docs": "Capability-dispatch outcome categories; Executed.u8 is opaque subprocess status (IN-08, OS-05).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Executed",
+            "payload": {
+              "fields": [
+                "ProviderName",
+                "u8"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DelegateInHost",
+            "payload": {
+              "fields": [
+                "CapabilityName",
+                "CapabilityFilePath",
+                "DisciplineText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "OS-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityDispatchRequest": {
+      "action": "reference",
+      "docs": "Carries validated command, profile, briefing, and discipline data into a provider adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "request",
+              "ty": "CapabilityExecRequest"
+            },
+            {
+              "name": "profile",
+              "ty": "CapabilityProfile"
+            },
+            {
+              "name": "briefing",
+              "ty": "BriefingText"
+            },
+            {
+              "name": "discipline",
+              "ty": "DisciplineText"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecError": {
+      "action": "modify",
+      "docs": "Reports fail-closed profile, source, preflight, or provider dispatch failures.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ProfileResolution",
+            "payload": {
+              "fields": [
+                "CapabilityName",
+                "CapabilityFailureDetail"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ExecutionModeRejected",
+            "payload": {
+              "fields": [
+                "CapabilityName",
+                "ExecutionMode"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ModelMissing",
+            "payload": {
+              "fields": [
+                "CapabilityName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EffortMissing",
+            "payload": {
+              "fields": [
+                "CapabilityName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnsupportedProvider",
+            "payload": {
+              "fields": [
+                "ProviderName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SourceValidation",
+            "payload": {
+              "fields": [
+                "CapabilityFilePath",
+                "CapabilityFailureDetail"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "AdapterPreflight",
+            "payload": {
+              "fields": [
+                "CapabilityName",
+                "ProviderName",
+                "CapabilityFailureDetail"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DispatchFailed",
+            "payload": {
+              "fields": [
+                "ProviderName",
+                "CapabilityFailureDetail"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecRequest": {
+      "action": "modify",
+      "docs": "Validated command requesting a fresh or explicitly resumed capability dispatch.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "CapabilityName"
+            },
+            {
+              "name": "host",
+              "ty": "ProviderName"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "CapabilityFilePath"
+            },
+            {
+              "name": "timeout",
+              "ty": "Option<TimeoutSeconds>"
+            },
+            {
+              "name": "resume",
+              "ty": "CapabilityResumeRequest"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityFailureDetail": {
+      "action": "reference",
+      "docs": "Opaque sanitized diagnostic returned by capability adapters.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityFilePath": {
+      "action": "reference",
+      "docs": "Validated path to a capability briefing or discipline file.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&Path"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityInputValidationError": {
+      "action": "modify",
+      "docs": "Reports invalid typed inputs at the capability dispatch boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "EmptyProviderName",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyModelName",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyFilePath",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidFilePath",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyContent",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ZeroTimeoutSeconds",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyTargetArtifactSet",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityName": {
+      "action": "reference",
+      "docs": "Validated capability identifier shared by routing, cache, and dispatch boundaries.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "dry_write_driver::failure_details",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityProfile": {
+      "action": "modify",
+      "docs": "Fully resolved provider, model, effort, and execution mode for one capability dispatch.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "provider",
+              "ty": "ProviderName"
+            },
+            {
+              "name": "model",
+              "ty": "ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "ReasoningEffort"
+            },
+            {
+              "name": "execution_mode",
+              "ty": "ExecutionMode"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityResumeRequest": {
+      "action": "add",
+      "docs": "Distinguishes fresh dispatch from targetless fallback and target-bound session continuation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fresh",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ResumeWithoutTarget",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Resume",
+            "payload": {
+              "fields": [
+                "TargetArtifactSet"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ExecutionContractFingerprint": {
+      "action": "add",
+      "docs": "Typed digest of the stable execution contract that gates provider-session reuse.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "provider_session",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ModelName": {
+      "action": "reference",
+      "docs": "Validated provider model identifier used by dispatch and session compatibility checks.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ProviderName": {
+      "action": "reference",
+      "docs": "Validated provider identifier used by routing and session compatibility checks.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ProviderSessionCacheEntry": {
+      "action": "add",
+      "docs": "Provider-session cache payload (IN-04, CN-02, CN-06, CN-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "provider_session",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ProviderSessionCacheError": {
+      "action": "add",
+      "docs": "Classifies cache failures without exposing machine-local paths or provider internals.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Codec",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Symlink",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Path",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "provider_session",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ProviderSessionCacheKey": {
+      "action": "add",
+      "docs": "Separates reviewer, track capability, and workspace capability sessions by validated identity.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Review",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "domain::ids::TrackId"
+                },
+                {
+                  "name": "scope",
+                  "ty": "domain::review_v2::ScopeName"
+                },
+                {
+                  "name": "round_type",
+                  "ty": "domain::review_v2::RoundType"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TrackCapability",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "domain::ids::TrackId"
+                },
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                },
+                {
+                  "name": "target_artifacts",
+                  "ty": "TargetArtifactSet"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "WorkspaceCapability",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                },
+                {
+                  "name": "target_artifacts",
+                  "ty": "TargetArtifactSet"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "provider_session",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ProviderSessionId": {
+      "action": "add",
+      "docs": "Validated non-empty provider-native session identifier.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "provider_session",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ReasoningEffort": {
+      "action": "add",
+      "docs": "Closed provider-independent vocabulary for explicitly configured reasoning effort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Low",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Medium",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "High",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "XHigh",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Max",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ReviewerPrompt": {
+      "action": "add",
+      "docs": "Validated non-empty reviewer prompt used in the execution-contract fingerprint.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "provider_session",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TargetArtifactPath": {
+      "action": "add",
+      "docs": "Validated normalized repository-relative artifact path used in capability session identity.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TargetArtifactSet": {
+      "action": "add",
+      "docs": "Non-empty sorted deduplicated target-artifact identity for capability resume.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TimeoutSeconds": {
+      "action": "reference",
+      "docs": "Existing non-zero timeout value carried unchanged by CapabilityExecRequest while IN-08 adds fresh-versus-resumed selection to the same `sotp capability exec` command.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "u64"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_secs",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u64"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsExecutionError": {
+      "action": "add",
+      "docs": "Opaque adapter diagnostic; String is intentionally unconstrained because it carries no domain concept.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            "String"
+          ],
+          "has_stripped_fields": false,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "type_signals::ports",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsInteractor": {
+      "action": "modify",
+      "docs": "Carries the request's validated TrackId through every layer evaluation and enforces active-track consistency.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "layer_bindings",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBindingsPort>"
+            },
+            {
+              "name": "executor",
+              "ty": "std::sync::Arc<dyn TypeSignalsExecutorPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "type_signals::interactor",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsRequest": {
+      "action": "modify",
+      "docs": "Typed signal-evaluation command that prevents invalid track, branch, and layer identities from entering the use case.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "domain::ids::TrackId"
+            },
+            {
+              "name": "branch",
+              "ty": "domain::ids::TrackBranch"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "layer",
+              "ty": "Option<domain::tddd::layer_id::LayerId>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "type_signals::service",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

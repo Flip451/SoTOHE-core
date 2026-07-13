@@ -1,6 +1,570 @@
 {
   "schema_version": 2,
   "scopes": {
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Sha256Digest`, `TypeSignalsFreshness`, and `TypeSignalsSchemaVersion` are private-field value objects with no declared constructor or accessors, so the infrastructure codec/evaluator cannot create or inspect the freshness data required by `TypeSignalsDocument`.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+              "line": 1074,
+              "category": "api_shape"
+            },
+            {
+              "message": "`ProviderSessionCacheEntry` is opaque (`has_stripped_fields: true`) but declares no constructor, accessors, or serialization boundary. The cache port returns and accepts this type, leaving adapters and provider callers unable to persist or validate its session/profile/fingerprint fields.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 1516,
+              "category": "api_shape"
+            },
+            {
+              "message": "`TargetArtifactPath` and `TargetArtifactSet` are private-field value objects with no construction or read API, while `CapabilityResumeArg` crosses from CLI-driver into these types. The declared boundary has no way to convert validated CLI paths into the usecase resume identity.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 1849,
+              "category": "cross_layer_contract"
+            },
+            {
+              "message": "`FsProviderSessionCacheAdapter` and `Sha256ExecutionContractFingerprintAdapter` both have private state and empty method declarations, including no `new`/factory method or `Default` impl. The composition root therefore cannot construct either adapter for the dependencies it claims to wire.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 1168,
+              "category": "api_shape"
+            },
+            {
+              "message": "`ExecutionContractFingerprintPort::reviewer_fingerprint` and `capability_fingerprint` return `ProviderSessionCacheError`, whose `Io`, `Symlink`, and `Path` variants are structurally unrelated to the declared pure fingerprint operations. The entry does not document a justified subset; callers must handle unreachable cache-storage failures.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 552,
+              "category": "per_method_error_imprecision"
+            },
+            {
+              "message": "`ProviderSessionCachePort` is explicitly a machine-local persistence port, but all `load`/`save`/`remove` methods are synchronous and the entry does not acknowledge the blocking-I/O choice. This fixes the adapter contract to blocking filesystem operations without documenting the color decision.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 607,
+              "category": "sync_async_color_mismatch"
+            },
+            {
+              "message": "`TypeSignalsExecutorPort::evaluate_layer` takes filesystem roots and a layer binding and delegates semantic evaluation/rustdoc execution, yet is declared synchronous with no documented sync-I/O decision. The port contract leaves the adapter's external-process/filesystem execution model underspecified.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+              "line": 657,
+              "category": "sync_async_color_mismatch"
+            },
+            {
+              "message": "The `CapabilityDispatchOutcome` docs restate the upstream resume-boundary contract and the `Executed` payload semantics (including why raw `u8` is opaque) instead of only citing the `IN-08`/`OS-05` anchors.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 796,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "The `ProviderSessionCacheEntry` docs restate profile/fingerprint compatibility and expiry fallback behavior from the upstream contract; this behavior must remain in the cited spec anchors rather than being duplicated in the type catalogue.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 1518,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "The `AgentProfiles` docs restate the upstream routing invariant that `provider_label` is display-only and must not be used as identity, rather than referring to the `IN-01`/`IN-02`/`CN-01` anchors.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 362,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "The `AgentProfilesError` docs restate the upstream diagnostic-data policy for `UnsupportedSchemaVersion` instead of limiting the catalogue entry to the type change plus its anchors.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 524,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:b5a456c7c632e4fd0b56739ed45792d55748de1b482de42b00d3bdfd336c19f0",
+          "at": "2026-07-13T16:45:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::CapabilityExecArgs` declares only capability, host, briefing_file, and timeout_seconds, while `cli_driver::CapabilityExecDriverInput` requires `resume: CapabilityResumeArg`. The resume selector and target artifacts are therefore unreachable from the CLI, so the IN-08/AC-09 resume flow cannot be invoked.",
+              "severity": "P0",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+              "line": 111,
+              "category": "mirror_chain_divergence"
+            }
+          ],
+          "hash": "rvw1:sha256:77c7cbab5269c9fca2b1e703014621863f015467ac158ac10d1083880669e645",
+          "at": "2026-07-13T17:13:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc5d0930702a6721dc0ab30752ba09b98300adac4ce60c7b97cff958d58fb748",
+          "at": "2026-07-13T17:31:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeSignalsExecutorPort` abstracts blocking rustdoc/filesystem work and is consumed by `TypeSignalsInteractor`, so it is an application-service port rather than a domain concept. Declaring it as a `SecondaryPort` in the domain catalogue violates the Port Placement Rules; move this contract (and its executor error surface) to the usecase layer and have the infrastructure adapter implement that port.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+              "line": 657,
+              "category": "architecture violation"
+            },
+            {
+              "message": "`TypeSignalsInteractor` is marked `action: modify`, but its declared public shape and constructor are identical to the rustdoc baseline; only its implementation behavior is planned to change. This makes Chain ③ blue before the implementation lands and contradicts the catalogue's modify semantics. Mark it `reference` or omit it if no type-level edge requires it.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 1969,
+              "category": "SoT integrity/action incoherence"
+            },
+            {
+              "message": "Several baseline-identical entries are incorrectly marked `modify`: `AgentProfilesCapabilityAdapter`, `TypeSignalsExecutorAdapter`, `infrastructure::tddd::type_signals_codec::decode`, and `...::encode`. Their declared constructors/signatures contain no post-track structural delta, so they already evaluate blue before implementation. Use `reference` or omit body-only changes from the type catalogue.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 37,
+              "category": "SoT integrity/action incoherence"
+            },
+            {
+              "message": "`CapabilityDriver` is marked `action: modify`, but its declared public methods match the baseline exactly; the planned resume validation is a method-body change. Representing it as `modify` falsely claims a post-track structural change and allows Chain ③ to be blue before that behavior exists. Use `reference` or omit the entry.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_driver-types.json",
+              "line": 95,
+              "category": "SoT integrity/action incoherence"
+            },
+            {
+              "message": "`CapabilityCompositionRoot` is marked `action: modify`, although its declared public constructor and accessor signatures match the baseline. Changes to stripped private wiring do not constitute a catalogue-visible shape delta, so this should be `reference` rather than an already-blue `modify`.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_composition-types.json",
+              "line": 21,
+              "category": "SoT integrity/action incoherence"
+            },
+            {
+              "message": "Both `cli::commands::capability::execute` and `cli::commands::review::execute` are marked `action: modify`, but their parameter and return signatures are baseline-identical; only their bodies will change. Mark these entries `reference` or omit them so the catalogue does not claim unenforceable structural modifications.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+              "line": 5,
+              "category": "SoT integrity/action incoherence"
+            }
+          ],
+          "hash": "rvw1:sha256:bc5d0930702a6721dc0ab30752ba09b98300adac4ce60c7b97cff958d58fb748",
+          "at": "2026-07-13T17:39:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::tddd::type_signals_doc::decide_type_signals_reuse` requires a complete `current: &TypeSignalsFreshness`, including `LiveRustdocSnapshotHash`, even when `snapshot_status` is `Missing` or `ReadFailed`, where no current snapshot hash exists. Callers must fabricate a hash, and the separate parameters also admit contradictory states such as `Verified` paired with an unrelated hash. Carry the verified hash in the status enum or separate current input hashes from recorded freshness.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+              "line": 4,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "The new `TargetArtifactPath::try_new`, `TargetArtifactSet::try_new`, `ProviderSessionId::try_new`, and `ReviewerPrompt::try_new` methods all return the seven-variant `CapabilityInputValidationError`, although each can produce only a small, disjoint subset. Their declarations neither document those subsets nor justify the broad error surface, forcing callers to handle structurally impossible variants.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 17,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`CapabilityResumeArg::into_domain` returns the full `CapabilityInputValidationError`, but only conversion of `Resume(Vec<TargetArtifactPathArg>)` can fail, specifically while constructing `TargetArtifactSet`; provider, model, file-path, content, and timeout variants are structurally unreachable. Declare or document the producible subset.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_driver-types.json",
+              "line": 26,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`AgentProfiles::resolve_execution` operates on an already-loaded profile yet returns `AgentProfilesError`, exposing loader-only variants such as `Io`, `Symlink`, `PathOutsideTrustedRoot`, `Parse`, and `UnsupportedSchemaVersion`. Its declaration does not document a producible subset or justify requiring resolution callers to handle these impossible failures.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 410,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`infrastructure::tddd::type_signals_codec::encode` accepts an already validated `TypeSignalsDocument` but returns the shared `TypeSignalsCodecError`, including decode-only validation failures such as `InvalidSchemaVersion`, `InvalidTimestamp`, and `InvalidDigest`. The method does not identify its producible subset or justify this broad surface.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 60,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:4a177add70e8d337cfc2cb7853097ed8d28d42c607c1e2822f7694a8d0d1ab75",
+          "at": "2026-07-13T18:18:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ExecutionContractFingerprintPort` は reviewer 専用の `reviewer_fingerprint` と capability 専用の `capability_fingerprint` を単一 interface に束ねています。`CodexReviewer` / `ClaudeReviewer` と capability adapter 群の利用系統は分離しており、各 mock・代替実装に無関係なメソッドの実装を強制します。reviewer 用と capability 用の SecondaryPort に分割してください。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 572,
+              "category": "Interface Segregation violation"
+            },
+            {
+              "message": "`ExecutionContractFingerprintPort` の両メソッドは guarded contract file を読み取る外部 I/O 境界ですが、いずれも同期メソッドであり、docs は blocking I/O を同期 dispatch path で行う設計判断を説明していません。同期を意図するなら bounded blocking の選択を明記し、そうでなければ async 境界にしてください。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 574,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "`ProviderSessionCachePort::remove` は共有 `ProviderSessionCacheError` を返すため `Codec` まで公開しますが、key による削除処理は entry の encode/decode を行わず、この variant を構造的に生成できません。`ExecutionContractFingerprintPort` と同様に生成可能な subset を method docs で限定するか、より精密な error type を使用してください。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 675,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:53f35f952f8d43bdf7046930f09ab6adebcc6d482ac50dfcb92117fe354b728a",
+          "at": "2026-07-13T18:51:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a6801779eb100ab8dced3a2e2ed2fb1a58aff2652d86466244e883131ed448a",
+          "at": "2026-07-13T19:16:51Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 lacks a concrete target file or symbol; “T001 task-contract catalogue entries” leaves the implementation boundary to the executor.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001 restates the effort/profile behavior contract in prose (“typed provider, model...”, rejecting provider defaults); retain only concrete target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 lacks concrete profile file or symbol targets; “T002 task-contract catalogue entries” and “committed routing profiles” are not an executable boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002 restates the IN-01/IN-02/OS-02 behavior contract in prose, including reference verifiers and the pr-reviewer exemption.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 lacks concrete target files or symbols for the cache and fingerprint work; “T003 task-contract catalogue entries” is not an implementable boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 18,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003 restates the session-cache fingerprint and unsafe-reuse behavior contract in prose, including unreadable, mismatched, expired, and failed entries.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 lacks concrete reviewer, adapter, CLI, or composition target files/symbols; “T004 task-contract catalogue entries” does not define the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 24,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T004 restates the reviewer resume behavior contract, including same-scope eligibility, fresh-session fallback, flag reinjection, and full-scope re-evaluation.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 lacks concrete domain files or symbols for the signal artifact and freshness model; “T005 task-contract catalogue entries” is not an executable boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 30,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T005 restates the type-signals schema, conservative reuse, and completed-track migration behavior contract in prose.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 lacks concrete target files or symbols for the codec, executor, and composition work; “T006 task-contract catalogue entries” does not define the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 36,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T006 restates the signal-preflight skip/recompute behavior contract, including permitted work and conservative handling of unknown evidence.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T007 lacks concrete usecase or adapter target files/symbols; “T007 task-contract catalogue entries” is not an executable implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 42,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T007 restates the capability-resume behavior contract, including target-bound dispatch, fallback, flag injection, cache separation, and in-host exclusion.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T008 names only broad CLI/driver/composition boundaries and lacks concrete files or symbols; “T008 task-contract catalogue entries” is not an executable boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 48,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T008 restates the CLI resume and fresh-dispatch behavior contract instead of delegating that behavior to its IN/CN/AC anchors.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 48,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T009 lacks concrete capability-contract file paths or symbols; “shared capability discipline,” “affected ... contracts,” and “conformance or dead-reference coverage” leave the deliverables ambiguous.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 54,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T009 restates the full-scope re-review and upstream-artifact re-reading behavior contract in prose; cite CN-03/CN-10/AC-03/AC-10 instead.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 54,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:347a509a102b1e1993066a1b36191b0ad9d4d81c5b0cd64326639fde44820e1e",
+          "at": "2026-07-13T16:40:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 creates `ProviderSessionCacheKey`, which depends on the `TargetArtifactSet` type assigned to T007. However, S4 schedules T007 after T003, so T003 cannot be implemented as an independently buildable task. Move `TargetArtifactSet` into an earlier prerequisite or revise the task dependencies.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 18,
+              "category": "dependency cycle or wrong ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:9f438bb3d1c7770233eda4c1e79f05be7f12134dead6b1b428bd1b23e58437d9",
+          "at": "2026-07-13T16:48:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f40a917a941e19105d10b3cc38efc57bbce46537a64b0fc232441954463f706",
+          "at": "2026-07-13T16:54:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` contains behavioral prose but no explicit GO-NN-to-task mappings. Consequently GO-01 through GO-04 lack the required goal traceability—particularly GO-01, whose work extends beyond T001/T002, and cross-cutting GO-04. Add explicit mappings such as `GO-NN → T...` in `plan.summary`.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 60,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T002 is attributed to the modified `AgentProfilesError` catalogue entry, but T002's executable description names `AgentProfiles`, configuration/execution DTOs, and `AgentProfilesCapabilityAdapter::resolve` without any operation on `AgentProfilesError`. Add the error type and its intended modification to T002, or move/remove the attribution if another task owns it.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/task-contract.json",
+              "line": 17,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:9f40a917a941e19105d10b3cc38efc57bbce46537a64b0fc232441954463f706",
+          "at": "2026-07-13T17:01:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 は `TypeSignalsExecutionError` を `type_signals_doc.rs` の変更対象として列挙していますが、この catalogue entry は `tddd::catalogue_v2::catalogue_impl_signals_ports` に属する `action: reference` であり、T005 の新規型や `decide_type_signals_reuse` からも使用されません。一方、その実ファイルと `TypeSignalsExecutorPort` を変更する carrier task は T006 です。T005 からこの対象記載を外し、reference-entry attribution を T006 に移してください。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/task-contract.json",
+              "line": 64,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:26419f3d1e788140cf7cb62252f2a48614bd8f637f6fdae17cd8a1d0ee342732",
+          "at": "2026-07-13T17:07:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4464db8c52895c356736b239ec5710264c6083d97dae0cedd707626e2453bf04",
+          "at": "2026-07-13T17:11:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:43b5267c11e4ae8dd0781d8ba1cfb435c2cad1233c1e9c0a7ef653ed0e391602",
+          "at": "2026-07-13T18:13:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2440a4494cc2ef4b2f2b15a6ea489c3a6691d9740378f28e0ce793a31d3d6634",
+          "at": "2026-07-13T19:21:34Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01’s requirement for a low-effort fast round, provider-maximum final effort, and preservation of the two-stage review is not deterministically covered. AC-01 only verifies that distinct fast/final effort values resolve, so an implementation using arbitrary values or not preserving the two-stage behavior could pass all ACs.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 330,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "CN-08 requires a new-session fallback when the capability resume cache cannot be read or hashed, but no AC covers those cases. AC-09 covers valid entries and profile/contract mismatch, while AC-10 covers resume failure and expiry; an implementation could omit read/hash-failure fallback and still satisfy every AC.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 250,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "GO-04 promises preservation of review judgment and review-record semantics, but no acceptance criterion deterministically verifies that session resume leaves the judgment/record unit unchanged. AC-03 verifies full-scope rejudgment only, and AC-04 verifies session selection and flag injection; both could pass while resumed rounds alter record semantics.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 42,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:ef0973d9289a0f7ef6da6420df173797ca945a426216056f958ed7aad2c5253e",
+          "at": "2026-07-13T16:40:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22f57e52e8eda72c842a70ee3f0529f018cae653e6a35315453739232c03161c",
+          "at": "2026-07-13T16:45:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 permits signal-evaluation skip whenever the implementation, catalogue, baseline, and evaluator hashes match, even when the rustdoc-extraction contract changed or the live snapshot cannot be verified. CN-07 and AC-07 require rustdoc extraction and recalculation in those same cases, so the contract simultaneously permits skipping and requires recomputation, risking stale signals. The skip condition must also account for the extraction contract and snapshot-validity requirements.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 370,
+              "category": "scope / acceptance_criteria contradiction"
+            },
+            {
+              "message": "AC-09 applies its resume requirement to any `sotp capability exec` invocation carrying the resume option, but that command also has an in-host delegation outcome. This requires cache-backed resume for the in-host branch that OS-05 explicitly excludes. Restrict this criterion to provider-subprocess dispatches or explicitly specify that in-host dispatch rejects/ignores resume.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 410,
+              "category": "out_of_scope leakage"
+            }
+          ],
+          "hash": "rvw1:sha256:22f57e52e8eda72c842a70ee3f0529f018cae653e6a35315453739232c03161c",
+          "at": "2026-07-13T16:49:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-03 requires every evaluation whose decision inputs changed to run, but AC-05's complete-skip predicate omits the spec/catalogue↔spec input, and AC-06/AC-07 provide no spec-change path. A spec-only change could therefore satisfy the stated skip conditions and leave catalogue↔spec signals stale, contrary to D3. GO-03 lacks deterministic acceptance coverage for this case.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 370,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "CN-08 and AC-09 require invalidation on a capability execution-contract fingerprint mismatch, but the spec never defines that fingerprint's inputs for generic capability resume; IN-04 defines only the reviewer-specific fingerprint. D4 identifies capability SSoT, always-injected discipline, and declared policy/contract files as inputs. Without an equivalent contract here, downstream phases must invent which changes invalidate the cache, making stale-reuse prevention untestable.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 250,
+              "category": "constraint vague or untestable"
+            }
+          ],
+          "hash": "rvw1:sha256:108da43a56156852b9bd84a34fdafa56d8576cf5c188766aebda83000a916b9d",
+          "at": "2026-07-13T16:54:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-08 requires a fresh session when the concern changes, even if the target artifact remains the same. However, AC-09 only checks the resume option and track/capability/artifact identity, so all acceptance criteria can pass while a same-artifact concern switch incorrectly resumes stale context. This leaves GO-02/GO-04 without deterministic coverage for a prohibited reuse path.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 410,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:d46257338e0adf1ff89460ffa3a3b546f012a8687dfd402f1a78e49915cc5b4a",
+          "at": "2026-07-13T16:58:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b0673238fe06b26b1bfe37b71c4c5e5a44f3e572d61f83156a1e8c5e7c9191b",
+          "at": "2026-07-13T17:02:09Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {

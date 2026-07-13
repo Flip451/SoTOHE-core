@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-13T19:32:17Z",
+  "declaration_hash": "e7f2a638960ac4cacbd249f47ee6a81583056fc41e076fa603331e8a15bdf8a3",
+  "signals": [
+    {
+      "type_name": "ReviewCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "CapabilityCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

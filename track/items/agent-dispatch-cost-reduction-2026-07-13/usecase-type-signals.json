@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-13T19:32:04Z",
+  "declaration_hash": "5469c2f8d2b6a755f600617372271f04a2732f61cfad0ff4acef04d56b7c2e5c",
+  "signals": [
+    {
+      "type_name": "CapabilityExecError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "CapabilityExecRequest",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CapabilityExecutionContractFingerprintPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CapabilityInputValidationError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "CapabilityProfile",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CapabilityResumeRequest",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "ExecutionContractFingerprint",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "ProviderSessionCacheEntry",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "ProviderSessionCacheError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "ProviderSessionCacheKey",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ]
+    },
+    {
+      "type_name": "ProviderSessionCachePort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ProviderSessionId",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "ReasoningEffort",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ]
+    },
+    {
+      "type_name": "ReviewerExecutionContractFingerprintPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "ReviewerPrompt",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TargetArtifactPath",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::Ord",
+        "core::cmp::PartialEq",
+        "core::cmp::PartialOrd",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ]
+    },
+    {
+      "type_name": "TargetArtifactSet",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::hash::Hash"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsExecutionError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::error::Error",
+        "core::fmt::Debug",
+        "core::fmt::Display"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsExecutorPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "TypeSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeSignalsRequest",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "CapabilityDispatchOutcome",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CapabilityDispatchRequest",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CapabilityFailureDetail",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CapabilityFilePath",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CapabilityName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CapabilityProfilePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CapabilityProviderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ModelName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ProviderName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "Reviewer",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TimeoutSeconds",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeSignalsService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

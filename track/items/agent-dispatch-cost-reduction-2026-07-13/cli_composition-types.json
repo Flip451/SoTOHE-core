@@ -1,0 +1,612 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "ReviewCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalCompositionRoot",
+      "trait_ref": "core::default::Default"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityCompositionRoot": {
+      "action": "reference",
+      "docs": "Wires typed profile, fingerprint, session-cache, provider, use-case, and CLI-driver dependencies.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "runtime_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "discover",
+          "params": [],
+          "returns": "Result<Self, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "capability_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::capability::CapabilityDriver"
+        }
+      ],
+      "module_path": "capability",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ReviewCompositionRoot": {
+      "action": "modify",
+      "docs": "Wires scope-bound reviewer sessions while preserving existing review judgment and record boundaries.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_run_codex",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewRunCodexInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_run_claude",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewRunClaudeInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_run_local",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewRunLocalInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_run_fix_local",
+          "params": [
+            {
+              "name": "input",
+              "ty": "RunReviewFixLocalInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_run_fix_local_resolve",
+          "params": [
+            {
+              "name": "track_id_opt",
+              "ty": "Option<domain::ids::TrackId>"
+            },
+            {
+              "name": "scope",
+              "ty": "domain::review_v2::ScopeName"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "round_type",
+              "ty": "domain::review_v2::RoundType"
+            },
+            {
+              "name": "model",
+              "ty": "Option<usecase::capability_exec::ModelName>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_check_approved",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<domain::ids::TrackId>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_results",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewResultsInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_classify",
+          "params": [
+            {
+              "name": "paths",
+              "ty": "Vec<domain::review_v2::FilePath>"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<domain::ids::TrackId>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_files",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "domain::review_v2::ScopeName"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<domain::ids::TrackId>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_validate_scope",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "domain::review_v2::ScopeName"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<domain::ids::TrackId>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_get_briefing",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "domain::review_v2::ScopeName"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<domain::ids::TrackId>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_persist_commit_hash",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<domain::ids::TrackId>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::review::ReviewDriver"
+        }
+      ],
+      "module_path": "review_v2::shim",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "SignalCompositionRoot": {
+      "action": "modify",
+      "docs": "Wires semantic freshness collection, snapshot validation, and layer-granular type-signal execution.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal_check_gate",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "Option<std::path::PathBuf>"
+            },
+            {
+              "name": "spec_json_path",
+              "ty": "Option<std::path::PathBuf>"
+            },
+            {
+              "name": "gate",
+              "ty": "SignalGateName"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "Option<std::path::PathBuf>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal_calc_adr_user",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal_check_adr_user",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "strict_override",
+              "ty": "Option<domain::Strictness>"
+            },
+            {
+              "name": "gate",
+              "ty": "Option<SignalGateName>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "Option<std::path::PathBuf>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal_calc_spec_adr",
+          "params": [
+            {
+              "name": "spec_json_path",
+              "ty": "Option<std::path::PathBuf>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "Option<std::path::PathBuf>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal_check_spec_adr",
+          "params": [
+            {
+              "name": "spec_json_path",
+              "ty": "Option<std::path::PathBuf>"
+            },
+            {
+              "name": "strict_override",
+              "ty": "Option<domain::Strictness>"
+            },
+            {
+              "name": "gate",
+              "ty": "Option<SignalGateName>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "Option<std::path::PathBuf>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal_calc_catalog_spec",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal_check_catalog_spec",
+          "params": [
+            {
+              "name": "strict_override",
+              "ty": "Option<domain::Strictness>"
+            },
+            {
+              "name": "gate",
+              "ty": "Option<SignalGateName>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "Option<std::path::PathBuf>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal_calc_impl_catalog",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal_check_impl_catalog",
+          "params": [
+            {
+              "name": "strict_override",
+              "ty": "Option<domain::Strictness>"
+            },
+            {
+              "name": "gate",
+              "ty": "Option<SignalGateName>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "Option<std::path::PathBuf>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::signal::SignalDriver"
+        }
+      ],
+      "module_path": "signal",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "63e08410653b36dfecfd309013c5a28458ad5d405ac25a16ff64ac50ee43af3d",
+  "signals": [
+    {
+      "type_name": "CapabilityCommand",
+      "signal": "blue",
+      "entry_hash": "2c04b235b40686368adbdea61fc02fb10249a9d68e693f46e9461864ed772ec8"
+    },
+    {
+      "type_name": "CapabilityExecArgs",
+      "signal": "blue",
+      "entry_hash": "dcadc0ecfd795f6f274a29a194ba866e04f66889276a3f72acc4f0dd49ff64f3"
+    },
+    {
+      "type_name": "ReviewCommand",
+      "signal": "blue",
+      "entry_hash": "cdce85cfc427ab98e7657e05936c2041a9963ec3321d69ab1710c1546f57a60c"
+    },
+    {
+      "type_name": "cli::commands::capability::execute",
+      "signal": "blue",
+      "entry_hash": "48a67d73841c047057f8a23fe7189b1236203cb6cad983ed2da9adaae0cf8e62"
+    },
+    {
+      "type_name": "cli::commands::review::execute",
+      "signal": "blue",
+      "entry_hash": "7fcf72c7135be197b59ace6eee86b83d1427c61e55c3b2637f3b286ed3deb563"
+    }
+  ]
+}

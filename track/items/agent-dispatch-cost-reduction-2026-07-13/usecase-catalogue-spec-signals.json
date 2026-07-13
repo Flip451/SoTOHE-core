@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "5469c2f8d2b6a755f600617372271f04a2732f61cfad0ff4acef04d56b7c2e5c",
+  "signals": [
+    {
+      "type_name": "CapabilityDispatchOutcome",
+      "signal": "blue",
+      "entry_hash": "a3eed34be16cfc42bd8ea73f0a908698050004bf477d2df95daf4c9f2db53487"
+    },
+    {
+      "type_name": "CapabilityDispatchRequest",
+      "signal": "blue",
+      "entry_hash": "94f5e1fbcfcfb3b5e11ca4d18c646fc88d6b104e968bb0145cc1caa9ba75cd8c"
+    },
+    {
+      "type_name": "CapabilityExecError",
+      "signal": "blue",
+      "entry_hash": "5a0bb7632054e5e03b01bbbb9cac61e8b224dc9fb56b62645bde41445dba7dc9"
+    },
+    {
+      "type_name": "CapabilityExecRequest",
+      "signal": "blue",
+      "entry_hash": "2c58e7823f992884ac7973842d0d9e1fcd9a7c27e35f57e9c21d4c330918fa14"
+    },
+    {
+      "type_name": "CapabilityFailureDetail",
+      "signal": "blue",
+      "entry_hash": "9f8f0e2ed0411db72e8f2da945f003ed310710672d46e0b99e3e66b4cd121b62"
+    },
+    {
+      "type_name": "CapabilityFilePath",
+      "signal": "blue",
+      "entry_hash": "04f6b829eb8e0ce1557b7ce9feceff332701853d66b853c8c508675f2106af78"
+    },
+    {
+      "type_name": "CapabilityInputValidationError",
+      "signal": "blue",
+      "entry_hash": "2d5230d49452f660cbfdbe42b5d078ee7ed875f1af6f97b2f7c6f474304dd769"
+    },
+    {
+      "type_name": "CapabilityName",
+      "signal": "blue",
+      "entry_hash": "2ee31372e45ed1e89e8823e27973114c24f106c8490e6c103e349f62a06c8f61"
+    },
+    {
+      "type_name": "CapabilityProfile",
+      "signal": "blue",
+      "entry_hash": "215c2ee1f0be139ec935fa85fe7355d03bfe0ee5dcabb533599ce2a39d26ff00"
+    },
+    {
+      "type_name": "CapabilityResumeRequest",
+      "signal": "blue",
+      "entry_hash": "b2c5f01e0d6cc74c2cea4f407ab017f154f10c1d9797af161887c28c17bf4050"
+    },
+    {
+      "type_name": "ExecutionContractFingerprint",
+      "signal": "blue",
+      "entry_hash": "ee55b34ac35b40c57c2f893980c75c5fce924799902b09971a2cc2e667ee718c"
+    },
+    {
+      "type_name": "ModelName",
+      "signal": "blue",
+      "entry_hash": "6d00a546377bf27ae93083b4aaccbd20df8f104455e92d84d9d68c45d9e2aba8"
+    },
+    {
+      "type_name": "ProviderName",
+      "signal": "blue",
+      "entry_hash": "c3bf2c0e9de337b211f2f884338e2cbe08fee9669c9ef692a51de98ceec67055"
+    },
+    {
+      "type_name": "ProviderSessionCacheEntry",
+      "signal": "blue",
+      "entry_hash": "eea29fe9c256813bb037db73cb48fc232e89bebd8ba852f436514ef8e94784c3"
+    },
+    {
+      "type_name": "ProviderSessionCacheError",
+      "signal": "blue",
+      "entry_hash": "ec3e72a0623d2d2483b6ccd3f0cbe72352e9ed7240f9ed6be3c2c5e3a172d649"
+    },
+    {
+      "type_name": "ProviderSessionCacheKey",
+      "signal": "blue",
+      "entry_hash": "bffa3fb980f65a0df7a301553026573bab23e6f1e0614450e74d2915bf3d42bb"
+    },
+    {
+      "type_name": "ProviderSessionId",
+      "signal": "blue",
+      "entry_hash": "6f4633aeac349f1aa0e8198e8ca387dcbdc69c2a7fa92a513e95078d05db72e3"
+    },
+    {
+      "type_name": "ReasoningEffort",
+      "signal": "blue",
+      "entry_hash": "03e519301a476a3ec52699e2acdc29eb1170c0e8b6a8a405c44fba5ab47547ce"
+    },
+    {
+      "type_name": "ReviewerPrompt",
+      "signal": "blue",
+      "entry_hash": "8650cb50c7be6ec601ead3f58583b745fd4c64ae4b772026429da42727cb35e3"
+    },
+    {
+      "type_name": "TargetArtifactPath",
+      "signal": "blue",
+      "entry_hash": "99d9c6c6af9ff2d707c03cccca02b2aa99144dd0b5a42386090245d18a03fdd6"
+    },
+    {
+      "type_name": "TargetArtifactSet",
+      "signal": "blue",
+      "entry_hash": "a6ca4ba0eb45854f666f0aa383d3cc0fa635eec690b01f8d06fbd22e31ebb7e2"
+    },
+    {
+      "type_name": "TimeoutSeconds",
+      "signal": "blue",
+      "entry_hash": "af587cbffd5769fc3457275a8ae19bb6eac3319924116f863654caf0da89435b"
+    },
+    {
+      "type_name": "TypeSignalsExecutionError",
+      "signal": "blue",
+      "entry_hash": "48707011c823e6f9bf31d3878dc9c29805054f70aa84534401b674677336cc03"
+    },
+    {
+      "type_name": "TypeSignalsInteractor",
+      "signal": "blue",
+      "entry_hash": "9239f3052567d028c91d7714cc5a4465ff7d586bdf4622744eefd578a9ca18c8"
+    },
+    {
+      "type_name": "TypeSignalsRequest",
+      "signal": "blue",
+      "entry_hash": "dbe62ccc268f6223af588d0081ff226239cb94d6e78c296b9536e211141ec0d5"
+    },
+    {
+      "type_name": "CapabilityExecutionContractFingerprintPort",
+      "signal": "blue",
+      "entry_hash": "c4a2d388922599dfa4c6ceb063f65674e76e890e6899cffce2c0940d49a125d6"
+    },
+    {
+      "type_name": "CapabilityProfilePort",
+      "signal": "blue",
+      "entry_hash": "1ab2b0df54b71a9797579b3e423bf185817f18986cad6691d997fe04a783c3ef"
+    },
+    {
+      "type_name": "CapabilityProviderPort",
+      "signal": "blue",
+      "entry_hash": "ed46d144f9a0d2f29ed3b19e809aa61aaf3d9b5a2e89f89803631e7543432834"
+    },
+    {
+      "type_name": "ProviderSessionCachePort",
+      "signal": "blue",
+      "entry_hash": "5fa7ca0d2c5d68c26d3bdbdb6beae06efe00b4994b11fbf8d71aad576246f9e9"
+    },
+    {
+      "type_name": "Reviewer",
+      "signal": "blue",
+      "entry_hash": "f3178e0184a5589f89dae97a21f29add6faa53d158c1098e3e9fdb68895b090a"
+    },
+    {
+      "type_name": "ReviewerExecutionContractFingerprintPort",
+      "signal": "blue",
+      "entry_hash": "4c533b4f681139a8ec953e6c711213c50706cb5ef6a736bddff43b6e21c61fbd"
+    },
+    {
+      "type_name": "TypeSignalsExecutorPort",
+      "signal": "blue",
+      "entry_hash": "5f1c8729b01e752f35f6bdac7491a0fe5ee0f6229f68aca7d3eb565cdc1694bd"
+    },
+    {
+      "type_name": "TypeSignalsService",
+      "signal": "blue",
+      "entry_hash": "c6dbff53a575e12ed2fbc2aa48432ca03e583988f991b8c521ba542d907aa953"
+    }
+  ]
+}

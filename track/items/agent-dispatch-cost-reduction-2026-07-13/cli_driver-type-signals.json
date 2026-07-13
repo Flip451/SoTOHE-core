@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-13T19:32:11Z",
+  "declaration_hash": "5a9634afc398d21929c20916ddc447c6167bcab1564f8b4a031c10dbf3dfd149",
+  "signals": [
+    {
+      "type_name": "CapabilityExecDriverInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "CapabilityResumeArg",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug"
+      ]
+    },
+    {
+      "type_name": "TargetArtifactPathArg",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::str::FromStr"
+      ]
+    },
+    {
+      "type_name": "CapabilityDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

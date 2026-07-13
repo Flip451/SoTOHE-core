@@ -1,0 +1,255 @@
+{
+  "crate_name": "cli",
+  "functions": {
+    "cli::commands::capability::execute": {
+      "action": "reference",
+      "docs": "Maps capability CLI arguments into typed driver resume input and returns the process exit code.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "command",
+          "ty": "CapabilityCommand"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "cli::commands::review::execute": {
+      "action": "reference",
+      "docs": "Builds review composition with track, scope, and round identities required for safe session reuse.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "command",
+          "ty": "ReviewCommand"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "cli",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityCommand": {
+      "action": "reference",
+      "docs": "Selects the generic capability execution subcommand.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Exec",
+            "payload": {
+              "fields": [
+                "CapabilityExecArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecArgs": {
+      "action": "modify",
+      "docs": "Parses capability dispatch arguments into the mirrored typed driver input, including resume intent and target artifacts.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "cli_driver::capability::CapabilityNameArg"
+            },
+            {
+              "name": "host",
+              "ty": "cli_driver::capability::ProviderNameArg"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "cli_driver::capability::CapabilityFilePathArg"
+            },
+            {
+              "name": "timeout_seconds",
+              "ty": "Option<cli_driver::capability::TimeoutSecondsArg>"
+            },
+            {
+              "name": "resume",
+              "ty": "cli_driver::capability::CapabilityResumeArg"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ReviewCommand": {
+      "action": "reference",
+      "docs": "Selects review workflow commands whose round identity is composed downstream.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CodexLocal",
+            "payload": {
+              "fields": [
+                "CodexLocalArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ClaudeLocal",
+            "payload": {
+              "fields": [
+                "ClaudeLocalArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Local",
+            "payload": {
+              "fields": [
+                "LocalArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "FixLocal",
+            "payload": {
+              "fields": [
+                "FixLocalArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CheckApproved",
+            "payload": {
+              "fields": [
+                "CheckApprovedArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Results",
+            "payload": {
+              "fields": [
+                "ResultsArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Classify",
+            "payload": {
+              "fields": [
+                "ClassifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Files",
+            "payload": {
+              "fields": [
+                "FilesArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

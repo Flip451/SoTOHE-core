@@ -1,0 +1,289 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+        "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "usecase::capability_exec::TargetArtifactPath"
+        }
+      ],
+      "type_name": "TargetArtifactPathArg"
+    },
+    {
+      "methods": [
+        {
+          "docs": "Produces only usecase::capability_exec::CapabilityInputValidationError::EmptyTargetArtifactSet when a Resume path list is empty; Fresh, ResumeWithoutTarget, and non-empty Resume inputs are infallible.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+        "returns": "Result<usecase::capability_exec::CapabilityResumeRequest, usecase::capability_exec::CapabilityInputValidationError>"
+        }
+      ],
+      "type_name": "CapabilityResumeArg"
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TargetArtifactPathArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TargetArtifactPathArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TargetArtifactPathArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TargetArtifactPathArg",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TargetArtifactPathArg",
+      "trait_ref": "core::str::FromStr"
+    },
+    {
+      "for_type": "CapabilityResumeArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityResumeArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityResumeArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityResumeArg",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityDriver": {
+      "action": "reference",
+      "docs": "Validates CLI resume input and invokes the generic capability dispatch use case.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::capability_exec::CapabilityExecService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "CapabilityExecDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "capability",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecDriverInput": {
+      "action": "modify",
+      "docs": "Typed CLI-driver input for fresh or explicitly resumed capability execution.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "CapabilityNameArg"
+            },
+            {
+              "name": "host",
+              "ty": "ProviderNameArg"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "CapabilityFilePathArg"
+            },
+          {
+            "name": "timeout_seconds",
+            "ty": "Option<TimeoutSecondsArg>"
+          },
+          {
+            "name": "resume",
+            "ty": "CapabilityResumeArg"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityResumeArg": {
+      "action": "add",
+      "docs": "CLI-boundary representation of fresh, targetless, or target-bound capability resume intent.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fresh",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ResumeWithoutTarget",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Resume",
+            "payload": {
+              "fields": [
+                "Vec<TargetArtifactPathArg>"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TargetArtifactPathArg": {
+      "action": "add",
+      "docs": "CLI parser wrapper that validates a normalized repository-relative target artifact path.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}
