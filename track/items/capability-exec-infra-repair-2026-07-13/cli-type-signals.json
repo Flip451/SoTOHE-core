@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-13T09:26:48Z",
+  "declaration_hash": "83ed7cf1351de5692ccc2cc0d747e45e8413869d036040660e2b5af7e3a13dd7",
+  "signals": [
+    {
+      "type_name": "CapabilityExecArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

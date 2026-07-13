@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "83ed7cf1351de5692ccc2cc0d747e45e8413869d036040660e2b5af7e3a13dd7",
+  "signals": [
+    {
+      "type_name": "CapabilityExecArgs",
+      "signal": "blue",
+      "entry_hash": "610b3cfbf3a52111ba402f4028fc8b7a793080c0df5b291b8777cbd467463d49"
+    }
+  ]
+}

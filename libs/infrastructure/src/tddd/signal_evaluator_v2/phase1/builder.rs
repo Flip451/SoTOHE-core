@@ -12,5 +12,7 @@ mod phase16_check;
 mod rewrite;
 mod step55_impls;
 
+#[cfg(test)]
 pub(crate) use main_fn::phase1_build_s_and_d;
+pub(crate) use main_fn::phase1_build_s_and_d_with_rustdoc_root;
 pub(crate) use rewrite::rewrite_type_ref_ids_in_item;

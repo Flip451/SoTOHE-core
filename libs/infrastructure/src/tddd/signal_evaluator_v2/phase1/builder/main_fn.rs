@@ -12,7 +12,9 @@ use super::super::super::external_crates::{
     build_external_crates_for_scope, patch_paths_crate_ids, patch_paths_crate_ids_extra,
 };
 use super::super::super::resolution::resolve_unresolved_in_item;
-use super::super::super::{build_function_identity_map, build_type_trait_identity_map};
+use super::super::super::{
+    RustdocTargetResolution, build_function_identity_map, build_type_trait_identity_map,
+};
 use super::super::child_items::{
     insert_a_item_tree_into_s, insert_b_item_tree_into_s, remap_and_copy_a_children_to_s,
     remap_child_ids_in_item, remove_b_children_from_s,
@@ -27,9 +29,19 @@ use super::step55_impls::process_standalone_impls;
 // ---------------------------------------------------------------------------
 
 /// Main Phase 1 entry-point: builds S and D from A and B.
+#[cfg(test)]
 pub(crate) fn phase1_build_s_and_d(
     a: ExtendedCrate,
     b: &Crate,
+) -> Result<(ExtendedCrate, Crate), Phase1Error> {
+    phase1_build_s_and_d_with_rustdoc_root(a, b, None)
+}
+
+/// Main Phase 1 entry-point with a resolved package-to-rustdoc-root translation.
+pub(crate) fn phase1_build_s_and_d_with_rustdoc_root(
+    a: ExtendedCrate,
+    b: &Crate,
+    rustdoc_root: Option<&RustdocTargetResolution>,
 ) -> Result<(ExtendedCrate, Crate), Phase1Error> {
     // Determine crate name from B's root item.
     let crate_name = b.index.get(&b.root).and_then(|item| item.name.clone()).unwrap_or_default();
@@ -54,7 +66,7 @@ pub(crate) fn phase1_build_s_and_d(
 
     // --- Step 1: Build B identity maps ---
     let b_types = build_type_trait_identity_map(b);
-    let b_fns = build_function_identity_map(b);
+    let b_fns = build_function_identity_map(b, rustdoc_root);
 
     // --- Step 2: Seed S with all B items as implicit Reference ---
     for b_id in b_types.values() {
@@ -131,7 +143,7 @@ pub(crate) fn phase1_build_s_and_d(
     // --- Step 3: Build A identity maps ---
     let (a_krate, a_item_actions) = a.into_parts();
     let a_types = build_type_trait_identity_map(&a_krate);
-    let a_fns = build_function_identity_map(&a_krate);
+    let a_fns = build_function_identity_map(&a_krate, rustdoc_root);
 
     // --- Pre-step (A-side): Build A-wide Id remap (T008, IN-10) ---
     //
@@ -160,7 +172,7 @@ pub(crate) fn phase1_build_s_and_d(
         match action {
             ItemAction::Add => {
                 if in_b {
-                    return Err(Phase1Error::ActionContradiction(format!(
+                    return Err(Phase1Error::action_contradiction(format!(
                         "action=Add declared for '{a_name}' but it already exists in baseline"
                     )));
                 }
@@ -175,12 +187,12 @@ pub(crate) fn phase1_build_s_and_d(
             }
             ItemAction::Modify => {
                 if !in_b {
-                    return Err(Phase1Error::ActionContradiction(format!(
+                    return Err(Phase1Error::action_contradiction(format!(
                         "action=Modify declared for '{a_name}' but it does not exist in baseline"
                     )));
                 }
                 let s_id = state.s_type_id(a_name).ok_or_else(|| {
-                    Phase1Error::ActionContradiction(format!(
+                    Phase1Error::action_contradiction(format!(
                         "action=Modify: '{a_name}' expected in S but not found (internal error)"
                     ))
                 })?;
@@ -201,7 +213,7 @@ pub(crate) fn phase1_build_s_and_d(
             }
             ItemAction::Reference => {
                 if !in_b {
-                    return Err(Phase1Error::ActionContradiction(format!(
+                    return Err(Phase1Error::action_contradiction(format!(
                         "action=Reference declared for '{a_name}' but it does not exist in baseline"
                     )));
                 }
@@ -209,12 +221,12 @@ pub(crate) fn phase1_build_s_and_d(
             }
             ItemAction::Delete => {
                 if !in_b {
-                    return Err(Phase1Error::ActionContradiction(format!(
+                    return Err(Phase1Error::action_contradiction(format!(
                         "action=Delete declared for '{a_name}' but it does not exist in baseline"
                     )));
                 }
                 let s_id = state.s_type_id(a_name).ok_or_else(|| {
-                    Phase1Error::ActionContradiction(format!(
+                    Phase1Error::action_contradiction(format!(
                         "action=Delete: '{a_name}' expected in S but not found (internal error)"
                     ))
                 })?;
@@ -236,7 +248,7 @@ pub(crate) fn phase1_build_s_and_d(
         match action {
             ItemAction::Add => {
                 if in_b {
-                    return Err(Phase1Error::ActionContradiction(format!(
+                    return Err(Phase1Error::action_contradiction(format!(
                         "action=Add declared for function '{fn_path_str}' but it already exists in baseline"
                     )));
                 }
@@ -247,12 +259,12 @@ pub(crate) fn phase1_build_s_and_d(
             }
             ItemAction::Modify => {
                 if !in_b {
-                    return Err(Phase1Error::ActionContradiction(format!(
+                    return Err(Phase1Error::action_contradiction(format!(
                         "action=Modify declared for function '{fn_path_str}' but it does not exist in baseline"
                     )));
                 }
                 let s_id = state.s_fn_id(fn_path_str).ok_or_else(|| {
-                    Phase1Error::ActionContradiction(format!(
+                    Phase1Error::action_contradiction(format!(
                         "action=Modify: function '{fn_path_str}' expected in S but not found (internal error)"
                     ))
                 })?;
@@ -263,7 +275,7 @@ pub(crate) fn phase1_build_s_and_d(
             }
             ItemAction::Reference => {
                 if !in_b {
-                    return Err(Phase1Error::ActionContradiction(format!(
+                    return Err(Phase1Error::action_contradiction(format!(
                         "action=Reference declared for function '{fn_path_str}' but it does not exist in baseline"
                     )));
                 }
@@ -271,12 +283,12 @@ pub(crate) fn phase1_build_s_and_d(
             }
             ItemAction::Delete => {
                 if !in_b {
-                    return Err(Phase1Error::ActionContradiction(format!(
+                    return Err(Phase1Error::action_contradiction(format!(
                         "action=Delete declared for function '{fn_path_str}' but it does not exist in baseline"
                     )));
                 }
                 let s_id = state.s_fn_id(fn_path_str).ok_or_else(|| {
-                    Phase1Error::ActionContradiction(format!(
+                    Phase1Error::action_contradiction(format!(
                         "action=Delete: function '{fn_path_str}' expected in S but not found (internal error)"
                     ))
                 })?;

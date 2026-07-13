@@ -1,11 +1,12 @@
 //! Primary adapter driver for generic capability dispatch.
 
 use std::path::PathBuf;
+use std::str::FromStr;
 use std::sync::Arc;
 
 use usecase::capability_exec::{
     CapabilityDispatchOutcome, CapabilityExecRequest, CapabilityExecService, CapabilityFilePath,
-    ProviderName,
+    ProviderName, TimeoutSeconds,
 };
 use usecase::dry_write_driver::CapabilityName;
 
@@ -49,6 +50,28 @@ impl core::str::FromStr for CapabilityFilePathArg {
     }
 }
 
+/// CLI-boundary mirror of a validated provider-process timeout.
+#[derive(Debug, PartialEq, Eq)]
+pub struct TimeoutSecondsArg(TimeoutSeconds);
+
+impl Copy for TimeoutSecondsArg {}
+
+impl Clone for TimeoutSecondsArg {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl FromStr for TimeoutSecondsArg {
+    type Err = String;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        let seconds: u64 =
+            value.parse().map_err(|error| format!("invalid timeout seconds: {error}"))?;
+        TimeoutSeconds::try_new(seconds).map(Self).map_err(|error| error.to_string())
+    }
+}
+
 /// Parsed input for `sotp capability exec`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CapabilityExecDriverInput {
@@ -58,6 +81,8 @@ pub struct CapabilityExecDriverInput {
     pub host: ProviderNameArg,
     /// Validated path to the capability briefing file.
     pub briefing_file: CapabilityFilePathArg,
+    /// Provider-process timeout; `None` waits without a time limit.
+    pub timeout_seconds: Option<TimeoutSecondsArg>,
 }
 
 /// Primary adapter driver for generic capability dispatch.
@@ -88,6 +113,7 @@ fn into_request(input: CapabilityExecDriverInput) -> CapabilityExecRequest {
         capability: input.capability.0,
         host: input.host.0,
         briefing_file: input.briefing_file.0,
+        timeout: input.timeout_seconds.map(|timeout| timeout.0),
     }
 }
 
@@ -118,7 +144,7 @@ mod tests {
 
     use super::{
         CapabilityDriver, CapabilityExecDriverInput, CapabilityFilePathArg, CapabilityNameArg,
-        ProviderNameArg,
+        ProviderNameArg, TimeoutSecondsArg,
     };
     use usecase::capability_exec::{
         CapabilityDispatchOutcome, CapabilityExecError, CapabilityExecRequest,
@@ -160,7 +186,36 @@ mod tests {
             host: ProviderNameArg::from_str("claude").expect("valid test provider"),
             briefing_file: CapabilityFilePathArg::from_str("tmp/briefing.md")
                 .expect("valid test briefing path"),
+            timeout_seconds: None,
         }
+    }
+
+    #[test]
+    fn test_timeout_seconds_arg_rejects_zero_and_non_numeric_values() {
+        assert!(TimeoutSecondsArg::from_str("0").is_err());
+        assert!(TimeoutSecondsArg::from_str("abc").is_err());
+        assert!(TimeoutSecondsArg::from_str("1800").is_ok());
+    }
+
+    #[test]
+    fn test_capability_driver_forwards_timeout_to_request() {
+        let requests = Arc::new(Mutex::new(Vec::new()));
+        let driver = CapabilityDriver::new(Arc::new(RecordingService {
+            outcome: CapabilityDispatchOutcome::Executed {
+                provider: ProviderName::try_new("codex").expect("valid test provider"),
+                exit_code: 0,
+            },
+            requests: requests.clone(),
+        }));
+        let mut input = input();
+        input.timeout_seconds =
+            Some(TimeoutSecondsArg::from_str("1800").expect("valid test timeout"));
+
+        let _ = driver.handle(input);
+
+        let recorded = requests.lock().expect("test request recorder lock");
+        let request = recorded.first().expect("one request is recorded");
+        assert_eq!(request.timeout.map(|timeout| timeout.as_secs()), Some(1800));
     }
 
     #[test]

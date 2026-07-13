@@ -62,7 +62,7 @@ pub(super) fn resolve_generic_bound(
                         new_id = resolved_id;
                     }
                 } else {
-                    return Err(Phase1Error::UnresolvedTypeRef(trait_.path.clone()));
+                    return Err(Phase1Error::unresolved_type_ref(trait_.path.clone()));
                 }
             }
             let new_args = match trait_.args {
@@ -176,7 +176,7 @@ pub(super) fn resolve_type(
                         p.id = resolved_id;
                     }
                 } else {
-                    return Err(Phase1Error::UnresolvedTypeRef(p.path.clone()));
+                    return Err(Phase1Error::unresolved_type_ref(p.path.clone()));
                 }
             }
             // Recurse into args.
@@ -254,7 +254,7 @@ pub(super) fn resolve_type(
                                 p.id = resolved_id;
                             }
                         } else {
-                            return Err(Phase1Error::UnresolvedTypeRef(p.path.clone()));
+                            return Err(Phase1Error::unresolved_type_ref(p.path.clone()));
                         }
                     }
                     let new_path_args = match p.args {
@@ -300,7 +300,7 @@ pub(super) fn resolve_type(
                                     new_id = resolved_id;
                                 }
                             } else {
-                                return Err(Phase1Error::UnresolvedTypeRef(trait_.path.clone()));
+                                return Err(Phase1Error::unresolved_type_ref(trait_.path.clone()));
                             }
                         }
                         // Resolve HRTB binder params (e.g. `for<T: LocalTrait>`).
@@ -346,7 +346,7 @@ pub(super) fn resolve_type(
                                 new_id = resolved_id;
                             }
                         } else {
-                            return Err(Phase1Error::UnresolvedTypeRef(p.path.clone()));
+                            return Err(Phase1Error::unresolved_type_ref(p.path.clone()));
                         }
                     }
                     // Resolve HRTB binder params (e.g. `for<T: LocalTrait>`).

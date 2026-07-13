@@ -1,0 +1,235 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph T31_domain_domain_DiagnosticMessage["tddd::test_obligation::ids::DiagnosticMessage"]
+    direction TB
+    T31_domain_domain_DiagnosticMessage__self[DiagnosticMessage]
+    T31_domain_domain_DiagnosticMessage_try_new([try_new])
+    T31_domain_domain_DiagnosticMessage_as_str([as_str])
+  end
+  subgraph T25_domain_domain_Phase1Error["tddd::signal_evaluator::phase1_error::Phase1Error"]
+    direction TB
+    T25_domain_domain_Phase1Error__self[Phase1Error]
+    T25_domain_domain_Phase1Error_ActionContradiction[ActionContradiction]
+    T25_domain_domain_Phase1Error_UnresolvedTypeRef[UnresolvedTypeRef]
+    T25_domain_domain_Phase1Error_DanglingId[DanglingId]
+    T25_domain_domain_Phase1Error_RustdocRootResolution[RustdocRootResolution]
+    T25_domain_domain_Phase1Error_action_contradiction([action_contradiction])
+    T25_domain_domain_Phase1Error_unresolved_type_ref([unresolved_type_ref])
+    T25_domain_domain_Phase1Error_dangling_id([dangling_id])
+    T25_domain_domain_Phase1Error_rustdoc_root_resolution([rustdoc_root_resolution])
+  end
+  subgraph R33_domain_domain_SignalEvaluatorPort["tddd::signal_evaluator::port::SignalEvaluatorPort"]
+    direction TB
+    R33_domain_domain_SignalEvaluatorPort__self[SignalEvaluatorPort]
+    R33_domain_domain_SignalEvaluatorPort_evaluate([evaluate])
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_capability_exec["usecase::capability_exec"]
+    direction TB
+  subgraph T37_usecase_usecase_CapabilityExecRequest["capability_exec::CapabilityExecRequest"]
+    direction TB
+    T37_usecase_usecase_CapabilityExecRequest__self[CapabilityExecRequest]
+  end
+  subgraph T46_usecase_usecase_CapabilityInputValidationError["capability_exec::CapabilityInputValidationError"]
+    direction TB
+    T46_usecase_usecase_CapabilityInputValidationError__self[CapabilityInputValidationError]
+    T46_usecase_usecase_CapabilityInputValidationError_EmptyProviderName[EmptyProviderName]
+    T46_usecase_usecase_CapabilityInputValidationError_EmptyModelName[EmptyModelName]
+    T46_usecase_usecase_CapabilityInputValidationError_EmptyFilePath[EmptyFilePath]
+    T46_usecase_usecase_CapabilityInputValidationError_InvalidFilePath[InvalidFilePath]
+    T46_usecase_usecase_CapabilityInputValidationError_EmptyContent[EmptyContent]
+    T46_usecase_usecase_CapabilityInputValidationError_ZeroTimeoutSeconds[ZeroTimeoutSeconds]
+  end
+  subgraph T30_usecase_usecase_TimeoutSeconds["capability_exec::TimeoutSeconds"]
+    direction TB
+    T30_usecase_usecase_TimeoutSeconds__self[TimeoutSeconds]
+    T30_usecase_usecase_TimeoutSeconds_try_new([try_new])
+    T30_usecase_usecase_TimeoutSeconds_as_secs([as_secs])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_schema_export["infrastructure::schema_export"]
+    direction TB
+  subgraph T45_infrastructure_infrastructure_CargoTargetName["schema_export::bin_target::CargoTargetName"]
+    direction TB
+    T45_infrastructure_infrastructure_CargoTargetName__self[CargoTargetName]
+    T45_infrastructure_infrastructure_CargoTargetName_try_new([try_new])
+    T45_infrastructure_infrastructure_CargoTargetName_as_str([as_str])
+  end
+  subgraph T56_infrastructure_infrastructure_RustdocRootResolutionError["schema_export::bin_target::RustdocRootResolutionError"]
+    direction TB
+    T56_infrastructure_infrastructure_RustdocRootResolutionError__self[RustdocRootResolutionError]
+    T56_infrastructure_infrastructure_RustdocRootResolutionError_MetadataCommand[MetadataCommand]
+    T56_infrastructure_infrastructure_RustdocRootResolutionError_MetadataDecode[MetadataDecode]
+    T56_infrastructure_infrastructure_RustdocRootResolutionError_PackageNotFound[PackageNotFound]
+    T56_infrastructure_infrastructure_RustdocRootResolutionError_TargetSelection[TargetSelection]
+    T56_infrastructure_infrastructure_RustdocRootResolutionError_InvalidTargetName[InvalidTargetName]
+  end
+  subgraph T47_infrastructure_infrastructure_RustdocTargetKind["schema_export::bin_target::RustdocTargetKind"]
+    direction TB
+    T47_infrastructure_infrastructure_RustdocTargetKind__self[RustdocTargetKind]
+    T47_infrastructure_infrastructure_RustdocTargetKind_Library[Library]
+    T47_infrastructure_infrastructure_RustdocTargetKind_Binary[Binary]
+  end
+  subgraph T53_infrastructure_infrastructure_RustdocTargetResolution["schema_export::bin_target::RustdocTargetResolution"]
+    direction TB
+    T53_infrastructure_infrastructure_RustdocTargetResolution__self[RustdocTargetResolution]
+    T53_infrastructure_infrastructure_RustdocTargetResolution_package_name([package_name])
+    T53_infrastructure_infrastructure_RustdocTargetResolution_target_name([target_name])
+    T53_infrastructure_infrastructure_RustdocTargetResolution_rustdoc_root_name([rustdoc_root_name])
+    T53_infrastructure_infrastructure_RustdocTargetResolution_target_kind([target_kind])
+  end
+  F98_infrastructure_infrastructure_infrastructure__schema_export__bin_target__resolve_rustdoc_root_name[[resolve_rustdoc_root_name]]
+  end
+  subgraph infrastructure_infrastructure_module_tddd["infrastructure::tddd"]
+    direction TB
+  subgraph T47_infrastructure_infrastructure_SignalEvaluatorV2["tddd::signal_evaluator_v2::SignalEvaluatorV2"]
+    direction TB
+    T47_infrastructure_infrastructure_SignalEvaluatorV2__self[SignalEvaluatorV2]
+    T47_infrastructure_infrastructure_SignalEvaluatorV2_new([new])
+    T47_infrastructure_infrastructure_SignalEvaluatorV2_with_workspace_root([with_workspace_root])
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+  subgraph cli_driver_cli_driver_module_capability["cli_driver::capability"]
+    direction TB
+  subgraph T47_cli_driver_cli_driver_CapabilityExecDriverInput["capability::CapabilityExecDriverInput"]
+    direction TB
+    T47_cli_driver_cli_driver_CapabilityExecDriverInput__self[CapabilityExecDriverInput]
+  end
+  subgraph T39_cli_driver_cli_driver_TimeoutSecondsArg["capability::TimeoutSecondsArg"]
+    direction TB
+    T39_cli_driver_cli_driver_TimeoutSecondsArg__self[TimeoutSecondsArg]
+  end
+  end
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+end
+subgraph cli["cli"]
+  direction TB
+  subgraph cli_cli_module_commands["cli::commands"]
+    direction TB
+  subgraph T26_cli_cli_CapabilityExecArgs["commands::capability::CapabilityExecArgs"]
+    direction TB
+    T26_cli_cli_CapabilityExecArgs__self[CapabilityExecArgs]
+  end
+  end
+end
+T31_domain_domain_DiagnosticMessage_try_new --> T31_domain_domain_DiagnosticMessage__self
+T25_domain_domain_Phase1Error_ActionContradiction --o T31_domain_domain_DiagnosticMessage__self
+T25_domain_domain_Phase1Error_UnresolvedTypeRef --o T31_domain_domain_DiagnosticMessage__self
+T25_domain_domain_Phase1Error_DanglingId --o T31_domain_domain_DiagnosticMessage__self
+T25_domain_domain_Phase1Error_RustdocRootResolution --o T31_domain_domain_DiagnosticMessage__self
+T25_domain_domain_Phase1Error_action_contradiction --> T25_domain_domain_Phase1Error__self
+T25_domain_domain_Phase1Error_unresolved_type_ref --> T25_domain_domain_Phase1Error__self
+T25_domain_domain_Phase1Error_dangling_id --> T25_domain_domain_Phase1Error__self
+T25_domain_domain_Phase1Error_rustdoc_root_resolution --> T25_domain_domain_Phase1Error__self
+R33_domain_domain_SignalEvaluatorPort_evaluate --> T25_domain_domain_Phase1Error__self
+T37_usecase_usecase_CapabilityExecRequest__self --o|timeout| T30_usecase_usecase_TimeoutSeconds__self
+T30_usecase_usecase_TimeoutSeconds_try_new --> T46_usecase_usecase_CapabilityInputValidationError__self
+T30_usecase_usecase_TimeoutSeconds_try_new --> T30_usecase_usecase_TimeoutSeconds__self
+T45_infrastructure_infrastructure_CargoTargetName_try_new --> T56_infrastructure_infrastructure_RustdocRootResolutionError__self
+T45_infrastructure_infrastructure_CargoTargetName_try_new --> T45_infrastructure_infrastructure_CargoTargetName__self
+T56_infrastructure_infrastructure_RustdocRootResolutionError_MetadataCommand --o T31_domain_domain_DiagnosticMessage__self
+T56_infrastructure_infrastructure_RustdocRootResolutionError_MetadataDecode --o T31_domain_domain_DiagnosticMessage__self
+T56_infrastructure_infrastructure_RustdocRootResolutionError_TargetSelection --o T31_domain_domain_DiagnosticMessage__self
+T56_infrastructure_infrastructure_RustdocRootResolutionError_InvalidTargetName --o T31_domain_domain_DiagnosticMessage__self
+T53_infrastructure_infrastructure_RustdocTargetResolution_target_name --> T45_infrastructure_infrastructure_CargoTargetName__self
+T53_infrastructure_infrastructure_RustdocTargetResolution_target_kind --> T47_infrastructure_infrastructure_RustdocTargetKind__self
+F98_infrastructure_infrastructure_infrastructure__schema_export__bin_target__resolve_rustdoc_root_name --> T56_infrastructure_infrastructure_RustdocRootResolutionError__self
+F98_infrastructure_infrastructure_infrastructure__schema_export__bin_target__resolve_rustdoc_root_name --> T53_infrastructure_infrastructure_RustdocTargetResolution__self
+T47_infrastructure_infrastructure_SignalEvaluatorV2_new --> T47_infrastructure_infrastructure_SignalEvaluatorV2__self
+T47_infrastructure_infrastructure_SignalEvaluatorV2_with_workspace_root --> T47_infrastructure_infrastructure_SignalEvaluatorV2__self
+T47_infrastructure_infrastructure_SignalEvaluatorV2__self -.impl.-> R33_domain_domain_SignalEvaluatorPort__self
+T47_cli_driver_cli_driver_CapabilityExecDriverInput__self --o|timeout_seconds| T39_cli_driver_cli_driver_TimeoutSecondsArg__self
+T26_cli_cli_CapabilityExecArgs__self --o|timeout_seconds| T39_cli_driver_cli_driver_TimeoutSecondsArg__self
+class T31_domain_domain_DiagnosticMessage_try_new method_node
+class T31_domain_domain_DiagnosticMessage_as_str method_node
+class T31_domain_domain_DiagnosticMessage__self value_object
+class T25_domain_domain_Phase1Error_ActionContradiction variant_node
+class T25_domain_domain_Phase1Error_UnresolvedTypeRef variant_node
+class T25_domain_domain_Phase1Error_DanglingId variant_node
+class T25_domain_domain_Phase1Error_RustdocRootResolution variant_node
+class T25_domain_domain_Phase1Error_action_contradiction method_node
+class T25_domain_domain_Phase1Error_unresolved_type_ref method_node
+class T25_domain_domain_Phase1Error_dangling_id method_node
+class T25_domain_domain_Phase1Error_rustdoc_root_resolution method_node
+class T25_domain_domain_Phase1Error__self error_type
+class R33_domain_domain_SignalEvaluatorPort_evaluate method_node
+class R33_domain_domain_SignalEvaluatorPort__self secondary_port
+class T37_usecase_usecase_CapabilityExecRequest__self command
+class T46_usecase_usecase_CapabilityInputValidationError_EmptyProviderName variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_EmptyModelName variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_EmptyFilePath variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_InvalidFilePath variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_EmptyContent variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_ZeroTimeoutSeconds variant_node
+class T46_usecase_usecase_CapabilityInputValidationError__self error_type
+class T30_usecase_usecase_TimeoutSeconds_try_new method_node
+class T30_usecase_usecase_TimeoutSeconds_as_secs method_node
+class T30_usecase_usecase_TimeoutSeconds__self value_object
+class T45_infrastructure_infrastructure_CargoTargetName_try_new method_node
+class T45_infrastructure_infrastructure_CargoTargetName_as_str method_node
+class T45_infrastructure_infrastructure_CargoTargetName__self value_object
+class T56_infrastructure_infrastructure_RustdocRootResolutionError_MetadataCommand variant_node
+class T56_infrastructure_infrastructure_RustdocRootResolutionError_MetadataDecode variant_node
+class T56_infrastructure_infrastructure_RustdocRootResolutionError_PackageNotFound variant_node
+class T56_infrastructure_infrastructure_RustdocRootResolutionError_TargetSelection variant_node
+class T56_infrastructure_infrastructure_RustdocRootResolutionError_InvalidTargetName variant_node
+class T56_infrastructure_infrastructure_RustdocRootResolutionError__self error_type
+class T47_infrastructure_infrastructure_RustdocTargetKind_Library variant_node
+class T47_infrastructure_infrastructure_RustdocTargetKind_Binary variant_node
+class T47_infrastructure_infrastructure_RustdocTargetKind__self value_object
+class T53_infrastructure_infrastructure_RustdocTargetResolution_package_name method_node
+class T53_infrastructure_infrastructure_RustdocTargetResolution_target_name method_node
+class T53_infrastructure_infrastructure_RustdocTargetResolution_rustdoc_root_name method_node
+class T53_infrastructure_infrastructure_RustdocTargetResolution_target_kind method_node
+class T53_infrastructure_infrastructure_RustdocTargetResolution__self value_object
+class F98_infrastructure_infrastructure_infrastructure__schema_export__bin_target__resolve_rustdoc_root_name free_function
+class F98_infrastructure_infrastructure_infrastructure__schema_export__bin_target__resolve_rustdoc_root_name function_node
+class T47_infrastructure_infrastructure_SignalEvaluatorV2_new method_node
+class T47_infrastructure_infrastructure_SignalEvaluatorV2_with_workspace_root method_node
+class T47_infrastructure_infrastructure_SignalEvaluatorV2__self secondary_adapter
+class T47_cli_driver_cli_driver_CapabilityExecDriverInput__self dto
+class T39_cli_driver_cli_driver_TimeoutSecondsArg__self dto
+class T26_cli_cli_CapabilityExecArgs__self dto
+```

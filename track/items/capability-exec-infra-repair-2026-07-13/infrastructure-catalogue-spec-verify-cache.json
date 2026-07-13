@@ -1,0 +1,798 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "13b8cada4339a4c0a2c3cedfe1cfc0c564e54e439762a060a32f1b61c896d0e7",
+      "evidence_hash": "b960d7eaa31a074f006f13c4b589beaf3d4f093ca897650ca72ee3d382f64f77",
+      "verdict": {
+        "kind": "pass",
+        "citation": "package の rustdoc target を cargo metadata で解決する単一機構を導入する。lib target があればそれを優先し、lib が無ければ唯一の bin target を選び、複数 bin の場合は `default_run` が一致する場合だけ選ぶ。選択できない metadata は列挙順に依存せず fail-closed とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CargoTargetName"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "package の rustdoc target を cargo metadata で解決する単一機構を導入する。lib target があればそれを優先し、lib が無ければ唯一の bin target を選び、複数 bin の場合は `default_run` が一致する場合だけ選ぶ。選択できない metadata は列挙順に依存せず fail-closed とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "13b8cada4339a4c0a2c3cedfe1cfc0c564e54e439762a060a32f1b61c896d0e7",
+      "evidence_hash": "9376ae729d1fac6bf061f4c7d1dc531e589b8978d97f2a3d57a62170074e0013",
+      "verdict": {
+        "kind": "pass",
+        "citation": "選択した metadata target の name を rustdoc 実行 target とし、その `-` を `_` に正規化した値を rustdoc crate root とする。schema export、catalog import の型照合、signal 評価器の identity key 正規化はこの同じ翻訳機構を使用し、catalogue 利用者向けの型 path は package 名 root のまま維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CargoTargetName"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "選択した metadata target の name を rustdoc 実行 target とし、その `-` を `_` に正規化した値を rustdoc crate root とする。schema export、catalog import の型照合、signal 評価器の identity key 正規化はこの同じ翻訳機構を使用し、catalogue 利用者向けの型 path は package 名 root のまま維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "13b8cada4339a4c0a2c3cedfe1cfc0c564e54e439762a060a32f1b61c896d0e7",
+      "evidence_hash": "09769d863a3d648e704a14ca9ca24605b6b68522c5d8a0f767d5f6d5dcfcf94a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "metadata に lib target が無い package で複数 bin target を選ぶには `default_run` の一致を必要とし、`default_run` の欠如、不一致、target 名欠如、又は一意な選択不能を成功扱いにしない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CargoTargetName"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "metadata に lib target が無い package で複数 bin target を選ぶには `default_run` の一致を必要とし、`default_run` の欠如、不一致、target 名欠如、又は一意な選択不能を成功扱いにしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "13b8cada4339a4c0a2c3cedfe1cfc0c564e54e439762a060a32f1b61c896d0e7",
+      "evidence_hash": "cc84c3fc052c0fa0a94eca78e338805a5c38fab1e473d8d4ce077c0cf546d58c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc root の導出では package 名からの推測、個別 surface の独自実装、又は静的 fallback を用いず、target metadata の name と `-`→`_` 正規化だけに従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CargoTargetName"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "rustdoc root の導出では package 名からの推測、個別 surface の独自実装、又は静的 fallback を用いず、target metadata の name と `-`→`_` 正規化だけに従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "eb04936e6f03fe865ace2e449fe0a7deb5648efa1268c30c11024875e7f217ae",
+      "evidence_hash": "b960d7eaa31a074f006f13c4b589beaf3d4f093ca897650ca72ee3d382f64f77",
+      "verdict": {
+        "kind": "pass",
+        "citation": "package の rustdoc target を cargo metadata で解決する単一機構を導入する。lib target があればそれを優先し、lib が無ければ唯一の bin target を選び、複数 bin の場合は `default_run` が一致する場合だけ選ぶ。選択できない metadata は列挙順に依存せず fail-closed とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocRootResolutionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "package の rustdoc target を cargo metadata で解決する単一機構を導入する。lib target があればそれを優先し、lib が無ければ唯一の bin target を選び、複数 bin の場合は `default_run` が一致する場合だけ選ぶ。選択できない metadata は列挙順に依存せず fail-closed とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "eb04936e6f03fe865ace2e449fe0a7deb5648efa1268c30c11024875e7f217ae",
+      "evidence_hash": "9376ae729d1fac6bf061f4c7d1dc531e589b8978d97f2a3d57a62170074e0013",
+      "verdict": {
+        "kind": "pass",
+        "citation": "選択した metadata target の name を rustdoc 実行 target とし、その `-` を `_` に正規化した値を rustdoc crate root とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocRootResolutionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "選択した metadata target の name を rustdoc 実行 target とし、その `-` を `_` に正規化した値を rustdoc crate root とする。schema export、catalog import の型照合、signal 評価器の identity key 正規化はこの同じ翻訳機構を使用し、catalogue 利用者向けの型 path は package 名 root のまま維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "eb04936e6f03fe865ace2e449fe0a7deb5648efa1268c30c11024875e7f217ae",
+      "evidence_hash": "09769d863a3d648e704a14ca9ca24605b6b68522c5d8a0f767d5f6d5dcfcf94a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "metadata に lib target が無い package で複数 bin target を選ぶには `default_run` の一致を必要とし、`default_run` の欠如、不一致、target 名欠如、又は一意な選択不能を成功扱いにしない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocRootResolutionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "metadata に lib target が無い package で複数 bin target を選ぶには `default_run` の一致を必要とし、`default_run` の欠如、不一致、target 名欠如、又は一意な選択不能を成功扱いにしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "eb04936e6f03fe865ace2e449fe0a7deb5648efa1268c30c11024875e7f217ae",
+      "evidence_hash": "cc84c3fc052c0fa0a94eca78e338805a5c38fab1e473d8d4ce077c0cf546d58c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc root の導出では package 名からの推測、個別 surface の独自実装、又は静的 fallback を用いず、target metadata の name と `-`→`_` 正規化だけに従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocRootResolutionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "rustdoc root の導出では package 名からの推測、個別 surface の独自実装、又は静的 fallback を用いず、target metadata の name と `-`→`_` 正規化だけに従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "eb04936e6f03fe865ace2e449fe0a7deb5648efa1268c30c11024875e7f217ae",
+      "evidence_hash": "ff14aa537ee8b6fa22695324ed82841adbb387ad0667dbcb2cb8d8ee8bae05dc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "lib を持たず複数 bin target を持つ package では `default_run` が既存 bin 名に一致するときだけその bin を選ぶことを検証する。`default_run` が無い、不一致である、又は target 名を取得できない場合は metadata の順序に関係なく失敗することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocRootResolutionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "lib を持たず複数 bin target を持つ package では `default_run` が既存 bin 名に一致するときだけその bin を選ぶことを検証する。`default_run` が無い、不一致である、又は target 名を取得できない場合は metadata の順序に関係なく失敗することを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "eb04936e6f03fe865ace2e449fe0a7deb5648efa1268c30c11024875e7f217ae",
+      "evidence_hash": "3b579b865750543bcfa5882d6e5c7a8a5d41ef1c07c263f738e8117f9b970e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc root 翻訳のための config field、crate / bin 名の static map、又は surface 固有の fallback が存在せず、schema export、catalog import、signal 評価器が同じ cargo metadata 解決規則に従うことを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocRootResolutionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "rustdoc root 翻訳のための config field、crate / bin 名の static map、又は surface 固有の fallback が存在せず、schema export、catalog import、signal 評価器が同じ cargo metadata 解決規則に従うことを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "569576ed277dd2782f0907955c77685433bd856d6adfbee7335fe73519de7334",
+      "evidence_hash": "b960d7eaa31a074f006f13c4b589beaf3d4f093ca897650ca72ee3d382f64f77",
+      "verdict": {
+        "kind": "pass",
+        "citation": "package の rustdoc target を cargo metadata で解決する単一機構を導入する。lib target があればそれを優先し、lib が無ければ唯一の bin target を選び、複数 bin の場合は `default_run` が一致する場合だけ選ぶ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocTargetKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "package の rustdoc target を cargo metadata で解決する単一機構を導入する。lib target があればそれを優先し、lib が無ければ唯一の bin target を選び、複数 bin の場合は `default_run` が一致する場合だけ選ぶ。選択できない metadata は列挙順に依存せず fail-closed とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "569576ed277dd2782f0907955c77685433bd856d6adfbee7335fe73519de7334",
+      "evidence_hash": "09769d863a3d648e704a14ca9ca24605b6b68522c5d8a0f767d5f6d5dcfcf94a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "metadata に lib target が無い package で複数 bin target を選ぶには `default_run` の一致を必要とし"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocTargetKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "metadata に lib target が無い package で複数 bin target を選ぶには `default_run` の一致を必要とし、`default_run` の欠如、不一致、target 名欠如、又は一意な選択不能を成功扱いにしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3ec0e9929943b3501fae576404f2110defe23d1dfc0bba690de66716709c6f61",
+      "evidence_hash": "b960d7eaa31a074f006f13c4b589beaf3d4f093ca897650ca72ee3d382f64f77",
+      "verdict": {
+        "kind": "pass",
+        "citation": "package の rustdoc target を cargo metadata で解決する単一機構を導入する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocTargetResolution"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "package の rustdoc target を cargo metadata で解決する単一機構を導入する。lib target があればそれを優先し、lib が無ければ唯一の bin target を選び、複数 bin の場合は `default_run` が一致する場合だけ選ぶ。選択できない metadata は列挙順に依存せず fail-closed とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3ec0e9929943b3501fae576404f2110defe23d1dfc0bba690de66716709c6f61",
+      "evidence_hash": "9376ae729d1fac6bf061f4c7d1dc531e589b8978d97f2a3d57a62170074e0013",
+      "verdict": {
+        "kind": "pass",
+        "citation": "選択した metadata target の name を rustdoc 実行 target とし、その `-` を `_` に正規化した値を rustdoc crate root とする。schema export、catalog import の型照合、signal 評価器の identity key 正規化はこの同じ翻訳機構を使用し、catalogue 利用者向けの型 path は package 名 root のまま維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocTargetResolution"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "選択した metadata target の name を rustdoc 実行 target とし、その `-` を `_` に正規化した値を rustdoc crate root とする。schema export、catalog import の型照合、signal 評価器の identity key 正規化はこの同じ翻訳機構を使用し、catalogue 利用者向けの型 path は package 名 root のまま維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3ec0e9929943b3501fae576404f2110defe23d1dfc0bba690de66716709c6f61",
+      "evidence_hash": "09769d863a3d648e704a14ca9ca24605b6b68522c5d8a0f767d5f6d5dcfcf94a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "metadata に lib target が無い package で複数 bin target を選ぶには `default_run` の一致を必要とし、`default_run` の欠如、不一致、target 名欠如、又は一意な選択不能を成功扱いにしない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocTargetResolution"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "metadata に lib target が無い package で複数 bin target を選ぶには `default_run` の一致を必要とし、`default_run` の欠如、不一致、target 名欠如、又は一意な選択不能を成功扱いにしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3ec0e9929943b3501fae576404f2110defe23d1dfc0bba690de66716709c6f61",
+      "evidence_hash": "cc84c3fc052c0fa0a94eca78e338805a5c38fab1e473d8d4ce077c0cf546d58c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc root の導出では package 名からの推測、個別 surface の独自実装、又は静的 fallback を用いず、target metadata の name と `-`→`_` 正規化だけに従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocTargetResolution"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "rustdoc root の導出では package 名からの推測、個別 surface の独自実装、又は静的 fallback を用いず、target metadata の name と `-`→`_` 正規化だけに従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3ec0e9929943b3501fae576404f2110defe23d1dfc0bba690de66716709c6f61",
+      "evidence_hash": "274d05cf0e2940495be1bea3e090195232056d1bce24fca53b5c8867057dce70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cargo metadata に lib target がある package では、package 名と異なる lib 名及び `-` を含む lib 名であっても lib target を選び、その target 名を `-`→`_` 正規化した rustdoc root を得ることを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocTargetResolution"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "cargo metadata に lib target がある package では、package 名と異なる lib 名及び `-` を含む lib 名であっても lib target を選び、その target 名を `-`→`_` 正規化した rustdoc root を得ることを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3ec0e9929943b3501fae576404f2110defe23d1dfc0bba690de66716709c6f61",
+      "evidence_hash": "bbe859ba72d520d3b36f95d7b2136468b8e4359070636bc99738c7918eb0dcf2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "lib を持たない package では唯一の bin target を選び、package 名と異なる bin 名及び `-` を含む bin 名から正規化済み rustdoc root を得ることを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocTargetResolution"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "lib を持たない package では唯一の bin target を選び、package 名と異なる bin 名及び `-` を含む bin 名から正規化済み rustdoc root を得ることを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3ec0e9929943b3501fae576404f2110defe23d1dfc0bba690de66716709c6f61",
+      "evidence_hash": "ff14aa537ee8b6fa22695324ed82841adbb387ad0667dbcb2cb8d8ee8bae05dc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "又は target 名を取得できない場合は metadata の順序に関係なく失敗することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocTargetResolution"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "lib を持たず複数 bin target を持つ package では `default_run` が既存 bin 名に一致するときだけその bin を選ぶことを検証する。`default_run` が無い、不一致である、又は target 名を取得できない場合は metadata の順序に関係なく失敗することを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "09e570c2e7bdb2ed6e61a5fe650b38089491444e95e8ffeab12a8ca2d9abc1c7",
+      "evidence_hash": "9376ae729d1fac6bf061f4c7d1dc531e589b8978d97f2a3d57a62170074e0013",
+      "verdict": {
+        "kind": "pass",
+        "citation": "signal 評価器の identity key 正規化はこの同じ翻訳機構を使用し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SignalEvaluatorV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "選択した metadata target の name を rustdoc 実行 target とし、その `-` を `_` に正規化した値を rustdoc crate root とする。schema export、catalog import の型照合、signal 評価器の identity key 正規化はこの同じ翻訳機構を使用し、catalogue 利用者向けの型 path は package 名 root のまま維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "09e570c2e7bdb2ed6e61a5fe650b38089491444e95e8ffeab12a8ca2d9abc1c7",
+      "evidence_hash": "1adc55e60c077cfdc79d0b48f55be7da6aa29292b2bbda75a2f09152b2a7315c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "signal 評価器の identity key 正規化が共有 resolver を使い、既存の crate 名 literal 対応表に依存せず、rename 後の package / target の組合せを metadata から解決することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SignalEvaluatorV2"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "signal 評価器の identity key 正規化が共有 resolver を使い、既存の crate 名 literal 対応表に依存せず、rename 後の package / target の組合せを metadata から解決することを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9ca78d8010032b76f4e1334894310384d94f09433ca6cb60fdf6b79a076e2db",
+      "evidence_hash": "b960d7eaa31a074f006f13c4b589beaf3d4f093ca897650ca72ee3d382f64f77",
+      "verdict": {
+        "kind": "pass",
+        "citation": "package の rustdoc target を cargo metadata で解決する単一機構を導入する。lib target があればそれを優先し、lib が無ければ唯一の bin target を選び、複数 bin の場合は `default_run` が一致する場合だけ選ぶ。選択できない metadata は列挙順に依存せず fail-closed とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::schema_export::bin_target::resolve_rustdoc_root_name"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "package の rustdoc target を cargo metadata で解決する単一機構を導入する。lib target があればそれを優先し、lib が無ければ唯一の bin target を選び、複数 bin の場合は `default_run` が一致する場合だけ選ぶ。選択できない metadata は列挙順に依存せず fail-closed とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9ca78d8010032b76f4e1334894310384d94f09433ca6cb60fdf6b79a076e2db",
+      "evidence_hash": "9376ae729d1fac6bf061f4c7d1dc531e589b8978d97f2a3d57a62170074e0013",
+      "verdict": {
+        "kind": "pass",
+        "citation": "schema export、catalog import の型照合、signal 評価器の identity key 正規化はこの同じ翻訳機構を使用し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::schema_export::bin_target::resolve_rustdoc_root_name"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "選択した metadata target の name を rustdoc 実行 target とし、その `-` を `_` に正規化した値を rustdoc crate root とする。schema export、catalog import の型照合、signal 評価器の identity key 正規化はこの同じ翻訳機構を使用し、catalogue 利用者向けの型 path は package 名 root のまま維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9ca78d8010032b76f4e1334894310384d94f09433ca6cb60fdf6b79a076e2db",
+      "evidence_hash": "d5dbe1c24741ffe02036c28f0deb30dd76f4aa3ec930ce71939221db52d3accb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "crate 名又は bin 名を対象にした literal 対応表を廃止し、rustdoc root 翻訳のための新しい設定 field を導入しない。翻訳事実の唯一の情報源は cargo metadata とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::schema_export::bin_target::resolve_rustdoc_root_name"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "crate 名又は bin 名を対象にした literal 対応表を廃止し、rustdoc root 翻訳のための新しい設定 field を導入しない。翻訳事実の唯一の情報源は cargo metadata とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9ca78d8010032b76f4e1334894310384d94f09433ca6cb60fdf6b79a076e2db",
+      "evidence_hash": "09769d863a3d648e704a14ca9ca24605b6b68522c5d8a0f767d5f6d5dcfcf94a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "metadata に lib target が無い package で複数 bin target を選ぶには `default_run` の一致を必要とし、`default_run` の欠如、不一致、target 名欠如、又は一意な選択不能を成功扱いにしない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::schema_export::bin_target::resolve_rustdoc_root_name"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "metadata に lib target が無い package で複数 bin target を選ぶには `default_run` の一致を必要とし、`default_run` の欠如、不一致、target 名欠如、又は一意な選択不能を成功扱いにしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9ca78d8010032b76f4e1334894310384d94f09433ca6cb60fdf6b79a076e2db",
+      "evidence_hash": "cc84c3fc052c0fa0a94eca78e338805a5c38fab1e473d8d4ce077c0cf546d58c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc root の導出では package 名からの推測、個別 surface の独自実装、又は静的 fallback を用いず、target metadata の name と `-`→`_` 正規化だけに従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::schema_export::bin_target::resolve_rustdoc_root_name"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "rustdoc root の導出では package 名からの推測、個別 surface の独自実装、又は静的 fallback を用いず、target metadata の name と `-`→`_` 正規化だけに従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9ca78d8010032b76f4e1334894310384d94f09433ca6cb60fdf6b79a076e2db",
+      "evidence_hash": "274d05cf0e2940495be1bea3e090195232056d1bce24fca53b5c8867057dce70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cargo metadata に lib target がある package では、package 名と異なる lib 名及び `-` を含む lib 名であっても lib target を選び、その target 名を `-`→`_` 正規化した rustdoc root を得ることを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::schema_export::bin_target::resolve_rustdoc_root_name"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "cargo metadata に lib target がある package では、package 名と異なる lib 名及び `-` を含む lib 名であっても lib target を選び、その target 名を `-`→`_` 正規化した rustdoc root を得ることを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9ca78d8010032b76f4e1334894310384d94f09433ca6cb60fdf6b79a076e2db",
+      "evidence_hash": "bbe859ba72d520d3b36f95d7b2136468b8e4359070636bc99738c7918eb0dcf2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "lib を持たない package では唯一の bin target を選び、package 名と異なる bin 名及び `-` を含む bin 名から正規化済み rustdoc root を得ることを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::schema_export::bin_target::resolve_rustdoc_root_name"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "lib を持たない package では唯一の bin target を選び、package 名と異なる bin 名及び `-` を含む bin 名から正規化済み rustdoc root を得ることを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9ca78d8010032b76f4e1334894310384d94f09433ca6cb60fdf6b79a076e2db",
+      "evidence_hash": "ff14aa537ee8b6fa22695324ed82841adbb387ad0667dbcb2cb8d8ee8bae05dc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "lib を持たず複数 bin target を持つ package では `default_run` が既存 bin 名に一致するときだけその bin を選ぶことを検証する。`default_run` が無い、不一致である、又は target 名を取得できない場合は metadata の順序に関係なく失敗することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::schema_export::bin_target::resolve_rustdoc_root_name"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "lib を持たず複数 bin target を持つ package では `default_run` が既存 bin 名に一致するときだけその bin を選ぶことを検証する。`default_run` が無い、不一致である、又は target 名を取得できない場合は metadata の順序に関係なく失敗することを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9ca78d8010032b76f4e1334894310384d94f09433ca6cb60fdf6b79a076e2db",
+      "evidence_hash": "cbd1a4d6c239ba7d94ac44a9e30b9138b5866b741f8f4da8709d0707b40c1dde",
+      "verdict": {
+        "kind": "pass",
+        "citation": "schema export の rustdoc 実行が解決済み target 名を使い、package 名と異なる lib / bin target 又は rename 後の target で正しい rustdoc root を解決することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::schema_export::bin_target::resolve_rustdoc_root_name"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "schema export の rustdoc 実行が解決済み target 名を使い、package 名と異なる lib / bin target 又は rename 後の target で正しい rustdoc root を解決することを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9ca78d8010032b76f4e1334894310384d94f09433ca6cb60fdf6b79a076e2db",
+      "evidence_hash": "9587be98df55673062fb895184f4ff0d960f43bb7d59b3b24ebbb13b4a4e7d56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalog import が package 名 root の catalogue 型 path を維持したまま、照合時だけ共有 resolver で rustdoc root に翻訳し、bin-only package の reference / modify / delete 型操作を成功させることを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::schema_export::bin_target::resolve_rustdoc_root_name"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "catalog import が package 名 root の catalogue 型 path を維持したまま、照合時だけ共有 resolver で rustdoc root に翻訳し、bin-only package の reference / modify / delete 型操作を成功させることを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9ca78d8010032b76f4e1334894310384d94f09433ca6cb60fdf6b79a076e2db",
+      "evidence_hash": "1adc55e60c077cfdc79d0b48f55be7da6aa29292b2bbda75a2f09152b2a7315c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "signal 評価器の identity key 正規化が共有 resolver を使い、既存の crate 名 literal 対応表に依存せず、rename 後の package / target の組合せを metadata から解決することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::schema_export::bin_target::resolve_rustdoc_root_name"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "signal 評価器の identity key 正規化が共有 resolver を使い、既存の crate 名 literal 対応表に依存せず、rename 後の package / target の組合せを metadata から解決することを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9ca78d8010032b76f4e1334894310384d94f09433ca6cb60fdf6b79a076e2db",
+      "evidence_hash": "3b579b865750543bcfa5882d6e5c7a8a5d41ef1c07c263f738e8117f9b970e5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc root 翻訳のための config field、crate / bin 名の static map、又は surface 固有の fallback が存在せず、schema export、catalog import、signal 評価器が同じ cargo metadata 解決規則に従うことを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::schema_export::bin_target::resolve_rustdoc_root_name"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "rustdoc root 翻訳のための config field、crate / bin 名の static map、又は surface 固有の fallback が存在せず、schema export、catalog import、signal 評価器が同じ cargo metadata 解決規則に従うことを検証する。"
+        }
+      }
+    }
+  ]
+}

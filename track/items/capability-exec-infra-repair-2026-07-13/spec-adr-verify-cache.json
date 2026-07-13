@@ -1,0 +1,626 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "ecf0a8f896d920937d15dcfaf686d425cbd39f099ccda54abb51bc53a0eefdf0",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "capability wrapper の実行契約は「コマンドの exit code と stdout が同一 tool call 内で agent に返る」こととする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "capability wrapper が provider shell tool の完了時の exit code と stdout を同じ呼び出しで受け取る blocking 実行契約を維持し、長時間の reviewer / fixer 実行を結果なしの実行中 session として誤読しないようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "46b9778e28c049d7b92d7bf18ee6349d64167a0162874872e304fdee2e6b1be8",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp capability exec` に `--timeout-seconds <N>` flag を追加する。flag 未指定のときは時間上限を設けず、provider process の完了まで待ち続ける。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "`sotp capability exec` の provider subprocess 待機時間を dispatch ごとに CLI から表現可能にし、未指定の実行を時間上限なく完了まで待機させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "0e01e29dc97e217cf86f4515f13c910f179199316fdeca01086405b7508893f2",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc 識別に触れる全ての箇所 — schema export の rustdoc 実行、`catalog import` の型照合、signal 評価器の identity key 正規化 — はこの機構を共有する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "package 名の catalogue 識別と rustdoc crate root の異なる命名域を cargo metadata から動的に翻訳し、crate / bin の rename や bin-only package に対しても schema export、catalog import、signal 評価が一貫して動作するようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "4b8c175a3cdbdfc67f41e9e505ea900edef9e0ce46b18e62e34889197070ce5b",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "provider CLI の project 設定で PTY-backed exec（実行中 session を返す挙動）を無効化し、shell tool を blocking 挙動に固定する。capability wrapper の実行契約は「コマンドの exit code と stdout が同一 tool call 内で agent に返る」こととする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "provider project 設定で PTY-backed exec を無効にし、capability wrapper が blocking shell-tool を前提として完了結果を扱う。正当に長時間となる reviewer subprocess には呼び出し側 timeout を明示し、運用文書でその timeout 下限を示す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d7d3184817872edbe2bbcbb34d2f7c34b9766e14aab5f4640a9b96124fd0bdf5",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "flag 未指定のときは時間上限を設けず、provider process の完了まで待ち続ける。コード内定数による一律 timeout は廃止する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`sotp capability exec` に任意の `--timeout-seconds <N>` を追加し、正の値が指定されたときだけ provider process の待機上限として適用する。flag 未指定時は既存の固定 600 秒上限を使わず、provider process の完了まで待機する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "5cab3e4d1ee340b3bf5fbde779f8c74cc2649ad8c1e083ff0a0662320cbca2ef",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "timeout 値は正の整数のみを受け付け、0 は入力検証で拒否する。値は CLI 引数境界から usecase の検証済み型を経由して subprocess 待機処理まで型付きで伝搬させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "timeout 値を CLI 境界で正の整数として検証し、検証済みの値だけを usecase を通じて subprocess 待機処理へ型付きで伝搬する。0 は subprocess を起動せず入力として拒否する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "b960d7eaa31a074f006f13c4b589beaf3d4f093ca897650ca72ee3d382f64f77",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "解決機構は、対象 package の `targets` から lib target があればその唯一の target を選び、lib target が無ければ唯一の bin target を選ぶ。bin target が複数ある場合は package の `default_run` がそのいずれかを指すときだけ選び、`default_run` が無い・いずれにも一致しない・target 名を取得できない場合は metadata の列挙順に依存せず fail-closed とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "package の rustdoc target を cargo metadata で解決する単一機構を導入する。lib target があればそれを優先し、lib が無ければ唯一の bin target を選び、複数 bin の場合は `default_run` が一致する場合だけ選ぶ。選択できない metadata は列挙順に依存せず fail-closed とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "9376ae729d1fac6bf061f4c7d1dc531e589b8978d97f2a3d57a62170074e0013",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc 実行に渡す target 名と rustdoc crate root は、選択した target の metadata 上の `name` から導出する。crate root はその `name` の `-` を `_` に正規化した値とし、package 名から推測しない。」「rustdoc 識別に触れる全ての箇所 — schema export の rustdoc 実行、`catalog import` の型照合、signal 評価器の identity key 正規化 — はこの機構を共有する。」「利用者向けの型 path は catalogue の識別体系どおり package 名 root（例: `cli::commands::…`）を維持し、rustdoc との照合時にのみ root segment を翻訳する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "選択した metadata target の name を rustdoc 実行 target とし、その `-` を `_` に正規化した値を rustdoc crate root とする。schema export、catalog import の型照合、signal 評価器の identity key 正規化はこの同じ翻訳機構を使用し、catalogue 利用者向けの型 path は package 名 root のまま維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5dbe1c24741ffe02036c28f0deb30dd76f4aa3ec930ce71939221db52d3accb",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "crate 名や bin 名の literal 対応表をコードに書くことは禁止する。翻訳のための新しい設定 field も導入しない — cargo metadata が既に保持する事実の二重管理になるためである。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "crate 名又は bin 名を対象にした literal 対応表を廃止し、rustdoc root 翻訳のための新しい設定 field を導入しない。翻訳事実の唯一の情報源は cargo metadata とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "e80f90842d6a4c32970a634a0cdb2e16bf838318ff84f0d5f429306f55197670",
+      "evidence_hash": "c41ba35066141335ad390f0c06f0b19aa550c960695d68ce2eb80d72b15cfe8d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`named field + variant field × String`: 全層 × 全 role で ON、ただし次の role のみ除外する: ... `ErrorType` を含む他の全 role（`ValueObject` / `Entity` / `AggregateRoot` 等）は対象である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`Phase1Error` を catalogue で modify 宣言する際は、既存の `ActionContradiction`、`UnresolvedTypeRef`、`DanglingId` variant の payload を生の `String` のまま保持せず、検証済み newtype `DiagnosticMessage` へ移行する。これにより `RustdocRootResolution` を追加した post-state 全体を `ErrorType` の variant field に対する primitive obsession guard に適合させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-01-0004-catalogue-primitive-obsession-guard.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "30ce23780d52bb2e8ac69dc3929d80b10430f555c0b15ec7229835a4e03a492b",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この方式は reviewer 経路（`sotp review local` の `--timeout-seconds`）と対称であり、dispatch ごとに「この作業は長い」という呼び出し側の意図を表現できる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "`sotp review local` の既存の 1800 秒 default と `--timeout-seconds` による可変指定は変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "3f6d33978f66b7cdbf00aedbd5441feddf95525f0809e3cace0ae57f68ae0087",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--timeout-seconds <N>` flag を追加する。flag 未指定のときは時間上限を設けず、provider process の完了まで待ち続ける。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "capability profile に timeout の既定値を持たせる仕組みを追加しない。timeout の意図は capability 単位ではなく dispatch ごとの CLI flag で表現する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "5663d9d47df83f4c2ee65312b3ba51462cbf919252511d30a46390c052d97271",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "crate 名や bin 名の literal 対応表をコードに書くことは禁止する。翻訳のための新しい設定 field も導入しない"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-03",
+          "text_label": "package と rustdoc root の対応を設定 file 又は crate / bin 名の個別 literal map で管理しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "bb59540cdcc354950a8fd5c5fef58cd61fe2f484ba1a9e352bdd662c913333da",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「flag 未指定のときは時間上限を設けず、provider process の完了まで待ち続ける。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "timeout の省略は無期限待機を意味し、実行中 process を wrapper が独自に kill しない。無期限待機の進行監視は呼び出し側 orchestrator の責務とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "b19d6cb063a13f073d637dc799636edf15086ffc92182c5b5fa1c99495786ca0",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "timeout 値は正の整数のみを受け付け、0 は入力検証で拒否する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "timeout が指定された場合は正の整数だけを受け入れ、0 又は検証不能な入力を fail-closed で拒否する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "09769d863a3d648e704a14ca9ca24605b6b68522c5d8a0f767d5f6d5dcfcf94a",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin target が複数ある場合は package の `default_run` がそのいずれかを指すときだけ選び、`default_run` が無い・いずれにも一致しない・target 名を取得できない場合は metadata の列挙順に依存せず fail-closed とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "metadata に lib target が無い package で複数 bin target を選ぶには `default_run` の一致を必要とし、`default_run` の欠如、不一致、target 名欠如、又は一意な選択不能を成功扱いにしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc84c3fc052c0fa0a94eca78e338805a5c38fab1e473d8d4ce077c0cf546d58c",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc 実行に渡す target 名と rustdoc crate root は、選択した target の metadata 上の `name` から導出する。crate root はその `name` の `-` を `_` に正規化した値とし、package 名から推測しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "rustdoc root の導出では package 名からの推測、個別 surface の独自実装、又は静的 fallback を用いず、target metadata の name と `-`→`_` 正規化だけに従う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "f9a8cdc2899a3be7804bd1b5945448f403ebed14a3d5fd21022b5825450d2d61",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "capability wrapper の実行契約は「コマンドの exit code と stdout が同一 tool call 内で agent に返る」こととする。blocking 化により、timeout 不足は明示的なエラー（exit 124 と経過時間）として agent に返り、agent は timeout パラメータを付けて自己修正できる。reviewer 呼び出しを行う capability の運用文書には、reviewer subprocess の正当な実行時間（前段の gate 実行を含む）を踏まえた timeout 下限を明文化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "capability wrapper の provider shell tool が、完了した command の exit code と stdout を同一呼び出しで返す blocking 挙動となることを確認する。timeout が不足する command は結果なしの実行中 session ではなく exit 124 と経過時間を伴う明示的な失敗として返り、reviewer 呼び出しの運用文書には正当な長時間実行に対する timeout 下限が記載されていることを確認する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "428061a01f58987aa0c5a3b75c58b1c6c0a90c1c9f85b5cabbd8aa075145d4be",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "flag 未指定のときは時間上限を設けず、provider process の完了まで待ち続ける。コード内定数による一律 timeout は廃止する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp capability exec` を `--timeout-seconds` なしで実行すると provider process に一律の 600 秒上限を設定せず、完了まで待機することを検証する。正の timeout を指定した場合だけ、その値が provider process の待機上限として使われることも検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "9e1e49d162426f3ecc52c099fcaef74dfcb421699b2bd8a2099c6306cd5bcefb",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "timeout 値は正の整数のみを受け付け、0 は入力検証で拒否する。値は CLI 引数境界から usecase の検証済み型を経由して subprocess 待機処理まで型付きで伝搬させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`--timeout-seconds 0` を与えると command が subprocess を起動せず非成功で終了し、正の timeout は CLI 境界から検証済みの値として usecase と subprocess adapter に到達することを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "274d05cf0e2940495be1bea3e090195232056d1bce24fca53b5c8867057dce70",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "解決機構は、対象 package の `targets` から lib target があればその唯一の target を選び、lib target が無ければ唯一の bin target を選ぶ。… crate root はその `name` の `-` を `_` に正規化した値とし、package 名から推測しない。したがって `[lib] name` が package 名と異なる lib crate も、ハイフンを含む lib / bin target も同じ規則で扱う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "cargo metadata に lib target がある package では、package 名と異なる lib 名及び `-` を含む lib 名であっても lib target を選び、その target 名を `-`→`_` 正規化した rustdoc root を得ることを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "bbe859ba72d520d3b36f95d7b2136468b8e4359070636bc99738c7918eb0dcf2",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「lib target が無ければ唯一の bin target を選ぶ。」また、「crate root はその `name` の `-` を `_` に正規化した値とし、package 名から推測しない。したがって `[lib] name` が package 名と異なる lib crate も、ハイフンを含む lib / bin target も同じ規則で扱う。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "lib を持たない package では唯一の bin target を選び、package 名と異なる bin 名及び `-` を含む bin 名から正規化済み rustdoc root を得ることを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "ff14aa537ee8b6fa22695324ed82841adbb387ad0667dbcb2cb8d8ee8bae05dc",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bin target が複数ある場合は package の `default_run` がそのいずれかを指すときだけ選び、`default_run` が無い・いずれにも一致しない・target 名を取得できない場合は metadata の列挙順に依存せず fail-closed とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "lib を持たず複数 bin target を持つ package では `default_run` が既存 bin 名に一致するときだけその bin を選ぶことを検証する。`default_run` が無い、不一致である、又は target 名を取得できない場合は metadata の順序に関係なく失敗することを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "cbd1a4d6c239ba7d94ac44a9e30b9138b5866b741f8f4da8709d0707b40c1dde",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc 実行に渡す target 名と rustdoc crate root は、選択した target の metadata 上の `name` から導出する。crate root はその `name` の `-` を `_` に正規化した値とし、package 名から推測しない。したがって `[lib] name` が package 名と異なる lib crate も、ハイフンを含む lib / bin target も同じ規則で扱う。rustdoc 識別に触れる全ての箇所 — schema export の rustdoc 実行、`catalog import` の型照合、signal 評価器の identity key 正規化 — はこの機構を共有する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "schema export の rustdoc 実行が解決済み target 名を使い、package 名と異なる lib / bin target 又は rename 後の target で正しい rustdoc root を解決することを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "9587be98df55673062fb895184f4ff0d960f43bb7d59b3b24ebbb13b4a4e7d56",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「利用者向けの型 path は catalogue の識別体系どおり package 名 root（例: `cli::commands::…`）を維持し、rustdoc との照合時にのみ root segment を翻訳する。」\n「rustdoc 識別に触れる全ての箇所 — schema export の rustdoc 実行、`catalog import` の型照合、signal 評価器の identity key 正規化 — はこの機構を共有する。」\n「lib target が無ければ唯一の bin target を選ぶ。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "catalog import が package 名 root の catalogue 型 path を維持したまま、照合時だけ共有 resolver で rustdoc root に翻訳し、bin-only package の reference / modify / delete 型操作を成功させることを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "1adc55e60c077cfdc79d0b48f55be7da6aa29292b2bbda75a2f09152b2a7315c",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc 識別に触れる全ての箇所 — schema export の rustdoc 実行、`catalog import` の型照合、signal 評価器の identity key 正規化 — はこの機構を共有する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "signal 評価器の identity key 正規化が共有 resolver を使い、既存の crate 名 literal 対応表に依存せず、rename 後の package / target の組合せを metadata から解決することを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "3b579b865750543bcfa5882d6e5c7a8a5d41ef1c07c263f738e8117f9b970e5d",
+      "evidence_hash": "6f8df5903f9d17930e2ede0082eeb0858ef64e58849afdfba503bfea399bd6b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc 識別に触れる全ての箇所 — schema export の rustdoc 実行、`catalog import` の型照合、signal 評価器の identity key 正規化 — はこの機構を共有する。 crate 名や bin 名の literal 対応表をコードに書くことは禁止する。翻訳のための新しい設定 field も導入しない"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "rustdoc root 翻訳のための config field、crate / bin 名の static map、又は surface 固有の fallback が存在せず、schema export、catalog import、signal 評価器が同じ cargo metadata 解決規則に従うことを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0410-capability-exec-infra-repair.md",
+          "decision_id": "D3"
+        }
+      }
+    }
+  ]
+}

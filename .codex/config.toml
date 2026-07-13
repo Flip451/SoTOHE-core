@@ -11,6 +11,13 @@ personality = "pragmatic"
 hooks = true
 multi_agent = true
 shell_snapshot = true
+# Blocking shell-tool semantics are required: capability wrappers (reviewer /
+# fixer dispatch, cargo make gates) run multi-minute commands whose exit code
+# and stdout must return to the agent in the same tool call. unified_exec
+# yields a detached "running session" after its wait window instead of the
+# final result. With it disabled, an undersized timeout fails loudly (exit
+# 124) and the agent retries with a larger timeout parameter.
+unified_exec = false
 
 [agents]
 max_threads = 6

@@ -3,6 +3,7 @@
 use std::ffi::OsString;
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::time::Duration;
 
 use serde::Deserialize;
 use usecase::capability_exec::{
@@ -103,9 +104,10 @@ impl CapabilityProviderPort for CodexCapabilityAdapter {
         let sandbox = self.sandbox_mode(request)?;
         let prompt = capability_prompt(request);
         let args = build_codex_args(request.profile.model.as_str(), sandbox, &prompt);
+        let timeout = request.request.timeout.map(|timeout| Duration::from_secs(timeout.as_secs()));
         let exit_code = self
             .process_runner
-            .run("codex", &args, &self.repo_root, &self.runtime_dir, &self.provider)
+            .run("codex", &args, &self.repo_root, &self.runtime_dir, &self.provider, timeout)
             .map_err(|error| match error {
                 CapabilityExecError::DispatchFailed { .. } => error,
                 other => dispatch_error(&self.provider, other.to_string()),
@@ -149,19 +151,22 @@ mod tests {
     use std::fs;
     use std::path::{Path, PathBuf};
     use std::sync::{Arc, Mutex};
+    use std::time::Duration;
 
     use super::super::{MAX_CAPABILITY_EXEC_TEXT_BYTES, ProviderProcessRunner};
     use super::{CodexCapabilityAdapter, SandboxMode, build_codex_args, sandbox_mode_from_skill};
     use usecase::capability_exec::{
         BriefingText, CapabilityDispatchOutcome, CapabilityDispatchRequest, CapabilityExecError,
         CapabilityExecRequest, CapabilityFilePath, CapabilityProfile, CapabilityProviderPort,
-        DisciplineText, ExecutionMode, ModelName, ProviderName,
+        DisciplineText, ExecutionMode, ModelName, ProviderName, TimeoutSeconds,
     };
     use usecase::dry_write_driver::CapabilityName;
 
+    type RecordedInvocation = (String, Vec<OsString>, Option<Duration>);
+
     #[derive(Default)]
     struct RecordingProcessRunner {
-        invocations: Mutex<Vec<(String, Vec<OsString>)>>,
+        invocations: Mutex<Vec<RecordedInvocation>>,
         exit_code: u8,
     }
 
@@ -173,11 +178,13 @@ mod tests {
             _repo_root: &Path,
             _runtime_dir: &Path,
             _provider: &ProviderName,
+            timeout: Option<Duration>,
         ) -> Result<u8, CapabilityExecError> {
-            self.invocations
-                .lock()
-                .expect("test process recorder lock")
-                .push((binary.to_owned(), args.to_vec()));
+            self.invocations.lock().expect("test process recorder lock").push((
+                binary.to_owned(),
+                args.to_vec(),
+                timeout,
+            ));
             Ok(self.exit_code)
         }
     }
@@ -191,6 +198,7 @@ mod tests {
                 capability: CapabilityName::try_new(capability)?,
                 host: ProviderName::try_new(host)?,
                 briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
+                timeout: None,
             },
             profile: CapabilityProfile {
                 provider: ProviderName::try_new("codex")?,
@@ -310,6 +318,32 @@ mod tests {
         );
         assert!(prompt.contains("Do not stage changes."));
         assert!(!prompt.contains("sandbox: workspace-write"));
+        assert_eq!(invocation.2, None, "an omitted timeout runs the provider without a limit");
+        Ok(())
+    }
+
+    #[test]
+    fn test_codex_capability_adapter_forwards_requested_timeout()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_skill(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nskill body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let adapter = CodexCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+        let mut request = request_from_host("claude")?;
+        request.request.timeout = Some(TimeoutSeconds::try_new(1800)?);
+
+        adapter.dispatch(&request)?;
+
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        let invocation = invocations.first().expect("one process invocation is recorded");
+        assert_eq!(invocation.2, Some(Duration::from_secs(1800)));
         Ok(())
     }
 

@@ -3,6 +3,7 @@
 use std::ffi::OsString;
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::time::Duration;
 
 use usecase::capability_exec::{
     CLAUDE_PROVIDER_NAME, CapabilityDispatchOutcome, CapabilityDispatchRequest,
@@ -87,12 +88,14 @@ impl CapabilityProviderPort for ClaudeCapabilityAdapter {
             request.profile.model.as_str(),
             &prompt,
         );
+        let timeout = request.request.timeout.map(|timeout| Duration::from_secs(timeout.as_secs()));
         let exit_code = self.process_runner.run(
             "claude",
             &args,
             &self.repo_root,
             &self.runtime_dir,
             &self.provider,
+            timeout,
         )?;
         Ok(CapabilityDispatchOutcome::Executed { provider: self.provider.clone(), exit_code })
     }
@@ -139,19 +142,22 @@ mod tests {
     use std::fs;
     use std::path::{Path, PathBuf};
     use std::sync::{Arc, Mutex};
+    use std::time::Duration;
 
     use super::super::{MAX_CAPABILITY_EXEC_TEXT_BYTES, ProviderProcessRunner};
     use super::{ClaudeCapabilityAdapter, build_claude_args, validate_agent_definition};
     use usecase::capability_exec::{
         BriefingText, CapabilityDispatchOutcome, CapabilityDispatchRequest, CapabilityExecError,
         CapabilityExecRequest, CapabilityFilePath, CapabilityProfile, CapabilityProviderPort,
-        DisciplineText, ExecutionMode, ModelName, ProviderName,
+        DisciplineText, ExecutionMode, ModelName, ProviderName, TimeoutSeconds,
     };
     use usecase::dry_write_driver::CapabilityName;
 
+    type RecordedInvocation = (String, Vec<OsString>, Option<Duration>);
+
     #[derive(Default)]
     struct RecordingProcessRunner {
-        invocations: Mutex<Vec<(String, Vec<OsString>)>>,
+        invocations: Mutex<Vec<RecordedInvocation>>,
         exit_code: u8,
     }
 
@@ -163,11 +169,13 @@ mod tests {
             _repo_root: &Path,
             _runtime_dir: &Path,
             _provider: &ProviderName,
+            timeout: Option<Duration>,
         ) -> Result<u8, CapabilityExecError> {
-            self.invocations
-                .lock()
-                .expect("test process recorder lock")
-                .push((binary.to_owned(), args.to_vec()));
+            self.invocations.lock().expect("test process recorder lock").push((
+                binary.to_owned(),
+                args.to_vec(),
+                timeout,
+            ));
             Ok(self.exit_code)
         }
     }
@@ -181,6 +189,7 @@ mod tests {
                 capability: CapabilityName::try_new(capability)?,
                 host: ProviderName::try_new(host)?,
                 briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
+                timeout: None,
             },
             profile: CapabilityProfile {
                 provider: ProviderName::try_new("claude")?,
@@ -332,6 +341,32 @@ mod tests {
                 "$implementer Briefing: Read tmp/briefing.md and perform the task.\n\nDo not stage changes.",
             ]
         );
+        assert_eq!(invocation.2, None, "an omitted timeout runs the provider without a limit");
+        Ok(())
+    }
+
+    #[test]
+    fn test_claude_capability_adapter_forwards_requested_timeout()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_agent(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let adapter = ClaudeCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+        let mut request = request_from_host("codex")?;
+        request.request.timeout = Some(TimeoutSeconds::try_new(1800)?);
+
+        adapter.dispatch(&request)?;
+
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        let invocation = invocations.first().expect("one process invocation is recorded");
+        assert_eq!(invocation.2, Some(Duration::from_secs(1800)));
         Ok(())
     }
 

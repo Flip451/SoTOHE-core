@@ -173,6 +173,7 @@ mod tests {
             host: ProviderNameArg::from_str(host).expect("valid test provider"),
             briefing_file: CapabilityFilePathArg::from_str("tmp/briefing.md")
                 .expect("valid test briefing path"),
+            timeout_seconds: None,
         }
     }
 

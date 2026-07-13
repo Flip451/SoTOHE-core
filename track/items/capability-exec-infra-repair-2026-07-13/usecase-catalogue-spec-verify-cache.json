@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "91e1a8663d89f53b9876c8b993184d8d1c43dee33ec1af3329309e6c91b2a8ed",
+      "evidence_hash": "d7d3184817872edbe2bbcbb34d2f7c34b9766e14aab5f4640a9b96124fd0bdf5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp capability exec` に任意の `--timeout-seconds <N>` を追加し、正の値が指定されたときだけ provider process の待機上限として適用する。flag 未指定時は既存の固定 600 秒上限を使わず、provider process の完了まで待機する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`sotp capability exec` に任意の `--timeout-seconds <N>` を追加し、正の値が指定されたときだけ provider process の待機上限として適用する。flag 未指定時は既存の固定 600 秒上限を使わず、provider process の完了まで待機する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "91e1a8663d89f53b9876c8b993184d8d1c43dee33ec1af3329309e6c91b2a8ed",
+      "evidence_hash": "5cab3e4d1ee340b3bf5fbde779f8c74cc2649ad8c1e083ff0a0662320cbca2ef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "timeout 値を CLI 境界で正の整数として検証し、検証済みの値だけを usecase を通じて subprocess 待機処理へ型付きで伝搬する。0 は subprocess を起動せず入力として拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "timeout 値を CLI 境界で正の整数として検証し、検証済みの値だけを usecase を通じて subprocess 待機処理へ型付きで伝搬する。0 は subprocess を起動せず入力として拒否する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "91e1a8663d89f53b9876c8b993184d8d1c43dee33ec1af3329309e6c91b2a8ed",
+      "evidence_hash": "428061a01f58987aa0c5a3b75c58b1c6c0a90c1c9f85b5cabbd8aa075145d4be",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp capability exec` を `--timeout-seconds` なしで実行すると provider process に一律の 600 秒上限を設定せず、完了まで待機することを検証する。正の timeout を指定した場合だけ、その値が provider process の待機上限として使われることも検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp capability exec` を `--timeout-seconds` なしで実行すると provider process に一律の 600 秒上限を設定せず、完了まで待機することを検証する。正の timeout を指定した場合だけ、その値が provider process の待機上限として使われることも検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "91e1a8663d89f53b9876c8b993184d8d1c43dee33ec1af3329309e6c91b2a8ed",
+      "evidence_hash": "9e1e49d162426f3ecc52c099fcaef74dfcb421699b2bd8a2099c6306cd5bcefb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--timeout-seconds 0` を与えると command が subprocess を起動せず非成功で終了し、正の timeout は CLI 境界から検証済みの値として usecase と subprocess adapter に到達することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`--timeout-seconds 0` を与えると command が subprocess を起動せず非成功で終了し、正の timeout は CLI 境界から検証済みの値として usecase と subprocess adapter に到達することを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c141ab3a00338ce2d21900fcfd94deb32916bfb74c70f1a9ea5ce31ed0e8db12",
+      "evidence_hash": "5cab3e4d1ee340b3bf5fbde779f8c74cc2649ad8c1e083ff0a0662320cbca2ef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "timeout 値を CLI 境界で正の整数として検証し、検証済みの値だけを usecase を通じて subprocess 待機処理へ型付きで伝搬する。0 は subprocess を起動せず入力として拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityInputValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "timeout 値を CLI 境界で正の整数として検証し、検証済みの値だけを usecase を通じて subprocess 待機処理へ型付きで伝搬する。0 は subprocess を起動せず入力として拒否する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c141ab3a00338ce2d21900fcfd94deb32916bfb74c70f1a9ea5ce31ed0e8db12",
+      "evidence_hash": "b19d6cb063a13f073d637dc799636edf15086ffc92182c5b5fa1c99495786ca0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "timeout が指定された場合は正の整数だけを受け入れ、0 又は検証不能な入力を fail-closed で拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityInputValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "timeout が指定された場合は正の整数だけを受け入れ、0 又は検証不能な入力を fail-closed で拒否する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c141ab3a00338ce2d21900fcfd94deb32916bfb74c70f1a9ea5ce31ed0e8db12",
+      "evidence_hash": "9e1e49d162426f3ecc52c099fcaef74dfcb421699b2bd8a2099c6306cd5bcefb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--timeout-seconds 0` を与えると command が subprocess を起動せず非成功で終了し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityInputValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`--timeout-seconds 0` を与えると command が subprocess を起動せず非成功で終了し、正の timeout は CLI 境界から検証済みの値として usecase と subprocess adapter に到達することを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0eb4d8930d5005a3642f09fcf876809ae5677d25ff3f5db87ce77bd2b42eedb3",
+      "evidence_hash": "5cab3e4d1ee340b3bf5fbde779f8c74cc2649ad8c1e083ff0a0662320cbca2ef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "timeout 値を CLI 境界で正の整数として検証し、検証済みの値だけを usecase を通じて subprocess 待機処理へ型付きで伝搬する。0 は subprocess を起動せず入力として拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TimeoutSeconds"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "timeout 値を CLI 境界で正の整数として検証し、検証済みの値だけを usecase を通じて subprocess 待機処理へ型付きで伝搬する。0 は subprocess を起動せず入力として拒否する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0eb4d8930d5005a3642f09fcf876809ae5677d25ff3f5db87ce77bd2b42eedb3",
+      "evidence_hash": "b19d6cb063a13f073d637dc799636edf15086ffc92182c5b5fa1c99495786ca0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "timeout が指定された場合は正の整数だけを受け入れ、0 又は検証不能な入力を fail-closed で拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TimeoutSeconds"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "timeout が指定された場合は正の整数だけを受け入れ、0 又は検証不能な入力を fail-closed で拒否する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0eb4d8930d5005a3642f09fcf876809ae5677d25ff3f5db87ce77bd2b42eedb3",
+      "evidence_hash": "9e1e49d162426f3ecc52c099fcaef74dfcb421699b2bd8a2099c6306cd5bcefb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--timeout-seconds 0` を与えると command が subprocess を起動せず非成功で終了し、正の timeout は CLI 境界から検証済みの値として usecase と subprocess adapter に到達することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TimeoutSeconds"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`--timeout-seconds 0` を与えると command が subprocess を起動せず非成功で終了し、正の timeout は CLI 境界から検証済みの値として usecase と subprocess adapter に到達することを検証する。"
+        }
+      }
+    }
+  ]
+}

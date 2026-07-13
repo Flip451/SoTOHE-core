@@ -1,0 +1,79 @@
+{
+  "crate_name": "cli",
+  "functions": {},
+  "layer": "cli",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityExecArgs": {
+      "action": "modify",
+      "docs": "Capability execution Clap DTO updated with optional timeout input (IN-02, IN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "cli_driver::capability::CapabilityNameArg"
+            },
+            {
+              "name": "host",
+              "ty": "cli_driver::capability::ProviderNameArg"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "cli_driver::capability::CapabilityFilePathArg"
+            },
+            {
+              "name": "timeout_seconds",
+              "ty": "Option<cli_driver::capability::TimeoutSecondsArg>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

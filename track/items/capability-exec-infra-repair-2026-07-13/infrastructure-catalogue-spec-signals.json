@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "4648177169b734bb494108fbf4d345352f86fb24bd493f03c53b7622eb2fc5f5",
+  "signals": [
+    {
+      "type_name": "CargoTargetName",
+      "signal": "blue",
+      "entry_hash": "13b8cada4339a4c0a2c3cedfe1cfc0c564e54e439762a060a32f1b61c896d0e7"
+    },
+    {
+      "type_name": "RustdocRootResolutionError",
+      "signal": "blue",
+      "entry_hash": "eb04936e6f03fe865ace2e449fe0a7deb5648efa1268c30c11024875e7f217ae"
+    },
+    {
+      "type_name": "RustdocTargetKind",
+      "signal": "blue",
+      "entry_hash": "569576ed277dd2782f0907955c77685433bd856d6adfbee7335fe73519de7334"
+    },
+    {
+      "type_name": "RustdocTargetResolution",
+      "signal": "blue",
+      "entry_hash": "3ec0e9929943b3501fae576404f2110defe23d1dfc0bba690de66716709c6f61"
+    },
+    {
+      "type_name": "SignalEvaluatorV2",
+      "signal": "blue",
+      "entry_hash": "09e570c2e7bdb2ed6e61a5fe650b38089491444e95e8ffeab12a8ca2d9abc1c7"
+    },
+    {
+      "type_name": "infrastructure::schema_export::bin_target::resolve_rustdoc_root_name",
+      "signal": "blue",
+      "entry_hash": "f9ca78d8010032b76f4e1334894310384d94f09433ca6cb60fdf6b79a076e2db"
+    }
+  ]
+}

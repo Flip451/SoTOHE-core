@@ -6,6 +6,7 @@ use clap::{Args, Subcommand};
 use cli_composition::CapabilityCompositionRoot;
 use cli_driver::capability::{
     CapabilityExecDriverInput, CapabilityFilePathArg, CapabilityNameArg, ProviderNameArg,
+    TimeoutSecondsArg,
 };
 
 use crate::commands::driver_outcome_to_exit;
@@ -28,6 +29,10 @@ pub struct CapabilityExecArgs {
     /// Path to a non-empty UTF-8 briefing file.
     #[arg(long)]
     pub briefing_file: CapabilityFilePathArg,
+    /// Provider-process timeout in seconds. When omitted, the provider process
+    /// runs without a time limit.
+    #[arg(long)]
+    pub timeout_seconds: Option<TimeoutSecondsArg>,
 }
 
 /// Executes a generic capability command.
@@ -57,6 +62,7 @@ fn execute_exec(args: CapabilityExecArgs) -> ExitCode {
         capability: args.capability,
         host: args.host,
         briefing_file: args.briefing_file,
+        timeout_seconds: args.timeout_seconds,
     }))
 }
 
@@ -67,7 +73,7 @@ mod tests {
 
     use super::{
         CapabilityCommand, CapabilityExecArgs, CapabilityFilePathArg, CapabilityNameArg,
-        ProviderNameArg, execute, execute_with,
+        ProviderNameArg, TimeoutSecondsArg, execute, execute_with,
     };
 
     #[derive(Parser)]
@@ -90,7 +96,12 @@ mod tests {
         .expect("valid capability command parses");
 
         match cli.command {
-            CapabilityCommand::Exec(CapabilityExecArgs { capability, host, briefing_file }) => {
+            CapabilityCommand::Exec(CapabilityExecArgs {
+                capability,
+                host,
+                briefing_file,
+                timeout_seconds,
+            }) => {
                 assert_eq!(
                     capability,
                     "implementer".parse::<CapabilityNameArg>().expect("valid test capability")
@@ -102,8 +113,48 @@ mod tests {
                         .parse::<CapabilityFilePathArg>()
                         .expect("valid test briefing path")
                 );
+                assert_eq!(timeout_seconds, None, "omitted timeout parses as no limit");
             }
         }
+    }
+
+    #[test]
+    fn test_capability_exec_timeout_seconds_parses_and_rejects_zero() {
+        let cli = TestCli::try_parse_from([
+            "sotp",
+            "exec",
+            "implementer",
+            "--host",
+            "codex",
+            "--briefing-file",
+            "tmp/briefing.md",
+            "--timeout-seconds",
+            "1800",
+        ])
+        .expect("valid timeout parses");
+        match cli.command {
+            CapabilityCommand::Exec(args) => {
+                assert_eq!(
+                    args.timeout_seconds,
+                    Some("1800".parse::<TimeoutSecondsArg>().expect("valid test timeout"))
+                );
+            }
+        }
+
+        assert!(
+            TestCli::try_parse_from([
+                "sotp",
+                "exec",
+                "implementer",
+                "--host",
+                "codex",
+                "--briefing-file",
+                "tmp/briefing.md",
+                "--timeout-seconds",
+                "0",
+            ])
+            .is_err()
+        );
     }
 
     #[test]
@@ -164,6 +215,7 @@ mod tests {
             capability: "implementer".parse().expect("valid test capability"),
             host: "codex".parse().expect("valid test provider"),
             briefing_file: "tmp/briefing.md".parse().expect("valid test briefing path"),
+            timeout_seconds: None,
         });
         let mut forwarded = None;
 

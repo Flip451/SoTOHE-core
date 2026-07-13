@@ -15,7 +15,6 @@ use usecase::capability_exec::{CapabilityExecError, ProviderName};
 
 use super::{MAX_CAPABILITY_EXEC_LOG_BYTES, dispatch_error, path_guard};
 
-const PROVIDER_PROCESS_TIMEOUT: Duration = Duration::from_secs(600);
 const PROVIDER_PROCESS_POLL_INTERVAL: Duration = Duration::from_millis(50);
 const PROVIDER_LOG_DRAIN_TIMEOUT: Duration = Duration::from_secs(1);
 const LOG_TRUNCATION_NOTICE: &[u8] = b"\n[provider stderr truncated]\n";
@@ -30,6 +29,7 @@ pub(crate) trait ProviderProcessRunner: Send + Sync {
         repo_root: &Path,
         runtime_dir: &Path,
         provider: &ProviderName,
+        timeout: Option<Duration>,
     ) -> Result<u8, CapabilityExecError>;
 }
 
@@ -43,30 +43,14 @@ impl ProviderProcessRunner for SystemProviderProcessRunner {
         repo_root: &Path,
         runtime_dir: &Path,
         provider: &ProviderName,
+        timeout: Option<Duration>,
     ) -> Result<u8, CapabilityExecError> {
-        run_provider_process(binary, args, repo_root, runtime_dir, provider)
+        run_provider_process_with_timeout(binary, args, repo_root, runtime_dir, provider, timeout)
     }
 }
 
 pub(crate) fn system_process_runner() -> Arc<dyn ProviderProcessRunner> {
     Arc::new(SystemProviderProcessRunner)
-}
-
-fn run_provider_process(
-    binary: &str,
-    args: &[OsString],
-    repo_root: &Path,
-    runtime_dir: &Path,
-    provider: &ProviderName,
-) -> Result<u8, CapabilityExecError> {
-    run_provider_process_with_timeout(
-        binary,
-        args,
-        repo_root,
-        runtime_dir,
-        provider,
-        PROVIDER_PROCESS_TIMEOUT,
-    )
 }
 
 pub(crate) fn run_provider_process_with_timeout(
@@ -75,7 +59,7 @@ pub(crate) fn run_provider_process_with_timeout(
     repo_root: &Path,
     runtime_dir: &Path,
     provider: &ProviderName,
-    timeout: Duration,
+    timeout: Option<Duration>,
 ) -> Result<u8, CapabilityExecError> {
     let runtime_dir = prepare_runtime_dir(repo_root, runtime_dir, provider)?;
     let timestamp = SystemTime::now()
@@ -371,23 +355,27 @@ fn wait_for_provider_process(
     child: &mut Child,
     provider: &ProviderName,
     binary: &str,
-    timeout: Duration,
+    timeout: Option<Duration>,
 ) -> Result<ExitStatus, CapabilityExecError> {
     let started = Instant::now();
     loop {
         match child.try_wait() {
             Ok(Some(status)) => return Ok(status),
-            Ok(None) if started.elapsed() >= timeout => {
-                terminate_provider_process(child, provider, binary)?;
-                return Err(dispatch_error(
-                    provider,
-                    format!(
-                        "{binary} provider process timed out after {} seconds",
-                        timeout.as_secs()
-                    ),
-                ));
+            Ok(None) => {
+                if let Some(limit) = timeout
+                    && started.elapsed() >= limit
+                {
+                    terminate_provider_process(child, provider, binary)?;
+                    return Err(dispatch_error(
+                        provider,
+                        format!(
+                            "{binary} provider process timed out after {} seconds",
+                            limit.as_secs()
+                        ),
+                    ));
+                }
+                thread::sleep(PROVIDER_PROCESS_POLL_INTERVAL);
             }
-            Ok(None) => thread::sleep(PROVIDER_PROCESS_POLL_INTERVAL),
             Err(error) => {
                 let poll_detail = format!("cannot poll {binary} provider process: {error}");
                 let termination_detail = terminate_provider_process(child, provider, binary)

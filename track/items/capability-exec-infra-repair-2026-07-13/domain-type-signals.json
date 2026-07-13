@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-13T09:26:36Z",
+  "declaration_hash": "e1dc7de8f4a2852fed6e6d2a17cf2648a1f467b193e6b4b5aefabf5c47c92afc",
+  "signals": [
+    {
+      "type_name": "Phase1Error",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DiagnosticMessage",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalEvaluatorPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

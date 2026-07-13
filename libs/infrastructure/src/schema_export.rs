@@ -24,7 +24,8 @@ use rustdoc_types::{ItemEnum, Visibility};
 mod format_helpers;
 
 #[path = "schema_export/bin_target.rs"]
-mod bin_target;
+pub mod bin_target;
+pub(crate) use bin_target::{RustdocTargetResolution, resolve_rustdoc_root_name};
 
 #[path = "schema_export/extract.rs"]
 mod extract;

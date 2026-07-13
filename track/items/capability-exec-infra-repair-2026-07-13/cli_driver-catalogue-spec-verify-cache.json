@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "layer": "cli_driver",
+  "entries": [
+    {
+      "claim_hash": "2a14465f767acffbcb8e2f64d60161009926cb39f72727746069eec595ed0ae3",
+      "evidence_hash": "5cab3e4d1ee340b3bf5fbde779f8c74cc2649ad8c1e083ff0a0662320cbca2ef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "timeout 値を CLI 境界で正の整数として検証し、検証済みの値だけを usecase を通じて subprocess 待機処理へ型付きで伝搬する。0 は subprocess を起動せず入力として拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecDriverInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "timeout 値を CLI 境界で正の整数として検証し、検証済みの値だけを usecase を通じて subprocess 待機処理へ型付きで伝搬する。0 は subprocess を起動せず入力として拒否する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2a14465f767acffbcb8e2f64d60161009926cb39f72727746069eec595ed0ae3",
+      "evidence_hash": "9e1e49d162426f3ecc52c099fcaef74dfcb421699b2bd8a2099c6306cd5bcefb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`--timeout-seconds 0` を与えると command が subprocess を起動せず非成功で終了し、正の timeout は CLI 境界から検証済みの値として usecase と subprocess adapter に到達することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityExecDriverInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`--timeout-seconds 0` を与えると command が subprocess を起動せず非成功で終了し、正の timeout は CLI 境界から検証済みの値として usecase と subprocess adapter に到達することを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "74cf8f6468480009aaa4a0b7ba950d818b545b71f2f2328212905f08de949c5e",
+      "evidence_hash": "d7d3184817872edbe2bbcbb34d2f7c34b9766e14aab5f4640a9b96124fd0bdf5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp capability exec` に任意の `--timeout-seconds <N>` を追加し、正の値が指定されたときだけ provider process の待機上限として適用する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TimeoutSecondsArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`sotp capability exec` に任意の `--timeout-seconds <N>` を追加し、正の値が指定されたときだけ provider process の待機上限として適用する。flag 未指定時は既存の固定 600 秒上限を使わず、provider process の完了まで待機する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "74cf8f6468480009aaa4a0b7ba950d818b545b71f2f2328212905f08de949c5e",
+      "evidence_hash": "5cab3e4d1ee340b3bf5fbde779f8c74cc2649ad8c1e083ff0a0662320cbca2ef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "timeout 値を CLI 境界で正の整数として検証し、検証済みの値だけを usecase を通じて subprocess 待機処理へ型付きで伝搬する。0 は subprocess を起動せず入力として拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TimeoutSecondsArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "timeout 値を CLI 境界で正の整数として検証し、検証済みの値だけを usecase を通じて subprocess 待機処理へ型付きで伝搬する。0 は subprocess を起動せず入力として拒否する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "74cf8f6468480009aaa4a0b7ba950d818b545b71f2f2328212905f08de949c5e",
+      "evidence_hash": "9e1e49d162426f3ecc52c099fcaef74dfcb421699b2bd8a2099c6306cd5bcefb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "正の timeout は CLI 境界から検証済みの値として usecase と subprocess adapter に到達する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TimeoutSecondsArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`--timeout-seconds 0` を与えると command が subprocess を起動せず非成功で終了し、正の timeout は CLI 境界から検証済みの値として usecase と subprocess adapter に到達することを検証する。"
+        }
+      }
+    }
+  ]
+}

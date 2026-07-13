@@ -371,7 +371,7 @@ pub fn execute_type_signals_for_layer(
     })?;
 
     // --- Step 5: Evaluate ---
-    let evaluator = SignalEvaluatorV2::new();
+    let evaluator = SignalEvaluatorV2::with_workspace_root(workspace_root.to_path_buf());
     let report = evaluator.evaluate(extended_a, baseline_b, current_c).map_err(|e| {
         EvaluateSignalsError(format!(
             "signal evaluation error for layer '{}': {e:?}",
