@@ -1,0 +1,90 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は field / variant / alias の `dyn Trait` edge も対象にしますが、D4 は `method_param` / `method_returns` の style key しか規定していません。既存の `field` / `variant_payload` / `alias` key を使うのか不明で、下流実装の受入れ条件が一意に定まりません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0308-contract-map-dyn-trait-return-edge.md",
+              "line": 79,
+              "category": "inconsistent decisions within same ADR"
+            },
+            {
+              "message": "D1 は TraitObject の bound path の抽出だけを定め、複数 bound や generic / associated-type arguments の扱いを定義していません。`dyn Port + Send`、`dyn Iterator<Item = DeclaredType>`、`dyn Port<DeclaredType>` で trait edge のみか内部の宣言型 edge も出すのか不明です。D5 も単純な `Arc<dyn DeclaredPort>` のみで、この差異を固定できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0308-contract-map-dyn-trait-return-edge.md",
+              "line": 47,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:3d97313de8567f9090e16eca68bf448ce008e03c29007213d930bec75cdd54f9",
+          "at": "2026-07-13T12:49:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5 is ambiguous: it requires a minimum of 3 regression cases but enumerates 5 concrete cases without stating whether all five are mandatory. Downstream spec/task coverage cannot derive a deterministic acceptance set; cases 4–5 could be omitted while satisfying the stated minimum.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0308-contract-map-dyn-trait-return-edge.md",
+              "line": 103,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:7b2b5e850ff296622d77538d315acd133a03d455aea7181bb1ab029195ee3530",
+          "at": "2026-07-13T12:59:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fbc595faeebb1132904b87cbc6d755dc56bd93c6073e98509f188775b273abc6",
+          "at": "2026-07-13T13:02:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 の qualified path 規則は `crate::Port` / `self::Port` / `super::Port` の扱いを決めていません。記載どおり先頭 segment を crate 名にすると、catalogue の TypeRef 規約で有効なこれらの自 crate 参照が trait_index の `(current_crate, Port)` に到達せず、今回解消するはずの edge 欠落が残ります。spec.json が観測可能な挙動を導出できるよう、Rust 相対 prefix の解決規則と回帰ケースを明記してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0308-contract-map-dyn-trait-return-edge.md",
+              "line": 72,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:fbc595faeebb1132904b87cbc6d755dc56bd93c6073e98509f188775b273abc6",
+          "at": "2026-07-13T13:05:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 は `crate::` / `self::` / `super::` を `current_crate` に正規化すると決める一方、この規則を「既存 `resolve_trait_subgraph` と同一」として共通化を要求しています。しかし現行 resolver は修飾パスの先頭 segment を常に crate 名として扱うため、共通化すると既存の trait_impl edge の解決意味論まで変更されます。`dyn Trait` edge の ADR がこの追加変更を意図しているか不明で、下流の spec/test が trait_impl 側の受入条件を導出できません。既存 resolver も変更対象とするのかを明示してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0308-contract-map-dyn-trait-return-edge.md",
+              "line": 80,
+              "category": "scope_leakage_into_adr_body"
+            }
+          ],
+          "hash": "rvw1:sha256:44c2ff80f54083d3a4aab29ce2d87fb7444deea9dea3e0792b9f02fee9a5e7f8",
+          "at": "2026-07-13T13:07:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d695afec3b8f04bf03479c1bc7da4a5d338643d3ce0f4c3e1f42b0ba4caf9e95",
+          "at": "2026-07-13T13:10:07Z"
+        }
+      ]
+    }
+  }
+}
