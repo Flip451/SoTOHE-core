@@ -109,12 +109,17 @@ mod tests {
     use domain::tddd::catalogue_v2::composite::{
         StructKind, StructShape, TypeKindV2, TypestateMarker, TypestateTransitions,
     };
-    use domain::tddd::catalogue_v2::entries::{InherentImplDeclV2, TraitEntry, TypeEntry};
-    use domain::tddd::catalogue_v2::identifiers::{
-        CrateName, FieldName, MethodName, ModulePath, TraitName, TypeName, TypeRef, VariantName,
+    use domain::tddd::catalogue_v2::entries::{
+        FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
     };
-    use domain::tddd::catalogue_v2::methods::MethodDeclaration;
-    use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction, SelfReceiver};
+    use domain::tddd::catalogue_v2::identifiers::{
+        CrateName, FieldName, FunctionName, FunctionPath, MethodName, ModulePath, TraitName,
+        TypeName, TypeRef, VariantName,
+    };
+    use domain::tddd::catalogue_v2::methods::{MethodDeclaration, ParamDeclaration};
+    use domain::tddd::catalogue_v2::roles::{
+        ContractRole, DataRole, FunctionRole, ItemAction, SelfReceiver,
+    };
     use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
     use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl};
     use domain::tddd::{ContractMapRenderOptions, ContractMapRenderer};
@@ -1995,14 +2000,507 @@ include_function_roles = []
     }
 
     // -----------------------------------------------------------------------
+    // dyn Trait TypeRef and trait_impl resolution (AC-01–AC-07)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn test_contract_map_dyn_trait_all_type_ref_positions_emit_trait_edges() {
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+
+        for trait_name in [
+            "DeclaredPort",
+            "FieldPort",
+            "VariantPort",
+            "AliasPort",
+            "FunctionParamPort",
+            "FunctionReturnPort",
+            "MethodParamPort",
+        ] {
+            doc.insert_trait(TraitName::new(trait_name).unwrap(), make_empty_trait_entry());
+        }
+
+        let factory_method = MethodDeclaration::new(
+            MethodName::new("build").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![ParamDeclaration::new(
+                domain::tddd::catalogue_v2::identifiers::ParamName::new("port").unwrap(),
+                TypeRef::new("Arc<dyn MethodParamPort>").unwrap(),
+            )],
+            TypeRef::new("Arc<dyn DeclaredPort>").unwrap(),
+            false,
+            None,
+        );
+        doc.insert_trait(
+            TraitName::new("Factory").unwrap(),
+            make_trait_entry_with_methods(vec![factory_method]),
+        );
+        doc.insert_type(
+            TypeName::new("FieldOwner").unwrap(),
+            make_plain_struct_entry(
+                vec![FieldDecl::new(
+                    FieldName::new("port").unwrap(),
+                    TypeRef::new("Arc<dyn FieldPort>").unwrap(),
+                )],
+                vec![],
+            ),
+        );
+        doc.insert_type(
+            TypeName::new("VariantOwner").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Enum {
+                    variants: vec![VariantDecl::tuple(
+                        VariantName::new("Port").unwrap(),
+                        vec![TypeRef::new("Arc<dyn VariantPort>").unwrap()],
+                    )],
+                },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        doc.insert_type(
+            TypeName::new("AliasOwner").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias { target: TypeRef::new("Arc<dyn AliasPort>").unwrap() },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        doc.insert_function(
+            FunctionPath::at_root(
+                CrateName::new("domain").unwrap(),
+                FunctionName::new("build_ports").unwrap(),
+            ),
+            FunctionEntry::new(
+                ItemAction::Add,
+                FunctionRole::FreeFunction,
+                vec![ParamDeclaration::new(
+                    domain::tddd::catalogue_v2::identifiers::ParamName::new("port").unwrap(),
+                    TypeRef::new("Arc<dyn FunctionParamPort>").unwrap(),
+                )],
+                TypeRef::new("Arc<dyn FunctionReturnPort>").unwrap(),
+                false,
+                vec![],
+                vec![],
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let rendered = render_and_scan(&[doc], &[layer]);
+        let factory_build =
+            format!("{}_build", render::trait_node_id("domain", "domain", "Factory"));
+        assert_edge_count(
+            &rendered,
+            &factory_build,
+            "--o",
+            None,
+            &render::trait_rep_node_id("domain", "domain", "MethodParamPort"),
+            1,
+        );
+        assert_edge_count(
+            &rendered,
+            &factory_build,
+            "-->",
+            None,
+            &render::trait_rep_node_id("domain", "domain", "DeclaredPort"),
+            1,
+        );
+        assert_edge_count(
+            &rendered,
+            &render::type_rep_node_id("domain", "domain", "FieldOwner"),
+            "--o",
+            Some("port"),
+            &render::trait_rep_node_id("domain", "domain", "FieldPort"),
+            1,
+        );
+        assert_edge_count(
+            &rendered,
+            &format!("{}_Port", render::type_node_id("domain", "domain", "VariantOwner")),
+            "--o",
+            None,
+            &render::trait_rep_node_id("domain", "domain", "VariantPort"),
+            1,
+        );
+        assert_edge_count(
+            &rendered,
+            &render::type_rep_node_id("domain", "domain", "AliasOwner"),
+            "---",
+            Some("alias_of"),
+            &render::trait_rep_node_id("domain", "domain", "AliasPort"),
+            1,
+        );
+        let build_ports = render::function_node_id("domain", "domain", "domain::build_ports");
+        assert_edge_count(
+            &rendered,
+            &build_ports,
+            "--o",
+            None,
+            &render::trait_rep_node_id("domain", "domain", "FunctionParamPort"),
+            1,
+        );
+        assert_edge_count(
+            &rendered,
+            &build_ports,
+            "-->",
+            None,
+            &render::trait_rep_node_id("domain", "domain", "FunctionReturnPort"),
+            1,
+        );
+    }
+
+    #[test]
+    fn test_contract_map_dyn_external_trait_silently_skips_edge() {
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+        let method = MethodDeclaration::new(
+            MethodName::new("inspect").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("Arc<dyn std::fmt::Debug>").unwrap(),
+            false,
+            None,
+        );
+        doc.insert_trait(
+            TraitName::new("Inspector").unwrap(),
+            make_trait_entry_with_methods(vec![method]),
+        );
+
+        let rendered = render_and_scan(&[doc], &[layer]);
+        assert!(
+            rendered.edge_lines.iter().all(|line| !line.contains("Debug")),
+            "undeclared external traits must not produce edges: {}",
+            rendered.output
+        );
+    }
+
+    #[test]
+    fn test_contract_map_dyn_same_name_type_and_trait_resolve_separately() {
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+        doc.insert_type(TypeName::new("Foo").unwrap(), make_plain_struct_entry(vec![], vec![]));
+        doc.insert_trait(TraitName::new("Foo").unwrap(), make_empty_trait_entry());
+        doc.insert_type(
+            TypeName::new("Owner").unwrap(),
+            make_plain_struct_entry(
+                vec![
+                    FieldDecl::new(FieldName::new("plain").unwrap(), TypeRef::new("Foo").unwrap()),
+                    FieldDecl::new(
+                        FieldName::new("dynamic").unwrap(),
+                        TypeRef::new("Arc<dyn Foo>").unwrap(),
+                    ),
+                ],
+                vec![],
+            ),
+        );
+
+        let rendered = render_and_scan(&[doc], &[layer]);
+        let owner = render::type_rep_node_id("domain", "domain", "Owner");
+        assert_edge_count(
+            &rendered,
+            &owner,
+            "--o",
+            Some("plain"),
+            &render::type_rep_node_id("domain", "domain", "Foo"),
+            1,
+        );
+        assert_edge_count(
+            &rendered,
+            &owner,
+            "--o",
+            Some("dynamic"),
+            &render::trait_rep_node_id("domain", "domain", "Foo"),
+            1,
+        );
+    }
+
+    #[test]
+    fn test_contract_map_dyn_multiple_bounds_resolve_declared_traits_only() {
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+        for trait_name in ["DeclaredPort", "DeclaredMarker"] {
+            doc.insert_trait(TraitName::new(trait_name).unwrap(), make_empty_trait_entry());
+        }
+        doc.insert_type(
+            TypeName::new("Owner").unwrap(),
+            make_plain_struct_entry(
+                vec![FieldDecl::new(
+                    FieldName::new("ports").unwrap(),
+                    TypeRef::new("Arc<dyn DeclaredPort + DeclaredMarker + Send>").unwrap(),
+                )],
+                vec![],
+            ),
+        );
+
+        let rendered = render_and_scan(&[doc], &[layer]);
+        let owner = render::type_rep_node_id("domain", "domain", "Owner");
+        for trait_name in ["DeclaredPort", "DeclaredMarker"] {
+            assert_edge_count(
+                &rendered,
+                &owner,
+                "--o",
+                Some("ports"),
+                &render::trait_rep_node_id("domain", "domain", trait_name),
+                1,
+            );
+        }
+        assert!(
+            rendered.edge_lines.iter().all(|line| !line.contains("Send")),
+            "undeclared marker traits must be silently skipped: {}",
+            rendered.output
+        );
+    }
+
+    #[test]
+    fn test_contract_map_dyn_generic_and_associated_types_emit_deduplicated_edges() {
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+        doc.insert_trait(TraitName::new("DeclaredPort").unwrap(), make_empty_trait_entry());
+        for type_name in ["GenericType", "AssociatedType"] {
+            doc.insert_type(
+                TypeName::new(type_name).unwrap(),
+                make_plain_struct_entry(vec![], vec![]),
+            );
+        }
+        doc.insert_type(
+            TypeName::new("Owner").unwrap(),
+            make_plain_struct_entry(
+                vec![FieldDecl::new(
+                    FieldName::new("port").unwrap(),
+                    TypeRef::new("Arc<dyn DeclaredPort<GenericType, Item = AssociatedType>>")
+                        .unwrap(),
+                )],
+                vec![],
+            ),
+        );
+
+        let rendered = render_and_scan(&[doc], &[layer]);
+        let owner = render::type_rep_node_id("domain", "domain", "Owner");
+        for target in [
+            render::trait_rep_node_id("domain", "domain", "DeclaredPort"),
+            render::type_rep_node_id("domain", "domain", "GenericType"),
+            render::type_rep_node_id("domain", "domain", "AssociatedType"),
+        ] {
+            assert_edge_count(&rendered, &owner, "--o", Some("port"), &target, 1);
+        }
+    }
+
+    #[test]
+    fn test_contract_map_dyn_self_crate_prefixes_resolve_to_trait() {
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, CrateName::new("domain").unwrap(), layer.clone());
+        doc.insert_trait(TraitName::new("DeclaredPort").unwrap(), make_empty_trait_entry());
+        doc.insert_type(
+            TypeName::new("Owner").unwrap(),
+            make_plain_struct_entry(
+                vec![
+                    FieldDecl::new(
+                        FieldName::new("crate_port").unwrap(),
+                        TypeRef::new("Arc<dyn crate::port::DeclaredPort>").unwrap(),
+                    ),
+                    FieldDecl::new(
+                        FieldName::new("self_port").unwrap(),
+                        TypeRef::new("Arc<dyn self::port::DeclaredPort>").unwrap(),
+                    ),
+                    FieldDecl::new(
+                        FieldName::new("super_port").unwrap(),
+                        TypeRef::new("Arc<dyn super::port::DeclaredPort>").unwrap(),
+                    ),
+                ],
+                vec![],
+            ),
+        );
+
+        let rendered = render_and_scan(&[doc], &[layer]);
+        let owner = render::type_rep_node_id("domain", "domain", "Owner");
+        let target = render::trait_rep_node_id("domain", "domain", "DeclaredPort");
+        for field_name in ["crate_port", "self_port", "super_port"] {
+            assert_edge_count(&rendered, &owner, "--o", Some(field_name), &target, 1);
+        }
+    }
+
+    #[test]
+    fn test_contract_map_trait_impl_shared_resolver_preserves_and_extends_resolution() {
+        let domain_layer = LayerId::try_new("domain").unwrap();
+        let adapter_layer = LayerId::try_new("infrastructure").unwrap();
+        let mut domain_doc =
+            CatalogueDocument::new(3, CrateName::new("domain").unwrap(), domain_layer.clone());
+        domain_doc.insert_trait(TraitName::new("DeclaredPort").unwrap(), make_empty_trait_entry());
+        for type_name in ["CrateAdapter", "SelfAdapter", "SuperAdapter", "BareAdapter"] {
+            domain_doc.insert_type(
+                TypeName::new(type_name).unwrap(),
+                make_plain_struct_entry(vec![], vec![]),
+            );
+        }
+        for (trait_ref, for_type) in [
+            ("crate::port::DeclaredPort", "CrateAdapter"),
+            ("self::port::DeclaredPort", "SelfAdapter"),
+            ("super::port::DeclaredPort", "SuperAdapter"),
+            ("DeclaredPort", "BareAdapter"),
+        ] {
+            domain_doc.push_trait_impl(TraitImplDeclV2::new(
+                TypeRef::new(trait_ref).unwrap(),
+                TypeRef::new(for_type).unwrap(),
+            ));
+        }
+
+        let mut adapter_doc =
+            CatalogueDocument::new(3, CrateName::new("adapter").unwrap(), adapter_layer.clone());
+        adapter_doc.insert_type(
+            TypeName::new("CrossAdapter").unwrap(),
+            make_plain_struct_entry(vec![], vec![]),
+        );
+        adapter_doc.insert_type(
+            TypeName::new("ExternalAdapter").unwrap(),
+            make_plain_struct_entry(vec![], vec![]),
+        );
+        adapter_doc.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("domain::port::DeclaredPort").unwrap(),
+            TypeRef::new("CrossAdapter").unwrap(),
+        ));
+        adapter_doc.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("std::fmt::Debug").unwrap(),
+            TypeRef::new("ExternalAdapter").unwrap(),
+        ));
+
+        let rendered = render_and_scan(&[domain_doc, adapter_doc], &[domain_layer, adapter_layer]);
+        let target = render::trait_rep_node_id("domain", "domain", "DeclaredPort");
+        for source in [
+            render::type_rep_node_id("domain", "domain", "CrateAdapter"),
+            render::type_rep_node_id("domain", "domain", "SelfAdapter"),
+            render::type_rep_node_id("domain", "domain", "SuperAdapter"),
+            render::type_rep_node_id("domain", "domain", "BareAdapter"),
+            render::type_rep_node_id("infrastructure", "adapter", "CrossAdapter"),
+        ] {
+            assert_edge_count(&rendered, &source, "-.impl.->", None, &target, 1);
+        }
+        assert!(
+            rendered.edge_lines.iter().all(|line| !line.contains("Debug")),
+            "workspace-external trait impls must stay silently skipped: {}",
+            rendered.output
+        );
+
+        let type_ref_source = include_str!("render/type_ref.rs");
+        assert_eq!(
+            type_ref_source.matches("fn resolve_trait_ref_node_id").count(),
+            1,
+            "the four-step trait resolver must have one implementation"
+        );
+        assert!(
+            type_ref_source
+                .contains("resolve_trait_ref_node_id(candidate, current_crate, trait_index)"),
+            "dyn Trait candidates must delegate to the shared resolver"
+        );
+        assert!(
+            type_ref_source
+                .contains("resolve_trait_ref_node_id(trait_ref_str, current_crate, trait_index)"),
+            "trait_impl references must delegate to the shared resolver"
+        );
+    }
+
+    // -----------------------------------------------------------------------
     // Helper constructors for tests
     // -----------------------------------------------------------------------
 
+    struct RenderedContractMap {
+        output: String,
+        edge_lines: Vec<String>,
+    }
+
+    fn render_and_scan(
+        catalogues: &[CatalogueDocument],
+        layer_order: &[LayerId],
+    ) -> RenderedContractMap {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = write_style_config(tmp.path(), FULL_VALID_CONFIG);
+        let adapter = ContractMapRendererAdapter::new(path);
+        let output = adapter
+            .render(catalogues, layer_order, &ContractMapRenderOptions::default())
+            .unwrap()
+            .as_ref()
+            .to_string();
+        let edge_lines = output
+            .lines()
+            .map(str::trim)
+            .filter(|line| {
+                line.contains(" -->")
+                    || line.contains(" --o")
+                    || line.contains(" ---")
+                    || line.contains(" -.impl.->")
+                    || line.contains(" ==>")
+            })
+            .map(str::to_string)
+            .collect();
+
+        RenderedContractMap { output, edge_lines }
+    }
+
+    fn assert_edge_count(
+        rendered: &RenderedContractMap,
+        source: &str,
+        arrow: &str,
+        label: Option<&str>,
+        target: &str,
+        expected_count: usize,
+    ) {
+        let expected = match label {
+            Some(label) => format!("{source} {arrow}|{label}| {target}"),
+            None => format!("{source} {arrow} {target}"),
+        };
+        let actual_count =
+            rendered.edge_lines.iter().filter(|line| line.as_str() == expected).count();
+        assert_eq!(
+            actual_count, expected_count,
+            "expected {expected_count} edge(s) `{expected}`; output: {}",
+            rendered.output
+        );
+    }
+
+    fn make_plain_struct_entry(
+        fields: Vec<FieldDecl>,
+        methods: Vec<MethodDeclaration>,
+    ) -> TypeEntry {
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields, has_stripped_fields: false },
+                None,
+            )),
+            methods,
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        )
+    }
+
     fn make_empty_trait_entry() -> TraitEntry {
+        make_trait_entry_with_methods(vec![])
+    }
+
+    fn make_trait_entry_with_methods(methods: Vec<MethodDeclaration>) -> TraitEntry {
         TraitEntry::new(
             ItemAction::Add,
             ContractRole::SecondaryPort,
-            vec![],
+            methods,
             vec![],
             vec![],
             vec![],
