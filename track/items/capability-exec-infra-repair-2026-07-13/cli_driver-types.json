@@ -1,0 +1,132 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TimeoutSecondsArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TimeoutSecondsArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TimeoutSecondsArg",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "TimeoutSecondsArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TimeoutSecondsArg",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TimeoutSecondsArg",
+      "trait_ref": "core::str::FromStr"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityExecDriverInput": {
+      "action": "modify",
+      "docs": "Primary-adapter input DTO. During adapter-to-usecase conversion, timeout_seconds maps to CapabilityExecRequest::timeout; the CLI-boundary field keeps the unit suffix while the typed usecase field omits it.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "CapabilityNameArg"
+            },
+            {
+              "name": "host",
+              "ty": "ProviderNameArg"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "CapabilityFilePathArg"
+            },
+            {
+              "name": "timeout_seconds",
+              "ty": "Option<TimeoutSecondsArg>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TimeoutSecondsArg": {
+      "action": "add",
+      "docs": "CLI-driver timeout argument mirror added for capability execution input (IN-02, IN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

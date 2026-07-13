@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "066041d0ca7717efdd7bd9c7f9408d84db952bfd7716474538f9ee8e7197f350",
+  "signals": [
+    {
+      "type_name": "CapabilityExecDriverInput",
+      "signal": "blue",
+      "entry_hash": "2a14465f767acffbcb8e2f64d60161009926cb39f72727746069eec595ed0ae3"
+    },
+    {
+      "type_name": "TimeoutSecondsArg",
+      "signal": "blue",
+      "entry_hash": "74cf8f6468480009aaa4a0b7ba950d818b545b71f2f2328212905f08de949c5e"
+    }
+  ]
+}

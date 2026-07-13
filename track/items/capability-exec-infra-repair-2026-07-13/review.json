@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:64a0038442610edadf97909b2eefcc2cb0361772a9c81bdaacae374829d8b609",
-          "at": "2026-07-13T04:21:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:64a0038442610edadf97909b2eefcc2cb0361772a9c81bdaacae374829d8b609",
-          "at": "2026-07-13T04:25:00Z"
-        }
-      ]
-    },
     "adr": {
       "rounds": [
         {
@@ -49,6 +31,338 @@
           "findings": [],
           "hash": "rvw1:sha256:79c5b39b145c5a402312edb538da4121c7caf7345e71f328cd5fa1eca00a2386",
           "at": "2026-07-13T04:28:21Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:64a0038442610edadf97909b2eefcc2cb0361772a9c81bdaacae374829d8b609",
+          "at": "2026-07-13T04:21:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:64a0038442610edadf97909b2eefcc2cb0361772a9c81bdaacae374829d8b609",
+          "at": "2026-07-13T04:25:00Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's description lacks an accepted AC/IN/CN/spec-element anchor and does not identify concrete target files or symbols; `D2` is an ADR anchor, not an executable-plan anchor.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002's description lacks an accepted AC/IN/CN/spec-element anchor and does not identify concrete target files or symbols; `D3` is an ADR anchor, not an executable-plan anchor.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001 restates upstream behavior contracts in prose (unlimited waiting, fail-closed invalid values, and the D1 baseline) instead of using target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 restates upstream behavior contracts in prose (package-root preservation, fallback removal, target-selection failures, and rename handling) instead of using target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The IN-01/AC-01 mappings to T001 are implausible: T001 only says to retain the D1 blocking-exec baseline, without directing implementation or verification of the provider PTY configuration and reviewer operational-document timeout lower bound required by IN-01/AC-01.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/task-coverage.json",
+              "line": 49,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:872d26f682c8c86b9810337fbbbeda31f74ccbda3937253695bfc61d677a572c",
+          "at": "2026-07-13T05:24:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is not fully executable: it says to add a shared resolver “in the infrastructure layer” but does not identify the file or symbol where that resolver belongs. Only the consumer locations are specified, so the implementer must invent the resolver boundary.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:76dae95156ccfafb6f56c09288ebefb8232dbd7b3e751e69020ef8fd6cbab0ab",
+          "at": "2026-07-13T05:31:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b6df6393ca0bd761f7bbfa5ab6b21a0bfbb61ac2efb66e4ef81a35644b0ccf2",
+          "at": "2026-07-13T05:36:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 の実装境界が実際の timeout 伝搬経路を欠いています。`CapabilityExecRequest.timeout` から `ProviderProcessRunner` へ渡すには `libs/infrastructure/src/capability_exec/{claude,codex}.rs` の adapter 配線が必要ですが、記述は `process.rs` へ直接飛んでおり、executor が対象を発明しないと AC-02/AC-03 を実装できません。また D1 の `.codex/config.toml` と `review-fix-lead.md` は既に HEAD で実装済みなのに「Update」としており、briefing の回帰確認とも不一致です。必要な adapter symbol を対象に追加し、D1 は明示的な回帰検証操作へ修正してください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002 は AC-09 / IN-05 に必要な catalogued contract を実行対象に含めていません。`domain-types.json` は `Phase1Error` の `modify`（`RustdocRootResolution(DiagnosticMessage)` 追加）を要求しますが、記述には `libs/domain/src/tddd/signal_evaluator/phase1_error.rs` もその操作もありません。列挙された infrastructure targets だけでは上流 catalogue を満たせないため、この domain target と具体的な変更操作を T002 に追加してください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:8b6df6393ca0bd761f7bbfa5ab6b21a0bfbb61ac2efb66e4ef81a35644b0ccf2",
+          "at": "2026-07-13T05:43:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae666b6fc98c0fbfe572e6d526a199e25e6d88465227ba4923ef2eddebcc6c14",
+          "at": "2026-07-13T05:48:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 specifies adding `RustdocRootResolver` in `libs/infrastructure/src/rustdoc_root.rs`, but the upstream infrastructure catalogue contracts `resolve_rustdoc_root_name` and its resolver types under `schema_export::bin_target`. Implementing T002 as written would not satisfy the catalogue contract and leaves the plan/contract attribution inconsistent.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/impl-plan.json",
+              "line": 12,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:94ab6620b660cafbda63bde737592787d03e590fcd14f146a8d4715a2cd63653",
+          "at": "2026-07-13T06:55:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff5f0598fb22f64de4f20001c63b420e9d26a94d32f616b7d27205fc75b4f494",
+          "at": "2026-07-13T06:59:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff5f0598fb22f64de4f20001c63b420e9d26a94d32f616b7d27205fc75b4f494",
+          "at": "2026-07-13T07:04:10Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dcbdea2f7120ea1661d63601d7db0d8f04cd05cec615a007b224ba995b7c31b",
+          "at": "2026-07-13T05:23:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dcbdea2f7120ea1661d63601d7db0d8f04cd05cec615a007b224ba995b7c31b",
+          "at": "2026-07-13T05:26:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9fcedc958ba7d6e51520cad44464136995a3277604357bdf404e6d78a6012dc2",
+          "at": "2026-07-13T06:54:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9fcedc958ba7d6e51520cad44464136995a3277604357bdf404e6d78a6012dc2",
+          "at": "2026-07-13T06:56:55Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The infrastructure catalogue omits the existing `infrastructure::ProviderProcessRunner` trait even though the track changes its public method to accept a timeout. Add an `action: modify` entry declaring the post-change signature; otherwise this API mutation is undeclared.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+              "line": 28,
+              "category": "missing companion modify"
+            }
+          ],
+          "hash": "rvw1:sha256:3eef54d7622d69688b9a0e527e5396a8ca76c6dff5fd45fd21efe802a19e3265",
+          "at": "2026-07-13T05:24:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TimeoutSeconds::try_new` can only produce `ZeroTimeoutSeconds`, but returns the broad `CapabilityInputValidationError` containing five unrelated variants. The catalogue does not document or justify this breadth.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/usecase-types.json",
+              "line": 17,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`domain::SignalEvaluatorPort::evaluate` is synchronous, while `infrastructure::SignalEvaluatorV2` performs cargo-metadata root resolution involving external process I/O. The catalogue does not acknowledge the intentional blocking choice.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/domain-types.json",
+              "line": 71,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "`cli::CapabilityExecArgs` docs restate the IN-03 validation and cross-layer propagation contract instead of referring to the upstream anchor only.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/cli-types.json",
+              "line": 27,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`cli_driver::TimeoutSecondsArg` docs restate parsing, validated propagation, and the raw-primitive design rationale; this belongs upstream and should be anchor-referenced rather than reproduced.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/cli_driver-types.json",
+              "line": 101,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::TimeoutSeconds` docs restate the positive-value boundary and primitive-obsession design rationale instead of only identifying the change and citing the upstream contract.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/usecase-types.json",
+              "line": 212,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`domain::Phase1Error` docs restate fail-closed behavior, Display semantics, and DiagnosticMessage reuse rather than using an upstream anchor citation.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/domain-types.json",
+              "line": 163,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`infrastructure::SignalEvaluatorV2` docs restate the cargo-metadata package-to-rustdoc-root translation contract instead of keeping the catalogue description anchor-based.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+              "line": 32,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:3eef54d7622d69688b9a0e527e5396a8ca76c6dff5fd45fd21efe802a19e3265",
+          "at": "2026-07-13T05:39:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8dba0d3872e7fba020df44846364d8d89fcd23dadec17657a8101bc5ef572d08",
+          "at": "2026-07-13T05:59:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::SignalEvaluatorV2` は IN-05/AC-09 の評価器側しか宣言しておらず、CN-03/CN-04 の fail-closed な target 選択を schema export・catalog import・signal evaluator 間で一元的に所有する resolver contract が存在しません。共有 resolver とその結果/error contract を該当 anchor に grounded して、唯一の enforcement owner を宣言してください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+              "line": 30,
+              "category": "enforcement-owner contradiction"
+            },
+            {
+              "message": "`domain::Phase1Error` は新しい `RustdocRootResolution` だけでなく、baseline で `String` を持つ既存の `ActionContradiction`、`UnresolvedTypeRef`、`DanglingId` まで `DiagnosticMessage` に変更しています。IN-05/AC-09 は rustdoc-root 解決失敗の追加しか根拠づけておらず、既存3 variant の破壊的 payload migration には無関係です。既存 shape を維持するか、この migration を直接根拠づける upstream contract が必要です。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/domain-types.json",
+              "line": 170,
+              "category": "spec_refs off-topic"
+            },
+            {
+              "message": "`usecase::CapabilityInputValidationError` の docs は、0秒 timeout を process dispatch 前に拒否するという IN-03/AC-03 の挙動契約を散文で再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、変更対象・操作と anchor cite のみにしてください。",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/usecase-types.json",
+              "line": 148,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:8dba0d3872e7fba020df44846364d8d89fcd23dadec17657a8101bc5ef572d08",
+          "at": "2026-07-13T06:08:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::CargoTargetName::try_new` can only fail with `InvalidTargetName`, but returns the broad `RustdocRootResolutionError` containing metadata, package lookup, and target-selection variants. The method has no documented producible subset or justification for this imprecision.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/infrastructure-types.json",
+              "line": 79,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "The mirror chain diverges without a documented mapping: `cli_driver::CapabilityExecDriverInput` declares `timeout_seconds`, while `usecase::CapabilityExecRequest` declares `timeout`. This leaves the cross-layer conversion contract ambiguous; document the intentional rename or align the field names.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/cli_driver-types.json",
+              "line": 54,
+              "category": "mirror chain divergence"
+            },
+            {
+              "message": "`domain::DiagnosticMessage` docs restate the upstream primitive-obsession rationale (“avoids a duplicate raw-string wrapper”) instead of limiting the entry description to the referenced upstream anchor and local declaration.",
+              "severity": "P1",
+              "file": "track/items/capability-exec-infra-repair-2026-07-13/domain-types.json",
+              "line": 115,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:5b01b87993598fa5549b0a56072a5cf8c45941fb58bf410f21c249231d657a96",
+          "at": "2026-07-13T06:57:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2dd5e50082ba01a5cd6790b6bc930a183d7990b45d4b5e4a69a6f8519536e5d",
+          "at": "2026-07-13T07:19:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2dd5e50082ba01a5cd6790b6bc930a183d7990b45d4b5e4a69a6f8519536e5d",
+          "at": "2026-07-13T07:25:23Z"
         }
       ]
     }

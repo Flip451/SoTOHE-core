@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-13T07:27:19Z",
+  "declaration_hash": "066041d0ca7717efdd7bd9c7f9408d84db952bfd7716474538f9ee8e7197f350",
+  "signals": [
+    {
+      "type_name": "CapabilityExecDriverInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TimeoutSecondsArg",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy",
+        "core::str::FromStr"
+      ]
+    }
+  ]
+}

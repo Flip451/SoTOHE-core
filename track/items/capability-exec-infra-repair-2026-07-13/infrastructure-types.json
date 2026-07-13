@@ -1,0 +1,484 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::schema_export::bin_target::resolve_rustdoc_root_name": {
+      "action": "add",
+      "docs": "Shared resolver introduced as the sole enforcement owner for schema export, catalogue import, and signal evaluation (IN-04, IN-05, CN-03, CN-04, AC-04–AC-10).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "package_name",
+          "ty": "&domain::tddd::catalogue_v2::CrateName"
+        }
+      ],
+      "returns": "Result<RustdocTargetResolution, RustdocRootResolutionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "docs": "Returns only RustdocRootResolutionError::InvalidTargetName; this method does not produce the metadata, package-lookup, or target-selection variants.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, RustdocRootResolutionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "CargoTargetName"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "package_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::tddd::catalogue_v2::CrateName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "target_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CargoTargetName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "rustdoc_root_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::tddd::catalogue_v2::CrateName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "target_kind",
+          "params": [],
+          "receiver": "&self",
+          "returns": "RustdocTargetKind"
+        }
+      ],
+      "type_name": "RustdocTargetResolution"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "SignalEvaluatorV2",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalEvaluatorV2",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalEvaluatorV2",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalEvaluatorV2",
+      "trait_ref": "domain::tddd::SignalEvaluatorPort"
+    },
+    {
+      "for_type": "CargoTargetName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CargoTargetName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CargoTargetName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CargoTargetName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "RustdocTargetKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "RustdocTargetKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "RustdocTargetKind",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "RustdocTargetKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "RustdocTargetKind",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "RustdocTargetResolution",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "RustdocTargetResolution",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "RustdocTargetResolution",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "RustdocTargetResolution",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "RustdocRootResolutionError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "RustdocRootResolutionError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "RustdocRootResolutionError",
+      "trait_ref": "core::error::Error"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CargoTargetName": {
+      "action": "add",
+      "docs": "Validated infrastructure-local Cargo target-name value introduced for the shared resolver (IN-04, IN-05, CN-03, CN-04).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "schema_export::bin_target",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "RustdocRootResolutionError": {
+      "action": "add",
+      "docs": "Typed failure contract introduced for resolve_rustdoc_root_name (IN-04, IN-05, CN-03, CN-04, AC-06, AC-10).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MetadataCommand",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "MetadataDecode",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "PackageNotFound",
+            "payload": {
+              "fields": [
+                "domain::tddd::catalogue_v2::CrateName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TargetSelection",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTargetName",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "schema_export::bin_target",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "RustdocTargetKind": {
+      "action": "add",
+      "docs": "Finite metadata target-kind value introduced for the shared resolver (IN-04, CN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Library",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Binary",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "schema_export::bin_target",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "RustdocTargetResolution": {
+      "action": "add",
+      "docs": "Typed result contract introduced for resolve_rustdoc_root_name (IN-04, IN-05, CN-03, CN-04, AC-04–AC-06).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "schema_export::bin_target",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "SignalEvaluatorV2": {
+      "action": "modify",
+      "docs": "SignalEvaluatorV2 updated for workspace-root-aware evaluation (IN-05, AC-09).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_workspace_root",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::signal_evaluator_v2",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

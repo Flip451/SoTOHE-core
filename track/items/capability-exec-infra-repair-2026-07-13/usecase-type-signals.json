@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-13T07:27:14Z",
+  "declaration_hash": "c762b4d990d98fe32503abc3274a25615d5661196ab1c5c66b9879d00b56d933",
+  "signals": [
+    {
+      "type_name": "CapabilityExecRequest",
+      "kind_tag": "command",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "CapabilityInputValidationError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TimeoutSeconds",
+      "kind_tag": "value_object",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "core::clone::Clone",
+        "core::cmp::Eq",
+        "core::cmp::PartialEq",
+        "core::fmt::Debug",
+        "core::marker::Copy"
+      ]
+    }
+  ]
+}
