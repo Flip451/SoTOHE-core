@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Modify libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/type_ref.rs (candidate collection, resolve_type_ref_node_ids, resolve_trait_subgraph, and the extracted shared trait resolver), render/emit.rs (all resolve_type_ref_node_ids and resolve_method_type_refs call sites), and render/mod.rs (trait-index propagation); migrate affected renderer unit tests. GO-01, GO-02; IN-01..IN-08; OUT-01..OUT-05; CN-01..CN-04.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Add the ADR §D5 regression tests and shared test helper in libs/infrastructure/src/tddd/contract_map_renderer_adapter/mod.rs #[cfg(test)] mod tests. IN-09; AC-01..AC-07; CN-01..CN-04.",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "T001 updates the internal renderer targets type_ref.rs, emit.rs, and mod.rs for trait-index resolution and call-site wiring (GO-01, GO-02; IN-01..IN-08; OUT-01..OUT-05; CN-01..CN-04).",
+      "T002 adds ADR §D5 regression tests in contract_map_renderer_adapter/mod.rs #[cfg(test)] mod tests (IN-09; AC-01..AC-07; CN-01..CN-04).",
+      "Both tasks belong to a single Rust feature batch — the resolver signature change in T001 propagates through emit.rs and requires an accompanying test commit before any inter-task compile / review boundary — and are intended to land together per feature-batch full-cycle (small combined diff, ~370-500 lines including tests)."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "S1: dyn Trait candidate split, trait fallback, and call-site wiring",
+        "description": [
+          "T001 updates type_ref.rs candidate collection, resolve_type_ref_node_ids, resolve_trait_subgraph, and the extracted shared trait resolver, plus render/mod.rs and render/emit.rs call-site wiring. GO-01, GO-02; IN-01..IN-08; OUT-01..OUT-05; CN-01..CN-04."
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "S2: seven regression tests for AC-01 through AC-07",
+        "description": [
+          "T002 adds the ADR §D5 regression tests and shared test helper to contract_map_renderer_adapter/mod.rs #[cfg(test)] mod tests. IN-09; AC-01..AC-07; CN-01..CN-04.",
+          "T001 and T002 must be prepared and reviewed as one feature batch: T001's resolver-signature change is compile-blocking until T002 exercises the new shape (or existing tests are migrated in T001), so the batch is verified together before the single Rust CI run."
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      }
+    ]
+  }
+}
