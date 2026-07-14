@@ -63,4 +63,4 @@ Goal traceability: GO-01 → T001; GO-02 → T004/T007-T011; GO-03 → T006/T012
 
 > After T012, T013, T015-T020, and the verifier-route sections, run T021 only in `Makefile.toml` CI tasks `ci-local` and `ci-container` to add the machine-path and template-reference verifier invocations (spec.json#AC-04, #AC-12, #AC-15).
 
-- [x] **T021**: After T012, T013, and T015-T020, update `Makefile.toml`: add `verify-machine-paths-local` and `verify-template-refs-local` to `ci-local` and `ci-container`; retain the standalone `verify-sotp-version-tag-local` task; leave `template-export-smoke-local` verifier wiring unchanged (spec.json#IN-03, #IN-06, #IN-07, #CN-01, #CN-02, #CN-03, #CN-05, #AC-04, #AC-10, #AC-12, #AC-15, #OS-05).
+- [x] **T021**: After T012, T013, and T015-T020, update `Makefile.toml`: add `verify-machine-paths-local` and `verify-template-refs-local` to `ci-local` and `ci-container`; retain the standalone `verify-sotp-version-tag-local` task; leave `template-export-smoke-local` verifier wiring unchanged (spec.json#IN-03, #IN-06, #IN-07, #CN-01, #CN-02, #CN-03, #CN-05, #AC-04, #AC-10, #AC-12, #AC-15, #OS-05). (`ad510d662449551e1254efcce8f7a500f3613745`)

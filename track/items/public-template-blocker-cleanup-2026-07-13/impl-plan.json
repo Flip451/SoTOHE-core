@@ -124,7 +124,8 @@
     {
       "id": "T021",
       "description": "After T012, T013, and T015-T020, update `Makefile.toml`: add `verify-machine-paths-local` and `verify-template-refs-local` to `ci-local` and `ci-container`; retain the standalone `verify-sotp-version-tag-local` task; leave `template-export-smoke-local` verifier wiring unchanged (spec.json#IN-03, #IN-06, #IN-07, #CN-01, #CN-02, #CN-03, #CN-05, #AC-04, #AC-10, #AC-12, #AC-15, #OS-05).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "ad510d662449551e1254efcce8f7a500f3613745"
     },
     {
       "id": "T022",
