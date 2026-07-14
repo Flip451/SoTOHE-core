@@ -1,7 +1,12 @@
 {
-  "schema_version": 1,
-  "generated_at": "2026-07-13T23:24:22Z",
-  "declaration_hash": "57bd9ee32fba3f84929edba516e8556816ff4abcead7b8ec6ffa7cdcf9306642",
+  "schema_version": 2,
+  "generated_at": "2026-07-14T11:19:58Z",
+  "declaration_hash": "223bc680689ab9551f4644ca4378fd27ec54541432908e4eeb408c7a501c38e8",
+  "implementation_input_hash": "70a2dcb0a80363e21cf2613db275e991ed6ad390c313c7475f3ddbc474b2cf9f",
+  "baseline_hash": "0e9baa5253a20dd6138c6b9a0d7ddd02a89177b91fd28bdb582c2eb9bf0da8a6",
+  "live_rustdoc_snapshot_hash": "90d61882857d118f0e3fa86fb28fd43063372d722341c465bdcb961d8ffddc2e",
+  "evaluator_contract_hash": "2a777bad7254e62184a5879b04c88e397ef9d415c4ffa8474e0cf34c3b27ba8d",
+  "rustdoc_extraction_contract_hash": "12a00d7d8c09783a43c5d7057da95042a359d2ba6fc0112dcb00806300694be0",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -9,9 +14,9 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "core::error::Error",
-        "core::fmt::Debug",
-        "core::fmt::Display"
+        "Debug",
+        "Display",
+        "Error"
       ]
     },
     {
@@ -20,10 +25,10 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
       ]
     },
     {
@@ -38,9 +43,9 @@
       "signal": "yellow",
       "found_type": true,
       "found_items": [
-        "core::error::Error",
-        "core::fmt::Debug",
-        "core::fmt::Display"
+        "Debug",
+        "Display",
+        "Error"
       ]
     },
     {
@@ -49,10 +54,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
       ]
     },
     {
@@ -61,10 +66,10 @@
       "signal": "yellow",
       "found_type": false,
       "missing_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
       ]
     },
     {
@@ -73,10 +78,10 @@
       "signal": "yellow",
       "found_type": false,
       "missing_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
       ]
     },
     {
@@ -85,10 +90,10 @@
       "signal": "yellow",
       "found_type": false,
       "missing_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
       ]
     },
     {
@@ -97,9 +102,9 @@
       "signal": "yellow",
       "found_type": false,
       "missing_items": [
-        "core::error::Error",
-        "core::fmt::Debug",
-        "core::fmt::Display"
+        "Debug",
+        "Display",
+        "Error"
       ]
     },
     {
@@ -108,11 +113,11 @@
       "signal": "yellow",
       "found_type": false,
       "missing_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug",
-        "core::hash::Hash"
+        "Clone",
+        "Debug",
+        "Eq",
+        "Hash",
+        "PartialEq"
       ]
     },
     {
@@ -127,10 +132,10 @@
       "signal": "yellow",
       "found_type": false,
       "missing_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
       ]
     },
     {
@@ -139,11 +144,11 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug",
-        "core::marker::Copy"
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
       ]
     },
     {
@@ -158,10 +163,10 @@
       "signal": "yellow",
       "found_type": false,
       "missing_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
       ]
     },
     {
@@ -170,13 +175,13 @@
       "signal": "yellow",
       "found_type": false,
       "missing_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::Ord",
-        "core::cmp::PartialEq",
-        "core::cmp::PartialOrd",
-        "core::fmt::Debug",
-        "core::hash::Hash"
+        "Clone",
+        "Debug",
+        "Eq",
+        "Hash",
+        "Ord",
+        "PartialEq",
+        "PartialOrd"
       ]
     },
     {
@@ -185,30 +190,36 @@
       "signal": "yellow",
       "found_type": false,
       "missing_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug",
-        "core::hash::Hash"
+        "Clone",
+        "Debug",
+        "Eq",
+        "Hash",
+        "PartialEq"
       ]
+    },
+    {
+      "type_name": "TypeSignalsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TypeSignalsExecutionError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "core::clone::Clone",
-        "core::error::Error",
-        "core::fmt::Debug",
-        "core::fmt::Display"
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Error"
       ]
     },
     {
       "type_name": "TypeSignalsExecutorPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TypeSignalsInteractor",
@@ -219,7 +230,7 @@
     {
       "type_name": "TypeSignalsRequest",
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -261,6 +272,12 @@
     {
       "type_name": "CapabilityProviderPort",
       "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DiagnosticText",
+      "kind_tag": "value_object",
       "signal": "blue",
       "found_type": true
     },

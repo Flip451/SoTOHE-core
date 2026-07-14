@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "b1b57b7792a1e25c2b07b2dc8b05f454eb9fd93f84894e5c8a858c237007a47a",
+  "catalogue_declaration_hash": "57cc07e187db75bce8a7c5bfaaee5fd3d2d4e266e080dbef22c630975e156e8d",
   "signals": [
     {
       "type_name": "AgentProfiles",
@@ -58,6 +58,11 @@
       "entry_hash": "30a3f36fd68ca59433fa2617cf31898af3308b1521cab4cdd84229369f83bc48"
     },
     {
+      "type_name": "LoadCatalogueSpecSignalsForViewError",
+      "signal": "blue",
+      "entry_hash": "29d0ea6dc4fffdb3d1ec107809797a0298339751417ca1bd0e3f7bc86bd33dfe"
+    },
+    {
       "type_name": "ModelNameDto",
       "signal": "blue",
       "entry_hash": "9abd8fbb6762f7144876d9339b3ffa60cc3f8e86b6a8f694d050809ea9b390d6"
@@ -83,6 +88,11 @@
       "entry_hash": "ffb9e61b7888840cca62e32c193a15f0be21b642b0fdeb7302084fad2ecca4c4"
     },
     {
+      "type_name": "RustdocSchemaExporter",
+      "signal": "blue",
+      "entry_hash": "de9f162b71e1a3d5231205ba5a52a8097bb331e44395e5bfd63bad3e8094b07d"
+    },
+    {
       "type_name": "Sha256ExecutionContractFingerprintAdapter",
       "signal": "blue",
       "entry_hash": "634a1f050bb5a840fef97129400ad7318918ccc21f00be4e94845012f8aaade5"
@@ -95,7 +105,7 @@
     {
       "type_name": "TypeSignalsExecutorAdapter",
       "signal": "blue",
-      "entry_hash": "71b749ae70051d08d279c4cbc62befda14649302ff6b922cef6ba02964b9e604"
+      "entry_hash": "34807e49c4405472177e938d4852a11b2327211eb05a2e546697be12002b201f"
     },
     {
       "type_name": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args",
@@ -115,7 +125,7 @@
     {
       "type_name": "infrastructure::tddd::type_signals_codec::declaration_hash",
       "signal": "blue",
-      "entry_hash": "b99532057b377a17005d6617e20370f22db0b34ebd6ee0b6aa8b3b87973a2df5"
+      "entry_hash": "f06f308a68178fbe3cc7e207501b97c579ddd9b90390c1813d218fb70d09279d"
     },
     {
       "type_name": "infrastructure::tddd::type_signals_codec::decode",
@@ -131,6 +141,11 @@
       "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
       "signal": "blue",
       "entry_hash": "5dbbc911f7ff1d9e727810ff7569872bd1115d2d338ed50883625fcc7d48bcc1"
+    },
+    {
+      "type_name": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
+      "signal": "blue",
+      "entry_hash": "d8dee42da3a2f83f32804f8aab35e267eef69f91d4a79fd9af9fb76316fe1b9f"
     }
   ]
 }

@@ -6,5 +6,5 @@
 |------|------|--------|---------|--------|----------|
 | CapabilityCompositionRoot | composition_root | reference | — | 🔵 | 🔵 |
 | ReviewCompositionRoot | composition_root | modify | — | 🟡 | 🔵 |
-| SignalCompositionRoot | composition_root | modify | — | 🟡 | 🔵 |
+| SignalCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
 

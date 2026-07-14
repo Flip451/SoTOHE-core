@@ -16,6 +16,7 @@
 | CapabilityFailureDetail | value_object | reference | — | 🔵 | 🔵 |
 | CapabilityFilePath | value_object | reference | — | 🔵 | 🔵 |
 | CapabilityName | value_object | reference | — | 🔵 | 🔵 |
+| DiagnosticText | value_object | reference | — | 🔵 | 🔵 |
 | ExecutionContractFingerprint | value_object | add | — | 🟡 | 🔵 |
 | ModelName | value_object | reference | — | 🔵 | 🔵 |
 | ProviderName | value_object | reference | — | 🔵 | 🔵 |
@@ -33,7 +34,8 @@
 | CapabilityExecError | error_type | modify | ProfileResolution, ExecutionModeRejected, ModelMissing, EffortMissing, UnsupportedProvider, SourceValidation, AdapterPreflight, DispatchFailed | 🔵 | 🔵 |
 | CapabilityInputValidationError | error_type | modify | EmptyProviderName, EmptyModelName, EmptyFilePath, InvalidFilePath, EmptyContent, ZeroTimeoutSeconds, EmptyTargetArtifactSet | 🟡 | 🔵 |
 | ProviderSessionCacheError | error_type | add | Io, Codec, Symlink, Path | 🟡 | 🔵 |
-| TypeSignalsExecutionError | error_type | add | — | 🟡 | 🔵 |
+| TypeSignalsError | error_type | modify | BranchTrackMismatch, LayerBindingsLoad, NoLayers, EvaluationFailed, InconsistentRequest | 🔵 | 🔵 |
+| TypeSignalsExecutionError | error_type | add | — | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -45,7 +47,7 @@
 | ProviderSessionCachePort | secondary_port | add | fn load(&self, key: &ProviderSessionCacheKey) -> Result<Option<ProviderSessionCacheEntry>, ProviderSessionCacheError>, fn save(&self, key: &ProviderSessionCacheKey, entry: &ProviderSessionCacheEntry) -> Result<(), ProviderSessionCacheError>, fn remove(&self, key: &ProviderSessionCacheKey) -> Result<(), ProviderSessionCacheError> | 🟡 | 🔵 |
 | Reviewer | secondary_port | reference | fn review(&self, target: &domain::review_v2::ReviewTarget) -> Result<(domain::review_v2::Verdict, domain::review_v2::LogInfo), domain::review_v2::ReviewerError>, fn fast_review(&self, target: &domain::review_v2::ReviewTarget) -> Result<(domain::review_v2::FastVerdict, domain::review_v2::LogInfo), domain::review_v2::ReviewerError> | 🔵 | 🔵 |
 | ReviewerExecutionContractFingerprintPort | secondary_port | add | fn reviewer_fingerprint(&self, scope: &domain::review_v2::ScopeName) -> Result<ExecutionContractFingerprint, ProviderSessionCacheError> | 🟡 | 🔵 |
-| TypeSignalsExecutorPort | secondary_port | add | fn evaluate_layer(&self, items_dir: &std::path::Path, track_id: &domain::ids::TrackId, workspace_root: &std::path::Path, binding: &domain::tddd::catalogue_v2::TdddLayerBinding) -> Result<(), TypeSignalsExecutionError> | 🟡 | 🔵 |
+| TypeSignalsExecutorPort | secondary_port | add | fn evaluate_layer(&self, items_dir: &std::path::Path, track_id: &domain::ids::TrackId, workspace_root: &std::path::Path, binding: &domain::tddd::catalogue_v2::TdddLayerBinding) -> Result<(), TypeSignalsExecutionError> | 🔵 | 🔵 |
 
 ## Application Services
 
@@ -71,5 +73,5 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CapabilityExecRequest | command | modify | — | 🟡 | 🔵 |
-| TypeSignalsRequest | command | modify | — | 🟡 | 🔵 |
+| TypeSignalsRequest | command | modify | — | 🔵 | 🔵 |
 

@@ -3,6 +3,150 @@
   "entries": [
     {
       "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "7ef3643f34ffc5114e382194719257421deec5f492804f1bae69c9016222a63f",
+        "declaration_hash": "84f68c5f5ed94b92d7abed1947cb2a540ae958277bbd64596419c250fd36a6a8",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(decide_type_signals_reuse(&recorded, &current, snapshot_status.clone()), TypeSignalsReuseDecision::SkipEvaluation); ... differing_evaluator_contract.evaluator_contract_hash = EvaluatorContractHash::new(digest(B)); ... TypeSignalsReuseDecision::ReevaluateWithSnapshot ... changed.declaration_hash = CatalogueDeclarationHash::new(digest(B)); ... TypeSignalsReuseDecision::ReevaluateWithSnapshot ... changed.baseline_hash = BaselineHash::new(digest(B)); ... TypeSignalsReuseDecision::ReevaluateWithSnapshot"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "7ef3643f34ffc5114e382194719257421deec5f492804f1bae69c9016222a63f",
+        "declaration_hash": "84f68c5f5ed94b92d7abed1947cb2a540ae958277bbd64596419c250fd36a6a8",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&recorded, &current, snapshot_status.clone()),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );\n...\nassert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "7ef3643f34ffc5114e382194719257421deec5f492804f1bae69c9016222a63f",
+        "declaration_hash": "84f68c5f5ed94b92d7abed1947cb2a540ae958277bbd64596419c250fd36a6a8",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for status in [\n            LiveRustdocSnapshotStatus::Missing,\n            LiveRustdocSnapshotStatus::ReadFailed,\n            LiveRustdocSnapshotStatus::ParseFailed,\n            LiveRustdocSnapshotStatus::HashMismatch,\n            LiveRustdocSnapshotStatus::Verified(LiveRustdocSnapshotHash::new(digest(B))),\n        ] {\n            assert_eq!(\n                decide_type_signals_reuse(&freshness(), &current(), status),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "7ef3643f34ffc5114e382194719257421deec5f492804f1bae69c9016222a63f",
+        "declaration_hash": "84f68c5f5ed94b92d7abed1947cb2a540ae958277bbd64596419c250fd36a6a8",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&recorded, &current, snapshot_status.clone()),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "7ef3643f34ffc5114e382194719257421deec5f492804f1bae69c9016222a63f",
+        "declaration_hash": "84f68c5f5ed94b92d7abed1947cb2a540ae958277bbd64596419c250fd36a6a8",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "7ef3643f34ffc5114e382194719257421deec5f492804f1bae69c9016222a63f",
+        "declaration_hash": "84f68c5f5ed94b92d7abed1947cb2a540ae958277bbd64596419c250fd36a6a8",
+        "anchor_text_hash": "24b933f6486d2712ab342cc915f02e02b7d6226416d7401413db097808be44cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "changed.implementation_input_hash = ImplementationInputHash::new(digest(B));\nassert_eq!(\n    decide_type_signals_reuse(&freshness(), &changed, verified()),\n    TypeSignalsReuseDecision::ReextractAndEvaluate\n);\n\nchanged.rustdoc_extraction_contract_hash = RustdocExtractionContractHash::new(digest(B));\nassert_eq!(\n    decide_type_signals_reuse(&freshness(), &changed, verified()),\n    TypeSignalsReuseDecision::ReextractAndEvaluate\n);\n\nfor status in [\n    LiveRustdocSnapshotStatus::Missing,\n    LiveRustdocSnapshotStatus::ReadFailed,\n    LiveRustdocSnapshotStatus::ParseFailed,\n    LiveRustdocSnapshotStatus::HashMismatch,\n    LiveRustdocSnapshotStatus::Verified(LiveRustdocSnapshotHash::new(digest(B))),\n] {\n    assert_eq!(\n        decide_type_signals_reuse(&freshness(), &current(), status),\n        TypeSignalsReuseDecision::ReextractAndEvaluate\n    );\n}"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
         "entry_key": "CapabilityExecError",
         "anchor_id": {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
@@ -333,7 +477,7 @@
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            profiles.resolve_execution(&capability(capability_name), RoundType::Final),\n            Ok(ResolvedExecution::ProviderCli { .. })\n        ));\n\nassert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n    ));\nassert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n    ));"
+        "citation": "for capability_name in [\n        \"orchestrator\",\n        \"spec-designer\",\n        \"impl-planner\",\n        \"type-designer\",\n        \"adr-editor\",\n        \"rollback-diagnoser\",\n        \"implementer\",\n        \"researcher\",\n        \"review-fix-lead\",\n        \"dry-checker\",\n        \"dry-fix-lead\",\n        \"ref-verifier-chain1\",\n        \"ref-verifier-chain2\",\n        \"obligation-fulfillment-verifier\",\n        \"waiver-verifier\",\n    ] {\n        assert!(matches!(\n            profiles.resolve_execution(&capability(capability_name), RoundType::Final),\n            Ok(ResolvedExecution::ProviderCli { .. })\n        ));\n    }\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n    ));\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n    ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -405,7 +549,7 @@
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n        ));\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n    ));\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"pr-reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::HostedService { .. })\n    ));"
+        "citation": "assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })\n    ));\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })\n    ));\n    assert!(matches!(\n        profiles.resolve_execution(&capability(\"pr-reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::HostedService { .. })\n    ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -429,7 +573,7 @@
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n        profiles.resolve_execution(&capability(\"pr-reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::HostedService { provider }) if provider.as_str() == \"codex\"\n    ));\n\nassert!(matches!(\n        profiles.resolve_execution(&capability(\"reviewer\"), RoundType::Fast),\n        Err(AgentProfilesError::EffortMissing(name, RoundType::Fast)) if name.as_str() == \"reviewer\"\n    ));"
+        "citation": "profiles.resolve_execution(&capability(\"pr-reviewer\"), RoundType::Final),\n        Ok(ResolvedExecution::HostedService { provider }) if provider.as_str() == \"codex\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1078,6 +1222,2574 @@
       "verdict": {
         "kind": "fulfilled",
         "citation": "build_gemini_ref_verifier_args(\"gemini-2.5-pro\", ReasoningEffort::Low, \"the prompt\")\n                .expect_err(\"Gemini execution must fail closed when effort cannot be injected\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "d41d0b4091cb9bc1013f3463e49c35b9b087dd834158fa2159020c77d1a50841",
+        "declaration_hash": "da634d72fdf030f16e412195eeaf616e6638b8eb7538e9538605b27e69f36a99",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(skip_observer.launches(), 0, \"verified inputs must not launch rustdoc\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "d41d0b4091cb9bc1013f3463e49c35b9b087dd834158fa2159020c77d1a50841",
+        "declaration_hash": "da634d72fdf030f16e412195eeaf616e6638b8eb7538e9538605b27e69f36a99",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(skip_observer.launches(), 0, \"verified inputs must not launch rustdoc\");\nassert_eq!(conservative_observer.launches(), 1, \"changed implementation inputs must re-extract through the real adapter\");\nassert_eq!(rustdoc.launches(), 1, \"{lane} must launch rustdoc\");\nassert_eq!(evaluation.evaluations(), 1, \"{lane} must evaluate signals after re-extraction\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "d41d0b4091cb9bc1013f3463e49c35b9b087dd834158fa2159020c77d1a50841",
+        "declaration_hash": "da634d72fdf030f16e412195eeaf616e6638b8eb7538e9538605b27e69f36a99",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 1, \"an indeterminate closure must launch rustdoc\");\nassert_eq!(evaluation.evaluations(), 1, \"an indeterminate closure must evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "d41d0b4091cb9bc1013f3463e49c35b9b087dd834158fa2159020c77d1a50841",
+        "declaration_hash": "da634d72fdf030f16e412195eeaf616e6638b8eb7538e9538605b27e69f36a99",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 0, \"a full match must not launch rustdoc\");\n        assert_eq!(evaluation.evaluations(), 0, \"a full match must not evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "d41d0b4091cb9bc1013f3463e49c35b9b087dd834158fa2159020c77d1a50841",
+        "declaration_hash": "da634d72fdf030f16e412195eeaf616e6638b8eb7538e9538605b27e69f36a99",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 0, \"{lane} change must not launch rustdoc\");\n            assert_eq!(evaluation.evaluations(), 1, \"{lane} change must reevaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:evaluate_layer"
+      },
+      "key": {
+        "bound_tests_set_hash": "a4f9e8ae5c82e09db763c589f6e83c37899f0082a6b1a81dcd783577445ce66b",
+        "declaration_hash": "b788bb7f3920bc41416c2c2dffadacabbbfdacd81a0d6bf1058581d071c92387",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(result.is_ok(), \"a verified full match must skip rustdoc: {result:?}\");\nassert_eq!(rustdoc.launches(), 0, \"a full match must not launch rustdoc\");\nassert_eq!(evaluation.evaluations(), 0, \"a full match must not evaluate signals\");\n...\nassert_eq!(rustdoc.launches(), 0, \"{lane} change must not launch rustdoc\");\nassert_eq!(evaluation.evaluations(), 1, \"{lane} change must reevaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:evaluate_layer"
+      },
+      "key": {
+        "bound_tests_set_hash": "a4f9e8ae5c82e09db763c589f6e83c37899f0082a6b1a81dcd783577445ce66b",
+        "declaration_hash": "b788bb7f3920bc41416c2c2dffadacabbbfdacd81a0d6bf1058581d071c92387",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"assert_eq!(rustdoc.launches(), 0, \\\"a full match must not launch rustdoc\\\");\" ... \"assert_eq!(rustdoc.launches(), 1, \\\"an indeterminate closure must launch rustdoc\\\");\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:evaluate_layer"
+      },
+      "key": {
+        "bound_tests_set_hash": "a4f9e8ae5c82e09db763c589f6e83c37899f0082a6b1a81dcd783577445ce66b",
+        "declaration_hash": "b788bb7f3920bc41416c2c2dffadacabbbfdacd81a0d6bf1058581d071c92387",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 1, \"an indeterminate closure must launch rustdoc\");\n        assert_eq!(evaluation.evaluations(), 1, \"an indeterminate closure must evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:evaluate_layer"
+      },
+      "key": {
+        "bound_tests_set_hash": "a4f9e8ae5c82e09db763c589f6e83c37899f0082a6b1a81dcd783577445ce66b",
+        "declaration_hash": "b788bb7f3920bc41416c2c2dffadacabbbfdacd81a0d6bf1058581d071c92387",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(result.is_ok(), \"a verified full match must skip rustdoc: {result:?}\");\nassert_eq!(rustdoc.launches(), 0, \"a full match must not launch rustdoc\");\nassert_eq!(evaluation.evaluations(), 0, \"a full match must not evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:evaluate_layer"
+      },
+      "key": {
+        "bound_tests_set_hash": "a4f9e8ae5c82e09db763c589f6e83c37899f0082a6b1a81dcd783577445ce66b",
+        "declaration_hash": "b788bb7f3920bc41416c2c2dffadacabbbfdacd81a0d6bf1058581d071c92387",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 0, \"{lane} change must not launch rustdoc\");\n            assert_eq!(evaluation.evaluations(), 1, \"{lane} change must reevaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:evaluate_layer"
+      },
+      "key": {
+        "bound_tests_set_hash": "a4f9e8ae5c82e09db763c589f6e83c37899f0082a6b1a81dcd783577445ce66b",
+        "declaration_hash": "b788bb7f3920bc41416c2c2dffadacabbbfdacd81a0d6bf1058581d071c92387",
+        "anchor_text_hash": "24b933f6486d2712ab342cc915f02e02b7d6226416d7401413db097808be44cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 1, \"{lane} change must launch rustdoc\");\n            assert_eq!(evaluation.evaluations(), 1, \"{lane} change must evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::declaration_hash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::declaration_hash",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "86a9a49467a7c28681a6ed334eaf2b851967514f7f9442ccca8adf31c45127bb",
+        "declaration_hash": "4ee70f0ee7bd5d8ff42294c3b35c56ae745bc23750ea28cf5b36d95bf3c348fd",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let hash = declaration_hash(b\"abc\");\n        assert_eq!(\n            hash.as_digest().as_str(),\n            \"ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::declaration_hash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::declaration_hash",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "86a9a49467a7c28681a6ed334eaf2b851967514f7f9442ccca8adf31c45127bb",
+        "declaration_hash": "4ee70f0ee7bd5d8ff42294c3b35c56ae745bc23750ea28cf5b36d95bf3c348fd",
+        "anchor_text_hash": "62c40f2ec9b627814622c55731c88a656f7ced8f24a317079f9b36a4d43a6b7d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let hash = declaration_hash(b\"abc\");\n        assert_eq!(\n            hash.as_digest().as_str(),\n            \"ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::declaration_hash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::declaration_hash",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "86a9a49467a7c28681a6ed334eaf2b851967514f7f9442ccca8adf31c45127bb",
+        "declaration_hash": "4ee70f0ee7bd5d8ff42294c3b35c56ae745bc23750ea28cf5b36d95bf3c348fd",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let hash = declaration_hash(b\"abc\");\n        assert_eq!(\n            hash.as_digest().as_str(),\n            \"ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::declaration_hash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_codec::declaration_hash",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "86a9a49467a7c28681a6ed334eaf2b851967514f7f9442ccca8adf31c45127bb",
+        "declaration_hash": "4ee70f0ee7bd5d8ff42294c3b35c56ae745bc23750ea28cf5b36d95bf3c348fd",
+        "anchor_text_hash": "49aae763cb96599341893eccc90ff4c17871c389da9f6afbe3a9f41d775d6f11"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let hash = declaration_hash(b\"abc\");\n        assert_eq!(\n            hash.as_digest().as_str(),\n            \"ba7816bf8f01cfea414140de5dae2223b00361a396177177a9cb410ff61f20015ad\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "69b0cc94427f6b4e56084b0356fba8997c8cf2de03d9ba5ca799079a47b51ca4",
+        "declaration_hash": "8570f921afcbc65f88db6452116bef1953f99fde68ed9ad0ab54e120729c528c",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let changed_hash = compute_catalogue_declaration_hash(&changed_catalogue);\n        assert_ne!(hash, changed_hash, \"a catalogue-byte change must recompute the hash\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "69b0cc94427f6b4e56084b0356fba8997c8cf2de03d9ba5ca799079a47b51ca4",
+        "declaration_hash": "8570f921afcbc65f88db6452116bef1953f99fde68ed9ad0ab54e120729c528c",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(hash.as_digest().as_str(), V3_CATALOGUE_ONE_TYPE_DECLARATION_HASH); ... assert_eq!(\n            hash.as_digest().as_str(),\n            recorded_signals.catalogue_declaration_hash.to_hex(),\n            \"the catalogue hash must agree with the recorded signal-artifact snapshot\"\n        ); ... assert_ne!(hash, changed_hash, \"a catalogue-byte change must recompute the hash\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "69b0cc94427f6b4e56084b0356fba8997c8cf2de03d9ba5ca799079a47b51ca4",
+        "declaration_hash": "8570f921afcbc65f88db6452116bef1953f99fde68ed9ad0ab54e120729c528c",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(hash.as_digest().as_str(), recorded_signals.catalogue_declaration_hash.to_hex(), \"the catalogue hash must agree with the recorded signal-artifact snapshot\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "27898deb47a4c3435c1950cc546322cdb7a336dc96df44669c7aa42d78fa57b5",
+        "declaration_hash": "3a8cc164b69ab629f4fd8fe50a1f1a3a6e5437b2d42494e302d74a2552677719",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(evaluation.evaluations(), 0, \"a full match must not evaluate signals\"); ... for lane in [\"catalogue\", \"baseline\", \"evaluator\"] ... assert_eq!(evaluation.evaluations(), 1, \"{lane} change must reevaluate signals\"); ... for lane in [\"implementation\", \"extraction-contract\"] ... assert_eq!(rustdoc.launches(), 1, \"{lane} change must launch rustdoc\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "27898deb47a4c3435c1950cc546322cdb7a336dc96df44669c7aa42d78fa57b5",
+        "declaration_hash": "3a8cc164b69ab629f4fd8fe50a1f1a3a6e5437b2d42494e302d74a2552677719",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(result.is_ok(), \"a verified full match must skip rustdoc: {result:?}\");\n        assert_eq!(rustdoc.launches(), 0, \"a full match must not launch rustdoc\");\n...\nassert!(result.is_ok(), \"{lane} change must re-extract: {result:?}\");\n            assert_eq!(rustdoc.launches(), 1, \"{lane} change must launch rustdoc\");\n...\nassert_eq!(rustdoc.launches(), 1, \"{lane} must launch rustdoc\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "27898deb47a4c3435c1950cc546322cdb7a336dc96df44669c7aa42d78fa57b5",
+        "declaration_hash": "3a8cc164b69ab629f4fd8fe50a1f1a3a6e5437b2d42494e302d74a2552677719",
+        "anchor_text_hash": "62c40f2ec9b627814622c55731c88a656f7ced8f24a317079f9b36a4d43a6b7d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"for lane in [\\n            \\\"missing\\\",\\n            \\\"read-failed\\\",\\n            \\\"parse-fail\\\",\\n            \\\"hash-mismatch\\\",\\n            \\\"legacy\\\",\\n            \\\"implementation_input_hash\\\",\\n            \\\"baseline_hash\\\",\\n            \\\"live_rustdoc_snapshot_hash\\\",\\n            \\\"evaluator_contract_hash\\\",\\n            \\\"rustdoc_extraction_contract_hash\\\",\\n        ]\" ... \"assert_eq!(rustdoc.launches(), 1, \\\"{lane} must launch rustdoc\\\");\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "27898deb47a4c3435c1950cc546322cdb7a336dc96df44669c7aa42d78fa57b5",
+        "declaration_hash": "3a8cc164b69ab629f4fd8fe50a1f1a3a6e5437b2d42494e302d74a2552677719",
+        "anchor_text_hash": "44d8c635626e30a0abb85c59e9b9f2f549a3f4e3f42902eef8bebf51f841cb69"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let alpha_before =\n            hash_workspace_inputs(root, \"alpha\", ImplementationInputHash::new).unwrap();\n        let beta_before =\n            hash_workspace_inputs(root, \"beta\", ImplementationInputHash::new).unwrap();\n        fs::write(root.join(\"crates/alpha/src/lib.rs\"), \"pub struct ChangedAlpha;\\n\").unwrap();\n        let alpha_after =\n            hash_workspace_inputs(root, \"alpha\", ImplementationInputHash::new).unwrap();\n        let beta_after = hash_workspace_inputs(root, \"beta\", ImplementationInputHash::new).unwrap();\n\n        assert_ne!(alpha_before, alpha_after, \"the changed crate must be re-extracted\");\n        assert_eq!(beta_before, beta_after, \"an unrelated layer must retain its closure hash\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "27898deb47a4c3435c1950cc546322cdb7a336dc96df44669c7aa42d78fa57b5",
+        "declaration_hash": "3a8cc164b69ab629f4fd8fe50a1f1a3a6e5437b2d42494e302d74a2552677719",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 1, \"an indeterminate closure must launch rustdoc\"); assert_eq!(evaluation.evaluations(), 1, \"an indeterminate closure must evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "27898deb47a4c3435c1950cc546322cdb7a336dc96df44669c7aa42d78fa57b5",
+        "declaration_hash": "3a8cc164b69ab629f4fd8fe50a1f1a3a6e5437b2d42494e302d74a2552677719",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(result.is_ok(), \"a verified full match must skip rustdoc: {result:?}\");\n        assert_eq!(rustdoc.launches(), 0, \"a full match must not launch rustdoc\");\n        assert_eq!(evaluation.evaluations(), 0, \"a full match must not evaluate signals\");\n...\nassert_eq!(freshness.live_rustdoc_snapshot_hash(), &LiveRustdocSnapshotHash::new(...), \"the persisted snapshot hash must match the parseable live rustdoc JSON\");\n...\nassert_eq!(rustdoc.launches(), 1, \"{lane} change must launch rustdoc\");\nassert_eq!(evaluation.evaluations(), 1, \"{lane} change must evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "27898deb47a4c3435c1950cc546322cdb7a336dc96df44669c7aa42d78fa57b5",
+        "declaration_hash": "3a8cc164b69ab629f4fd8fe50a1f1a3a6e5437b2d42494e302d74a2552677719",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(result.is_ok(), \"{lane} change must evaluate from the verified snapshot: {result:?}\");\nassert_eq!(rustdoc.launches(), 0, \"{lane} change must not launch rustdoc\");\nassert_eq!(evaluation.evaluations(), 1, \"{lane} change must reevaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "27898deb47a4c3435c1950cc546322cdb7a336dc96df44669c7aa42d78fa57b5",
+        "declaration_hash": "3a8cc164b69ab629f4fd8fe50a1f1a3a6e5437b2d42494e302d74a2552677719",
+        "anchor_text_hash": "24b933f6486d2712ab342cc915f02e02b7d6226416d7401413db097808be44cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 1, \"{lane} must launch rustdoc\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "27898deb47a4c3435c1950cc546322cdb7a336dc96df44669c7aa42d78fa57b5",
+        "declaration_hash": "3a8cc164b69ab629f4fd8fe50a1f1a3a6e5437b2d42494e302d74a2552677719",
+        "anchor_text_hash": "49aae763cb96599341893eccc90ff4c17871c389da9f6afbe3a9f41d775d6f11"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n                result.is_ok(),\n                \"{lane} must re-extract from the exported snapshot: {result:?}\"\n            );\n            assert_eq!(rustdoc.launches(), 1, \"{lane} must launch rustdoc\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "30206390388c5358aaf7c16ed85d7bd33cbfe74cf9f7a7158425efb43d03dc81",
+        "declaration_hash": "f9a081948ee4bb743fe4b4e84f39a35e76822ccdff105b9a971522e27dc6c5d8",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(result.is_ok(), \"a verified full match must skip rustdoc: {result:?}\"); assert_eq!(rustdoc.launches(), 0, \"a full match must not launch rustdoc\"); assert_eq!(evaluation.evaluations(), 0, \"a full match must not evaluate signals\"); ... for lane in [\"catalogue\", \"baseline\", \"evaluator\"] ... assert_eq!(evaluation.evaluations(), 1, \"{lane} change must reevaluate signals\"); ... for lane in [\"implementation\", \"extraction-contract\"] ... assert_eq!(rustdoc.launches(), 1, \"{lane} change must launch rustdoc\"); assert_eq!(evaluation.evaluations(), 1, \"{lane} change must evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "30206390388c5358aaf7c16ed85d7bd33cbfe74cf9f7a7158425efb43d03dc81",
+        "declaration_hash": "f9a081948ee4bb743fe4b4e84f39a35e76822ccdff105b9a971522e27dc6c5d8",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 0, \"{lane} change must not launch rustdoc\");\nassert_eq!(evaluation.evaluations(), 1, \"{lane} change must reevaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "30206390388c5358aaf7c16ed85d7bd33cbfe74cf9f7a7158425efb43d03dc81",
+        "declaration_hash": "f9a081948ee4bb743fe4b4e84f39a35e76822ccdff105b9a971522e27dc6c5d8",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 1, \"an indeterminate closure must launch rustdoc\");\n        assert_eq!(evaluation.evaluations(), 1, \"an indeterminate closure must evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "30206390388c5358aaf7c16ed85d7bd33cbfe74cf9f7a7158425efb43d03dc81",
+        "declaration_hash": "f9a081948ee4bb743fe4b4e84f39a35e76822ccdff105b9a971522e27dc6c5d8",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(result.is_ok(), \"a verified full match must skip rustdoc: {result:?}\");\n        assert_eq!(rustdoc.launches(), 0, \"a full match must not launch rustdoc\");\n        assert_eq!(evaluation.evaluations(), 0, \"a full match must not evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "30206390388c5358aaf7c16ed85d7bd33cbfe74cf9f7a7158425efb43d03dc81",
+        "declaration_hash": "f9a081948ee4bb743fe4b4e84f39a35e76822ccdff105b9a971522e27dc6c5d8",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(result.is_ok(), \"a verified full match must skip rustdoc: {result:?}\");\n        assert_eq!(rustdoc.launches(), 0, \"a full match must not launch rustdoc\");\n        assert_eq!(evaluation.evaluations(), 0, \"a full match must not evaluate signals\");\n\n        assert!(\n                result.is_ok(),\n                \"{lane} change must evaluate from the verified snapshot: {result:?}\"\n            );\n            assert_eq!(rustdoc.launches(), 0, \"{lane} change must not launch rustdoc\");\n            assert_eq!(evaluation.evaluations(), 1, \"{lane} change must reevaluate signals\");\n\nassert!(result.is_ok(), \"{lane} change must re-extract: {result:?}\");\n            assert_eq!(rustdoc.launches(), 1, \"{lane} change must launch rustdoc\");\n            assert_eq!(evaluation.evaluations(), 1, \"{lane} change must evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "30206390388c5358aaf7c16ed85d7bd33cbfe74cf9f7a7158425efb43d03dc81",
+        "declaration_hash": "f9a081948ee4bb743fe4b4e84f39a35e76822ccdff105b9a971522e27dc6c5d8",
+        "anchor_text_hash": "24b933f6486d2712ab342cc915f02e02b7d6226416d7401413db097808be44cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(result.is_ok(), \"{lane} must re-extract from the exported snapshot: {result:?}\");\nassert_eq!(rustdoc.launches(), 1, \"{lane} must launch rustdoc\");\nassert_eq!(evaluation.evaluations(), 1, \"{lane} must evaluate signals after re-extraction\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "e2589dc3ad2b3fa790e32949cb7f2257684e8135bb47437a808f98b56c7cd705",
+        "declaration_hash": "6a27be601b3f174075f83d024f7a31c78aee0e31b0df19f173b380d6ea47e7f4",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"a full match must not launch rustdoc\"; \"a full match must not evaluate signals\"; \"{lane} change must evaluate from the verified snapshot\"; \"{lane} change must launch rustdoc\"; \"{lane} change must evaluate signals\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "e2589dc3ad2b3fa790e32949cb7f2257684e8135bb47437a808f98b56c7cd705",
+        "declaration_hash": "6a27be601b3f174075f83d024f7a31c78aee0e31b0df19f173b380d6ea47e7f4",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"assert_eq!(rustdoc.launches(), 0, \\\"a full match must not launch rustdoc\\\");\"; \"assert_eq!(rustdoc.launches(), 1, \\\"{lane} must launch rustdoc\\\");\"; \"assert_eq!(rustdoc.launches(), 1, \\\"an indeterminate closure must launch rustdoc\\\");\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "e2589dc3ad2b3fa790e32949cb7f2257684e8135bb47437a808f98b56c7cd705",
+        "declaration_hash": "6a27be601b3f174075f83d024f7a31c78aee0e31b0df19f173b380d6ea47e7f4",
+        "anchor_text_hash": "62c40f2ec9b627814622c55731c88a656f7ced8f24a317079f9b36a4d43a6b7d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"freshness.implementation_input_hash()\" ... \"freshness.baseline_hash()\" ... \"freshness.live_rustdoc_snapshot_hash()\" ... \"freshness.evaluator_contract_hash()\" ... \"freshness.rustdoc_extraction_contract_hash()\"; \"legacy\" ... \"must re-extract\"; \"an indeterminate closure must launch rustdoc\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "e2589dc3ad2b3fa790e32949cb7f2257684e8135bb47437a808f98b56c7cd705",
+        "declaration_hash": "6a27be601b3f174075f83d024f7a31c78aee0e31b0df19f173b380d6ea47e7f4",
+        "anchor_text_hash": "44d8c635626e30a0abb85c59e9b9f2f549a3f4e3f42902eef8bebf51f841cb69"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(alpha_before, alpha_after, \"the changed crate must be re-extracted\");\n        assert_eq!(beta_before, beta_after, \"an unrelated layer must retain its closure hash\");\n        ...\n        TypeSignalsReuseDecision::SkipEvaluation,\n            \"the unaffected layer must retain its skip path\"\n        ...\n        TypeSignalsReuseDecision::ReextractAndEvaluate"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "e2589dc3ad2b3fa790e32949cb7f2257684e8135bb47437a808f98b56c7cd705",
+        "declaration_hash": "6a27be601b3f174075f83d024f7a31c78aee0e31b0df19f173b380d6ea47e7f4",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 1, \"an indeterminate closure must launch rustdoc\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "e2589dc3ad2b3fa790e32949cb7f2257684e8135bb47437a808f98b56c7cd705",
+        "declaration_hash": "6a27be601b3f174075f83d024f7a31c78aee0e31b0df19f173b380d6ea47e7f4",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(skip_observer.launches(), 0, \"verified inputs must not launch rustdoc\"); ... assert_eq!(conservative_observer.launches(), 1, \"changed implementation inputs must re-extract through the real adapter\"); ... assert_eq!(rustdoc.launches(), 0, \"a full match must not launch rustdoc\"); ... assert_eq!(rustdoc.launches(), 1, \"{lane} must launch rustdoc\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "e2589dc3ad2b3fa790e32949cb7f2257684e8135bb47437a808f98b56c7cd705",
+        "declaration_hash": "6a27be601b3f174075f83d024f7a31c78aee0e31b0df19f173b380d6ea47e7f4",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 0, \"{lane} change must not launch rustdoc\");\n            assert_eq!(evaluation.evaluations(), 1, \"{lane} change must reevaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "e2589dc3ad2b3fa790e32949cb7f2257684e8135bb47437a808f98b56c7cd705",
+        "declaration_hash": "6a27be601b3f174075f83d024f7a31c78aee0e31b0df19f173b380d6ea47e7f4",
+        "anchor_text_hash": "24b933f6486d2712ab342cc915f02e02b7d6226416d7401413db097808be44cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 1, \"{lane} must launch rustdoc\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "e2589dc3ad2b3fa790e32949cb7f2257684e8135bb47437a808f98b56c7cd705",
+        "declaration_hash": "6a27be601b3f174075f83d024f7a31c78aee0e31b0df19f173b380d6ea47e7f4",
+        "anchor_text_hash": "49aae763cb96599341893eccc90ff4c17871c389da9f6afbe3a9f41d775d6f11"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for lane in [\n            \"missing\",\n            \"read-failed\",\n            \"parse-fail\",\n            \"hash-mismatch\",\n            \"legacy\",\n            \"implementation_input_hash\",\n            \"baseline_hash\",\n            \"live_rustdoc_snapshot_hash\",\n            \"evaluator_contract_hash\",\n            \"rustdoc_extraction_contract_hash\",\n        ] {\n...\n            assert_eq!(rustdoc.launches(), 1, \"{lane} must launch rustdoc\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaselineHash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaselineHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "33af49c51982cf359f2b194b67bfd640b4d65e629fa0a5122ac952599da1799b",
+        "declaration_hash": "b77391c9e38637c3ff0896e2721fbdc36795a2b340a1dc6a0b7e6dce21d153cc",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "changed.baseline_hash = BaselineHash::new(digest(B));\n        assert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaselineHash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaselineHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "33af49c51982cf359f2b194b67bfd640b4d65e629fa0a5122ac952599da1799b",
+        "declaration_hash": "b77391c9e38637c3ff0896e2721fbdc36795a2b340a1dc6a0b7e6dce21d153cc",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "changed.baseline_hash = BaselineHash::new(digest(B));\n        assert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueDeclarationHash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueDeclarationHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "bb4607671c7603f9f8b0f729c7c24b54cf90fea188fc1e0e79ae297904dc9020",
+        "declaration_hash": "5dcbc04eb9c18cb1067b4d7aef296eacd04c5301bc6cc93ed64f0d59a19d4b35",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "changed.declaration_hash = CatalogueDeclarationHash::new(digest(B));\n        assert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueDeclarationHash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueDeclarationHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "bb4607671c7603f9f8b0f729c7c24b54cf90fea188fc1e0e79ae297904dc9020",
+        "declaration_hash": "5dcbc04eb9c18cb1067b4d7aef296eacd04c5301bc6cc93ed64f0d59a19d4b35",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluatorContractHash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EvaluatorContractHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "9021a5930346d5d94c3ad3f1c184e82302a06af293453d0c6fed2bc4aa7b1cda",
+        "declaration_hash": "0796b23768a00d4d746e3216e14ec9f119ecabdd552b796b368e17cacee9a94e",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "changed.evaluator_contract_hash = EvaluatorContractHash::new(digest(B));\n        assert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluatorContractHash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EvaluatorContractHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "9021a5930346d5d94c3ad3f1c184e82302a06af293453d0c6fed2bc4aa7b1cda",
+        "declaration_hash": "0796b23768a00d4d746e3216e14ec9f119ecabdd552b796b368e17cacee9a94e",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "changed.evaluator_contract_hash = EvaluatorContractHash::new(digest(B));\n        assert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplementationInputHash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplementationInputHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "64076787cc69333fa4e83f4333ee9cb13f763847a0e7e8222833bcd6568d4389",
+        "declaration_hash": "1f51a03a5089a01c1368fc78a5df1107acac34cab574f8efb3f4f81581bbbb73",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "changed.implementation_input_hash = ImplementationInputHash::new(digest(B));\n        assert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplementationInputHash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplementationInputHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "2cd3e8a7acae78bfa537ad348044fb71138f848b2bbb529eb12e24e65bf45ad8",
+        "declaration_hash": "1f51a03a5089a01c1368fc78a5df1107acac34cab574f8efb3f4f81581bbbb73",
+        "anchor_text_hash": "44d8c635626e30a0abb85c59e9b9f2f549a3f4e3f42902eef8bebf51f841cb69"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let dependency_source_changed =\n            hash_resolved_build_inputs(workspace.path(), \"alpha\").unwrap();\n        assert_ne!(\n            initial, dependency_source_changed,\n            \"dependency source belongs to alpha's closure\"\n        );\n\n        let dependency_manifest_changed =\n            hash_resolved_build_inputs(workspace.path(), \"alpha\").unwrap();\n        assert_ne!(\n            dependency_source_changed, dependency_manifest_changed,\n            \"dependency manifest belongs to alpha's resolved closure\"\n        );\n\n        let feature_selection_changed =\n            hash_resolved_build_inputs(workspace.path(), \"alpha\").unwrap();\n        assert_ne!(\n            dependency_manifest_changed, feature_selection_changed,\n            \"resolved dependency features belong to alpha's closure\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LiveRustdocSnapshotHash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LiveRustdocSnapshotHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "aa461f82796f8763583c1ff02c43900979e4187492d4ae17a274ba0dc24c072d",
+        "declaration_hash": "f5058320698c14b7ba199e92bad0cca715402ebd618e5dd49cf6fa704c31be4d",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 0, \"{lane} change must not launch rustdoc\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LiveRustdocSnapshotHash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LiveRustdocSnapshotHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "889c51348440e50cf0741bea142d9626b4541bcaaf3a9594eee05c8f21dae894",
+        "declaration_hash": "f5058320698c14b7ba199e92bad0cca715402ebd618e5dd49cf6fa704c31be4d",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n                result.is_ok(),\n                \"{lane} must re-extract from the exported snapshot: {result:?}\"\n            );\n            assert_eq!(rustdoc.launches(), 1, \"{lane} must launch rustdoc\");\n            assert_eq!(\n                evaluation.evaluations(),\n                1,\n                \"{lane} must evaluate signals after re-extraction\"\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LiveRustdocSnapshotStatus",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LiveRustdocSnapshotStatus",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "aa461f82796f8763583c1ff02c43900979e4187492d4ae17a274ba0dc24c072d",
+        "declaration_hash": "7ae40a70034a4a69ffa712b4c3c2f195b6bf0fde3a86245fce3db4539f146a1e",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 0, \"{lane} change must not launch rustdoc\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LiveRustdocSnapshotStatus",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LiveRustdocSnapshotStatus",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "889c51348440e50cf0741bea142d9626b4541bcaaf3a9594eee05c8f21dae894",
+        "declaration_hash": "7ae40a70034a4a69ffa712b4c3c2f195b6bf0fde3a86245fce3db4539f146a1e",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 1, \"{lane} must launch rustdoc\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LiveRustdocSnapshotStatus",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LiveRustdocSnapshotStatus",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "aa461f82796f8763583c1ff02c43900979e4187492d4ae17a274ba0dc24c072d",
+        "declaration_hash": "7ae40a70034a4a69ffa712b4c3c2f195b6bf0fde3a86245fce3db4539f146a1e",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 0, \"{lane} change must not launch rustdoc\");\n            assert_eq!(evaluation.evaluations(), 1, \"{lane} change must reevaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LiveRustdocSnapshotStatus",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LiveRustdocSnapshotStatus",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "889c51348440e50cf0741bea142d9626b4541bcaaf3a9594eee05c8f21dae894",
+        "declaration_hash": "7ae40a70034a4a69ffa712b4c3c2f195b6bf0fde3a86245fce3db4539f146a1e",
+        "anchor_text_hash": "24b933f6486d2712ab342cc915f02e02b7d6226416d7401413db097808be44cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 1, \"{lane} must launch rustdoc\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "RustdocExtractionContractHash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RustdocExtractionContractHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "a98e1528a75292a8678f844605bb89c38dbbb3eb4729beb74ba7b5f7a3020ddd",
+        "declaration_hash": "246dd504499ea229739dd0663c865ff3fbc64d95c9dd6e3eb94f1121582a7251",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "changed.rustdoc_extraction_contract_hash = RustdocExtractionContractHash::new(digest(B));\nassert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "RustdocExtractionContractHash",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RustdocExtractionContractHash",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "a98e1528a75292a8678f844605bb89c38dbbb3eb4729beb74ba7b5f7a3020ddd",
+        "declaration_hash": "246dd504499ea229739dd0663c865ff3fbc64d95c9dd6e3eb94f1121582a7251",
+        "anchor_text_hash": "24b933f6486d2712ab342cc915f02e02b7d6226416d7401413db097808be44cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let mut changed = current();\n        changed.rustdoc_extraction_contract_hash = RustdocExtractionContractHash::new(digest(B));\n        assert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "Sha256Digest",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "Sha256Digest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "02fd80033135bf487b0fa79361dab30062f91f0eb8ae51837e68f3b6d9f5d72f",
+        "declaration_hash": "3ebef5b70f7dfc4636a9395dca2a6f7c6e65b2e041d25d8b77ef7514d56c3851",
+        "anchor_text_hash": "62c40f2ec9b627814622c55731c88a656f7ced8f24a317079f9b36a4d43a6b7d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(digest.as_str(), B); ... assert_eq!(digest.as_str(), digest.as_str().to_ascii_lowercase(), \"the persisted {label} identity must be lowercase SHA-256 hex\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "Sha256Digest",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "Sha256Digest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "32487c25a1cc04639c8c4920bcc2b030140a65ff75ba3222bdd45e69f37dda41",
+        "declaration_hash": "3ebef5b70f7dfc4636a9395dca2a6f7c6e65b2e041d25d8b77ef7514d56c3851",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 1, \"an indeterminate closure must launch rustdoc\");\n        assert_eq!(evaluation.evaluations(), 1, \"an indeterminate closure must evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "Sha256Digest",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "Sha256Digest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "f5dc5e73dce559811a44a8386815e5c4c1a67f01b80863fe2e4700c90870487b",
+        "declaration_hash": "3ebef5b70f7dfc4636a9395dca2a6f7c6e65b2e041d25d8b77ef7514d56c3851",
+        "anchor_text_hash": "49aae763cb96599341893eccc90ff4c17871c389da9f6afbe3a9f41d775d6f11"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let digest = Sha256Digest::from_content_hash(ContentHash::from_bytes([0xbb; 32]));\n\n        assert_eq!(digest.as_str(), B); ... assert_eq!(Sha256Digest::try_new(\"abc\".to_owned()), Err(Sha256DigestError::InvalidLength)); ... assert_eq!(Sha256Digest::try_new(A.to_uppercase()), Err(Sha256DigestError::InvalidHex)); ... assert_eq!(artifact[\"live_rustdoc_snapshot_hash\"], digest.as_str());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "Sha256DigestError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "Sha256DigestError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "e0e95b2a53456e09641d9d875523ede5f62b1b5af0e38844849fcd848ef80515",
+        "declaration_hash": "219b6f011eee09d01a14bf622a6ca4e9e88c4a03141eb0bbae05912e952c0f89",
+        "anchor_text_hash": "62c40f2ec9b627814622c55731c88a656f7ced8f24a317079f9b36a4d43a6b7d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(TypeSignalsCodecError::InvalidDigest { field: actual_field, source })\n                        if actual_field.as_str() == field && source == expected_error"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "Sha256DigestError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "Sha256DigestError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "0cf1fe3b8d65ec3c61405ccbe040cb00f6abe45562b533c660104dff0b7458d0",
+        "declaration_hash": "219b6f011eee09d01a14bf622a6ca4e9e88c4a03141eb0bbae05912e952c0f89",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for (lane, malformed_digest) in\n            [(\"invalid-length\", \"short\".to_owned()), (\"invalid-hex\", FRESHNESS_A.to_uppercase())]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "Sha256DigestError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "Sha256DigestError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "e0e95b2a53456e09641d9d875523ede5f62b1b5af0e38844849fcd848ef80515",
+        "declaration_hash": "219b6f011eee09d01a14bf622a6ca4e9e88c4a03141eb0bbae05912e952c0f89",
+        "anchor_text_hash": "49aae763cb96599341893eccc90ff4c17871c389da9f6afbe3a9f41d775d6f11"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(TypeSignalsCodecError::InvalidDigest { field: actual_field, source })\n                        if actual_field.as_str() == field && source == expected_error"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsCurrentInputs",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCurrentInputs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "e9ccf9761e39decf3355d6adfeb861771496277eb3a2caa0b22a35b15859f241",
+        "declaration_hash": "be8d18b88b590139d2809d62bc7d3f11e3428b483ea01180c1f26eb8e8d4f821",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(recorded.declaration_hash(), current.declaration_hash());\n        assert_eq!(recorded.implementation_input_hash(), current.implementation_input_hash());\n        assert_eq!(recorded.baseline_hash(), current.baseline_hash());\n        assert_eq!(recorded.evaluator_contract_hash(), current.evaluator_contract_hash());\n        assert_eq!(\n            recorded.rustdoc_extraction_contract_hash(),\n            current.rustdoc_extraction_contract_hash()\n        );\n        assert_eq!(\n            decide_type_signals_reuse(&recorded, &current, snapshot_status.clone()),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );\n\n        let mut differing_evaluator_contract = current.clone();\n        differing_evaluator_contract.evaluator_contract_hash =\n            EvaluatorContractHash::new(digest(B));\n        assert_eq!(\n            decide_type_signals_reuse(&recorded, &differing_evaluator_contract, snapshot_status),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsCurrentInputs",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCurrentInputs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "bb4607671c7603f9f8b0f729c7c24b54cf90fea188fc1e0e79ae297904dc9020",
+        "declaration_hash": "be8d18b88b590139d2809d62bc7d3f11e3428b483ea01180c1f26eb8e8d4f821",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "changed.declaration_hash = CatalogueDeclarationHash::new(digest(B));\n        assert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsCurrentInputs",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCurrentInputs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "32487c25a1cc04639c8c4920bcc2b030140a65ff75ba3222bdd45e69f37dda41",
+        "declaration_hash": "be8d18b88b590139d2809d62bc7d3f11e3428b483ea01180c1f26eb8e8d4f821",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "fs::remove_file(fixture.workspace.path().join(\"Cargo.lock\")).unwrap();\n        let (rustdoc, evaluation) = fixture.evaluation_spies();\n\n        let error = fixture.evaluate_with(&rustdoc, &evaluation).unwrap_err();\n\n        assert!(\n            error.to_string().contains(\"Cargo.lock\"),\n            \"closure error must be retained: {error}\"\n        );\n        assert_eq!(rustdoc.launches(), 1, \"an indeterminate closure must launch rustdoc\");\n        assert_eq!(evaluation.evaluations(), 1, \"an indeterminate closure must evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsCurrentInputs",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCurrentInputs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "d8cf11f385042925dc58ac7f58fec3b2319d51736708a580a2af32534097711b",
+        "declaration_hash": "be8d18b88b590139d2809d62bc7d3f11e3428b483ea01180c1f26eb8e8d4f821",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(decide_type_signals_reuse(&recorded, &current, snapshot_status.clone()),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );\n\n        let mut differing_evaluator_contract = current.clone();\n        differing_evaluator_contract.evaluator_contract_hash =\n            EvaluatorContractHash::new(digest(B));\n        assert_eq!(\n            decide_type_signals_reuse(&recorded, &differing_evaluator_contract, snapshot_status),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsCurrentInputs",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCurrentInputs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "9021a5930346d5d94c3ad3f1c184e82302a06af293453d0c6fed2bc4aa7b1cda",
+        "declaration_hash": "be8d18b88b590139d2809d62bc7d3f11e3428b483ea01180c1f26eb8e8d4f821",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsCurrentInputs",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCurrentInputs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "f1b3a1da5cb7bd211e827180b6389da77fb31dbd9d98fc9a112d0b442a137473",
+        "declaration_hash": "be8d18b88b590139d2809d62bc7d3f11e3428b483ea01180c1f26eb8e8d4f821",
+        "anchor_text_hash": "24b933f6486d2712ab342cc915f02e02b7d6226416d7401413db097808be44cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(result.is_ok(), \"{lane} change must re-extract: {result:?}\");\n            assert_eq!(rustdoc.launches(), 1, \"{lane} change must launch rustdoc\");\n            assert_eq!(evaluation.evaluations(), 1, \"{lane} change must evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "6268e618d0baaf6f1318fc678792f714179b3a2b9903a0aef2eff17231fb32c0",
+        "declaration_hash": "e3bd2bd8f283e36a1ef44df5e94e71a1a35001e8c1c030715744de4e3cd60ee3",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 0, \"a full match must not launch rustdoc\");\n        assert_eq!(evaluation.evaluations(), 0, \"a full match must not evaluate signals\");\n...\nfor lane in [\"catalogue\", \"baseline\", \"evaluator\"] {\n...\nassert_eq!(rustdoc.launches(), 0, \"{lane} change must not launch rustdoc\");\n            assert_eq!(evaluation.evaluations(), 1, \"{lane} change must reevaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "bb4607671c7603f9f8b0f729c7c24b54cf90fea188fc1e0e79ae297904dc9020",
+        "declaration_hash": "e3bd2bd8f283e36a1ef44df5e94e71a1a35001e8c1c030715744de4e3cd60ee3",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "2bc7b3c3b627c302d8f5bfbfb2df4aee4aaa043079289ddb019de7782722708d",
+        "declaration_hash": "e3bd2bd8f283e36a1ef44df5e94e71a1a35001e8c1c030715744de4e3cd60ee3",
+        "anchor_text_hash": "62c40f2ec9b627814622c55731c88a656f7ced8f24a317079f9b36a4d43a6b7d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(document.freshness(), &freshness());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "4c2ca1cb3a171f0c10876fe052d2b71956d3d7a52c5fefdf654e7f1d0f5fe83a",
+        "declaration_hash": "e3bd2bd8f283e36a1ef44df5e94e71a1a35001e8c1c030715744de4e3cd60ee3",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n                decide_type_signals_reuse(&freshness(), &current(), status),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "b5e344c7a7fd397155ded285c88c2bec5d4cca192bab0a70d68fa92c4722c734",
+        "declaration_hash": "e3bd2bd8f283e36a1ef44df5e94e71a1a35001e8c1c030715744de4e3cd60ee3",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 0, \"a full match must not launch rustdoc\");\n        assert_eq!(evaluation.evaluations(), 0, \"a full match must not evaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "bb4607671c7603f9f8b0f729c7c24b54cf90fea188fc1e0e79ae297904dc9020",
+        "declaration_hash": "e3bd2bd8f283e36a1ef44df5e94e71a1a35001e8c1c030715744de4e3cd60ee3",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "changed.declaration_hash = CatalogueDeclarationHash::new(digest(B));\nassert_eq!(\n    decide_type_signals_reuse(&freshness(), &changed, verified()),\n    TypeSignalsReuseDecision::ReevaluateWithSnapshot\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "4c2ca1cb3a171f0c10876fe052d2b71956d3d7a52c5fefdf654e7f1d0f5fe83a",
+        "declaration_hash": "e3bd2bd8f283e36a1ef44df5e94e71a1a35001e8c1c030715744de4e3cd60ee3",
+        "anchor_text_hash": "24b933f6486d2712ab342cc915f02e02b7d6226416d7401413db097808be44cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for status in [\n            LiveRustdocSnapshotStatus::Missing,\n            LiveRustdocSnapshotStatus::ReadFailed,\n            LiveRustdocSnapshotStatus::ParseFailed,\n            LiveRustdocSnapshotStatus::HashMismatch,\n            LiveRustdocSnapshotStatus::Verified(LiveRustdocSnapshotHash::new(digest(B))),\n        ] {\n            assert_eq!(\n                decide_type_signals_reuse(&freshness(), &current(), status),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsDocument",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "eaab5a7a4c24ba5bd463cf1254605a23b0b5395c04ed33d5de5562bdd186ba4d",
+        "declaration_hash": "e3bd2bd8f283e36a1ef44df5e94e71a1a35001e8c1c030715744de4e3cd60ee3",
+        "anchor_text_hash": "49aae763cb96599341893eccc90ff4c17871c389da9f6afbe3a9f41d775d6f11"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(document.schema_version().value(), TYPE_SIGNALS_SCHEMA_VERSION);\n        assert_eq!(document.declaration_hash().as_digest().as_str(), A);\n        assert_eq!(document.freshness(), &freshness());\n        assert!(\n                matches!(decode(&value.to_string()), Err(TypeSignalsCodecError::Json(_))),\n                \"schema-v2 artifact missing {field} must fail closed\"\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "d8cf11f385042925dc58ac7f58fec3b2319d51736708a580a2af32534097711b",
+        "declaration_hash": "1ecae448648c1949391a028071f266cb8ac9bd7987b058c4ba320a32f650c8a1",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(recorded.declaration_hash(), current.declaration_hash());\nassert_eq!(recorded.implementation_input_hash(), current.implementation_input_hash());\nassert_eq!(recorded.baseline_hash(), current.baseline_hash());\nassert_eq!(recorded.evaluator_contract_hash(), current.evaluator_contract_hash());\nassert_eq!(\n    recorded.rustdoc_extraction_contract_hash(),\n    current.rustdoc_extraction_contract_hash()\n);\nassert!(matches!(\n    &snapshot_status,\n    LiveRustdocSnapshotStatus::Verified(hash)\n        if hash == recorded.live_rustdoc_snapshot_hash()\n));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "bb4607671c7603f9f8b0f729c7c24b54cf90fea188fc1e0e79ae297904dc9020",
+        "declaration_hash": "1ecae448648c1949391a028071f266cb8ac9bd7987b058c4ba320a32f650c8a1",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let mut changed = current();\n        changed.declaration_hash = CatalogueDeclarationHash::new(digest(B));\n        assert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "2bc7b3c3b627c302d8f5bfbfb2df4aee4aaa043079289ddb019de7782722708d",
+        "declaration_hash": "1ecae448648c1949391a028071f266cb8ac9bd7987b058c4ba320a32f650c8a1",
+        "anchor_text_hash": "62c40f2ec9b627814622c55731c88a656f7ced8f24a317079f9b36a4d43a6b7d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(document.freshness(), &freshness());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "64076787cc69333fa4e83f4333ee9cb13f763847a0e7e8222833bcd6568d4389",
+        "declaration_hash": "1ecae448648c1949391a028071f266cb8ac9bd7987b058c4ba320a32f650c8a1",
+        "anchor_text_hash": "44d8c635626e30a0abb85c59e9b9f2f549a3f4e3f42902eef8bebf51f841cb69"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "changed.implementation_input_hash = ImplementationInputHash::new(digest(B));\n        assert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "4c2ca1cb3a171f0c10876fe052d2b71956d3d7a52c5fefdf654e7f1d0f5fe83a",
+        "declaration_hash": "1ecae448648c1949391a028071f266cb8ac9bd7987b058c4ba320a32f650c8a1",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n                decide_type_signals_reuse(&freshness(), &current(), status),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "7ef3643f34ffc5114e382194719257421deec5f492804f1bae69c9016222a63f",
+        "declaration_hash": "1ecae448648c1949391a028071f266cb8ac9bd7987b058c4ba320a32f650c8a1",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(decide_type_signals_reuse(&recorded, &current, snapshot_status.clone()),\n            TypeSignalsReuseDecision::SkipEvaluation);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "9021a5930346d5d94c3ad3f1c184e82302a06af293453d0c6fed2bc4aa7b1cda",
+        "declaration_hash": "1ecae448648c1949391a028071f266cb8ac9bd7987b058c4ba320a32f650c8a1",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "changed.evaluator_contract_hash = EvaluatorContractHash::new(digest(B));\nassert_eq!(\n    decide_type_signals_reuse(&freshness(), &changed, verified()),\n    TypeSignalsReuseDecision::ReevaluateWithSnapshot\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "4c2ca1cb3a171f0c10876fe052d2b71956d3d7a52c5fefdf654e7f1d0f5fe83a",
+        "declaration_hash": "1ecae448648c1949391a028071f266cb8ac9bd7987b058c4ba320a32f650c8a1",
+        "anchor_text_hash": "24b933f6486d2712ab342cc915f02e02b7d6226416d7401413db097808be44cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for status in [\n            LiveRustdocSnapshotStatus::Missing,\n            LiveRustdocSnapshotStatus::ReadFailed,\n            LiveRustdocSnapshotStatus::ParseFailed,\n            LiveRustdocSnapshotStatus::HashMismatch,\n            LiveRustdocSnapshotStatus::Verified(LiveRustdocSnapshotHash::new(digest(B))),\n        ] {\n            assert_eq!(\n                decide_type_signals_reuse(&freshness(), &current(), status),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsFreshness",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "eaab5a7a4c24ba5bd463cf1254605a23b0b5395c04ed33d5de5562bdd186ba4d",
+        "declaration_hash": "1ecae448648c1949391a028071f266cb8ac9bd7987b058c4ba320a32f650c8a1",
+        "anchor_text_hash": "49aae763cb96599341893eccc90ff4c17871c389da9f6afbe3a9f41d775d6f11"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(document.freshness(), &freshness());\n        assert_eq!(document.signals(), &[signal()]);\n\n            assert!(\n                matches!(decode(&value.to_string()), Err(TypeSignalsCodecError::Json(_))),\n                \"schema-v2 artifact missing {field} must fail closed\"\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsLoadResult",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsLoadResult",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "b69e0fe50e53068811441113711874584ca416768e25128b80e9feab7eadc719",
+        "declaration_hash": "87197c5236693d45474ab0d857cd252fcf895d7b17847ff6321f52af3b88d49b",
+        "anchor_text_hash": "62c40f2ec9b627814622c55731c88a656f7ced8f24a317079f9b36a4d43a6b7d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result =\n            TypeSignalsLoadResult::Stale(document, CatalogueDeclarationHash::new(digest(B)));\n        assert!(result.is_stale());\n        assert!(result.as_current().is_none());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsLoadResult",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsLoadResult",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "b69e0fe50e53068811441113711874584ca416768e25128b80e9feab7eadc719",
+        "declaration_hash": "87197c5236693d45474ab0d857cd252fcf895d7b17847ff6321f52af3b88d49b",
+        "anchor_text_hash": "49aae763cb96599341893eccc90ff4c17871c389da9f6afbe3a9f41d775d6f11"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(result.is_stale());\n        assert!(result.as_current().is_none());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsReuseDecision",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsReuseDecision",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "921373012d122cb9eac76c6c0038923af65c5df42d020b57e5fa3d9487f62167",
+        "declaration_hash": "1913d67fa130305afaf51773baa6fe1e9689dfeadc0f4fb1ea69150be04519d8",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"the persisted declaration identity must match the current catalogue\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsReuseDecision",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsReuseDecision",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "aa461f82796f8763583c1ff02c43900979e4187492d4ae17a274ba0dc24c072d",
+        "declaration_hash": "1913d67fa130305afaf51773baa6fe1e9689dfeadc0f4fb1ea69150be04519d8",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 0, \"{lane} change must not launch rustdoc\");\n            assert_eq!(evaluation.evaluations(), 1, \"{lane} change must reevaluate signals\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsReuseDecision",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsReuseDecision",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "4c2ca1cb3a171f0c10876fe052d2b71956d3d7a52c5fefdf654e7f1d0f5fe83a",
+        "declaration_hash": "1913d67fa130305afaf51773baa6fe1e9689dfeadc0f4fb1ea69150be04519d8",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n                decide_type_signals_reuse(&freshness(), &current(), status),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsReuseDecision",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsReuseDecision",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "87c91ad53dced93716f2cb4a9967d7db8bc222a1b8758ce748ad7ab4c835ada0",
+        "declaration_hash": "1913d67fa130305afaf51773baa6fe1e9689dfeadc0f4fb1ea69150be04519d8",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&recorded, &current, snapshot_status.clone()),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );\n\nassert_eq!(\n            decide_type_signals_reuse(&recorded, &differing_evaluator_contract, snapshot_status),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\n        );\n\nassert_eq!(rustdoc.launches(), 1, \"{lane} must launch rustdoc\");\nassert_eq!(\n    evaluation.evaluations(),\n    1,\n    \"{lane} must evaluate signals after re-extraction\"\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsReuseDecision",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsReuseDecision",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "9021a5930346d5d94c3ad3f1c184e82302a06af293453d0c6fed2bc4aa7b1cda",
+        "declaration_hash": "1913d67fa130305afaf51773baa6fe1e9689dfeadc0f4fb1ea69150be04519d8",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&freshness(), &changed, verified()),\n            TypeSignalsReuseDecision::ReevaluateWithSnapshot\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsReuseDecision",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsReuseDecision",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "4c2ca1cb3a171f0c10876fe052d2b71956d3d7a52c5fefdf654e7f1d0f5fe83a",
+        "declaration_hash": "1913d67fa130305afaf51773baa6fe1e9689dfeadc0f4fb1ea69150be04519d8",
+        "anchor_text_hash": "24b933f6486d2712ab342cc915f02e02b7d6226416d7401413db097808be44cf"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n                decide_type_signals_reuse(&freshness(), &current(), status),\n                TypeSignalsReuseDecision::ReextractAndEvaluate\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsSchemaVersion",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsSchemaVersion",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "2bc7b3c3b627c302d8f5bfbfb2df4aee4aaa043079289ddb019de7782722708d",
+        "declaration_hash": "2ecd992f2125c70dd96d7cecd84a8d9575c71ec89d2bea6b8e79b7b95ace5a84",
+        "anchor_text_hash": "62c40f2ec9b627814622c55731c88a656f7ced8f24a317079f9b36a4d43a6b7d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(document.schema_version().value(), TYPE_SIGNALS_SCHEMA_VERSION);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsSchemaVersion",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsSchemaVersion",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "e1f0fdca8e3b0978a1f3ced7eb1b052299c1a2c0c3720c9e106d79ac053c7dcc",
+        "declaration_hash": "2ecd992f2125c70dd96d7cecd84a8d9575c71ec89d2bea6b8e79b7b95ace5a84",
+        "anchor_text_hash": "49aae763cb96599341893eccc90ff4c17871c389da9f6afbe3a9f41d775d6f11"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            matches!(result, Err(TypeSignalsCodecError::UnsupportedSchemaVersion(version)) if version.value() == 1)\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsSchemaVersionError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsSchemaVersionError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "004b77c9b03f45ef9893aa8878d9249597ba903f6aae9195c6b94d81dff713b0",
+        "declaration_hash": "6dc11306a37ee2b43de4c2bbe6bed34da69d826883364454822151a76f512328",
+        "anchor_text_hash": "62c40f2ec9b627814622c55731c88a656f7ced8f24a317079f9b36a4d43a6b7d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(TypeSignalsSchemaVersion::try_new(0), Err(TypeSignalsSchemaVersionError::Zero));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsSchemaVersionError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsSchemaVersionError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "36c18da191804a11e809a6339fa212daa1c401c9a13f851816bfccd8d8608e51",
+        "declaration_hash": "6dc11306a37ee2b43de4c2bbe6bed34da69d826883364454822151a76f512328",
+        "anchor_text_hash": "49aae763cb96599341893eccc90ff4c17871c389da9f6afbe3a9f41d775d6f11"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = decode(&payload(0, \"2026-04-18T12:00:00Z\", serde_json::json!([])));\n        assert!(matches!(result, Err(TypeSignalsCodecError::InvalidSchemaVersion(_))));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutionError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutionError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "86f80d85a37431ef253aa18685e9bd6c6aac77b20cba3cc016f3a6861adc1bc4",
+        "declaration_hash": "35ca5be1ce02c8637b71026590bae50fd48014ea09e5578ee991ec60ddcbf552",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "matches!(err, TypeSignalsError::EvaluationFailed { ref layer_id, ref reason }\n            if layer_id.as_ref() == \"domain\" && reason.as_str() == \"evaluation failed: nightly not installed\")"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LoadCatalogueSpecSignalsForViewError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LoadCatalogueSpecSignalsForViewError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "57469b2c53d7a8c20a15ee74d9fbb4cbbe042a5ca4daad67f813cff405a7aaed",
+        "declaration_hash": "782b32cee80f5144dfad64b742219b09c0862811f83a6d683383af7cec0a9e44",
+        "anchor_text_hash": "68927f7c3e5267891b6668fda154c11dfb2f5ac808d98960225c7f685fe861ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let error = load_catalogue_spec_signals_for_view(signals_file.path(), catalogue_bytes)\n            .expect_err(\"a stale declaration hash must fail closed\");\n\n        assert!(\n            matches!(\n                error,\n                LoadCatalogueSpecSignalsForViewError::StaleHash {\n                    path,\n                    declared,\n                    actual,\n                } if path == signals_file.path()\n                    && declared == expected_declared\n                    && actual != expected_declared\n            ),\n            \"stale declaration hash must surface as StaleHash\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LoadCatalogueSpecSignalsForViewError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LoadCatalogueSpecSignalsForViewError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "1b8b31ef386593a94efc8b7b87533df76cb45a985aae02c1386a2288b1712d6d",
+        "declaration_hash": "782b32cee80f5144dfad64b742219b09c0862811f83a6d683383af7cec0a9e44",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "matches!(\n                error,\n                LoadCatalogueSpecSignalsForViewError::StaleHash {\n                    path,\n                    declared,\n                    actual,\n                } if path == signals_file.path()\n                    && declared == expected_declared\n                    && actual != expected_declared\n            )"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RustdocSchemaExporter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "f3f3a113d79846a5603050bc4d908e5413efe8f7bb87a6c58e2a14979f26b0b5",
+        "declaration_hash": "08a6c5258f9471b2d5949d3a89eef870c490f7d157e70ab359aee2e605b10bca",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rustdoc.launches(), 0, \"{lane} change must not launch rustdoc\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RustdocSchemaExporter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "f3f3a113d79846a5603050bc4d908e5413efe8f7bb87a6c58e2a14979f26b0b5",
+        "declaration_hash": "08a6c5258f9471b2d5949d3a89eef870c490f7d157e70ab359aee2e605b10bca",
+        "anchor_text_hash": "75b43ffe78c8e7f87d2ef2b71174ae8124734aa272f8d731f2a22fd889feddda"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"assert!(\\n                result.is_ok(),\\n                \\\"{lane} change must evaluate from the verified snapshot: {result:?}\\\"\\n            );\\n            assert_eq!(rustdoc.launches(), 0, \\\"{lane} change must not launch rustdoc\\\");\\n            assert_eq!(evaluation.evaluations(), 1, \\\"{lane} change must reevaluate signals\\\");\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsCodecError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCodecError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "0c959cf5056891057a5abaae4cc35690babf4f9606a1e29af7380d65bb4e0c4b",
+        "declaration_hash": "973fed8e44cb0dd26796013e775b0e9e20a42fd29510c6e454659ea037300789",
+        "anchor_text_hash": "62c40f2ec9b627814622c55731c88a656f7ced8f24a317079f9b36a4d43a6b7d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "matches!(decode(&value.to_string()), Err(TypeSignalsCodecError::Json(_)))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsCodecError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCodecError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "f9cf1fffb54e7cfb9e9683d366e969e835f4e7465d0743ffee606fe2769e3155",
+        "declaration_hash": "973fed8e44cb0dd26796013e775b0e9e20a42fd29510c6e454659ea037300789",
+        "anchor_text_hash": "5bccbfc255341918cf9ac6632443f8780bebcdad97b2ca442fb4bbffb15e6f5f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n                result.is_ok(),\n                \"{lane} must re-extract from the exported snapshot: {result:?}\"\n            );\n            assert_eq!(rustdoc.launches(), 1, \"{lane} must launch rustdoc\");\n            assert_eq!(\n                evaluation.evaluations(),\n                1,\n                \"{lane} must evaluate signals after re-extraction\"\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsCodecError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCodecError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "0c959cf5056891057a5abaae4cc35690babf4f9606a1e29af7380d65bb4e0c4b",
+        "declaration_hash": "973fed8e44cb0dd26796013e775b0e9e20a42fd29510c6e454659ea037300789",
+        "anchor_text_hash": "49aae763cb96599341893eccc90ff4c17871c389da9f6afbe3a9f41d775d6f11"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n                matches!(decode(&value.to_string()), Err(TypeSignalsCodecError::Json(_))),\n                \"schema-v2 artifact missing {field} must fail closed\"\n            );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     }

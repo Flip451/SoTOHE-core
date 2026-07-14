@@ -38,6 +38,120 @@
         "citation": "Closed provider-independent vocabulary for explicitly configured reasoning effort."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "9b8b2517cb97bf05443fb581197844b236bb8111a1e76704c73517b32d104b6a",
+        "declaration_hash": "ef898895803b9da66dfe668ad6ba40592a97784c673f999295521e6b8496e110",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase failure contract constructed by TypeSignalsInteractor; opaque failure details reuse the baseline DiagnosticText value object, while track, branch, and layer identities remain validated domain types."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b9c3d23c0afc8f4a79bb695070d906b9bc5ffac8572571db22d2a779a692997d",
+        "declaration_hash": "ef898895803b9da66dfe668ad6ba40592a97784c673f999295521e6b8496e110",
+        "anchor_text_hash": "bf67b07b3df039ed9e256ea3d2141355728881e8e9506f2feeba1412717794fa"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase failure contract constructed by TypeSignalsInteractor"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "9ec6d48d2366e91035e030e12dee10b477f78611b0a5e721828a0dbaf9dfef64",
+        "declaration_hash": "ef898895803b9da66dfe668ad6ba40592a97784c673f999295521e6b8496e110",
+        "anchor_text_hash": "62c40f2ec9b627814622c55731c88a656f7ced8f24a317079f9b36a4d43a6b7d"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Usecase failure contract constructed by TypeSignalsInteractor\"; methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsRequest",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "49b771a57b8cfef1abeceba5da79a306ad8338b9e8891b799b18871a6847fbf9",
+        "declaration_hash": "145c9c4a58963b3005c9c925ffff7114a1b3d080b4abc491c16b90d4e9fabacf",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsRequest",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "3a3bd22d65d388d391d505c0586024f8bf105a1ed8a8bb4b980ae17bbca128fa",
+        "declaration_hash": "145c9c4a58963b3005c9c925ffff7114a1b3d080b4abc491c16b90d4e9fabacf",
+        "anchor_text_hash": "44d8c635626e30a0abb85c59e9b9f2f549a3f4e3f42902eef8bebf51f841cb69"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Typed signal-evaluation command that prevents invalid track, branch, and layer identities from entering the use case."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LoadCatalogueSpecSignalsForViewError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "132eff256d3b7e23ad363f33c0d9cf880529e532602d3955d3412a0cab250992",
+        "declaration_hash": "782b32cee80f5144dfad64b742219b09c0862811f83a6d683383af7cec0a9e44",
+        "anchor_text_hash": "8b83d2b5df4a2d33596f0d15795676e6520a69b8cfd86e81d7c5534411d1c6d8"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Fail-closed catalogue-spec signal loading errors"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ]
 }

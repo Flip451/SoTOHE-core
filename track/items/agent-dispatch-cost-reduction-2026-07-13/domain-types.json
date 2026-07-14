@@ -68,6 +68,18 @@
         {
           "has_default_impl": false,
           "is_async": false,
+          "name": "from_content_hash",
+          "params": [
+            {
+              "name": "content_hash",
+              "ty": "ContentHash"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
           "name": "as_str",
           "params": [],
           "receiver": "&self",
@@ -1125,7 +1137,7 @@
     },
     "Sha256Digest": {
       "action": "add",
-      "docs": "Validated lowercase SHA-256 hexadecimal digest used by freshness identities.",
+      "docs": "Validated lowercase SHA-256 hexadecimal digest used by freshness identities; external text uses try_new, while computed ContentHash values use the infallible from_content_hash path.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",

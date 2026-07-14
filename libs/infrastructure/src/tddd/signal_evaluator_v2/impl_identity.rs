@@ -48,16 +48,21 @@ const COMPILER_INTERNAL_TRAIT_PATHS: &[&str] = &[
     // Qualified paths (primary krate.paths code path)
     "core::marker::StructuralPartialEq",
     "core::marker::StructuralEq",
+    "core::clone::TrivialClone",
     "std::marker::StructuralPartialEq",
     "std::marker::StructuralEq",
+    "std::clone::TrivialClone",
     // Two-segment fallback (core_canonical_path / std_canonical_path for unrecognised names)
     "core::StructuralPartialEq",
     "core::StructuralEq",
+    "core::TrivialClone",
     "std::StructuralPartialEq",
     "std::StructuralEq",
+    "std::TrivialClone",
     // Bare short-name fallback (normalize_impl_trait_path when ID absent from krate.paths)
     "StructuralPartialEq",
     "StructuralEq",
+    "TrivialClone",
 ];
 
 /// Returns `true` when the normalized trait path matches one of the compiler-internal
@@ -95,7 +100,9 @@ pub(crate) fn is_compiler_internal_trait(normalized_trait_name: &str) -> bool {
 /// Trait path normalization (via `normalize_impl_trait_path`):
 /// - Local-crate trait paths (`crate::MyTrait`, bare `MyTrait`,
 ///   `{crate_name}::MyTrait`) are reduced to their last segment so that S-side
-///   codec paths and C-side rustdoc paths produce the same key.
+///   codec paths and C-side rustdoc paths produce the same key. The domain and
+///   usecase `TypeSignalsExecutorPort` paths are retained because the catalogue
+///   explicitly models their replacement as separate delete/add identities.
 /// - External crate paths (e.g. `serde::Serialize`) are preserved verbatim to
 ///   prevent collisions between distinct traits sharing the same short name.
 ///
@@ -291,23 +298,25 @@ pub(crate) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeM
                             "core" | "alloc" => {
                                 crate::tddd::type_ref_parser::core_canonical_path(&joined)
                             }
-                            // Workspace crates (domain, usecase): the S-side codec emits
-                            // the bare short trait name.  Return the short name here to
-                            // match the multi-segment branch below.
+                            "domain" | "usecase" if joined == "TypeSignalsExecutorPort" => {
+                                format!("{ext_crate_name}::{joined}")
+                            }
                             "domain" | "usecase" => joined,
                             other => format!("{other}::{joined}"),
                         }
                     } else if let Some(first_seg) = ps.path.first() {
-                        // For workspace crates (domain, usecase), the S-side catalogue codec
-                        // emits the bare short trait name (to remain consistent when rustdoc
-                        // omits the trait from krate.paths and falls back to the raw path
-                        // string).  Normalise multi-segment domain/usecase paths to the bare
-                        // short name so both sides produce the same identity key.
-                        if first_seg == "domain" || first_seg == "usecase" {
-                            // ps.path.last() is always Some when ps.path is non-empty.
-                            ps.path.last().unwrap_or(first_seg).to_string()
-                        } else {
+                        // Most workspace trait identities are historically normalised to their
+                        // short name. The TypeSignals executor port is the exception: its
+                        // domain-to-usecase migration is modelled as delete/add, so collapsing
+                        // the two qualified paths would hide both declared changes.
+                        let is_executor_port = ps.path.last().is_some_and(|last| {
+                            last == "TypeSignalsExecutorPort"
+                                && matches!(first_seg.as_str(), "domain" | "usecase")
+                        });
+                        if is_executor_port {
                             joined
+                        } else {
+                            ps.path.last().unwrap_or(first_seg).to_string()
                         }
                     } else {
                         joined
@@ -328,7 +337,7 @@ pub(crate) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeM
             };
 
             // Skip compiler-internal phantom marker traits (StructuralPartialEq,
-            // StructuralEq).  These cannot be declared in any workspace catalogue
+            // StructuralEq, TrivialClone). These cannot be declared in any workspace catalogue
             // because they have no stable user-facing name, so they would always
             // appear in `CMinusSUnionD` regardless of catalogue completeness.
             // Per ADR `2026-05-08-0305` D9, derive-generated trait impls (Clone,

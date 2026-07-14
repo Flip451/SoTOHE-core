@@ -1,7 +1,12 @@
 {
-  "schema_version": 1,
-  "generated_at": "2026-07-13T23:24:28Z",
-  "declaration_hash": "b1b57b7792a1e25c2b07b2dc8b05f454eb9fd93f84894e5c8a858c237007a47a",
+  "schema_version": 2,
+  "generated_at": "2026-07-14T11:20:04Z",
+  "declaration_hash": "57cc07e187db75bce8a7c5bfaaee5fd3d2d4e266e080dbef22c630975e156e8d",
+  "implementation_input_hash": "fb52e540083b9aa39ee5549f9c5ae42136e548d724b8110b8c2fb8292e46f7a8",
+  "baseline_hash": "520e9c086c794a0b0ab80f0f7ebb14653611da5f739c4b6c6a140809064098d1",
+  "live_rustdoc_snapshot_hash": "990f21b8417e9910f5ffcf771769c1de7a2c645ad3376995be8347660f26dd06",
+  "evaluator_contract_hash": "2a777bad7254e62184a5879b04c88e397ef9d415c4ffa8474e0cf34c3b27ba8d",
+  "rustdoc_extraction_contract_hash": "12a00d7d8c09783a43c5d7057da95042a359d2ba6fc0112dcb00806300694be0",
   "signals": [
     {
       "type_name": "AgentProfiles",
@@ -9,7 +14,7 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "core::fmt::Debug"
+        "Debug"
       ]
     },
     {
@@ -18,10 +23,10 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "core::convert::From<Error>",
-        "core::error::Error",
-        "core::fmt::Debug",
-        "core::fmt::Display"
+        "Debug",
+        "Display",
+        "Error",
+        "From<Error>"
       ]
     },
     {
@@ -30,9 +35,9 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "core::clone::Clone",
-        "core::fmt::Debug",
-        "serde_core::de::Deserialize<'de>"
+        "Clone",
+        "Debug",
+        "Deserialize<'de>"
       ]
     },
     {
@@ -81,17 +86,28 @@
       ]
     },
     {
+      "type_name": "LoadCatalogueSpecSignalsForViewError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
       "type_name": "ReasoningEffortDto",
       "kind_tag": "enum",
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug",
-        "core::marker::Copy",
-        "serde_core::de::Deserialize<'de>"
+        "Clone",
+        "Copy",
+        "Debug",
+        "Deserialize<'de>",
+        "Eq",
+        "PartialEq"
       ]
     },
     {
@@ -100,11 +116,17 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "core::clone::Clone",
-        "core::cmp::Eq",
-        "core::cmp::PartialEq",
-        "core::fmt::Debug"
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
       ]
+    },
+    {
+      "type_name": "RustdocSchemaExporter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "Sha256ExecutionContractFingerprintAdapter",
@@ -119,13 +141,22 @@
     {
       "type_name": "TypeSignalsCodecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
-        "core::convert::From<Error>",
-        "core::error::Error",
-        "core::fmt::Debug",
-        "core::fmt::Display"
+        "Debug",
+        "Display",
+        "Error",
+        "From<Error>"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsExecutorAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "usecase::type_signals::ports::TypeSignalsExecutorPort"
       ]
     },
     {
@@ -149,26 +180,20 @@
     {
       "type_name": "infrastructure::tddd::type_signals_codec::declaration_hash",
       "kind_tag": "free_function",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
       "kind_tag": "free_function",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
-      "type_name": "TypeSignalsExecutorAdapter",
-      "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": true,
-      "found_items": [
-        "TypeSignalsExecutorPort"
-      ],
-      "missing_items": [
-        "TypeSignalsExecutorPort"
-      ]
+      "type_name": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "AgentProfilesCapabilityAdapter",

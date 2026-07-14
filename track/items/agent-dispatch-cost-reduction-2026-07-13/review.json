@@ -1,518 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87e87b14d4c8e91a357d128fcbb8e4196031695a6f19a91c0d4ed4e0dbcffc41",
-          "at": "2026-07-13T21:25:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87e87b14d4c8e91a357d128fcbb8e4196031695a6f19a91c0d4ed4e0dbcffc41",
-          "at": "2026-07-13T21:29:25Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The dry-checker final/default effort is set to `high`, but D1 requires reviewer-like final lanes on Codex to use the provider maximum, `xhigh`. The final DRY-check lane therefore runs below the required effort level; set `reasoning_effort` to `xhigh`.",
-              "severity": "P0",
-              "file": ".harness/config/agent-profiles.json",
-              "line": 81,
-              "category": "capability routing mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:38493a7a5e525dd585c55f0aac489e462d7e87d6b58fc11dc7c10f321a082eac",
-          "at": "2026-07-13T21:20:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry-checker` の fast/final 用キーが契約と異なります。`reasoning_effort` ではなく `final_reasoning_effort: \"xhigh\"` が必要で、現在の `fast_reasoning_effort: \"medium\"` も D1 の fast=low に違反します。このままでは final dispatch が必須 effort を解決できず fail-closed で失敗します。",
-              "severity": "P0",
-              "file": ".harness/config/agent-profiles.json",
-              "line": 81,
-              "category": "capability routing mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:56cef24bd4ad1204fc52f69b0366c24a6f7ce7fc00292bb3e385cd1f50ccabb2",
-          "at": "2026-07-13T21:25:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94558f51cde94d5697892908fc3135e71a440eab683d03a8e4718095e93bc3f1",
-          "at": "2026-07-13T21:29:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94558f51cde94d5697892908fc3135e71a440eab683d03a8e4718095e93bc3f1",
-          "at": "2026-07-13T22:28:51Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 lacks a concrete target file or symbol; “T001 task-contract catalogue entries” leaves the implementation boundary to the executor.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 6,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T001 restates the effort/profile behavior contract in prose (“typed provider, model...”, rejecting provider defaults); retain only concrete target, operation, and anchors.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T002 lacks concrete profile file or symbol targets; “T002 task-contract catalogue entries” and “committed routing profiles” are not an executable boundary.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 12,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T002 restates the IN-01/IN-02/OS-02 behavior contract in prose, including reference verifiers and the pr-reviewer exemption.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 12,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T003 lacks concrete target files or symbols for the cache and fingerprint work; “T003 task-contract catalogue entries” is not an implementable boundary.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 18,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T003 restates the session-cache fingerprint and unsafe-reuse behavior contract in prose, including unreadable, mismatched, expired, and failed entries.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 18,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T004 lacks concrete reviewer, adapter, CLI, or composition target files/symbols; “T004 task-contract catalogue entries” does not define the implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 24,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T004 restates the reviewer resume behavior contract, including same-scope eligibility, fresh-session fallback, flag reinjection, and full-scope re-evaluation.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 24,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T005 lacks concrete domain files or symbols for the signal artifact and freshness model; “T005 task-contract catalogue entries” is not an executable boundary.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 30,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T005 restates the type-signals schema, conservative reuse, and completed-track migration behavior contract in prose.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 30,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T006 lacks concrete target files or symbols for the codec, executor, and composition work; “T006 task-contract catalogue entries” does not define the implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 36,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T006 restates the signal-preflight skip/recompute behavior contract, including permitted work and conservative handling of unknown evidence.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 36,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T007 lacks concrete usecase or adapter target files/symbols; “T007 task-contract catalogue entries” is not an executable implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 42,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T007 restates the capability-resume behavior contract, including target-bound dispatch, fallback, flag injection, cache separation, and in-host exclusion.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 42,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T008 names only broad CLI/driver/composition boundaries and lacks concrete files or symbols; “T008 task-contract catalogue entries” is not an executable boundary.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 48,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T008 restates the CLI resume and fresh-dispatch behavior contract instead of delegating that behavior to its IN/CN/AC anchors.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 48,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T009 lacks concrete capability-contract file paths or symbols; “shared capability discipline,” “affected ... contracts,” and “conformance or dead-reference coverage” leave the deliverables ambiguous.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 54,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T009 restates the full-scope re-review and upstream-artifact re-reading behavior contract in prose; cite CN-03/CN-10/AC-03/AC-10 instead.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 54,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:347a509a102b1e1993066a1b36191b0ad9d4d81c5b0cd64326639fde44820e1e",
-          "at": "2026-07-13T16:40:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T003 creates `ProviderSessionCacheKey`, which depends on the `TargetArtifactSet` type assigned to T007. However, S4 schedules T007 after T003, so T003 cannot be implemented as an independently buildable task. Move `TargetArtifactSet` into an earlier prerequisite or revise the task dependencies.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 18,
-              "category": "dependency cycle or wrong ordering"
-            }
-          ],
-          "hash": "rvw1:sha256:9f438bb3d1c7770233eda4c1e79f05be7f12134dead6b1b428bd1b23e58437d9",
-          "at": "2026-07-13T16:48:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f40a917a941e19105d10b3cc38efc57bbce46537a64b0fc232441954463f706",
-          "at": "2026-07-13T16:54:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`plan.summary` contains behavioral prose but no explicit GO-NN-to-task mappings. Consequently GO-01 through GO-04 lack the required goal traceability—particularly GO-01, whose work extends beyond T001/T002, and cross-cutting GO-04. Add explicit mappings such as `GO-NN → T...` in `plan.summary`.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 60,
-              "category": "task-coverage gap"
-            },
-            {
-              "message": "T002 is attributed to the modified `AgentProfilesError` catalogue entry, but T002's executable description names `AgentProfiles`, configuration/execution DTOs, and `AgentProfilesCapabilityAdapter::resolve` without any operation on `AgentProfilesError`. Add the error type and its intended modification to T002, or move/remove the attribution if another task owns it.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/task-contract.json",
-              "line": 17,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:9f40a917a941e19105d10b3cc38efc57bbce46537a64b0fc232441954463f706",
-          "at": "2026-07-13T17:01:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T005 は `TypeSignalsExecutionError` を `type_signals_doc.rs` の変更対象として列挙していますが、この catalogue entry は `tddd::catalogue_v2::catalogue_impl_signals_ports` に属する `action: reference` であり、T005 の新規型や `decide_type_signals_reuse` からも使用されません。一方、その実ファイルと `TypeSignalsExecutorPort` を変更する carrier task は T006 です。T005 からこの対象記載を外し、reference-entry attribution を T006 に移してください。",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/task-contract.json",
-              "line": 64,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:26419f3d1e788140cf7cb62252f2a48614bd8f637f6fdae17cd8a1d0ee342732",
-          "at": "2026-07-13T17:07:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4464db8c52895c356736b239ec5710264c6083d97dae0cedd707626e2453bf04",
-          "at": "2026-07-13T17:11:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:43b5267c11e4ae8dd0781d8ba1cfb435c2cad1233c1e9c0a7ef653ed0e391602",
-          "at": "2026-07-13T18:13:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2440a4494cc2ef4b2f2b15a6ea489c3a6691d9740378f28e0ce793a31d3d6634",
-          "at": "2026-07-13T19:21:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66d735e1bc0ff63f9ba66378da3d5d7a4f611780e7d0202a4df6bf212dda73a6",
-          "at": "2026-07-13T21:33:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T002の「using the resolved reasoning effort; Gemini fails closed when effort cannot be injected」は、anchorで参照すべき上流の挙動契約を散文で再記述しています。`knowledge/conventions/no-upstream-restatement.md`に従い、対象・操作・anchor citeだけにしてください。",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
-              "line": 11,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:aa2bdb687e562e870e52d839b9564c3b6f63cd3c08dea415d16f537d638777c6",
-          "at": "2026-07-13T22:21:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:97e6fe81d8a103dea6ce734b01f36b75912f6d3f567ec3c83a6f8a61bde98f79",
-          "at": "2026-07-13T22:24:48Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f823dbe2f4d57aa7514f3bee9dd3e60725bc9194d47e63ded184ebefccd042fc",
-          "at": "2026-07-13T21:19:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f823dbe2f4d57aa7514f3bee9dd3e60725bc9194d47e63ded184ebefccd042fc",
-          "at": "2026-07-13T21:25:19Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 の入力 hash は source 内容・Cargo.lock・toolchain 識別子 בלבדで、Cargo.toml の feature/target 設定、rustflags/RUSTDOCFLAGS、その他 rustdoc 出力を変える設定を捕捉することが明示されていません。この変更後も hash が一致して signal 再計算を skip すると、古い type-signals を新しい実装条件に対して再利用できます。実装が hash に含める入力集合と、未モデル化入力時の fail-closed 動作を決定として明記してください。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 56,
-              "category": "decision underspecified for downstream consumption"
-            },
-            {
-              "message": "D4 は継続作業を「同じ成果物」への再入に限定していますが、track cache のキーは track × capability だけで対象 artifact を含みません。同一 track 内で同じ capability が別 artifact を扱うと、orchestrator が resume を opt-in した際に前の artifact の session を再利用し、stale context を引き継げます。track cache も artifact/work-unit identity をキーまたは検証条件に含める必要があります。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 62,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:e28b1deafd32dbdedacc5da5839fb082192a37692907d9a436c2fa942ea52fec",
-          "at": "2026-07-13T13:37:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 simultaneously requires skipping signal recalculation when implementation inputs are unchanged and re-evaluating when the catalogue/spec changes, but it does not define a retained and validated rustdoc snapshot for that re-evaluation. The downstream implementation cannot safely evaluate a changed catalogue without rerunning rustdoc or specifying a cache, so this can consume absent/stale data.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 54,
-              "category": "decision underspecified for downstream consumption"
-            },
-            {
-              "message": "The D3 freshness hash does not explicitly cover all inputs that affect the stored signals: the evaluator also consumes the baseline rustdoc artifact, and rustdoc/evaluation can vary with path-dependency, build-script, or proc-macro source changes not captured by the listed target-crate source and lockfile inputs. Without an explicit complete input closure or fail-closed detection for these cases, an unchanged hash can incorrectly skip recalculation and leave stale signals.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 56,
-              "category": "decision underspecified for downstream consumption"
-            }
-          ],
-          "hash": "rvw1:sha256:8a1936a638f682ff57609a28bc3a52b36cff5ca03ae7efa0a0c54281e1e76ce4",
-          "at": "2026-07-13T13:44:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 is internally inconsistent: it says baseline changes may reuse the live rustdoc snapshot without extraction (lines 54–56), but then requires the current baseline hash to equal the artifact’s recorded baseline hash. Any actual baseline change makes that condition false and forces rustdoc recomputation, so downstream implementation cannot derive the stated skip behavior.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 56,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:905d06f2de81067badcdc312fa215e94cd7949ff9017a2914597fd1e9e3c6aec",
-          "at": "2026-07-13T13:48:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2 lists `fresh-every-round` as a rejected candidate, but no Rejected Alternatives entry actually rejects fresh reviewer sessions. H concerns capability dispatches under D4, while C only rejects cross-tier resume, leaving D2's reviewer-session choice without a corresponding rationale.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 10,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:8ea7d58df436321bbdb35e53480a57c0221701d7b5a3c238150ef2153fb0ef4b",
-          "at": "2026-07-13T13:51:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 requires skipping rustdoc extraction and later reusing a verified live snapshot, but it only specifies storing the snapshot hash in the type-signals artifact while explicitly rejecting a separate transient cache. It does not define where the snapshot body is persisted or how it is loaded; regenerating it with Cargo would perform the extraction that D3 intends to skip, while omitting it makes signal recomputation impossible. Downstream implementation/spec cannot derive a working acceptance criterion for this reuse path.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 56,
-              "category": "decision underspecified for downstream consumption"
-            }
-          ],
-          "hash": "rvw1:sha256:c2e7ed3cd7c8d0bee017ad2694fbfd41d43d6708579eecf3828e4be8ad9d6d61",
-          "at": "2026-07-13T13:54:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2/D4 の session cache は provider/model だけで再利用可否を決め、review briefing・severity policy・capability contract の世代変更を無効化または再注入する規則がありません。再起動後や規約更新後に同じ track/scope/artifact で resume すると、古い判断規則・作業契約のまま review/編集を続け得るため、observable な fail-closed 条件を追加してください。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 48,
-              "category": "decision underspecified for downstream consumption"
-            },
-            {
-              "message": "D1 の candidate_selection にある `merge-fast-final-tiers` は、Rejected Alternatives A-L または採択 decision に対応する説明がありません。fast/final の effort tier を統合する案を却下したのか、採択方針に含めるのかが decision trace から判定できず、ADR の選択理由と downstream acceptance criteria の根拠が不完全です。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 6,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:3e333d9af262e53f830748c286c014c3151f6bbbf735450b4068d2df6a57a0f2",
-          "at": "2026-07-13T13:58:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bfb67537af7ea8afea42eee4449d98aa405cb5f58950cff36073956125483f76",
-          "at": "2026-07-13T14:03:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2 fingerprints the contents of the resolved scope files and generated briefing, then invalidates the session on any mismatch. A fixer re-round necessarily changes at least a scoped file—and the briefing may also be regenerated—so the cache always falls back to a new session instead of resuming as D2 requires. Separate stable execution-contract inputs from mutable review inputs.",
-              "severity": "P0",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 48,
-              "category": "inconsistent decisions within the same ADR"
-            },
-            {
-              "message": "D4 includes the dispatch briefing's contents in the fingerprint and invalidates the session when they change. Since `capability exec` receives each task through that briefing, follow-up or repair work normally requires changing it; the intended continuation therefore becomes a fresh session. The decision must specify which stable contract portion is fingerprinted independently of the changing task payload.",
-              "severity": "P0",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 64,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:bfb67537af7ea8afea42eee4449d98aa405cb5f58950cff36073956125483f76",
-          "at": "2026-07-13T14:06:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 permits skipping signal evaluation when “all inputs” are unchanged, but the defined freshness state covers only the target rustdoc build-input closure, catalogue declaration, baseline, and snapshot. Signal results also depend on the evaluator implementation and its configuration, which can change without changing any of those hashes; downstream spec.json therefore cannot derive an observable invalidation rule, and previously generated signals may remain stale after evaluation semantics change. Specify how the evaluation contract participates in freshness or when reevaluation is mandatory.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 54,
-              "category": "decision underspecified for downstream consumption"
-            }
-          ],
-          "hash": "rvw1:sha256:f8363ba8866e61492d1566bce3aa0d5f5f5ba0dd845b86b3d70393c3504a8307",
-          "at": "2026-07-13T14:11:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 は evaluator-contract の変更時にも既存 rustdoc snapshot の再利用を許可していますが、その contract 自体に evaluator 実装の code/build identity を含めています。抽出用の引数・root 解決・JSON 生成方法を担う実装が変わっても、実装側 input hash と旧 snapshot の自己 hash が一致すれば旧 snapshot を再利用できるため、「判定不能なら rustdoc 抽出から再計算する」という fail-closed 方針に反して stale signal を生成し得ます。下流 spec が安全な再利用条件を導出できるよう、抽出結果へ影響する contract の変更を snapshot 無効化条件として明確にしてください。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 54,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:2134ab5c76dd93544397956b0f3f593ee1cd539f8bb6c113ad548bebc8937aa3",
-          "at": "2026-07-13T14:15:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e02a12ecad05852e529f05be0bc2b4998b3f6e1f4fee0c2c1eff928d1f24a4df",
-          "at": "2026-07-13T14:19:40Z"
-        }
-      ]
-    },
     "types": {
       "rounds": [
         {
@@ -786,6 +274,508 @@
           "findings": [],
           "hash": "rvw1:sha256:462668e88796e961dc59653d42c59c92999a76c12d5a22b2cf592407aaa729e0",
           "at": "2026-07-13T22:39:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LoadCatalogueSpecSignalsForViewError::Hash` is dead vocabulary. Both sources of `Sha256DigestError` are already canonical: `declaration_hash` formats a SHA-256 value as exactly 64 lowercase hexadecimal characters, while the loader revalidates `ContentHash::to_hex()`, which has the same guarantee. Consequently neither `InvalidLength` nor `InvalidHex` can occur. The fallible contracts on `infrastructure::tddd::type_signals_codec::declaration_hash` and `infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash` propagate an impossible failure and create this unconstructible variant. Provide an infallible conversion for computed digest bytes and reserve fallible parsing for external strings.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 1443,
+              "category": "unconstructible error variant / per-method error imprecision"
+            },
+            {
+              "message": "`RustdocSchemaExporter::existing_rustdoc_json_path` returns the broad `domain::schema::SchemaExportError`, but this method neither checks nightly, launches rustdoc, nor parses rustdoc JSON. Its implementation maps its resolution and path-safety failures exclusively to `RustdocFailed`, leaving `NightlyNotFound`, `ParseFailed`, and `CrateNotFound` structurally unreachable. The catalogue docs neither list that producible subset nor justify the broad error. Declare a method-specific error or explicitly narrow the contract.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 1857,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "The `infrastructure::RustdocSchemaExporter` docs restate AC-06's behavioral contract by promising verified snapshot resolution without launching rustdoc. Under `knowledge/conventions/no-upstream-restatement.md`, catalogue docs should identify the changed symbol and cite the upstream anchors rather than duplicate their behavior; replace this clause with an anchor-only change description such as adding `existing_rustdoc_json_path` for IN-06/AC-06.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 1810,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:a5ea198d613065ae81aa6c2a07523475fc73facc37614e99954f9fe225d3bf11",
+          "at": "2026-07-14T06:25:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:955b4dc040a4c7f3ffb86375dfd15ccfa668636ac0e5f983c84d5ec33d576ac3",
+          "at": "2026-07-14T07:15:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:109d4520bf5e010ba62ce50d893be7ea0e3cad154e7980a9d900daf9f03bb663",
+          "at": "2026-07-14T11:19:37Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdddf6274c939ce5cdc37f6c2c1129e63d89d5f6eb34801e190573617c81544c",
+          "at": "2026-07-13T21:22:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The resolved `effort` is discarded here, and `run_dry_fix_codex` consequently launches Codex without `model_reasoning_effort`. Even though missing effort now fails during profile resolution, every successful `dry-fix-lead` dispatch still falls back to Codex's implicit default, violating the explicit/fail-closed effort contract. Capture the effort and pass it into the Codex invocation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/mod.rs",
+              "line": 101,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "The shared ref/obligation verifier runner discards the resolved `effort`. The Codex branch continues to hardcode `high`, so configured fast=`low` and final=`xhigh` executions both run at the wrong level; Claude/Gemini likewise receive no resolved effort. Thread the typed effort into each provider's argument builder instead of using a hardcoded or provider-default value.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/process_runner.rs",
+              "line": 150,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:fdddf6274c939ce5cdc37f6c2c1129e63d89d5f6eb34801e190573617c81544c",
+          "at": "2026-07-13T21:28:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e59c03d6ef6415eb3268146a08c3f11e9e5e98e785bc4b48272f42aa074afeb",
+          "at": "2026-07-13T22:23:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "For out-of-host Claude dispatches, the resolved `request.profile.effort` is dropped: `build_claude_args` receives only capability, model, and prompt, so no `--effort` flag reaches the subprocess. An explicitly configured effort therefore silently falls back to Claude's provider default, violating D1's fail-closed execution contract.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/claude.rs",
+              "line": 86,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "Codex generic dispatch similarly ignores `request.profile.effort`; the generated arguments contain model and sandbox but no `model_reasoning_effort` override. Capabilities resolved through `AgentProfilesCapabilityAdapter` consequently run with Codex's implicit default despite having a validated explicit effort.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/codex.rs",
+              "line": 106,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:169809b5acf9f4dab608ec9434e354c65d79aa2e66fd6f7b6de09cccb96cd60b",
+          "at": "2026-07-13T23:12:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03b87380b15ff20b933e349c1d18deff5cc996ea7d77c54a345e78282b5213dc",
+          "at": "2026-07-13T23:23:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The baseline is hashed before its symlink guard runs. Because `SkipEvaluation` returns before the later guard, a symlinked baseline outside `canonical_items` can participate in a successful freshness match. Run `reject_symlinks_below(&baseline_path, &canonical_items)` before `hash_identity`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 384,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The persisted signal artifact is read without checking the leaf or its ancestors for symlinks. A valid schema-v2 document reached through a symlink can supply the recorded hashes and trigger `SkipEvaluation`. Apply the established `reject_symlinks_below` guard before reading it.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 404,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "Both contract fingerprints hash only `type_signals_evaluator.rs`. Evaluator behavior also depends on `signal_evaluator_v2`, `signal_tags`, codecs and rules, while extraction behavior depends on `schema_export`, target/root resolution, invocation arguments, features, and configuration. Changes to those inputs leave these hashes unchanged and can incorrectly reuse stale signals or snapshots. Hash the complete resolved closures required by ADR D3.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 385,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "The build-input fingerprint treats every local package closure as fully resolved after hashing its package tree, but it neither discovers build-script inputs outside that tree nor rejects custom-build packages whose inputs cannot be determined. For example, changing a workspace-level schema named by `cargo:rerun-if-changed` can alter generated public API while this hash remains unchanged, allowing a stale snapshot reuse. Detect unresolved build-script inputs and fail closed, or include their resolved files/tools in the hash.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 45,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "The new reuse path loads both existing rustdoc snapshots and persisted signal artifacts with unbounded `read_to_string` calls. A malformed large file can exhaust memory before parsing; the existing signal reader already establishes a 16 MiB bounded-read pattern. Enforce explicit size limits before these reads.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 125,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:f78259925398ee05a8c1a269624ac4cc81d6f45d83dfc95642f8f923b81f6f9b",
+          "at": "2026-07-14T06:25:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The evaluator/extraction fingerprints hash files from the runtime source checkout identified by the compile-time `CARGO_MANIFEST_DIR`, rather than the code embedded in the running `bin/sotp`. If source B is evaluated with an older binary A, that binary writes results produced by A while recording B's hash; after installing binary B, the hashes match and evaluation can be skipped, leaving stale signals. Exported/transplanted binaries can also reference a nonexistent build-host path. Embed a build-time contract digest in the binary instead of reading mutable source files at runtime.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 103,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "`encode` serializes the document's arbitrary schema version even though this codec only supports the current version. Because `TypeSignalsDocument::with_schema_version` is public, callers can emit a schema-v3 file with the schema-v2 shape which this codec immediately rejects on read. Validate the version before serialization or always emit `TYPE_SIGNALS_SCHEMA_VERSION`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 175,
+              "category": "serde codec break"
+            },
+            {
+              "message": "Cargo configuration files are detected with `is_file()` and loaded with `std::fs::read`, both of which follow symlinks. This bypasses the repository's real-file config convention and can read configuration outside the intended config root. Use `symlink_metadata()` and reject symlinks before loading, following the `scope_config_loader.rs` pattern.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 343,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The common build-input reader follows symlinks for workspace/package manifests and `Cargo.lock`; unlike the source traversal, it performs no `symlink_metadata().file_type().is_symlink()` rejection. A symlinked freshness input can therefore escape the trusted workspace boundary. Reject symlinks before every `append_file` read.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 496,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The build-input closure recursively enumerates every regular file under each local package and then reads each file fully into memory without any file-count, depth, per-file-size, or aggregate-byte bound. A large generated file or sufficiently large tree can exhaust memory or make the mandatory review prelude effectively unbounded. Apply explicit traversal and byte limits and fail closed when exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 446,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:c8afca2938289c68dc6ead57b858c194ccfcb7dd989880c5b769e8f6786b9bdc",
+          "at": "2026-07-14T07:16:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workspace-root symlink check occurs only later in the evaluation, after this call has already executed `cargo metadata` and traversed manifests and source files beneath `workspace_root`. Because leaf `symlink_metadata` checks follow symlinked ancestors, a symlinked workspace root reaches external I/O before rejection. Validate the workspace anchor before any freshness hashing or snapshot resolution.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 452,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "Build scripts are rejected only for local/path packages. Registry or git dependencies with `custom-build` targets remain reusable even though their outputs can depend on untracked system files; changing such an input can alter rustdoc output without changing this digest. Reject unresolved build scripts across the complete dependency closure or hash their resolved inputs/outputs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 69,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "The source collector unconditionally excludes package-root `tmp` and every directory named `target`, without proving they are build outputs. Cargo permits declared sources such as `[lib] path = \"tmp/lib.rs\"`, so changing that source produces the same implementation-input hash and can incorrectly reuse stale signals. Derive the source closure from Cargo inputs or fail closed when an excluded directory is referenced.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 403,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "The snapshot-reuse method uses `resolve_target_dir`, whose metadata failure or malformed output silently falls back to `<workspace>/target`. A transient resolution failure can therefore select and verify an old snapshot at the default path instead of forcing rustdoc extraction, contrary to the conservative freshness contract. Use a strict target-directory resolver for reuse that propagates any metadata/parse failure.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 101,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:97dcfc69a1a243b5a184d4652bac69a43cd654319c99aa9558f992e77f24c755",
+          "at": "2026-07-14T07:49:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The freshness hash records environment-variable strings and the fixed `rustup run nightly rustc -Vv` output, but not the identity/content of the actual compiler or documentation executable selected by Cargo (`RUSTDOC`, `CARGO_BUILD_RUSTDOC`/`build.rustdoc`, `RUSTC`, or wrappers). If a custom rustdoc binary changes in place at the same path, the implementation-input hash remains unchanged and `SkipEvaluation` can reuse stale output. Hash the resolved executable identity/content or treat such overrides as indeterminate and re-extract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 150,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "`collect_contract_files` recursively traverses contract-source directories and accumulates paths without any depth, file-count, or aggregate-byte bound. The per-file limit is applied only afterward, so a sufficiently deep or large source tree can exhaust stack, memory, or build time. Add fail-closed traversal budgets like those in `build_inputs::collect_package_files`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/build.rs",
+              "line": 97,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:558026a26268af4dc685424096270e2aad704d553675cae278b862f68ff19fa8",
+          "at": "2026-07-14T08:02:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8731cab0eea0e73f011dd79f471915256b7d1a39d115ac6cb0ac9d325ae6b817",
+          "at": "2026-07-14T08:15:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`implementation_input_hash` には target 名または path 文字列だけが入り、custom target JSON の内容が含まれません。同じ path の target specification を変更しても hash が変わらず、古い rustdoc snapshot に対して `SkipEvaluation` が選ばれ得ます。custom target の内容も hash 化するか、解決不能として再利用を拒否してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 60,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "評価後に baseline と workspace inputs を再読込して freshness hash を作っていますが、評価前の値との一致を確認していません。長い rustdoc 実行中に source、lockfile、baseline が変更されると、旧入力で生成した signals/snapshot と新入力の hash が同じ artifact に保存され、次回は誤って `SkipEvaluation` できます。評価に使用した同一 bytes の hash を保持するか、前後の hash が一致しなければ再試行または失敗させてください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 585,
+              "category": "fingerprint or hash drift"
+            }
+          ],
+          "hash": "rvw1:sha256:3771fb9e65a19f2ddb7f47666499d8a087719c1469a58a7c3179328fe1788b3b",
+          "at": "2026-07-14T08:56:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The traversal budget counts only regular files. Directories consume no budget, so a package tree containing arbitrarily many empty directories (within the depth limit) causes unbounded `read_dir` recursion during signal freshness calculation. Count every visited directory entry or add a global directory/entry limit.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 481,
+              "category": "unbounded_io"
+            },
+            {
+              "message": "The build-script traversal has the same unbounded-directory gap: `ContractSourceBudget.files` increases only for files, allowing arbitrarily many empty directories to bypass all count and byte limits and exhaust build time/resources. Apply a bounded total-entry or directory count before recursing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/build.rs",
+              "line": 143,
+              "category": "unbounded_io"
+            }
+          ],
+          "hash": "rvw1:sha256:2ab80ccb98381159cdfff16be4b255af3e093dab3c92907344362e890f3b6e3e",
+          "at": "2026-07-14T09:11:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "An absolute `CARGO_TARGET_DIR` with a symlinked ancestor is accepted. For example, with `/tmp/link -> /outside`, `CARGO_TARGET_DIR=/tmp/link/target` causes `symlink_metadata()` to follow `link` and inspect only the real leaf directory. Later checks treat that lexical target as the trusted root and inspect only descendants, so snapshot reuse can read `/outside/target/doc/*.json`. Reject every target-directory component with the existing ancestor-walking symlink guard before trusting it.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/schema_export/path_resolution.rs",
+              "line": 157,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`reject_symlinked_type_signals_anchor` checks only the final path component. A `workspace_root` or `items_dir` reached through a symlinked parent passes this check; subsequent canonicalization resolves both paths through the link, so containment also passes. The freshness pipeline can consequently read build inputs and write signals outside the intended lexical workspace. Use the existing `reject_symlinks_up_to_root` pattern, consistent with the repository's symlink-parent rejection tests.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 82,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:d434e1c39456a2ae052916222537528d2c0441c7c162a391f0554b8b0465be24",
+          "at": "2026-07-14T09:21:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`append_local_package_sources` only hashes files beneath each package directory. Rust inputs can legally escape that directory through `include!`, `include_str!`, `include_bytes!`, or `#[path]`; changing such a shared file leaves `implementation_input_hash` unchanged and can incorrectly select `SkipEvaluation`, accepting stale type signals. Hash compiler-reported external inputs or fail closed when the complete closure cannot be established.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 457,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "The new freshness commands use `Command::output()`, which buffers unbounded stdout and stderr before any source-closure byte budget applies. `cargo metadata` can contain arbitrarily large manifest metadata/dependency output, so this path can exhaust memory before failing closed; the rustup commands have the same issue. Stream subprocess output through explicit size limits.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 153,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "Strict snapshot target resolution buffers the complete `cargo metadata --no-deps` stdout/stderr via `Command::output()` without a bound. Large workspace/package metadata can therefore exhaust memory during snapshot lookup. Read the subprocess pipes with a fixed cap and reject over-limit output.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export/path_resolution.rs",
+              "line": 75,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:29605bf14948ae43ad74f867bd39d05509614c8a5ef350fed3a815b9ee2970e7",
+          "at": "2026-07-14T09:32:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The evaluator and extraction contract digests are built from hand-picked infrastructure paths. Semantics from local path dependencies and helpers outside these lists can change without changing Cargo.lock or the hashed manifests, leaving the contract hash unchanged and permitting stale reuse. Hash the complete resolved code/build closure required by D3/CN-05.",
+              "severity": "P1",
+              "file": "libs/infrastructure/build.rs",
+              "line": 30,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "Local package hashing walks only the manifest's parent directory and ignores Cargo metadata's `targets[].src_path`. A valid target path outside that directory can therefore change without affecting `implementation_input_hash`, allowing stale rustdoc snapshots to be reused. Hash every resolved target source root or reject targets escaping the package root.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 89,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "The bounded-output helper limits retained bytes but has no wall-clock timeout: `child.wait()` and the pipe readers can block forever if cargo, rustup, or a descendant never exits or retains a pipe. These calls run in the reviewer prelude, so one stuck subprocess can hang the review indefinitely. Add bounded waiting and process-tree termination.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/process.rs",
+              "line": 56,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:8f2826c6e1d4e7301acd9d99ee3df44a8acb6fcd44686cd3ceb59946fc3e7cee",
+          "at": "2026-07-14T09:49:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo metadata`-derived `manifest_path` values are read and recursively traversed without proving that each package root remains under `workspace_root` or another explicitly trusted root. A repository-controlled external path dependency can therefore make freshness calculation enumerate and hash files outside the repository. Apply an `is_safe_briefing_path`-style validation, canonical containment check, and ancestor-symlink rejection; per CN-04, roots that cannot be authorized must fail closed into re-extraction.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 88,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The new snapshot lookup calls `resolve_rustdoc_root_name`, whose `cargo metadata` subprocess uses unbounded `.output()`. This puts the freshness path at risk of an indefinite subprocess or unbounded stdout/stderr allocation before the bounded metadata lookup runs. Use the bounded command runner with an output cap and timeout.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 99,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "`core_source_roots` enumerates `libs_root` and grows `roots` without applying the declared entry budget. The later recursive scan is bounded, but a workspace with many direct library entries can consume unbounded time and memory before that budget is created. Apply an entry limit during this top-level scan as well.",
+              "severity": "P1",
+              "file": "libs/infrastructure/build.rs",
+              "line": 40,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:21840407717a26f9b8d64ebddd301ad1853f8325522ff18b713a674e240c6702",
+          "at": "2026-07-14T10:03:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d24e59010e4e1ea74e09258d6434a0a463d7f36a22bc05fc97854a8585343934",
+          "at": "2026-07-14T10:15:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The freshness closure rejects unresolved `custom-build` targets but accepts `proc-macro` targets. Procedural macros can perform arbitrary filesystem I/O while generating the rustdoc-visible API; changing such an external file would not change any currently hashed field, allowing stale `SkipEvaluation`. Reject unresolved proc-macro targets or include a verified hermetic input identity.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 181,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "The byte scanner can miss valid external-input syntax such as `include /* comment */ !(\"../../shared.rs\")` and `#[cfg_attr(feature = \"x\", path = \"../../shared.rs\")]`. Those referenced files lie outside the walked package tree, so their contents can change without changing `implementation_input_hash`, permitting stale snapshot reuse. Use syntax-aware detection or otherwise fail closed for unresolved source inputs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 424,
+              "category": "fingerprint or hash drift"
+            }
+          ],
+          "hash": "rvw1:sha256:13f54f7776a8b9681d91d2e1c4dcf97ccc63c716d7ab0de8658dc713086ed38e",
+          "at": "2026-07-14T10:45:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea48f5a8e6d4de67fcfda698e2d7e8bdd9adfed9b03349056650f822656ff220",
+          "at": "2026-07-14T10:56:26Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f823dbe2f4d57aa7514f3bee9dd3e60725bc9194d47e63ded184ebefccd042fc",
+          "at": "2026-07-13T21:19:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f823dbe2f4d57aa7514f3bee9dd3e60725bc9194d47e63ded184ebefccd042fc",
+          "at": "2026-07-13T21:25:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24b5c380b1839ad24c958d3695386c78ef662c5f0bca2e0a881e615b88eafe80",
+          "at": "2026-07-14T06:23:32Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87e87b14d4c8e91a357d128fcbb8e4196031695a6f19a91c0d4ed4e0dbcffc41",
+          "at": "2026-07-13T21:25:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87e87b14d4c8e91a357d128fcbb8e4196031695a6f19a91c0d4ed4e0dbcffc41",
+          "at": "2026-07-13T21:29:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5faabd6f4992094ae491ab34e77daacd508ac27bed236a5129174d35dbff45a7",
+          "at": "2026-07-14T06:27:12Z"
         }
       ]
     },
@@ -895,72 +885,667 @@
         }
       ]
     },
-    "infrastructure": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The dry-checker final/default effort is set to `high`, but D1 requires reviewer-like final lanes on Codex to use the provider maximum, `xhigh`. The final DRY-check lane therefore runs below the required effort level; set `reasoning_effort` to `xhigh`.",
+              "severity": "P0",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 81,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:38493a7a5e525dd585c55f0aac489e462d7e87d6b58fc11dc7c10f321a082eac",
+          "at": "2026-07-13T21:20:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry-checker` の fast/final 用キーが契約と異なります。`reasoning_effort` ではなく `final_reasoning_effort: \"xhigh\"` が必要で、現在の `fast_reasoning_effort: \"medium\"` も D1 の fast=low に違反します。このままでは final dispatch が必須 effort を解決できず fail-closed で失敗します。",
+              "severity": "P0",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 81,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:56cef24bd4ad1204fc52f69b0366c24a6f7ce7fc00292bb3e385cd1f50ccabb2",
+          "at": "2026-07-13T21:25:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94558f51cde94d5697892908fc3135e71a440eab683d03a8e4718095e93bc3f1",
+          "at": "2026-07-13T21:29:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94558f51cde94d5697892908fc3135e71a440eab683d03a8e4718095e93bc3f1",
+          "at": "2026-07-13T22:28:51Z"
+        }
+      ]
+    },
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fdddf6274c939ce5cdc37f6c2c1129e63d89d5f6eb34801e190573617c81544c",
-          "at": "2026-07-13T21:22:27Z"
+          "hash": "rvw1:sha256:54109f1fe1308de7696fd7f46c8a0965d2773cc418181a293d1e1dc48a30815e",
+          "at": "2026-07-13T21:30:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54109f1fe1308de7696fd7f46c8a0965d2773cc418181a293d1e1dc48a30815e",
+          "at": "2026-07-13T22:27:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab3669fc27032c1fb5d689af213ea7e3f55436714e4b3a272470d89d9baaf100",
+          "at": "2026-07-14T07:13:05Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 の入力 hash は source 内容・Cargo.lock・toolchain 識別子 בלבדで、Cargo.toml の feature/target 設定、rustflags/RUSTDOCFLAGS、その他 rustdoc 出力を変える設定を捕捉することが明示されていません。この変更後も hash が一致して signal 再計算を skip すると、古い type-signals を新しい実装条件に対して再利用できます。実装が hash に含める入力集合と、未モデル化入力時の fail-closed 動作を決定として明記してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 56,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D4 は継続作業を「同じ成果物」への再入に限定していますが、track cache のキーは track × capability だけで対象 artifact を含みません。同一 track 内で同じ capability が別 artifact を扱うと、orchestrator が resume を opt-in した際に前の artifact の session を再利用し、stale context を引き継げます。track cache も artifact/work-unit identity をキーまたは検証条件に含める必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 62,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:e28b1deafd32dbdedacc5da5839fb082192a37692907d9a436c2fa942ea52fec",
+          "at": "2026-07-13T13:37:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 simultaneously requires skipping signal recalculation when implementation inputs are unchanged and re-evaluating when the catalogue/spec changes, but it does not define a retained and validated rustdoc snapshot for that re-evaluation. The downstream implementation cannot safely evaluate a changed catalogue without rerunning rustdoc or specifying a cache, so this can consume absent/stale data.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 54,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "The D3 freshness hash does not explicitly cover all inputs that affect the stored signals: the evaluator also consumes the baseline rustdoc artifact, and rustdoc/evaluation can vary with path-dependency, build-script, or proc-macro source changes not captured by the listed target-crate source and lockfile inputs. Without an explicit complete input closure or fail-closed detection for these cases, an unchanged hash can incorrectly skip recalculation and leave stale signals.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 56,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:8a1936a638f682ff57609a28bc3a52b36cff5ca03ae7efa0a0c54281e1e76ce4",
+          "at": "2026-07-13T13:44:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 is internally inconsistent: it says baseline changes may reuse the live rustdoc snapshot without extraction (lines 54–56), but then requires the current baseline hash to equal the artifact’s recorded baseline hash. Any actual baseline change makes that condition false and forces rustdoc recomputation, so downstream implementation cannot derive the stated skip behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 56,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:905d06f2de81067badcdc312fa215e94cd7949ff9017a2914597fd1e9e3c6aec",
+          "at": "2026-07-13T13:48:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 lists `fresh-every-round` as a rejected candidate, but no Rejected Alternatives entry actually rejects fresh reviewer sessions. H concerns capability dispatches under D4, while C only rejects cross-tier resume, leaving D2's reviewer-session choice without a corresponding rationale.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 10,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:8ea7d58df436321bbdb35e53480a57c0221701d7b5a3c238150ef2153fb0ef4b",
+          "at": "2026-07-13T13:51:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 requires skipping rustdoc extraction and later reusing a verified live snapshot, but it only specifies storing the snapshot hash in the type-signals artifact while explicitly rejecting a separate transient cache. It does not define where the snapshot body is persisted or how it is loaded; regenerating it with Cargo would perform the extraction that D3 intends to skip, while omitting it makes signal recomputation impossible. Downstream implementation/spec cannot derive a working acceptance criterion for this reuse path.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 56,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:c2e7ed3cd7c8d0bee017ad2694fbfd41d43d6708579eecf3828e4be8ad9d6d61",
+          "at": "2026-07-13T13:54:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2/D4 の session cache は provider/model だけで再利用可否を決め、review briefing・severity policy・capability contract の世代変更を無効化または再注入する規則がありません。再起動後や規約更新後に同じ track/scope/artifact で resume すると、古い判断規則・作業契約のまま review/編集を続け得るため、observable な fail-closed 条件を追加してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 48,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D1 の candidate_selection にある `merge-fast-final-tiers` は、Rejected Alternatives A-L または採択 decision に対応する説明がありません。fast/final の effort tier を統合する案を却下したのか、採択方針に含めるのかが decision trace から判定できず、ADR の選択理由と downstream acceptance criteria の根拠が不完全です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 6,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:3e333d9af262e53f830748c286c014c3151f6bbbf735450b4068d2df6a57a0f2",
+          "at": "2026-07-13T13:58:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bfb67537af7ea8afea42eee4449d98aa405cb5f58950cff36073956125483f76",
+          "at": "2026-07-13T14:03:03Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The resolved `effort` is discarded here, and `run_dry_fix_codex` consequently launches Codex without `model_reasoning_effort`. Even though missing effort now fails during profile resolution, every successful `dry-fix-lead` dispatch still falls back to Codex's implicit default, violating the explicit/fail-closed effort contract. Capture the effort and pass it into the Codex invocation.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/dry_fix_local/mod.rs",
-              "line": 101,
-              "category": "non-fail-closed config"
+              "message": "D2 fingerprints the contents of the resolved scope files and generated briefing, then invalidates the session on any mismatch. A fixer re-round necessarily changes at least a scoped file—and the briefing may also be regenerated—so the cache always falls back to a new session instead of resuming as D2 requires. Separate stable execution-contract inputs from mutable review inputs.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 48,
+              "category": "inconsistent decisions within the same ADR"
             },
             {
-              "message": "The shared ref/obligation verifier runner discards the resolved `effort`. The Codex branch continues to hardcode `high`, so configured fast=`low` and final=`xhigh` executions both run at the wrong level; Claude/Gemini likewise receive no resolved effort. Thread the typed effort into each provider's argument builder instead of using a hardcoded or provider-default value.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/ref_verify/process_runner.rs",
-              "line": 150,
-              "category": "non-fail-closed config"
+              "message": "D4 includes the dispatch briefing's contents in the fingerprint and invalidates the session when they change. Since `capability exec` receives each task through that briefing, follow-up or repair work normally requires changing it; the intended continuation therefore becomes a fresh session. The decision must specify which stable contract portion is fingerprinted independently of the changing task payload.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 64,
+              "category": "inconsistent decisions within the same ADR"
             }
           ],
-          "hash": "rvw1:sha256:fdddf6274c939ce5cdc37f6c2c1129e63d89d5f6eb34801e190573617c81544c",
-          "at": "2026-07-13T21:28:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2e59c03d6ef6415eb3268146a08c3f11e9e5e98e785bc4b48272f42aa074afeb",
-          "at": "2026-07-13T22:23:31Z"
+          "hash": "rvw1:sha256:bfb67537af7ea8afea42eee4449d98aa405cb5f58950cff36073956125483f76",
+          "at": "2026-07-13T14:06:27Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "For out-of-host Claude dispatches, the resolved `request.profile.effort` is dropped: `build_claude_args` receives only capability, model, and prompt, so no `--effort` flag reaches the subprocess. An explicitly configured effort therefore silently falls back to Claude's provider default, violating D1's fail-closed execution contract.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/capability_exec/claude.rs",
-              "line": 86,
-              "category": "non-fail-closed config"
-            },
-            {
-              "message": "Codex generic dispatch similarly ignores `request.profile.effort`; the generated arguments contain model and sandbox but no `model_reasoning_effort` override. Capabilities resolved through `AgentProfilesCapabilityAdapter` consequently run with Codex's implicit default despite having a validated explicit effort.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/capability_exec/codex.rs",
-              "line": 106,
-              "category": "non-fail-closed config"
+              "message": "D3 permits skipping signal evaluation when “all inputs” are unchanged, but the defined freshness state covers only the target rustdoc build-input closure, catalogue declaration, baseline, and snapshot. Signal results also depend on the evaluator implementation and its configuration, which can change without changing any of those hashes; downstream spec.json therefore cannot derive an observable invalidation rule, and previously generated signals may remain stale after evaluation semantics change. Specify how the evaluation contract participates in freshness or when reevaluation is mandatory.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 54,
+              "category": "decision underspecified for downstream consumption"
             }
           ],
-          "hash": "rvw1:sha256:169809b5acf9f4dab608ec9434e354c65d79aa2e66fd6f7b6de09cccb96cd60b",
-          "at": "2026-07-13T23:12:16Z"
+          "hash": "rvw1:sha256:f8363ba8866e61492d1566bce3aa0d5f5f5ba0dd845b86b3d70393c3504a8307",
+          "at": "2026-07-13T14:11:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は evaluator-contract の変更時にも既存 rustdoc snapshot の再利用を許可していますが、その contract 自体に evaluator 実装の code/build identity を含めています。抽出用の引数・root 解決・JSON 生成方法を担う実装が変わっても、実装側 input hash と旧 snapshot の自己 hash が一致すれば旧 snapshot を再利用できるため、「判定不能なら rustdoc 抽出から再計算する」という fail-closed 方針に反して stale signal を生成し得ます。下流 spec が安全な再利用条件を導出できるよう、抽出結果へ影響する contract の変更を snapshot 無効化条件として明確にしてください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 54,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:2134ab5c76dd93544397956b0f3f593ee1cd539f8bb6c113ad548bebc8937aa3",
+          "at": "2026-07-13T14:15:02Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:03b87380b15ff20b933e349c1d18deff5cc996ea7d77c54a345e78282b5213dc",
-          "at": "2026-07-13T23:23:05Z"
+          "hash": "rvw1:sha256:e02a12ecad05852e529f05be0bc2b4998b3f6e1f4fee0c2c1eff928d1f24a4df",
+          "at": "2026-07-13T14:19:40Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eed5226c767fa495148a2a4468a327ec40ac1035e6a35334d6ea0b7a5a5870a5",
+          "at": "2026-07-14T06:23:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eed5226c767fa495148a2a4468a327ec40ac1035e6a35334d6ea0b7a5a5870a5",
+          "at": "2026-07-14T06:27:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd668edf234c37a4c569aaab36f14562420d2653dad956fd3370148679e87d42",
+          "at": "2026-07-14T07:12:01Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 lacks a concrete target file or symbol; “T001 task-contract catalogue entries” leaves the implementation boundary to the executor.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001 restates the effort/profile behavior contract in prose (“typed provider, model...”, rejecting provider defaults); retain only concrete target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 lacks concrete profile file or symbol targets; “T002 task-contract catalogue entries” and “committed routing profiles” are not an executable boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002 restates the IN-01/IN-02/OS-02 behavior contract in prose, including reference verifiers and the pr-reviewer exemption.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 lacks concrete target files or symbols for the cache and fingerprint work; “T003 task-contract catalogue entries” is not an implementable boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 18,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003 restates the session-cache fingerprint and unsafe-reuse behavior contract in prose, including unreadable, mismatched, expired, and failed entries.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 lacks concrete reviewer, adapter, CLI, or composition target files/symbols; “T004 task-contract catalogue entries” does not define the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 24,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T004 restates the reviewer resume behavior contract, including same-scope eligibility, fresh-session fallback, flag reinjection, and full-scope re-evaluation.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 lacks concrete domain files or symbols for the signal artifact and freshness model; “T005 task-contract catalogue entries” is not an executable boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 30,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T005 restates the type-signals schema, conservative reuse, and completed-track migration behavior contract in prose.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 lacks concrete target files or symbols for the codec, executor, and composition work; “T006 task-contract catalogue entries” does not define the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 36,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T006 restates the signal-preflight skip/recompute behavior contract, including permitted work and conservative handling of unknown evidence.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T007 lacks concrete usecase or adapter target files/symbols; “T007 task-contract catalogue entries” is not an executable implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 42,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T007 restates the capability-resume behavior contract, including target-bound dispatch, fallback, flag injection, cache separation, and in-host exclusion.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T008 names only broad CLI/driver/composition boundaries and lacks concrete files or symbols; “T008 task-contract catalogue entries” is not an executable boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 48,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T008 restates the CLI resume and fresh-dispatch behavior contract instead of delegating that behavior to its IN/CN/AC anchors.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 48,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T009 lacks concrete capability-contract file paths or symbols; “shared capability discipline,” “affected ... contracts,” and “conformance or dead-reference coverage” leave the deliverables ambiguous.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 54,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T009 restates the full-scope re-review and upstream-artifact re-reading behavior contract in prose; cite CN-03/CN-10/AC-03/AC-10 instead.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 54,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:347a509a102b1e1993066a1b36191b0ad9d4d81c5b0cd64326639fde44820e1e",
+          "at": "2026-07-13T16:40:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 creates `ProviderSessionCacheKey`, which depends on the `TargetArtifactSet` type assigned to T007. However, S4 schedules T007 after T003, so T003 cannot be implemented as an independently buildable task. Move `TargetArtifactSet` into an earlier prerequisite or revise the task dependencies.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 18,
+              "category": "dependency cycle or wrong ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:9f438bb3d1c7770233eda4c1e79f05be7f12134dead6b1b428bd1b23e58437d9",
+          "at": "2026-07-13T16:48:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f40a917a941e19105d10b3cc38efc57bbce46537a64b0fc232441954463f706",
+          "at": "2026-07-13T16:54:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` contains behavioral prose but no explicit GO-NN-to-task mappings. Consequently GO-01 through GO-04 lack the required goal traceability—particularly GO-01, whose work extends beyond T001/T002, and cross-cutting GO-04. Add explicit mappings such as `GO-NN → T...` in `plan.summary`.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 60,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T002 is attributed to the modified `AgentProfilesError` catalogue entry, but T002's executable description names `AgentProfiles`, configuration/execution DTOs, and `AgentProfilesCapabilityAdapter::resolve` without any operation on `AgentProfilesError`. Add the error type and its intended modification to T002, or move/remove the attribution if another task owns it.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/task-contract.json",
+              "line": 17,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:9f40a917a941e19105d10b3cc38efc57bbce46537a64b0fc232441954463f706",
+          "at": "2026-07-13T17:01:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 は `TypeSignalsExecutionError` を `type_signals_doc.rs` の変更対象として列挙していますが、この catalogue entry は `tddd::catalogue_v2::catalogue_impl_signals_ports` に属する `action: reference` であり、T005 の新規型や `decide_type_signals_reuse` からも使用されません。一方、その実ファイルと `TypeSignalsExecutorPort` を変更する carrier task は T006 です。T005 からこの対象記載を外し、reference-entry attribution を T006 に移してください。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/task-contract.json",
+              "line": 64,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:26419f3d1e788140cf7cb62252f2a48614bd8f637f6fdae17cd8a1d0ee342732",
+          "at": "2026-07-13T17:07:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4464db8c52895c356736b239ec5710264c6083d97dae0cedd707626e2453bf04",
+          "at": "2026-07-13T17:11:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:43b5267c11e4ae8dd0781d8ba1cfb435c2cad1233c1e9c0a7ef653ed0e391602",
+          "at": "2026-07-13T18:13:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2440a4494cc2ef4b2f2b15a6ea489c3a6691d9740378f28e0ce793a31d3d6634",
+          "at": "2026-07-13T19:21:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66d735e1bc0ff63f9ba66378da3d5d7a4f611780e7d0202a4df6bf212dda73a6",
+          "at": "2026-07-13T21:33:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002の「using the resolved reasoning effort; Gemini fails closed when effort cannot be injected」は、anchorで参照すべき上流の挙動契約を散文で再記述しています。`knowledge/conventions/no-upstream-restatement.md`に従い、対象・操作・anchor citeだけにしてください。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 11,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:aa2bdb687e562e870e52d839b9564c3b6f63cd3c08dea415d16f537d638777c6",
+          "at": "2026-07-13T22:21:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:97e6fe81d8a103dea6ce734b01f36b75912f6d3f567ec3c83a6f8a61bde98f79",
+          "at": "2026-07-13T22:24:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 is a split candidate. Its infrastructure work alone includes the evaluator (~1,265 changed lines), codec (~344), adapter (~149), schema exporter, verification/render changes, and tests—already multiple times the configured 500-line per-scope ceiling before the usecase and composition work is counted. Split T006 into independently reviewable tasks.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 33,
+              "category": "batch-size infeasibility"
+            },
+            {
+              "message": "T006 attributes the action:`modify` `RustdocSchemaExporter` entry, but its description never targets either `libs/infrastructure/src/schema_export.rs` or `RustdocSchemaExporter`. This is not a reference-entry carrier attribution: add that target and operation to T006 so the task contract matches the executable task boundary.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/task-contract.json",
+              "line": 92,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:7039db208096cad5d87afcfc3916f504382ab244c0666d55a970b4596194b858",
+          "at": "2026-07-14T07:16:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 is not review-sized. Its infrastructure work alone spans roughly 1,974 changed lines across the named files—almost 4× the configured 500-line ceiling—and `type_signals_evaluator.rs` alone exceeds twice the ceiling. Describing six retrospective sub-scopes without separate task IDs does not make them independently committable; split T006 into actual tasks.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 33,
+              "category": "batch-size infeasibility"
+            },
+            {
+              "message": "T006 sub-scopes (e) and (f) are stale against their attributed contracts. They describe a fallible declaration-digest boundary, place `LoadCatalogueSpecSignalsForViewError` under `infrastructure::verify::catalogue_spec_signals`, and associate `RustdocSchemaExporter` with that boundary. The attributed catalogue contracts instead make both hash functions infallible, locate the error in `type_catalogue_render`, and modify `RustdocSchemaExporter` for `existing_rustdoc_json_path`. An executor must invent the correct target and operation; update these sub-scopes to match the task-contract attributions.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 33,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:f6a553dc2507f7a419fbd8e5062b8105522858cce66e3d5e269eb32186c28b22",
+          "at": "2026-07-14T07:27:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` still maps GO-03 and GO-04 to the removed T006 and omits replacement tasks T010–T015, leaving goal-to-task traceability stale. Replace T006 with the applicable split task IDs.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 81,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "S3's declared order is not independently executable: T012 calls `RustdocSchemaExporter::existing_rustdoc_json_path`, which T014 adds later, while T010 removes the domain executor port before T013 rebinds its infrastructure adapter. Reorder these dependencies or combine the compile-coupled steps.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 113,
+              "category": "dependency cycle or wrong ordering"
+            },
+            {
+              "message": "T012 is a split candidate: the current diff for its named evaluator file alone is 1,317 changed lines, over twice the 500-line scope ceiling, before accounting for the associated build-input helper. Split evaluator execution, build-input closure, and snapshot-reuse work into smaller tasks.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 43,
+              "category": "batch-size infeasibility"
+            },
+            {
+              "message": "T010 only retires the legacy domain port and error, but is mapped to IN-07 and AC-08, which concern schema-v2 freshness persistence and legacy-artifact handling. Neither its operation nor its attributed catalogue entries touch those requirements, so these mappings are implausible.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/task-coverage.json",
+              "line": 10,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T011 is mapped to AC-08 even though it only adds usecase ports, orchestration, and errors; it contains no artifact schema, encoding, decoding, or legacy-artifact validation step. Remove the AC-08 mapping or add executable work that actually covers it.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/task-coverage.json",
+              "line": 41,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T015 only changes catalogue declaration hashing and render-time stale-hash error handling, but is also mapped to IN-06, IN-07, CN-05, CN-07, AC-07, and AC-08, which require rustdoc snapshot reuse, build-input closure handling, or artifact schema behavior. Those mappings are not supported by T015's described work or task-contract entries.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/task-coverage.json",
+              "line": 9,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:616aed48d27cf59eb687d0e34b28e6cc1088d6c68f6e1ecd3bd5090c3731cd1b",
+          "at": "2026-07-14T07:55:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05/AC-06 の mapping は load-bearing な coverage gap を隠している。両 AC は catalogue↔spec 評価に使う spec の変更時に評価を再実行することを要求するが、mapping 先の task descriptions には spec input の identity を記録・比較する対象 file/symbol と操作がない。T005 が列挙する freshness model にも spec identity はなく、T015 は catalogue declaration hash のみを扱うため、実装者は spec-only change の invalidation を実装できない。該当 task に executable な spec-input freshness step を追加し、coverage を更新すること。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/task-coverage.json",
+              "line": 38,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:e50f1673a42a92c0eb2cde446c4d187cd061f28ffd3736d41ad0f2f9833cafbf",
+          "at": "2026-07-14T08:04:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T015 restates AC-05/AC-06 behavior in prose: “regenerates the catalogue↔spec evaluation on preflight without invoking `TypeSignalsExecutorAdapter` or rustdoc.” Keep only the target, operation, and anchor citations as required by `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 68,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 repeats the upstream behavior contract: “it consumes current spec-element identities and must not trigger rustdoc re-extraction.” This is not an ordering statement and duplicates AC-05/AC-06; remove it or replace it with dependency/anchor-only text per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/impl-plan.json",
+              "line": 126,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:42870bb2129e1d6a51672758a6601e556febb10eec3b61ffc413b63533f4beb8",
+          "at": "2026-07-14T08:17:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9986c659e18ad11c495411b7d60c7dec56e11c4f9c3ef6e36912cd21026c6ec9",
+          "at": "2026-07-14T08:23:37Z"
         }
       ]
     },
@@ -1008,24 +1593,20 @@
           "findings": [],
           "hash": "rvw1:sha256:528254b6e817585913367db1da724f5ad2adb69d04c55d473e05115daf4969ee",
           "at": "2026-07-13T23:10:36Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54109f1fe1308de7696fd7f46c8a0965d2773cc418181a293d1e1dc48a30815e",
-          "at": "2026-07-13T21:30:10Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:54109f1fe1308de7696fd7f46c8a0965d2773cc418181a293d1e1dc48a30815e",
-          "at": "2026-07-13T22:27:55Z"
+          "hash": "rvw1:sha256:2172f1f05f8cd47f0b2be88e3ffeadce96cb3c49ab78dec175523db8511993aa",
+          "at": "2026-07-14T07:19:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb40827d2b2e6317e5522f58c2e385840200b5d8b4e3f3e0ffa102d437417c55",
+          "at": "2026-07-14T08:52:23Z"
         }
       ]
     }

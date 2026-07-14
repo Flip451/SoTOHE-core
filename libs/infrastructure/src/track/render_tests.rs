@@ -1611,13 +1611,21 @@ fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
     write_minimal_style_config_to_root(dir.path());
 
-    // Companion signal file with a Blue signal for the declared TrackId.
+    // Schema-v2 companion signal file with a Blue signal for the declared TrackId.
     let decl_bytes = std::fs::read(track_dir.join("domain-types.json")).unwrap();
-    let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
+    let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes)
+        .as_digest()
+        .as_str()
+        .to_owned();
     let signal_file = serde_json::json!({
-        "schema_version": 1,
+        "schema_version": 2,
         "generated_at": "2026-04-19T00:00:00Z",
         "declaration_hash": hash,
+        "implementation_input_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "baseline_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "live_rustdoc_snapshot_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "evaluator_contract_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "rustdoc_extraction_contract_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
         "signals": [
             {
                 "type_name": "TrackId",
@@ -2321,7 +2329,10 @@ fn setup_track_repo_base(arch_rules: &str) -> (tempfile::TempDir, std::path::Pat
 /// opt-in/out guard, keeping hash computation in one place.
 fn fresh_cat_spec_signals_json(track_dir: &std::path::Path) -> String {
     let decl_bytes = std::fs::read(track_dir.join("domain-types.json")).unwrap();
-    let hash_hex = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
+    let hash_hex = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes)
+        .as_digest()
+        .as_str()
+        .to_owned();
     serde_json::to_string_pretty(&serde_json::json!({
         "schema_version": 1,
         "catalogue_declaration_hash": hash_hex,

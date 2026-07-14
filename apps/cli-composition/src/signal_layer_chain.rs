@@ -60,7 +60,7 @@ impl usecase::signal::SignalLayerReader for BindingSignalLayerReader {
 /// the orchestrator, not locally.
 #[allow(clippy::too_many_arguments, clippy::type_complexity)]
 pub(crate) fn signal_check_layer_chain(
-    strict_override: bool,
+    strict_override: Option<domain::Strictness>,
     gate: Option<SignalGateName>,
     workspace_root: Option<PathBuf>,
     chain_id: domain::ChainId,

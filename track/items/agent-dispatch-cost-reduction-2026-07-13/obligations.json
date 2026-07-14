@@ -461,7 +461,7 @@
         "role": "FreeFunction"
       },
       "brief": "Author a logic test covering 'entry' of infrastructure::tddd::type_signals_codec::declaration_hash",
-      "declaration_hash": "6a9c557839f2e3e1a9a8662f4227c3acd557ecd8fcb11718bedb43f79d3c1cda",
+      "declaration_hash": "4ee70f0ee7bd5d8ff42294c3b35c56ae745bc23750ea28cf5b36d95bf3c348fd",
       "spec_refs": [
         {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
@@ -534,6 +534,38 @@
         {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "AC-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",
+      "declaration_hash": "8570f921afcbc65f88db6452116bef1953f99fde68ed9ad0ab54e120729c528c",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-06"
         }
       ]
     },

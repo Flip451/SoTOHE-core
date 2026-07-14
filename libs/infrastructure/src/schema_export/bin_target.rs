@@ -7,6 +7,7 @@
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::time::Duration;
 
 use domain::schema::SchemaExportError;
 use domain::tddd::catalogue_v2::CrateName;
@@ -14,6 +15,9 @@ use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use thiserror::Error;
 
 use super::path_resolution::resolve_target_dir;
+
+const MAX_SCHEMA_EXPORT_COMMAND_OUTPUT_BYTES: usize = 16 * 1024 * 1024;
+const MAX_SCHEMA_EXPORT_COMMAND_DURATION: Duration = Duration::from_secs(120);
 
 /// Validated name of a Cargo target selected for rustdoc.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -129,17 +133,21 @@ pub fn resolve_rustdoc_root_name(
     workspace_root: &Path,
     package_name: &CrateName,
 ) -> Result<RustdocTargetResolution, RustdocRootResolutionError> {
-    let output = Command::new("cargo")
-        .args(["metadata", "--format-version", "1", "--no-deps"])
-        .current_dir(workspace_root)
-        .output()
-        .map_err(|error| {
-            resolution_error(
-                format!("cannot run cargo metadata: {error}"),
-                package_name,
-                RustdocRootResolutionError::MetadataCommand,
-            )
-        })?;
+    let mut command = Command::new("cargo");
+    command.args(["metadata", "--format-version", "1", "--no-deps"]).current_dir(workspace_root);
+    let output = crate::capability_exec::process::run_command_with_bounded_output(
+        &mut command,
+        MAX_SCHEMA_EXPORT_COMMAND_OUTPUT_BYTES,
+        MAX_SCHEMA_EXPORT_COMMAND_DURATION,
+        "cargo metadata for rustdoc target resolution",
+    )
+    .map_err(|error| {
+        resolution_error(
+            format!("cannot run cargo metadata: {error}"),
+            package_name,
+            RustdocRootResolutionError::MetadataCommand,
+        )
+    })?;
     if !output.status.success() {
         return Err(resolution_error(
             format!(
@@ -193,11 +201,15 @@ pub(super) fn run_rustdoc(
             build_rustdoc_args(crate_name, &["--bin", resolution.target_name().as_str()])
         }
     };
-    let output = Command::new("cargo")
-        .args(args)
-        .current_dir(workspace_root)
-        .output()
-        .map_err(|error| SchemaExportError::RustdocFailed(error.to_string()))?;
+    let mut command = Command::new("cargo");
+    command.args(args).current_dir(workspace_root);
+    let output = crate::capability_exec::process::run_command_with_bounded_output(
+        &mut command,
+        MAX_SCHEMA_EXPORT_COMMAND_OUTPUT_BYTES,
+        MAX_SCHEMA_EXPORT_COMMAND_DURATION,
+        "cargo rustdoc",
+    )
+    .map_err(|error| SchemaExportError::RustdocFailed(error.to_string()))?;
     if !output.status.success() {
         return Err(SchemaExportError::RustdocFailed(format!(
             "cargo rustdoc for package `{crate_name}` target `{}` failed: {}",

@@ -214,6 +214,46 @@
       "trait_ref": "TypeSignalsService"
     },
     {
+      "action": "reference",
+      "for_type": "TypeSignalsError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticText",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
       "action": "modify",
       "for_type": "CapabilityInputValidationError",
       "trait_ref": "core::fmt::Debug"
@@ -995,48 +1035,48 @@
       "kind": {
         "kind": "enum",
         "variants": [
-        {
-          "name": "ProfileResolution",
-          "payload": {
-            "fields": [
-              {
-                "name": "capability",
-                "ty": "CapabilityName"
-              },
-              {
-                "name": "detail",
-                "ty": "CapabilityFailureDetail"
-              }
-            ],
-            "kind": "struct"
-          }
-        },
-        {
-          "name": "ExecutionModeRejected",
-          "payload": {
-            "fields": [
-              {
-                "name": "capability",
-                "ty": "CapabilityName"
-              },
-              {
-                "name": "mode",
-                "ty": "ExecutionMode"
-              }
-            ],
-            "kind": "struct"
-          }
-        },
-        {
-          "name": "ModelMissing",
-          "payload": {
-            "fields": [
-              {
-                "name": "capability",
-                "ty": "CapabilityName"
-              }
-            ],
-            "kind": "struct"
+          {
+            "name": "ProfileResolution",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ExecutionModeRejected",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                },
+                {
+                  "name": "mode",
+                  "ty": "ExecutionMode"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ModelMissing",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                }
+              ],
+              "kind": "struct"
             }
           },
           {
@@ -1048,69 +1088,69 @@
               "kind": "tuple"
             }
           },
-        {
-          "name": "UnsupportedProvider",
-          "payload": {
-            "fields": [
-              {
-                "name": "provider",
-                "ty": "ProviderName"
-              }
-            ],
-            "kind": "struct"
-          }
-        },
-        {
-          "name": "SourceValidation",
-          "payload": {
-            "fields": [
-              {
-                "name": "path",
-                "ty": "CapabilityFilePath"
-              },
-              {
-                "name": "detail",
-                "ty": "CapabilityFailureDetail"
-              }
-            ],
-            "kind": "struct"
-          }
-        },
-        {
-          "name": "AdapterPreflight",
-          "payload": {
-            "fields": [
-              {
-                "name": "capability",
-                "ty": "CapabilityName"
-              },
-              {
-                "name": "provider",
-                "ty": "ProviderName"
-              },
-              {
-                "name": "detail",
-                "ty": "CapabilityFailureDetail"
-              }
-            ],
-            "kind": "struct"
-          }
-        },
-        {
-          "name": "DispatchFailed",
-          "payload": {
-            "fields": [
-              {
-                "name": "provider",
-                "ty": "ProviderName"
-              },
-              {
-                "name": "detail",
-                "ty": "CapabilityFailureDetail"
-              }
-            ],
-            "kind": "struct"
-          }
+          {
+            "name": "UnsupportedProvider",
+            "payload": {
+              "fields": [
+                {
+                  "name": "provider",
+                  "ty": "ProviderName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "SourceValidation",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "CapabilityFilePath"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "AdapterPreflight",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                },
+                {
+                  "name": "provider",
+                  "ty": "ProviderName"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DispatchFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "provider",
+                  "ty": "ProviderName"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
           }
         ]
       },
@@ -1524,6 +1564,55 @@
         },
         {
           "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "DiagnosticText": {
+      "action": "reference",
+      "docs": "Baseline-validated unconstrained diagnostic-text value object reused for opaque usecase failure details; usecase placement preserves its existing co-location with git-workflow consumers.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "s",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "git_workflow",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-06",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ]
@@ -2104,6 +2193,97 @@
       "spec_refs": [
         {
           "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsError": {
+      "action": "modify",
+      "docs": "Usecase failure contract constructed by TypeSignalsInteractor; opaque failure details reuse the baseline DiagnosticText value object, while track, branch, and layer identities remain validated domain types.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "BranchTrackMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "branch",
+                  "ty": "domain::ids::TrackBranch"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "domain::ids::TrackId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "LayerBindingsLoad",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoLayers",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EvaluationFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer_id",
+                  "ty": "domain::tddd::layer_id::LayerId"
+                },
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InconsistentRequest",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "type_signals::service",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-07",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ]

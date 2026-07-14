@@ -9,7 +9,9 @@
 //! injected secondary ports — no direct infrastructure calls.
 
 mod interactor;
+mod ports;
 mod service;
 
 pub use interactor::TypeSignalsInteractor;
+pub use ports::{TypeSignalsExecutionError, TypeSignalsExecutorPort};
 pub use service::{TypeSignalsError, TypeSignalsRequest, TypeSignalsService};

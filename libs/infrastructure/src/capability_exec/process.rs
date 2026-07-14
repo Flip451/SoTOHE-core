@@ -17,9 +17,166 @@ use super::{MAX_CAPABILITY_EXEC_LOG_BYTES, dispatch_error, path_guard};
 
 const PROVIDER_PROCESS_POLL_INTERVAL: Duration = Duration::from_millis(50);
 const PROVIDER_LOG_DRAIN_TIMEOUT: Duration = Duration::from_secs(1);
+const BOUNDED_COMMAND_POLL_INTERVAL: Duration = Duration::from_millis(50);
+const BOUNDED_COMMAND_DRAIN_TIMEOUT: Duration = Duration::from_secs(1);
 const LOG_TRUNCATION_NOTICE: &[u8] = b"\n[provider stderr truncated]\n";
 
 static PROVIDER_LOG_SEQUENCE: AtomicU64 = AtomicU64::new(0);
+
+/// Bounded output collected from a short-lived subprocess.
+pub(crate) struct BoundedCommandOutput {
+    pub(crate) status: ExitStatus,
+    pub(crate) stdout: Vec<u8>,
+    pub(crate) stderr: Vec<u8>,
+}
+
+struct BoundedPipeOutput {
+    bytes: Vec<u8>,
+    exceeded_limit: bool,
+}
+
+/// Runs a subprocess while draining both output streams concurrently.
+///
+/// Each stream retains at most `maximum_bytes`, but continues draining after
+/// reaching that cap so the child cannot block on a full pipe. An over-limit
+/// stream is reported only after the child exits and both readers are joined.
+pub(crate) fn run_command_with_bounded_output(
+    command: &mut Command,
+    maximum_bytes: usize,
+    timeout: Duration,
+    label: &str,
+) -> Result<BoundedCommandOutput, std::io::Error> {
+    command.stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
+    configure_process_group(command);
+    let mut child = command.spawn()?;
+    let process_id = child.id();
+    let stdout = child.stdout.take().ok_or_else(|| {
+        Error::new(ErrorKind::BrokenPipe, format!("{label} subprocess stdout was not captured"))
+    })?;
+    let stderr = child.stderr.take().ok_or_else(|| {
+        Error::new(ErrorKind::BrokenPipe, format!("{label} subprocess stderr was not captured"))
+    })?;
+    let stdout_reader = spawn_bounded_pipe_reader(stdout, maximum_bytes);
+    let stderr_reader = spawn_bounded_pipe_reader(stderr, maximum_bytes);
+    let status = wait_for_bounded_command(&mut child, process_id, timeout, label)?;
+    let stdout = receive_bounded_pipe(stdout_reader, process_id, label, "stdout")?;
+    let stderr = receive_bounded_pipe(stderr_reader, process_id, label, "stderr")?;
+    if stdout.exceeded_limit || stderr.exceeded_limit {
+        return Err(Error::new(
+            ErrorKind::InvalidData,
+            format!("{label} subprocess output exceeds {maximum_bytes} bytes per stream"),
+        ));
+    }
+    Ok(BoundedCommandOutput { status, stdout: stdout.bytes, stderr: stderr.bytes })
+}
+
+fn spawn_bounded_pipe_reader(
+    pipe: impl Read + Send + 'static,
+    maximum_bytes: usize,
+) -> Receiver<Result<BoundedPipeOutput, std::io::Error>> {
+    let (sender, receiver) = mpsc::sync_channel(1);
+    thread::spawn(move || {
+        let _ = sender.send(collect_bounded_pipe(pipe, maximum_bytes));
+    });
+    receiver
+}
+
+fn collect_bounded_pipe(
+    mut pipe: impl Read,
+    maximum_bytes: usize,
+) -> Result<BoundedPipeOutput, std::io::Error> {
+    let mut buffer = [0_u8; 8192];
+    let mut bytes = Vec::new();
+    let mut exceeded_limit = false;
+    loop {
+        let read = pipe.read(&mut buffer)?;
+        if read == 0 {
+            break;
+        }
+        let remaining = maximum_bytes.saturating_sub(bytes.len());
+        let retained = remaining.min(read);
+        let retained_bytes = buffer.get(..retained).ok_or_else(|| {
+            Error::new(
+                ErrorKind::InvalidData,
+                "subprocess pipe reader returned an invalid byte count",
+            )
+        })?;
+        bytes.extend_from_slice(retained_bytes);
+        exceeded_limit |= retained < read;
+    }
+    Ok(BoundedPipeOutput { bytes, exceeded_limit })
+}
+
+fn receive_bounded_pipe(
+    receiver: Receiver<Result<BoundedPipeOutput, std::io::Error>>,
+    process_id: u32,
+    label: &str,
+    stream: &str,
+) -> Result<BoundedPipeOutput, std::io::Error> {
+    match receiver.recv_timeout(BOUNDED_COMMAND_DRAIN_TIMEOUT) {
+        Ok(Ok(output)) => Ok(output),
+        Ok(Err(error)) => {
+            Err(Error::new(error.kind(), format!("cannot read {label} {stream}: {error}")))
+        }
+        Err(RecvTimeoutError::Timeout) => {
+            let termination_detail = terminate_bounded_process_group(process_id)
+                .err()
+                .map(|error| format!("; process-tree termination also failed: {error}"))
+                .unwrap_or_default();
+            Err(Error::new(
+                ErrorKind::TimedOut,
+                format!(
+                    "{label} {stream} reader did not close within {} seconds after the subprocess exited{termination_detail}",
+                    BOUNDED_COMMAND_DRAIN_TIMEOUT.as_secs()
+                ),
+            ))
+        }
+        Err(RecvTimeoutError::Disconnected) => {
+            Err(Error::other(format!("{label} {stream} reader thread disconnected")))
+        }
+    }
+}
+
+fn wait_for_bounded_command(
+    child: &mut Child,
+    process_id: u32,
+    timeout: Duration,
+    label: &str,
+) -> Result<ExitStatus, std::io::Error> {
+    let started = Instant::now();
+    loop {
+        match child.try_wait() {
+            Ok(Some(status)) => return Ok(status),
+            Ok(None) if started.elapsed() >= timeout => {
+                terminate_bounded_command(child, process_id)?;
+                return Err(Error::new(
+                    ErrorKind::TimedOut,
+                    format!("{label} subprocess timed out after {} seconds", timeout.as_secs()),
+                ));
+            }
+            Ok(None) => thread::sleep(BOUNDED_COMMAND_POLL_INTERVAL),
+            Err(error) => {
+                let termination_detail = terminate_bounded_command(child, process_id)
+                    .err()
+                    .map(|termination_error| {
+                        format!("; process-tree termination also failed: {termination_error}")
+                    })
+                    .unwrap_or_default();
+                return Err(Error::new(
+                    error.kind(),
+                    format!("cannot poll {label} subprocess: {error}{termination_detail}"),
+                ));
+            }
+        }
+    }
+}
+
+fn terminate_bounded_command(child: &mut Child, process_id: u32) -> Result<(), std::io::Error> {
+    if terminate_bounded_process_group(process_id).is_err() {
+        child.kill()?;
+    }
+    child.wait().map(|_| ())
+}
 
 pub(crate) trait ProviderProcessRunner: Send + Sync {
     fn run(
@@ -89,7 +246,7 @@ pub(crate) fn run_provider_process_with_timeout(
         .stdin(Stdio::null())
         .stdout(Stdio::inherit())
         .stderr(Stdio::piped());
-    configure_provider_process_group(&mut command);
+    configure_process_group(&mut command);
     let mut child = command
         .spawn()
         .map_err(|error| dispatch_error(provider, format!("cannot start {binary}: {error}")))?;
@@ -306,39 +463,37 @@ pub(crate) fn spawn_bounded_log_writer(
                 let read = stderr.read(&mut buffer)?;
                 if read == 0 {
                     break;
-                } else {
-                    if written < MAX_CAPABILITY_EXEC_LOG_BYTES {
-                        let remaining = MAX_CAPABILITY_EXEC_LOG_BYTES - written;
-                        if read <= remaining {
-                            let captured = buffer.get(..read).ok_or_else(|| {
+                }
+                if written < MAX_CAPABILITY_EXEC_LOG_BYTES {
+                    let remaining = MAX_CAPABILITY_EXEC_LOG_BYTES - written;
+                    if read <= remaining {
+                        let captured = buffer.get(..read).ok_or_else(|| {
+                            Error::new(
+                                ErrorKind::InvalidData,
+                                "stderr reader returned an invalid byte count",
+                            )
+                        })?;
+                        log_file.write_all(captured)?;
+                        written += read;
+                    } else {
+                        let content_budget = remaining.saturating_sub(LOG_TRUNCATION_NOTICE.len());
+                        if content_budget > 0 {
+                            let captured = buffer.get(..content_budget).ok_or_else(|| {
                                 Error::new(
                                     ErrorKind::InvalidData,
                                     "stderr reader returned an invalid byte count",
                                 )
                             })?;
                             log_file.write_all(captured)?;
-                            written += read;
-                        } else {
-                            let content_budget =
-                                remaining.saturating_sub(LOG_TRUNCATION_NOTICE.len());
-                            if content_budget > 0 {
-                                let captured = buffer.get(..content_budget).ok_or_else(|| {
-                                    Error::new(
-                                        ErrorKind::InvalidData,
-                                        "stderr reader returned an invalid byte count",
-                                    )
-                                })?;
-                                log_file.write_all(captured)?;
-                            }
-                            if remaining >= LOG_TRUNCATION_NOTICE.len() {
-                                log_file.write_all(LOG_TRUNCATION_NOTICE)?;
-                            }
-                            written = MAX_CAPABILITY_EXEC_LOG_BYTES;
-                            truncated = true;
                         }
-                    } else {
+                        if remaining >= LOG_TRUNCATION_NOTICE.len() {
+                            log_file.write_all(LOG_TRUNCATION_NOTICE)?;
+                        }
+                        written = MAX_CAPABILITY_EXEC_LOG_BYTES;
                         truncated = true;
                     }
+                } else {
+                    truncated = true;
                 }
             }
             if truncated {
@@ -390,130 +545,26 @@ fn wait_for_provider_process(
     }
 }
 
-#[cfg(unix)]
-fn configure_provider_process_group(command: &mut Command) {
-    use std::os::unix::process::CommandExt as _;
-    command.process_group(0);
-}
+#[path = "process/termination.rs"]
+mod termination;
 
-#[cfg(not(unix))]
-fn configure_provider_process_group(_command: &mut Command) {}
+use termination::{
+    configure_process_group, terminate_bounded_process_group, terminate_provider_process,
+    terminate_provider_process_group,
+};
 
-#[cfg(unix)]
-fn terminate_provider_process(
-    child: &mut Child,
-    provider: &ProviderName,
-    binary: &str,
-) -> Result<(), CapabilityExecError> {
-    let process_id = child.id();
-    if terminate_provider_process_group(process_id, provider, binary).is_err() {
-        child.kill().map_err(|error| {
-            dispatch_error(provider, format!("cannot terminate {binary} provider process: {error}"))
-        })?;
+#[cfg(test)]
+mod tests {
+    use std::io::Cursor;
+
+    use super::collect_bounded_pipe;
+
+    #[test]
+    fn test_collect_bounded_pipe_discards_excess_after_limit() -> Result<(), std::io::Error> {
+        let collected = collect_bounded_pipe(Cursor::new(b"abcdef"), 3)?;
+
+        assert_eq!(collected.bytes, b"abc");
+        assert!(collected.exceeded_limit);
+        Ok(())
     }
-    child.wait().map_err(|error| {
-        dispatch_error(provider, format!("cannot reap {binary} provider process: {error}"))
-    })?;
-    Ok(())
-}
-
-#[cfg(unix)]
-fn terminate_provider_process_group(
-    process_id: u32,
-    provider: &ProviderName,
-    binary: &str,
-) -> Result<(), CapabilityExecError> {
-    let process_group = format!("-{process_id}");
-    let status = Command::new("kill")
-        .args(["-KILL", "--", process_group.as_str()])
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-        .map_err(|error| {
-            dispatch_error(
-                provider,
-                format!("cannot terminate {binary} provider process group: {error}"),
-            )
-        })?;
-    if !status.success() {
-        return Err(dispatch_error(
-            provider,
-            format!("cannot terminate {binary} provider process group {process_id}"),
-        ));
-    }
-    Ok(())
-}
-
-#[cfg(windows)]
-fn terminate_provider_process(
-    child: &mut Child,
-    provider: &ProviderName,
-    binary: &str,
-) -> Result<(), CapabilityExecError> {
-    let process_id = child.id();
-    if terminate_provider_process_group(process_id, provider, binary).is_err() {
-        child.kill().map_err(|error| {
-            dispatch_error(provider, format!("cannot terminate {binary} provider process: {error}"))
-        })?;
-    }
-    child.wait().map_err(|error| {
-        dispatch_error(provider, format!("cannot reap {binary} provider process: {error}"))
-    })?;
-    Ok(())
-}
-
-#[cfg(windows)]
-fn terminate_provider_process_group(
-    process_id: u32,
-    provider: &ProviderName,
-    binary: &str,
-) -> Result<(), CapabilityExecError> {
-    let process_id = process_id.to_string();
-    let status = Command::new("taskkill")
-        .args(["/PID", process_id.as_str(), "/T", "/F"])
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-        .map_err(|error| {
-            dispatch_error(
-                provider,
-                format!("cannot terminate {binary} provider process tree: {error}"),
-            )
-        })?;
-    if !status.success() {
-        return Err(dispatch_error(
-            provider,
-            format!("cannot terminate {binary} provider process tree {process_id}"),
-        ));
-    }
-    Ok(())
-}
-
-#[cfg(not(any(unix, windows)))]
-fn terminate_provider_process(
-    child: &mut Child,
-    provider: &ProviderName,
-    binary: &str,
-) -> Result<(), CapabilityExecError> {
-    child.kill().map_err(|error| {
-        dispatch_error(provider, format!("cannot terminate {binary} provider process: {error}"))
-    })?;
-    child.wait().map_err(|error| {
-        dispatch_error(provider, format!("cannot reap {binary} provider process: {error}"))
-    })?;
-    Ok(())
-}
-
-#[cfg(not(any(unix, windows)))]
-fn terminate_provider_process_group(
-    _process_id: u32,
-    provider: &ProviderName,
-    binary: &str,
-) -> Result<(), CapabilityExecError> {
-    Err(dispatch_error(
-        provider,
-        format!("cannot terminate {binary} provider process tree on this platform"),
-    ))
 }

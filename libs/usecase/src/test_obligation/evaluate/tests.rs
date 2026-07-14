@@ -63,10 +63,12 @@ use domain::{
 
 use domain::SpecDocumentLoaderPort;
 
+use super::plan::PlannedAction;
 use super::{
     EvaluateTestObligationsApplicationService, EvaluateTestObligationsCommand,
     EvaluateTestObligationsInteractor, TestObligationEvaluateConfig,
 };
+use crate::test_obligation::LoadedCatalogueDocument;
 
 fn run<F: Future>(future: F) -> F::Output {
     let mut future = pin!(future);
@@ -598,6 +600,31 @@ fn spec_doc() -> SpecDocument {
     .unwrap()
 }
 
+fn spec_doc_with_in_scope_and_acceptance_criteria() -> SpecDocument {
+    let requirement = |id: &str| {
+        SpecRequirement::new(
+            SpecElementId::try_new(id).unwrap(),
+            format!("{id} requirement text."),
+            vec![],
+            vec![],
+            vec![],
+        )
+        .unwrap()
+    };
+    SpecDocument::new(
+        "Test spec",
+        "1.0",
+        vec![],
+        SpecScope::new(vec![requirement("IN-05")], vec![]),
+        vec![],
+        vec![requirement("AC-05")],
+        vec![],
+        vec![],
+        None,
+    )
+    .unwrap()
+}
+
 fn empty_spec_doc() -> SpecDocument {
     SpecDocument::new(
         "Test spec",
@@ -647,6 +674,48 @@ fn empty_catalogue() -> CatalogueDocument {
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     )
+}
+
+fn voluntary_edge(entry_key: &str, element_id: &str) -> TestObligationEdgeId {
+    TestObligationEdgeId::new(
+        CatalogueEntryKey::try_new(entry_key.to_owned()).unwrap(),
+        TestObligationAnchorId::try_new(
+            "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json".to_owned(),
+            element_id.to_owned(),
+        )
+        .unwrap(),
+    )
+}
+
+fn type_entry(kind: TypeKindV2, role: DataRole) -> TypeEntry {
+    TypeEntry::new(
+        domain::tddd::catalogue_v2::roles::ItemAction::Add,
+        role,
+        kind,
+        vec![],
+        vec![],
+        vec![],
+        ModulePath::root(),
+        None,
+        vec![],
+        vec![],
+    )
+}
+
+fn catalogue_with_type_entries(
+    crate_name: &str,
+    layer: &str,
+    entries: Vec<(&str, TypeEntry)>,
+) -> CatalogueDocument {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new(crate_name).unwrap(),
+        LayerId::try_new(layer).unwrap(),
+    );
+    for (name, entry) in entries {
+        catalogue.insert_type(TypeName::new(name).unwrap(), entry);
+    }
+    catalogue
 }
 
 struct Harness {
@@ -1352,6 +1421,93 @@ fn test_voluntary_binding_for_derived_edge_uses_real_obligation_id() {
     let expected_obligation_id = obligation().id().clone();
     assert_eq!(saved.entries()[0].edge_id(), &edge());
     assert_eq!(saved.entries()[0].obligation_id(), &expected_obligation_id);
+}
+
+#[test]
+fn test_plan_voluntary_bindings_for_struct_and_enum_catalogue_entries_uses_llm_lane() {
+    let h = harness(
+        Some(ObligationsDocument::new(track(), vec![])),
+        None,
+        fulfilled(),
+        fulfillment_fail(),
+        WaiverVerdict::Pending,
+    );
+    let plain_struct = TypeKindV2::Struct(StructKind::new(
+        StructShape::Plain { fields: vec![], has_stripped_fields: true },
+        None,
+    ));
+    let domain_catalogue = catalogue_with_type_entries(
+        "domain",
+        "domain",
+        vec![
+            (
+                "TypeSignalsCurrentInputs",
+                type_entry(plain_struct.clone(), DataRole::value_object()),
+            ),
+            ("TypeSignalsFreshness", type_entry(plain_struct, DataRole::value_object())),
+            (
+                "TypeSignalsReuseDecision",
+                type_entry(TypeKindV2::Enum { variants: vec![] }, DataRole::value_object()),
+            ),
+        ],
+    );
+    let infrastructure_catalogue = catalogue_with_type_entries(
+        "infrastructure",
+        "infrastructure",
+        vec![(
+            "LoadCatalogueSpecSignalsForViewError",
+            type_entry(TypeKindV2::Enum { variants: vec![] }, DataRole::ErrorType),
+        )],
+    );
+    let records = vec![
+        TestBindingRecord::VoluntaryBinding {
+            edge_id: voluntary_edge("TypeSignalsCurrentInputs", "AC-05"),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        },
+        TestBindingRecord::VoluntaryBinding {
+            edge_id: voluntary_edge("TypeSignalsFreshness", "IN-05"),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        },
+        TestBindingRecord::VoluntaryBinding {
+            edge_id: voluntary_edge("TypeSignalsReuseDecision", "AC-05"),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        },
+        TestBindingRecord::VoluntaryBinding {
+            edge_id: voluntary_edge("LoadCatalogueSpecSignalsForViewError", "IN-05"),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        },
+        TestBindingRecord::VoluntaryBinding {
+            edge_id: voluntary_edge("LoadCatalogueSpecSignalsForViewError", "AC-05"),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        },
+    ];
+    let catalogues = vec![
+        LoadedCatalogueDocument::new(
+            Path::new("track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json"),
+            domain_catalogue,
+        ),
+        LoadedCatalogueDocument::new(
+            Path::new(
+                "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+            ),
+            infrastructure_catalogue,
+        ),
+    ];
+
+    let plan = h
+        .interactor
+        .plan_binding_records(
+            &records,
+            &ObligationsDocument::new(track(), vec![]),
+            &catalogues,
+            &spec_doc_with_in_scope_and_acceptance_criteria(),
+            None,
+            None,
+        )
+        .unwrap();
+
+    assert_eq!(plan.len(), records.len());
+    assert!(plan.iter().all(|action| matches!(action, PlannedAction::Fulfillment(_))));
 }
 
 #[test]

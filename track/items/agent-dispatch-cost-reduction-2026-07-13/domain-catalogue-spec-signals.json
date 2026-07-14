@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "e27f55be6ee37c3d628d8c49e6a0ae7c11f8351ef4744c272d83696a75b30de7",
+  "catalogue_declaration_hash": "6bfa6d7cbc541da545697deee34e90ecefc705717e6642bbd414a554863fda13",
   "signals": [
     {
       "type_name": "BaselineHash",
@@ -55,7 +55,7 @@
     {
       "type_name": "Sha256Digest",
       "signal": "blue",
-      "entry_hash": "3cdca1b776322b31143de91896e6e5848fd5d5dbc299655800b34f4b88c0926a"
+      "entry_hash": "523a49e8e756990f9cb76cda32aabbd6ca138bf1e599edea885fe5f72d2c33bc"
     },
     {
       "type_name": "Sha256DigestError",

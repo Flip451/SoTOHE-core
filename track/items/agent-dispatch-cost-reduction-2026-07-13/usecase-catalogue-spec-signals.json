@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "57bd9ee32fba3f84929edba516e8556816ff4abcead7b8ec6ffa7cdcf9306642",
+  "catalogue_declaration_hash": "223bc680689ab9551f4644ca4378fd27ec54541432908e4eeb408c7a501c38e8",
   "signals": [
     {
       "type_name": "CapabilityDispatchOutcome",
@@ -51,6 +51,11 @@
       "type_name": "CapabilityResumeRequest",
       "signal": "blue",
       "entry_hash": "b2c5f01e0d6cc74c2cea4f407ab017f154f10c1d9797af161887c28c17bf4050"
+    },
+    {
+      "type_name": "DiagnosticText",
+      "signal": "blue",
+      "entry_hash": "9dfcf9d7f52c4b8f4209faf3faab966521cd25f3a30811086608335bc317d4df"
     },
     {
       "type_name": "ExecutionContractFingerprint",
@@ -111,6 +116,11 @@
       "type_name": "TimeoutSeconds",
       "signal": "blue",
       "entry_hash": "af587cbffd5769fc3457275a8ae19bb6eac3319924116f863654caf0da89435b"
+    },
+    {
+      "type_name": "TypeSignalsError",
+      "signal": "blue",
+      "entry_hash": "b218c014708d0b5bd520f47a6a0ede22d41630b02494b6bd64d8fe10d361186a"
     },
     {
       "type_name": "TypeSignalsExecutionError",

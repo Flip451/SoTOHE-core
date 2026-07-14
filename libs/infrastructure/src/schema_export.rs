@@ -13,11 +13,13 @@
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::time::Duration;
 
 use domain::schema::{
     FunctionInfo, ImplInfo, SchemaExport, SchemaExportError, SchemaExporter, TraitInfo, TypeInfo,
     TypeKind,
 };
+use domain::tddd::catalogue_v2::CrateName;
 use rustdoc_types::{ItemEnum, Visibility};
 
 #[path = "schema_export/format_helpers.rs"]
@@ -79,6 +81,31 @@ impl RustdocSchemaExporter {
         check_nightly_available()?;
         bin_target::run_rustdoc(&self.workspace_root, crate_name)
     }
+
+    /// Resolves a previously generated rustdoc JSON path without launching rustdoc.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SchemaExportError`] when target resolution or the path-safety
+    /// checks cannot establish a trusted existing-snapshot location.
+    pub fn existing_rustdoc_json_path(
+        &self,
+        crate_name: &str,
+    ) -> Result<std::path::PathBuf, SchemaExportError> {
+        let package_name = CrateName::new(crate_name.to_owned()).map_err(|error| {
+            SchemaExportError::RustdocFailed(format!(
+                "invalid catalogue crate name `{crate_name}`: {error}"
+            ))
+        })?;
+        let resolution = resolve_rustdoc_root_name(&self.workspace_root, &package_name)
+            .map_err(|error| SchemaExportError::RustdocFailed(error.to_string()))?;
+        let target_dir = path_resolution::resolve_target_dir_strict(&self.workspace_root)?;
+        let path = target_dir
+            .join("doc")
+            .join(format!("{}.json", resolution.rustdoc_root_name().as_str()));
+        ensure_rustdoc_json_path_safe(&target_dir, &path, "type-signals snapshot reuse")?;
+        Ok(path)
+    }
 }
 
 impl SchemaExporter for RustdocSchemaExporter {
@@ -105,10 +132,15 @@ impl usecase::export_schema::SchemaExporterPort for RustdocSchemaExporter {
 }
 
 fn check_nightly_available() -> Result<(), SchemaExportError> {
-    let output = Command::new("rustup")
-        .args(["run", "nightly", "rustc", "--version"])
-        .output()
-        .map_err(|_| SchemaExportError::NightlyNotFound)?;
+    let mut command = Command::new("rustup");
+    command.args(["run", "nightly", "rustc", "--version"]);
+    let output = crate::capability_exec::process::run_command_with_bounded_output(
+        &mut command,
+        16 * 1024 * 1024,
+        Duration::from_secs(120),
+        "nightly rustc availability",
+    )
+    .map_err(|_| SchemaExportError::NightlyNotFound)?;
 
     if !output.status.success() {
         return Err(SchemaExportError::NightlyNotFound);
@@ -118,7 +150,7 @@ fn check_nightly_available() -> Result<(), SchemaExportError> {
 
 /// Validate that a computed rustdoc JSON path is safely rooted at `target_dir`.
 ///
-/// `target_dir` is the resolved Cargo target directory (from `resolve_target_dir`),
+/// `target_dir` is the resolved Cargo target directory,
 /// which may legitimately live outside the workspace when callers set an absolute
 /// `CARGO_TARGET_DIR` (e.g., `/cargo-target` in CI containers — see the
 /// Dockerfile's `IMAGE_CARGO_TARGET_DIR`). The workspace root is not the
@@ -335,7 +367,7 @@ mod tests {
 
     use super::extract::{extract_enum_variants, extract_params, extract_receiver, format_return};
     use super::format_helpers::{collect_type_names, format_type};
-    use super::path_resolution::resolve_configured_target_dir;
+    use super::path_resolution::{resolve_configured_target_dir, resolve_target_dir_strict};
     use super::trait_origins::{build_trait_origins, resolve_trait_origin};
     use super::*;
 
@@ -442,6 +474,70 @@ mod tests {
 
         assert!(matches!(err, SchemaExportError::RustdocFailed(_)));
         assert!(err.to_string().contains("symlink guard"));
+    }
+
+    #[test]
+    fn test_existing_rustdoc_json_path_resolvable_crate_returns_existing_target_doc_path() {
+        let workspace = tempfile::tempdir().unwrap();
+        let manifest = workspace.path().join("Cargo.toml");
+        let source = workspace.path().join("src/lib.rs");
+        std::fs::write(
+            &manifest,
+            "[package]\nname = \"fixture_workspace\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[lib]\nname = \"fixture_root\"\npath = \"src/lib.rs\"\n",
+        )
+        .unwrap();
+        std::fs::create_dir_all(source.parent().unwrap()).unwrap();
+        std::fs::write(&source, "pub struct Fixture;\n").unwrap();
+        let expected =
+            resolve_target_dir_strict(workspace.path()).unwrap().join("doc/fixture_root.json");
+        std::fs::create_dir_all(expected.parent().unwrap()).unwrap();
+        let rustdoc_json = format!(
+            r#"{{"root":0,"crate_version":null,"includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
+            rustdoc_types::FORMAT_VERSION
+        );
+        std::fs::write(&expected, rustdoc_json).unwrap();
+
+        let path = RustdocSchemaExporter::new(workspace.path().to_path_buf())
+            .existing_rustdoc_json_path("fixture_workspace")
+            .unwrap();
+
+        assert_eq!(path, expected);
+        assert!(path.is_file());
+        let content = std::fs::read_to_string(&path).unwrap();
+        let parsed: rustdoc_types::Crate = serde_json::from_str(&content).unwrap();
+        assert_eq!(parsed.format_version, rustdoc_types::FORMAT_VERSION);
+    }
+
+    #[test]
+    fn test_existing_rustdoc_json_path_unresolvable_workspace_returns_rustdoc_failed() {
+        let workspace = tempfile::tempdir().unwrap();
+        let missing_workspace = workspace.path().join("missing-workspace");
+
+        let error = RustdocSchemaExporter::new(missing_workspace)
+            .existing_rustdoc_json_path("fixture_workspace")
+            .unwrap_err();
+
+        assert!(matches!(error, SchemaExportError::RustdocFailed(_)));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error() {
+        let workspace = tempfile::tempdir().unwrap();
+        let target_parent = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let linked_ancestor = target_parent.path().join("linked-target-parent");
+        std::os::unix::fs::symlink(outside.path(), &linked_ancestor).unwrap();
+
+        let error = resolve_configured_target_dir(
+            workspace.path(),
+            linked_ancestor.join("target"),
+            "CARGO_TARGET_DIR",
+        )
+        .unwrap_err();
+
+        assert!(matches!(error, SchemaExportError::RustdocFailed(_)));
+        assert!(error.to_string().contains("symlink guard rejected"));
     }
 
     fn trait_bound(name: &str) -> rustdoc_types::GenericBound {

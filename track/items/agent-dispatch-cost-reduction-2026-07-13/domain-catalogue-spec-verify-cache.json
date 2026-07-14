@@ -531,7 +531,7 @@
       }
     },
     {
-      "claim_hash": "3cdca1b776322b31143de91896e6e5848fd5d5dbc299655800b34f4b88c0926a",
+      "claim_hash": "523a49e8e756990f9cb76cda32aabbd6ca138bf1e599edea885fe5f72d2c33bc",
       "evidence_hash": "878e1860a6cdc6b72117348b0a177487dd1b97ca5d8e218b1844f3257f386a6d",
       "verdict": {
         "kind": "pass",
@@ -555,7 +555,7 @@
       }
     },
     {
-      "claim_hash": "3cdca1b776322b31143de91896e6e5848fd5d5dbc299655800b34f4b88c0926a",
+      "claim_hash": "523a49e8e756990f9cb76cda32aabbd6ca138bf1e599edea885fe5f72d2c33bc",
       "evidence_hash": "311e0eb218466efcff988ce152df338433e52d110ecd1ea9dc385a17853dfb62",
       "verdict": {
         "kind": "pass",
@@ -579,11 +579,11 @@
       }
     },
     {
-      "claim_hash": "3cdca1b776322b31143de91896e6e5848fd5d5dbc299655800b34f4b88c0926a",
+      "claim_hash": "523a49e8e756990f9cb76cda32aabbd6ca138bf1e599edea885fe5f72d2c33bc",
       "evidence_hash": "3586a0eb53a01ed37c5ee5d487f84bf5e48e640aca8812c7e26e22efa3f17a69",
       "verdict": {
         "kind": "pass",
-        "citation": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。"
+        "citation": "D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

@@ -6,30 +6,13 @@
 
 use std::sync::Arc;
 
-use domain::tddd::catalogue_v2::{
-    TdddLayerBindingsError, TdddLayerBindingsPort, TypeSignalsExecutorPort,
-};
+use domain::tddd::LayerId;
+use domain::tddd::catalogue_v2::{TdddLayerBindingsError, TdddLayerBindingsPort};
 
+use crate::git_workflow::DiagnosticText;
+
+use super::ports::TypeSignalsExecutorPort;
 use super::service::{TypeSignalsError, TypeSignalsRequest, TypeSignalsService};
-
-// ---------------------------------------------------------------------------
-// Validate track_id
-// ---------------------------------------------------------------------------
-
-/// Validates a track ID string (lowercase slug).
-///
-/// Delegates to the canonical domain `TrackId::try_new` validation, mapping the
-/// domain `ValidationError` into this module's `InvalidTrackId` variant so the
-/// slug rule has a single source of truth (ADR D1).
-///
-/// # Errors
-///
-/// Returns `TypeSignalsError::InvalidTrackId` if the ID is invalid.
-fn validate_track_id(id: &str) -> Result<(), TypeSignalsError> {
-    domain::TrackId::try_new(id)
-        .map(|_| ())
-        .map_err(|e| TypeSignalsError::InvalidTrackId { reason: e.to_string() })
-}
 
 // ---------------------------------------------------------------------------
 // Interactor
@@ -78,9 +61,8 @@ impl TypeSignalsService for TypeSignalsInteractor {
     ///    and that the suffix matches `track_id`.
     /// 3. Derive `items_dir = workspace_root/track/items`.
     /// 4. Resolve layer bindings; fail-closed when no layers found.
-    /// 5. For each layer, call `TypeSignalsExecutorPort::evaluate_layer`.
-    ///    Absent catalogue files are always skipped unconditionally;
-    ///    present catalogues are always evaluated strictly.
+    /// 5. For each layer, call `TypeSignalsExecutorPort::evaluate_layer`, which
+    ///    verifies its persisted freshness inputs before any reuse.
     ///
     /// # Errors
     ///
@@ -89,16 +71,10 @@ impl TypeSignalsService for TypeSignalsInteractor {
         let TypeSignalsRequest { items_dir: _items_dir, track_id, branch, workspace_root, layer } =
             request;
 
-        // Step 1: validate track_id.
-        validate_track_id(&track_id)?;
-
-        // Step 2: active-track guard (CN-07).
-        // Reject non-`track/` branches and branch/track-id mismatches.
-        // This mirrors `RefreshCatalogueSpecSignalsInteractor` exactly.
-        let suffix = branch
-            .strip_prefix("track/")
-            .ok_or_else(|| TypeSignalsError::NonActiveTrack { branch: branch.clone() })?;
-        if suffix != track_id.as_str() {
+        // `TrackId` and `TrackBranch` make malformed identities unrepresentable.
+        // Retain the cross-field guard: the branch still must name this request's
+        // track rather than another valid track.
+        if branch.as_ref().strip_prefix("track/") != Some(track_id.as_ref()) {
             return Err(TypeSignalsError::BranchTrackMismatch {
                 branch: branch.clone(),
                 track_id: track_id.clone(),
@@ -114,17 +90,19 @@ impl TypeSignalsService for TypeSignalsInteractor {
         let items_dir = workspace_root.join("track").join("items");
 
         // Step 3: resolve layer bindings.
-        let bindings =
-            self.layer_bindings.load(&workspace_root, layer.as_deref()).map_err(|e| match e {
+        let bindings = self
+            .layer_bindings
+            .load(&workspace_root, layer.as_ref().map(AsRef::as_ref))
+            .map_err(|e| match e {
                 TdddLayerBindingsError::LoadFailed { reason } => {
-                    TypeSignalsError::LayerBindingsLoad { reason }
+                    TypeSignalsError::LayerBindingsLoad { reason: DiagnosticText::new(reason) }
                 }
                 TdddLayerBindingsError::LayerNotFound { layer_id } => {
                     TypeSignalsError::LayerBindingsLoad {
-                        reason: format!(
+                        reason: DiagnosticText::new(format!(
                             "layer '{layer_id}' not found or not tddd.enabled in \
                              architecture-rules.json"
-                        ),
+                        )),
                     }
                 }
                 TdddLayerBindingsError::NoLayers => TypeSignalsError::NoLayers,
@@ -138,9 +116,18 @@ impl TypeSignalsService for TypeSignalsInteractor {
         // Absent catalogue files are always skipped unconditionally (no gate-vs-direct
         // distinction). Present catalogues are always evaluated strictly.
         for binding in &bindings {
-            let layer_id = binding.layer_id.clone();
+            let layer_id = LayerId::try_new(binding.layer_id.clone()).map_err(|error| {
+                TypeSignalsError::InconsistentRequest {
+                    reason: DiagnosticText::new(format!(
+                        "layer binding contains an invalid layer id: {error}"
+                    )),
+                }
+            })?;
             self.executor.evaluate_layer(&items_dir, &track_id, &workspace_root, binding).map_err(
-                |e| TypeSignalsError::EvaluationFailed { layer_id, reason: e.to_string() },
+                |e| TypeSignalsError::EvaluationFailed {
+                    layer_id,
+                    reason: DiagnosticText::new(e.to_string()),
+                },
             )?;
         }
 

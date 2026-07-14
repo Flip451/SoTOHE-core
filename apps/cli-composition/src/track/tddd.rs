@@ -27,12 +27,14 @@ impl TrackCompositionRoot {
         workspace_root: PathBuf,
         layer: Option<String>,
     ) -> Result<CommandOutcome, CompositionError> {
+        use domain::TrackBranch;
         use infrastructure::git_cli::SystemGitRepo;
         use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
         use infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter;
         use usecase::type_signals::{
             TypeSignalsInteractor, TypeSignalsRequest, TypeSignalsService,
         };
+        use usecase::{LayerId, TrackId};
 
         let items_dir = workspace_root.join("track").join("items");
         let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)?;
@@ -51,6 +53,16 @@ impl TrackCompositionRoot {
                 )
             })?;
 
+        let typed_track_id = TrackId::try_new(resolved_id.clone()).map_err(|error| {
+            CompositionError::WiringFailed(format!("invalid track ID '{resolved_id}': {error}"))
+        })?;
+        let typed_branch = TrackBranch::try_new(branch.clone()).map_err(|error| {
+            CompositionError::WiringFailed(format!("invalid track branch '{branch}': {error}"))
+        })?;
+        let typed_layer = layer.map(LayerId::try_new).transpose().map_err(|error| {
+            CompositionError::WiringFailed(format!("invalid layer id: {error}"))
+        })?;
+
         let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new());
         let executor = Arc::new(TypeSignalsExecutorAdapter::new());
         let interactor = TypeSignalsInteractor::new(layer_bindings, executor);
@@ -58,10 +70,10 @@ impl TrackCompositionRoot {
         interactor
             .run(TypeSignalsRequest {
                 items_dir,
-                track_id: resolved_id,
-                branch,
+                track_id: typed_track_id,
+                branch: typed_branch,
                 workspace_root,
-                layer,
+                layer: typed_layer,
             })
             .map_err(|e| CompositionError::Usecase(e.to_string()))?;
 

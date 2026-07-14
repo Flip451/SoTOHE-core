@@ -39,6 +39,7 @@ use std::path::{Path, PathBuf};
 use domain::tddd::catalogue_v2::{
     CatalogueDocument, ContractRole, DataRole, FunctionRole, TypeKindV2,
 };
+use domain::tddd::type_signals_doc::CatalogueDeclarationHash;
 use domain::{CatalogueSpecSignalsDocument, ConfidenceSignal, TypeSignal};
 use thiserror::Error;
 
@@ -85,8 +86,12 @@ pub enum LoadCatalogueSpecSignalsForViewError {
     },
 
     /// The signals file is stale relative to the on-disk catalogue bytes.
-    #[error("catalogue-spec-signals at '{}' is stale (declared={declared}, actual={actual}). Run `sotp signal calc-catalog-spec <track_id>` to regenerate.", path.display())]
-    StaleHash { path: PathBuf, declared: String, actual: String },
+    #[error("catalogue-spec-signals at '{}' is stale (declared={declared:?}, actual={actual:?}). Run `sotp signal calc-catalog-spec <track_id>` to regenerate.", path.display())]
+    StaleHash {
+        path: PathBuf,
+        declared: CatalogueDeclarationHash,
+        actual: CatalogueDeclarationHash,
+    },
 }
 
 /// Load a `<layer>-catalogue-spec-signals.json` document for view rendering.
@@ -137,7 +142,11 @@ pub fn load_catalogue_spec_signals_for_view(
         LoadCatalogueSpecSignalsForViewError::Decode { path: signals_path.to_path_buf(), source }
     })?;
     let actual = type_signals_codec::declaration_hash(catalogue_bytes);
-    let declared = doc.catalogue_declaration_hash.to_hex();
+    let declared = CatalogueDeclarationHash::new(
+        domain::tddd::type_signals_doc::Sha256Digest::from_content_hash(
+            doc.catalogue_declaration_hash.clone(),
+        ),
+    );
     if declared != actual {
         return Err(LoadCatalogueSpecSignalsForViewError::StaleHash {
             path: signals_path.to_path_buf(),
@@ -643,6 +652,78 @@ mod tests {
             })
             .collect();
         CatalogueSpecSignalsDocument::new(make_dummy_hash(), sigs)
+    }
+
+    #[test]
+    fn test_load_catalogue_spec_signals_for_view_missing_file_returns_not_found() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let missing_path = temp_dir.path().join("catalogue-spec-signals.json");
+
+        let error = load_catalogue_spec_signals_for_view(&missing_path, b"{}")
+            .expect_err("a missing catalogue-spec signals file must fail closed");
+
+        assert!(
+            matches!(
+                error,
+                LoadCatalogueSpecSignalsForViewError::NotFound { path }
+                    if path == missing_path
+            ),
+            "missing catalogue-spec signals must surface as NotFound"
+        );
+    }
+
+    #[test]
+    fn test_load_catalogue_spec_signals_for_view_malformed_document_returns_decode() {
+        let signals_file = tempfile::NamedTempFile::new().unwrap();
+        std::fs::write(signals_file.path(), "not valid JSON").unwrap();
+
+        let error = load_catalogue_spec_signals_for_view(signals_file.path(), b"{}")
+            .expect_err("a malformed catalogue-spec signals document must fail closed");
+
+        assert!(
+            matches!(
+                error,
+                LoadCatalogueSpecSignalsForViewError::Decode { path, .. }
+                    if path == signals_file.path()
+            ),
+            "malformed catalogue-spec signals must surface as Decode"
+        );
+    }
+
+    #[test]
+    fn test_load_catalogue_spec_signals_for_view_stale_declaration_hash_returns_stale_hash() {
+        let signals_file = tempfile::NamedTempFile::new().unwrap();
+        let stale_declaration_hash = "0".repeat(64);
+        let catalogue_bytes = br#"{"schema_version": 3, "types": {}}"#;
+        let stale_signals = format!(
+            r#"{{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "{stale_declaration_hash}",
+  "signals": []
+}}"#
+        );
+        std::fs::write(signals_file.path(), stale_signals).unwrap();
+
+        let error = load_catalogue_spec_signals_for_view(signals_file.path(), catalogue_bytes)
+            .expect_err("a stale declaration hash must fail closed");
+        let expected_declared = CatalogueDeclarationHash::new(
+            domain::tddd::type_signals_doc::Sha256Digest::try_new(stale_declaration_hash.clone())
+                .unwrap(),
+        );
+
+        assert!(
+            matches!(
+                error,
+                LoadCatalogueSpecSignalsForViewError::StaleHash {
+                    path,
+                    declared,
+                    actual,
+                } if path == signals_file.path()
+                    && declared == expected_declared
+                    && actual != expected_declared
+            ),
+            "stale declaration hash must surface as StaleHash"
+        );
     }
 
     #[test]

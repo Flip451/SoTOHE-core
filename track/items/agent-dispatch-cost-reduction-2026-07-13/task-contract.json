@@ -73,22 +73,35 @@
       {"layer": "domain", "entry_key": "TypeSignalsSchemaVersionError"},
       {"layer": "domain", "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"}
     ],
-    "T006": [
-      {"layer": "domain", "entry_key": "TypeSignalsExecutorPort"},
-      {"layer": "domain", "entry_key": "TypeSignalsExecutionError"},
+    "T011": [
       {"layer": "usecase", "entry_key": "TypeSignalsExecutorPort"},
       {"layer": "usecase", "entry_key": "TypeSignalsExecutionError"},
       {"layer": "usecase", "entry_key": "TypeSignalsInteractor"},
       {"layer": "usecase", "entry_key": "TypeSignalsRequest"},
-      {"layer": "usecase", "entry_key": "TypeSignalsService"},
+      {"layer": "usecase", "entry_key": "TypeSignalsError"},
+      {"layer": "usecase", "entry_key": "DiagnosticText"},
+      {"layer": "usecase", "entry_key": "TypeSignalsService"}
+    ],
+    "T018": [
       {"layer": "infrastructure", "entry_key": "EvaluateSignalsError"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"}
+    ],
+    "T013": [
+      {"layer": "domain", "entry_key": "TypeSignalsExecutorPort"},
+      {"layer": "domain", "entry_key": "TypeSignalsExecutionError"},
       {"layer": "infrastructure", "entry_key": "TypeSignalsCodecError"},
       {"layer": "infrastructure", "entry_key": "TypeSignalsExecutorAdapter"},
       {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::declaration_hash"},
       {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::decode"},
       {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::encode"},
-      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"},
       {"layer": "cli_composition", "entry_key": "SignalCompositionRoot"}
+    ],
+    "T014": [
+      {"layer": "infrastructure", "entry_key": "RustdocSchemaExporter"}
+    ],
+    "T015": [
+      {"layer": "infrastructure", "entry_key": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash"},
+      {"layer": "infrastructure", "entry_key": "LoadCatalogueSpecSignalsForViewError"}
     ],
     "T007": [
       {"layer": "usecase", "entry_key": "CapabilityDispatchOutcome"},

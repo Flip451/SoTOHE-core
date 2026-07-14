@@ -176,7 +176,7 @@ pub fn refresh_one_layer(
     // Compute raw-bytes SHA-256 (same canonical-hash helper as merge_gate_adapter).
     let catalogue_hash_hex = type_signals_codec::declaration_hash(&bytes);
     let catalogue_declaration_hash =
-        ContentHash::try_from_hex(&catalogue_hash_hex).map_err(|e| {
+        ContentHash::try_from_hex(catalogue_hash_hex.as_digest().as_str()).map_err(|e| {
             format!("internal: catalogue hash for layer '{layer_id}' is not canonical hex: {e}")
         })?;
 

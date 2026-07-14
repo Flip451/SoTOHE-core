@@ -43,3 +43,6 @@ libc = "0.2.183"
 rstest = { workspace = true }
 temp-env = "0.3"
 tempfile = "3.27.0"
+
+[build-dependencies]
+sha2 = "0.10.9"

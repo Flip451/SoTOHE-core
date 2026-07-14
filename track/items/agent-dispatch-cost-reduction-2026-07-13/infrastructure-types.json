@@ -119,7 +119,7 @@
     },
     "infrastructure::tddd::type_signals_codec::declaration_hash": {
       "action": "modify",
-      "docs": "Hashes opaque catalogue bytes into the typed declaration freshness identity.",
+      "docs": "Hashes opaque catalogue bytes into the typed declaration freshness identity through the infallible computed ContentHash conversion path.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -260,6 +260,34 @@
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ]
+    },
+    "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash": {
+      "action": "modify",
+      "docs": "Computes the typed catalogue declaration hash infallibly for cross-crate integration fixtures.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "catalogue_bytes",
+          "ty": "&[u8]"
+        }
+      ],
+      "returns": "domain::tddd::type_signals_doc::CatalogueDeclarationHash",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
     }
   },
   "inherent_impls": [
@@ -318,6 +346,16 @@
   "layer": "infrastructure",
   "schema_version": 5,
   "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "RustdocSchemaExporter",
+      "trait_ref": "domain::schema::SchemaExporter"
+    },
+    {
+      "action": "reference",
+      "for_type": "RustdocSchemaExporter",
+      "trait_ref": "usecase::export_schema::SchemaExporterPort"
+    },
     {
       "action": "delete",
       "for_type": "TypeSignalsExecutorAdapter",
@@ -478,6 +516,21 @@
     {
       "for_type": "Sha256ExecutionContractFingerprintAdapter",
       "trait_ref": "usecase::provider_session::ReviewerExecutionContractFingerprintPort"
+    },
+    {
+      "action": "modify",
+      "for_type": "LoadCatalogueSpecSignalsForViewError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "LoadCatalogueSpecSignalsForViewError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "LoadCatalogueSpecSignalsForViewError",
+      "trait_ref": "core::error::Error"
     }
   ],
   "traits": {},
@@ -486,14 +539,14 @@
       "action": "modify",
       "docs": "Trusted routing-profile loader and typed execution resolver; provider_label is unconstrained display text (IN-01, IN-02, CN-01).",
       "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
+    "kind": {
+      "kind": "struct",
+      "shape": {
+        "fields": [],
+        "has_stripped_fields": true,
+        "kind": "plain"
+      }
+    },
       "methods": [
         {
           "has_default_impl": false,
@@ -1374,6 +1427,111 @@
         }
       ]
     },
+    "LoadCatalogueSpecSignalsForViewError": {
+      "action": "modify",
+      "docs": "Fail-closed catalogue-spec signal loading errors; StaleHash retains both compared catalogue declaration hashes as validated domain values.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotFound",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NotRegularFile",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "source",
+                  "ty": "std::io::Error"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Decode",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "source",
+                  "ty": "CatalogueSpecSignalsCodecError"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "StaleHash",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "declared",
+                  "ty": "domain::tddd::type_signals_doc::CatalogueDeclarationHash"
+                },
+                {
+                  "name": "actual",
+                  "ty": "domain::tddd::type_signals_doc::CatalogueDeclarationHash"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "type_catalogue_render",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
     "ModelNameDto": {
       "action": "reference",
       "docs": "Validated profile-side model identifier wrapper.",
@@ -1633,6 +1791,74 @@
         }
       ]
     },
+    "RustdocSchemaExporter": {
+      "action": "modify",
+      "docs": "Adds existing_rustdoc_json_path for IN-06 / AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export_rustdoc_json_path",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<std::path::PathBuf, domain::schema::SchemaExportError>"
+        },
+        {
+          "docs": "Produces only domain::schema::SchemaExportError::RustdocFailed; other SchemaExportError variants are unreachable for existing-path resolution.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "existing_rustdoc_json_path",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<std::path::PathBuf, domain::schema::SchemaExportError>"
+        }
+      ],
+      "module_path": "schema_export",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
     "Sha256ExecutionContractFingerprintAdapter": {
       "action": "add",
       "docs": "Hashes canonical capability and scope-specific reviewer contract inputs into stable fingerprints.",
@@ -1747,15 +1973,17 @@
       ]
     },
     "TypeSignalsExecutorAdapter": {
-      "action": "reference",
-      "docs": "Baseline unit adapter carried to expose the relocated usecase port implementation.",
+      "action": "modify",
+      "docs": "Baseline unit adapter modified to implement the relocated usecase port while removing the legacy domain port implementation.",
       "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "unit"
-        }
-      },
+    "kind": {
+      "kind": "struct",
+      "shape": {
+        "fields": [],
+        "has_stripped_fields": false,
+        "kind": "plain"
+      }
+    },
       "methods": [
         {
           "has_default_impl": false,
