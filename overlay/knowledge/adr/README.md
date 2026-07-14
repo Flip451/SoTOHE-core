@@ -10,7 +10,7 @@ decisions: []
 
 - **フォーマット**: Nygard 式 + Rejected Alternatives + Reassess When
 - **言語**: 日本語
-- **採番**: `YYYY-MM-DD-HHMM-slug.md`（例: `2026-03-11-1430-track-status-derived.md`）
+- **採番**: `YYYY-MM-DD-HHMM-slug.md`（例: `<date>-<time>-<slug>.md`）
 - **Status**: `Proposed` / `Accepted` / `Superseded` / `Deprecated`
   - `Proposed`: ADR is authored and under review / pending activation of the associated track
   - `Accepted`: Decision is accepted and implementation may proceed

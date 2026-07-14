@@ -20,7 +20,7 @@ branch strategy の実値は 2 段階で解決する。どちらの経路でも�
 1. **グローバル設定** (`.harness/config/branch-strategy.json`): `base_branch` / `merge_target` / `merge_method` の 3 フィールドを持つ。トラックがまだ存在しない bootstrap 操作（`/track:init` によるブランチ作成、`cargo make track-branch-create`）はこのファイルを直接読む（`JsonConfigBranchStrategyAdapter`）。
 2. **トラックスナップショット** (`track/items/<id>/metadata.json` の `branch_strategy_snapshot` フィールド): トラック作成時にグローバル設定から 1 回だけ複製され、以後そのトラックの生存期間中は不変。トラック作成後のブランチ操作（`cargo make track-switch-base`、PR 作成・マージ）はこのスナップショットを読む（`SnapshotBranchStrategyAdapter`）。グローバル設定を後から変更しても、既存トラックの挙動は変わらない。
 
-両アダプタは usecase 層の `BranchStrategyPort` トレイト（`base_branch()` / `merge_target()` / `merge_method()` / `track_prefix()`）を実装する。`track_prefix()` は常に `"track/"` を返す（CN-04、ブランチ命名規則自体は設定対象外）。
+両アダプタは usecase 層の `BranchStrategyPort` トレイト（`base_branch()` / `merge_target()` / `merge_method()` / `track_prefix()`）を実装する。`track_prefix()` は常に `"track/"` を返す。ブランチ命名規則自体は設定対象外である。
 
 ### 現在のトラック解決
 
@@ -38,7 +38,7 @@ branch strategy の実値は 2 段階で解決する。どちらの経路でも�
 
 - `cargo make track-branch-switch '<id>'` で対象トラックのブランチに切り替える。
 - `cargo make track-switch-base` でアクティブなトラックの `branch_strategy_snapshot` から解決した base branch に切り替え、そのあと ff-only sync（内部的には `bin/sotp git sync` — `git pull --ff-only`）で最新取り込みを試みる（`/track:done` が内部で使用する）。この合成コマンドでは、upstream 未設定 / non-fast-forward / worktree unresolved などの既知 sync refusal はすべて「[WARN] Pull failed (may not have remote tracking branch)」に downgrade され、branch switch 自体が可能な場合は workflow を失敗させない。
-- `cargo make sync` は現在のブランチを ff-only pull するのみの薄いラッパー。ブランチ切り替えは行わないので、track branch 上で upstream に fast-forward 追従する用途としても使える。単体実行時は upstream 未設定 / non-fast-forward / worktree unresolved を typed error として fail-closed する（トラック切替と remote sync を独立したコマンドに分離した理由については ADR `knowledge/adr/2026-07-04-0155-git-sync-dedicated-command.md` を参照）。
+- `cargo make sync` は現在のブランチを ff-only pull するのみの薄いラッパー。ブランチ切り替えは行わないので、track branch 上で upstream に fast-forward 追従する用途としても使える。単体実行時は upstream 未設定 / non-fast-forward / worktree unresolved を typed error として fail-closed する。トラック切り替えと remote sync は別コマンドとして扱う。
 
 ### マージワークフロー（track/ ブランチ）
 

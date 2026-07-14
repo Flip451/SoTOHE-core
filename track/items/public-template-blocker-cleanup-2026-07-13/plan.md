@@ -10,7 +10,7 @@ Run T022 after T002; it is independent of T003 and precedes final enablement in 
 T021 is final enablement and is blocked on T012, T013, and T015-T020.
 Goal traceability: GO-01 → T001; GO-02 → T004/T007-T011/T021; GO-03 → T006/T012/T013/T021; GO-04 → T014; GO-05 → T002/T003/T005/T015-T022; GO-06 → T002/T003/T005/T007-T011/T015-T022; GO-07 → T006/T007-T011/T021.
 
-## Tasks (12/22 resolved)
+## Tasks (15/22 resolved)
 
 ### S1 — Template export classification and output protection
 
@@ -34,19 +34,19 @@ Goal traceability: GO-01 → T001; GO-02 → T004/T007-T011/T021; GO-03 → T006
 
 > After the verifier functions are in place, run T007 through T011 in hexagonal dependency order: usecase, filesystem adapter, primary adapter, CLI surface, then composition-level smoke coverage.
 
-- [x] **T007**: Extend `libs/usecase/src/verify.rs::{VerifyPort::verify_catalogue_spec_refs, VerifyService::verify_catalogue_spec_refs, VerifyInteractor}` with the three verifier routes, propagate `track_id: Option<TrackId>` across the catalogue-spec-refs port/service delegation, and add interaction/error-transport tests (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #IN-08, #CN-02, #AC-03, #AC-12, #AC-15, #AC-20).
-- [x] **T008**: Extend `libs/infrastructure/src/verify_adapter.rs::FsVerifyAdapter` with delegations to the three verifier functions and adapter-route tests (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #CN-02, #AC-03, #AC-12, #AC-15).
-- [x] **T009**: Extend `apps/cli-driver/src/verify.rs::{VerifyInput::CatalogueSpecRefs, VerifyDriver::handle}` with the three verification variants, propagate `track_id: Option<TrackId>` to `VerifyService::verify_catalogue_spec_refs`, and add input-to-usecase route tests (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #IN-08, #CN-02, #AC-03, #AC-12, #AC-15, #AC-20).
-- [x] **T010**: Extend `apps/cli/src/commands/verify.rs::{VerifyCommand, dispatch_to_outcome}` with the three subcommands using `VerifyArgs` and `CatalogueSpecRefsArgs`, including `parse_track_id`, and add parser/dispatch tests in `apps/cli/src/commands/verify_tests.rs` (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #CN-02, #AC-03, #AC-12, #AC-15, #AC-20).
-- [x] **T011**: Wire the three routes in `apps/cli-composition/src/verify.rs::VerifyCompositionRoot::verify_driver` and add controlled command-smoke coverage at that composition boundary (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #CN-02, #AC-03, #AC-12, #AC-15).
+- [x] **T007**: Extend `libs/usecase/src/verify.rs::{VerifyPort::verify_catalogue_spec_refs, VerifyService::verify_catalogue_spec_refs, VerifyInteractor}` with the three verifier routes, propagate `track_id: Option<TrackId>` across the catalogue-spec-refs port/service delegation, and add interaction/error-transport tests (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #IN-08, #CN-02, #AC-03, #AC-12, #AC-15, #AC-20). (`3b61b828e620c72c5ebe10f98dc0226a14ca6c67`)
+- [x] **T008**: Extend `libs/infrastructure/src/verify_adapter.rs::FsVerifyAdapter` with delegations to the three verifier functions and adapter-route tests (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #CN-02, #AC-03, #AC-12, #AC-15). (`3b61b828e620c72c5ebe10f98dc0226a14ca6c67`)
+- [x] **T009**: Extend `apps/cli-driver/src/verify.rs::{VerifyInput::CatalogueSpecRefs, VerifyDriver::handle}` with the three verification variants, propagate `track_id: Option<TrackId>` to `VerifyService::verify_catalogue_spec_refs`, and add input-to-usecase route tests (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #IN-08, #CN-02, #AC-03, #AC-12, #AC-15, #AC-20). (`3b61b828e620c72c5ebe10f98dc0226a14ca6c67`)
+- [x] **T010**: Extend `apps/cli/src/commands/verify.rs::{VerifyCommand, dispatch_to_outcome}` with the three subcommands using `VerifyArgs` and `CatalogueSpecRefsArgs`, including `parse_track_id`, and add parser/dispatch tests in `apps/cli/src/commands/verify_tests.rs` (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #CN-02, #AC-03, #AC-12, #AC-15, #AC-20). (`3b61b828e620c72c5ebe10f98dc0226a14ca6c67`)
+- [x] **T011**: Wire the three routes in `apps/cli-composition/src/verify.rs::VerifyCompositionRoot::verify_driver` and add controlled command-smoke coverage at that composition boundary (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #CN-02, #AC-03, #AC-12, #AC-15). (`3b61b828e620c72c5ebe10f98dc0226a14ca6c67`)
 
 ### S4 — Shipped-document and archive workflow cleanup
 
 > Run T012, then T014, then T013; T013 reviews the manifest-resolved shipped set after the archive workflow and command edits (spec.json#AC-05, #AC-06).
 
-- [ ] **T012**: Rewrite the manifest-resolved `knowledge/conventions/**` shipped documents, using `knowledge/adr/README.md` for generic ADR navigation where needed, and add targeted document checks (spec.json#GO-03, #IN-03, #CN-01, #CN-05, #AC-05, #AC-06, #OS-03).
-- [ ] **T014**: Create `.harness/workflows/track/archive.md`, reduce `.claude/commands/track/archive.md` to its invocation/reporting bridge, and add directory-derived archive/registry coverage for `apps/cli/src/commands/track/archive.rs::execute_archive` and `libs/infrastructure/src/track/render/{snapshot.rs,registry.rs}` (spec.json#GO-04, #IN-04, #AC-07, #AC-08, #OS-04).
-- [ ] **T013**: Use the include/overlay file set resolved from `.harness/config/template-boundary.json`, excluding the T012 convention set, to rewrite remaining shipped documents and configuration; perform the required semantic review over that completed resolved set (spec.json#GO-03, #IN-03, #CN-01, #CN-05, #AC-05, #AC-06, #OS-03, #OS-06).
+- [x] **T012**: Rewrite the manifest-resolved `knowledge/conventions/**` shipped documents, using `knowledge/adr/README.md` for generic ADR navigation where needed, and add targeted document checks (spec.json#GO-03, #IN-03, #CN-01, #CN-05, #AC-05, #AC-06, #OS-03).
+- [x] **T014**: Create `.harness/workflows/track/archive.md`, reduce `.claude/commands/track/archive.md` to its invocation/reporting bridge, and add directory-derived archive/registry coverage for `apps/cli/src/commands/track/archive.rs::execute_archive` and `libs/infrastructure/src/track/render/{snapshot.rs,registry.rs}` (spec.json#GO-04, #IN-04, #AC-07, #AC-08, #OS-04).
+- [x] **T013**: Use the include/overlay file set resolved from `.harness/config/template-boundary.json`, excluding the T012 convention set, to rewrite remaining shipped documents and configuration; perform the required semantic review over that completed resolved set (spec.json#GO-03, #IN-03, #CN-01, #CN-05, #AC-05, #AC-06, #OS-03, #OS-06).
 
 ### S5 — Tracked-artifact machine-path cleanup
 

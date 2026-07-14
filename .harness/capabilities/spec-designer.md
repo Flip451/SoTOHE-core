@@ -88,7 +88,7 @@ Apply `knowledge/conventions/prefer-type-safe-abstractions.md` (Newtype / Enum-f
 
 ## Signal Evaluation Decision Criteria
 
-These three criteria let the specialist resolve citation-placement and yellow-resolution questions autonomously, without round-tripping to the orchestrator. They mirror the signal evaluation rules documented in the plan-artifact workflow ADR (§D3.1).
+These three criteria let the specialist resolve citation-placement and yellow-resolution questions autonomously, without round-tripping to the orchestrator. They mirror the signal evaluation rules documented in the plan-artifact workflow.
 
 ### (1) Universal coding principles belong at the top level, not per element
 
@@ -98,7 +98,7 @@ Use per-element `convention_refs[]` only when the convention is bound to a speci
 
 ### (2) `convention_refs[]` does not contribute to Blue
 
-Per ADR §D3.1 (`convention_refs[]`: signal 評価対象外), convention references are intentionally excluded from the signal calculation. Signal is computed from `adr_refs[]` + `informal_grounds[]` only:
+Convention references are intentionally excluded from the signal calculation. Signal is computed from `adr_refs[]` + `informal_grounds[]` only:
 
 - `informal_grounds[]` non-empty → 🟡 Yellow (takes priority regardless of adr_refs)
 - `informal_grounds[]` empty + `adr_refs[]` non-empty → 🔵 Blue

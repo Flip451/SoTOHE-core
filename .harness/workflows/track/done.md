@@ -11,7 +11,7 @@ attempt a ff-only sync, and report a short completion summary. This workflow per
 gate checks — merge-time gates have already been run by `/track:merge` (or the equivalent PR
 merge path). The sync is attempted, not guaranteed: all fail-closed sync modes (missing
 upstream / non-fast-forward / worktree unresolved) are downgraded to a warning and do not
-fail the workflow, preserving the pre-track CLI behavior contract (CN-05 bit-equivalent).
+fail the workflow, preserving the pre-track CLI behavior contract exactly.
 
 ## Inputs
 

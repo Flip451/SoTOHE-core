@@ -43,7 +43,7 @@ A draft that violates any convention rule must be self-rejected before the orche
 
 ## Mission
 
-Translate the track's ADR (design decisions) and spec.json (behavioral contract) into **per-layer TDDD catalogue entries** (`<layer>-types.json`) via the **generate + annotate workflow** (ADR `2026-07-02-1345-catalogue-generation-annotation.md` D2): the catalogue JSON is never composed by hand — the `sotp catalog` scaffolding CLI generates schema-conformant entry skeletons from intent inputs, and the type-designer's work is the intent itself plus the `$todo` fill-ins. For each type the spec and ADR require:
+Translate the track's ADR (design decisions) and spec.json (behavioral contract) into **per-layer TDDD catalogue entries** (`<layer>-types.json`) via the **generate + annotate workflow**: the catalogue JSON is never composed by hand — the `sotp catalog` scaffolding CLI generates schema-conformant entry skeletons from intent inputs, and the type-designer's work is the intent itself plus the `$todo` fill-ins. For each type the spec and ADR require:
 
 - Pick the correct `role` value and the `kind` discriminator (`struct` with `shape` `unit`/`tuple`/`plain`, `enum`, or `type_alias`) — these are intent inputs to `sotp catalog add`
 - Decide `action` (add / modify / reference / delete) against the existing baseline — for pre-existing types this selects the `sotp catalog import --action` variant
@@ -99,7 +99,7 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
    ```
    bin/sotp track baseline-graph <id> [--layers <layer_id>]
    ```
-   `baseline-graph` (Reality View, ADR `2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation`) renders both depths from the rustdoc baseline in a **single** invocation: depth=1 overview to `track/items/<id>/<layer>-graph-d1/index.md` and depth=2 cluster detail to `track/items/<id>/<layer>-graph-d2/<cluster>.md`. Cluster = top-level module (fixed) — there is no `--cluster-depth` flag. Requires the baselines captured in step 1. (`--layers` takes a comma-separated id list; omit it to render every `tddd.enabled` layer.)
+   `baseline-graph` (Reality View) renders both depths from the rustdoc baseline in a **single** invocation: depth=1 overview to `track/items/<id>/<layer>-graph-d1/index.md` and depth=2 cluster detail to `track/items/<id>/<layer>-graph-d2/<cluster>.md`. Cluster = top-level module (fixed) — there is no `--cluster-depth` flag. Requires the baselines captured in step 1. (`--layers` takes a comma-separated id list; omit it to render every `tddd.enabled` layer.)
 
 3. **(produced by step 2)** — depth=2 detail is emitted by the same `baseline-graph` invocation as depth=1; no separate depth command is needed.
 
@@ -112,7 +112,7 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
    - current kind / partition (informs `action: modify` vs cross-partition `delete` + `add`)
    - naming conventions in use (so new entries stay consistent)
 
-6. **Generate catalogue entries via the scaffolding CLI** — do NOT compose catalogue JSON by hand (D2). Decide each entry's role / kind / action intent from the reconnaissance (steps 1–5) + ADR + spec, then drive the matching verb:
+6. **Generate catalogue entries via the scaffolding CLI** — do NOT compose catalogue JSON by hand. Decide each entry's role / kind / action intent from the reconnaissance (steps 1–5) + ADR + spec, then drive the matching verb:
 
    - **Track's first catalogue session** — create the empty schema-conformant skeleton for every `tddd.enabled` layer in one invocation:
      ```
@@ -120,16 +120,16 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
      ```
      Fail-closed: errors with `FileExists` (no partial writes) when any target catalogue already exists — skip `init` at incremental sessions. The generated skeleton carries only the 6 top-level keys (`schema_version` / `crate_name` / `layer` / `types` / `traits` / `functions`); the `inherent_impls` / `trait_impls` arrays appear when first populated.
 
-   - **Pre-existing baseline type** (action `reference` / `modify` / `delete`) — import the rustdoc-extracted shape; no manual transcription (D3):
+   - **Pre-existing baseline type** (action `reference` / `modify` / `delete`) — import the rustdoc-extracted shape; no manual transcription:
      ```
      bin/sotp catalog import --layer <layer> --type <rust::path::TypeName> \
        --action <reference|modify|delete> [--anchor <spec-anchor>]...
      ```
-     `reference` carries the current shape unchanged. `modify` imports the current shape as the editing baseline — apply the intended delta during annotation (step 7). `delete` writes an identity-only tombstone (no live shape); **for `delete` the `--anchor` is mandatory** — the tombstone must be grounded at import time (D8), and the command fails closed when no anchor is supplied. The import resolves identity, signatures, fields, struct shape (unit / tuple / plain, `has_stripped_fields`), and alias targets from rustdoc.
+     `reference` carries the current shape unchanged. `modify` imports the current shape as the editing baseline — apply the intended delta during annotation (step 7). `delete` writes an identity-only tombstone (no live shape); **for `delete` the `--anchor` is mandatory** — the tombstone must be grounded at import time, and the command fails closed when no anchor is supplied. The import resolves identity, signatures, fields, struct shape (unit / tuple / plain, `has_stripped_fields`), and alias targets from rustdoc.
 
      **Import scope — `types` entries only.** The rustdoc importer resolves type entries and inserts into the `types` section; it does not (yet) import pre-existing **traits** or **functions**. For a baseline trait / function that needs `reference` / `modify`: generate the entry with `catalog add --kind trait|function`, supplying the current source signatures as `--method` / param fragments, then adjust the generated `action` field by hand during annotation (`add` is the generated default — change it to the intended action with the Edit tool). Transcribe the signatures from the reconnaissance outputs (steps 4–5) — not from memory.
 
-     For a baseline trait / function that needs `delete`, do **not** leave a generated live entry with `action: delete`: the decoder treats `delete` as an identity-only tombstone and rejects live-entry fields such as `role`, `methods`, `params`, `returns`, and `docs`. Use the current source identity from the reconnaissance outputs, then replace the entry body with a tombstone carrying only the allowed fields: `action: "delete"`, optional `module_path` for traits (function identity is the full function-path map key, so functions must not carry `module_path`), and grounding fields (`spec_refs` and / or `informal_grounds`). A formal spec anchor is required for deletes; keep that anchor in `spec_refs` because there is no `catalog import --anchor` path for non-type tombstones. Post-generation editing is the supported route for these non-type gaps (D7), and `catalog check` still enforces schema validity and hole-freedom on the result. Treat rustdoc import support for non-type entries as a future CLI extension, not a licence to hand-compose whole documents.
+     For a baseline trait / function that needs `delete`, do **not** leave a generated live entry with `action: delete`: the decoder treats `delete` as an identity-only tombstone and rejects live-entry fields such as `role`, `methods`, `params`, `returns`, and `docs`. Use the current source identity from the reconnaissance outputs, then replace the entry body with a tombstone carrying only the allowed fields: `action: "delete"`, optional `module_path` for traits (function identity is the full function-path map key, so functions must not carry `module_path`), and grounding fields (`spec_refs` and / or `informal_grounds`). A formal spec anchor is required for deletes; keep that anchor in `spec_refs` because there is no `catalog import --anchor` path for non-type tombstones. Post-generation editing is the supported route for these non-type gaps, and `catalog check` still enforces schema validity and hole-freedom on the result. Treat rustdoc import support for non-type entries as a future CLI extension, not a licence to hand-compose whole documents.
 
    - **New type introduced by this track** (action `add`) — supply the designed shape as intent:
      ```
@@ -141,21 +141,21 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
      - `--method "fn name(&self, x: T) -> U"` (repeatable) — trait / entry methods
      - `--inherent-method "fn new(...) -> Self"` (repeatable) — inherent impl methods
      - `--variant "Name"` / `--variant "Name(T)"` / `--variant "Name { f: T }"` (repeatable) — enum variants
-     - `--trait-impl "TraitRef"` (repeatable) — trait impl declarations. Pass **only the trait reference** (e.g. `--trait-impl "core::fmt::Debug"`); the CLI sets `for_type` to the entry named by `--name` (D8). Do NOT write an `impl … for …` fragment — the whole argument is taken as `trait_ref`
+     - `--trait-impl "TraitRef"` (repeatable) — trait impl declarations. Pass **only the trait reference** (e.g. `--trait-impl "core::fmt::Debug"`); the CLI sets `for_type` to the entry named by `--name`. Do NOT write an `impl … for …` fragment — the whole argument is taken as `trait_ref`
      - `--generic "T: Bound"` / `--where "Vec<T>: Clone"` — declaration-level generics
      - `--impl-generic` / `--impl-where` / `--inherent-impl-generic` / `--inherent-impl-where` — impl-block-level generics
-     Role vocabulary, entry-name validity, and function-path keys are validated by the CLI at input time (D5/D6) — schema conformance is not the designer's manual responsibility.
+     Role vocabulary, entry-name validity, and function-path keys are validated by the CLI at input time — schema conformance is not the designer's manual responsibility.
 
-   Both write verbs resolve the target track from the current git branch fail-closed; `--track-id` exists as a READ override only for `check`. Duplicate entry names are rejected fail-closed (D6).
+   Both write verbs resolve the target track from the current git branch fail-closed; `--track-id` exists as a READ override only for `check`. Duplicate entry names are rejected fail-closed.
 
 7. **Annotate the generated skeletons and verify completion**:
 
-   - **Fill every `$todo` hole** with the designed judgment content using the Edit tool. Each `$todo` node carries an instruction string describing what belongs in the slot. Holes mark judgment content only (intent / docs / role payload details); machine-derivable structure was already emitted by step 6 (D5).
+   - **Fill every `$todo` hole** with the designed judgment content using the Edit tool. Each `$todo` node carries an instruction string describing what belongs in the slot. Holes mark judgment content only (intent / docs / role payload details); machine-derivable structure was already emitted by step 6.
    - **Append spec anchors** to generated entries where grounding was not passed at generation time:
      ```
      bin/sotp catalog cite --layer <layer> --entry <Name> --anchor <spec-anchor>...
      ```
-   - **Hand-adjustment of generated JSON is free** (D7) — the completion boundary is the check, not the writing route. When reading or adjusting generated entries, consult `knowledge/conventions/catalogue-schema-reference.md` (wire format, role payloads, `kind` / `shape` representation, cookbook patterns).
+   - **Hand-adjustment of generated JSON is free** — the completion boundary is the check, not the writing route. When reading or adjusting generated entries, consult `knowledge/conventions/catalogue-schema-reference.md` (wire format, role payloads, `kind` / `shape` representation, cookbook patterns).
    - **Verify completion**:
      ```
      bin/sotp catalog check
@@ -274,9 +274,9 @@ The orchestrator's responsibility is signal-based phase gate evaluation only. Ca
 
 Do NOT emit Rust code, module trees, or inline trait signatures outside the catalogue fields.
 
-## Schema reference (relocated — D9)
+## Schema reference
 
-The v5 wire format lives in **`knowledge/conventions/catalogue-schema-reference.md`**: document structure, the role vocabularies and their payloads, the `kind` / `shape` representation, `MethodDeclaration`, TypeRef rules, catalogue lint rule kinds, lint config distribution, and the pattern cookbook. This workflow document deliberately carries no schema detail (D2): generation emits schema-conformant output, and `bin/sotp catalog check` enforces the schema fail-closed. Consult the reference when reading generated entries, judging `$todo` fill-ins, or hand-adjusting entries. Its authority note applies: the sotp implementation is the schema authority — on divergence, sotp wins.
+The v5 wire format lives in **`knowledge/conventions/catalogue-schema-reference.md`**: document structure, the role vocabularies and their payloads, the `kind` / `shape` representation, `MethodDeclaration`, TypeRef rules, catalogue lint rule kinds, lint config distribution, and the pattern cookbook. This workflow document deliberately carries no schema detail: generation emits schema-conformant output, and `bin/sotp catalog check` enforces the schema fail-closed. Consult the reference when reading generated entries, judging `$todo` fill-ins, or hand-adjusting entries. Its authority note applies: the sotp implementation is the schema authority — on divergence, sotp wins.
 
 ## Design Principles (MUST follow)
 
@@ -436,7 +436,7 @@ In addition to the per-layer baseline / graph capture inside the 12-step pipelin
 
 ## Design self-check (before generating / annotating)
 
-Wire-format validity (role vocabulary membership, entry-name validity, function-path key format) is enforced by the `sotp catalog` verbs at input time and by `sotp catalog check` afterwards — it is no longer a manual checklist concern (D5/D6/D7). The following **design** checks remain the specialist's judgment and are NOT machine-enforced:
+Wire-format validity (role vocabulary membership, entry-name validity, function-path key format) is enforced by the `sotp catalog` verbs at input time and by `sotp catalog check` afterwards — it is no longer a manual checklist concern. The following **design** checks remain the specialist's judgment and are NOT machine-enforced:
 
 1. Every type carrying state-specific data with transitions uses a per-state struct cluster with the `typestate` marker set (orthogonal to `shape`) + `Enum` wrapper; no flat-enum + `Option<...>` field design.
 2. Every `action: modify` trait / struct / function lists ALL methods / fields / params and returns after annotation — partial declaration is the most common source of 🟡 findings.
@@ -453,7 +453,7 @@ Wire-format validity (role vocabulary membership, entry-name validity, function-
 
 ## Scope Ownership
 
-- **Writes permitted**: `track/items/<id>/<layer>-types.json` — generated and appended by the `bin/sotp catalog` verbs (`init` / `add` / `import` / `cite`); the Edit tool touches it only for annotation (`$todo` fill-in) and post-generation adjustment (D7). Do NOT compose a whole catalogue document by hand with the Write tool (D2). Baseline files (`<layer>-types-baseline.json`), baseline-graph output (`<layer>-graph-d1/index.md` + `<layer>-graph-d2/<cluster>.md`, Reality View), and contract-map (`contract-map.md`) are generated by `bin/sotp` CLI commands. Per-layer catalogue → spec signal JSON (`<layer>-catalogue-spec-signals.json`) is generated by `bin/sotp signal calc-catalog-spec`. Per-layer type → spec signal JSON (`<layer>-type-signals.json`) is generated by `bin/sotp signal calc-impl-catalog`. Per-layer catalogue view (`<layer>-types.md`) is generated by `bin/sotp track views sync`. Do NOT write these generated files directly via Write/Edit.
+- **Writes permitted**: `track/items/<id>/<layer>-types.json` — generated and appended by the `bin/sotp catalog` verbs (`init` / `add` / `import` / `cite`); the Edit tool touches it only for annotation (`$todo` fill-in) and post-generation adjustment. Do NOT compose a whole catalogue document by hand with the Write tool. Baseline files (`<layer>-types-baseline.json`), baseline-graph output (`<layer>-graph-d1/index.md` + `<layer>-graph-d2/<cluster>.md`, Reality View), and contract-map (`contract-map.md`) are generated by `bin/sotp` CLI commands. Per-layer catalogue → spec signal JSON (`<layer>-catalogue-spec-signals.json`) is generated by `bin/sotp signal calc-catalog-spec`. Per-layer type → spec signal JSON (`<layer>-type-signals.json`) is generated by `bin/sotp signal calc-impl-catalog`. Per-layer catalogue view (`<layer>-types.md`) is generated by `bin/sotp track views sync`. Do NOT write these generated files directly via Write/Edit.
 - **Writes forbidden**: any other track's artifacts, other capabilities' SSoT files (`spec.json`, `impl-plan.json`, `task-coverage.json`, `metadata.json`), any file under `knowledge/adr/` or `knowledge/conventions/`, any source code, and track task-state transitions through `bin/sotp track transition`; this capability has no task-state transition authority. `plan.md` must not be edited directly via Write/Edit — it is regenerated as a side effect of `bin/sotp track views sync` (Step 11), which is required by this pipeline.
 - **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp catalog init` / `add` / `import` / `cite` / `check`, `bin/sotp track baseline-capture`, `bin/sotp track baseline-graph`, `bin/sotp track contract-map`, `bin/sotp signal calc-catalog-spec`, `bin/sotp signal calc-impl-catalog`, `bin/sotp track views sync`, `bin/sotp signal check-catalog-spec`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
 - Do not spawn further agents (keep type-designer output deterministic).

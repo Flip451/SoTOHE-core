@@ -53,7 +53,7 @@ echo "[OK] cargo available"
 # jq is only required by install-sotp (which does its own preflight). When
 # `sotp template export` transplanted the running binary into bin/sotp, the
 # tagless first-run path skips install-sotp entirely and jq is not needed
-# (ADR 2026-07-08-0541 D1 tagless first run must not depend on jq).
+# The tagless first-run path must not depend on jq.
 
 # 2. Docker images
 echo ""
@@ -64,13 +64,13 @@ echo "[OK] Docker tools image built"
 
 # 3. Install pinned sotp CLI binary
 #
-# ADR 2026-07-08-0541 D1/D2: when `sotp template export` transplants the
+# When `sotp template export` transplants the
 # running binary into the exported tree, `bin/sotp` is already present and
 # executable — a fresh cargo install would be redundant work at best and
 # would collide with a tag-less initial adoption at worst. Detect that path
 # and skip install-sotp when `bin/sotp` runs read-only successfully; fall back
-# to the fixed-tag install path (D2) otherwise. Users do not choose the branch
-# (CN-07): the default flow selects it automatically.
+# to the fixed-tag install path otherwise. Users do not choose the branch: the
+# default flow selects it automatically.
 echo ""
 echo "--- Step 3/6: Install sotp CLI binary (pinned tag) ---"
 if [ -x bin/sotp ] && bin/sotp --help >/dev/null 2>&1; then

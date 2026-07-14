@@ -4,7 +4,7 @@
 # This file is the repo-committed default for the baseline-graph renderer.
 # Edit this file to customize mermaid node shapes, colors, edge styles, etc.
 #
-# Absence of this file is a fail-closed error (CN-02 / AC-15):
+# Absence of this required style configuration is a fail-closed error:
 # BaselineGraphRendererAdapter::render_overview / render_clusters returns
 # BaselineGraphRendererError::StyleConfigNotFound.
 #
@@ -15,8 +15,8 @@
 #   [edge.<EdgeKind>]      — arrow syntax + optional label for an edge kind
 #   [filter]               — future rendering filters
 #
-# Note: [role.*] is NOT present — Reality View input is rustdoc_types::Crate which
-# carries no catalogue role data (ADR 2026-05-22-1507 Decision C / IN-04).
+# Note: [role.*] is NOT present — Reality View input is rustdoc_types::Crate, which
+# carries no catalogue role data.
 
 # ---------------------------------------------------------------------------
 # Node category styles

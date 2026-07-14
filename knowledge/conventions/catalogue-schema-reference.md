@@ -4,14 +4,14 @@
 
 TDDD 型カタログ v5 の schema 詳細リファレンス。wire format / role 語彙 / kind・shape 表現 / lint rule kinds / JSON 例を一箇所に集約する。
 
-生成 + 注釈 workflow (ADR `2026-07-02-1345-catalogue-generation-annotation.md` D2 / D9) では、カタログ JSON の骨格は `sotp catalog` コマンド群が生成し、type-designer は意図の入力と `$todo` 穴埋めだけを行う。schema の深い理解は執筆に不要になったが、schema 情報そのものは以下の場面で引き続き必要であり、本書がその受け皿になる (D9):
+生成 + 注釈 workflow では、カタログ JSON の骨格は `sotp catalog` コマンド群が生成し、type-designer は意図の入力と `$todo` 穴埋めだけを行う。schema の深い理解は執筆に不要になったが、schema 情報そのものは以下の場面で引き続き必要であり、本書がその受け皿になる:
 
 - 生成された穴埋め済みエントリの**読解**
 - `$todo` 残存箇所への**記入内容の判断**
 - 生成物の**保守・デバッグ** (signal 🟡/🔴 の原因調査を含む)
 - 生成コマンドを経ない**手直し編集**の正確性確認
 
-> **Authority note (D9)**: schema の権威は sotp の実装側にある。本書は記述的な参照文書 (descriptive mirror) であり、canonical SSoT はソースコード — 具体的には `libs/domain/src/tddd/catalogue_v2/` (`CatalogueDocument`, `TypeEntry`, `TraitEntry`, `FunctionEntry`, `TraitImplDeclV2`, `InherentImplDeclV2`) と `libs/infrastructure/src/tddd/catalogue_document_codec/` — である。本書の記述と実装が乖離した場合は **sotp 側を正とし**、本書を修正する。記述が疑わしいときは source を読み、Open Question として報告する。
+> **Authority note**: schema の権威は sotp の実装側にある。本書は記述的な参照文書 (descriptive mirror) であり、canonical SSoT はソースコード — 具体的には `libs/domain/src/tddd/catalogue_v2/` (`CatalogueDocument`, `TypeEntry`, `TraitEntry`, `FunctionEntry`, `TraitImplDeclV2`, `InherentImplDeclV2`) と `libs/infrastructure/src/tddd/catalogue_document_codec/` — である。本書の記述と実装が乖離した場合は **sotp 側を正とし**、本書を修正する。記述が疑わしいときは source を読み、Open Question として報告する。
 
 ## Scope
 
@@ -67,11 +67,11 @@ Catalogue files for this workspace use **`schema_version: 5`** — a 2-axis stru
 | `UseCase` | `{ "UseCase": { "handles": ["<TypeRef>"...] } }` | `handles` defaults to `[]` ⇔ `{ "UseCase": {} }` |
 | `EventPolicy` | `{ "EventPolicy": { "reacts_to": ["<TypeRef>", ...] } }` | `reacts_to` is **required and must be non-empty** (`NonEmptyVec` invariant — empty array is a decode error) |
 | `DomainEvent` | `{ "DomainEvent": {} }` | unit variant — payload-free event role (Stage 2) |
-| `Specification` / `Factory` / `Interactor` / `Command` / `Query` / `Dto` / `ErrorType` / `SecondaryAdapter` / `CompositionRoot` / `PrimaryAdapter` | `{ "<Variant>": {} }` | unit variants — always write the empty object payload. `CompositionRoot` is permitted only in `cli_composition`; `PrimaryAdapter` is permitted only in `cli_driver` (ADR 2026-06-21-1420 D2 / D3) |
+| `Specification` / `Factory` / `Interactor` / `Command` / `Query` / `Dto` / `ErrorType` / `SecondaryAdapter` / `CompositionRoot` / `PrimaryAdapter` | `{ "<Variant>": {} }` | unit variants — always write the empty object payload. `CompositionRoot` is permitted only in `cli_composition`; `PrimaryAdapter` is permitted only in `cli_driver` |
 
 Using a trait-section or function-section role here is a parse-time error.
 
-`IdentityAccessor` shape: `{ "method_name": "<MethodName>" }` (a public getter method name; public field identity is forbidden — D5). The Rust type is a single-field struct holding a `MethodName`.
+`IdentityAccessor` shape: `{ "method_name": "<MethodName>" }` (a public getter method name; public field identity is forbidden). The Rust type is a single-field struct holding a `MethodName`.
 
 `InvariantDecl` shape: `{ "name": "<InvariantName>", "predicate": { "SelfMethod": "<MethodName>" } }`. `InvariantName` is a `String`-backed newtype (non-empty, identifier-validated). `InvariantPredicate` is an enum whose only current variant is `SelfMethod(MethodName)`; future predicate kinds add new variants.
 
@@ -160,7 +160,7 @@ or with impl-block-level generics:
 | `SpecificationPort` | `{ "SpecificationPort": {} }` | unit — always empty object payload |
 | `ApplicationService` | `{ "ApplicationService": {} }` | unit |
 | `SecondaryPort` | `{ "SecondaryPort": {} }` | unit (non-Repository secondary port) |
-| `Repository` | `{ "Repository": { "aggregate": "<TypeRef>" } }` | `aggregate` is **required** — names the AggregateRoot type this Repository persists; no default (a Repository without an aggregate is an illegal state — D10) |
+| `Repository` | `{ "Repository": { "aggregate": "<TypeRef>" } }` | `aggregate` is **required** — names the AggregateRoot type this Repository persists; no default (a Repository without an aggregate is an illegal state) |
 
 Using a type-section or function-section role here is a parse-time error. The plain-string form (`"role": "SpecificationPort"` etc.) is no longer accepted — the codec rejects it as a parse-time error.
 
@@ -183,11 +183,11 @@ Using a type-section or function-section role here is a parse-time error. The pl
 
 `role` MUST be one of the **2 function-section role values**: `FreeFunction` | `UseCaseFunction`.
 
-The BTreeMap key is a function path with format `<this-crate>::[<module_path>::]<function_name>` (module segments optional; e.g. `"<this-crate>::register_user"` at crate root, `"<this-crate>::merge_gate::check_strict_merge_gate"` with module). **`<this-crate>` MUST equal the document's own `crate_name`** — the codec rejects any function path key that does not start with `{crate_name}::` (D4).
+The BTreeMap key is a function path with format `<this-crate>::[<module_path>::]<function_name>` (module segments optional; e.g. `"<this-crate>::register_user"` at crate root, `"<this-crate>::merge_gate::check_strict_merge_gate"` with module). **`<this-crate>` MUST equal the document's own `crate_name`** — the codec rejects any function path key that does not start with `{crate_name}::`.
 
 ## The `kind` field (3 top-level discriminators: `struct` / `enum` / `type_alias`)
 
-A struct's Rust-level form (unit / tuple / plain) is carried in a nested `shape`; its typestate membership is an **orthogonal** sibling (`typestate`), so **any** struct shape can be a typestate state. The old `unit_struct` / `tuple_struct` / `plain_struct` wire tags are **removed** (CN-02) — the codec (`deny_unknown_fields`) rejects them; always write `"kind": "struct"` and put the form in `shape`.
+A struct's Rust-level form (unit / tuple / plain) is carried in a nested `shape`; its typestate membership is an **orthogonal** sibling (`typestate`), so **any** struct shape can be a typestate state. The old `unit_struct` / `tuple_struct` / `plain_struct` wire tags are **removed** — the codec (`deny_unknown_fields`) rejects them; always write `"kind": "struct"` and put the form in `shape`.
 
 ```json
 // 1. Struct — always `"kind": "struct"`; the `shape` (unit | tuple | plain) is nested.
@@ -269,7 +269,7 @@ rustdoc **omits private fields** from the public API JSON and sets `has_stripped
 
 ## Catalogue Lint Rule Kinds (reference)
 
-The linter (ADR D15 / D17) validates catalogue entries via 12 `CatalogueLinterRuleKind` variants. The type-designer does not author lint configs (that's the user's `.harness/catalogue-lint/config.json`), but knowing which rule kinds exist explains why certain fields are required when a lint is opt-in.
+The linter validates catalogue entries via 12 `CatalogueLinterRuleKind` variants. The type-designer does not author lint configs (that's the user's `.harness/catalogue-lint/config.json`), but knowing which rule kinds exist explains why certain fields are required when a lint is opt-in.
 
 - `FieldEmpty { target_field }` — payload field must be empty
 - `FieldNonEmpty { target_field }` — payload field must be non-empty
@@ -279,7 +279,7 @@ The linter (ADR D15 / D17) validates catalogue entries via 12 `CatalogueLinterRu
 - `NoRoleInMethodSignature { forbidden_roles }` — no method param / return may reference a type whose role is in the forbidden list
 - `MethodReferenceSignature { target_field }` — the method named in `target_field` exists and matches a receiver / params / returns shape
 - `AccessorSignatureRequired { target_field }` — identity getter (or similar) exists with `&self` / no params / non-`()` return
-- `FieldElementUniqueAcrossEntries { target_field: "exclusive_members" }` — the same element does not appear in multiple AggregateRoot entries (target_field is fixed to `exclusive_members` per D6/D11)
+- `FieldElementUniqueAcrossEntries { target_field: "exclusive_members" }` — the same element does not appear in multiple AggregateRoot entries (target_field is fixed to `exclusive_members`)
 - `NoExternalReferenceInMethods { target_field: "exclusive_members" }` — types listed in `exclusive_members` must not appear in non-aggregate methods (fixed target_field)
 - `NoPublicField` — `StructShape::Plain` / `Tuple` entries must not declare public fields
 - `ForbiddenMethodReceiver { forbidden_receiver }` — methods must not declare the listed receiver; canonical values: `"self"` / `"&self"` / `"&mut self"` (anything else is rejected by `CatalogueLinterRule::new` as `CatalogueLinterRuleError::InvalidRuleConfig`)
@@ -288,14 +288,14 @@ The linter (ADR D15 / D17) validates catalogue entries via 12 `CatalogueLinterRu
 
 **Errors**: `CatalogueLinterError::InvalidRuleConfig(String)` is returned for unsupported `target_field` names, or for carry-prechecked rule kinds when any selected `target_role` does not carry the field. `CatalogueLinterRuleError::InvalidRuleConfig(String)` is returned by `CatalogueLinterRule::new` when `ForbiddenMethodReceiver.forbidden_receiver` does not match the canonical receiver set. `MethodReferenceSignature` and `AccessorSignatureRequired` reject only unsupported field names (`invariants` / `identity`, respectively) and skip entries whose role does not carry that accepted field. `CatalogueLinterError::UnknownLayer { layer_id }` is returned when `target_layer_id` is not present in the catalogue map.
 
-## Distribution & Config (ADR D15 / D19)
+## Distribution & Config
 
 The lint configuration mechanism is separate from `<layer>-types.json` but uses related types. A type-designer cataloguing the `lint` machinery must know these files exist:
 
-- **`.harness/catalogue-lint/presets/ddd-strict.json`** — the canonical *distributed preset*. Contains `{ "schema_version": 1, "rules": [...] }` with the minimum-core rules derived deterministically from ADR D4–D11 / D16 / D18. The user copies this file (or its rule list) into their `config.json`; there is no Rust `ddd_strict_preset()` API (D15 amend).
-- **`.harness/catalogue-lint/config.json`** — the per-project lint config. Same `{ "schema_version": 1, "rules": [...] }` shape. `sotp track lint` resolves rules with the precedence **CLI `--rules-file` > `config.json` > fail-closed error**. There is no silent preset fallback (D19).
+- **`.harness/catalogue-lint/presets/ddd-strict.json`** — the canonical *distributed preset*. Contains `{ "schema_version": 1, "rules": [...] }` with the minimum-core rules for catalogue integrity and layer constraints. The user copies this file (or its rule list) into their `config.json`; there is no Rust `ddd_strict_preset()` API.
+- **`.harness/catalogue-lint/config.json`** — the per-project lint config. Same `{ "schema_version": 1, "rules": [...] }` shape. `sotp track lint` resolves rules with the precedence **CLI `--rules-file` > `config.json` > fail-closed error**. There is no silent preset fallback.
 
-Types introduced by D19 that the type-designer may need to catalogue:
+Types that the type-designer may need to catalogue:
 
 - `LintConfig` (usecase layer, `role: ValueObject`) — holds the parsed `rules: Vec<LintRuleSpec>` with a private field, exposes `new(rules)` / `rules() -> &[LintRuleSpec]`.
 - `LintConfigLoader` (usecase layer, `role: SecondaryPort`) — `Send + Sync` trait with `fn load(&self) -> Result<LintConfig, LintConfigLoaderError>` (no path parameter; the path is baked into the adapter at construction).
@@ -634,7 +634,7 @@ When a trait is `modify`-ed, the declaration must enumerate every method. Partia
 
 ### Pattern 5: `add` free function with generics + where_predicates
 
-This example is from `<orchestration-crate>-types.json` (so `crate_name: "<orchestration-crate>"`). The function path key MUST start with the document's own `crate_name::` (the codec rejects cross-crate function paths per D4).
+This example is from `<orchestration-crate>-types.json` (so `crate_name: "<orchestration-crate>"`). The function path key MUST start with the document's own `crate_name::` (the codec rejects cross-crate function paths).
 
 ```jsonc
 // In <orchestration-crate>-types.json — crate_name is "<orchestration-crate>"
@@ -741,5 +741,5 @@ A `reference` entry's methods / fields do not drive Phase 2 structural equality:
 
 - `.harness/capabilities/type-designer.md` — 生成 + 注釈 workflow の手順書 (capability operational SSoT)
 - `knowledge/conventions/type-designer-kind-selection.md` — role / kind 選定の拘束ルール (R1-R10)
-- `knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md` — 生成 + 注釈への移行決定 (D2) と本書の設置決定 (D9)
+- `knowledge/adr/README.md` — 設計判断の索引（履歴を確認する必要がある場合）
 - `libs/domain/src/tddd/catalogue_v2/` / `libs/infrastructure/src/tddd/catalogue_document_codec/` — schema authority (canonical SSoT)

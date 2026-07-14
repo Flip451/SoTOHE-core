@@ -15,15 +15,15 @@ Author three Phase 3 artifacts:
   - `plan.sections[]` of `{id, title, description[], task_ids[]}` — the grouping view used by `plan.md`
 - `track/items/<id>/task-coverage.json` — the coverage map:
   - Per-section (`in_scope` / `out_of_scope` / `constraints` / `acceptance_criteria`) mapping from `SpecElementId` to `Vec<TaskId>`, enforcing that every enforced spec element is linked to at least one task
-- `track/items/<id>/task-contract.json` — the task-to-catalogue-entry attribution map (IN-02):
+- `track/items/<id>/task-contract.json` — the task-to-catalogue-entry attribution map:
   - `schema_version`
   - `track_id` — the active track identifier
-  - `entries` — map from `TaskId` to list of `{layer, entry_key}` pairs, declaring which catalogue entries each task is responsible for implementing; used by the CN-01 pre-review gate to verify attribution completeness and impl_catalog blue signals before review
+  - `entries` — map from `TaskId` to list of `{layer, entry_key}` pairs, declaring which catalogue entries each task is responsible for implementing; used by the pre-review gate to verify attribution completeness and impl_catalog blue signals before review
   - Rollout note: the track introducing `task-contract.json` defines the schema/gate first; subsequent impl-planner runs generate this third artifact alongside the existing two outputs
 
 The plan describes **how the feature is broken into implementation steps**, not the types themselves. Trait signatures, enum variants, and `TypeDefinitionKind` decisions belong to the type-designer's catalogue; architectural decisions belong to the ADR.
 
-This capability **owns `impl-plan.json`, `task-coverage.json`, and `task-contract.json` for this track**: it writes all three artifacts directly, evaluates the task-coverage binary gate via `bin/sotp verify plan-artifact-refs`, and relies on the CN-01 pre-review gate for `task-contract.json` attribution-completeness / impl_catalog-blue verification. The orchestrator receives the gate verdicts (OK / ERROR) and decides whether Phase 3 passes.
+This capability **owns `impl-plan.json`, `task-coverage.json`, and `task-contract.json` for this track**: it writes all three artifacts directly, evaluates the task-coverage binary gate via `bin/sotp verify plan-artifact-refs`, and relies on the pre-review gate for `task-contract.json` attribution-completeness / impl_catalog-blue verification. The orchestrator receives the gate verdicts (OK / ERROR) and decides whether Phase 3 passes.
 
 ## Boundary with other capabilities
 

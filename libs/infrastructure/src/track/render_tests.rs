@@ -648,6 +648,36 @@ fn collect_track_snapshots_tie_breaks_same_updated_at_by_track_id() {
 }
 
 #[test]
+fn test_collect_track_snapshots_archive_directory_renders_archived_registry() {
+    let dir = tempfile::tempdir().unwrap();
+    let archived_dir = dir.path().join("track/archive/legacy-track");
+    std::fs::create_dir_all(&archived_dir).unwrap();
+    std::fs::write(
+        archived_dir.join("metadata.json"),
+        sample_metadata_json_with_schema_and_branch(
+            3,
+            "legacy-track",
+            "done",
+            "2026-03-13T02:00:00Z",
+            r#"[{"id":"T001","description":"Completed task","status":"done"}]"#,
+            Some("track/legacy-track"),
+        ),
+    )
+    .unwrap();
+
+    let snapshots = collect_track_snapshots(dir.path()).unwrap();
+    assert_eq!(snapshots.len(), 1);
+    assert_eq!(snapshots[0].status(), "archived");
+
+    let rendered = render_registry(&snapshots);
+    assert!(rendered.contains("| legacy-track | Archived | 2026-03-13 |"));
+    assert!(
+        !rendered.contains("| legacy-track | Done |"),
+        "an archive-directory track must not appear in Completed Tracks: {rendered}"
+    );
+}
+
+#[test]
 fn sync_rendered_views_omits_unchanged_registry_from_changed_set() {
     let dir = tempfile::tempdir().unwrap();
     init_git_repo_on_track_branch(dir.path(), "track-a");

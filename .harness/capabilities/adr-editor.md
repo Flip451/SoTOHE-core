@@ -77,7 +77,7 @@ The front-matter MUST be the very first content in the file — a `---`-delimite
 
 The front-matter recognises exactly two top-level keys (`deny_unknown_fields` rejects any others):
 
-- `adr_id` (required, non-empty string): the slug identifier — typically the file name without the `.md` extension (e.g. `2026-04-27-1234-adr-decision-traceability-lifecycle`).
+- `adr_id` (required, non-empty string): the slug identifier — typically the file name without the `.md` extension (e.g. `<date>-<time>-<slug>`).
 - `decisions[]` (optional list, defaults to empty when omitted; may be empty for non-ADR README pages but otherwise carries one entry per `### D<n>` decision in the body):
   - `id` (required, non-empty string): a per-decision identifier such as `D1`, `D2`, …, or — for grandfathered legacy ADRs — `<file-stem>_grandfathered`.
   - `user_decision_ref` (optional string): a reference to where the user explicitly approved the decision (chat segment ref, approval marker, etc.). Sets the signal to 🔵 Blue (highest priority — wins over `review_finding_ref` if both are set).
@@ -86,7 +86,7 @@ The front-matter recognises exactly two top-level keys (`deny_unknown_fields` re
   - `status` (required string): one of `proposed` / `accepted` / `implemented` / `superseded` / `deprecated`. These five values dispatch through the ADR front-matter parser to the corresponding decision typestate variants (one per status). Any other value is rejected at parse time.
   - `superseded_by` (optional string, **required when** `status: superseded`): a reference to the superseding decision (`<adr-slug>.md#<id>` form). Forbidden on any other status (the parser rejects it even if the value is `null`).
   - `implemented_in` (optional string, **required when** `status: implemented`): a non-empty commit hash or reference identifying where the decision was actualized (e.g. `"abc1234"` or `"track/my-feature@0c0f24c"`). Forbidden on any other status (same key-presence rule as `superseded_by`).
-  - `grandfathered` (optional boolean): when `true`, exempts the decision from the `verify-adr-signals` Red/Yellow signal check (D4 grandfathered exemption). Use only for ADRs predating the front-matter format whose grounds cannot reasonably be reconstructed.
+  - `grandfathered` (optional boolean): when `true`, exempts the decision from the `verify-adr-signals` Red/Yellow signal check. Use only for ADRs predating the front-matter format whose grounds cannot reasonably be reconstructed.
 
 ### Grounds requirement
 
@@ -98,7 +98,7 @@ Every `decisions[]` entry MUST satisfy at least one of the following:
 
 A decision with none of the three is evaluated as 🔴 Red and blocks the `cargo make verify-adr-signals` CI gate. Do not write a Red-grounded decision unless the briefing explicitly authorises it.
 
-### Body preservation (CN-01)
+### Body preservation
 
 When adding front-matter to an ADR that previously had none (back-fill case), the markdown body MUST remain byte-for-byte unchanged. Only the leading `---\n…\n---\n` block is added; no whitespace in the body, no heading shifts, no rewording.
 

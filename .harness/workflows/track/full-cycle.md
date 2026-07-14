@@ -72,7 +72,7 @@ accumulation:
    a hard halt).
 4. If adding this task would cause a layer's **already-non-zero** cumulative diff in the current
    batch to exceed its ceiling, close the current batch and start a new one.
-5. **CN-01 continuation rule**: if the next task only touches layers whose cumulative diff in
+5. **Continuation rule**: if the next task only touches layers whose cumulative diff in
    the current batch is still zero, and the task's own contribution stays within those layers'
    ceilings, the ceiling of any other already-touched layer is irrelevant — append the task.
 6. Repeat until all remaining tasks are placed.

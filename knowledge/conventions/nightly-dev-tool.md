@@ -39,4 +39,4 @@ Rules for using Rust nightly as a dev-only tool while keeping crates on stable.
 ## Related Documents
 
 - `knowledge/conventions/hexagonal-architecture.md` — rustdoc JSON parsing stays in infrastructure layer
-- `knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md` — rustdoc_types-based TDDD TypeGraph design
+- `knowledge/adr/README.md` — rustdoc_types-based TDDD TypeGraph を含む設計判断の索引

@@ -13,7 +13,7 @@ Every requirement, constraint, and acceptance criterion in `spec.md` must carry 
 
 | Tag | Meaning | Signal | Example |
 |-----|---------|--------|---------|
-| `[source: <document> §<section>]` | Explicit reference to a document, section, or external standard | Blue | `[source: PRD §3.2]`, `[source: knowledge/adr/2026-03-11-0070-conch-parser-selection.md]` |
+| `[source: <document> §<section>]` | Explicit reference to a document, section, or external standard | Blue | `[source: PRD §3.2]`, `[source: knowledge/adr/<adr-id>.md#<decision-id>]` |
 | `[source: convention — <file>]` | Established project convention with specific file reference | Blue | `[source: convention — knowledge/conventions/security.md]` |
 | `[source: feedback — <context>]` | User feedback or correction (undocumented, not persisted) | Yellow | `[source: feedback — Rust-first policy]` |
 | `[source: inference — <reason>]` | Inferred from context, conventions, or common practice; not explicitly stated | Yellow | `[source: inference — security best practice]` |
@@ -27,7 +27,8 @@ Every requirement, constraint, and acceptance criterion in `spec.md` must carry 
 The merge gate (invoked via `sotp pr wait-and-merge`) blocks merge when any
 requirement still has a Yellow source. CI runs in interim mode and surfaces
 Yellow as a `VerifyFinding::warning` (visible in `cargo make ci` output) without
-blocking development iteration — see ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md` §D8.
+blocking development iteration. This keeps development feedback visible while reserving the
+strict Blue-only requirement for the merge gate.
 
 ### Upgrading Yellow to Blue
 

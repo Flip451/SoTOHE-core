@@ -40,42 +40,47 @@
     {
       "id": "T007",
       "description": "Extend `libs/usecase/src/verify.rs::{VerifyPort::verify_catalogue_spec_refs, VerifyService::verify_catalogue_spec_refs, VerifyInteractor}` with the three verifier routes, propagate `track_id: Option<TrackId>` across the catalogue-spec-refs port/service delegation, and add interaction/error-transport tests (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #IN-08, #CN-02, #AC-03, #AC-12, #AC-15, #AC-20).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "3b61b828e620c72c5ebe10f98dc0226a14ca6c67"
     },
     {
       "id": "T008",
       "description": "Extend `libs/infrastructure/src/verify_adapter.rs::FsVerifyAdapter` with delegations to the three verifier functions and adapter-route tests (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #CN-02, #AC-03, #AC-12, #AC-15).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "3b61b828e620c72c5ebe10f98dc0226a14ca6c67"
     },
     {
       "id": "T009",
       "description": "Extend `apps/cli-driver/src/verify.rs::{VerifyInput::CatalogueSpecRefs, VerifyDriver::handle}` with the three verification variants, propagate `track_id: Option<TrackId>` to `VerifyService::verify_catalogue_spec_refs`, and add input-to-usecase route tests (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #IN-08, #CN-02, #AC-03, #AC-12, #AC-15, #AC-20).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "3b61b828e620c72c5ebe10f98dc0226a14ca6c67"
     },
     {
       "id": "T010",
       "description": "Extend `apps/cli/src/commands/verify.rs::{VerifyCommand, dispatch_to_outcome}` with the three subcommands using `VerifyArgs` and `CatalogueSpecRefsArgs`, including `parse_track_id`, and add parser/dispatch tests in `apps/cli/src/commands/verify_tests.rs` (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #CN-02, #AC-03, #AC-12, #AC-15, #AC-20).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "3b61b828e620c72c5ebe10f98dc0226a14ca6c67"
     },
     {
       "id": "T011",
       "description": "Wire the three routes in `apps/cli-composition/src/verify.rs::VerifyCompositionRoot::verify_driver` and add controlled command-smoke coverage at that composition boundary (spec.json#GO-02, #GO-06, #GO-07, #IN-02, #IN-06, #IN-07, #CN-02, #AC-03, #AC-12, #AC-15).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "3b61b828e620c72c5ebe10f98dc0226a14ca6c67"
     },
     {
       "id": "T012",
       "description": "Rewrite the manifest-resolved `knowledge/conventions/**` shipped documents, using `knowledge/adr/README.md` for generic ADR navigation where needed, and add targeted document checks (spec.json#GO-03, #IN-03, #CN-01, #CN-05, #AC-05, #AC-06, #OS-03).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T014",
       "description": "Create `.harness/workflows/track/archive.md`, reduce `.claude/commands/track/archive.md` to its invocation/reporting bridge, and add directory-derived archive/registry coverage for `apps/cli/src/commands/track/archive.rs::execute_archive` and `libs/infrastructure/src/track/render/{snapshot.rs,registry.rs}` (spec.json#GO-04, #IN-04, #AC-07, #AC-08, #OS-04).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T013",
       "description": "Use the include/overlay file set resolved from `.harness/config/template-boundary.json`, excluding the T012 convention set, to rewrite remaining shipped documents and configuration; perform the required semantic review over that completed resolved set (spec.json#GO-03, #IN-03, #CN-01, #CN-05, #AC-05, #AC-06, #OS-03, #OS-06).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T015",

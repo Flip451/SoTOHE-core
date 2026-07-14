@@ -57,7 +57,7 @@
 <!-- convention-docs:start -->
 - `testing.md`: Testing Convention
 - `adr.md`: Convention: Architecture Decision Records (ADR)
-- `bash-write-guard.md`: Bash File-Write Guard (CON-07)
+- `bash-write-guard.md`: Bash File-Write Guard
 - `branch-strategy.md`: Branch Strategy Convention
 - `catalogue-schema-reference.md`: Catalogue Schema Reference (v5)
 - `coding-principles.md`: Coding Principles Convention

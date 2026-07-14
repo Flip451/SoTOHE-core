@@ -9,8 +9,8 @@
 
 Run the DRY fix phase (DFP) for the current track branch. The workflow drives the
 `dry-fix-lead` (dfl) capability through the whole-codebase DRY gate (single scope) until the
-gate passes, is opted out, or the loop is exhausted. DFP is **loosely coupled** to review
-(D1/OS-01): this workflow does NOT invoke the `review` workflow. The DRY gate and the review
+gate passes, is opted out, or the loop is exhausted. DFP is **loosely coupled** to review:
+this workflow does NOT invoke the `review` workflow. The DRY gate and the review
 gate are independent. The sequencing of DFP and RFP is owned by the caller (`full-cycle`
 workflow) or the user.
 
