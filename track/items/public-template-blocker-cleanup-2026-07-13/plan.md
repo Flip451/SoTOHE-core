@@ -6,19 +6,21 @@
 Run T001 before T002; T003 can proceed independently once its codec callers are identified.
 Run T004-T011 in layer order: verifier modules, usecase, filesystem adapter, primary adapter, CLI, then composition coverage.
 Run T012, then T014, then T013 so the manifest-resolved review sees the completed shipped set; execute T015-T020 as successive bounded finding batches over one inventory.
+Run T022 after T002; it is independent of T003 and precedes final enablement in T021.
 T021 is final enablement and is blocked on T012, T013, and T015-T020.
-Goal traceability: GO-01 → T001; GO-02 → T004/T007-T011/T021; GO-03 → T006/T012/T013/T021; GO-04 → T014; GO-05 → T002/T003/T005/T015-T021; GO-06 → T002/T003/T005/T007-T011/T015-T021; GO-07 → T006/T007-T011/T021.
+Goal traceability: GO-01 → T001; GO-02 → T004/T007-T011/T021; GO-03 → T006/T012/T013/T021; GO-04 → T014; GO-05 → T002/T003/T005/T015-T022; GO-06 → T002/T003/T005/T007-T011/T015-T022; GO-07 → T006/T007-T011/T021.
 
-## Tasks (0/21 resolved)
+## Tasks (4/22 resolved)
 
 ### S1 — Template export classification and output protection
 
-> Run T001 before T002 because both change `FsTemplateExportAdapter`; retain their module-level tests with each task.
+> Run T001 before T002 because both change `FsTemplateExportAdapter`; run T022 after T002.
 > Run T003 independently after locating every structured-artifact codec caller of `FilePath`.
 
-- [ ] **T001**: In `libs/infrastructure/src/template_export/mod.rs`, update `FsTemplateExportAdapter::export` and its walk helpers to classify ignorable worktree entries before manifest traversal; add focused cases in `libs/infrastructure/src/template_export/tests.rs` (spec.json#GO-01, #IN-01, #CN-01, #AC-01, #AC-02, #OS-01).
-- [ ] **T002**: In `libs/infrastructure/src/template_export/mod.rs::FsTemplateExportAdapter::export` and `libs/usecase/src/template_export/mod.rs::{TemplateExportError, TemplateExportPortError}`, add exported-output machine-path validation, error propagation, and focused acceptance/rejection tests (spec.json#GO-05, #GO-06, #IN-06, #CN-03, #AC-13, #AC-14).
-- [ ] **T003**: At `libs/domain/src/review_v2/types.rs::FilePath::new` and its structured-artifact codec callers, route persisted path fields through the validated value object and add codec acceptance/rejection tests (spec.json#GO-05, #GO-06, #IN-05, #IN-06, #CN-03, #CN-04, #AC-11, #AC-14).
+- [x] **T001**: In `libs/infrastructure/src/template_export/mod.rs`, update `FsTemplateExportAdapter::export` and its walk helpers to classify ignorable worktree entries before manifest traversal; add focused cases in `libs/infrastructure/src/template_export/tests.rs` (spec.json#GO-01, #IN-01, #CN-01, #AC-01, #AC-02, #OS-01).
+- [x] **T002**: In `libs/infrastructure/src/template_export/mod.rs::FsTemplateExportAdapter::export` and `libs/usecase/src/template_export/mod.rs::{TemplateExportError, TemplateExportPortError}`, add exported-output machine-path validation, error propagation, and focused acceptance/rejection tests (spec.json#GO-05, #GO-06, #IN-06, #CN-03, #AC-13, #AC-14).
+- [x] **T022**: In `libs/infrastructure/src/template_export/mod.rs::FsTemplateExportAdapter` and the `usecase::template_export::TemplateExportPort` composition binding in `apps/cli-composition/src/template_export/mod.rs`, replace the adapter's ambient machine-home environment lookup with composition-root `HOME`/`USERPROFILE` resolution injected through its constructor, and add focused adapter/composition tests (spec.json#IN-06, #CN-03, #AC-13).
+- [x] **T003**: At `libs/domain/src/review_v2/types.rs::FilePath::new` and its structured-artifact codec callers, route persisted path fields through the validated value object and add codec acceptance/rejection tests (spec.json#GO-05, #GO-06, #IN-05, #IN-06, #CN-03, #CN-04, #AC-11, #AC-14).
 
 ### S2 — Verifier implementations
 

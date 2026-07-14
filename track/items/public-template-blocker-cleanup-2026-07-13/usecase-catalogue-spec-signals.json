@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "d64d4890e508bf44f5d856d97e387f13ab8937da53eee97b3bec853980a9bea4",
+  "catalogue_declaration_hash": "ffcd411f5a24bc11e825d25854049e0430f00f0c9507a5c3de55c0fe7e0550c8",
   "signals": [
     {
       "type_name": "TemplateExportError",
@@ -26,6 +26,11 @@
       "type_name": "VerifyPortError",
       "signal": "blue",
       "entry_hash": "71b4695ad27d9fdaaf3f376005ffe575d8e1cf74fc23d498f3ec197d50c0459c"
+    },
+    {
+      "type_name": "TemplateExportPort",
+      "signal": "blue",
+      "entry_hash": "b1e8351444708f807ba68a30fa7f80329f554e8d1291c83b54bd557690032c3b"
     },
     {
       "type_name": "VerifyPort",

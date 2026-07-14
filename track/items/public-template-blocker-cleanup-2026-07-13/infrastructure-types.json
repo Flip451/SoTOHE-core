@@ -79,10 +79,70 @@
       "action": "modify",
       "for_type": "FsVerifyAdapter",
       "trait_ref": "usecase::verify::VerifyPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsTemplateExportAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "delete",
+      "for_type": "FsTemplateExportAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsTemplateExportAdapter",
+      "trait_ref": "usecase::template_export::TemplateExportPort"
     }
   ],
   "traits": {},
   "types": {
+    "FsTemplateExportAdapter": {
+      "action": "modify",
+      "docs": "Filesystem template-export adapter with construction-injected machine-home scan input (IN-06; CN-03; AC-13).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "machine_home_dir",
+              "ty": "Option<std::path::PathBuf>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    },
     "FsVerifyAdapter": {
       "action": "reference",
       "docs": "Existing filesystem secondary adapter whose `usecase::verify::VerifyPort` implementation gains delegation for the three new verification operations while its unit shape and constructor remain unchanged.",

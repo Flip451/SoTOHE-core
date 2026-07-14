@@ -60,6 +60,11 @@ subgraph usecase["usecase"]
     T39_usecase_usecase_TemplateExportPortError_Io[Io]
     T39_usecase_usecase_TemplateExportPortError_MachinePathDetected[MachinePathDetected]
   end
+  subgraph R34_usecase_usecase_TemplateExportPort["template_export::TemplateExportPort"]
+    direction TB
+    R34_usecase_usecase_TemplateExportPort__self[TemplateExportPort]
+    R34_usecase_usecase_TemplateExportPort_export([export])
+  end
   end
   subgraph usecase_usecase_module_verify["usecase::verify"]
     direction TB
@@ -131,6 +136,14 @@ subgraph usecase["usecase"]
 end
 subgraph infrastructure["infrastructure"]
   direction TB
+  subgraph infrastructure_infrastructure_module_template_export["infrastructure::template_export"]
+    direction TB
+  subgraph T53_infrastructure_infrastructure_FsTemplateExportAdapter["template_export::FsTemplateExportAdapter"]
+    direction TB
+    T53_infrastructure_infrastructure_FsTemplateExportAdapter__self[FsTemplateExportAdapter]
+    T53_infrastructure_infrastructure_FsTemplateExportAdapter_new([new])
+  end
+  end
   subgraph infrastructure_infrastructure_module_verify["infrastructure::verify"]
     direction TB
   F75_infrastructure_infrastructure_infrastructure__verify__machine_paths__verify[[verify]]
@@ -217,6 +230,7 @@ end
 T22_domain_domain_FilePath_new --> T22_domain_domain_FilePath__self
 T35_usecase_usecase_TemplateExportError_Export --o|source| T39_usecase_usecase_TemplateExportPortError__self
 T39_usecase_usecase_TemplateExportPortError_MachinePathDetected --o|path| T22_domain_domain_FilePath__self
+R34_usecase_usecase_TemplateExportPort_export --> T39_usecase_usecase_TemplateExportPortError__self
 T32_usecase_usecase_VerifyInteractor_new --o R26_usecase_usecase_VerifyPort__self
 T32_usecase_usecase_VerifyInteractor_new --> T32_usecase_usecase_VerifyInteractor__self
 T29_usecase_usecase_VerifyOutcome_success --> T29_usecase_usecase_VerifyOutcome__self
@@ -302,8 +316,10 @@ R29_usecase_usecase_VerifyService_verify_plan_artifact_refs --> T31_usecase_usec
 R29_usecase_usecase_VerifyService_verify_catalogue_spec_refs --> T29_usecase_usecase_VerifyOutcome__self
 R29_usecase_usecase_VerifyService_verify_catalogue_spec_refs --> T31_usecase_usecase_VerifyPortError__self
 T32_usecase_usecase_VerifyInteractor__self -.impl.-> R29_usecase_usecase_VerifyService__self
+T53_infrastructure_infrastructure_FsTemplateExportAdapter_new --> T53_infrastructure_infrastructure_FsTemplateExportAdapter__self
 T45_infrastructure_infrastructure_FsVerifyAdapter_new --> T45_infrastructure_infrastructure_FsVerifyAdapter__self
 T45_infrastructure_infrastructure_FsVerifyAdapter__self -.impl.-> R26_usecase_usecase_VerifyPort__self
+T53_infrastructure_infrastructure_FsTemplateExportAdapter__self -.impl.-> R34_usecase_usecase_TemplateExportPort__self
 T21_cli_cli_VerifyCommand_LatestTrack --o T18_cli_cli_VerifyArgs__self
 T21_cli_cli_VerifyCommand_RetentionGate --o T18_cli_cli_VerifyArgs__self
 T21_cli_cli_VerifyCommand_SotpVersionTag --o T18_cli_cli_VerifyArgs__self
@@ -333,6 +349,8 @@ class T39_usecase_usecase_TemplateExportPortError_UnclassifiedPath variant_node
 class T39_usecase_usecase_TemplateExportPortError_Io variant_node
 class T39_usecase_usecase_TemplateExportPortError_MachinePathDetected variant_node
 class T39_usecase_usecase_TemplateExportPortError__self error_type
+class R34_usecase_usecase_TemplateExportPort_export method_node
+class R34_usecase_usecase_TemplateExportPort__self secondary_port
 class T32_usecase_usecase_VerifyInteractor_new method_node
 class T32_usecase_usecase_VerifyInteractor__self interactor
 class T29_usecase_usecase_VerifyOutcome_success method_node
@@ -382,6 +400,8 @@ class R29_usecase_usecase_VerifyService_verify_spec_signals method_node
 class R29_usecase_usecase_VerifyService_verify_plan_artifact_refs method_node
 class R29_usecase_usecase_VerifyService_verify_catalogue_spec_refs method_node
 class R29_usecase_usecase_VerifyService__self app_service
+class T53_infrastructure_infrastructure_FsTemplateExportAdapter_new method_node
+class T53_infrastructure_infrastructure_FsTemplateExportAdapter__self secondary_adapter
 class F75_infrastructure_infrastructure_infrastructure__verify__machine_paths__verify free_function
 class F75_infrastructure_infrastructure_infrastructure__verify__machine_paths__verify function_node
 class F78_infrastructure_infrastructure_infrastructure__verify__sotp_version_tag__verify free_function

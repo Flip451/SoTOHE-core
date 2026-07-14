@@ -184,7 +184,8 @@ pub enum TemplateBoundaryManifestReadError {
 ///
 /// Enumerates every fail-closed condition the filesystem export can hit: a
 /// pre-existing output directory, a missing overlay or source path, an
-/// unclassified path, or an I/O failure.
+/// unclassified path, a work-machine path in the exported output, or an I/O
+/// failure.
 #[derive(Debug, Error)]
 pub enum TemplateExportPortError {
     /// The output directory already exists (export refuses to overwrite).
@@ -212,6 +213,12 @@ pub enum TemplateExportPortError {
     UnclassifiedPath {
         /// The pattern that has no manifest classification.
         path: TemplatePathPattern,
+    },
+    /// Exported output contains the current work machine's home-directory path.
+    #[error("exported output contains a work-machine path: {path}")]
+    MachinePathDetected {
+        /// Repo-relative exported file that contains the machine path.
+        path: domain::review_v2::FilePath,
     },
     /// An I/O error occurred during export.
     #[error("i/o error during template export at {path}: {reason}")]
@@ -274,7 +281,8 @@ pub trait TemplateExportPort: Send + Sync {
     ///
     /// Returns a [`TemplateExportPortError`] variant when the output directory
     /// already exists, an overlay or source path is missing, a path is
-    /// unclassified, or an I/O error occurs.
+    /// unclassified, the exported output contains a work-machine path, or an
+    /// I/O error occurs.
     fn export(
         &self,
         command: &TemplateExportCommand,
@@ -513,6 +521,36 @@ mod tests {
     }
 
     #[test]
+    fn test_export_with_machine_path_detection_returns_export_error() {
+        let mut manifest_port = MockManifestPort::new();
+        manifest_port.expect_read().times(1).returning(|_| Ok(sample_manifest()));
+
+        let mut export_port = MockExportPort::new();
+        export_port.expect_export().times(1).returning(|_, _| {
+            Err(TemplateExportPortError::MachinePathDetected {
+                path: domain::review_v2::FilePath::new("libs/domain/src/lib.rs").unwrap(),
+            })
+        });
+
+        let mut transplant_port = MockTransplantPort::new();
+        transplant_port.expect_transplant().times(0);
+
+        let interactor = TemplateExportInteractor::new(
+            Arc::new(manifest_port),
+            Arc::new(export_port),
+            Arc::new(transplant_port),
+        );
+        let result = interactor.export(sample_command());
+
+        assert!(matches!(
+            result,
+            Err(TemplateExportError::Export {
+                source: TemplateExportPortError::MachinePathDetected { .. }
+            })
+        ));
+    }
+
+    #[test]
     fn test_export_with_transplant_source_unavailable_maps_to_binary_transplant() {
         let mut manifest_port = MockManifestPort::new();
         manifest_port.expect_read().times(1).returning(|_| Ok(sample_manifest()));
@@ -642,5 +680,19 @@ mod tests {
             TemplateExportPortError::SourceMissing { path: PathBuf::from("/ws/missing") };
         let export_err = TemplateExportError::from(port_err);
         assert!(matches!(export_err, TemplateExportError::Export { .. }));
+    }
+
+    #[test]
+    fn test_export_error_from_machine_path_detection_maps_to_export_variant() {
+        let port_err = TemplateExportPortError::MachinePathDetected {
+            path: domain::review_v2::FilePath::new("libs/domain/src/lib.rs").unwrap(),
+        };
+        let export_err = TemplateExportError::from(port_err);
+        assert!(matches!(
+            export_err,
+            TemplateExportError::Export {
+                source: TemplateExportPortError::MachinePathDetected { .. }
+            }
+        ));
     }
 }

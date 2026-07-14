@@ -3,6 +3,78 @@
   "layer": "infrastructure",
   "entries": [
     {
+      "claim_hash": "8b48e1ddcac1a86c8b812c015941fe7260e5988436ca9fd05275961bc7168ae3",
+      "evidence_hash": "c1b1de1c77c3f6a11a11fbdf1488ec89c68e701965c74a979363f57a6fc24882",
+      "verdict": {
+        "kind": "pass",
+        "citation": "adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合は検査を fail-closed とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTemplateExportAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "公開元リポジトリの verify ゲートと export smoke 側の走査からなる 2 つの検査面、および構造化成果物の path 永続化境界における repo-relative 強制を追加する。2 つの検査面が用いる作業機の home directory は composition root が解決し、adapter / verifier の構築時または引数として明示的に渡す。adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合は検査を fail-closed とする。codec 境界は home directory を入力に取らず、repo-relative でない値をすべて構築時に拒否するため、環境依存を持たない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8b48e1ddcac1a86c8b812c015941fe7260e5988436ca9fd05275961bc7168ae3",
+      "evidence_hash": "4793c3d343a1b6a6514479391fa1db4d6894dcb464686ae7dc2962a1669c25f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "絶対パスの修正と検査は作業機情報を含む path に限定し、作業機情報を含まない system path、container 内 path、または一般例示 path の意味を変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTemplateExportAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "絶対パスの修正と検査は作業機情報を含む path に限定し、作業機情報を含まない system path、container 内 path、または一般例示 path の意味を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8b48e1ddcac1a86c8b812c015941fe7260e5988436ca9fd05275961bc7168ae3",
+      "evidence_hash": "9cf63c23daa8dcc022cdc0ce0dc7c3554131818ce8e049458ef824a80e33fab5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出力走査に用いる home directory は composition root が解決して adapter / verifier の構築時または引数として明示的に渡し、adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTemplateExportAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "template export smoke は export 出力を走査し、作業機の絶対パスを検出した場合に fail-closed で失敗する。出力走査に用いる home directory は composition root が解決して adapter / verifier の構築時または引数として明示的に渡し、adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。"
+        }
+      }
+    },
+    {
       "claim_hash": "a65c81f864bd9b12e91005e20c08fd401da74f8a66c1875445f730421c9ee804",
       "evidence_hash": "9f19bfa80ede153c4baa36d4e1e785fdcd659379f3baec537f5777e00f4ef92e",
       "verdict": {
@@ -28,10 +100,10 @@
     },
     {
       "claim_hash": "a65c81f864bd9b12e91005e20c08fd401da74f8a66c1875445f730421c9ee804",
-      "evidence_hash": "033a024e5ab3682c9c1292d5e03ee204ffded7d4c9a269609692053af7d926b0",
+      "evidence_hash": "a5e1050527ee0af864999ffbbe3cb33d012978ee2cb0718945ca598e92242c0a",
       "verdict": {
         "kind": "pass",
-        "citation": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。"
+        "citation": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。verifier が用いる home directory は composition root が解決して構築時または引数として明示的に渡し、verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -46,7 +118,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-12",
-          "text_label": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。対象を directory 列挙で絞り込まず、この最低対象を超える検出範囲を必須要件にしない。"
+          "text_label": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。verifier が用いる home directory は composition root が解決して構築時または引数として明示的に渡し、verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。対象を directory 列挙で絞り込まず、この最低対象を超える検出範囲を必須要件にしない。"
         }
       }
     },
@@ -76,7 +148,7 @@
     },
     {
       "claim_hash": "8707046281b0ef867c5e1b75700eebcafeafd221cd94c8d722e339f2fdc14265",
-      "evidence_hash": "033a024e5ab3682c9c1292d5e03ee204ffded7d4c9a269609692053af7d926b0",
+      "evidence_hash": "a5e1050527ee0af864999ffbbe3cb33d012978ee2cb0718945ca598e92242c0a",
       "verdict": {
         "kind": "pass",
         "citation": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。"
@@ -94,7 +166,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-12",
-          "text_label": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。対象を directory 列挙で絞り込まず、この最低対象を超える検出範囲を必須要件にしない。"
+          "text_label": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。verifier が用いる home directory は composition root が解決して構築時または引数として明示的に渡し、verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。対象を directory 列挙で絞り込まず、この最低対象を超える検出範囲を必須要件にしない。"
         }
       }
     },

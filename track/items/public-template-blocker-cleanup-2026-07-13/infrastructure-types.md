@@ -4,6 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| FsTemplateExportAdapter | secondary_adapter | modify | impl Debug, impl Default, impl TemplateExportPort | 🔵 | 🔵 |
 | FsVerifyAdapter | secondary_adapter | reference | impl Debug, impl Default, impl VerifyPort | 🔵 | 🔵 |
 
 ## Free Functions

@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-14T03:36:32Z",
-  "declaration_hash": "d64d4890e508bf44f5d856d97e387f13ab8937da53eee97b3bec853980a9bea4",
+  "generated_at": "2026-07-14T09:21:41Z",
+  "declaration_hash": "ffcd411f5a24bc11e825d25854049e0430f00f0c9507a5c3de55c0fe7e0550c8",
   "signals": [
     {
       "type_name": "TemplateExportPortError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -33,6 +33,12 @@
     {
       "type_name": "TemplateExportError",
       "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TemplateExportPort",
+      "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
     },

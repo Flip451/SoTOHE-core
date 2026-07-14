@@ -21,7 +21,7 @@ decisions:
     candidate_selection: "from:[rewrite-all-legacy-artifacts,exported-template-scan-only] chose:rewrite-all-legacy-artifacts"
     status: proposed
   - id: D6
-    user_decision_ref: "chat_segment:session-01GAmXz1CoicAsxZEFVrmW9H:2026-07-10"
+    user_decision_ref: "chat_segment:session-01GAmXz1CoicAsxZEFVrmW9H:2026-07-10 + chat_segment:session-017DYqro2nhLcQAhGZimYfk5:2026-07-14 検査の machine-home 入力は composition root が解決し構築時に明示的に渡す（adapter の暗黙 env 読み取り不採用）"
     candidate_selection: "from:[verify-gate-plus-typed-paths,writer-fix-and-manual-check-only] chose:verify-gate-plus-typed-paths"
     status: proposed
   - id: D7
@@ -101,6 +101,8 @@ D5 の完了条件を手動確認に留めず、機械検査に接続する。�
 2. exported template 側: template export smoke に、export 出力へ作業機の絶対パスが含まれていないことの走査を追加する。
 
 補助として、path を永続化する構造化成果物の codec 境界には、repo-relative であることを構築時に強制する型を導入する。型による強制は構造化データ側の再混入を塞ぐが、自由記述には効かないため、走査ゲートと併用する。
+
+2 つの検査面が用いる作業機の home directory は composition root が解決し、adapter / verifier の構築時または引数として明示的に渡す。adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まない。環境依存の解決と検査ロジックを分離するためであり、作業機の home directory を解決できない場合は検査を fail-closed する。補助の型は home directory を入力に取らず、repo-relative でない値をすべて構築時に拒否するため、環境依存を持たない。
 
 ### D7: 出荷対象への具体参照の再混入を名前キー検査で防ぐ
 

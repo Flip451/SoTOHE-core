@@ -71,6 +71,47 @@
     }
   ],
   "traits": {
+    "TemplateExportPort": {
+      "action": "reference",
+      "docs": "Existing template-export secondary port carried unchanged so the `FsTemplateExportAdapter` implementation edge remains visible; its public semantics and signature are unchanged. Methods intentionally remain synchronous to preserve the established single-process CLI batch model without introducing an async runtime.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "docs": "Filesystem export operation (baseline, unchanged).",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export",
+          "params": [
+            {
+              "name": "command",
+              "ty": "&TemplateExportCommand"
+            },
+            {
+              "name": "manifest",
+              "ty": "&domain::template_export::TemplateBoundaryManifest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TemplateExportReport, TemplateExportPortError>",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-13",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
     "VerifyPort": {
       "action": "modify",
       "docs": "Secondary port for the `sotp verify` command family. Methods intentionally remain synchronous to preserve the established single-process CLI batch model without introducing an async runtime. Path parameters are technical execution roots, `skip_stale` is a gate-control switch, and catalogue-spec verification accepts the validated `TrackId` value object.",

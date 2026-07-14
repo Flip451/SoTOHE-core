@@ -40,7 +40,7 @@ enum ParseDryCheckError<E> {
     /// JSON codec error (parse or deserialize).  The value is the concrete error
     /// already produced by `codec_error_mapper`.
     Codec(E),
-    /// Schema version is newer than [`CURRENT_SCHEMA_VERSION`].
+    /// Schema version falls outside the supported readable range.
     IncompatibleSchema(u64),
 }
 
@@ -53,7 +53,8 @@ enum ParseDryCheckError<E> {
 /// guard against this before calling, but the type makes it explicit).
 /// Returns `ParseDryCheckError::Codec(E)` on JSON parse/deserialize failure.
 /// Returns `ParseDryCheckError::IncompatibleSchema(version)` when the stored
-/// version exceeds [`CURRENT_SCHEMA_VERSION`].
+/// version falls outside the supported readable range (1 through
+/// [`CURRENT_SCHEMA_VERSION`]).
 fn parse_dry_check_content<E>(
     content: &str,
     path_str: &str,
@@ -70,7 +71,7 @@ fn parse_dry_check_content<E>(
 
     let version = envelope.get("schema_version").and_then(serde_json::Value::as_u64).unwrap_or(0);
 
-    if version > u64::from(CURRENT_SCHEMA_VERSION) {
+    if !(1..=u64::from(CURRENT_SCHEMA_VERSION)).contains(&version) {
         return Err(ParseDryCheckError::IncompatibleSchema(version));
     }
 
@@ -142,7 +143,7 @@ impl FsDryCheckStore {
     /// `config_fingerprint` fields default to the all-zeros sentinel via serde
     /// `default = "fail_closed_fingerprint_string"` so the interactor re-judges
     /// all pairs under the current config.
-    /// Future schema version (> 2) → `IncompatibleSchema` error.
+    /// Unsupported schema version (outside 1..=2) → `IncompatibleSchema` error.
     fn read_doc(&self) -> Result<DryCheckJsonV1, DryCheckReaderError> {
         let path_str = self.path.display().to_string();
 
@@ -170,7 +171,7 @@ impl FsDryCheckStore {
     /// Reads dry-check.json under an exclusive lock for read-modify-write.
     ///
     /// File absent → empty envelope (init-on-first-write).
-    /// Future schema version → writer error (refuse to overwrite unknown format).
+    /// Unsupported schema version → writer error (refuse to overwrite an unknown format).
     fn read_doc_for_write(&self) -> Result<DryCheckJsonV1, DryCheckWriterError> {
         let path_str = self.path.display().to_string();
 
@@ -503,6 +504,20 @@ mod tests {
         );
     }
 
+    fn assert_document_with_unknown_field_returns_codec_error(document: serde_json::Value) {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("dry-check.json");
+        std::fs::write(&path, document.to_string()).unwrap();
+
+        let store = FsDryCheckStore::new(path, dir.path().to_owned());
+        let result = store.read_records();
+
+        assert!(
+            matches!(result, Err(DryCheckReaderError::Codec { .. })),
+            "unknown fields must be rejected as codec errors, got: {result:?}"
+        );
+    }
+
     // ── Tests ─────────────────────────────────────────────────────────────────
 
     #[test]
@@ -513,13 +528,12 @@ mod tests {
         assert!(records.is_empty());
     }
 
-    /// Any schema_version greater than `CURRENT_SCHEMA_VERSION` (currently 2) must
-    /// return `IncompatibleSchema`.  Covers both the immediate next version (3) and an
-    /// arbitrary far-future version (99) to guard against off-by-one bugs and very
-    /// large version numbers.
+    /// Any schema_version outside the supported range (currently 1..=2) must
+    /// return `IncompatibleSchema`. Covers version zero, the immediate next
+    /// version (3), and an arbitrary far-future version (99).
     #[test]
-    fn test_read_records_future_schema_version_returns_incompatible_schema() {
-        for version in [3_u64, 99] {
+    fn test_read_records_unsupported_schema_version_returns_incompatible_schema() {
+        for version in [0_u64, 3, 99] {
             let dir = tempfile::tempdir().unwrap();
             let path = dir.path().join("dry-check.json");
             let json = format!(r#"{{"schema_version": {version}, "records": []}}"#);
@@ -533,6 +547,42 @@ mod tests {
                 "expected IncompatibleSchema({version}), got: {result:?}"
             );
         }
+    }
+
+    #[test]
+    fn test_read_records_unknown_envelope_field_returns_codec_error() {
+        assert_document_with_unknown_field_returns_codec_error(serde_json::json!({
+            "schema_version": 1,
+            "records": [],
+            "unexpected": true
+        }));
+    }
+
+    #[test]
+    fn test_read_records_unknown_record_field_returns_codec_error() {
+        let mut record = valid_v1_record_json();
+        record["unexpected"] = serde_json::json!(true);
+
+        assert_document_with_unknown_field_returns_codec_error(serde_json::json!({
+            "schema_version": 1,
+            "records": [record]
+        }));
+    }
+
+    #[test]
+    fn test_read_records_unknown_violation_field_returns_codec_error() {
+        let mut record = valid_v1_record_json();
+        record["verdict"] = serde_json::json!({
+            "violation": {
+                "refactor_proposal": "Extract a helper.",
+                "unexpected": true
+            }
+        });
+
+        assert_document_with_unknown_field_returns_codec_error(serde_json::json!({
+            "schema_version": 1,
+            "records": [record]
+        }));
     }
 
     #[test]
@@ -752,6 +802,16 @@ mod tests {
         record["changed_path"] = serde_json::json!("src/c.rs");
 
         assert_v1_record_returns_invalid_data(record, "changed_path outside pair");
+    }
+
+    #[test]
+    fn test_read_returns_invalid_data_for_absolute_persisted_paths() {
+        for field in ["low_path", "high_path", "changed_path"] {
+            let mut record = valid_v1_record_json();
+            record[field] = serde_json::json!("/home/workstation/src/a.rs");
+
+            assert_v1_record_returns_invalid_data(record, field);
+        }
     }
 
     #[test]

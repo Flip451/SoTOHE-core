@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "80c2c26f5d675afedaf1c0b0a19404cac1147838c3c1cbc273715a6926064655",
+  "catalogue_declaration_hash": "3469ebec93ea87fc3047f1a4faed792d13b95a20b3bbf66ac37668af9e651dfb",
   "signals": [
+    {
+      "type_name": "FsTemplateExportAdapter",
+      "signal": "blue",
+      "entry_hash": "8b48e1ddcac1a86c8b812c015941fe7260e5988436ca9fd05275961bc7168ae3"
+    },
     {
       "type_name": "FsVerifyAdapter",
       "signal": "blue",

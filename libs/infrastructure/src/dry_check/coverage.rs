@@ -42,6 +42,7 @@ const MIN_READABLE_SCHEMA_VERSION: u32 = 3;
 /// Serde lives only here per the hexagonal principle — the domain
 /// `DryCheckCoverageRecord` stays serde-free.
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct CoverageManifestV4 {
     schema_version: u32,
     /// SHA-256 fingerprint of the `dry-check.json` fields that affect `dry write`
@@ -65,12 +66,14 @@ fn fail_closed_corpus_fingerprint_string() -> String {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct FragmentRefDto {
     path: String,
     content_hash: String,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct PairKeyDto {
     low: FragmentRefDto,
     high: FragmentRefDto,
@@ -466,6 +469,48 @@ mod tests {
     }
 
     #[test]
+    fn test_coverage_manifest_unknown_field_returns_parse_error() {
+        let hash = "a".repeat(64);
+        let manifests = [
+            serde_json::json!({
+                "schema_version": 4,
+                "config_fingerprint": hash,
+                "corpus_fingerprint": "c".repeat(64),
+                "fragment_refs": [],
+                "processed_pair_keys": [],
+                "unexpected": true
+            }),
+            serde_json::json!({
+                "schema_version": 4,
+                "config_fingerprint": "a".repeat(64),
+                "corpus_fingerprint": "c".repeat(64),
+                "fragment_refs": [{
+                    "path": "src/a.rs",
+                    "content_hash": "a".repeat(64),
+                    "unexpected": true
+                }],
+                "processed_pair_keys": []
+            }),
+            serde_json::json!({
+                "schema_version": 4,
+                "config_fingerprint": "a".repeat(64),
+                "corpus_fingerprint": "c".repeat(64),
+                "fragment_refs": [],
+                "processed_pair_keys": [{
+                    "low": { "path": "src/a.rs", "content_hash": "a".repeat(64) },
+                    "high": { "path": "src/b.rs", "content_hash": "b".repeat(64) },
+                    "unexpected": true
+                }]
+            }),
+        ];
+
+        for manifest in manifests {
+            let result = serde_json::from_value::<CoverageManifestV4>(manifest);
+            assert!(result.is_err(), "unknown coverage-manifest field must fail closed");
+        }
+    }
+
+    #[test]
     fn test_read_coverage_with_schema_version_1_returns_coverage_port_error() {
         // schema_version 1 files lack processed_pair_keys; the adapter must
         // reject them (fail-closed) so the user is prompted to run `dry write`.
@@ -518,6 +563,29 @@ mod tests {
   "corpus_fingerprint": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   "fragment_refs": [
     { "path": "../src/a.rs", "content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
+  ],
+  "processed_pair_keys": []
+}"#,
+        )
+        .unwrap();
+        let adapter = FsDryCheckCoverageAdapter::new(path, dir.path().to_owned());
+
+        let result = adapter.read_coverage(&make_track_id());
+        assert!(matches!(result, Err(DryCheckCycleError::CoveragePort(_))));
+    }
+
+    #[test]
+    fn test_read_coverage_with_absolute_path_returns_coverage_port_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("coverage.json");
+        std::fs::write(
+            &path,
+            br#"{
+  "schema_version": 4,
+  "config_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "corpus_fingerprint": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "fragment_refs": [
+    { "path": "/home/workstation/src/a.rs", "content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
   ],
   "processed_pair_keys": []
 }"#,

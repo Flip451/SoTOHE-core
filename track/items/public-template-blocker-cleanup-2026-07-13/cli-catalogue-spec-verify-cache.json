@@ -28,7 +28,7 @@
     },
     {
       "claim_hash": "dd577d936d15d5e88c6b22621e68fdb3f28730dc74cf16342ffbaad61420e6e0",
-      "evidence_hash": "033a024e5ab3682c9c1292d5e03ee204ffded7d4c9a269609692053af7d926b0",
+      "evidence_hash": "a5e1050527ee0af864999ffbbe3cb33d012978ee2cb0718945ca598e92242c0a",
       "verdict": {
         "kind": "pass",
         "citation": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。"
@@ -46,7 +46,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-12",
-          "text_label": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。対象を directory 列挙で絞り込まず、この最低対象を超える検出範囲を必須要件にしない。"
+          "text_label": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。verifier が用いる home directory は composition root が解決して構築時または引数として明示的に渡し、verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。対象を directory 列挙で絞り込まず、この最低対象を超える検出範囲を必須要件にしない。"
         }
       }
     },
@@ -100,10 +100,10 @@
     },
     {
       "claim_hash": "321ec9134b6cd0acb982c9a5b26015624cc0a96434a53687db9676192b9f8d92",
-      "evidence_hash": "033a024e5ab3682c9c1292d5e03ee204ffded7d4c9a269609692053af7d926b0",
+      "evidence_hash": "a5e1050527ee0af864999ffbbe3cb33d012978ee2cb0718945ca598e92242c0a",
       "verdict": {
         "kind": "pass",
-        "citation": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。"
+        "citation": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。verifier が用いる home directory は composition root が解決して構築時または引数として明示的に渡し、verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -118,7 +118,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-12",
-          "text_label": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。対象を directory 列挙で絞り込まず、この最低対象を超える検出範囲を必須要件にしない。"
+          "text_label": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。verifier が用いる home directory は composition root が解決して構築時または引数として明示的に渡し、verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。対象を directory 列挙で絞り込まず、この最低対象を超える検出範囲を必須要件にしない。"
         }
       }
     },

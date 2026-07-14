@@ -52,10 +52,10 @@
     },
     {
       "claim_hash": "f6a635f95d26e3d039e7b3af5bae357d29c45764bc2ac511c58168276bf3a140",
-      "evidence_hash": "86258f83ebe9f172c80e72813eed1a5371580a862fc9854a9347446356261688",
+      "evidence_hash": "272a89a2b6954a4d6f536687120c8d084a8bd960a2f41b3fe4e3f160a383ef50",
       "verdict": {
         "kind": "pass",
-        "citation": "path を保存する構造化成果物の codec 境界は repo-relative でない値を保存前に拒否し"
+        "citation": "repo-relative でない値をすべて構築時に拒否するため、環境依存を持たない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -70,7 +70,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-14",
-          "text_label": "path を保存する構造化成果物の codec 境界は repo-relative でない値を保存前に拒否し、自由記述に対しては AC-12 および AC-13 の走査が同じ再混入を検出する。"
+          "text_label": "path を保存する構造化成果物の codec 境界は home directory を入力に取らず、repo-relative でない値をすべて構築時に拒否するため、環境依存を持たない。自由記述に対しては AC-12 および AC-13 の走査が同じ再混入を検出する。"
         }
       }
     }

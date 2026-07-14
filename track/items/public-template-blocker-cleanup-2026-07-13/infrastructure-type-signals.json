@@ -1,8 +1,14 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-14T03:36:37Z",
-  "declaration_hash": "80c2c26f5d675afedaf1c0b0a19404cac1147838c3c1cbc273715a6926064655",
+  "generated_at": "2026-07-14T09:21:46Z",
+  "declaration_hash": "3469ebec93ea87fc3047f1a4faed792d13b95a20b3bbf66ac37668af9e651dfb",
   "signals": [
+    {
+      "type_name": "FsTemplateExportAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "infrastructure::verify::machine_paths::verify",
       "kind_tag": "free_function",

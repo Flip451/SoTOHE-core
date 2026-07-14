@@ -128,7 +128,7 @@
       },
       {
         "id": "IN-06",
-        "text": "公開元リポジトリの verify ゲート、export smoke 側の走査、および構造化成果物の path 永続化境界に対する repo-relative 強制を追加する。",
+        "text": "公開元リポジトリの verify ゲートと export smoke 側の走査からなる 2 つの検査面、および構造化成果物の path 永続化境界における repo-relative 強制を追加する。2 つの検査面が用いる作業機の home directory は composition root が解決し、adapter / verifier の構築時または引数として明示的に渡す。adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合は検査を fail-closed とする。codec 境界は home directory を入力に取らず、repo-relative でない値をすべて構築時に拒否するため、環境依存を持たない。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
@@ -399,7 +399,7 @@
     },
     {
       "id": "AC-12",
-      "text": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。対象を directory 列挙で絞り込まず、この最低対象を超える検出範囲を必須要件にしない。",
+      "text": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。verifier が用いる home directory は composition root が解決して構築時または引数として明示的に渡し、verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。対象を directory 列挙で絞り込まず、この最低対象を超える検出範囲を必須要件にしない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
@@ -409,7 +409,7 @@
     },
     {
       "id": "AC-13",
-      "text": "template export smoke は export 出力を走査し、作業機の絶対パスを検出した場合に fail-closed で失敗する。",
+      "text": "template export smoke は export 出力を走査し、作業機の絶対パスを検出した場合に fail-closed で失敗する。出力走査に用いる home directory は composition root が解決して adapter / verifier の構築時または引数として明示的に渡し、adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
@@ -419,7 +419,7 @@
     },
     {
       "id": "AC-14",
-      "text": "path を保存する構造化成果物の codec 境界は repo-relative でない値を保存前に拒否し、自由記述に対しては AC-12 および AC-13 の走査が同じ再混入を検出する。",
+      "text": "path を保存する構造化成果物の codec 境界は home directory を入力に取らず、repo-relative でない値をすべて構築時に拒否するため、環境依存を持たない。自由記述に対しては AC-12 および AC-13 の走査が同じ再混入を検出する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
