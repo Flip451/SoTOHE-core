@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D7 defers the exact detection pattern and implementation to implementation time. Terms such as “date-time-shaped ADR filename” and “track ID with a date suffix” do not define the accepted grammar, path boundaries, or placeholder/false-positive handling, so downstream spec and implementations can produce materially different gates. Define observable matching rules and required cases before implementation.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+              "line": 109,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
+          "at": "2026-07-13T23:40:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
+          "at": "2026-07-14T00:28:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
+          "at": "2026-07-14T00:29:59Z"
+        }
+      ]
+    }
+  }
+}
