@@ -157,14 +157,14 @@
             {
               "message": "T002 says the stage-1 migration rewrites `DataRole` from 13 to 15 variants, but the same task explicitly defers `DataRole::DomainEvent` to Stage 2. Stage 1 only introduces `EventPolicy` here, so the variant-count claim overstates the scope and is internally inconsistent with the rest of the task.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
               "line": 12,
               "category": "contradiction"
             },
             {
               "message": "T007 describes `CatalogueLinterRuleKind` as expanding to 12 \"data-carrying\" variants, but `NoPublicField` is still a unit variant in the generated catalogue model. The task should say 12 variants, not 12 data-carrying variants.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
               "line": 42,
               "category": "factual error"
             }
@@ -216,7 +216,7 @@
             {
               "message": "This section schedules the linter framework rewrite and port removal in Stage 1 (`T007`-`T009`), but ADR D3 explicitly says linter work comes after schema migration and the `DomainEvent` stage. Because these tasks are not just placeholders, the plan contradicts its required execution order and becomes ambiguous to execute.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
               "line": 41,
               "category": "contradiction"
             }
@@ -345,7 +345,7 @@
             {
               "message": "`S3` still describes T010 as an active-track catalogue migration, but the task itself has been changed to `skipped`/N/A because migration is now explicitly out of scope. That leaves the section narrative and the task state contradictory, and the remaining T010 dependency text misleading.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
               "line": 30,
               "category": "contradiction"
             }
@@ -360,7 +360,7 @@
             {
               "message": "`T011` still says it depends on `T010`, but the surrounding Stage 1 summary and `impl-plan.json` now mark `T010` as skipped and say the Stage 1 test gate depends only on `T001-T006`. That leaves the generated plan graph internally inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
               "line": 36,
               "category": "contradiction"
             }
@@ -417,7 +417,7 @@
             {
               "message": "`RunCatalogueLint` is documented as “unchanged from baseline” and “stable,” but the trait now adds `Send + Sync` supertrait bounds. That is a contract change, so the docs and signature conflict.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/usecase-types.json",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/usecase-types.json",
               "line": 264,
               "category": "contradiction"
             }
@@ -446,7 +446,7 @@
             {
               "message": "`plan.md` and `impl-plan.json` still describe `ddd_strict_preset()` as returning `Vec<CatalogueLinterRule>`, but the updated type catalogue declares `Result<Vec<CatalogueLinterRule>, CatalogueLinterError>` in `domain-types.json`/`domain-types.md`. That leaves the plan artifacts internally inconsistent about the public API shape.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
               "line": 67,
               "category": "contradiction"
             }
@@ -649,7 +649,7 @@
             {
               "message": "T019 is sequenced after T018, but T018 removes the `ddd_strict_preset()` source that T019 says it must transcribe. In this order the preset JSON no longer has an in-repo source of truth, so the task is not deterministically executable unless another preserved source is added.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
               "line": 84,
               "category": "infeasibility"
             }
@@ -679,7 +679,7 @@
             {
               "message": "`T015` is assigned two incompatible responsibilities. In `plan.md` line 61, the Stage 3 summary says T015 creates `.harness/catalogue-lint/presets/ddd-strict.json`, but the task list at `plan.md` line 67 still defines T015 as the `ddd_strict_preset()` Rust function, and `impl-plan.json` line 113 assigns the JSON file creation to T019 instead. The preset-file ownership is therefore ambiguous and the plan is internally inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/plan.md",
               "line": 61,
               "category": "contradiction"
             }
@@ -795,7 +795,7 @@
             {
               "message": "`T023`/`T024` were advanced to `done` and `T025` was moved to `in_progress`, which conflicts with this round's briefing for the `plan-artifacts` scope: it asked for the checkpoint with `T023`/`T024` still `in_progress` and only the metadata refreshed. As written, the plan now reports `24/25 resolved` and prematurely closes the two tasks instead of preserving the intended in-flight state.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
+              "file": "track/items/tddd-pattern-semantics-extension-2026-06-13/impl-plan.json",
               "line": 136,
               "category": "contradiction"
             }
@@ -1016,14 +1016,14 @@
             {
               "message": "The new JSON boundary types are permissive by default: `LintRuleKind` and `LintRuleSpec` do not use `deny_unknown_fields`, so extra or stale keys in `.harness/catalogue-lint/config.json` will be ignored instead of rejected. That weakens the fail-closed config contract and can hide schema drift or typos.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_lint_workflow.rs",
+              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
               "line": 106,
               "category": "correctness"
             },
             {
               "message": "The new config-driven branch in `execute()` has no direct test coverage in this module. The existing tests still only cover CLI-supplied rules, loader failure, invalid layer, and rule conversion, so the new `ConfigMissing`/`ConfigInvalid` behavior and CLI-vs-config precedence can regress unnoticed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_lint_workflow.rs",
+              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
               "line": 262,
               "category": "testing"
             }
@@ -1052,7 +1052,7 @@
             {
               "message": "The fail-closed coverage manifest is only written at the end of `run_dry_check`, but several earlier `?` exits (`read_records`, `build_corpus_index`, `fragment_pairs_result`, and probe setup) can return before that write. When any of those fail, the previous manifest is left in place, so `check_approved` can still approve stale state instead of blocking on the failed dry-write run. This path needs to invalidate/write fail-closed coverage before returning on every error path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check/interactor.rs",
+              "file": "libs/usecase/src/dry_check/interactor.rs",
               "line": 185,
               "category": "missing error handling"
             }
@@ -1096,7 +1096,7 @@
             {
               "message": "`unresolved_pair_count` can be double-counted here: a stale latest `Violation` record is counted once in the violation scan above and again in this freshness scan because both branches run for the same pair. That makes `Blocked` report an inflated unresolved-pair total (for example, one stale violation becomes 2).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check/approval_interactor.rs",
+              "file": "libs/usecase/src/dry_check/approval_interactor.rs",
               "line": 214,
               "category": "logic"
             }
@@ -1185,7 +1185,7 @@
             {
               "message": "`FixpointResolve` is a read-only, stdout-only selector like `Resolve`/`NextTask`, but it is not included in `is_display_only_track_command`. As a result, `execute_track_with_telemetry` will open a telemetry writer and write track logs for this command, which breaks the no-file-IO behavior the display-only path is meant to guarantee.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "file": "apps/cli/src/main.rs",
               "line": 524,
               "category": "architecture"
             }
@@ -1340,14 +1340,14 @@
             {
               "message": "`CatalogueLinterRuleError::EmptyPermittedLayers` is still documented as a possible `CatalogueLinterRule::new` failure, but `KindLayerConstraint` now requires `NonEmptyVec<LayerId>`, so this constructor can never return that error. That makes the public contract false; either keep raw layer vectors here or remove the dead error path/docs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
               "line": 317,
               "category": "contract"
             },
             {
               "message": "`CatalogueLinterRule::new` adds two new reachable failure branches (`EmptyRequiredTraits`, `EmptyForbiddenRoles`), but the test module only covers `EmptyTargetField` and happy paths. Add negative tests for those branches so the new public API surface is actually exercised.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
               "line": 663,
               "category": "testing"
             }
@@ -1362,7 +1362,7 @@
             {
               "message": "`CatalogueLinterRuleKind` uses `NonEmptyVec` for `KindLayerConstraint.permitted_layers`, `TraitImplRequired.required_traits`, and `NoRoleInMethodSignature.forbidden_roles`, but the ADR sketch for D15 models these payloads as plain `Vec`. This changes the domain contract by making empty rule payloads unrepresentable, so the codec can no longer round-trip the documented schema and valid empty-config cases are rejected before evaluation.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
               "line": 217,
               "category": "correctness"
             }
@@ -1582,14 +1582,14 @@
             {
               "message": "`continue 'method_loop` stops after the first forbidden match in a method, so a signature with multiple bad slots only reports the first one. That regresses `NoRoleInMethodSignature` from the previous per-`sig_type` behavior and can silently miss additional forbidden params/returns.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 256,
               "category": "correctness"
             },
             {
               "message": "`resolve_type_role` ignores `target_layer_id` and scans `all_catalogues` in `BTreeMap` order, so an unqualified reference like `OrderPlaced` resolves to whichever layer sorts first rather than the target layer. If the same bare name exists in multiple layers, `ReferencedRoleConstraint` and `NoRoleInMethodSignature` can produce false positives or false negatives depending on map ordering; the briefing requires target-layer-first resolution.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 34,
               "category": "correctness"
             }
@@ -1604,14 +1604,14 @@
             {
               "message": "P1: `resolve_type_role` treats every `::` as a top-level layer separator. Because `TypeRef` explicitly allows generics and namespaced inner types, a valid ref like `Option<domain::OrderPlaced>` is parsed as the layer hint `Option<domain` with tail `OrderPlaced>`, so cross-layer role resolution can miss or misresolve common type forms and flip the lint result. The lookup needs to tokenize the type expression instead of splitting the whole string on the last `::`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 43,
               "category": "correctness"
             },
             {
               "message": "P1: `NoRoleInMethodSignature` no longer resolves the referenced type at all; it scans every catalogue by bare-name substring. That means a qualified signature such as `domain::OrderPlaced` can still be rejected because some unrelated layer happens to define another `OrderPlaced` with a forbidden role. This is a false positive for explicit layer-qualified references and is not equivalent to the new cross-layer resolution used by `ReferencedRoleConstraint`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 253,
               "category": "correctness"
             }
@@ -1624,7 +1624,7 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1 in [catalogue_linter_eval.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs#L286): `NoRoleInMethodSignature` now treats any top-level `::` as a layer qualifier and skips every catalogue that does not match that prefix. A token like `crate::OrderRepo` or `ports::OrderRepo` therefore scans zero catalogues when the prefix is not an actual `LayerId`, so a forbidden role can slip through undetected. The branch needs a fallback to the normal cross-catalogue search when the prefix is not a known layer.",
+              "message": "P1 in [catalogue_linter_eval.rs](libs/domain/src/tddd/catalogue_linter_eval.rs#L286): `NoRoleInMethodSignature` now treats any top-level `::` as a layer qualifier and skips every catalogue that does not match that prefix. A token like `crate::OrderRepo` or `ports::OrderRepo` therefore scans zero catalogues when the prefix is not an actual `LayerId`, so a forbidden role can slip through undetected. The branch needs a fallback to the normal cross-catalogue search when the prefix is not a known layer.",
               "severity": "P1",
               "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 286,
@@ -1641,7 +1641,7 @@
             {
               "message": "`extract_top_level_layer_hint` returns `None` whenever a `<...>` appears before the last `::`, so wrapped path-qualified refs like `Vec<domain::OrderPlaced>` or `Result<domain::OrderPlaced, E>` lose their layer hint. `NoRoleInMethodSignature` then falls back to scanning every catalogue, which can report a forbidden role from the wrong layer, and `ReferencedRoleConstraint` cannot resolve valid wrapped cross-layer `TypeRef`s. This is a correctness regression for generic signatures.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 31,
               "category": "correctness"
             }
@@ -1656,14 +1656,14 @@
             {
               "message": "`NoRoleInMethodSignature` still produces false positives when the same bare type name exists in multiple layers. The helper only suppresses an entry if the signature explicitly mentions another layer prefix, but unqualified refs are supposed to resolve to `target_layer_id` first. Example: if the target layer has `OrderRepo` as `ValueObject` and another layer has `OrderRepo` as `Repository`, a method signature `OrderRepo` in the target layer will be flagged as forbidden even though target-layer priority should pick the local `ValueObject` and stop there.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 78,
               "category": "logic"
             },
             {
               "message": "`resolve_type_role` does not actually handle unqualified generic wrappers such as `Vec<OrderPlaced>` or `Option<OrderPlaced>`. When case 2 fails to find a known layer prefix, case 3 falls back to `type_ref.split(\"::\").last()`, which leaves the full generic string intact (`Vec<OrderPlaced>`), so `ReferencedRoleConstraint` gets `None` and rejects valid references even when the inner type exists with the expected role.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 159,
               "category": "logic"
             }
@@ -1700,14 +1700,14 @@
             {
               "message": "`resolve_type_role` does not treat an explicit `layer::Type` reference as authoritative. After checking the hinted catalogue, it falls back to `resolve_bare_name(tail, ...)`, so `domain::OrderPlaced` can incorrectly resolve to another layer's `OrderPlaced` when the domain entry is missing or renamed. That makes `ReferencedRoleConstraint` validate against the wrong catalogue and hides broken cross-layer references.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 163,
               "category": "correctness"
             },
             {
               "message": "`layer_qualified_name_in_sig` claims to require a boundary-delimited `layer::Type`, but `find(&prefix)` matches the layer string anywhere in the signature. As written, `subdomain::Foo` can be treated as `domain::Foo`, and the same substring strategy is reused in the generic-argument path below. That can misattribute forbidden types to the wrong layer in `NoRoleInMethodSignature` and `ReferencedRoleConstraint`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 57,
               "category": "correctness"
             }
@@ -1744,14 +1744,14 @@
             {
               "message": "`resolve_type_role` stops at the wrapper name for known-layer-qualified `TypeRef`s, so valid refs like `domain::Result<OrderPlaced>` or `domain::Paged<OrderPlaced>` are treated as missing unless the wrapper itself exists in the catalogue. That makes `ReferencedRoleConstraint` reject supported cross-layer generic refs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 188,
               "category": "correctness"
             },
             {
               "message": "The fallback path can resolve against wrapper/module tokens such as `Vec`, `Result`, or `domain` instead of the actual payload type, so generic `TypeRef`s can be checked against the wrong role or wrong layer. This breaks cross-layer lookup for valid generic signatures.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 201,
               "category": "correctness"
             }
@@ -1766,7 +1766,7 @@
             {
               "message": "Cross-layer lookup still assumes the layer prefix is immediately adjacent to the type name. A valid path like `domain::models::OrderPlaced` is treated as unqualified because `extract_top_level_layer_hint`/`layer_qualified_name_in_sig` only match `layer_id::Type` (or the last path segment), so `ReferencedRoleConstraint` and `NoRoleInMethodSignature` can resolve/flag against the wrong catalogue when names collide.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 241,
               "category": "correctness"
             }
@@ -1781,7 +1781,7 @@
             {
               "message": "`match_layer_prefix` only recognizes qualifiers that start with the layer id itself, so a documented path like `crate::domain::OrderPlaced` is downgraded to bare-name lookup instead of resolving the `domain` layer directly. That makes `ReferencedRoleConstraint` pick the wrong role when the same bare type name exists in another catalogue (or the target layer).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 78,
               "category": "logic"
             }
@@ -1796,14 +1796,14 @@
             {
               "message": "`extract_first_generic_arg` only tracks `<...>` nesting, so it splits on commas inside tuple/array/parenthesized first generic arguments. Valid refs like `Result<(OrderPlaced, E)>` will be truncated to `\"(OrderPlaced\"`, and `ReferencedRoleConstraint` will silently fail to resolve the real role-bearing type.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 257,
               "category": "correctness"
             },
             {
               "message": "`match_layer_prefix` returns the first matching layer in `BTreeMap` order instead of the most specific matching segment. A qualified path like `crate::domain::Foo` can therefore resolve to the wrong catalogue when a layer id matches an outer path segment, which makes cross-layer lookup depend on unrelated map ordering.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 76,
               "category": "correctness"
             }
@@ -1818,14 +1818,14 @@
             {
               "message": "`extract_top_level_layer_hint()` drops the outer layer qualifier whenever any generic argument contains `::` (`sep_pos >= lt` returns `None`). For a type like `domain::Wrapper<crate::Foo>`, `resolve_type_role()` never checks `Wrapper` in the `domain` catalogue and instead falls back to the inner generic argument, so `ReferencedRoleConstraint` can validate the wrong role for layer-qualified generic wrappers.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 43,
               "category": "correctness"
             },
             {
               "message": "This assertion will not compile: `matches!(result, ...)` moves `result`, and the panic message then formats `{result:?}` again. The new unknown-layer test needs to borrow or clone the result before matching.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
               "line": 2575,
               "category": "build"
             }
@@ -1840,14 +1840,14 @@
             {
               "message": "This test will not compile: `matches!(result, ...)` moves `result`, so the later `{result:?}` formatting in the same `assert!` uses a moved value. Borrow the result or precompute the debug string before the `matches!` check.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
               "line": 2575,
               "category": "testing"
             },
             {
               "message": "`sig_type_contains_entry` returns `false` as soon as it sees any other-layer-qualified occurrence of `bare_name`, which means a mixed type expression like `Result<Foo, domain::Bar>` can hide an unqualified forbidden `Foo` in the same slot. That creates false negatives in `NoRoleInMethodSignature`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 192,
               "category": "correctness"
             }
@@ -1884,7 +1884,7 @@
             {
               "message": "`matches!(result, ...)` moves `result` out of the `Result`, but the next assertion formats `{result:?}`. That is a borrow-of-moved-value compile error, so this test file will not build as written. Borrow `result` in the match (`matches!(&result, ...)`) or drop the later debug formatting.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
               "line": 2575,
               "category": "compile"
             }
@@ -1899,7 +1899,7 @@
             {
               "message": "Bare-name cross-layer resolution is order-dependent: `resolve_bare_name` stops at the first non-target catalogue in `BTreeMap` order, and `sig_type_contains_entry` does the same for method signatures. If two non-target layers define the same name with different roles, a bare reference can miss a forbidden role or resolve to the wrong role purely because of layer-id ordering. That makes `ReferencedRoleConstraint` and `NoRoleInMethodSignature` silently depend on catalogue sort order instead of actual catalogue contents.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 420,
               "category": "correctness"
             }
@@ -1912,9 +1912,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `resolve_type_role` does not normalize leading reference/pointer syntax before extracting the layer hint, so valid `TypeRef` forms like `&domain::OrderPlaced` or `*domain::OrderPlaced` are parsed as `&domain` / `*domain` and fall back to bare-name lookup. That can silently misresolve or miss cross-layer references in `ReferencedRoleConstraint`, even though the linter’s own type-ref scanning already treats `&`/`*` as valid boundaries. See [catalogue_linter_eval.rs:40](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs#L40) and [catalogue_linter_eval.rs:355](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs#L355).",
+              "message": "P1: `resolve_type_role` does not normalize leading reference/pointer syntax before extracting the layer hint, so valid `TypeRef` forms like `&domain::OrderPlaced` or `*domain::OrderPlaced` are parsed as `&domain` / `*domain` and fall back to bare-name lookup. That can silently misresolve or miss cross-layer references in `ReferencedRoleConstraint`, even though the linter’s own type-ref scanning already treats `&`/`*` as valid boundaries. See [catalogue_linter_eval.rs:40](libs/domain/src/tddd/catalogue_linter_eval.rs#L40) and [catalogue_linter_eval.rs:355](libs/domain/src/tddd/catalogue_linter_eval.rs#L355).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 40,
               "category": "correctness"
             }
@@ -1972,14 +1972,14 @@
             {
               "message": "This test only proves `find_in_catalogue` skips a delete-marked trait; it never forces the `NoRoleInMethodSignature` type/trait loops to evaluate a delete-marked candidate. If the new `action != Delete` guards in `catalogue_linter_eval.rs` were removed, this test would still pass unchanged, so the fail-closed regression is not actually covered.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
               "line": 2424,
               "category": "testing"
             },
             {
               "message": "This fixture leaves `DeletedAgg.methods` empty, so it does not exercise the new delete-action skip in `NoExternalReferenceInMethods`'s `other_entry.methods` scan. Dropping the `action != Delete` guard in `catalogue_linter_eval.rs` would not fail this test, which leaves the intended fail-closed behavior unverified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
               "line": 2585,
               "category": "testing"
             }
@@ -2030,7 +2030,7 @@
             {
               "message": "`target_field` validation still happens only after iterating matching entries. If a rule's `RuleTarget` matches no live entries in the catalogue (or only delete-marked ones), the new `field_*` helpers are never called, so a typo still returns `Ok([])` instead of `InvalidRuleConfig`. That leaves the fail-closed fix incomplete for empty scopes across `FieldEmpty`, `FieldNonEmpty`, `ReferencedRoleConstraint`, `FieldElementUniqueAcrossEntries`, and `NoExternalReferenceInMethods`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 71,
               "category": "error handling"
             }
@@ -2045,7 +2045,7 @@
             {
               "message": "`ReferencedRoleConstraint` still hard-fails on role-family mismatches inside the per-entry loop. `field_type_refs()` now returns `Err(InvalidRuleConfig)` for `aggregate` on any `DataRole`, and `contract_role_type_ref()` does the symmetric thing for data-only fields, so a rule whose `RuleTarget` includes both data and contract roles (or otherwise hits the \"wrong\" family first) aborts instead of evaluating the entries that do carry the field. That contradicts the new fail-closed intent in the comment here: only names unrecognized in both contexts should be rejected.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 138,
               "category": "logic"
             }
@@ -2060,14 +2060,14 @@
             {
               "message": "The `ReferencedRoleConstraint` pre-check only rejects fields unknown to both role families. That still accepts invalid target/field pairings such as `RuleTarget::new(vec![RoleKind::Repository])` with `target_field: \"emits\"`; the loops then see zero fields and return `Ok([])` instead of `InvalidRuleConfig`. This leaves a fail-open path for misconfigured rules.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 131,
               "category": "validation"
             },
             {
               "message": "Both `FieldElementUniqueAcrossEntries` and `NoExternalReferenceInMethods` call `validate_data_role_field()`, but that helper admits `invariants`, `emits`, `handles`, `reacts_to`, and `shared_value_objects`. Per the ADR these rules are only defined for `exclusive_members`, so misconfigurations like `NoExternalReferenceInMethods { target_field: \"invariants\" }` still silently no-op instead of failing closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 360,
               "category": "validation"
             }
@@ -2082,7 +2082,7 @@
             {
               "message": "P1: `ReferencedRoleConstraint` still has a fail-open path for `target_field: \"invariants\"`. `validate_data_role_field()` treats `invariants` as valid, `field_type_refs()` returns `Ok(&[])`, and `contract_role_type_ref()` returns `Ok(None)`, so this rule silently evaluates to zero checks instead of rejecting the config. That means an unsupported `ReferencedRoleConstraint` field remains accepted rather than returning `InvalidRuleConfig`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 124,
               "category": "missing error handling"
             }
@@ -2097,7 +2097,7 @@
             {
               "message": "`ReferencedRoleConstraint` still has a fail-open path for incoherent role/field pairs. The new pre-check only classifies roles as broad `DataRole` vs `ContractRole`, so impossible combinations like `RoleKind::Entity` + `target_field = \"emits\"` or `RoleKind::SpecificationPort` + `target_field = \"aggregate\"` still fall through and evaluate to zero refs instead of `InvalidRuleConfig`. `field_type_refs` and `contract_role_type_ref` already model field support at the variant level, so this guard needs variant-specific validation rather than the coarse `all_data`/`all_contract` split.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 147,
               "category": "correctness"
             }
@@ -2141,7 +2141,7 @@
             {
               "message": "`FieldEmpty`/`FieldNonEmpty` now reject misspelled field names, but they still silently no-op when the rule targets only ContractRole variants. For example, `RuleTarget::new(vec![RoleKind::Repository])` with `FieldNonEmpty { target_field: \"emits\" }` returns `Ok([])` instead of `InvalidRuleConfig`, so a misconfigured rule can still pass without checking anything. Add a target-role compatibility pre-check here as you did for the TypeRef-based rules.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 92,
               "category": "correctness"
             }
@@ -2170,7 +2170,7 @@
             {
               "message": "Skipping the pre-check when `target_roles` is empty leaves `RuleTarget::all_roles()` fail-open: `FieldEmpty`/`FieldNonEmpty` rules can still run against roles that never carry the field, which produces false positives instead of rejecting the rule configuration. The strict validation here needs to account for the full role universe when `target_roles` is empty, or explicitly reject that case.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 59,
               "category": "correctness"
             }
@@ -2185,7 +2185,7 @@
             {
               "message": "`ensure_target_can_produce_type_ref_checks` still uses `any(...)` and returns `Ok(())` for `RuleTarget::all_roles()`, so the TypeRef-based field rules (`FieldElementUniqueAcrossEntries` and `NoExternalReferenceInMethods`) remain fail-open for mixed targets. A rule like `[AggregateRoot, Entity]` with `exclusive_members` will silently skip the `Entity` entries instead of rejecting the incoherent config, which preserves the same silent-disable bug this patch is trying to eliminate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 39,
               "category": "logic"
             }
@@ -2243,7 +2243,7 @@
             {
               "message": "`NoExternalReferenceInMethods` still scans only `other_entry.methods`, so methods declared exclusively in `CatalogueDocument::inherent_impls` are never checked. A violating method can move into an inherent impl block and this boundary rule will silently pass.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 562,
               "category": "correctness"
             }
@@ -2312,14 +2312,14 @@
             {
               "message": "`DataRoleDto` still leaves the unit-like roles (`Specification`, `Factory`, `Interactor`, `Command`, `Query`, `Dto`, `ErrorType`, `SecondaryAdapter`) as unit variants, so serde continues to emit and accept bare strings for those cases. That means the new codec does not actually enforce the discriminated-object wire shape for the full role enum, and the legacy string form is still implicitly supported.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/dto_roles.rs",
               "line": 32,
               "category": "serialization"
             },
             {
               "message": "`ContractRole::Repository` is rendered with the display tag `repository`, but `section_to_signal_kind_tag` never collapses that tag back to the evaluator's `secondary_port` bucket, and there is no dedicated repository section. Repository traits will therefore fall into `Other` with a blank Signal column even when `check_type_signals` has produced a matching `secondary_port` signal.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
               "line": 208,
               "category": "rendering"
             }
@@ -2683,7 +2683,7 @@
             {
               "message": "The cookbook still shows unannotated plain-string `role` examples (`\"role\": \"ValueObject\"`, `\"role\": \"SecondaryPort\"`, etc.) even though the new normative section says that form is no longer accepted. As written, the file now teaches two incompatible wire formats, which can make type-designer emit invalid catalogue JSON. Rewrite those examples to the discriminated-object form or mark them explicitly as legacy/non-normative.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
+              "file": ".harness/capabilities/type-designer.md",
               "line": 625,
               "category": "correctness"
             }
@@ -2698,7 +2698,7 @@
             {
               "message": "The new `Repository` trait role is defined in the schema reference above, but the role-selection guidance here still maps repository/store/writer traits to `SecondaryPort`. That makes the `Repository` variant effectively unreachable for the common repository case and can still produce catalogues that violate the updated schema/ADR.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
+              "file": ".harness/capabilities/type-designer.md",
               "line": 517,
               "category": "correctness"
             }
@@ -2713,7 +2713,7 @@
             {
               "message": "`DataRole` now has 14 variants, including `EventPolicy`, but this reference and the quick self-check still claim there are only 13 type-section role values. That leaves the normative guidance internally inconsistent and can make valid `EventPolicy` catalogue entries look unsupported.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
+              "file": ".harness/capabilities/type-designer.md",
               "line": 262,
               "category": "correctness"
             }
@@ -2728,14 +2728,14 @@
             {
               "message": "The updated schema reference adds `EventPolicy` and `Repository`, but the role-selection guidance below still says `one of the 13 type-section role values` and maps repository-like driven ports to `SecondaryPort`. That is internally contradictory within the same capability doc and can lead type-designer to author catalogues that no longer match the new wire format.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
+              "file": ".harness/capabilities/type-designer.md",
               "line": 487,
               "category": "correctness"
             },
             {
               "message": "Removing the `Bash(while :*)`, `Bash(cat :*)`, `Bash(touch :*)`, `Bash(cp :*)`, and `Bash(mv :*)` deny patterns weakens the shell-guardrail layer without replacing it with an equivalent restriction. That re-opens the shell forms the repo policy relies on to keep file inspection and mutation behind the dedicated tools.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/settings.json",
+              "file": ".claude/settings.json",
               "line": 195,
               "category": "security"
             }
@@ -2750,7 +2750,7 @@
             {
               "message": "The trait-selection guidance still maps repository traits to `SecondaryPort` and never introduces `Repository` as a selectable role, so the new `Repository` wire format (with required `aggregate`) is unreachable for anyone following the doc. Update the trait branch / trait-direction bullets to distinguish repositories from generic secondary ports.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
+              "file": ".harness/capabilities/type-designer.md",
               "line": 518,
               "category": "correctness"
             }
@@ -2883,7 +2883,7 @@
             {
               "message": "The v4→v5 migration is incomplete in the authoritative guidance: this file still describes itself as a \"v4 schema reference\", points readers to the \"v4 Schema Reference\" in the mission bullets, labels the schema-field section as derived from v4, and refers to the cookbook's normative wire format as defined in the v4 reference. Those references should be updated or explicitly marked legacy, otherwise the document contradicts the new `schema_version: 5` guidance.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
+              "file": ".harness/capabilities/type-designer.md",
               "line": 19,
               "category": "correctness"
             }
@@ -2977,14 +2977,14 @@
             {
               "message": "The compliance note still says the convention's R1 matrix is v3-only and lacks v5 roles, but the updated convention file now adds `EventPolicy`, `DomainEvent`, and `Repository`. This makes the precedence guidance self-contradictory and points readers at the wrong source for v5 role availability.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/capabilities/type-designer.md",
+              "file": ".harness/capabilities/type-designer.md",
               "line": 14,
               "category": "consistency"
             },
             {
               "message": "The rewritten v5 section still labels the matrix `role (v3)` and keeps v3 schema references in the related-docs block. The document is internally inconsistent about whether the binding matrix is v3 or v5, which undermines its use as the canonical role/layer reference.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/type-designer-kind-selection.md",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
               "line": 41,
               "category": "consistency"
             }

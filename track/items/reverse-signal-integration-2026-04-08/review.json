@@ -54,14 +54,14 @@
             {
               "message": "`Reassess When` still reopens `auto-add` as a future option. That reintroduces the rejected Yellow/auto-add path the ADR otherwise bans, so the document is internally inconsistent with the stated TDDD policy.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
+              "file": "knowledge/adr/2026-04-08-1800-reverse-signal-integration.md",
               "line": 125,
               "category": "consistency"
             },
             {
               "message": "T07’s scope includes updating `registry.md`, but the acceptance criteria and verification steps only cover the `/track:plan` message plus the two workflow docs. The registry index update can be missed without any failing check, so the workflow redirect remains unverified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/reverse-signal-integration-2026-04-08/spec.json",
+              "file": "track/items/reverse-signal-integration-2026-04-08/spec.json",
               "line": 69,
               "category": "coverage"
             }
@@ -507,7 +507,7 @@
             {
               "message": "Missing regression coverage for the new `DomainTypeKind::ErrorType` missing-type branch. `evaluate_domain_type_signals` now returns `Yellow` here, but no test exercises this public path, so a future regression would go undetected.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/domain_types.rs",
+              "file": "libs/domain/src/domain_types.rs",
               "line": 442,
               "category": "testing"
             }
@@ -768,14 +768,14 @@
             {
               "message": "Step 2b now requires a per-group `## Changed Files` section for the `claude` path, but Step 2a no longer provides any recipe for deriving that list. `track-review-status` only reports scope state, so the briefing for `claude`/`Explore` runs is underspecified and cannot be built deterministically.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "file": ".claude/commands/track/review.md",
               "line": 98,
               "category": "correctness"
             },
             {
               "message": "The `review-fix-lead` agent prompt no longer passes an explicit scope file allowlist; `Scope files: (auto-injected by track-local-review)` refers to the reviewer subprocess, not the agent that must enforce scope boundaries and return `blocked_cross_scope`. This breaks the contract in `.claude/agents/review-fix-lead.md` and leaves the `claude` path without a modification allowlist.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "file": ".claude/commands/track/review.md",
               "line": 160,
               "category": "correctness"
             }
@@ -812,14 +812,14 @@
             {
               "message": "Hard-coding the reviewer model resolution to Codex and marking the `claude` path unsupported makes `/track:review` unusable for the existing `claude-heavy` profile, which still maps `reviewer` to `claude` in `.claude/agent-profiles.json`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "file": ".claude/commands/track/review.md",
               "line": 43,
               "category": "workflow"
             },
             {
               "message": "Replacing the explicit `Scope files` allowlist with `'(auto-injected by track-local-review)'` breaks the `review-fix-lead` contract: the agent no longer receives the file list it is allowed to modify, so it cannot reliably detect or report cross-scope fixes.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "file": ".claude/commands/track/review.md",
               "line": 145,
               "category": "architecture"
             }
@@ -893,7 +893,7 @@
             {
               "message": "The per-scope agent prompt now grants modification rights to every file matching the scope glob, instead of the concrete changed-file set for this review. That broadens the write set beyond the current review target and can let a fixer mutate unrelated files in the same layer, which risks unintended edits and stale review/hash state.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "file": ".claude/commands/track/review.md",
               "line": 145,
               "category": "correctness"
             }
@@ -908,7 +908,7 @@
             {
               "message": "The `review-fix-lead` allowlist recipe is incomplete for the `other` scope. `track/review-scope.json` has no `other` glob patterns, and this prompt never says to derive `other` as the complement of the named groups or to exclude `review_operational` / `other_track`, so the agent cannot get a correct modification allowlist for `other` and may either miss files or touch operational ones.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "file": ".claude/commands/track/review.md",
               "line": 145,
               "category": "workflow"
             }
@@ -1438,14 +1438,14 @@
             {
               "message": "`/track:design` only resolves `track/<id>` or `plan/<id>` branches and otherwise aborts. That is stricter than the established track-command resolver used elsewhere in the workflow, so invoking this command from a normal `main`/non-track checkout will fail even when a current track exists.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "file": ".claude/commands/track/design.md",
               "line": 15,
               "category": "workflow"
             },
             {
               "message": "The next-step guidance unconditionally tells the user to run `/track:implement`, but planning-only tracks must be activated first. On a `plan/<id>` branch this will send users into a command that immediately stops on the activation guard instead of giving the required `/track:activate <track-id>` step.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "file": ".claude/commands/track/design.md",
               "line": 94,
               "category": "workflow"
             }
@@ -2520,7 +2520,7 @@
             {
               "message": "The new `--strict` wiring for `SpecStates` is not exercised anywhere in this file. All updated spec-state tests still pass `strict: false`, so a regression in the new merge-gate path or the `args.strict` handoff to `infrastructure::verify::spec_states::verify` would slip through CI.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
+              "file": "apps/cli/src/commands/verify.rs",
               "line": 151,
               "category": "test coverage"
             }

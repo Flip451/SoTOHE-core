@@ -57,7 +57,7 @@
             {
               "message": "D4’s `FreeFunction` schema only declares `expected_params` and `expected_returns`, but the same section later treats `async`/sync as part of signature matching. Because the catalog-side declaration has no field for that dimension, the plan cannot represent or validate async mismatches as written.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
               "line": 248,
               "category": "factual error"
             }
@@ -72,14 +72,14 @@
             {
               "message": "D3 broadens reverse checking to every workspace-origin trait impl, but that conflicts with the earlier secondary-adapter scope decision that excludes infrastructure-internal traits. As written, traits like `GitRepository`/`GhClient` would become contract violations even though they are intentionally out of scope, so this check will produce false positives on the existing workspace.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
               "line": 234,
               "category": "contradiction"
             },
             {
               "message": "D4 models free functions as `functions: HashMap<String, FunctionNode>` keyed only by the short name, but it never records a module path or any other namespace. That means two public functions with the same name in different modules cannot be represented safely, and the later 'same module' reverse-extra rule has no identifier to evaluate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
               "line": 261,
               "category": "factual error"
             }
@@ -109,7 +109,7 @@
             {
               "message": "The new empty-`Vec` criterion says empty `Vec` is allowed whenever a struct has zero public fields, but the same ADR still requires tuple structs to be declared by positional indices (for example `struct Email(String)` must use `\"0\"`). That makes tuple structs with private fields both eligible for omission and required to be listed, so the `expected_members` rule is internally inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
               "line": 141,
               "category": "contradiction"
             }
@@ -124,14 +124,14 @@
             {
               "message": "D3’s reverse-check inclusion rule is too broad: it treats every trait whose `origin_crate` is in the workspace as in-scope, which would also pull in infrastructure-local traits such as `GitRepository` and `GhClient`. That conflicts with the earlier SecondaryAdapter track decision that those internal traits are out of scope, so `SystemGitRepo` / `SystemGhClient` would become false positives.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
               "line": 232,
               "category": "contradiction"
             },
             {
               "message": "The zero-member exception for `expected_members` is too broad to be implementable as written. The plan allows `expected_members: []` for tuple structs with all fields private, but the current TypeGraph export path still emits tuple fields, so those structs do not actually appear member-less in the data the evaluator reads.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
+              "file": "knowledge/adr/2026-04-26-0855-tddd-feature-extension-with-verification.md",
               "line": 168,
               "category": "infeasibility"
             }
@@ -460,7 +460,7 @@
             {
               "message": "`spec.md` says Stage 1 has `0 yellow / 0 red`, but `domain-types.md` still renders yellow rows for `TypeDefinitionKind` and the new `FunctionNode` / `FunctionBaselineEntry` / `TraitImplBaselineEntry` entries. The regenerated type view is therefore stale relative to the refreshed plan artifacts.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-and-signal-eval-2026-04-26/domain-types.md",
+              "file": "track/items/contract-map-and-signal-eval-2026-04-26/domain-types.md",
               "line": 7,
               "category": "contradiction"
             }
@@ -475,7 +475,7 @@
             {
               "message": "`domain-types.md` renders the entire `Signal` column as `—`, which contradicts the dual-axis model in the briefing and the generated `domain-type-signals.json`: `TypeDefinitionKind` is actually yellow because `FreeFunction` is still missing, and the new `FunctionNode` / `FunctionBaselineEntry` / `TraitImplBaselineEntry` entries are also yellow rather than blank.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-and-signal-eval-2026-04-26/domain-types.md",
+              "file": "track/items/contract-map-and-signal-eval-2026-04-26/domain-types.md",
               "line": 7,
               "category": "contradiction"
             }
@@ -490,14 +490,14 @@
             {
               "message": "This says the TypeGraph/baseline schema work will be completed \"simultaneously\" across S3/S4, but S4 is explicitly blocked until S3 finishes. The dependency order contradicts the stated core invariant and makes the parallelization claim inaccurate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-and-signal-eval-2026-04-26/plan.md",
+              "file": "track/items/contract-map-and-signal-eval-2026-04-26/plan.md",
               "line": 17,
               "category": "contradiction"
             },
             {
               "message": "GO-03 claims the track will also draw a distinct \"FreeFunction error-type edge\", but T009 and AC-09 only specify parameter and return-type edges. There is no matching task or acceptance criterion for a separate error-type edge, so the goal statement overstates the scoped deliverable.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-and-signal-eval-2026-04-26/spec.md",
+              "file": "track/items/contract-map-and-signal-eval-2026-04-26/spec.md",
               "line": 13,
               "category": "contradiction"
             }
@@ -699,14 +699,14 @@
             {
               "message": "This helper reads `items_dir/<track_id>/spec.json` directly without the symlink guard used by the neighboring TDDD commands. A symlinked `items_dir`, track directory, or `spec.json` can make the CLI hash files outside the trusted tree and leak their contents via stdout.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
+              "file": "apps/cli/src/commands/track/tddd/spec_element_hash.rs",
               "line": 34,
               "category": "security"
             },
             {
               "message": "No tests were added for the new public `execute_spec_element_hash` path, so the success case and the failure paths introduced here (`missing spec.json`, schema failure, missing anchor) are not covered.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
+              "file": "apps/cli/src/commands/track/tddd/spec_element_hash.rs",
               "line": 25,
               "category": "testing"
             }
@@ -721,7 +721,7 @@
             {
               "message": "The new tests only assert that `execute_spec_element_hash` succeeds or fails; they never verify stdout. That leaves the core behavior of this command unprotected, so a regression that prints the wrong format (for example JSON in `--anchor` mode or a single hash in map mode) would still pass the suite.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/spec_element_hash.rs",
+              "file": "apps/cli/src/commands/track/tddd/spec_element_hash.rs",
               "line": 164,
               "category": "test coverage"
             }
@@ -873,7 +873,7 @@
             {
               "message": "`evaluate_secondary_adapter` still only checks the trait names declared in `implements`; it never scans the code's full `trait_impls` set for undeclared implementations. As a result, an adapter that implements an extra workspace trait can never emit the reverse-extra signal required by §S, so `modify`/`reference` cases can be misclassified as Blue/Yellow instead of Yellow/Red.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "file": "libs/domain/src/tddd/signals.rs",
               "line": 498,
               "category": "correctness"
             }
@@ -902,7 +902,7 @@
             {
               "message": "`FreeFunction` carries `module_path` specifically to disambiguate functions in different modules, but the renderer still keys both `node_id` and the lookup index only by `entry.name()`. Two valid entries like `foo::run` and `bar::run` will collapse into one node and merged edges, so the contract map becomes incorrect for same-named free functions.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
               "line": 99,
               "category": null
             }
@@ -1026,14 +1026,14 @@
             {
               "message": "`FreeFunction` delete entries skip the module-scoped reverse-extra pass entirely. That means a module with only `delete` catalogue entries can still contain undeclared functions and be reported Blue, even though `signal_for_reverse_extra` says delete should still surface reverse extras as Yellow.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "file": "libs/domain/src/tddd/signals.rs",
               "line": 88,
               "category": null
             },
             {
               "message": "`FreeFunction` lookup now scopes by `(name, module_path)`, but consistency still collapses signals and entry matching to `(type_name, kind_tag)` only. If two free functions share the same short name in different modules, their signals become indistinguishable and one module's status can mask the other in coverage/yellow/red checks.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/consistency.rs",
+              "file": "libs/domain/src/tddd/consistency.rs",
               "line": 415,
               "category": null
             }
@@ -1048,7 +1048,7 @@
             {
               "message": "The new FreeFunction test block never exercises `module_path=None`; every case hard-codes `Some(\"usecase::track\")`. That leaves the top-level lookup/reverse-scope branch in `evaluate_free_function` and `evaluate_delete` unverified, even though the brief explicitly called for `None`/`Some` coverage.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "file": "libs/domain/src/tddd/signals.rs",
               "line": 2866,
               "category": "test"
             }
@@ -1063,7 +1063,7 @@
             {
               "message": "`check_consistency` still only computes undeclared `types` and `traits`; it never inspects `graph.functions()` or `baseline.functions()`. After adding `TypeDefinitionKind::FreeFunction` and `TypeGraph::functions`, an undeclared public `fn` can still slip through the consistency path with no reverse signal, so the new free-function surface is only partially validated.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/consistency.rs",
+              "file": "libs/domain/src/tddd/consistency.rs",
               "line": 223,
               "category": null
             }
@@ -1189,14 +1189,14 @@
             {
               "message": "FreeFunction signals still drop `module_path` here and are keyed only by `(type_name, kind_tag)`. That makes two `save_track` entries in different modules collide in `check_type_signals`, so the gate cannot distinguish or cover them independently.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "file": "libs/domain/src/tddd/signals.rs",
               "line": 1042,
               "category": "correctness"
             },
             {
               "message": "`delete_errors` records only `name` for `FreeFunction` deletes. Because free functions are keyed by `(name, module_path)` everywhere else and same short names are valid in different modules, invalid-delete diagnostics become ambiguous and the CLI can suppress or report the wrong signal.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/consistency.rs",
+              "file": "libs/domain/src/tddd/consistency.rs",
               "line": 431,
               "category": "correctness"
             }
@@ -1233,7 +1233,7 @@
             {
               "message": "Switching `FreeFunction` signals to fully-qualified `type_name` values (`module_path::name`) is not backward-compatible with the repo’s existing signal consumers, which still match and render signals by the catalogue entry’s short `name`. As a result, free-function rows will stop being associated with their signals unless every downstream consumer is updated in lockstep.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "file": "libs/domain/src/tddd/signals.rs",
               "line": 1107,
               "category": null
             }
@@ -1248,7 +1248,7 @@
             {
               "message": "`check_type_signals` still keys coverage by `(type_name, kind_tag)`, while FreeFunction signals use only the short function name. Two FreeFunction entries with the same name in different modules therefore collapse to one key, so a missing or stale signal for one module can be masked and the gate can pass with incomplete coverage.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/consistency.rs",
+              "file": "libs/domain/src/tddd/consistency.rs",
               "line": 538,
               "category": null
             }
@@ -1336,7 +1336,7 @@
             {
               "message": "The new Interactor → ApplicationService edge path does not suppress self-loops. Because node IDs are built from layer + name only, a same-layer Interactor and ApplicationService with the same short name collapse to the same `src_id`, and this block will emit `L... -.impl.-> L...` instead of skipping the broken edge like the other edge builders do.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
               "line": 215,
               "category": "logic"
             }
@@ -1440,14 +1440,14 @@
             {
               "message": "The new Phase 1.5 validation never rejects `expected_members` on kinds that do not define it (`enum`, `error_type`, `secondary_port`, `application_service`, `free_function`). Because `TypeCatalogueEntryDto` flattens the kind payload and does not deny unknown fields, those extra members are silently discarded by serde and malformed catalogues are accepted.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
               "line": 357,
               "category": null
             },
             {
               "message": "`typestate` is no longer covered by the stale-field guard for `expected_methods` / `expected_variants`. The later `implements` check is the only typestate-specific filter, so a typestate entry carrying those foreign fields will still decode successfully and the data will be dropped.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
               "line": 460,
               "category": null
             }
@@ -1462,14 +1462,14 @@
             {
               "message": "`FreeFunction` now validates `expected_params`, but `expected_returns` is never L1-checked for `::` on either decode or encode. That lets qualified return paths such as `std::io::Error` slip through even though the file-level contract says returns strings containing `::` must be rejected.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
               "line": 859,
               "category": "correctness"
             },
             {
               "message": "The new non-empty `expected_variants` rule for `enum`/`error_type` is enforced only during `decode()`. `encode()` still serializes `Enum { expected_variants: vec![] }` and `ErrorType { expected_variants: vec![] }` unchanged, so a public caller can emit JSON that this codec rejects on the next read.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
               "line": 1054,
               "category": "correctness"
             }
@@ -1506,7 +1506,7 @@
             {
               "message": "`decode_member_list` / `encode_member_list` only validate `Field.ty` for `::`; they never reject `::` in the member identifier itself. As a result, `expected_members` can carry impossible names like `foo::Bar` in both `Variant` and `Field.name`, and the codec will accept/emit them instead of enforcing the new L1 rule.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
               "line": 947,
               "category": null
             }
@@ -1535,14 +1535,14 @@
             {
               "message": "`build_trait_origins` collapses all impls by the trait short name and keeps the first entry seen. If a crate has two traits with the same short name (for example `std::fmt::Display` and a local `foo::Display`), `TraitImplEntry::origin_crate` becomes whichever one happened to be visited first in `krate.index.values()`. Because that iteration order comes from a `HashMap`, the result is nondeterministic and can mislabel trait origins, which breaks the downstream filtering that depends on this field.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "file": "libs/infrastructure/src/schema_export.rs",
               "line": 298,
               "category": null
             },
             {
               "message": "The new rustdoc extraction path in `schema_export.rs` has no direct test coverage for the added behavior: `functions()` population and `trait_origins` derivation. The existing integration tests still only assert non-empty types/traits/impls and parseable JSON, so regressions in `extract_module_path` or `build_trait_origins` would not be caught.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "file": "libs/infrastructure/src/schema_export.rs",
               "line": 135,
               "category": null
             }
@@ -1557,7 +1557,7 @@
             {
               "message": "`build_trait_origins` collapses all trait definitions to a `short_name -> crate` map, so a crate that defines its own trait with the same short name as an external trait will mislabel the external impls. For example, if the crate has a local `Display` and also implements `std::fmt::Display`, every `Display` impl is assigned `origin_crate = crate_name`, which breaks the new workspace/external filtering for common name collisions.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "file": "libs/infrastructure/src/schema_export.rs",
               "line": 317,
               "category": null
             }
@@ -1572,7 +1572,7 @@
             {
               "message": "`build_trait_origins` says the alphabetically-first full path should win when two external traits share a short name, but the `and_modify` branch overwrites an earlier external entry with any later external entry. That makes `origin_crate` wrong for external/external collisions (the last path wins instead of the first).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "file": "libs/infrastructure/src/schema_export.rs",
               "line": 323,
               "category": null
             }
@@ -1616,7 +1616,7 @@
             {
               "message": "Treating a missing `layers` key as `Vec::default()` makes a malformed `architecture-rules.json` indistinguishable from an intentionally empty config, so `load_workspace_crate_names` will silently return an empty workspace set and suppress IN-10 checks instead of surfacing the misconfiguration.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/tddd_layers.rs",
+              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
               "line": 328,
               "category": "error handling"
             }

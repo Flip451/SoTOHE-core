@@ -10,21 +10,21 @@
             {
               "message": "The version smoke-test still accepts Codex v0.100.x through v0.114.x, but this repo's safety model says the `.git` read-only protection is only guaranteed from v0.115.0 upward. Letting older versions through means the fixer can run without the protection this wrapper is supposed to enforce.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 953,
               "category": "security"
             },
             {
               "message": "The credential-isolation allowlist keeps `HOME`, and the comments explicitly note that `~/.ssh` remains readable. That leaves host SSH keys and other home-directory auth material available to the fixer, so the wrapper does not actually remove filesystem-based push capability as required.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 996,
               "category": "security"
             },
             {
               "message": "`codex exec` runs inside a `set -euo pipefail` pipeline, so any non-zero Codex exit or missing `REVIEW_FIX_STATUS` sentinel aborts the script before `EXIT_CODE` is captured and before the fallback `failed` status can be emitted. That breaks the required safe mapping of launch failures to a structured wrapper result.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 1056,
               "category": "error handling"
             }
@@ -39,14 +39,14 @@
             {
               "message": "Credential isolation is still incomplete: the allowlist keeps `HOME`, and the wrapper only sets `GIT_SSH_COMMAND=/bin/false`. That leaves `~/.ssh` and direct SSH-based auth available to the fixer, so the promised removal of filesystem SSH-key push capability is not actually enforced.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 991,
               "category": "security"
             },
             {
               "message": "`STATUS=$(grep ...)` runs under `set -euo pipefail`; if Codex output does not contain the sentinel, `grep` returns 1 and the shell exits before the fallback `failed` branch can run. Missing or malformed status output therefore does not fail closed as intended.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 1075,
               "category": "error handling"
             }
@@ -61,14 +61,14 @@
             {
               "message": "The status parser matches `REVIEW_FIX_STATUS:` anywhere in Codex output (`grep -oE ... | tail -1`) instead of requiring the final line to be the sentinel. If Codex quotes one of the status strings in its explanation or prints any extra text after it, the wrapper can misclassify the run as `completed` or `blocked_cross_scope` even though the contract was violated.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 1084,
               "category": "correctness"
             },
             {
               "message": "`--scope-files` is treated as optional, and the modification-boundary section is omitted entirely when the value is empty. That lets the fixer launch without an explicit file list if the caller forgets the argument or passes an empty list, which is a fail-open path for cross-scope edits.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 912,
               "category": "security"
             }
@@ -98,7 +98,7 @@
             {
               "message": "The new `track-local-review-fix-codex` wrapper has no automated coverage, so regressions in its security-critical guards (the `0.115.0` version floor, forbidden-sandbox rejection, credential isolation, and sentinel parsing) would slip through unnoticed. This is a P1 test gap because this task now gates the Codex review-fix path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 886,
               "category": "test coverage"
             }
@@ -113,14 +113,14 @@
             {
               "message": "Inference: this launch path likely never delivers the briefing text to Codex. Existing in-repo Codex launchers pass the prompt as the final argv item and keep stdin null, but this wrapper redirects the briefing file on stdin and passes `-` as the positional argument. Unless `codex exec` has undocumented stdin support, the fixer will receive `-` instead of the orchestrator briefing and scope list, so the task will not run as intended.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 1071,
               "category": "correctness"
             },
             {
               "message": "The wrapper always exits `0` after printing `completed`, `blocked_cross_scope`, or `failed`. That masks non-completed outcomes from Cargo Make and any shell automation that relies on process status, so a failed fixer run can be reported as a successful task at the exit-code level.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 1112,
               "category": "error handling"
             }
@@ -135,7 +135,7 @@
             {
               "message": "`env -i` combined with `HOME=$SAFE_HOME` strips the Codex CLI's own persisted login state and any env-based API credential before `codex exec` starts. In the normal CLI-login or `CODEX_API_KEY` setup, the fixer will launch unauthenticated and fail before it can do any work.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 1015,
               "category": "bug"
             }
@@ -198,7 +198,7 @@
             {
               "message": "The new `review-fix-lead` config leaves `model` set to `claude-opus-4-7`, but the new Codex dispatch path forwards that same field into `codex exec --model`. As a result, opting into `provider: codex` still inherits the Claude model unless the user also changes a second setting, so the documented provider-only switch is not actually usable.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/config/agent-profiles.json",
+              "file": ".harness/config/agent-profiles.json",
               "line": 47,
               "category": "correctness"
             }

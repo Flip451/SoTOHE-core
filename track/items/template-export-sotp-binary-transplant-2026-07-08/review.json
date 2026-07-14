@@ -121,7 +121,7 @@
             {
               "message": "`T002` is attributed to five reference-only usecase entries (`TemplateExportCommand`, `TemplateExportPort`, `TemplateExportPortError`, `TemplateExportReport`, `TemplateExportService`) even though the task text only says to preserve them. Per the impl-plan brief, reference entries are outside add/modify attribution, so this overstates T002's catalogue responsibility.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/track/items/template-export-sotp-binary-transplant-2026-07-08/task-contract.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/track/items/template-export-sotp-binary-transplant-2026-07-08/task-contract.json",
               "line": 9,
               "category": "task-contract attribution mismatch"
             }
@@ -136,21 +136,21 @@
             {
               "message": "T003 goes beyond `target + operation + anchor cite` by spelling out the expected adapter-test outcomes (`successful copy (byte-identity + exec bit + read-only startup exit 0)` and the fail-closed destination-write / permission-set cases). Per `knowledge/conventions/no-upstream-restatement.md`, keep the task text at the file/symbol target, the operation, and the anchors.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/track/items/template-export-sotp-binary-transplant-2026-07-08/impl-plan.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/track/items/template-export-sotp-binary-transplant-2026-07-08/impl-plan.json",
               "line": 18,
               "category": "upstream restatement"
             },
             {
               "message": "T004 restates the end-to-end behavior contract in prose (`byte-identical to the current process binary`, `exec permission`, `--help exit 0`) instead of limiting itself to the target, operation, and anchors. That is exactly the downstream prose duplication `knowledge/conventions/no-upstream-restatement.md` forbids.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/track/items/template-export-sotp-binary-transplant-2026-07-08/impl-plan.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/track/items/template-export-sotp-binary-transplant-2026-07-08/impl-plan.json",
               "line": 24,
               "category": "upstream restatement"
             },
             {
               "message": "T005 restates the bootstrap branching contract by naming the runtime condition (`bin/sotp` presence plus a successful `--help` start) in the task text. Per `knowledge/conventions/no-upstream-restatement.md`, this should be reduced to target + operation + anchor cite only.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/track/items/template-export-sotp-binary-transplant-2026-07-08/impl-plan.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/track/items/template-export-sotp-binary-transplant-2026-07-08/impl-plan.json",
               "line": 30,
               "category": "upstream restatement"
             }

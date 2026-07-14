@@ -10,7 +10,7 @@ Run T022 after T002; it is independent of T003 and precedes final enablement in 
 T021 is final enablement and is blocked on T012, T013, and T015-T020.
 Goal traceability: GO-01 → T001; GO-02 → T004/T007-T011/T021; GO-03 → T006/T012/T013/T021; GO-04 → T014; GO-05 → T002/T003/T005/T015-T022; GO-06 → T002/T003/T005/T007-T011/T015-T022; GO-07 → T006/T007-T011/T021.
 
-## Tasks (15/22 resolved)
+## Tasks (21/22 resolved)
 
 ### S1 — Template export classification and output protection
 
@@ -44,20 +44,20 @@ Goal traceability: GO-01 → T001; GO-02 → T004/T007-T011/T021; GO-03 → T006
 
 > Run T012, then T014, then T013; T013 reviews the manifest-resolved shipped set after the archive workflow and command edits (spec.json#AC-05, #AC-06).
 
-- [x] **T012**: Rewrite the manifest-resolved `knowledge/conventions/**` shipped documents, using `knowledge/adr/README.md` for generic ADR navigation where needed, and add targeted document checks (spec.json#GO-03, #IN-03, #CN-01, #CN-05, #AC-05, #AC-06, #OS-03).
-- [x] **T014**: Create `.harness/workflows/track/archive.md`, reduce `.claude/commands/track/archive.md` to its invocation/reporting bridge, and add directory-derived archive/registry coverage for `apps/cli/src/commands/track/archive.rs::execute_archive` and `libs/infrastructure/src/track/render/{snapshot.rs,registry.rs}` (spec.json#GO-04, #IN-04, #AC-07, #AC-08, #OS-04).
-- [x] **T013**: Use the include/overlay file set resolved from `.harness/config/template-boundary.json`, excluding the T012 convention set, to rewrite remaining shipped documents and configuration; perform the required semantic review over that completed resolved set (spec.json#GO-03, #IN-03, #CN-01, #CN-05, #AC-05, #AC-06, #OS-03, #OS-06).
+- [x] **T012**: Rewrite the manifest-resolved `knowledge/conventions/**` shipped documents, using `knowledge/adr/README.md` for generic ADR navigation where needed, and add targeted document checks (spec.json#GO-03, #IN-03, #CN-01, #CN-05, #AC-05, #AC-06, #OS-03). (`680f6d9062e8b5799928411a4f4ecaf95a7b6592`)
+- [x] **T014**: Create `.harness/workflows/track/archive.md`, reduce `.claude/commands/track/archive.md` to its invocation/reporting bridge, and add directory-derived archive/registry coverage for `apps/cli/src/commands/track/archive.rs::execute_archive` and `libs/infrastructure/src/track/render/{snapshot.rs,registry.rs}` (spec.json#GO-04, #IN-04, #AC-07, #AC-08, #OS-04). (`680f6d9062e8b5799928411a4f4ecaf95a7b6592`)
+- [x] **T013**: Use the include/overlay file set resolved from `.harness/config/template-boundary.json`, excluding the T012 convention set, to rewrite remaining shipped documents and configuration; perform the required semantic review over that completed resolved set (spec.json#GO-03, #IN-03, #CN-01, #CN-05, #AC-05, #AC-06, #OS-03, #OS-06). (`680f6d9062e8b5799928411a4f4ecaf95a7b6592`)
 
 ### S5 — Tracked-artifact machine-path cleanup
 
 > T015-T020 each rerun the machine-path verifier and resolve the next bounded finding batch over one complete `git ls-files` inventory.
 
-- [ ] **T015**: From the deterministic `infrastructure::verify::machine_paths::verify` finding order over the `git ls-files` inventory, resolve the first 450 source-line findings and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
-- [ ] **T016**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
-- [ ] **T017**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
-- [ ] **T018**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
-- [ ] **T019**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
-- [ ] **T020**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the final at-most-84 remaining source-line findings, and record the zero-findings result (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
+- [x] **T015**: From the deterministic `infrastructure::verify::machine_paths::verify` finding order over the `git ls-files` inventory, resolve the first 450 source-line findings and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
+- [x] **T016**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
+- [x] **T017**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
+- [x] **T018**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
+- [x] **T019**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
+- [x] **T020**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the final at-most-84 remaining source-line findings, and record the zero-findings result (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
 
 ### S6 — Final CI and export-smoke enablement
 

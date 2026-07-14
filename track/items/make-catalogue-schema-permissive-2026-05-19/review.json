@@ -10,14 +10,14 @@
             {
               "message": "D2 gives `InherentImplDeclV2` its own entry type and simultaneously says `TypeEntry` must not carry impl data, but it never says where the new entry is stored in `CatalogueDocument`. In the current catalogue shape the only impl carrier is `TypeEntry.trait_impls`, so this leaves inherent impl blocks without a serialization/evaluation home.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+              "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
               "line": 79,
               "category": "infeasibility"
             },
             {
               "message": "The same D2 section reuses `MethodGenericParam` for impl- and trait-declaration generics, but that type only models a parameter name plus bounds for type parameters. It cannot represent lifetime or const generic parameters, so the advertised support for impl/trait generic declarations is narrower than the Rust syntax the ADR claims to cover.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
+              "file": "knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md",
               "line": 87,
               "category": "factual error"
             }
@@ -98,7 +98,7 @@
             {
               "message": "This contract-map is still only a placeholder: it explicitly suppresses node shapes and edges, so it does not render the cross-layer type relationships that the briefing says must be captured in this artifact. The `IN-24 / OS-07` deferral note is also a stray cross-reference for this track’s spec set.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/contract-map.md",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/contract-map.md",
               "line": 2,
               "category": "factual error"
             }
@@ -113,7 +113,7 @@
             {
               "message": "`contract-map.md` is still a placeholder rather than a rendered contract map: it explicitly says no node shapes or edges are emitted, so the file does not satisfy the scope requirement that this view express the inter-layer type relationships in mermaid form.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/contract-map.md",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/contract-map.md",
               "line": 2,
               "category": "contradiction"
             }
@@ -141,9 +141,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Rendered view mismatch: `/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.md` marks `BoundOp` and `InherentImplDeclV2` as `—`, but the source `/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.json` sets both to `action: \"add\"`. The markdown view therefore contradicts the generated JSON and obscures the intended add-vs-modify status.",
+              "message": "Rendered view mismatch: `track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.md` marks `BoundOp` and `InherentImplDeclV2` as `—`, but the source `track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.json` sets both to `action: \"add\"`. The markdown view therefore contradicts the generated JSON and obscures the intended add-vs-modify status.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.md",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.md",
               "line": 7,
               "category": "factual error"
             }
@@ -158,7 +158,7 @@
             {
               "message": "T001 claims `#[serde(default)]` is enough to keep old `type_/bounds` catalogue JSON loadable after renaming the fields to `lhs/rhs/operator`, but defaulting missing fields does not preserve the old values. As written, existing documents would deserialize with empty predicates unless the plan also requires `alias`/`rename` handling or a migration layer.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
               "line": 13,
               "category": "factual error"
             }
@@ -173,7 +173,7 @@
             {
               "message": "T001's compatibility claim is incomplete: it only aliases the legacy `type_`/`bounds` fields to `lhs`/`rhs`, but does not provide any legacy mapping or default for the new `operator` field. As written, older `WherePredicateDecl` records still cannot deserialize into the new shape, so the stated backward-compatibility path is not actually sufficient.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
               "line": 13,
               "category": "factual error"
             }
@@ -224,7 +224,7 @@
             {
               "message": "`T011` is the integration checkpoint, but the `tasks` array still orders it before `T012`, even though `T011` says it validates the D4/orphan-guard fix from `T012` and AC-12. Any consumer that follows the JSON task order will schedule integration before the dependent fix exists, which makes the plan ordering internally inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/impl-plan.json",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/impl-plan.json",
               "line": 65,
               "category": "infeasibility"
             }
@@ -239,14 +239,14 @@
             {
               "message": "CN-01 says every new field on `InherentImplDeclV2` / `TraitImplDeclV2` / `TraitEntry` uses an empty `Vec`/array default, but the same plan introduces non-collection fields such as `WherePredicateDecl.operator` and `InherentImplDeclV2.type_name` with different defaults. As written, the constraint conflicts with the schema changes it is meant to govern.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
               "line": 215,
               "category": "contradiction"
             },
             {
               "message": "S2 claims T004-T006 can be started in parallel, but T004 and T006 both touch `libs/domain/.../entries.rs` (`InherentImplDeclV2`/`CatalogueDocument.inherent_impls` vs `TraitEntry.generics`/`where_predicates`). That is not a disjoint write set, so the parallelism claim is infeasible as written.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
               "line": 22,
               "category": "infeasibility"
             }
@@ -283,7 +283,7 @@
             {
               "message": "T012 / IN-13 / AC-12 rely on a `TraitImplDeclV2.for_` field that can carry a fully-qualified self-type path, but `domain-types.json` only declares `trait_name`, `origin_crate`, `generic_args`, `impl_generics`, and `impl_where_predicates` for `TraitImplDeclV2`. As written, the D4 cross-crate impl cannot be represented in the catalogue, so the task is infeasible unless the schema adds a target-type field or redefines an existing one.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/plan.md",
               "line": 45,
               "category": "infeasibility"
             }
@@ -379,7 +379,7 @@
             {
               "message": "`T012` is marked `done` here even though the same plan still says it must start only after `T009` completes, and `T009` is still `todo`. That makes the artifact internally inconsistent: a downstream task is shown finished while its stated prerequisite is not.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/impl-plan.json",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/impl-plan.json",
               "line": 55,
               "category": "contradiction"
             }
@@ -394,7 +394,7 @@
             {
               "message": "This scope was described as a track-transition where only T001 should move to `in_progress`, with all other task statuses left unchanged. Instead, the source data now marks T012 as `done` and the rendered plan shows `1/12 resolved`, which overstates progress for this review scope.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/impl-plan.json",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/impl-plan.json",
               "line": 55,
               "category": "contradiction"
             }
@@ -737,7 +737,7 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "AC-10 still says the `for_is_external` filter removal is handled by D4/AC-12, but the updated ADR moved that decision to D3. That leaves the spec pointing at the wrong decision owner and makes the D3/D4 split inconsistent with the rest of the track. The same stale D4 label also remains in [domain-types.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.json):108 and [infrastructure-types.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/infrastructure-types.json):25,97.",
+              "message": "AC-10 still says the `for_is_external` filter removal is handled by D4/AC-12, but the updated ADR moved that decision to D3. That leaves the spec pointing at the wrong decision owner and makes the D3/D4 split inconsistent with the rest of the track. The same stale D4 label also remains in [domain-types.json](track/items/make-catalogue-schema-permissive-2026-05-19/domain-types.json):108 and [infrastructure-types.json](track/items/make-catalogue-schema-permissive-2026-05-19/infrastructure-types.json):25,97.",
               "severity": "P1",
               "file": "track/items/make-catalogue-schema-permissive-2026-05-19/spec.json",
               "line": 384,
@@ -1122,7 +1122,7 @@
             {
               "message": "`T016` is simultaneously treated as required work for `AC-13` and classified as out-of-scope in the coverage map. `spec.md` ties `AC-13` to `T016`, `plan.md` marks `T016` as the catalogue-schema rewrite task, but `task-coverage.json` lists the same task under `OS-04`. That makes the scope gate self-contradictory: the acceptance criterion depends on work declared out of scope.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/task-coverage.json",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/task-coverage.json",
               "line": 25,
               "category": "contradiction"
             }
@@ -1180,7 +1180,7 @@
             {
               "message": "`usecase-types.md` marks both interactor rows as Cat-Spec Blue, but the updated `usecase-types.json` docs still say those `new` methods should stay Yellow until IN-19/IN-20 land. The generated summary is therefore overstating the current catalogue-spec state and conflicts with the planning narrative.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/make-catalogue-schema-permissive-2026-05-19/usecase-types.md",
+              "file": "track/items/make-catalogue-schema-permissive-2026-05-19/usecase-types.md",
               "line": 14,
               "category": "factual error"
             }
@@ -1458,7 +1458,7 @@
             {
               "message": "P1: The canonical `TraitImplDecl` schema shown here omits the required `action` field, even though the domain type (`TraitImplDeclV2`) includes `action: ItemAction` and the rest of this document tells authors to set `action` on every catalogue entry. The later adapter example repeats the same omission, so a reader following this guide will emit malformed top-level impl declarations.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "file": ".claude/agents/type-designer.md",
               "line": 254,
               "category": "correctness"
             }
@@ -1473,7 +1473,7 @@
             {
               "message": "The new top-level impl schema still uses the obsolete name `TraitImplDecl` here, but the canonical domain type in the repo is `TraitImplDeclV2`. That stale identifier will mislead authors and makes the `trait_impls` section inconsistent with the documented SSoT.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "file": ".claude/agents/type-designer.md",
               "line": 227,
               "category": "correctness"
             }
@@ -1595,14 +1595,14 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: [mod.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs#L389) The new `for_path_raw` tiebreaker assumes the raw `Type::ResolvedPath.path` is identical on S and C, but this map also contains A-sourced impls whose `for_.path` is synthesized from catalogue short names rather than rustdoc’s original module-qualified path. On a same-key collision that mixes A-sourced and rustdoc-sourced impls, S and C can still sort different winners and produce a false `CMinusSUnionD` red.",
+              "message": "P1: [mod.rs](libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs#L389) The new `for_path_raw` tiebreaker assumes the raw `Type::ResolvedPath.path` is identical on S and C, but this map also contains A-sourced impls whose `for_.path` is synthesized from catalogue short names rather than rustdoc’s original module-qualified path. On a same-key collision that mixes A-sourced and rustdoc-sourced impls, S and C can still sort different winners and produce a false `CMinusSUnionD` red.",
               "severity": "P1",
               "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
               "line": 389,
               "category": "correctness"
             },
             {
-              "message": "P1: [tests.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs#L2716) The new collision regression test does not exercise the changed behavior: both competing impl fixtures use the same `for_.path` (`\"MyError\"`), so the assertion only checks the final `Id` fallback. A regression in the new path-based ordering would still pass this test.",
+              "message": "P1: [tests.rs](libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs#L2716) The new collision regression test does not exercise the changed behavior: both competing impl fixtures use the same `for_.path` (`\"MyError\"`), so the assertion only checks the final `Id` fallback. A regression in the new path-based ordering would still pass this test.",
               "severity": "P1",
               "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
               "line": 2716,
@@ -1648,14 +1648,14 @@
             {
               "message": "`BoundOp::Equal` is still being dropped here: every `WherePredicateDecl` is emitted as `WherePredicate::BoundPredicate`, and the `operator` field is only read to silence the warning. That means a catalogue decoded from `\"operator\": \"Equal\"` will silently turn back into a `:` predicate when it is converted to the extended crate, which breaks round-tripping and changes semantics.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 938,
               "category": "correctness"
             },
             {
               "message": "The new `operator` field is not validated for `Equal` predicates. This boundary only rejects empty `rhs`, so `operator = Equal` with zero or multiple RHS entries is still accepted and then re-serialized by the encoder, leaving illegal domain states representable even though `WherePredicateDecl` documents `Equal` as a single-RHS form.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
               "line": 398,
               "category": "validation"
             }
@@ -1865,14 +1865,14 @@
             {
               "message": "`run()` now hard-fails on an `InherentImplDeclV2` whose `type_name` is not in `local_name_to_id`, but the design note in this same block says these entries should be skipped defensively. As written, one stray or external inherent impl will abort the whole codec run instead of being ignored.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 313,
               "category": "correctness"
             },
             {
-              "message": "The new evaluator tests only assert `!is_red()` at both [signal_evaluator_v2/tests.rs:3177](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3177) and [signal_evaluator_v2/tests.rs:3368](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3368). That leaves room for a Yellow regression to pass, even though the brief says these cases should stay Blue.",
+              "message": "The new evaluator tests only assert `!is_red()` at both [signal_evaluator_v2/tests.rs:3177](libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3177) and [signal_evaluator_v2/tests.rs:3368](libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3368). That leaves room for a Yellow regression to pass, even though the brief says these cases should stay Blue.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
               "line": 3177,
               "category": "test coverage"
             }
@@ -1887,14 +1887,14 @@
             {
               "message": "The new inherent-impl path calls `encode_method_items` without passing the enclosing impl generics, and `encode_method_items` itself only rewrites types against `method.generics`. Any method inside `impl<T> ...` or `trait Foo<T>` that mentions an outer `T` will be encoded as an unresolved path instead of `Type::Generic`, so generic methods will miscompare in phase 2.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 359,
               "category": "correctness"
             },
             {
               "message": "The inherent-impl loop silently skips entries whose `type_name` is missing from `local_name_to_id`. That drops catalogue data without surfacing an error, so a malformed `inherent_impls` entry can disappear from the output and the caller never learns the codec input was inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 313,
               "category": "error handling"
             }
@@ -1909,14 +1909,14 @@
             {
               "message": "`encode_trait` now records trait-level generics on the trait item, but it still calls `encode_method_items(..., &[])`. That means any trait method that mentions a trait parameter, e.g. `trait Foo<T> { fn get(&self) -> T; }`, will encode `T` as an unresolved type in the method signature and fail A/C structural comparison for valid generic traits.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 1423,
               "category": "correctness"
             },
             {
               "message": "`encode_method_items` now uses outer impl generic names for parameter/return parsing, but `build_where_form_generics` still receives only `method_generic_names`. For valid methods like `impl<T> Foo<T> { fn make<U: Into<T>>() {} }`, the `T` inside `U`'s bound will still be encoded as an unresolved type instead of an in-scope generic, so the encoded `Function.generics` will not match rustdoc.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 1697,
               "category": "correctness"
             }
@@ -1931,14 +1931,14 @@
             {
               "message": "These new end-to-end cases only cover the happy path (`impl<T: Clone>` on both sides) plus the legacy empty-A case. They never assert that a changed `Impl.generics` shape becomes non-Blue, so a regression that keeps ignoring impl-block generics would still pass this suite. Add a negative mismatch case here.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
               "line": 2994,
               "category": "testing"
             },
             {
               "message": "The codec tests verify generic-parameter counts and names, but they do not check the actual bound payloads emitted by `build_where_form_generics`. For example, `test_trait_decl_generics_encoded_correctly` would still pass if the inline `Clone` bound or the explicit `where T: Send` predicate were dropped. That leaves the new generic/where-form encoding insufficiently covered.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
               "line": 1724,
               "category": "testing"
             }
@@ -1953,7 +1953,7 @@
             {
               "message": "`inherent_impls` are accepted for any `TypeName`, but the append logic only handles `Struct` and `Enum` items. If a catalogue points an inherent impl at a `TypeAlias` (or any future non-struct/enum type), the codec silently leaves the impl orphaned instead of rejecting it. That produces an impossible Rust item in the output and can skew downstream signal evaluation; this should fail closed with an error.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 389,
               "category": "missing validation"
             }
@@ -1966,14 +1966,14 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `encode_trait` still serializes `supertrait_bounds` with `encode_bound_str` at [libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs:1461](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L1461), so trait generics are not in scope there. A valid declaration like `trait Foo<T>: Into<T>` will encode `T` as an unresolved/path type instead of `Type::Generic`, which breaks the new trait-generic support for any generic supertrait bounds.",
+              "message": "P1: `encode_trait` still serializes `supertrait_bounds` with `encode_bound_str` at [libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs:1461](libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L1461), so trait generics are not in scope there. A valid declaration like `trait Foo<T>: Into<T>` will encode `T` as an unresolved/path type instead of `Type::Generic`, which breaks the new trait-generic support for any generic supertrait bounds.",
               "severity": "P1",
               "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 1461,
               "category": "bug"
             },
             {
-              "message": "P1: The new coverage does not actually pin down the new impl-linking behavior. The inherent-impl test at [libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs:1948](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs#L1948) only checks that some generic `Impl` exists; it never asserts that the generated impl id was appended to the owning type's `impls` list. Likewise, the signal tests at [libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3177](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs#L3177) and [libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3369](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs#L3369) only assert that the final signal is Blue, which would still pass even if the codec stopped emitting `impl_generics`. That leaves the critical Phase-1 linkage path unprotected.",
+              "message": "P1: The new coverage does not actually pin down the new impl-linking behavior. The inherent-impl test at [libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs:1948](libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs#L1948) only checks that some generic `Impl` exists; it never asserts that the generated impl id was appended to the owning type's `impls` list. Likewise, the signal tests at [libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3177](libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs#L3177) and [libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs:3369](libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs#L3369) only assert that the final signal is Blue, which would still pass even if the codec stopped emitting `impl_generics`. That leaves the critical Phase-1 linkage path unprotected.",
               "severity": "P1",
               "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
               "line": 1948,
@@ -1990,14 +1990,14 @@
             {
               "message": "P1: The new inherent-impl codec test only checks `generics.params` and linkage into `Struct.impls`; it never asserts `impl_inner.generics.where_predicates`. A regression in `InherentImplDeclV2.impl_where_predicates` translation would still pass this test, so the new public path is not actually covered end-to-end.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec_tests.rs",
               "line": 1901,
               "category": "testing"
             },
             {
               "message": "P1: The backward-compat test for legacy trait impls only asserts the evaluator returns Blue. It does not verify the A-side `Impl` still encodes empty `generics.params` / `where_predicates`, and the evaluator intentionally ignores impl-block generics in structural comparison. That means this regression test would still pass even if old catalogues started emitting impl generics again.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/tests.rs",
               "line": 3228,
               "category": "testing"
             }
@@ -2112,14 +2112,14 @@
             {
               "message": "`collect_external_from_trait_impls` is still doing raw `find(\"::\")` on the whole `trait_ref` / `for_type` string. That misclassifies valid syn-parseable inputs with generic arguments or relative prefixes, e.g. `Foo<serde::Serialize>` or `crate::Foo`, and can register bogus external crates (`Foo<serde`, `crate`) before the real parse runs. The encoder then emits spurious `external_crates` entries and can mis-normalize impl metadata. This needs AST-based crate extraction, not string slicing.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 193,
               "category": "correctness"
             },
             {
               "message": "`v3_type_entry_details` now returns `—` for every non-typestate/non-enum entry, so `SecondaryAdapter` no longer renders its declared trait impls at all. That is a user-visible regression in the generated type catalogue: the Details column loses the only signal that an adapter implements traits, even though the surrounding docs still describe `SecondaryAdapter` as showing `impl Trait1, impl Trait2`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
               "line": 336,
               "category": "correctness"
             }
@@ -2134,21 +2134,21 @@
             {
               "message": "`resolve_trait_ref_for_top_level` only treats bare single-segment names as local. Valid local impl paths such as `crate::MyTrait`, `self::MyTrait`, `super::MyTrait`, or `my_crate::MyTrait` fall into the external-crate branch, which synthesizes an external crate entry and produces the wrong impl identity for a local trait.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 1866,
               "category": "correctness"
             },
             {
               "message": "The self-type attachment check still keys off `!s.contains(\"::\")`. A local impl written as `crate::Foo` or `my_crate::Foo` parses to the local `Foo` id, but this code leaves the impl orphaned instead of pushing it onto `Foo.impls`, so Phase 1 no longer sees it as part of the type tree.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 354,
               "category": "correctness"
             },
             {
               "message": "The details renderer compares `ti.for_type.as_str()` to the raw `type_name`. That misses the same qualified local forms (`crate::Foo`, `self::Foo`, `my_crate::Foo`), so SecondaryAdapter trait impls can disappear from the table even though they belong to that type. The comparison needs normalization, not raw string equality.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
               "line": 363,
               "category": "correctness"
             }
@@ -2185,7 +2185,7 @@
             {
               "message": "P1: `SecondaryAdapter` details now filters top-level `trait_impls` by `for_type_bare_name(...) == type_name`, but `for_type_bare_name` only strips `crate::`/`self::`/`super::` and never removes generic arguments or the self-crate prefix. As a result, valid entries like `impl Trait for Foo<T>` or `impl Trait for my_crate::Foo` will not match the `Foo` row and will render as `—`, so the new schema can silently hide declared impls in the type catalogue view.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
               "line": 322,
               "category": "correctness"
             }
@@ -2200,7 +2200,7 @@
             {
               "message": "P1: `v3_type_entry_details` now associates top-level impls with a type by comparing only the bare `for_type` name, so an external self type like `std::vec::Vec<i32>` will be rendered on any local `Vec` row. The new schema explicitly allows external self types, so this can produce incorrect `domain-types.md` output whenever a local type shares a name with an external impl target.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
               "line": 395,
               "category": "correctness"
             }
@@ -2215,14 +2215,14 @@
             {
               "message": "Local self types with generic arguments are misclassified as non-local, so their trait impls are not attached to the owning type. `normalize_local_short_name` does not strip `<...>` before the `local_name_to_id` lookup, which means valid inputs like `Foo<T>` or `crate::Foo<T>` end up encoded as orphan impls instead of being appended to the type's `impls` list.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 582,
               "category": "correctness"
             },
             {
               "message": "`trait_ref` is never parsed or validated as syntax in the top-level trait-impl encoder. The code only splits on the first `<` and fabricates a canonical string, so malformed non-empty inputs can produce bogus `Impl` items instead of an error, and type references nested inside trait generic args are never resolved through the type parser.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 1897,
               "category": "validation"
             }
@@ -2237,14 +2237,14 @@
             {
               "message": "Top-level `trait_impls` are now encoded independently, but this orphan-impl pass still gates insertion on the owning type's action. For a `Modify` local type, `parent_action` becomes `Modify`, so `effective_action != Some(Add)` and the impl is skipped entirely. That drops valid impls from S and will produce false missing-impl deltas in Phase 2.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
               "line": 464,
               "category": "correctness"
             },
             {
               "message": "Removing the `Equal`-lhs shape check makes the decoder accept catalogues that the encoder still rejects. A DTO like `where <T as Trait>::Assoc = U` now deserializes successfully here, but `CatalogueToExtendedCrateCodec::encode` later errors on the qualified-path LHS, so round-tripping the new schema can fail after a successful decode.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
               "line": 423,
               "category": "error handling"
             }
@@ -2259,21 +2259,21 @@
             {
               "message": "The local-self-type fast path discards the original `for_type` syntax whenever it matches a local type id: `impl Trait for Foo<Vec<T>>` is encoded as `Foo` because this branch jumps straight to `resolved_path_type(local_id, for_type_short)`. That loses valid generic arguments and nested refs on the self type, so the new top-level trait-impl schema is no longer lossless for permissive inputs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 351,
               "category": "correctness"
             },
             {
               "message": "`resolve_trait_ref_for_top_level` validates the trait reference, then returns `Path { ..., args: None }` after splicing the generic suffix into `path`. That makes any refs inside `trait_ref` generic args invisible to later traversals, including unresolved-marker checks and ref collection, so impls like `impl From<CatalogueLoaderError> for ...` can silently drop dependencies from Phase 1.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 1892,
               "category": "correctness"
             },
             {
               "message": "The v3 renderer only treats bare names plus `crate::`/`self::`/`super::` as local self types. The new codec also accepts self-crate-qualified forms such as `my_crate::Foo`, but those now fall through as external and disappear from the `SecondaryAdapter` details column, so rendered catalogues can omit valid impls.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
               "line": 329,
               "category": "correctness"
             }
@@ -2286,14 +2286,14 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: [type_catalogue_render.rs:330](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs:330) / [type_catalogue_render.rs:406](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs:406) still classify impls from the raw `for_type` string. That means supported external self-types are either misattributed or lost in the markdown view: fully-qualified externals like `std::vec::Vec<i32>` never match any local `SecondaryAdapter` row, while bare prelude names like `Vec` are treated as local even though the codec resolves them as external std types.",
+              "message": "P1: [type_catalogue_render.rs:330](libs/infrastructure/src/type_catalogue_render.rs:330) / [type_catalogue_render.rs:406](libs/infrastructure/src/type_catalogue_render.rs:406) still classify impls from the raw `for_type` string. That means supported external self-types are either misattributed or lost in the markdown view: fully-qualified externals like `std::vec::Vec<i32>` never match any local `SecondaryAdapter` row, while bare prelude names like `Vec` are treated as local even though the codec resolves them as external std types.",
               "severity": "P1",
               "file": "libs/infrastructure/src/type_catalogue_render.rs",
               "line": 330,
               "category": "correctness"
             },
             {
-              "message": "P1: [catalogue_to_extended_crate_codec.rs:378](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs:378) preserves external self-type spellings verbatim. Because the later impl-identity code uses the raw `for_` path as a collision tiebreaker, the new external-self-type support can pick different winners on S vs C when a local type and an external type share the same short name but the catalogue spelling does not exactly match rustdoc's spelling.",
+              "message": "P1: [catalogue_to_extended_crate_codec.rs:378](libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs:378) preserves external self-type spellings verbatim. Because the later impl-identity code uses the raw `for_` path as a collision tiebreaker, the new external-self-type support can pick different winners on S vs C when a local type and an external type share the same short name but the catalogue spelling does not exactly match rustdoc's spelling.",
               "severity": "P1",
               "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 378,
@@ -2310,14 +2310,14 @@
             {
               "message": "P1: The new external-crate prepass is still string-slicing the raw trait/self-type text. A valid absolute path like `::core::fmt::Display` makes `first_seg` empty, so `ensure_external_crate(\"\")` can register a phantom blank crate and shift external-crate ids in the output. This needs to be derived from the parsed `syn` path, not `find(\"::\")` on the raw string.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 211,
               "category": "correctness"
             },
             {
               "message": "P1: `resolve_trait_ref_for_top_level` reassembles the trait path by splicing the original substring after the first `<` back onto the parsed base path. That preserves arbitrary whitespace and qualifier formatting inside generic args instead of canonicalizing them from the parsed AST, so syntactically valid inputs like `From< CatalogueLoaderError >` or `From<crate::Foo>` can produce identity keys that do not match rustdoc's canonical form.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 1943,
               "category": "correctness"
             }
@@ -2330,9 +2330,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1 in [catalogue_to_extended_crate_codec.rs:353](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L353) and [catalogue_to_extended_crate_codec.rs:600](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L600): `normalize_local_short_name` strips every `for_type` down to its last path segment before deciding whether it is local. A qualified external self type such as `std::vec::Vec<i32>` will therefore be treated as local `Vec` whenever the crate has a local `Vec`, so the codec encodes the impl against the wrong self type. That can corrupt Phase 1/2 matching for valid cross-crate impls.",
+              "message": "P1 in [catalogue_to_extended_crate_codec.rs:353](libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L353) and [catalogue_to_extended_crate_codec.rs:600](libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs#L600): `normalize_local_short_name` strips every `for_type` down to its last path segment before deciding whether it is local. A qualified external self type such as `std::vec::Vec<i32>` will therefore be treated as local `Vec` whenever the crate has a local `Vec`, so the codec encodes the impl against the wrong self type. That can corrupt Phase 1/2 matching for valid cross-crate impls.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 353,
               "category": "logic"
             }
@@ -2361,7 +2361,7 @@
             {
               "message": "`for_type_local_bare_name` treats every bare `for_type` as local, so a valid top-level impl that the codec resolves from a bare std-prelude name like `Vec`/`Option` will be filtered out here and never show up in the rendered catalogue. That makes the new top-level `trait_impls` rendering diverge from the underlying document for accepted inputs without an explicit crate prefix.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
               "line": 319,
               "category": "correctness"
             }
@@ -2398,7 +2398,7 @@
             {
               "message": "The new impl identity sort key is not actually stable across the S/C split for external self-types. A-side `parse_type_ref_str` preserves the fully qualified `for_type` path (`std::vec::Vec<i32>`), while rustdoc can surface the same impl with a bare `Vec` path; because `build_impl_identity_map` sorts by `for_path_raw` before de-duplicating, duplicate-key impls can be resolved differently on S and C and the signal can flip even when the logical impls match.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
               "line": 423,
               "category": "correctness"
             }
@@ -2413,14 +2413,14 @@
             {
               "message": "`TraitImplDto` is now accepted as any syntactically valid `TypeRef`, but the rest of the pipeline only knows how to encode/decode a path-like trait reference. `trait_impl_from_dto` only checks `syn::Type` syntax, while `resolve_trait_ref_for_top_level` later rejects anything that is not `Type::ResolvedPath`, so JSON such as `{\"trait_ref\":\"&Foo\", ...}` can enter `CatalogueDocument` and then fail downstream instead of being rejected at the codec boundary. Tighten the DTO validation to the same path-only invariant the encoder expects.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
               "line": 529,
               "category": "error handling"
             },
             {
               "message": "The new standalone-impl `Modify`/`Delete` handling only removes or moves the root `Impl` item. It does not transfer the impl subtree (`Impl.items`) the way the existing impl helpers do, so any baseline method/assoc-item children can be left orphaned in `S` or missing from `D`. That leaves the impl graph internally inconsistent and can leak stale items into later passes.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
               "line": 502,
               "category": "logic error"
             }
@@ -2433,16 +2433,16 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: [builder.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs#L391) builds the baseline impl identity map with `crate_name = \"\"`, even though `build_impl_identity_map` only documents the empty-string fallback for A-side codec maps. If rustdoc omits a local trait id from `krate.paths`, this disables the real crate-name fallback and can mis-key the B-side impl, which in turn causes false `Modify`/`Delete` contradictions or missed `Reference`/reinsertion matching.",
+              "message": "P1: [builder.rs](libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs#L391) builds the baseline impl identity map with `crate_name = \"\"`, even though `build_impl_identity_map` only documents the empty-string fallback for A-side codec maps. If rustdoc omits a local trait id from `krate.paths`, this disables the real crate-name fallback and can mis-key the B-side impl, which in turn causes false `Modify`/`Delete` contradictions or missed `Reference`/reinsertion matching.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
               "line": 391,
               "category": "correctness"
             },
             {
-              "message": "P1: [type_catalogue_render.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs#L319) assumes every bare `for_type` string is local. The codec still resolves bare prelude names such as `Vec`, `Option`, or `Result` to external std types when no local type matches, so those valid trait impls will disappear from the rendered catalogue instead of being shown on the correct row.",
+              "message": "P1: [type_catalogue_render.rs](libs/infrastructure/src/type_catalogue_render.rs#L319) assumes every bare `for_type` string is local. The codec still resolves bare prelude names such as `Vec`, `Option`, or `Result` to external std types when no local type matches, so those valid trait impls will disappear from the rendered catalogue instead of being shown on the correct row.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
               "line": 319,
               "category": "correctness"
             }
@@ -2455,7 +2455,7 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `validate_for_type_not_bare_prelude` rejects any bare prelude name, even when it is a legitimate self-crate type. That breaks decode/encode round-trips for valid catalogues that happen to define local types named like `Vec` or `Option`, which the render path still treats as valid local names ([decode.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs#L559), [encode.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs#L235), [type_catalogue_render.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs#L1087)).",
+              "message": "P1: `validate_for_type_not_bare_prelude` rejects any bare prelude name, even when it is a legitimate self-crate type. That breaks decode/encode round-trips for valid catalogues that happen to define local types named like `Vec` or `Option`, which the render path still treats as valid local names ([decode.rs](libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs#L559), [encode.rs](libs/infrastructure/src/tddd/catalogue_document_codec/encode.rs#L235), [type_catalogue_render.rs](libs/infrastructure/src/type_catalogue_render.rs#L1087)).",
               "severity": "P1",
               "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode.rs",
               "line": 559,
@@ -2479,7 +2479,7 @@
             {
               "message": "`Modify` now removes B-seeded impl subtrees from `S` before the standalone-impl pass runs, but the `Delete` branch still only moves an impl when `state.s_index` already contains its root. If a deleted impl was evicted by that earlier parent-`Modify` cleanup, this branch becomes a no-op and the impl disappears from both `S` and `D`, which can suppress the expected delete signal / leave `D` incomplete.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
               "line": 526,
               "category": "logic error"
             }
@@ -2494,7 +2494,7 @@
             {
               "message": "The Delete eviction path rebuilds the impl root and then inserts each child under a freshly allocated `child_d_id`, but `root.items` still points at the ids produced by `remap_child_ids_in_item(..., &state.b_id_remap)`. Those ids are not updated to the new D-side ids, so the reconstructed impl in D has dangling child references and an inconsistent subtree.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
               "line": 658,
               "category": "data corruption"
             }
@@ -2509,7 +2509,7 @@
             {
               "message": "P1: The new B-side crate-name normalization is not applied symmetrically on the A-side key builder. `b_impl_map` now strips `my_crate::MyTrait` to `MyTrait` when `krate.paths` is incomplete, but `a_impl_map` still uses `\"\"`, so an A-side `trait_ref` written with an explicit crate prefix can produce a different identity key than the baseline and be misclassified as Add / trigger a false contradiction. This is especially likely because the codec preserves the user-supplied path verbatim.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/phase1/builder.rs",
               "line": 395,
               "category": "correctness"
             }
@@ -2612,14 +2612,14 @@
             {
               "message": "`format_type_strip_type_params` / `format_generic_args_strip_type_params` still decide whether to strip lifetime params by comparing the bare name (`lt.trim_start_matches('\\'')`) against `type_params`, but `type_ref_parser` now stores lifetime generic-param names as `\"'a\"` / `\"'static\"`. That means impl-block lifetime params stop being stripped from method/impl identity keys, which can flip otherwise equal items into mismatches.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
               "line": 1059,
               "category": "correctness"
             },
             {
               "message": "The new HRTB support never canonicalizes `GenericArg::Lifetime`: `format_generic_args_with_canon` still returns the raw lifetime string, so only borrowed-reference lifetimes participate in the positional canon map. Equivalent bounds like `for<'a> Foo<'a>` and `for<'b> Foo<'b>` will still fingerprint differently even though lifetime-only HRTBs are now meant to compare equal.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
               "line": 474,
               "category": "correctness"
             }
@@ -2634,14 +2634,14 @@
             {
               "message": "P1: `format_generic_bounds_with_canon` now supports lifetime-only HRTB binders, but it keys the binder map off `hp.name` verbatim. This module already accepts both bare (`\"a\"`) and apostrophe-prefixed (`\"'a\"`) lifetime names elsewhere, and `GenericArg::Lifetime` / `BorrowedRef` lifetimes are still stored with a leading apostrophe. On a bare-name binder, the new HRTB path will miss the lookup and the comparison will still false-negative instead of treating the binders as equivalent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
               "line": 1416,
               "category": "correctness"
             },
             {
               "message": "P1: The new HRTB support is not mirrored in the strip-aware formatter used by impl comparison. `format_generic_bounds_strip_type_params` still renders HRTB binders via `format_hrtb_type_params`, which drops lifetime binders entirely, and `items_structurally_equal` uses the stripped `for_` fingerprint for impls. That means a nested lifetime-only HRTB inside a generic arg/constraint can collapse to the same stripped key as the non-HRTB form, causing distinct impls to compare equal.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
               "line": 1262,
               "category": "correctness"
             }
@@ -2656,7 +2656,7 @@
             {
               "message": "The new lifetime-only HRTB support still erases any borrowed-reference lifetime that is not one of the binder lifetimes. Because `bounds_supported()` now lets these bounds through, supported cases can silently compare concrete lifetimes as if they were elided. For example, `for<'a,'b> Fn(&'static str)` and `for<'a,'b> Fn(&str)` both collapse to the same fingerprint here, which turns a real mismatch into a false Blue instead of failing closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
               "line": 293,
               "category": "correctness"
             }

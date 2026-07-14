@@ -32,14 +32,14 @@
             {
               "message": "Step 11 now explicitly regenerates `plan.md`, but the new 12a glob check never verifies it. That leaves one of the `cargo make track-sync-views` outputs able to stay missing or stale without tripping the final gate, so the stated \"all outputs are freshly regenerated\" post-condition is not actually enforced.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "file": ".claude/agents/type-designer.md",
               "line": 145,
               "category": "correctness"
             },
             {
               "message": "The freshness gate only re-validates `catalogue-spec-signals`; it never checks the `type-signals` artifact from step 10. By inference, a skipped or stale `type-signals` run can still leave `<layer>-types.md` incomplete while 12a/12b both pass, so the new self-verify does not cover all pipeline outputs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "file": ".claude/agents/type-designer.md",
               "line": 166,
               "category": "correctness"
             }
@@ -52,16 +52,16 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: The new mandatory 12b gate (`bin/sotp verify catalogue-spec-signals`) is not reflected in the Bash allowlist. The Scope Ownership/Bash usage section still lists only the `track ...` subcommands plus `track-sync-views`, so an agent following the whitelist literally can treat the freshness check as out of scope and skip it. See [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L526](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L526) and [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L532](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L532).",
+              "message": "P1: The new mandatory 12b gate (`bin/sotp verify catalogue-spec-signals`) is not reflected in the Bash allowlist. The Scope Ownership/Bash usage section still lists only the `track ...` subcommands plus `track-sync-views`, so an agent following the whitelist literally can treat the freshness check as out of scope and skip it. See [.claude/agents/type-designer.md#L526](.claude/agents/type-designer.md#L526) and [.claude/agents/type-designer.md#L532](.claude/agents/type-designer.md#L532).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "file": ".claude/agents/type-designer.md",
               "line": 526,
               "category": "correctness"
             },
             {
-              "message": "P1: Step 12a is internally inconsistent about how many paths it verifies. The block enumerates 9 paths total (7 per-layer paths plus `contract-map.md` and `plan.md`), but the closing sentence says “all 8 expected paths.” That mismatch makes the final self-check contract ambiguous and easy to misapply. See [/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L181](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md#L181).",
+              "message": "P1: Step 12a is internally inconsistent about how many paths it verifies. The block enumerates 9 paths total (7 per-layer paths plus `contract-map.md` and `plan.md`), but the closing sentence says “all 8 expected paths.” That mismatch makes the final self-check contract ambiguous and easy to misapply. See [.claude/agents/type-designer.md#L181](.claude/agents/type-designer.md#L181).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "file": ".claude/agents/type-designer.md",
               "line": 181,
               "category": "correctness"
             }
@@ -76,7 +76,7 @@
             {
               "message": "Step 12 still only proves freshness for `catalogue-spec-signals.json`; the graph outputs, `plan.md`, `contract-map.md`, and `<layer>-type-signals.json` are only checked for existence. A stale artifact from an earlier run can still satisfy 12a/12b, so the new post-condition that all prior outputs are “freshly regenerated” is not actually enforced.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "file": ".claude/agents/type-designer.md",
               "line": 145,
               "category": "correctness"
             }
@@ -91,7 +91,7 @@
             {
               "message": "P1: Step 12a still does not prove `<layer>-types.json` was freshly produced in this session. The only source-of-truth artefact in the existence check is globbed, so a stale catalogue file left over from a prior run will satisfy the guard even if step 7 was skipped. That leaves the exact skipped-step/stale-artifact failure mode this change is meant to block. Consider requiring a same-session write receipt for step 7, or a content/freshness check on `<layer>-types.json`, not just existence.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "file": ".claude/agents/type-designer.md",
               "line": 157,
               "category": "correctness"
             }
@@ -198,7 +198,7 @@
             {
               "message": "`ShellParserPortAdapter` reconstructs `SimpleCommand` with `redirect_texts: Vec::new()` and `has_output_redirect: false`, so the downstream guard policy can no longer see or block output redirects or heredoc-based git references. Once commands cross this new boundary, inputs like `> /tmp/file` are treated as allowed instead of blocked.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/guard.rs",
+              "file": "libs/usecase/src/guard.rs",
               "line": 108,
               "category": "security"
             }
@@ -213,7 +213,7 @@
             {
               "message": "P1: `ShellParserPortAdapter` discards the parser's error string and rewrites every failure to `ParseError::UnmatchedQuote`, so `GuardCheckInteractor::check` will always surface the unmatched-quote block reason even when the underlying parser failed for a different cause. That misreports parser failures and defeats the domain's distinction between nesting-depth and syntax failures.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/guard.rs",
+              "file": "libs/usecase/src/guard.rs",
               "line": 123,
               "category": "correctness"
             }
@@ -226,7 +226,7 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P0: [libs/usecase/src/guard.rs:131](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/guard.rs#L131) reconstructs argv with `split_whitespace()` after the port has already flattened each command into a single string. That destroys shell quoting/escaping, so a command like `git -C \"repo dir\" commit` is re-tokenized as `git`, `-C`, `repo`, `dir`, `commit`; `extract_git_subcommand()` then skips only one `-C` argument and can misidentify the effective subcommand, allowing guarded git operations to bypass the policy. This is a security-relevant false negative in the new guard boundary.",
+              "message": "P0: [libs/usecase/src/guard.rs:131](libs/usecase/src/guard.rs#L131) reconstructs argv with `split_whitespace()` after the port has already flattened each command into a single string. That destroys shell quoting/escaping, so a command like `git -C \"repo dir\" commit` is re-tokenized as `git`, `-C`, `repo`, `dir`, `commit`; `extract_git_subcommand()` then skips only one `-C` argument and can misidentify the effective subcommand, allowing guarded git operations to bypass the policy. This is a security-relevant false negative in the new guard boundary.",
               "severity": "P0",
               "file": "libs/usecase/src/guard.rs",
               "line": 131,
@@ -345,21 +345,21 @@
             {
               "message": "`NextTaskOutput` and `TaskCountsOutput` are missing fields that the current track CLI output already relies on: next-task prints the task `status`, and task-counts prints `total`. As written, this service cannot faithfully replace the existing behavior without recomputing those values outside the usecase boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "file": "libs/usecase/src/task_ops.rs",
               "line": 39,
               "category": "api-contract"
             },
             {
               "message": "`schema_version` is hard-coded to `3`, so `resolve_phase` will misclassify older v1/v2 tracks where branchless planning should still resolve to `Planning` instead of `Ready to Activate`. This wrapper needs the real schema version from metadata rather than assuming the current one.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
+              "file": "libs/usecase/src/track_phase.rs",
               "line": 145,
               "category": "correctness"
             },
             {
               "message": "Every port failure is mapped to `ExportFailed`, so the public `SerializationFailed` variant is never reachable even though the error type and docs promise it. The infrastructure adapter already distinguishes export vs serialization in its error strings, so the interactor should preserve that distinction.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/export_schema.rs",
+              "file": "libs/usecase/src/export_schema.rs",
               "line": 103,
               "category": "error-handling"
             }
@@ -372,14 +372,14 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `TaskOperationInteractor` never enforces the branch guard that these commands advertise. `skip_branch_check` is ignored in all four mutation methods, and the dedicated `BranchGuardFailed` / `BranchlessGuardFailed` variants are never emitted, so task mutations can still run on non-track branches instead of being rejected. See [task_ops.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs#L118) and [task_ops.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs#L240).",
+              "message": "P1: `TaskOperationInteractor` never enforces the branch guard that these commands advertise. `skip_branch_check` is ignored in all four mutation methods, and the dedicated `BranchGuardFailed` / `BranchlessGuardFailed` variants are never emitted, so task mutations can still run on non-track branches instead of being rejected. See [task_ops.rs](libs/usecase/src/task_ops.rs#L118) and [task_ops.rs](libs/usecase/src/task_ops.rs#L240).",
               "severity": "P1",
               "file": "libs/usecase/src/task_ops.rs",
               "line": 118,
               "category": "correctness"
             },
             {
-              "message": "P1: `TrackPhaseInteractor::resolve` hardcodes `schema_version = 3` and ignores `items_dir`, but `resolve_phase` uses the real schema version to decide between `Planning` and `ReadyToActivate`. Any track whose stored schema version is not 3 will be reported with the wrong phase and next command. See [track_phase.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs#L145).",
+              "message": "P1: `TrackPhaseInteractor::resolve` hardcodes `schema_version = 3` and ignores `items_dir`, but `resolve_phase` uses the real schema version to decide between `Planning` and `ReadyToActivate`. Any track whose stored schema version is not 3 will be reported with the wrong phase and next command. See [track_phase.rs](libs/usecase/src/track_phase.rs#L145).",
               "severity": "P1",
               "file": "libs/usecase/src/track_phase.rs",
               "line": 145,
@@ -396,7 +396,7 @@
             {
               "message": "`TrackPhaseInteractor::resolve` always passes `schema_version = 3` into `resolve_phase`. That collapses the schema-version branch in `domain::track_phase`, so a branchless v2 track is reported as `Ready to Activate` instead of `Planning` (the domain layer still exercises the v2 case).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
+              "file": "libs/usecase/src/track_phase.rs",
               "line": 160,
               "category": "correctness"
             }
@@ -411,14 +411,14 @@
             {
               "message": "P1: `read_schema_version_from_metadata` silently converts any missing or malformed `metadata.json` into schema version `5`, so a corrupt track can be reported as a valid v5 track instead of failing. That can change the resolved phase output and hide filesystem/data corruption. This should propagate an error through `TrackPhaseError` instead of defaulting.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
+              "file": "libs/usecase/src/track_phase.rs",
               "line": 122,
               "category": "correctness"
             },
             {
               "message": "P1: Branch validation now shells out to `git` directly from usecase code. That makes `TaskOperationService` depend on the host Git installation and checkout state, and it cannot be mocked in unit tests. This violates the repo's boundary/testability rules; the branch source should be injected behind a port or resolved in the composition root.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "file": "libs/usecase/src/task_ops.rs",
               "line": 242,
               "category": "architecture"
             }
@@ -433,14 +433,14 @@
             {
               "message": "P1: `TrackPhaseInteractor` now reaches straight into `metadata.json` with `std::fs::read_to_string`/`serde_json` instead of going through the existing store/port boundary. That adds a hidden filesystem dependency to the usecase layer, makes the service impossible to exercise with only mocked `TrackReader`/`ImplPlanReader`, and breaks the hexagonal rule that infrastructure access stays behind traits.",
               "severity": "P1",
-              "file": "\n/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
+              "file": "\nlibs/usecase/src/track_phase.rs",
               "line": 133,
               "category": "architecture"
             },
             {
               "message": "P1: `verdict_to_output` is `pub` and its signature exposes `domain::review_v2::ReviewApprovalVerdict`. That leaks a domain type into the public usecase API, which defeats the boundary the rest of this bundle is trying to establish and lets downstream code depend on domain review types through the usecase crate.",
               "severity": "P1",
-              "file": "\n/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/check_approved.rs",
+              "file": "\nlibs/usecase/src/review_v2/check_approved.rs",
               "line": 133,
               "category": "architecture"
             }
@@ -455,7 +455,7 @@
             {
               "message": "`transition_task`, `add_task`, `set_override`, and `clear_override` all persist the mutation and then call `load_impl_plan()` only to compute `derived_status`. If that second read fails, the method returns `StoreFailed(...)` after the write has already succeeded, so callers observe a failure for a committed change and may retry into a duplicate or inconsistent state. Make the status lookup non-fatal, or perform it before the write if you need it to gate the operation.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "file": "libs/usecase/src/task_ops.rs",
               "line": 367,
               "category": "correctness"
             }
@@ -492,21 +492,21 @@
             {
               "message": "After each successful mutation, `transition_task`/`add_task`/`set_override`/`clear_override` does a second `load_impl_plan()` and turns any read failure into `StoreFailed`. That lets the method return `Err` after the write has already committed, so a transient read error can prompt a duplicate retry against an already-mutated track.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "file": "libs/usecase/src/task_ops.rs",
               "line": 372,
               "category": "correctness"
             },
             {
               "message": "`BranchReaderFn` is exported as a new public boundary type, but the approved usecase catalogue does not include it. That leaks an undocumented dependency past the usecase boundary and means branch-guard enforcement depends on hidden wiring instead of the published `TaskOperationService` contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "file": "libs/usecase/src/task_ops.rs",
               "line": 217,
               "category": "architecture"
             },
             {
               "message": "`SchemaVersionReaderFn` is exported as a new public boundary type, but the approved catalogue only models `TrackPhaseOutput`, `TrackPhaseError`, `TrackPhaseService`, and `TrackPhaseInteractor`. A CLI wired from the documented contract cannot supply this extra reader without undocumented glue, so the public API no longer matches the catalogue.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
+              "file": "libs/usecase/src/track_phase.rs",
               "line": 102,
               "category": "architecture"
             }
@@ -521,14 +521,14 @@
             {
               "message": "P1: `TaskOperationInteractor::new` always stores `branch_reader: None`, and the only constructor that can inject a reader is `#[cfg(test)]`. In real builds that makes `skip_branch_check = false` a no-op, so branch mismatches are never rejected and mutations can run on the wrong checkout.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "file": "libs/usecase/src/task_ops.rs",
               "line": 248,
               "category": "correctness"
             },
             {
               "message": "P1: `TrackPhaseInteractor` has the same production-only gap: `with_schema_version_reader` is test-only, so the only runtime path falls back to `schema_version = 5`. That will misclassify older tracks, which the code itself notes can change the phase/next-command result.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
+              "file": "libs/usecase/src/track_phase.rs",
               "line": 196,
               "category": "correctness"
             }
@@ -719,14 +719,14 @@
             {
               "message": "P1: `transition_task` calls `reject_branchless_guard` before the explicit not-found path, then maps every failure from that guard to `BranchGuardFailed`. If the track does not exist, callers get the wrong error variant instead of `TrackNotFound`, which breaks downstream error handling and makes a missing track indistinguishable from a real branch-policy failure.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "file": "libs/usecase/src/task_ops.rs",
               "line": 381,
               "category": "correctness"
             },
             {
               "message": "P1: the only constructor that can inject a branch reader is `#[cfg(test)] pub(crate) fn with_branch_reader`, while `TaskOperationInteractor::new` always stores `branch_reader: None`. In non-test builds that makes `skip_branch_check = false` a no-op, so branch mismatches are never rejected by this service.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "file": "libs/usecase/src/task_ops.rs",
               "line": 273,
               "category": "correctness"
             }
@@ -741,7 +741,7 @@
             {
               "message": "`TaskOperationInteractor::new()` now hard-codes `branch_reader: None`, and the only constructor that can inject a branch reader is `#[cfg(test)]`. In non-test builds `enforce_branch_guard()` therefore takes the no-op path, so `skip_branch_check = false` no longer rejects branch mismatches or detached HEAD state and task mutations can run on the wrong checkout.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "file": "libs/usecase/src/task_ops.rs",
               "line": 273,
               "category": "correctness"
             }
@@ -793,7 +793,7 @@
             {
               "message": "`TaskOperationInteractor::new()` still leaves `branch_reader` unset, so `enforce_branch_guard()` returns early and every mutation on that instance silently skips the branch check. Because this constructor remains public, any production caller that uses it can mutate a track on the wrong checkout with `skip_branch_check = false` and no error.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "file": "libs/usecase/src/task_ops.rs",
               "line": 277,
               "category": "logic"
             }
@@ -808,7 +808,7 @@
             {
               "message": "`ReviewCheckApprovedInteractor::check_approved` has no behavior test covering its public path. The current tests only exercise `verdict_to_output` and error-variant construction, so the new track-id validation and closure delegation here can regress without a failing test.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/check_approved.rs",
+              "file": "libs/usecase/src/review_v2/check_approved.rs",
               "line": 123,
               "category": "testing"
             }
@@ -838,21 +838,21 @@
             {
               "message": "The new production path in `TaskOperationInteractor::new` is only exercised for the branchless-activation case. All branch-mismatch and detached-HEAD assertions still go through the test-only `with_branch_reader`, so a regression in `new` that drops or miswires the injected branch reader would not be caught by the suite. Add a `new`-based branch-guard failure test.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/task_ops.rs",
+              "file": "libs/usecase/src/task_ops.rs",
               "line": 286,
               "category": "testing"
             },
             {
               "message": "`TrackPhaseInteractor::new` is only tested with schema version 5. The legacy v1/v2 path described in the constructor docs is still only exercised via the test-only `with_schema_version_reader`, so a regression that ignores the caller-provided schema version or hardcodes 5 would slip through. Add a `new`-based test for a non-5 legacy track.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_phase.rs",
+              "file": "libs/usecase/src/track_phase.rs",
               "line": 141,
               "category": "testing"
             },
             {
-              "message": "Both [spec_refs.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_verify/spec_refs.rs#L169) and [type_signals.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_verify/type_signals.rs#L150) only cover the happy path for their new public wrappers. There is no test that an `Err` returned by the injected closure is propagated unchanged, which leaves the public error contract unverified. Add one failure-path test for each wrapper.",
+              "message": "Both [spec_refs.rs](libs/usecase/src/catalogue_verify/spec_refs.rs#L169) and [type_signals.rs](libs/usecase/src/catalogue_verify/type_signals.rs#L150) only cover the happy path for their new public wrappers. There is no test that an `Err` returned by the injected closure is propagated unchanged, which leaves the public error contract unverified. Add one failure-path test for each wrapper.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_verify/spec_refs.rs",
+              "file": "libs/usecase/src/catalogue_verify/spec_refs.rs",
               "line": 169,
               "category": "testing"
             }
@@ -895,14 +895,14 @@
             {
               "message": "The public `files_by_string` signature does not match the catalogue contract: `usecase-types.json` expects the parameter name `scope`, but this method is declared as `scope_name`. That leaves the API shape out of sync with the authoritative usecase declaration even though the Rust types are otherwise correct.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/scope_query.rs",
+              "file": "libs/usecase/src/review_v2/scope_query.rs",
               "line": 147,
               "category": "contract-mismatch"
             },
             {
               "message": "`LayerId::try_new` failures are being converted into `RenderContractMapError::LayerNotFound` before `load_all` runs, so a syntactically invalid `--layers` token is reported as 'not enabled' rather than invalid input. That collapses two distinct failure modes and contradicts the documented meaning of `LayerNotFound`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/contract_map_workflow.rs",
+              "file": "libs/usecase/src/contract_map_workflow.rs",
               "line": 184,
               "category": "error-handling"
             }
@@ -917,14 +917,14 @@
             {
               "message": "Invalid `layer_filter` syntax is being converted into `RenderContractMapError::LayerNotFound` here (`format!(\"{name}: {e}\")`). That makes a malformed layer name look like a missing enabled layer, so callers cannot distinguish bad input from a real absence in the catalogue and will get a misleading remediation hint.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/contract_map_workflow.rs",
+              "file": "libs/usecase/src/contract_map_workflow.rs",
               "line": 184,
               "category": "error handling"
             },
             {
               "message": "A malformed `track_id` is turned into `CatalogueLoaderError::LayerDiscoveryFailed` before the loader runs, which then surfaces as `RunCatalogueLintError::CatalogueLoad`. That reclassifies a user validation error as an infrastructure failure, so the string-based lint API cannot tell callers that the input itself was invalid.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_lint_workflow.rs",
+              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
               "line": 156,
               "category": "error handling"
             }
@@ -939,7 +939,7 @@
             {
               "message": "Both string-based guard helpers validate `track_id_str` before the underlying early-return path. The typed `reject_branchless_implementation_transition` / `reject_branchless_guard` functions return `Ok(())` immediately for non-implementation statuses, so these wrappers now fail on no-op inputs (for example `todo`) whenever the track id is malformed. That changes the semantics of the API and can break callers that invoke the helper unconditionally.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_resolution.rs",
+              "file": "libs/usecase/src/track_resolution.rs",
               "line": 156,
               "category": "correctness"
             }
@@ -954,21 +954,21 @@
             {
               "message": "`RunCatalogueLintError` adds a public `InvalidTrackId` variant here, but the authoritative declaration in `track/items/cli-via-usecase-only-2026-04-30/usecase-types.json` still lists only `CatalogueLoad`, `LintExecution`, `InvalidLayer`, and `InvalidRuleSpec` for this type. That leaves the usecase API and the generated contract/schema out of sync.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_lint_workflow.rs",
+              "file": "libs/usecase/src/catalogue_lint_workflow.rs",
               "line": 98,
               "category": "contract"
             },
             {
               "message": "`RenderContractMapError` adds `InvalidLayerFilter`, but `track/items/cli-via-usecase-only-2026-04-30/usecase-types.json` still declares only the six older variants and does not include a layer-filter parse error. The public Rust API therefore no longer matches the contract the rest of the pipeline is checking.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/contract_map_workflow.rs",
+              "file": "libs/usecase/src/contract_map_workflow.rs",
               "line": 109,
               "category": "contract"
             },
             {
               "message": "`files_by_string` is declared with `scope_name: String`, but the authoritative `ScopeQueryService` contract names that parameter `scope` in `track/items/cli-via-usecase-only-2026-04-30/usecase-types.json`. Parameter names are part of the tracked public signature here, so this will fail the declaration comparison even though the Rust types are otherwise correct.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/scope_query.rs",
+              "file": "libs/usecase/src/review_v2/scope_query.rs",
               "line": 147,
               "category": "contract"
             }
@@ -1117,21 +1117,21 @@
             {
               "message": "P1: `run_classify` now delegates path validation to `classify_by_strings`, which short-circuits on the first invalid path. The previous CLI behavior collected every bad path and returned a joined error, so a single run can now hide additional invalid inputs and the command no longer matches its documented contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/classify.rs",
+              "file": "apps/cli/src/commands/review/classify.rs",
               "line": 47,
               "category": "correctness"
             },
             {
               "message": "P1: `derive_track_status_from_json` treats a missing or malformed `impl-plan.json` task list as `planned`/`unknown`, and `execute_activate` uses that value for the auto-resume preflight. That means a corrupted materialized track can now pass the resume check and continue through `/track:activate --auto` instead of failing closed the way the old `load_impl_plan` path did.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
+              "file": "apps/cli/src/commands/track/mod.rs",
               "line": 96,
               "category": "safety"
             },
             {
               "message": "P1: the frozen-track guard is now fail-open for any unrecognized status string: only `done` and `archived` are rejected, and everything else is treated as active. If the status reader ever produces a new or malformed `TrackStatus` value, `type-signals` will run on a track that should have been frozen.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
               "line": 65,
               "category": "security"
             }
@@ -1146,14 +1146,14 @@
             {
               "message": "`derive_track_status_from_json` treats a missing or गैर-array `tasks` field as `planned`, and `execute_activate` later accepts only `planned` preflight states. A corrupted `impl-plan.json` can therefore be activated instead of being rejected fail-closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
+              "file": "apps/cli/src/commands/track/mod.rs",
               "line": 139,
               "category": "correctness"
             },
             {
               "message": "The new `--after` filter no longer mirrors `TaskId::try_new`: it accepts any `T<digits>` string, but the domain validator also requires the suffix to fit in `u64`. An oversized value will now reach `AddTaskCommand` and fail instead of being ignored and appended to the end as the command comment promises.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
               "line": 45,
               "category": "correctness"
             }
@@ -1166,21 +1166,21 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `review classify` now builds its interactor through `build_scope_query_interactor_str`, which goes through `build_v2_shared` and requires a materialized `track/items/<track_id>` directory plus diff-base resolution. That means the command no longer behaves like the old pure classifier for tracks that only have `review-scope.json`; it can now fail before any classification happens. See [apps/cli/src/commands/review/classify.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/classify.rs#L47), [libs/infrastructure/src/review_v2/cli_composition.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/cli_composition.rs#L139), and [libs/infrastructure/src/review_v2/cli_composition.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/cli_composition.rs#L261).",
+              "message": "P1: `review classify` now builds its interactor through `build_scope_query_interactor_str`, which goes through `build_v2_shared` and requires a materialized `track/items/<track_id>` directory plus diff-base resolution. That means the command no longer behaves like the old pure classifier for tracks that only have `review-scope.json`; it can now fail before any classification happens. See [apps/cli/src/commands/review/classify.rs](apps/cli/src/commands/review/classify.rs#L47), [libs/infrastructure/src/review_v2/cli_composition.rs](libs/infrastructure/src/review_v2/cli_composition.rs#L139), and [libs/infrastructure/src/review_v2/cli_composition.rs](libs/infrastructure/src/review_v2/cli_composition.rs#L261).",
               "severity": "P1",
               "file": "apps/cli/src/commands/review/classify.rs",
               "line": 47,
               "category": "correctness"
             },
             {
-              "message": "P1: `validate_all_paths` only rejects `/`-prefixed absolutes and `/`-separated `..` traversal. Windows-style invalid paths (`C:\\...`, `..\\...`, UNC paths) slip past this pre-check and only fail later in `classify_by_strings`, so the intended multi-error validation is incomplete. See [apps/cli/src/commands/review/classify.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/classify.rs#L73).",
+              "message": "P1: `validate_all_paths` only rejects `/`-prefixed absolutes and `/`-separated `..` traversal. Windows-style invalid paths (`C:\\...`, `..\\...`, UNC paths) slip past this pre-check and only fail later in `classify_by_strings`, so the intended multi-error validation is incomplete. See [apps/cli/src/commands/review/classify.rs](apps/cli/src/commands/review/classify.rs#L73).",
               "severity": "P1",
               "file": "apps/cli/src/commands/review/classify.rs",
               "line": 73,
               "category": "correctness"
             },
             {
-              "message": "P1: `next-task` now hardcodes `\"status\": \"todo\"` in the JSON payload. The command can no longer reflect the actual status of the task returned by the query service, so any non-todo next task will be misreported. See [apps/cli/src/commands/track/state_ops.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs#L180).",
+              "message": "P1: `next-task` now hardcodes `\"status\": \"todo\"` in the JSON payload. The command can no longer reflect the actual status of the task returned by the query service, so any non-todo next task will be misreported. See [apps/cli/src/commands/track/state_ops.rs](apps/cli/src/commands/track/state_ops.rs#L180).",
               "severity": "P1",
               "file": "apps/cli/src/commands/track/state_ops.rs",
               "line": 180,
@@ -1197,14 +1197,14 @@
             {
               "message": "`review classify` now goes through `build_scope_query_interactor_str`, which resolves the diff base (`.commit_hash` / `git rev-parse main`) before any classification work. That regresses the command from the documented pure-logic path: in a repo without `main` or a readable commit-hash file, `sotp review classify` now fails even though path classification itself does not need diff I/O.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/classify.rs",
+              "file": "apps/cli/src/commands/review/classify.rs",
               "line": 54,
               "category": "behavior"
             },
             {
               "message": "`review files` now constructs the scope-query interactor before validating the requested scope. Because the shared builder resolves the diff base first, an unknown `--scope` can now fail with git/base-read errors before the intended `Unknown scope` check and before any diff I/O. That breaks the command’s AC-08 ordering guarantee.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/files.rs",
+              "file": "apps/cli/src/commands/review/files.rs",
               "line": 46,
               "category": "behavior"
             }
@@ -1219,14 +1219,14 @@
             {
               "message": "P1: `--pretty` is now ignored. This code always requests JSON from `ExportSchemaInteractor`, and the infrastructure adapter currently serializes with pretty formatting unconditionally, so `sotp domain export-schema --pretty=false` no longer produces the compact form the CLI flag advertises.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/domain.rs",
+              "file": "apps/cli/src/commands/domain.rs",
               "line": 56,
               "category": "correctness"
             },
             {
               "message": "P1: `execute_next_task` no longer reports the track's derived status. It infers `status` from task counts and collapses everything to `\"todo\"` or `\"in_progress\"`, so mixed todo/done plans and any blocked/cancelled override are serialized incorrectly in the JSON output.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
               "line": 180,
               "category": "correctness"
             }
@@ -1352,7 +1352,7 @@
             {
               "message": "Collapsing every parsed command to `cmd.argv.join(\" \")` and then filtering out empty strings makes the new `ShellParserPort` path lose redirect-only commands and quoted-argument boundaries. In the usecase adapter, that means inputs like `> /tmp/file` can disappear before policy evaluation, so the guard can no longer block output-redirection writes reliably.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
+              "file": "libs/infrastructure/src/shell/conch.rs",
               "line": 47,
               "category": "security"
             }
@@ -1367,7 +1367,7 @@
             {
               "message": "The new `ShellParserPort` implementation at this file is not exercised by any test. The updated tests were switched to `ShellParser::split_shell(...)`, so they still only cover the domain-trait path and never verify the new `Vec<String>` serialization (`argv.join(\" \")`) or its error mapping. That leaves the only new behavior in this diff unguarded, so a regression in the infrastructure port would slip through.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
+              "file": "libs/infrastructure/src/shell/conch.rs",
               "line": 35,
               "category": "tests"
             }
@@ -1382,7 +1382,7 @@
             {
               "message": "P0: serializing each parsed command with `cmd.argv.join(\" \")` here is not lossless. Any argument that contains whitespace gets split back into separate argv entries by the usecase adapter, so shell-reentry inputs like `bash -c 'git push origin main'` are reconstructed as `bash -c git push origin main`. That breaks the `-c` payload boundary and can let blocked commands slip past policy checks.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
+              "file": "libs/infrastructure/src/shell/conch.rs",
               "line": 53,
               "category": "security"
             }
@@ -1397,7 +1397,7 @@
             {
               "message": "Serializing redirect-only commands as `\"\"` creates a guard bypass in the new CLI path: `ShellParserPortAdapter` will re-parse that entry as `argv: []` with `has_output_redirect = false`, so `domain::guard::policy::check_simple_command` never hits its output-redirect block. A command like `> /tmp/file` will be treated as allowed instead of blocked if this port is used for enforcement.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/shell/conch.rs",
+              "file": "libs/infrastructure/src/shell/conch.rs",
               "line": 58,
               "category": "security"
             }
@@ -1426,7 +1426,7 @@
             {
               "message": "Both `map_err` calls add a new textual prefix before returning the `String`, but `ExportSchemaInteractor` already wraps any port error as `ExportSchemaError::ExportFailed`. Once this adapter is wired in, failures will surface as `schema export failed: schema export failed: ...` or `schema export failed: schema serialization failed: ...`, which changes the existing user-facing error contract. Return the underlying error text unchanged here and let the usecase layer own the prefix.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "file": "libs/infrastructure/src/schema_export.rs",
               "line": 47,
               "category": "error handling"
             }
@@ -1455,28 +1455,28 @@
             {
               "message": "`execute_type_signals_for_layer` reads the catalogue and baseline files before any symlink validation, and later treats `track_dir` itself as the trusted root for writes. A symlinked `items_dir/<track_id>` can therefore both read and write outside the workspace.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
               "line": 57,
               "category": "security"
             },
             {
               "message": "`execute_spec_code_consistency_str` reads `domain-types.json` and `domain-types-baseline.json` directly from `project_root/track/items/<track_id>` with no symlink or root validation. A symlinked track directory can feed the verifier files outside the repo.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/spec_code_consistency.rs",
+              "file": "libs/infrastructure/src/verify/spec_code_consistency.rs",
               "line": 58,
               "category": "security"
             },
             {
               "message": "`read_track_status_str` reads `metadata.json` from the caller-supplied `items_dir` before any symlink check. Because TDDD commands call this as their preflight step, a symlinked items tree can spoof the active-track guard or escape the workspace.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fs_store.rs",
+              "file": "libs/infrastructure/src/track/fs_store.rs",
               "line": 335,
               "category": "security"
             },
             {
               "message": "`execute_verify_adr_signals` hands `project_root/knowledge/adr` straight to `FsAdrFileAdapter` without validating that the ADR tree is not a symlink. A symlinked ADR directory will be traversed as if it were inside the repo, so the verifier can read arbitrary files outside the workspace.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/adr_signals.rs",
+              "file": "libs/infrastructure/src/verify/adr_signals.rs",
               "line": 32,
               "category": "security"
             }
@@ -1491,21 +1491,21 @@
             {
               "message": "`items_dir` is treated as the trusted root, but this helper only guards `metadata.json` and then reads `impl-plan.json` via `FsTrackStore::load_impl_plan()` with no symlink check. A symlinked track root or symlinked `impl-plan.json` can therefore spoof the active-track guard used by the new TDDD commands.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fs_store.rs",
+              "file": "libs/infrastructure/src/track/fs_store.rs",
               "line": 349,
               "category": "security"
             },
             {
               "message": "`project_root` is never root-checked before being passed to `reject_symlinks_below()`. Because that helper only inspects descendants, a symlinked repo root bypasses the guard and lets `knowledge/adr` be traversed outside the workspace.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/adr_signals.rs",
+              "file": "libs/infrastructure/src/verify/adr_signals.rs",
               "line": 38,
               "category": "security"
             },
             {
               "message": "The same root-trust omission exists here: `project_root` is accepted as trusted input, but it is never validated before reading `track/items/<track>/domain-types.json` and `domain-types-baseline.json`. A symlinked workspace root can therefore escape the repo boundary and feed the verifier attacker-controlled files.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/spec_code_consistency.rs",
+              "file": "libs/infrastructure/src/verify/spec_code_consistency.rs",
               "line": 64,
               "category": "security"
             }
@@ -1542,7 +1542,7 @@
             {
               "message": "`root` is canonicalized only for the `items_dir` containment check, but the original git path is still handed to `FsReviewStore::new` and `FsCommitHashStore::new` as `trusted_root`. `reject_symlinks_below` treats the trusted root as already safe, so a symlinked checkout root can bypass the guard and redirect review.json / .commit_hash I/O outside the intended tree. Use the canonicalized root here or reject symlinked roots up front. The same trusted-root assumption is repeated in `persist_commit_hash_for_track`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/cli_composition.rs",
+              "file": "libs/infrastructure/src/review_v2/cli_composition.rs",
               "line": 278,
               "category": "security"
             }
@@ -1572,7 +1572,7 @@
             {
               "message": "`validate_and_write_catalogue()` trusts `track_dir` as the symlink-guard root, but never verifies that directory itself is non-symlink. Because `reject_symlinks_below()` stops at the trusted root, a symlinked `track_dir` (or a symlink swap between the earlier read guard and this write) can redirect the atomic write outside the workspace. The same pattern is repeated in `write_signal_file()`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
               "line": 416,
               "category": "security"
             }
@@ -1587,14 +1587,14 @@
             {
               "message": "The TDDD type-signal writer never validates `track_dir` itself, yet `reject_symlinks_below()` is called with `track_dir` as the trusted root. A symlinked `items_dir/<track_id>` directory will therefore be accepted and the declaration/signal writes can escape the items tree.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
               "line": 421,
               "category": "security"
             },
             {
               "message": "This flow writes the catalogue first and the signal file second. If `write_signal_file()` fails, the command returns an error after having already replaced `domain-types.json`, leaving the catalogue and signal files out of sync.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
               "line": 307,
               "category": "correctness"
             }
@@ -1609,14 +1609,14 @@
             {
               "message": "P1: The repo-root containment check is bypassable here and in `build_v2_shared()`. `normalize_path_components()` strips `..` before canonicalization, so a path like `/repo/track/items/link/../evil` can be normalized into an in-repo path even when `link` is a symlink that resolves outside the repo. That makes the `items_dir` safety check unsound and can let review v2 operate on an attacker-controlled tree.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/cli_composition.rs",
+              "file": "libs/infrastructure/src/review_v2/cli_composition.rs",
               "line": 238,
               "category": "security"
             },
             {
               "message": "P1: `evaluate_and_write_signals()` writes the declaration file before the derived signal file. If `write_signal_file()` fails after `validate_and_write_catalogue()` succeeds, the command returns an error but leaves the declaration updated and the signal file stale or missing. That creates a persistent split-brain state across the two artifacts instead of an all-or-nothing update.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
               "line": 317,
               "category": "correctness"
             }
@@ -1631,7 +1631,7 @@
             {
               "message": "These new TDDD facades build filesystem paths from raw `track_id` before validating it, so a direct caller can pass `../...` and read/write outside `track/items` (for example `items_dir.join(track_id)` here). The same unchecked join exists in `libs/infrastructure/src/tddd/catalogue_spec_signals_refresher.rs:45`, `libs/infrastructure/src/tddd/type_graph_export.rs:102`, and `libs/infrastructure/src/tddd/type_signals_evaluator.rs:92`. The current CLI happens to validate upstream, but the public library API itself is unsafe and can corrupt or exfiltrate files if reused.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_capture.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_capture.rs",
               "line": 103,
               "category": "security"
             }
@@ -1646,7 +1646,7 @@
             {
               "message": "New public helper `persist_commit_hash_for_track` is used by the CLI but has no direct happy-path or failure-path tests, so regressions in the branch guard, `.commit_hash` write, or symlink protection would slip through.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/mod.rs",
+              "file": "libs/infrastructure/src/review_v2/mod.rs",
               "line": 69,
               "category": "testing"
             }
@@ -1661,14 +1661,14 @@
             {
               "message": "`items_dir` and `workspace_root` are only checked with `symlink_metadata()`, not canonicalized or containment-checked. A caller can pass a path like `../` that resolves outside the repo, and `reject_symlinks_below()` will then treat that external directory as the trusted root. This lets `verify catalogue-spec-signals` read and write signals/catalogue files outside the intended workspace. The same root-validation gap also exists in `verify/spec_code_consistency.rs` and `verify/adr_signals.rs`.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
               "line": 33,
               "category": "security"
             },
             {
               "message": "`read_track_status_str()` accepts `items_dir` as a trusted root after only a symlink check. A caller can supply `items_dir` with `..` components, and the helper will read `metadata.json` / `impl-plan.json` from the resolved external directory instead of the intended items tree. Canonicalize `items_dir` and verify it stays under the repo root before using it as the symlink-guard anchor.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fs_store.rs",
+              "file": "libs/infrastructure/src/track/fs_store.rs",
               "line": 336,
               "category": "security"
             }
@@ -1889,9 +1889,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`task-coverage.json` does not trace the three GO-* requirements from [spec.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/spec.json:5) at all: this file only maps `in_scope` / `out_of_scope` / `constraints` / `acceptance_criteria`, so the briefing claim that every spec element is linked to at least one task is not actually satisfied.",
+              "message": "`task-coverage.json` does not trace the three GO-* requirements from [spec.json](track/items/cli-via-usecase-only-2026-04-30/spec.json:5) at all: this file only maps `in_scope` / `out_of_scope` / `constraints` / `acceptance_criteria`, so the briefing claim that every spec element is linked to at least one task is not actually satisfied.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/task-coverage.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/task-coverage.json",
               "line": 1,
               "category": "factual error"
             }
@@ -1921,14 +1921,14 @@
             {
               "message": "The new D1 record says it captures OQ-1〜OQ-6, but the subsection only documents OQ-1, OQ-2, OQ-3, OQ-4, and OQ-6. OQ-5 is never recorded, so the claimed permanent boundary record is incomplete.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
+              "file": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
               "line": 45,
               "category": "factual error"
             },
             {
               "message": "Section S4 says the review boundary batch includes `ReviewRoundType`, but T005 does not list it. Since `ReviewRoundType` is also catalogued in `usecase-types.json`, the plan is internally inconsistent about what that task is meant to create.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/impl-plan.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/impl-plan.json",
               "line": 29,
               "category": "contradiction"
             }
@@ -2232,7 +2232,7 @@
             {
               "message": "`TrackPhaseInteractor` and `TaskOperationInteractor` are both described as depending on storage \"ports\" (`TrackReader + ImplPlanReader` for phase resolution, and the `FsTrackStore` port for task operations), but this plan never introduces those ports. The only storage-related infrastructure node is `FsTrackStore` as a `secondary_adapter`, and the contract map only adds `ShellParserPort` and `SchemaExporterPort`. As written, S4/S5 cannot be implemented as a proper hexagonal boundary without adding unplanned types, so the downstream CLI migration tasks are underspecified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
               "line": 885,
               "category": "infeasibility"
             }
@@ -2247,7 +2247,7 @@
             {
               "message": "`TaskOperationInteractor` now says the CLI composition root injects `FsTrackStore` directly \"without importing it as a port\", but `TaskOperationService` still describes the interactor as persisting via the `FsTrackStore` port, and `contract-map.md` models `FsTrackStore` as a `secondary_adapter`. The same type is being described with two different architectural roles, so the plan artifact is internally inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
               "line": 1544,
               "category": "contradiction"
             }
@@ -2291,7 +2291,7 @@
             {
               "message": "`VerifyAdrSignals`/`VerifyAdrSignalsInteractor`/`AdrVerifyOutput` are marked as `modify` in the usecase catalogue, but `impl-plan.json:170-176` and `plan.md:70-72` never allocate a usecase-side task for that API change. T012 only updates the CLI callers and explicitly says to use the existing `VerifyAdrSignals` service, so the catalogue and implementation plan disagree about whether this round changes the verify-ADR-signals boundary or only its consumers.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
               "line": 1291,
               "category": "contradiction"
             }
@@ -2510,21 +2510,21 @@
             {
               "message": "HookShellParserPort is described as being used by hook dispatch, but the same entry then says \"CallerPort callers (GuardCheckInteractor) receive the full struct.\" GuardCheckInteractor belongs to the guard path, so this misstates the consumer and mixes the two responsibilities.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
               "line": 2533,
               "category": "factual error"
             },
             {
               "message": "ConchShellParser's prose says this track adds only the ShellParserPort impl, but the machine-readable `implements` list also adds HookShellParserPort. The narrative underreports the actual adapter change and is out of sync with the contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
               "line": 70,
               "category": "contradiction"
             },
             {
               "message": "HookShellParserPort is the only new catalogue entry that still carries `informal_grounds`, which contradicts the plan-artifacts rule that this round's catalogue should not retain informal grounds after the ADR handoff.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
               "line": 2567,
               "category": "contradiction"
             }
@@ -2539,7 +2539,7 @@
             {
               "message": "`HookShellParserPort` is introduced as a usecase public port, but its description and signature explicitly expose `domain::guard::SimpleCommand` and `domain::guard::ParseError`. That conflicts with `CN-01` / `IN-03`, which require the usecase public API to avoid direct domain-type exposure, so this port reintroduces the boundary leak the track is trying to remove.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
               "line": 2533,
               "category": "contradiction"
             }
@@ -2650,7 +2650,7 @@
             {
               "message": "`HookShellParserPort` is documented as the CN-01 exception for the hook-dispatch path, but its `spec_refs` only point to `IN-03` and `IN-04`. That leaves the new exception port without a direct anchor to the constraint/rationale that justifies exposing `SimpleCommand` and `ParseError`, so the catalogue trace for this special-case type is incomplete.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
               "line": 2532,
               "category": "broken reference"
             }
@@ -2747,16 +2747,16 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`T001` is still recorded as `todo` in the source plan, so the generated [plan.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/plan.md) still renders it unchecked. That contradicts the briefing for this bundle, which says T001 is included alongside T010-T013 and should be reflected as at least `in_progress` / `todo→in_progress`.",
+              "message": "`T001` is still recorded as `todo` in the source plan, so the generated [plan.md](track/items/cli-via-usecase-only-2026-04-30/plan.md) still renders it unchecked. That contradicts the briefing for this bundle, which says T001 is included alongside T010-T013 and should be reflected as at least `in_progress` / `todo→in_progress`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/impl-plan.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/impl-plan.json",
               "line": 5,
               "category": "contradiction"
             },
             {
-              "message": "The new `RunCatalogueLint` surface is internally inconsistent: [usecase-types.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json) says `RunCatalogueLint` is implemented by `RunCatalogueLintInteractor`, but [contract-map.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/contract-map.md) only adds the two nodes and never draws the usual `.impl.` edge between them. That leaves the new application service disconnected from its interactor in the rendered architecture map.",
+              "message": "The new `RunCatalogueLint` surface is internally inconsistent: [usecase-types.json](track/items/cli-via-usecase-only-2026-04-30/usecase-types.json) says `RunCatalogueLint` is implemented by `RunCatalogueLintInteractor`, but [contract-map.md](track/items/cli-via-usecase-only-2026-04-30/contract-map.md) only adds the two nodes and never draws the usual `.impl.` edge between them. That leaves the new application service disconnected from its interactor in the rendered architecture map.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/contract-map.md",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/contract-map.md",
               "line": 98,
               "category": "contradiction"
             }
@@ -3217,21 +3217,21 @@
             {
               "message": "This entry says the track replaces the old domain-typed `classify`/`files` API with `classify_by_strings`/`files_by_string`, but the same `expected_methods` block still lists `classify(Vec<FilePath>)` and `files(ScopeName)`. The service contract is internally contradictory.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
               "line": 1349,
               "category": "contradiction"
             },
             {
               "message": "The graph node for `reject_branchless_guard_by_str` no longer has the `reader` edge, but the domain catalog still documents that function as taking `&impl TrackReader`. The contract map and domain-types disagree on an existing dependency.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/contract-map.md",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/contract-map.md",
               "line": 108,
               "category": "contradiction"
             },
             {
               "message": "The usecase catalog now says `VerifyAdrSignals::verify` returns `AdrVerifyReport`, but the contract map removed the corresponding return node and does not add `AdrVerifyReport` anywhere. That leaves the published service contract and visualization out of sync.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/contract-map.md",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/contract-map.md",
               "line": 60,
               "category": "broken reference"
             }
@@ -3246,14 +3246,14 @@
             {
               "message": "The contract map now leaves the infrastructure free functions as isolated nodes: the surrounding block still lists builders/composition roots such as `build_review_v2`, `run_codex_review_str`, and `execute_verify_adr_signals`, but the `-->` dependency edges that used to connect them to their return/parameter types are gone. That makes the map no longer reflect the contracts still documented in `infrastructure-types.json`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/contract-map.md",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/contract-map.md",
               "line": 128,
               "category": "factual error"
             },
             {
               "message": "`AdrVerifyReport` is described as aggregating the four signal counts (`blue_count`, `yellow_count`, `red_count`, `grandfathered_count`), but the entry declares no `expected_members`. Since `VerifyAdrSignals` now returns `AdrVerifyReport` directly, the public contract for the verify-ADR-signals result is underspecified and no longer captures the fields that were previously modeled by `AdrVerifyOutput`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/domain-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/domain-types.json",
               "line": 149,
               "category": "factual error"
             }
@@ -3268,14 +3268,14 @@
             {
               "message": "`AdrVerifyReport` is added in `domain-types.json` and already referenced from `contract-map.md`, but the generated markdown catalogue stops at `TrackReader` and never lists the new value object. The JSON source and the human-readable domain catalogue are out of sync.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/domain-types.md",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/domain-types.md",
               "line": 9,
               "category": "contradiction"
             },
             {
               "message": "The new note says infrastructure free-function nodes are isolated once their params/returns are cleared, but the same graph still shows several infrastructure free functions with edges, such as `build_review_v2` and `run_codex_review_str`. The note overstates the effect of the change and does not match the rendered graph.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/contract-map.md",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/contract-map.md",
               "line": 2,
               "category": "contradiction"
             }
@@ -3290,7 +3290,7 @@
             {
               "message": "Several infrastructure helpers were catalogued with empty `expected_params`/`expected_returns` even though their descriptions still specify concrete inputs and outputs. For example, `run_example_demo` is described as returning a display string, `persist_commit_hash_for_track` as persisting a track-specific SHA, and `load_scope_config_only_str` / `execute_verify_adr_signals` / the `validate_*_str` helpers as taking string/path inputs and returning `Result`/`VerifyOutcome` values. As written, the catalogue now asserts nullary/void APIs and the contract map will drop those edges entirely, which is a semantic mismatch.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
               "line": 358,
               "category": "contradiction"
             }
@@ -3305,14 +3305,14 @@
             {
               "message": "`ScopeQueryInteractor` still says the new string methods \"replace the old domain-typed methods\", but `ScopeQueryService` at lines 1348-1400 explicitly keeps `classify`/`files` alongside the new string wrappers. That is a direct contradiction about whether the old API is removed or retained.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
               "line": 1458,
               "category": "contradiction"
             },
             {
               "message": "The `check_compliance_render`, `has_skill_command`, and `reject_branchless_guard_by_str` entries now have empty `expected_params`/`expected_returns`, but their descriptions still spell out concrete inputs and outputs (`prompt -> Option<String>`, `prompt -> bool`, and `reader/track_id_str/... -> Result<(), ...>`). The catalogue no longer describes the actual callable signature, so the generated contract map will omit real edges.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
               "line": 2975,
               "category": "factual error"
             }
@@ -3325,16 +3325,16 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`contract-map.md` now omits the `reject_branchless_guard_by_str` -> `TrackReader` edge even though [usecase-types.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json#L3033) still declares `reader: &impl TrackReader` for that function. That drops the intentional IN-09 CN-01 exception from the generated graph and leaves the contract map inconsistent with the catalogue.",
+              "message": "`contract-map.md` now omits the `reject_branchless_guard_by_str` -> `TrackReader` edge even though [usecase-types.json](track/items/cli-via-usecase-only-2026-04-30/usecase-types.json#L3033) still declares `reader: &impl TrackReader` for that function. That drops the intentional IN-09 CN-01 exception from the generated graph and leaves the contract map inconsistent with the catalogue.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/contract-map.md",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/contract-map.md",
               "line": 114,
               "category": "contradiction"
             },
             {
               "message": "`reject_branchless_implementation_transition_by_str` now has empty `expected_params` and `expected_returns` even though its description still says it is a string-based wrapper that validates `track_id_str` and delegates internally. The catalogue therefore claims a zero-argument/zero-return function, which is semantically wrong and removes the callable shape from downstream rendering.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
               "line": 3079,
               "category": "factual error"
             }
@@ -3347,16 +3347,16 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: [`usecase-types.json` line 1363](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json#L1363) still makes `ScopeQueryService::classify` return `Vec<PathClassification>`, but this artifact set never declares a `PathClassification` type and the updated [`contract-map.md` section](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/contract-map.md#L229) does not render any corresponding node/edge. The plan is therefore internally inconsistent about the public scope-query API.",
+              "message": "P1: [`usecase-types.json` line 1363](track/items/cli-via-usecase-only-2026-04-30/usecase-types.json#L1363) still makes `ScopeQueryService::classify` return `Vec<PathClassification>`, but this artifact set never declares a `PathClassification` type and the updated [`contract-map.md` section](track/items/cli-via-usecase-only-2026-04-30/contract-map.md#L229) does not render any corresponding node/edge. The plan is therefore internally inconsistent about the public scope-query API.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/usecase-types.json",
               "line": 1363,
               "category": "contradiction"
             },
             {
-              "message": "P1: [`usecase-types.json` line 1292](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/usecase-types.json#L1292) now says `VerifyAdrSignals::verify` returns `AdrVerifyReport`, but [`infrastructure-types.json` line 1393](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json#L1393) still claims the composition root keeps all domain-type handling inside the usecase layer and only translates the result into `VerifyOutcome`. Those statements cannot both be true once the composition root must observe `AdrVerifyReport` to perform the translation.",
+              "message": "P1: [`usecase-types.json` line 1292](track/items/cli-via-usecase-only-2026-04-30/usecase-types.json#L1292) now says `VerifyAdrSignals::verify` returns `AdrVerifyReport`, but [`infrastructure-types.json` line 1393](track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json#L1393) still claims the composition root keeps all domain-type handling inside the usecase layer and only translates the result into `VerifyOutcome`. Those statements cannot both be true once the composition root must observe `AdrVerifyReport` to perform the translation.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
+              "file": "track/items/cli-via-usecase-only-2026-04-30/infrastructure-types.json",
               "line": 1393,
               "category": "contradiction"
             }

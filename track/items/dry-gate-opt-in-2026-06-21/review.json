@@ -265,7 +265,7 @@
             {
               "message": "`resolve_dry_checker_config` now short-circuits when `explicit_model` is set, so `dry_write --model ...` no longer loads `agent-profiles.json` for the `dry-checker` capability. That silently drops any configured `fast_reasoning_effort` / `final_reasoning_effort` and the associated validation, so the dry checker runs with the built-in defaults even when the profile explicitly requests different efforts.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry/dry_checker_config.rs",
+              "file": "apps/cli-composition/src/dry/dry_checker_config.rs",
               "line": 66,
               "category": "application logic in composition"
             }
@@ -351,7 +351,7 @@
             {
               "message": "P1: `enabled` is not included in the canonical fingerprint, so two configs that differ only by opt-in state hash to the same `DryCheckConfigFingerprint`. `fingerprint_with_threshold` still encodes only `threshold`, `max_parallelism`, the reasoning-effort fields, and the known-bad percents ([config.rs:256-290]). Since `enabled` now changes whether the DRY gate is active, this omits a semantics-affecting field and can let stale coverage records survive an enable/disable flip without invalidation.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/config.rs",
+              "file": "libs/infrastructure/src/dry_check/config.rs",
               "line": 256,
               "category": "fingerprint or hash drift"
             }

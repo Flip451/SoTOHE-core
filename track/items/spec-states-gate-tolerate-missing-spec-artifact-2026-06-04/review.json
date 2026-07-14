@@ -71,14 +71,14 @@
             {
               "message": "The `spec.json`-only test does not actually verify the new behavior: it accepts both `ExitCode::SUCCESS` and `ExitCode::FAILURE`, so a regression in the track-branch path would still pass this test. That leaves the Phase 0 fallback effectively unprotected.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_tests.rs",
+              "file": "apps/cli/src/commands/verify_tests.rs",
               "line": 1204,
               "category": "test coverage"
             },
             {
               "message": "These tests create and delete fixtures under the real checkout's `track/items/` tree instead of an isolated temp repo, so they mutate shared state during `cargo test` and can interfere with other tests or leave residue if cleanup does not run. That breaks test independence.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_tests.rs",
+              "file": "apps/cli/src/commands/verify_tests.rs",
               "line": 1131,
               "category": "test isolation"
             }
@@ -93,7 +93,7 @@
             {
               "message": "The new `spec.md`-present test only asserts `ExitCode::SUCCESS`, which does not distinguish a real verification run from the `[SKIP]` path (also exit 0). If the branch regresses to skip whenever `spec.md` exists, this test will still pass. Capture stdout and assert the skip marker is absent, or otherwise assert that verification actually ran.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_tests.rs",
+              "file": "apps/cli/src/commands/verify_tests.rs",
               "line": 1141,
               "category": "test coverage"
             }
@@ -154,7 +154,7 @@
             {
               "message": "The S2 summary says \"Five operability fixes\", but the same section immediately enumerates D1-D6 and the task description below calls them \"Six cohesive changes\". The document undercounts its own scope, so this section is self-contradictory.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/plan.md",
+              "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/plan.md",
               "line": 16,
               "category": "contradiction"
             }
@@ -169,7 +169,7 @@
             {
               "message": "The dry-checker scope summary is internally inconsistent: this line says the track only covers model resolution, schema alignment, gitignore, and insert batching, but the same spec also brings `embed_batch` and corpus/index reuse into scope (IN-08/IN-09, AC-10/AC-11). That makes the out-of-scope summary narrower than the actual plan.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.md",
+              "file": "track/items/spec-states-gate-tolerate-missing-spec-artifact-2026-06-04/spec.md",
               "line": 35,
               "category": "contradiction"
             }
@@ -340,14 +340,14 @@
             {
               "message": "`insert_batch` infers the vector dimension from only the first item and never validates the rest. `FixedSizeListArray::from_iter_primitive` asserts that the flattened child length is a multiple of `dim`, so any mixed-dimension batch will panic inside infrastructure code instead of returning `SemanticIndexError::InsertFailed`.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
               "line": 377,
               "category": "panic"
             },
             {
               "message": "The new empty-slice test never calls `embed_batch`; it only asserts that adapter construction fails when the cache directory is empty. That means it cannot catch regressions in the zero-fragment fast path you added.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 628,
               "category": "test"
             }
@@ -508,14 +508,14 @@
             {
               "message": "The rebuild path can poison the persistent index cache: if `embed_batch`, `insert_batch`, or the fingerprint write fails after `LanceDbSemanticIndexAdapter::new`, the previous matching `.fingerprint` file is left behind and the next invocation will take the reuse branch against the partially built database directory. That can make `dry write` / `check-approved` query an incomplete index and miss violations.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 598,
               "category": "correctness"
             },
             {
               "message": "`Path::exists()` collapses filesystem errors into \"absent\" here. If either `spec.json` or `spec.md` exists but is inaccessible (permissions, broken metadata, other I/O failure), this returns `Ok(None)` and `verify_spec_states` emits a SKIP instead of failing closed, which can mask a broken verify gate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/verify.rs",
+              "file": "apps/cli-composition/src/verify.rs",
               "line": 97,
               "category": "correctness"
             }
@@ -530,14 +530,14 @@
             {
               "message": "`build_and_persist_corpus` reimplements `build_corpus_index` but drops the embeddings/fragments length check. If `embed_batch` returns the wrong count, `zip(...)` silently truncates the corpus, then the code writes the fingerprint sidecar as if the index were complete. That can leave missing fragments in the persistent cache and cause false negatives on later runs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 667,
               "category": "correctness"
             },
             {
               "message": "`symlink_metadata` treats any symlink node as \"present\", even when the target is missing. That diverges from the CLI mirror (`Path::exists()`), so a dangling `spec.json`/`spec.md` will suppress the new Phase-0 SKIP path and fall through to a hard error instead of no-op success.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/verify.rs",
+              "file": "apps/cli-composition/src/verify.rs",
               "line": 106,
               "category": "correctness"
             }
@@ -574,14 +574,14 @@
             {
               "message": "The rebuild path deletes `db_path` recursively on any fingerprint mismatch (`remove_dir_all(db_path)`), but `db_path` comes directly from CLI input and is never constrained to a dedicated cache directory. A typo or hostile invocation such as `--db-path /tmp` can therefore wipe arbitrary directories when the fingerprint changes, which is a data-loss bug.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 557,
               "category": "safety"
             },
             {
               "message": "This phase-0 skip helper treats any `NotFound` from `build_spec_path_from_track_id` as a skip, so a missing `track/items/<track_id>` directory is silently skipped instead of failing closed. That lets a broken track resolution or deleted track directory bypass `verify spec states`; the helper should only skip when the track directory exists and both spec artifacts are legitimately absent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/verify.rs",
+              "file": "apps/cli-composition/src/verify.rs",
               "line": 97,
               "category": "correctness"
             }
@@ -596,14 +596,14 @@
             {
               "message": "If `write_persistent_index_marker` fails after `create_dir_all(db_path)` has already created the cache directory, this path returns with an unmarked directory. The next run will treat that directory as unsafe and refuse to rebuild it, so a transient marker-write failure leaves `--db-path` stuck until manual deletion.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 752,
               "category": "correctness"
             },
             {
               "message": "This test does not actually trigger a metadata error: `not_dir.join(\"spec.json\")` is just a missing child path, so `spec_artifact_entry_exists` returns `Ok(false)`. `unwrap_err()` will panic, so the new error-case coverage will fail CI.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/verify.rs",
+              "file": "apps/cli-composition/src/verify.rs",
               "line": 629,
               "category": "testing"
             }
@@ -654,14 +654,14 @@
             {
               "message": "If `write_manifest()` fails here, the cleanup result from `clear_persistent_index_dir()` is ignored. That can leave an already-created `--db-path` on disk without the cache marker, and the next rebuild will fail on \"unmarked semantic index directory\" instead of recovering.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 1114,
               "category": "missing_error_handling"
             },
             {
               "message": "This Phase-0 skip now fires when the resolved `track/items/<id>` directory is missing, not just when `spec.json`/`spec.md` are absent. A broken track resolution therefore becomes a SKIP instead of an error, which can false-green the spec-states gate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/verify.rs",
+              "file": "apps/cli-composition/src/verify.rs",
               "line": 95,
               "category": "logic_error"
             }
@@ -691,14 +691,14 @@
             {
               "message": "Incremental index updates do not verify that `db_path` carries the `.sotp-cache` ownership marker before mutating the LanceDB table. `validate_existing_persistent_index_dir` only checks for a directory, so a pre-existing or corrupted index without the marker will still be deleted/reinserted in place, and any later cleanup will refuse to remove it. That bypasses the safety mechanism this change is meant to enforce.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 946,
               "category": "safety"
             },
             {
               "message": "`spec_artifact_entry_exists` treats any non-symlink path as an existing spec artifact. A directory or FIFO named `spec.json` therefore counts as \"present\", so `build_spec_path_from_track_id` can proceed instead of failing closed on a malformed artifact. That weakens the phase-0 skip logic and can let a bad `spec.json` fall through to markdown-based verification.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/verify.rs",
+              "file": "apps/cli-composition/src/verify.rs",
               "line": 129,
               "category": "bug"
             }

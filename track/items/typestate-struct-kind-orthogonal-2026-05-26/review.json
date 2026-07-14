@@ -162,7 +162,7 @@
             {
               "message": "`StructKind` is still marked with a yellow signal in the generated view, which conflicts with the post-implementation intent that the type-signals are fully Blue. The rest of the catalogue entries are already Blue, so this row leaves the plan-artifact set internally inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/typestate-struct-kind-orthogonal-2026-05-26/domain-types.md",
+              "file": "track/items/typestate-struct-kind-orthogonal-2026-05-26/domain-types.md",
               "line": 14,
               "category": "contradiction"
             }
@@ -242,7 +242,7 @@
             {
               "message": "`struct_kind.shape` is moved into the inner `match`, and the `StructShape::Plain` arm later reads `struct_kind.typestate`. That uses a partially moved value and will not compile for a non-`Copy` `StructKind`, so this breaks the infrastructure codec build path.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec.rs",
               "line": 269,
               "category": "correctness"
             }

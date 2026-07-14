@@ -10,7 +10,7 @@
             {
               "message": "Both new 'allowed on current branch' tests are inert: they build fixtures but never invoke `execute_catalogue_spec_signals`, so the success path for the rewritten branch guard and catalogue-spec file writes is no longer exercised. A regression in the matching-branch path would still pass this suite.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
               "line": 309,
               "category": null
             }
@@ -166,14 +166,14 @@
             {
               "message": "P1: the fail-closed branch guard is only surfaced when `spec.json` exists. In a workspace that has protected type catalogues (`architecture-rules.json` + `<layer>-types.json`) but no spec, a git lookup failure is downgraded to `false` and the function returns `Ok`, silently skipping type rendering instead of returning `InvalidTrackMetadata`. That violates the briefing’s CN-01 requirement for types-only tracks.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "file": "libs/infrastructure/src/track/render.rs",
               "line": 902,
               "category": "correctness"
             },
             {
               "message": "P1: the new mismatched-branch test does not actually cover the types half of the guard. It never writes any `<layer>-types.json` and only asserts that `spec.md` is absent, so a regression that still renders `*-types.md` on the wrong branch would pass unnoticed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render_tests.rs",
+              "file": "libs/infrastructure/src/track/render_tests.rs",
               "line": 2768,
               "category": "test coverage"
             }
@@ -210,14 +210,14 @@
             {
               "message": "The fail-closed branch error is only deferred when `architecture-rules.json` exists and a type catalogue is discovered. If git lookup fails on a track that has protected `*-types.json` inputs but no rules file, `sync_rendered_views` returns `Ok` after rendering `plan.md` and silently skips the protected views, which contradicts the new CN-01 fail-closed behavior.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "file": "libs/infrastructure/src/track/render.rs",
               "line": 1173,
               "category": "correctness"
             },
             {
               "message": "`track_dir_contains_type_catalogue()` only treats entries with `DirEntry::file_type().is_file()` as catalogues. That misses symlinked `*-types.json` files, even though the render loop later accepts them via `catalogue_path.is_file()`. As a result, a symlinked protected catalogue can bypass the deferred branch error when git lookup fails and the sync will succeed without rendering the view.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "file": "libs/infrastructure/src/track/render.rs",
               "line": 54,
               "category": "security"
             }
@@ -232,7 +232,7 @@
             {
               "message": "`git` lookup failures are only converted into `InvalidTrackMetadata` when `spec.json` exists or `track_dir_contains_type_catalogue()` finds a readable `*-types.json` file. On a non-git checkout with only `plan.md`/`registry.md` inputs, `sync_rendered_views` now succeeds instead of failing closed, which contradicts the branch-guard requirement in the briefing.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "file": "libs/infrastructure/src/track/render.rs",
               "line": 1178,
               "category": "error-handling"
             }
@@ -269,7 +269,7 @@
             {
               "message": "`git rev-parse --abbrev-ref HEAD` returns success with `HEAD` in detached-HEAD checkouts, so this branch guard treats a non-branch checkout as a normal mismatch (`Ok(false)`) instead of failing closed. That silently skips `spec.md`/`<layer>-types.md` on detached CI/worktree checkouts even when the active track should be rendered.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "file": "libs/infrastructure/src/track/render.rs",
               "line": 861,
               "category": "correctness"
             }
@@ -608,9 +608,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`domain-types.json` names the removed phase as `ReadyToActivate`, but this scope's spec and implementation plan both use `TrackPhase::ActivateTrack` ([spec.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/active-track-write-guard-2026-05-26/spec.json#L145), [impl-plan.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/active-track-write-guard-2026-05-26/impl-plan.json#L48)). The same `ReadyToActivate` wording also appears in [usecase-types.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/active-track-write-guard-2026-05-26/usecase-types.json#L210), so the generated catalogue is internally inconsistent about which enum arm is being deleted and could point implementers at the wrong variant.",
+              "message": "`domain-types.json` names the removed phase as `ReadyToActivate`, but this scope's spec and implementation plan both use `TrackPhase::ActivateTrack` ([spec.json](track/items/active-track-write-guard-2026-05-26/spec.json#L145), [impl-plan.json](track/items/active-track-write-guard-2026-05-26/impl-plan.json#L48)). The same `ReadyToActivate` wording also appears in [usecase-types.json](track/items/active-track-write-guard-2026-05-26/usecase-types.json#L210), so the generated catalogue is internally inconsistent about which enum arm is being deleted and could point implementers at the wrong variant.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/active-track-write-guard-2026-05-26/domain-types.json",
+              "file": "track/items/active-track-write-guard-2026-05-26/domain-types.json",
               "line": 22,
               "category": "factual error"
             }

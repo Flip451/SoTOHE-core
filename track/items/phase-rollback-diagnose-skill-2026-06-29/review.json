@@ -10,7 +10,7 @@
             {
               "message": "`knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md#L146` adds D9 as a `PreReviewGate` missing-`task-contract.json` hotfix, but `track/items/phase-rollback-diagnose-skill-2026-06-29/metadata.json#L4` and `track/items/phase-rollback-diagnose-skill-2026-06-29/plan.md#L2` still present the branch as the diagnose-skill / capability addition only. That mixes two distinct change sets under one plan-artifact review, so the required gate-behavior change is easy to miss.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
               "line": 146,
               "category": "contradiction"
             }
@@ -25,7 +25,7 @@
             {
               "message": "`D3` explicitly says no new hook or bypass mechanism is introduced, but the Negative consequence at line 217 says a new hook is being added. That makes the consequence text incompatible with the chosen soft-prompt design and should be rewritten to avoid implying a hook change that this ADR does not approve.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
               "line": 217,
               "category": "contradiction"
             }
@@ -133,7 +133,7 @@
             {
               "message": "The new D8 artifact-set paragraph says the configuration is \"4 kinds\", but the list immediately below contains five bullet items (and six artifacts plus `.codex/instructions.md`), so the section contradicts itself about the intended cross-host surface.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md",
               "line": 146,
               "category": "contradiction"
             }
@@ -262,7 +262,7 @@
             {
               "message": "The new `render_check_violations_includes_track_diagnose_soft_prompt` test still requires `.claude/skills/diagnose/SKILL.md`, but `render_check_violations` now renders `.claude/commands/track/diagnose.md` and `.harness/capabilities/rollback-diagnoser.md` instead. This makes the added test fail immediately and leaves the branch with a red unit test in the reviewed file.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-driver/src/task_contract.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/apps/cli-driver/src/task_contract.rs",
               "line": 311,
               "category": "testing"
             }
@@ -355,7 +355,7 @@
             {
               "message": "`knowledge/adr/2026-06-26-0503-...` is not a resolvable path in a fresh checkout; this distributed capability doc now points at an abbreviated/nonexistent ADR reference instead of the concrete ADR file, so the cross-reference cannot be followed by consumers.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/.harness/capabilities/rollback-diagnoser.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/.harness/capabilities/rollback-diagnoser.md",
               "line": 65,
               "category": "template-distribution reference leak"
             }

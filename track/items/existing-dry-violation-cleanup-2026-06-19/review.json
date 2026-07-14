@@ -148,14 +148,14 @@
             {
               "message": "This file dates PR #148's merge as 2026-06-04, but the bundle README and evaluation.md both place the same merge on 2026-06-02. The evidence set is internally inconsistent about the snapshot boundary.",
               "severity": "medium",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/research/2026-06-19-dry-check/gate-cache-evaluation.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/knowledge/research/2026-06-19-dry-check/gate-cache-evaluation.md",
               "line": 4,
               "category": "contradiction"
             },
             {
               "message": "The bullet says `\"tmp/reviewer-runtime\"` is defined in four separate locations, but the rationale says five occurrences and the locations list contains five paths. The count in the heading is wrong.",
               "severity": "medium",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/research/2026-06-19-dry-check/after/report.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/knowledge/research/2026-06-19-dry-check/after/report.md",
               "line": 255,
               "category": "factual error"
             }
@@ -170,7 +170,7 @@
             {
               "message": "`evaluation.md` says the overall density drop is \"fully concentrated in cli and cli-composition\", but the table immediately above shows domain density also fell from 0.743 to 0.713 (-4.0%). The statement should say the drop is mostly, not fully, concentrated in those two crates.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/research/2026-06-19-dry-check/evaluation.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/knowledge/research/2026-06-19-dry-check/evaluation.md",
               "line": 65,
               "category": "contradiction"
             }
@@ -519,14 +519,14 @@
             {
               "message": "S3's summary is stale: it still says T006 moves `run_codex_child` into a new `codex_subprocess`/`codex_common` module and keeps all code inside infrastructure. That contradicts the updated T006 text below, and the same stale wording is still mirrored in `plan.md:28`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/existing-dry-violation-cleanup-2026-06-19/impl-plan.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/existing-dry-violation-cleanup-2026-06-19/impl-plan.json",
               "line": 110,
               "category": "contradiction"
             },
             {
               "message": "The D3 catalogue docs still say the `run_codex_child` timeout-poll loop remains `pub(crate)` in `codex_common`, but T006 explicitly keeps that loop per-module and only shares `spawn_codex`, `drain_pipe`, `runtime_path`, and `tee_stderr_to_file`. The same stale claim also repeats at lines 30 and 50 in this file.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/existing-dry-violation-cleanup-2026-06-19/infrastructure-types.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/existing-dry-violation-cleanup-2026-06-19/infrastructure-types.json",
               "line": 15,
               "category": "contradiction"
             }

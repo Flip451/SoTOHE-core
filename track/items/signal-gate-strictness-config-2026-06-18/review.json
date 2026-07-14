@@ -67,14 +67,14 @@
             {
               "message": "`AssocConstName` is a new public validation boundary, but this module adds no direct tests for valid construction, invalid-input rejection, or `Display`/`FromStr` round-trips. Because its validation logic is macro-backed and shared only indirectly with the other identifier wrappers, a regression here would not be caught.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/identifiers.rs",
               "line": 243,
               "category": "testing"
             },
             {
               "message": "`TraitEntry` now carries `assoc_types` and `assoc_consts`, but there is no test coverage asserting their default-empty construction or that they participate in `PartialEq` the way the existing `generics` and `where_predicates` fields do. That leaves the new trait-item shape under-tested and makes a wiring regression easy to miss.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/entries.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/entries.rs",
               "line": 150,
               "category": "testing"
             }
@@ -574,7 +574,7 @@
             {
               "message": "`resolve_spec_json_path` now performs `SystemGitRepo::discover()` whenever `workspace_root` is `None`, even when `override_path` is already `Some`. That makes the explicit `--spec-json` path require a git checkout again, so `signal_calc_spec_adr` and `signal_check_spec_adr` will fail in non-repo contexts despite having a fully specified path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/signal.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/signal.rs",
               "line": 261,
               "category": "correctness"
             }
@@ -602,9 +602,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: [`signal_check_spec_adr`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/signal.rs#L376) still resolves strictness via `resolve_strict()` before it reaches the new `resolve_spec_json_path()` fast path. `resolve_strict()` at [`load_gate_matrix`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/signal.rs#L230) discovers the git repo when `--workspace-root` is omitted, so `sotp signal check-spec-adr --spec-json /tmp/spec.json` still fails outside a checkout before the explicit spec path can short-circuit. That leaves the new `Option<PathBuf>` wiring unable to satisfy the documented \"spec-json only\" flow for `check-spec-adr`.",
+              "message": "P1: [`signal_check_spec_adr`](file://<machine-home>/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/signal.rs#L376) still resolves strictness via `resolve_strict()` before it reaches the new `resolve_spec_json_path()` fast path. `resolve_strict()` at [`load_gate_matrix`](file://<machine-home>/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/signal.rs#L230) discovers the git repo when `--workspace-root` is omitted, so `sotp signal check-spec-adr --spec-json /tmp/spec.json` still fails outside a checkout before the explicit spec path can short-circuit. That leaves the new `Option<PathBuf>` wiring unable to satisfy the documented \"spec-json only\" flow for `check-spec-adr`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/signal.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/signal.rs",
               "line": 376,
               "category": "correctness"
             }
@@ -770,7 +770,7 @@
             {
               "message": "`calc-adr-user` is described as optional here (“薄い validate に留める（または省略）”), but the same ADR later makes the 8-command taxonomy mandatory in AC-01 (`signal {calc,check}-adr-user,...` must exist). Those two requirements conflict, so the command surface is underspecified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md",
               "line": 132,
               "category": "contradiction"
             }
@@ -859,7 +859,7 @@
             {
               "message": "T007 introduces a new separate public Stage2 entrypoint for `signal check-impl-catalog`, but the infrastructure catalogue still only declares `infrastructure::verify::spec_states::verify_from_spec_json` and explicitly says that function is Stage1-only. As written, the plan and the type catalogue disagree about the exposed public surface, so the Stage2 callable is unmodelled in the plan artifacts.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
               "line": 35,
               "category": "contradiction"
             }
@@ -874,7 +874,7 @@
             {
               "message": "The error contract for invalid strictness values is inconsistent inside the plan. T003 hard-codes an invalid strictness string to `ParseFailed`, but T013 later treats the same case as `ParseFailed` **or** `InvalidValue`, and the infrastructure catalogue already defines `SignalGatesConfigError::InvalidValue`. That leaves the observable failure mode underspecified and makes the earlier module test target disagree with the later one.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
               "line": 19,
               "category": "contradiction"
             }
@@ -1135,14 +1135,14 @@
             {
               "message": "`task-coverage.json` under-covers AC-14/AC-15: they are only linked to T016/T017, but the Blue transitions still depend on the parser tasks T014/T015 (`QualifiedPath` and `Generic`). As written, the coverage map makes the later catalogue updates look sufficient on their own when they are not.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/task-coverage.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/task-coverage.json",
               "line": 55,
               "category": "contradiction"
             },
             {
               "message": "The blanket-impl where-clause is specified with two incompatible shapes: the ADR/spec prose uses `bound: \"domain::PersistedSoTChain\"`, while T016 uses `rhs: [\"PersistedSoTChain\"]`. The plan never reconciles those representations, so the intended JSON shape for `impl_where_predicates` is ambiguous.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
               "line": 39,
               "category": "contradiction"
             }
@@ -1216,7 +1216,7 @@
             {
               "message": "The execution-order note says the entire S8 group must complete before T006, but the same artifact now marks T006 as done while T015 is still `in_progress`. That leaves the plan self-contradictory about what has to precede T006 and makes the remaining ordering guidance misleading.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/signal-gate-strictness-config-2026-06-18/plan.md",
               "line": 35,
               "category": "contradiction"
             }
@@ -2567,14 +2567,14 @@
             {
               "message": "Top-level JSON shape is not validated before calling `.get(\"$schema_version\")`, so a syntactically valid but non-object document (for example `[]` or `\"foo\"`) is reported as `MissingKey { key: \"$schema_version\" }` instead of the documented parse/structure failure. That misclassifies a malformed config and makes the error contract inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/signal_gates_config.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/signal_gates_config.rs",
               "line": 228,
               "category": "error handling"
             },
             {
               "message": "Gate-cell type errors fall through to `SignalGatesConfigError::ParseFailed { path: PathBuf::new(), ... }` because `find_invalid_strictness_cell` only checks string values and ignores numbers/nulls/arrays/objects. A config like `\"adr_user\": 1` therefore loses the real file path and offending key/value, violating the loader's error-reporting contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/signal_gates_config.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/signal_gates_config.rs",
               "line": 255,
               "category": "error handling"
             }
@@ -2603,14 +2603,14 @@
             {
               "message": "`read_adr_verify_report` now scans `repo_root/knowledge/adr` directly, but it no longer applies the trusted-root / symlink rejection that `execute_verify_adr_signals` uses. A branch can make `knowledge/adr` a symlink and redirect the merge-gate scan outside the repository, which is a path-traversal/security regression.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
               "line": 440,
               "category": "security"
             },
             {
               "message": "The new qualified-path branch accepts any `qself` path but only reads the single segment at `qself.position`. If the path has additional trailing segments after the associated item, they are silently dropped instead of remaining unresolved, so valid inputs can be misrepresented as a different type.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/type_ref_parser/parse_ctx.rs",
               "line": 83,
               "category": "correctness"
             }
@@ -2647,7 +2647,7 @@
             {
               "message": "`Ok(false)` from `reject_symlinks_below` is not equivalent to a cleanly missing `knowledge/adr` directory. If `knowledge/` is replaced with a regular file or another non-directory ancestor, this branch returns `NotFound` and the merge gate will treat ADR scanning as absent, bypassing chain 0 instead of failing closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
               "line": 469,
               "category": "security"
             }
@@ -2662,7 +2662,7 @@
             {
               "message": "`read_adr_verify_report` delegates to `FsAdrFileAdapter`, which skips non-regular entries instead of rejecting them. That means symlinked `knowledge/adr/*.md` files are silently ignored, so a branch can hide all ADR decisions behind symlinks and get an empty clean report instead of a fail-closed error.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/merge_gate_adapter.rs",
               "line": 497,
               "category": "security"
             }
@@ -2734,14 +2734,14 @@
             {
               "message": "`AssocTypeDecl.default` and `AssocConstDecl.ty` are only checked with `TypeRef::new`, which accepts any non-empty string. Unlike the other `TypeRef` fields in this codec, these values are never run through `validate_type_ref_str`, so malformed Rust types (for example `Vec<` or `Foo<`) now survive decode and fail later in the encode path instead of being rejected at the DTO boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_document_codec/decode_assoc.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_document_codec/decode_assoc.rs",
               "line": 35,
               "category": "validation"
             },
             {
               "message": "`AssocTypeDecl` defaults are parsed with `parse_type_ref_str` but never rewritten against `trait_generic_names`. That means defaults such as `type Item = Vec<T>` are still rendered with a raw `T` path instead of `Type::Generic(\"T\")`, so traits that only differ by generic parameter renames will compare unequal even though the bounds path already canonicalizes those names.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
               "line": 530,
               "category": "correctness"
             }
@@ -2756,7 +2756,7 @@
             {
               "message": "The new assoc-item decoders only reject empty names. `assoc_types[*].name` and `assoc_consts[*].name` are never validated as Rust identifiers, and there is no duplicate-name check before the items are fed into `Trait.items` / `build_trait_method_map`. A malformed or colliding assoc item can therefore be accepted and silently overwrite a different item during trait fingerprinting, producing a false match.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_document_codec/decode_assoc.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_document_codec/decode_assoc.rs",
               "line": 21,
               "category": "validation"
             }
@@ -2786,7 +2786,7 @@
             {
               "message": "`encode_assoc_type_item()` and `encode_assoc_const_item()` still call `parse_type_ref_str()` without any trait-generic context, then rely on `rewrite_generic_types()`. That rewrite does not descend into `Type::QualifiedPath`, so valid defaults/types like `T::Item`, `<T as Trait>::Assoc`, or `Vec<T::Assoc>` will keep a non-generic self-type and can be emitted as the wrong rustdoc shape. The new assoc-item codec will therefore mis-encode valid trait-generic inputs instead of matching the C-side representation.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
               "line": 530,
               "category": "correctness"
             }
@@ -2801,7 +2801,7 @@
             {
               "message": "This appends `AssocType`/`AssocConst` IDs into `Trait.items`, but the contract-map renderer still walks `Trait.items` and emits only `ItemEnum::Function` children. As a result, traits with associated items now influence equality/signals but those items remain invisible in rendered output, so the D4 change is internally inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
               "line": 62,
               "category": "correctness"
             }
@@ -2816,7 +2816,7 @@
             {
               "message": "`validate_trait_item_names` now enforces a single flat name set across methods, associated types, and associated consts. That rejects valid traits that reuse an identifier across namespaces (for example, an associated type and a method with the same name), so the codec will fail on some legal catalogues instead of round-tripping them.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
               "line": 25,
               "category": "correctness"
             }
@@ -2858,16 +2858,16 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `resolve_external_type_ids` still only recurses through `ResolvedPath` and container variants, but the new assoc-item encoder now emits `Type::QualifiedPath` values. Any external crate ids inside `self_type` or `trait_` stay unresolved, so valid trait-scoped defaults like `<ext::Foo as ext::Trait>::Assoc` can compare/resolve incorrectly. See [encoder_state_type_ref_parsing.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs#L32) and [encoder_state_fn_trait_codec.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs#L559).",
+              "message": "P1: `resolve_external_type_ids` still only recurses through `ResolvedPath` and container variants, but the new assoc-item encoder now emits `Type::QualifiedPath` values. Any external crate ids inside `self_type` or `trait_` stay unresolved, so valid trait-scoped defaults like `<ext::Foo as ext::Trait>::Assoc` can compare/resolve incorrectly. See [encoder_state_type_ref_parsing.rs](<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs#L32) and [encoder_state_fn_trait_codec.rs](<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs#L559).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_type_ref_parsing.rs",
               "line": 32,
               "category": "correctness"
             },
             {
-              "message": "P1: `rewrite_trait_scoped_type_inner` does not recurse into `ImplTrait`, `DynTrait`, `FunctionPointer`, or `Pat`, so trait projections nested inside those forms are left as plain `ResolvedPath` nodes. Inputs like `Vec<fn() -> T::Item>` or `impl Iterator<Item = T::Item>` will be mis-encoded instead of producing the expected qualified projection shape. See [encoder_state_fn_trait_codec.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs#L564).",
+              "message": "P1: `rewrite_trait_scoped_type_inner` does not recurse into `ImplTrait`, `DynTrait`, `FunctionPointer`, or `Pat`, so trait projections nested inside those forms are left as plain `ResolvedPath` nodes. Inputs like `Vec<fn() -> T::Item>` or `impl Iterator<Item = T::Item>` will be mis-encoded instead of producing the expected qualified projection shape. See [encoder_state_fn_trait_codec.rs](<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs#L564).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder_state_fn_trait_codec.rs",
               "line": 564,
               "category": "correctness"
             }
@@ -2993,7 +2993,7 @@
             {
               "message": "`verify_sibling_json_stages()` returns immediately on any Stage 1 error (`return Some(stage1)`), so the combined `verify()` path never reports Stage 2 findings when `spec.json` is stale or otherwise invalid. This contradicts the briefing requirement that the combined caller merge Stage 1 and Stage 2 outcomes, and it can silently hide type-signal violations behind an earlier spec-adr failure.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/spec_states.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/spec_states.rs",
               "line": 439,
               "category": "correctness"
             }
@@ -3008,7 +3008,7 @@
             {
               "message": "P1: `verify_sibling_json_stages` always invokes and merges both stage functions, so a symlink-guard failure on `spec.json` is reported twice (once from each stage). That violates the briefing’s no-double-counting requirement and inflates `VerifyOutcome::error_count()` for a single underlying failure. Short-circuit stage 2 when stage 1 fails on the shared file/symlink preamble, or dedupe identical findings before merging.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/spec_states.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/spec_states.rs",
               "line": 438,
               "category": "correctness"
             }
@@ -3088,7 +3088,7 @@
             {
               "message": "P1 testing gap: `test_v3_catalogue_signals_referencing_nonexistent_type_produces_finding` does not exercise the missing-entry path it claims to cover. It writes `V3_CATALOGUE_EMPTY` plus all-zero hashes, so `execute_catalogue_spec_signals` exits earlier on the coverage-mismatch branch before the new freshness / domain-gate delegation is reached. A regression in the real non-existent-type path would still pass this test.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/catalogue_spec_signals.rs",
               "line": 749,
               "category": "testing"
             }
@@ -3103,7 +3103,7 @@
             {
               "message": "These two new `pub` helpers are only exercised indirectly by the module tests. `compute_catalogue_entry_hash` has untested failure paths (`invalid JSON`, missing section/key), and `compute_catalogue_declaration_hash` expands the public surface without a direct contract test. Either keep them `pub(crate)` if they are test-only, or add direct happy-path and error-path coverage.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/catalogue_spec_signals.rs",
               "line": 108,
               "category": "testing"
             }
@@ -3697,14 +3697,14 @@
             {
               "message": "The chain-0 result is only merged at the end of the function, but the early returns here and at the later `stage1.has_errors()` check exit before that merge. Invalid branches or missing/failed `spec.json` therefore drop ADR findings entirely, which contradicts the new requirement that chain ⓪ be accumulated independently of the other stages.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
               "line": 305,
               "category": "correctness"
             },
             {
               "message": "The new `strict=false` arm in `check_chain2_for_layer` is not exercised by any test in this scope, and every existing test now hardcodes `all_strict_matrix()`. That leaves the new warning-mode behavior and the added ADR reader port effectively unverified, so a regression in the non-blocking path could ship unnoticed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate/chain2_gate.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate/chain2_gate.rs",
               "line": 275,
               "category": "test coverage"
             }
@@ -3726,7 +3726,7 @@
             {
               "message": "`check_strict_merge_gate` reads the ADR report before calling `validate_branch_ref`, so an untrusted branch string reaches the `TrackBlobReader` port unvalidated. That reintroduces the very ref-safety check this function is supposed to enforce and can make the adapter operate on malicious refs like `..` or `@{...}` before the branch is rejected.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/merge_gate.rs",
               "line": 287,
               "category": "security"
             }

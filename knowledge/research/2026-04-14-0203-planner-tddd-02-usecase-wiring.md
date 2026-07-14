@@ -761,8 +761,8 @@ The `read_enabled_layers` adapter reads `architecture-rules.json` from the PR br
 
 ### Critical Files for Implementation
 
-- `/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs`
-- `/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/baseline.rs`
-- `/home/flip451/individual/t-rust/templates/SoTOHE-core/architecture-rules.json`
-- `/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md`
-- `/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/tddd_layers.rs`
+- `apps/cli/src/commands/track/tddd/signals.rs`
+- `apps/cli/src/commands/track/tddd/baseline.rs`
+- `architecture-rules.json`
+- `.claude/commands/track/design.md`
+- `libs/infrastructure/src/verify/tddd_layers.rs`

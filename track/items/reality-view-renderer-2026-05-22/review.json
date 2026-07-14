@@ -42,7 +42,7 @@
             {
               "message": "Section F says every `Struct / Enum / Trait / TypeAlias / Function` entry is subgraph化, but the surrounding text treats `FunctionEntry` as a standalone callable node that is not subgraphized. This needs one consistent rule for Function entries.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
               "line": 202,
               "category": "contradiction"
             }
@@ -57,7 +57,7 @@
             {
               "message": "Decision O indexes traits by `(CrateName, TraitName)` after reducing `Impl.trait_` to the last `::` segment. That drops module-path information, so a crate with two public traits that share the same short name will collide and impl edges can be misresolved or silently skipped.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
               "line": 287,
               "category": "factual error"
             }
@@ -401,7 +401,7 @@
             {
               "message": "The ADR already defines `BaselineDocument` as a three-field wrapper struct earlier in the document, but this consequence bullet still calls it a `wrapper newtype`. In Rust, \"newtype\" implies a single-field tuple struct, so this wording contradicts the chosen data shape and can mislead the follow-up type-design/implementation work.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
+              "file": "knowledge/adr/2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation.md",
               "line": 562,
               "category": "factual error"
             }
@@ -487,7 +487,7 @@
             {
               "message": "`BaselineGraphRenderer` now describes `render_clusters` as enumerating clusters with an `external item filter crate_id!=0`, but the infrastructure artifact says the adapter filters to local-crate items only (`crate_id == 0`) before deriving cluster keys. Those two descriptions disagree on which `krate.paths` entries drive depth-2 cluster generation, so the plan is internally inconsistent about the renderer's source set.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/reality-view-renderer-2026-05-22/domain-types.json",
+              "file": "track/items/reality-view-renderer-2026-05-22/domain-types.json",
               "line": 315,
               "category": "contradiction"
             }
@@ -887,7 +887,7 @@
             {
               "message": "The new ID-validation behavior is not actually covered here: `test_execute_contract_map_with_invalid_track_id_returns_error` uses a temp dir that is not a Git repo, so `execute_contract_map` returns from `SystemGitRepo::discover_from` before it ever reaches `TrackId::try_new`. As written, this test would still pass if the new CLI-boundary validation regressed, and there is no negative test for invalid `--layers` input either.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "file": "apps/cli/src/commands/track/tddd/contract_map.rs",
               "line": 161,
               "category": "testing"
             }
@@ -902,7 +902,7 @@
             {
               "message": "Move the `TrackId::try_new` validation ahead of the git-discovery/branch guard. As written, a malformed `track_id` is still masked by `cannot discover git repo` or branch-mismatch failures whenever `workspace_root` is not a valid repo, so the new CLI-boundary validation does not actually run first. The added invalid-track-id test also does not exercise the new path because it uses a temp dir that fails discovery earlier.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "file": "apps/cli/src/commands/track/tddd/contract_map.rs",
               "line": 44,
               "category": "error handling"
             }
@@ -931,7 +931,7 @@
             {
               "message": "The new CLI composition root still lacks a real success-path test. `test_execute_baseline_graph_branch_guard_passes_for_current_track` only proves the branch guard does not reject; it accepts any loader/renderer/writer failure and skips entirely on non-`track/` branches. That leaves regressions in the new wiring (wrong adapter construction, wrong style-config path, broken writer output path) uncovered in CI.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "file": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
               "line": 262,
               "category": "testing"
             }
@@ -978,7 +978,7 @@
             {
               "message": "This filter still admits public inherent methods as standalone `Function` nodes. The only gates here are `crate_id == 0`, `krate.paths.contains_key(id)`, and `Visibility::Public`, but method items are also registered in `Crate::paths` as `ItemKind::Function` with paths like `[crate, ..., ParentName, method_name]`, so they pass this check and get misclassified as top-level functions. That violates the documented 'standalone / top-level only' scope for `ItemEnum::Function` and will render methods in the wrong place.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_extractor.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_extractor.rs",
               "line": 123,
               "category": "correctness"
             }
@@ -993,7 +993,7 @@
             {
               "message": "`ItemEnum::Function` is emitted whenever the item is public and present in `krate.paths`, but that does not prove it is a free function. Rustdoc can also place associated methods in `paths`, so this loop will misclassify public impl/trait methods as top-level Function nodes and violate the standalone-function requirement. Exclude method IDs (or otherwise check the parent `Trait`/`Impl` item lists) before constructing `ExtractedNode::Function`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_extractor.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_extractor.rs",
               "line": 128,
               "category": "correctness"
             }
@@ -1059,7 +1059,7 @@
             {
               "message": "`function_node_id` sanitizes the entire `full_path` as one string, which drops path-boundary information and can produce identical ids for different functions when module or item names contain underscores. For example, `crate::a::b__c::f` and `crate::a__b::c::f` both sanitize to `crate__a__b__c__f`, so the final `F<len>_...` ids collide even though the paths are distinct. This breaks the intended injective node-id scheme and can merge unrelated function nodes/edges.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_id_generator.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_id_generator.rs",
               "line": 149,
               "category": "correctness"
             }
@@ -1074,14 +1074,14 @@
             {
               "message": "`module_path_from_summary` does not return the `sanitized_module_path` format required by the ADR/spec. It length-encodes each middle segment (`6__review__7__manager`), but the contract says the module path should just be the middle segments joined with `_` after sanitization (`review_manager`). As written, every type/trait id built from this helper will diverge from the documented `T<len>_...` / `R<len>_...` format.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_id_generator.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_id_generator.rs",
               "line": 193,
               "category": "correctness"
             },
             {
               "message": "`function_node_id` is also using a per-segment length encoding (`encode_path_segments`) instead of the spec's `sanitized_full_path` string. The ADR defines `F<len>_<sanitized_layer>_<sanitized_crate>_<sanitized_full_path>`, so this implementation will generate ids that do not match the documented format for any function path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_id_generator.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/node_id_generator.rs",
               "line": 153,
               "category": "correctness"
             }
@@ -1125,21 +1125,21 @@
             {
               "message": "Grouping Struct/Enum/Trait/TypeAlias entries by the short `name` key overwrites same-named items from different modules, so one of the colliding entries and its edges disappear from the rendered graph.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
               "line": 553,
               "category": "correctness"
             },
             {
               "message": "This call renders every crate cluster with the full `baselines` slice, and `emit_all_entries_for_layer` also extracts nodes from the full layer, so a layer with multiple crates duplicates all entries under every `*_root` cluster instead of scoping the content to that crate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
               "line": 342,
               "category": "correctness"
             },
             {
               "message": "`field_type_node_id` resolves same-crate `Type::ResolvedPath` values to `type_node_id` (the subgraph id) instead of the representative `type_rep_node_id`, so struct-field, enum-payload, and alias edges target the container rather than the concrete node the renderer creates for edge endpoints.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
               "line": 677,
               "category": "correctness"
             }
@@ -1183,14 +1183,14 @@
             {
               "message": "`build_entry_label` reconstructs the display path by replacing every `_` with `::`, but `module_path_from_summary()` already collapses real path segments with `_`. Any module segment that legitimately contains an underscore will be rendered as a different path (for example `foo_bar` becomes `foo::bar`), so the emitted subgraph labels can be wrong.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
               "line": 686,
               "category": "correctness"
             },
             {
               "message": "`VariantKind::Struct` payload handling ignores `has_stripped_fields`. When rustdoc omits hidden/private variant fields, this code still emits edges for the remaining field IDs, which produces a partial and potentially misleading enum-variant shape instead of skipping or marking the incomplete payload.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
               "line": 265,
               "category": "correctness"
             }
@@ -1241,7 +1241,7 @@
             {
               "message": "This match only emits impl edges for `Type::ResolvedPath` and blanket bodies for `Type::Generic`. Legal trait impls on primitives, tuples, arrays, references, and other concrete self types fall into `_ => continue`, so their `-.impl.->` edges are silently omitted and the rendered graph is incomplete.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/impl_processor.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/impl_processor.rs",
               "line": 430,
               "category": "correctness"
             }
@@ -1359,7 +1359,7 @@
             {
               "message": "The overview renderer hardcodes `:::cluster` on every cluster node even though it reads the configured cluster class from `style.node[\"Cluster\"].class`. That means cluster styling is not fully config-driven: a user-defined `classDef cluster` will be applied unintentionally, and a non-`cluster` class name is only partially honored.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
               "line": 556,
               "category": "spec_divergence"
             }
@@ -1374,14 +1374,14 @@
             {
               "message": "`ClusterKey::node_id()` is not injective: it concatenates two already-valid identifiers with `_`, so distinct clusters can collapse to the same Mermaid node id when the crate name or top-level module contains underscores. The `\"root\"` sentinel in `cluster_key_from_path()` makes the ambiguity worse by merging a real top-level `root` module with crate-root items. That can silently merge separate clusters and misroute cross-cluster edges.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
               "line": 257,
               "category": "correctness"
             },
             {
               "message": "The `emit_all_entries_for_layer()` result is discarded and the scratch edge buffer is still consumed afterward. If edge-style resolution fails partway through rendering, the overview can emit a partial, misleading cross-cluster edge set instead of propagating the error or suppressing the harvest entirely.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
               "line": 486,
               "category": "error_handling"
             }
@@ -1396,14 +1396,14 @@
             {
               "message": "`ClusterKey::node_id()` is not injective: it just sanitizes and concatenates `crate_name` and `module_seg1`, so distinct raw cluster keys can alias after sanitization (for example `a-b` + `c` vs `a` + `b_c`). `cluster_key_from_path()` also uses the literal `root` sentinel, so a real top-level module named `root` collapses into the crate-root cluster. That can merge unrelated clusters and misclassify edges.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
               "line": 256,
               "category": "correctness"
             },
             {
               "message": "`render_overview_mermaid()` suppresses any error from `emit_all_entries_for_layer()` and clears `all_edge_lines`. If a required edge style is missing or another render failure occurs, the function still returns `Ok(...)` with cross-cluster edges silently omitted instead of failing closed, which hides configuration problems and contradicts the stated error contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
               "line": 489,
               "category": "error handling"
             }
@@ -1418,7 +1418,7 @@
             {
               "message": "The overview renderer still emits inline `:::<class>` annotations for cluster nodes (`{cluster_node_id}[\"{label}\"]:::{cluster_class}`) even though the T009 brief requires class application to be emitted only as separate `class <id> <className>` lines. That violates the mandated output structure and reintroduces the Mermaid parsing risk this step was meant to eliminate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
               "line": 578,
               "category": "spec deviation"
             }
@@ -1433,7 +1433,7 @@
             {
               "message": "The overview reducer discards the original edge syntax and label when it collapses cross-cluster relations: every surviving relation is re-emitted as `-->` after deduping by `(src_cluster, dst_cluster)`. That turns explicit non-directional/typed edges such as `---|alias_of|` into plain directed arrows and can collapse different relation kinds between the same cluster pair into one arbitrary edge, so the depth-1 diagram no longer faithfully reflects the underlying graph.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
               "line": 503,
               "category": "spec"
             }
@@ -1448,7 +1448,7 @@
             {
               "message": "`lookup_cluster` uses a raw string prefix match (`starts_with(\"{key}_\")`) to classify edge endpoints. That can misattribute non-entry node ids such as `anon_*`, `prim_*`, or `generic_*` when their text happens to share a cluster prefix, which then produces incorrect cluster-pair aggregation or drops real cross-cluster edges.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
               "line": 405,
               "category": "correctness"
             }
@@ -1478,7 +1478,7 @@
             {
               "message": "`ClusterKey::node_id()` builds Mermaid ids by simply concatenating sanitized `crate_name` and `module_seg1`, so distinct valid clusters can collide after sanitization (for example `foo` + `bar_baz` and `foo_bar` + `baz` both become `foo_bar_baz`). That would merge unrelated clusters and misattach edges/classes in the overview; the `",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
               "line": 262,
               "category": "correctness"
             }
@@ -1493,14 +1493,14 @@
             {
               "message": "`ClusterKey::node_id()` is not injective for legal Rust names. Sanitizing each segment and joining them with `__` still collides when one side has leading/trailing underscores, so two distinct `(crate_name, module_seg1)` pairs can render to the same Mermaid node id and be merged into one cluster.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
               "line": 263,
               "category": "correctness"
             },
             {
               "message": "`cluster_key_from_path()` uses the literal string `\"root\"` as a sentinel for crate-root items. That makes a real top-level module named `root` indistinguishable from crate-root entries, so different clusters collapse together and their cross-cluster edges are attributed to the wrong cluster.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
               "line": 292,
               "category": "correctness"
             }
@@ -1626,14 +1626,14 @@
             {
               "message": "Cluster-local entry filtering does not cover blanket-body nodes. `build_blanket_body_map(...)` is still populated with only `crate_filter`, so a depth-2 cluster can render blanket impl bodies declared in a different top-level module. That breaks the \"cluster-internal only\" guarantee for trait subgraphs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
               "line": 734,
               "category": "correctness"
             },
             {
               "message": "Cross-crate same-layer type references still fall back to anonymous node IDs here, so the new cluster post-filter cannot map them to a cluster. Field/alias/variant edges to another cluster will be kept as local edges instead of being suppressed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/entry_subgraph.rs",
               "line": 980,
               "category": "correctness"
             }
@@ -1707,7 +1707,7 @@
             {
               "message": "Non-symlink I/O failures from the track-directory symlink guard are mapped to `LayerDiscoveryFailed`, but the port contract says filesystem failures during load should surface as `IoError`. A permission/stat failure on `track_root/<track_id>` will therefore be misclassified as an `architecture-rules.json` discovery problem instead of a normal load I/O error, which breaks callers that rely on the error split.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_loader_adapter.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_loader_adapter.rs",
               "line": 116,
               "category": "contract_violation"
             }
@@ -1722,7 +1722,7 @@
             {
               "message": "Non-symlink I/O failures from the `track_dir` symlink-guard path are classified as `LayerDiscoveryFailed`, but the port contract reserves `LayerDiscoveryFailed` for `architecture-rules.json` discovery/parsing and uses `IoError` for ordinary filesystem failures during load. A permission/stat failure on `track_root/<track_id>` will therefore be reported under the wrong error variant and break callers that rely on the split.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_loader_adapter.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_loader_adapter.rs",
               "line": 112,
               "category": "contract_violation"
             }
@@ -1737,7 +1737,7 @@
             {
               "message": "`load_all` silently collapses `schema_export.targets` to `first()` and ignores the rest. The rest of the TDDD pipeline treats multi-target layers as unsupported and fails closed, so this adapter can accept an invalid configuration and return a `BaselineDocument` with the wrong `crate_name` instead of surfacing an error. That can make downstream rendering attribute the baseline to the wrong crate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_loader_adapter.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_loader_adapter.rs",
               "line": 206,
               "category": "correctness"
             }
@@ -1752,7 +1752,7 @@
             {
               "message": "Non-symlink I/O failures while checking `track_root/<track_id>` are converted to `LayerDiscoveryFailed`, but `BaselineGraphLoaderError` reserves that variant for `architecture-rules.json` discovery/parsing. A permission/stat failure on the track directory will therefore be misreported under the wrong error branch instead of surfacing as a normal load I/O failure, which breaks callers that distinguish loader I/O from rules discovery.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_loader_adapter.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_loader_adapter.rs",
               "line": 125,
               "category": "contract_violation"
             }
@@ -1767,7 +1767,7 @@
             {
               "message": "Rejecting `schema_export.targets.len() > 1` makes `load_all` fail on a valid multi-crate layer configuration. The ADR/spec explicitly model `1 layer N crate` via `Vec<BaselineDocument>`, so this branch prevents the baseline-graph pipeline from loading an approved configuration instead of returning the per-crate documents it is designed to support.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_loader_adapter.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_loader_adapter.rs",
               "line": 196,
               "category": "correctness"
             }
@@ -1796,7 +1796,7 @@
             {
               "message": "`cluster_key` is interpolated directly into `out_path` without validation. A raw value containing path separators, `..`, or an absolute path can escape `track_root/<track_id>/<layer>-graph-d2/`, and `reject_symlinks_below` does not block that class of path traversal. This permits arbitrary file writes outside the intended directory.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_writer_adapter.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_writer_adapter.rs",
               "line": 144,
               "category": "security"
             }
@@ -1811,7 +1811,7 @@
             {
               "message": "`cluster_key` is inserted directly into the output path (`out_dir.join(format!(\"{cluster_key}.md\"))`) without validating that it is a single safe path segment. A caller can supply `../` or separator characters to escape `.../<layer>-graph-d2/`, and `reject_symlinks_below()` does not canonicalize or reject `..` traversal, so the write can land outside the intended track directory.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_writer_adapter.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_writer_adapter.rs",
               "line": 144,
               "category": "security"
             }
@@ -1840,7 +1840,7 @@
             {
               "message": "These new \"layer-agnostic\" tests still check raw `contains(layer_str)` / `contains(\"subgraph ...\")` substrings, but Mermaid headers are `subgraph <id>[\"<label>\"]`. Because `layer_subgraph_id(layer)` already injects the layer string into the id, a regression that hardcodes the label while keeping the id dynamic would still pass. That leaves CN-01 untested in the exact cases this change is meant to cover.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
               "line": 1979,
               "category": "test coverage"
             }
@@ -1899,14 +1899,14 @@
             {
               "message": "`collect_own_crate_node_ids_from_type` treats every own-crate `ResolvedPath` as a valid edge target, but it does not apply the renderer's public/supportable-kind filter. If a method signature mentions a private type or an item kind that `node_extractor` never renders (for example a union), this will emit a phantom `method_param`/`method_returns` edge to a missing node id.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/impl_processor.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/impl_processor.rs",
               "line": 373,
               "category": "correctness"
             },
             {
               "message": "The `GenericArgs::AngleBracketed` walk only recurses through `GenericArg::Type` and ignores `constraints`. Rustdoc stores associated-type/constant bindings there, so signatures like `Foo<Item = MyType>` can silently lose own-crate references and never emit the corresponding method edge.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/impl_processor.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/impl_processor.rs",
               "line": 421,
               "category": "correctness"
             }
@@ -1979,7 +1979,7 @@
             {
               "message": "Pass 3a walks every `Function` inside an inherent `Impl`, but it never applies the public-only filter that depth-2 inherent method rendering uses, and it does not skip CN-11 provided methods either. As written, private helper methods can now contribute cluster edges, so the overview can over-report dependencies that are not visible in the rendered API surface. Mirror `emit_inherent_methods`' visibility/provided-method guards before collecting signatures.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_graph_renderer_adapter/render/mod.rs",
               "line": 775,
               "category": "correctness"
             }
@@ -2092,7 +2092,7 @@
             {
               "message": "`layer_filter` entries are copied verbatim into `resolved`, so duplicate `LayerId`s are rendered and written multiple times and `rendered_layer_count` is inflated. That makes the baseline-graph workflow behave differently from the contract-map workflow, where duplicates collapse via membership filtering. If repeated layers are meant to be harmless input, this needs deduping before the render/write loop.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/baseline_graph_workflow.rs",
+              "file": "libs/usecase/src/baseline_graph_workflow.rs",
               "line": 257,
               "category": "logic"
             }

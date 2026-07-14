@@ -38,14 +38,14 @@
             {
               "message": "`cargo make track-sync-views` is still documented as the primary way to generate `plan.md` in both the SSoT and lifecycle sections, but that wrapper task was deleted from `Makefile.toml` in this patch. Following the workflow now points users at a non-existent command; the doc should be updated to only reference `bin/sotp track views sync`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/workflow.md",
+              "file": "track/workflow.md",
               "line": 154,
               "category": "broken ref"
             },
             {
               "message": "The `track-active-gate` / `track-commit-message` descriptions still mention `track-local-review`, but that wrapper was removed from the same change. The Makefile's own help text now advertises a task path that no longer exists, which leaves stale migration guidance in the canonical task list.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 659,
               "category": "broken ref"
             }
@@ -60,14 +60,14 @@
             {
               "message": "This canonical review-fix doc still names deleted wrapper tasks (`track-check-approved` here, and `track-sync-views` a few lines below). The workflow now routes through `bin/sotp review check-approved` and `bin/sotp track views sync`, so leaving the old task names is a broken ref in the instructions that drive the review gate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.agents/skills/review-fix-lead/SKILL.md",
+              "file": ".agents/skills/review-fix-lead/SKILL.md",
               "line": 22,
               "category": "broken ref"
             },
             {
               "message": "The `track-commit-message` description still says the regen sequence is shared with `track-local-review`, but that wrapper was removed in this change set. The description no longer matches the actual native `review local` path, so this leaves a stale reference in a task that is still part of the workflow.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 689,
               "category": "broken ref"
             }
@@ -141,7 +141,7 @@
             {
               "message": "The deleted passthrough-task checks were removed, but this file no longer asserts the two retained `track-local-review-fix-codex` / `track-local-dry-fix` Makefile wrappers added in `Makefile.toml`. A regression in either CODEX_BIN shell wrapper would now slip past `scripts/test_make_wrappers.py`, so the retained tasks need explicit coverage.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/scripts/test_make_wrappers.py",
+              "file": "scripts/test_make_wrappers.py",
               "line": null,
               "category": "testing"
             }
@@ -170,14 +170,14 @@
             {
               "message": "`track-pr` at this block no longer does the documented push + ensure-pr workflow. It now aliases `track-pr-push` by calling `bin/sotp pr push`, so `cargo make track-pr` will never create or reuse a PR after pushing; it also drops `${@}`, so plan-branch callers lose the optional track-id path. The updated assertions in `scripts/test_make_wrappers.py:275-295` mirror this regression instead of catching it.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 647,
               "category": "correctness"
             },
             {
               "message": "`track-pr-push` and `track-pr-review` no longer forward `${@}` into the native `sotp pr ...` subcommands. The Rust CLI still accepts `PushArgs.track_id` and `ReviewCycleArgs.{track_id,resume}` (`apps/cli/src/commands/pr.rs:31-91`), so this drops the explicit track-id path for plan branches and makes `cargo make track-pr-review --resume` impossible. `scripts/test_make_wrappers.py:278-295` also stopped asserting forwarded args, so the regression is now unguarded.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 642,
               "category": "correctness"
             }
@@ -207,7 +207,7 @@
             {
               "message": "The rewritten PR wrappers no longer mirror the separator handling in the Rust dispatcher: the old `track-pr`/`track-pr-push`/`track-pr-review` flow strips a leading `--` before forwarding args, but these Makefile tasks now pass `${@}`/`CARGO_MAKE_TASK_ARGS` straight through. That makes the documented `cargo make ... -- ...` form able to forward a literal `--` into `bin/sotp`, which will break clap parsing for `pr push`, `pr ensure-pr`, and `pr review-cycle`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 662,
               "category": "correctness"
             }
@@ -280,7 +280,7 @@
             {
               "message": "This wrapper no longer preserves the old positional `cargo make track-set-commit-hash <track-id>` contract. It now forwards `${@}` straight to `sotp track set-commit-hash`, but the native `track` subcommand only accepts `--track-id`, so any existing explicit-track invocation will fail with an unexpected positional argument. If the task is meant to stay user-facing, translate the forwarded value to `--track-id` or make the no-arg-only behavior explicit.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 667,
               "category": "correctness"
             }
@@ -317,7 +317,7 @@
             {
               "message": "`track-commit-message` now invokes `bin/sotp dry check-approved` without forwarding the required `--track-id`, and it also stops passing the per-track threshold that the old Rust path resolved from `dry-check.json`. As written this step will fail at the DRY gate, and even after adding the missing track id it would silently fall back to the CLI default threshold instead of preserving the previous gate semantics.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 708,
               "category": "correctness"
             }
@@ -449,7 +449,7 @@
             {
               "message": "The new `threshold: None` branch in both `dry_write` and `dry_check_approved` has no unit coverage. Every existing test in this module still passes `Some(...)`, so the fail-closed config lookup (`DryCheckConfig::load`) and the required missing-config error path can regress without detection.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 243,
               "category": "testing"
             }
@@ -464,7 +464,7 @@
             {
               "message": "The new `threshold: None` path in `dry_write`/`dry_check_approved` has no coverage at all. The existing tests only exercise `Some(...)` inputs, so the new config-fallback and fail-closed behavior can regress without a unit test catching a broken `.harness/config/dry-check.json` load or a missing config file.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 243,
               "category": "test_coverage_gap"
             }
@@ -479,7 +479,7 @@
             {
               "message": "The new `threshold: None` tests do not create `.harness/config/dry-check.json`; they only assert that the error is not `invalid --threshold`. As written, they will still pass if the config fallback never runs, so the new fail-closed/config-loading behavior is not actually covered.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 1329,
               "category": "testing"
             }
@@ -667,7 +667,7 @@
             {
               "message": "This section still advertises the deleted daemon task `cargo make test-one-exec`, so the harness-policy docs point users at a command that no longer exists. Update it to the new run-`--rm` wrapper or remove the example.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/rules/07-dev-environment.md",
+              "file": ".claude/rules/07-dev-environment.md",
               "line": 186,
               "category": "broken-ref"
             }
@@ -696,14 +696,14 @@
             {
               "message": "Stale `cargo make track-local-review` guidance remains after the migration. That wrapper is no longer defined, so the agent now points at a dead command; the same stale reference also appears in `.claude/rules/07-dev-environment.md:15`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
+              "file": ".claude/agents/review-fix-lead.md",
               "line": 22,
               "category": "broken ref"
             },
             {
               "message": "The direct `bin/sotp review local` example still includes a `--` separator before the flags. `review local` takes its flags directly, so this command will not parse; the same mistake also appears in `.claude/rules/10-guardrails.md:82-83` for the planner/reviewer examples.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "file": ".claude/commands/track/review.md",
               "line": 100,
               "category": "command syntax"
             }
@@ -718,7 +718,7 @@
             {
               "message": "The PermissionRequest hook still tells users to fall back to `cargo make track-review-results`, `cargo make track-check-approved`, and `cargo make track-local-plan` for direct native review/plan commands, but those cargo-make tasks are no longer defined and were removed from the allowlists. That leaves the newly documented `bin/sotp review results` / `bin/sotp review check-approved` / `bin/sotp plan codex-local` paths blocked with no valid fallback.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/settings.json",
+              "file": ".claude/settings.json",
               "line": 64,
               "category": "broken_ref"
             }
@@ -733,7 +733,7 @@
             {
               "message": "The fallback example for the reviewer is not runnable as written: `bin/sotp review local` requires `--round-type` and `--group`, but the guardrail only shows `--model` and `--briefing-file`. Copying this snippet will fail argument parsing instead of launching the reviewer.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/rules/10-guardrails.md",
+              "file": ".claude/rules/10-guardrails.md",
               "line": 83,
               "category": "broken_ref"
             }
@@ -748,14 +748,14 @@
             {
               "message": "The reviewer invocation example is stale: the real fixer prompt prepends `bin/sotp track views sync &&` and passes `--track-id`, but this section shows only `bin/sotp review local --round-type fast --group {scope} --briefing-file ...` and says the reviewer self-resolves track-id. That misstates the command contract and can lead agents to omit the sync prelude.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "file": ".claude/commands/track/review.md",
               "line": 100,
               "category": "correctness"
             },
             {
               "message": "`sotp review local` does not invoke `track type-signals`; only the commit-gate `track-active-gate` does. This note overstates the host-side `protoc` requirement for review runs and ties it to the wrong command path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/rules/07-dev-environment.md",
+              "file": ".claude/rules/07-dev-environment.md",
               "line": 15,
               "category": "correctness"
             }
@@ -770,7 +770,7 @@
             {
               "message": "This still refers to `sotp review codex-local`, but the current entry point is `bin/sotp review local`. The old command name is no longer valid, so this guidance now points agents at a non-existent command.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
+              "file": ".claude/agents/review-fix-lead.md",
               "line": 57,
               "category": "broken_ref"
             }
@@ -785,7 +785,7 @@
             {
               "message": "This note still points to `track-pr-merge`, but that cargo-make wrapper no longer exists; the merge path has been renamed to `bin/sotp pr wait-and-merge` / `/track:merge`. Update the note so it does not reference a dead command.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/pr-review.md",
+              "file": ".claude/commands/track/pr-review.md",
               "line": 34,
               "category": "broken_ref"
             }
@@ -800,21 +800,21 @@
             {
               "message": "PermissionRequest still tells users to fall back to `cargo make track-check-approved` and `cargo make track-review-results`, but this patch removed those wrappers from the allowlist and Makefile, so the hook now points at dead commands for `bin/sotp review check-approved` / `results`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/settings.json",
+              "file": ".claude/settings.json",
               "line": 64,
               "category": "broken ref"
             },
             {
               "message": "The Codex dry-fix wrapper example is missing the `--` separator before forwarded args. Without it, `--track-id` and `--briefing-file` are treated as cargo-make flags instead of reaching `track-local-dry-fix`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/dry-check.md",
+              "file": ".claude/commands/track/dry-check.md",
               "line": 22,
               "category": "command syntax"
             },
             {
               "message": "Both Codex review-fix examples dropped the `--` separator (`cargo make track-local-review-fix-codex --scope ...`), so `--scope` / `--track-id` / `--briefing-file` will not be forwarded to the wrapper. The fast-round example at this line and the final-round example at line 127 both need the separator restored.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/review.md",
+              "file": ".claude/commands/track/review.md",
               "line": 87,
               "category": "command syntax"
             }
@@ -894,21 +894,21 @@
             {
               "message": "`.claude/commands/track/implement.md:18` still tells implementers to fix the plan with `track-sync-views`, but that wrapper was removed in this teardown. This leaves a dead command in the canonical workflow doc.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/implement.md",
+              "file": ".claude/commands/track/implement.md",
               "line": 18,
               "category": "broken ref"
             },
             {
               "message": "`.claude/commands/track/commit.md:93` still reports `track-sync-views` in the summary output, and the surrounding note says `bin/sotp track views sync` regenerates `ALL` tracks. The native command now only refreshes the active track (or registry-only mode when no track branch is resolved), so this is both a stale ref and an incorrect scope description.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/commit.md",
+              "file": ".claude/commands/track/commit.md",
               "line": 93,
               "category": "broken ref"
             },
             {
               "message": "`.claude/rules/07-dev-environment.md:73` presents runnable examples that are not valid as written: `bin/sotp review local` is missing required review inputs, `bin/sotp dry fix-local` is missing required `--track-id` and `--briefing-file`, and `bin/sotp plan codex-local` is missing required `--model` and briefing/prompt input.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/rules/07-dev-environment.md",
+              "file": ".claude/rules/07-dev-environment.md",
               "line": 73,
               "category": "incorrect example"
             }
@@ -1041,7 +1041,7 @@
             {
               "message": "Anchoring the new native subcommand to `PathBuf::from(\"track/items\")` makes `bin/sotp track set-commit-hash` fail before the composition layer runs whenever it is launched from a repo subdirectory, because the path is resolved against the current working directory instead of the discovered repo root. The underlying `CliApp::track_set_commit_hash` path already works from the repo root regardless of cwd, so this regresses a valid invocation context.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
+              "file": "apps/cli/src/commands/track/mod.rs",
               "line": 615,
               "category": "behavior regression"
             }
@@ -1155,7 +1155,7 @@
             {
               "message": "`DryCheckApprovedArgs.threshold` now changes parser behavior from a hardcoded default to `Option<f32>`, but this file only updates the `write` parsing tests. There is still no test that `check-approved` parses `threshold` as `None` by default and `Some(...)` when explicitly passed, so a regression in the new CLI surface could slip through.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/dry.rs",
+              "file": "apps/cli/src/commands/dry.rs",
               "line": 182,
               "category": "test coverage"
             }
@@ -1232,7 +1232,7 @@
             {
               "message": "D9 conflates `.harness/config/dry-check.json` as both the source of truth for the DRY threshold and a historical record whose `threshold` value should not affect the next decision. Those roles conflict in the same file/field, so the implementation boundary is ambiguous unless config and history are split or the wording is tightened.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-05-1535-cargo-make-teardown.md",
+              "file": "knowledge/adr/2026-06-05-1535-cargo-make-teardown.md",
               "line": 171,
               "category": "contradiction"
             }
@@ -1304,7 +1304,7 @@
             {
               "message": "`T004` assumes all `bin/sotp make` callers are gone before `apps/cli/src/commands/make.rs` is deleted, but `T008` is still the task that rewrites `commit` / `track-commit-message`. Until `T008` runs, those commit-related tasks remain the remaining callers, so deleting the subcommand at this point would strand them and break CI. Reorder the plan so the commit-script rebuild happens before `T004`, or fold that rewrite into the same step.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cargo-make-teardown-2026-06-05/plan.md",
+              "file": "track/items/cargo-make-teardown-2026-06-05/plan.md",
               "line": 40,
               "category": "infeasibility"
             }
@@ -1341,7 +1341,7 @@
             {
               "message": "`track-signals` has two different removal points in the plan: T005 already removes it from `Makefile.toml` (`plan.md:26`), but S6/S8 still describe it as a wrapper that survives until T009 (`plan.md:46`, `plan.md:60`). T009's actual task body only removes `track-baseline-capture` (`plan.md:63`), so the wrapper's lifecycle is internally contradictory.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cargo-make-teardown-2026-06-05/plan.md",
+              "file": "track/items/cargo-make-teardown-2026-06-05/plan.md",
               "line": 46,
               "category": "contradiction"
             }
@@ -1533,7 +1533,7 @@
             {
               "message": "T008 is marked `done`, but this scope's briefing calls for a progress-marker update to `in_progress`; the regenerated view should stay at `5/10 resolved` with `[~]`, not advance to `6/10 resolved` with `[x]`. `plan.md` mirrors the same completed state.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cargo-make-teardown-2026-06-05/impl-plan.json",
+              "file": "track/items/cargo-make-teardown-2026-06-05/impl-plan.json",
               "line": 36,
               "category": "factual error"
             }
@@ -1562,7 +1562,7 @@
             {
               "message": "`plan.md` still says `track-signals` is present here and will be deleted by `T009`, but the earlier `T005` entry already removes the `track-signals` wrapper task. That makes the S6/S8 ordering note stale and internally inconsistent with the task list.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cargo-make-teardown-2026-06-05/plan.md",
+              "file": "track/items/cargo-make-teardown-2026-06-05/plan.md",
               "line": 46,
               "category": "contradiction"
             }

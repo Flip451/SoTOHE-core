@@ -10,7 +10,7 @@
             {
               "message": "The placeholder note points users to `/track:implement` to generate `impl-plan.json`, but the workflow defines `/track:impl-plan` as the phase that produces `impl-plan.json`; `/track:implement` is the later code-implementation phase.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/verification-md-rename-observations-md-2026-04-25/plan.md",
+              "file": "track/items/verification-md-rename-observations-md-2026-04-25/plan.md",
               "line": 4,
               "category": "factual error"
             }

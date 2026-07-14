@@ -175,14 +175,14 @@
             {
               "message": "S1 describes `domain_service` as the place for DDD domain services, including stateless aggregate-crossing operations, but the selection rules only admit structs with at least one field and route zero-field cases to `free_function`. As written, the new kind does not actually cover the stateless domain-service case it claims to solve.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
               "line": 161,
               "category": "contradiction"
             },
             {
               "message": "S2 says the current `methods_of()` special handling becomes unnecessary, but the replacement still keeps direct arms for `SecondaryPort` and `ApplicationService` and preserves the `SecondaryAdapter` trait-impl path. This is a simplification, not elimination, so the claim is overstated.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
               "line": 235,
               "category": "factual error"
             }
@@ -241,7 +241,7 @@
             {
               "message": "S2 says `methods_of()` will be made uniform after M1, but the proposed match still special-cases `SecondaryAdapter` via `implements` only. That leaves any methods declared on `SecondaryAdapter.expected_methods` invisible to the contract-map, so the renderer change does not actually match the schema uniformization promised in M1.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
+              "file": "knowledge/adr/2026-04-28-0135-tddd-struct-kind-uniformization-and-catalogue-linter.md",
               "line": 262,
               "category": null
             }
@@ -373,7 +373,7 @@
             {
               "message": "T004 defines `CatalogueLinter::run` without `layer_id`, but the rest of the plan models the same port with `layer_id: &str` and T005/T006 are written against that 3-argument signature. As written, the plan gives two incompatible interfaces for `CatalogueLinter`, so the adapter and interactor tasks cannot be implemented consistently until T004 is aligned.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/plan.md",
               "line": 39,
               "category": "contradiction"
             }
@@ -526,14 +526,14 @@
             {
               "message": "`CatalogueLinter` is a `secondary_port`, but this artifact adds `expected_methods` to it. The scope policy explicitly says `secondary_port` entries must not gain that field, so this JSON no longer matches the intended plan-artifact schema.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-struct-kind-uniformization-2026-04-29/domain-types.json",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/domain-types.json",
               "line": 194,
               "category": "factual error"
             },
             {
               "message": "`RunCatalogueLint` is an `application_service`, but this artifact adds `expected_methods` to it. The scope policy explicitly excludes `application_service` entries from the new field, so this entry is semantically inconsistent with the intended codec/catalogue shape.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-struct-kind-uniformization-2026-04-29/usecase-types.json",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/usecase-types.json",
               "line": 87,
               "category": "factual error"
             }
@@ -676,7 +676,7 @@
             {
               "message": "`load_all(track_id)` is described here as if it fetches the layer identified by `layer_id`, but the call is keyed by `track_id` and `layer_id` is only used later for validation/linting. As written, the interactor contract conflates the track scope with the layer scope.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-struct-kind-uniformization-2026-04-29/impl-plan.json",
+              "file": "track/items/tddd-struct-kind-uniformization-2026-04-29/impl-plan.json",
               "line": 36,
               "category": "factual error"
             }
@@ -1029,14 +1029,14 @@
             {
               "message": "Step 1 offers \"continue on the current branch\" when the starting branch is not `main`, but Step 2 still unconditionally creates `track/<id>` from `main`. That leaves no actual execution path for the suggested non-main continuation option, so the command can send the user into an impossible choice.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/init.md",
+              "file": ".claude/commands/track/init.md",
               "line": 19,
               "category": "logic"
             },
             {
               "message": "The non-empty `git status` handling is internally inconsistent for the intended baseline-file case: it first says every listed item needs user handling, then says `knowledge/` baseline files need no action and can just be carried to Step 3, while still requiring the user to resolve the non-empty state before proceeding. As written, the common baseline case can still block the bootstrap flow without a clear resolution rule.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/init.md",
+              "file": ".claude/commands/track/init.md",
               "line": 20,
               "category": "logic"
             }
@@ -1530,7 +1530,7 @@
             {
               "message": "The R3 bullet for `domain_service` says `依存なし or 軽量、状態なし`, but R6 immediately below requires `expected_members >= 1` and defines `domain_service` as a field-bearing domain struct. As written, this can misclassify stateless helpers as `domain_service` instead of `free_function`; the text should say stateful/field-bearing behavior, or otherwise exclude `状態なし` here.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/type-designer-kind-selection.md",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
               "line": 93,
               "category": "correctness"
             }

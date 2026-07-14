@@ -5,7 +5,7 @@
 - 2026-03-29 時点でこのトラックは凍結する。
 - 理由: current spec (`WF-59`) の範囲を超えて、review state 分離 / per-group hash / group 独立進行 / cycle freeze / `check-approved` 再設計が必要だと判明したため。
 - このトラックは `superseded by new review-state architecture` として扱い、review cycle の収束はここでは追わない。
-- 後継設計の叩き台は [tmp/設計方針-2026-03-29-0947.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/tmp/設計方針-2026-03-29-0947.md) を参照。
+- 後継設計の叩き台は [tmp/設計方針-2026-03-29-0947.md](tmp/設計方針-2026-03-29-0947.md) を参照。
 
 ## Scope Verified
 

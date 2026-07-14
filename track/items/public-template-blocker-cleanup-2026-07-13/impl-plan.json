@@ -70,47 +70,50 @@
     {
       "id": "T012",
       "description": "Rewrite the manifest-resolved `knowledge/conventions/**` shipped documents, using `knowledge/adr/README.md` for generic ADR navigation where needed, and add targeted document checks (spec.json#GO-03, #IN-03, #CN-01, #CN-05, #AC-05, #AC-06, #OS-03).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "680f6d9062e8b5799928411a4f4ecaf95a7b6592"
     },
     {
       "id": "T014",
       "description": "Create `.harness/workflows/track/archive.md`, reduce `.claude/commands/track/archive.md` to its invocation/reporting bridge, and add directory-derived archive/registry coverage for `apps/cli/src/commands/track/archive.rs::execute_archive` and `libs/infrastructure/src/track/render/{snapshot.rs,registry.rs}` (spec.json#GO-04, #IN-04, #AC-07, #AC-08, #OS-04).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "680f6d9062e8b5799928411a4f4ecaf95a7b6592"
     },
     {
       "id": "T013",
       "description": "Use the include/overlay file set resolved from `.harness/config/template-boundary.json`, excluding the T012 convention set, to rewrite remaining shipped documents and configuration; perform the required semantic review over that completed resolved set (spec.json#GO-03, #IN-03, #CN-01, #CN-05, #AC-05, #AC-06, #OS-03, #OS-06).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "680f6d9062e8b5799928411a4f4ecaf95a7b6592"
     },
     {
       "id": "T015",
       "description": "From the deterministic `infrastructure::verify::machine_paths::verify` finding order over the `git ls-files` inventory, resolve the first 450 source-line findings and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T016",
       "description": "Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T017",
       "description": "Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T018",
       "description": "Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T019",
       "description": "Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T020",
       "description": "Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the final at-most-84 remaining source-line findings, and record the zero-findings result (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T021",

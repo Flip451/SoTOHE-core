@@ -314,7 +314,7 @@
             {
               "message": "`plan.md` and `impl-plan.json` describe S1/T001 as a \"repo-wide migration of every existing track catalogue file\" under `track/items/**/{domain,usecase,infrastructure}-types.json`, but the briefing explicitly says other tracks' v3 catalogues are intentionally left unmigrated for lazy migration. That makes the rollout boundary inconsistent and overstates the scope of this plan.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/spec-ref-embedded-hash-removal-2026-06-11/plan.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/spec-ref-embedded-hash-removal-2026-06-11/plan.md",
               "line": 9,
               "category": "contradiction"
             }

@@ -350,9 +350,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: [README.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/README.md#L90) and [README.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/README.md#L96) misstate the canonical `/track:adr2pr` flow. The README says the command runs `/track:plan` and then implements/reviews/commits/creates the PR, but the actual orchestrator explicitly says not to invoke `/track:plan`, requires an initial ADR review+commit, and ends at `/track:pr-review` with no merge ([.claude/commands/track/adr2pr.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md#L19), [.claude/commands/track/adr2pr.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md#L39)). A newcomer following the README will execute the wrong sequence and miss required steps.",
+              "message": "P1: [README.md](README.md#L90) and [README.md](README.md#L96) misstate the canonical `/track:adr2pr` flow. The README says the command runs `/track:plan` and then implements/reviews/commits/creates the PR, but the actual orchestrator explicitly says not to invoke `/track:plan`, requires an initial ADR review+commit, and ends at `/track:pr-review` with no merge ([.claude/commands/track/adr2pr.md](.claude/commands/track/adr2pr.md#L19), [.claude/commands/track/adr2pr.md](.claude/commands/track/adr2pr.md#L39)). A newcomer following the README will execute the wrong sequence and miss required steps.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/README.md",
+              "file": "README.md",
               "line": 90,
               "category": "correctness"
             }
@@ -367,7 +367,7 @@
             {
               "message": "Deleting `DEVELOPER_AI_WORKFLOW.md` leaves the doc-pattern verifier still hard-coded to that file. `REQUIRED_LINES` and `CONVENTIONS_REQUIRED_LINES` still require `cargo make verify-track-metadata`, `cargo make verify-tech-stack`, `cargo make verify-latest-track`, `/track:revert`, and the conventions-reference line from `DEVELOPER_AI_WORKFLOW.md`, so `cargo make ci` will now fail once `verify_architecture_docs` runs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/doc_patterns.rs",
+              "file": "libs/infrastructure/src/verify/doc_patterns.rs",
               "line": 103,
               "category": "dead-reference"
             }
@@ -382,7 +382,7 @@
             {
               "message": "The new prerequisites section still omits the host Rust/Cargo toolchain even though the first documented setup step is `cargo make bootstrap`, and that bootstrap task hard-fails when `cargo` is missing. As written, a fresh machine with Docker but without Rust will hit a setup failure immediately.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/README.md",
+              "file": "README.md",
               "line": 56,
               "category": "onboarding"
             }
@@ -785,7 +785,7 @@
             {
               "message": "`T003` was advanced from `todo` to `in_progress` in the same artifact update, so this snapshot is no longer limited to the T002 transition described in the briefing. That contradicts the stated intent that the only delta from the previous round should be T002's status change.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
+              "file": "track/items/operational-docs-restructure-unified-2026-06-16/impl-plan.json",
               "line": 19,
               "category": "contradiction"
             }

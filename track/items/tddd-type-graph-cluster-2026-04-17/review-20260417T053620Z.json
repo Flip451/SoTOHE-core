@@ -357,21 +357,21 @@
             {
               "message": "Stale-output cleanup only runs after `exists() && is_file()/is_dir()`. Because `Path::exists()` is false for broken symlinks, a pre-existing symlink at `<layer>-graph.md` or `<layer>-graph/` bypasses `reject_symlinks_below` entirely and is left behind instead of failing closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 249,
               "category": "security"
             },
             {
               "message": "Replacing `::` with `_` is not injective over valid module paths: `foo_bar::Baz` and `foo::bar_Baz` both become `foo_bar_Baz.md`. `write_type_graph_dir` can therefore overwrite one cluster page with another and its stale-file bookkeeping will misclassify the current file set.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 654,
               "category": "correctness"
             },
             {
               "message": "`sanitize_cluster_id` has the same collision problem for overview nodes: `a::b` and `a__b` both sanitize to `a__b`. Distinct clusters can merge into one Mermaid node, collapsing edges in `render_type_graph_overview`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 665,
               "category": "correctness"
             }
@@ -386,14 +386,14 @@
             {
               "message": "`cluster_key_to_filename` is using `replace(\"::\", \"-\")`, but the documented cluster-layout contract in the ADR/briefing is `:: -> _` (for example `domain::review_v2` should become `domain_review_v2.md`). As written, `write_type_graph_dir` will emit and later clean up the wrong on-disk paths, so any consumer following the documented filename convention will miss the generated files.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 659,
               "category": "correctness"
             },
             {
               "message": "`sanitize_cluster_id` is not injective: `replace(\"__\", \"_U_\").replace(\"::\", \"__\")` maps legitimate cluster keys like `domain::a__b` and `domain::a_U_b` to the same mermaid node id. That means `render_type_graph_overview` can collapse distinct clusters into one node and misroute cluster-to-cluster edges whenever module names contain consecutive underscores.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 675,
               "category": "correctness"
             }
@@ -408,14 +408,14 @@
             {
               "message": "Replacing `::` with `_` is not injective: distinct cluster keys can collapse to the same filename and Mermaid ID (for example `foo::bar_baz` and `foo_bar::baz` both become `foo_bar_baz`). That can overwrite one cluster file with another and merge unrelated clusters in the overview.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 654,
               "category": "correctness"
             },
             {
               "message": "`ghost_{tgt}` shares the same Mermaid node namespace as real type nodes. A real type named `ghost_Published` will collide with the synthetic ghost node for target `Published`, so the clustered diagram can silently merge a real node and a cross-cluster reference.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 366,
               "category": "correctness"
             }
@@ -430,14 +430,14 @@
             {
               "message": "`cluster_key_to_filename` is not injective and does not match the documented `:: -> _` filename contract. Distinct cluster keys such as `foo::a__b` and `foo::a::b` both map to `foo__a__b.md`, so `write_type_graph_dir` can overwrite one cluster page with another and its stale-file cleanup can misidentify the active file set.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 659,
               "category": "correctness"
             },
             {
               "message": "`sanitize_cluster_id` has the same collision class for Mermaid node IDs. Distinct cluster keys such as `a::b` and `a__b` both sanitize to `a__b`, so `render_type_graph_overview` can merge different clusters into one node and lose cluster-to-cluster edges.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 677,
               "category": "correctness"
             }
@@ -452,14 +452,14 @@
             {
               "message": "Cluster overview drops unresolved nodes: `classify_types` can record `UNRESOLVED_CLUSTER` cross-edges for absent target types, but `render_type_graph_overview` only declares nodes from `plan.assignments`. That can produce mermaid edges to `unresolved` with no corresponding node in the diagram.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 454,
               "category": "correctness"
             },
             {
               "message": "Cluster filename sanitization is not injective: `cluster_key_to_filename` maps distinct cluster keys to the same `<cluster>.md` (for example `foo_bar::baz` and `foo::bar_baz` both become `foo_bar_baz.md`). `write_type_graph_dir` will silently overwrite one cluster's output and stale cleanup can target the wrong file.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 662,
               "category": "correctness"
             }
@@ -496,14 +496,14 @@
             {
               "message": "`render_type_graph_clustered()` builds ghost nodes from only the short target type name (`→ {tgt}` / `_xref_{tgt}`), so cross-cluster references lose their target-cluster context. That does not match the spec’s `[→ other::Type]` rendering and can be ambiguous if the same short name appears in more than one cluster.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 415,
               "category": "correctness"
             },
             {
               "message": "The stale-cluster cleanup deletes every `*.md` in `<layer>-graph/` that is not in the current assignment set. That is broader than removing the previous mode’s generated outputs and can silently delete unrelated markdown files that happen to live in the graph directory.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 619,
               "category": "safety"
             }
@@ -518,14 +518,14 @@
             {
               "message": "The stale-cluster cleanup still deletes any alphanumeric `.md` file inside `<layer>-graph/` that is not in `expected_cluster_files`. That includes ordinary user files like `README.md` or `notes.md`, so switching into cluster mode can silently remove unrelated markdown content. Restrict deletion to files that were actually generated by this renderer.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 624,
               "category": "safety"
             },
             {
               "message": "`computed_edges` is assigned in the `plan.cross_edges.is_empty()` fallback but never read afterward. That leaves an unused binding, which becomes a hard failure under the repo's `clippy -D warnings` gate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 484,
               "category": "build"
             }
@@ -540,7 +540,7 @@
             {
               "message": "The stale cluster-file cleanup still treats any `^[A-Za-z0-9_]+\\.md$` file as tool-generated and deletes it if it is not in the current assignment set. That will silently remove unrelated markdown files such as `README.md` or `notes.md` placed in `<layer>-graph/`, so the cleanup is still broader than \"remove the previous mode's output only\".",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 643,
               "category": "safety"
             }
@@ -570,7 +570,7 @@
             {
               "message": "`render_type_graph_clustered` does not enforce `max_nodes_per_diagram` across the whole diagram. Member nodes are truncated first, then cross-cluster ghost nodes are truncated independently, so a cluster can still render up to `2 * max_nodes_per_diagram` nodes. For a large cluster with many external references, this defeats the documented per-diagram cap and can still produce oversized diagrams.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 346,
               "category": "correctness"
             }
@@ -673,14 +673,14 @@
             {
               "message": "`max_nodes_per_diagram` is still enforced before trait nodes are emitted, so `EdgeSet::Impls` / `EdgeSet::All` can produce diagrams that exceed the configured node limit without setting the truncation flag. `intra_trait_targets` are appended after the budget check and are never counted in `sorted_nodes` or `ghost_budget`, so a type with many trait impls can render arbitrarily many extra nodes.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 455,
               "category": "correctness"
             },
             {
               "message": "The cluster overview now inherits impl edges as cross-cluster edges to the synthetic `unresolved` cluster. Because `classify_types` has no cluster assignment for traits and `render_type_graph_overview` folds `plan.cross_edges` into `overview_edges` unchanged, `index.md` will show a phantom `unresolved` node and impl counts whenever `edge_set` includes `Impls` or `All`. That is misleading for valid trait implementations.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 651,
               "category": "correctness"
             }
@@ -717,7 +717,7 @@
             {
               "message": "`render_type_graph_flat` still counts connected nodes by raw short name before trait nodes are disambiguated. If a trait and a type share the same name, `total_nodes_connected` and `node_names.len()` collapse them into one entry even though the renderer emits two Mermaid nodes (`Foo` and `_trait_Foo`), so `max_nodes_per_diagram` can be exceeded and the connected-node count in the header is wrong.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 125,
               "category": "correctness"
             }
@@ -754,7 +754,7 @@
             {
               "message": "`Fields` inherits the method self-edge filter (`target != source_name.as_str()`), so legitimate recursive/self-referential fields are dropped. A struct like `Node { next: Option<Node> }` will not produce a field edge, which means `EdgeSet::Fields` and `EdgeSet::All` silently miss an expected workspace edge.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 390,
               "category": "correctness"
             }
@@ -802,7 +802,7 @@
             {
               "message": "T001 only enumerates the three production call sites and compresses the `consistency.rs` test ripple into `8 tests`; it does not list the seven existing `check_type_signals` test call sites required by the review brief, so the signature-change ripple is not fully specified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
               "line": 13,
               "category": "consistency"
             }
@@ -817,14 +817,14 @@
             {
               "message": "T001's verification checklist says there are 7 existing `check_type_signals` tests, but `metadata.json`/`spec.json` enumerate 8 existing tests and the current `libs/domain/src/tddd/consistency.rs` test block has 8 `test_check_type_signals_*` cases. The checklist undercounts the ripple and leaves one existing test case untracked.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
               "line": 13,
               "category": "consistency"
             },
             {
               "message": "T003's acceptance text says there are 6 unit tests, but it only names five conditions; the sixth case from `metadata.json` (`single-cluster cross_edges empty`) is missing, and the same omission is echoed in `verification.md`. That leaves the ClusterPlan acceptance scope under-specified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/spec.json",
               "line": 236,
               "category": "consistency"
             }
@@ -1272,21 +1272,21 @@
             {
               "message": "The infrastructure row in `verification.md` is off: the 13 `infrastructure-graph/*.md` cluster files sum to 52 types, not 50, so the derived `~3.8 types/cluster` is also wrong (it is closer to 4.0).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
               "line": 117,
               "category": "correctness"
             },
             {
               "message": "§S5.1 in the ADR repeats the same infrastructure miscount: it states `50` total types and `~3.8` types/cluster, but the generated cluster files add up to 52 types.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
+              "file": "knowledge/adr/2026-04-16-2200-tddd-type-graph-view.md",
               "line": 525,
               "category": "correctness"
             },
             {
               "message": "T006 is still marked `in_progress` in `metadata.json`, which conflicts with the updated verification table marking the task done and leaves the track state inconsistent for downstream automation.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/metadata.json",
               "line": 140,
               "category": "consistency"
             }
@@ -1359,7 +1359,7 @@
             {
               "message": "T003 is undercounted in the audit trail. `libs/infrastructure/src/tddd/type_graph_cluster.rs` has 9 `#[test]` functions, including `test_classify_types_depth_zero_cross_edges_always_empty`, `test_classify_types_depth_zero_empty_graph_still_yields_single_cluster`, and `test_cross_edges_absent_type_maps_to_unresolved_at_depth_one`, but the docs still describe the task as `6 spec'd tests + 1 RFL-added guard` and `metadata.json:121` / `plan.md:34-36` say `6 unit tests`. That makes the verification record factually stale.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
+              "file": "track/items/tddd-type-graph-cluster-2026-04-17/verification.md",
               "line": 104,
               "category": "factual_error"
             }

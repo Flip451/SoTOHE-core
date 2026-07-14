@@ -56,7 +56,7 @@
             {
               "message": "`Path::is_file()` treats more than a missing file as false, including dangling symlinks, directories, and unreadable paths. This change turns those corruption cases into silent skips, so a broken `plan.md` will no longer surface as a verify failure. If the intent is only to skip when the file is truly absent, the check needs to distinguish `NotFound` from other states.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/view_freshness.rs",
+              "file": "libs/infrastructure/src/verify/view_freshness.rs",
               "line": 89,
               "category": "error_handling"
             }
@@ -104,7 +104,7 @@
             {
               "message": "The new ADR omits the required `## Status` section entirely. The repository's ADR convention explicitly requires that section, so this record is not conformant and its lifecycle state is ambiguous.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-27-0324-phase-aware-verify-gates.md",
+              "file": "knowledge/adr/2026-04-27-0324-phase-aware-verify-gates.md",
               "line": 1,
               "category": "factual error"
             }

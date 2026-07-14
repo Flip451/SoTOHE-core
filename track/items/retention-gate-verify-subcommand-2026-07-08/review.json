@@ -229,7 +229,7 @@
             {
               "message": "`walk()` accepts symlinked descendants under `LIVE_SURFACE`: `std::fs::metadata()` and `read_dir()` will follow a symlinked `libs/`, `.claude/*`, etc., so a repo can redirect the scan outside the workspace. The adapter only rejects a symlinked root; this boundary needs the same `symlink_metadata()`/reject pattern used by `track::symlink_guard::reject_symlinks_below` and the `scope_config_loader.rs` symlink tests.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/verify/retention_gate.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/verify/retention_gate.rs",
               "line": 93,
               "category": "symlink not rejected at boundary"
             }
@@ -305,7 +305,7 @@
             {
               "message": "`test_verify_command_gate_name_uses_verify_prefix` does not exercise the newly added `VerifyCommand::RetentionGate` branch, so the new `verify-retention-gate` telemetry label is effectively untested. A typo in that label would still pass this test because the subcommand list only covers `latest-track`, `arch-docs`, and `layers`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-004/apps/cli/src/main.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/apps/cli/src/main.rs",
               "line": 984,
               "category": "test coverage"
             }

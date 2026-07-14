@@ -43,7 +43,7 @@
             {
               "message": "The new delete-error abort runs after both `atomic_write_file` calls, so a rejected `delete` still rewrites `domain-types.json` and `domain-types.md` before returning `Err`. That leaves the track mutated even though the command reports failure; the validation should happen before any write or be rolled back.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
               "line": 153,
               "category": "correctness"
             }
@@ -370,7 +370,7 @@
             {
               "message": "The new \"kind change => delete + add pair\" guidance is too broad. That pattern only works for cross-partition moves such as `value_object` -> `trait_port`; for migrations that stay in the type partition (`value_object` -> `enum`, `enum` -> `error_type`, etc.), the delete entry will still see the replacement through `graph.get_type(name)` and never turn Blue, so `/track:design` can produce a catalogue that cannot pass validation. Restrict this rule to cross-partition moves or define a separate same-partition migration rule.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "file": ".claude/commands/track/design.md",
               "line": 93,
               "category": "correctness"
             }
@@ -429,7 +429,7 @@
             {
               "message": "The pre-TDDD-03 backfill rule is too broad: it rewrites any actionless entry that exists in the baseline to `action: \"modify\"`, but the next bullet requires cross-partition kind migrations to become a `delete` + `add` pair. A legacy entry that moves between non-trait and trait partitions will be guided to the wrong action and then fail validation (`ModifyButNotInBaseline`).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "file": ".claude/commands/track/design.md",
               "line": 100,
               "category": "workflow correctness"
             }

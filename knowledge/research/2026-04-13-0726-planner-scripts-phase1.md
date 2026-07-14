@@ -338,8 +338,8 @@ fn render_plan_renders_done_without_commit_hash_no_none_literal() {
 
 ## Critical Files for Implementation
 
-- `/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs`
-- `/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/transition.rs`
-- `/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/tests/transition_integration.rs` (新規)
-- `/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/track.rs`
-- `/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml`
+- `libs/infrastructure/src/track/render.rs`
+- `apps/cli/src/commands/track/transition.rs`
+- `apps/cli/tests/transition_integration.rs` (新規)
+- `libs/domain/src/track.rs`
+- `Makefile.toml`

@@ -1264,7 +1264,7 @@
                   {
                     "message": "`record_round()`'s new verdict/concern/finding validation is not fully covered on the string-path entrypoint: there is no test for `findings_remain` with an empty `findings` array or `zero_findings` with non-empty `findings`. The typed path covers those cases, but regressions in the parsed-JSON path would still slip through.",
                     "severity": "P1",
-                    "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_workflow/usecases.rs",
+                    "file": "libs/usecase/src/review_workflow/usecases.rs",
                     "line": 203
                   }
                 ]

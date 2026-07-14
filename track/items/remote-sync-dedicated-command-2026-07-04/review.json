@@ -24,14 +24,14 @@
             {
               "message": "T001 is attributed to `ExplicitTrackBranch`, `TrackBranchClaim`, and `BranchReaderPort`, but the task text explicitly says those reference-only entries are unchanged. Remove those attributions or the contract no longer matches the described edit scope.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/task-contract.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/task-contract.json",
               "line": 5,
               "category": "task-contract attribution mismatch"
             },
             {
               "message": "T005 is attributed to `FileArgs`, `CommitFromFileArgs`, and `UnstageArgs`, but the task text says the `AddAll` / `AddFromFile` / `CommitFromFile` / `NoteFromFile` / `Unstage` variants keep their existing shape and tests. Those symbol attributions look inflated for the described change.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/task-contract.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/task-contract.json",
               "line": 37,
               "category": "task-contract attribution mismatch"
             }
@@ -68,14 +68,14 @@
             {
               "message": "S1-S7 (and the task bullets beneath them) restate upstream ADR/spec behavior in prose instead of staying in the executable-plan format. Examples include 'exact stdout/stderr/exit contracts', 'git pull --ff-only classified into 3 typed SyncError variants', and 'graceful skip forbidden'. The impl-plan prompt only allows target + operation + anchor cite, so this text needs to be collapsed into action items.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/plan.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/plan.md",
               "line": 15,
               "category": "upstream restatement"
             },
             {
               "message": "T002 over-attributes `BranchReaderPort` even though the task text explicitly says 'Reference-only entries (ExplicitTrackBranch, TrackBranchClaim, BranchReaderPort) are unchanged'. That catalogue entry is not part of the work and should be removed from the task-contract map.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/task-contract.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/task-contract.json",
               "line": 12,
               "category": "task-contract attribution mismatch"
             }
@@ -257,14 +257,14 @@
             {
               "message": "T010 is under-attributed in `task-contract.json`: the task text in `impl-plan.json:60` explicitly edits `apps/cli-composition/src/track/branch_strategy.rs` (`switch_base_error_to_outcome`), but the T010 contract only lists usecase/infrastructure entries plus `persist_commit_hash_for_track`. The corresponding `cli_composition` entry is missing, so the contract does not cover the full task surface.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/task-contract.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/task-contract.json",
               "line": 62,
               "category": "task-contract attribution mismatch"
             },
             {
               "message": "T011 is under-attributed in `task-contract.json`: the task text in `impl-plan.json:66` explicitly edits `apps/cli-composition/src/telemetry.rs` to replace `TelemetryAggregateServiceImpl` wiring, but the T011 contract only names usecase/infrastructure entries. No `cli_composition` entry is attributed for the composition-layer rewrite, so the task-contract mapping is incomplete.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/task-contract.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/task-contract.json",
               "line": 68,
               "category": "task-contract attribution mismatch"
             }
@@ -330,14 +330,14 @@
             {
               "message": "`tasks[].description` for `T004` restates upstream behavior contract instead of staying in target + operation + anchor form: `typed failure classification for the 3 fail-closed modes (upstream-not-set / non-fast-forward / worktree-unresolved)`. Per `knowledge/conventions/no-upstream-restatement.md`, remove the prose and keep only the file/symbol change plus the anchor cite.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/impl-plan.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/impl-plan.json",
               "line": 24,
               "category": "upstream restatement"
             },
             {
               "message": "`tasks[].description` for `T011` restates upstream design rationale instead of staying in target + operation + anchor form: `reshape TelemetryAggregateInteractor into a facade over both sub-interactors (validation locus + delegation)`. Per `knowledge/conventions/no-upstream-restatement.md`, trim the rationale prose and keep only the change target, the operation, and the anchor cite.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/impl-plan.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/impl-plan.json",
               "line": 66,
               "category": "upstream restatement"
             }
@@ -517,7 +517,7 @@
             {
               "message": "`fs::read_dir(path)` will follow a symlinked `path` and enumerate the target directory, but this port method never performs the explicit `symlink_metadata()`/reject check used elsewhere in the infrastructure boundary. That lets an untrusted caller hand in a symlink and read entries outside the intended workspace tree.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/git_cli/workflow_adapter.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/git_cli/workflow_adapter.rs",
               "line": 535,
               "category": "symlink not rejected at boundary"
             }
@@ -589,7 +589,7 @@
             {
               "message": "`move_path` accepts any path that does not strip the repo prefix by falling back to the original `src`/`dst` values. That means absolute paths outside the repo, and `..`-based paths that fail prefix stripping, are forwarded to `git mv` instead of being rejected, which bypasses the trusted-root boundary for this filesystem-mutating adapter.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/git_cli/workflow_adapter.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/git_cli/workflow_adapter.rs",
               "line": 256,
               "category": "trusted-root violation"
             }
@@ -604,7 +604,7 @@
             {
               "message": "`classify_sync_failure` falls through to `SyncError::WorktreeUnresolved` for every `git pull --ff-only` failure that does not match the two string checks. That downgrades unrelated git errors such as auth/network/remote corruption, and future wording changes in git, into the same non-fatal path as a dirty worktree, so callers can report success after a real sync failure. Unknown stderr should not be swallowed into the warning path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/git_cli/mod.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/git_cli/mod.rs",
               "line": 53,
               "category": "missing error handling"
             }
@@ -651,14 +651,14 @@
             {
               "message": "`switch_to_base` downgrades `SyncNonFastForward` and `SyncWorktreeUnresolved` to a warning and then returns `Ok(...)`, so `git sync` can report success even though `git pull --ff-only` failed. The surrounding docs say only `SyncUpstreamNotSet` is the non-fatal case; the other sync failures should propagate so callers do not continue on a stale branch.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
               "line": 658,
               "category": "error handling"
             },
             {
               "message": "`commit_from_file` wraps pure branch-guard failures from `verify_explicit_track_branch` / `verify_auto_detected_branch` in `GitWorkflowError::Unavailable`, which turns a user-context or validation failure into an infrastructure outage. Callers can no longer distinguish a branch mismatch or missing claim from a real git/process failure, so the abstraction boundary is lost.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
               "line": 514,
               "category": "error type confusion"
             }
@@ -709,14 +709,14 @@
             {
               "message": "`current_branch_track_id` collapses every parse error except `InvalidTrackId` into `Ok(None)`, so `DetachedHead` and `NoBranch` are treated as \"no track\" instead of a failure. In the `CurrentBranchTrackIdStrict` CLI path that becomes a successful exit, which silently hides detached-HEAD / branch-detection problems.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
               "line": 556,
               "category": "correctness"
             },
             {
               "message": "If the `logs/` rename fails, the attempted rollback `self.git.move_path(Some(project_root), &dst_dir, &src_dir)` discards its result. A second failure can leave the track half-archived while the API only reports the original rename error, so the caller cannot tell the rollback also failed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
               "line": 726,
               "category": "error handling"
             }
@@ -731,21 +731,21 @@
             {
               "message": "`TelemetryAggregateInteractor::emit_archived` builds `telemetry_dir` from a raw `track_id` string without validating it as a `domain::TrackId`. A malformed id such as `../evil` would escape `track/archive` and let the archived telemetry writer write outside the intended tree if a caller bypasses the CLI-level prevalidation.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/telemetry.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/telemetry.rs",
               "line": 392,
               "category": "security"
             },
             {
               "message": "The new public `GitWorkflowInteractor` APIs are missing direct coverage for their success/forwarding paths: `current_branch_track_id` only has detached-head/no-branch tests, and `sync_current_branch` is only exercised indirectly through `switch_to_base`. A regression in branch parsing or sync delegation could ship without a failing test.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs",
               "line": 537,
               "category": "testing"
             },
             {
               "message": "`TelemetryAggregateInteractor::emit_archived` has no test that `ArchivedTrackTelemetryPort::emit` failures are propagated as `EmitUnavailable`; the current tests only cover the happy path, repo-root failure, and malformed `items_dir`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/telemetry.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/telemetry.rs",
               "line": 394,
               "category": "testing"
             }
@@ -1001,7 +1001,7 @@
             {
               "message": "The `docs` field for `usecase::git_workflow::GitPrimitivePort` is restating the upstream contract in prose (per-method git semantics, explicit implementation target, and branch-root behavior) instead of staying at the required \"change + operation + anchor cite\" level. This violates `knowledge/conventions/no-upstream-restatement.md`; the same pattern also appears in `cli::commands::git::GitCommand`, `cli_driver::git::GitInput`, and `cli_composition::git::GitCompositionRoot`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
               "line": 206,
               "category": "upstream restatement"
             }
@@ -1016,14 +1016,14 @@
             {
               "message": "`GitWorkflowService::current_branch_track_id` still returns `Result<Option<String>, GitWorkflowError>` here, so the service boundary exports a branch-derived track identifier as a raw string instead of a validated domain type. That keeps the track-id contract stringly typed and pushes re-validation onto every caller.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
               "line": 520,
               "category": "SoT integrity"
             },
             {
               "message": "`domain-types.json` is missing the reference nodes needed by this track's usecase surface: `BranchReadError` (`usecase-types.json:555`), `domain::TrackId` (`:644`, `:656`, `:678`, `:702`, `:732`) and `domain::CommitHash` (`:302`, `:712`, `:733`, `:741`). Without those declarations, the contract map leaves the new cross-layer type edges unresolved.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/domain-types.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/domain-types.json",
               "line": 5,
               "category": "SoT integrity"
             }
@@ -1081,7 +1081,7 @@
             {
               "message": "The catalogue adds `ArchivedTelemetryFactoryPort::build` returning `std::sync::Arc<dyn ArchivedTrackTelemetryPort>` in `usecase-types.json`, but the rendered `contract-map.md` never draws that dependency edge. The telemetry subgraph therefore no longer matches the type catalogue and hides the new factory return type.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/contract-map.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/contract-map.md",
               "line": 170,
               "category": "SoT integrity"
             }
@@ -1196,9 +1196,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Several updated `docs` fields restate downstream behavior/contract instead of staying at `change target + operation + anchor cite`, which violates `knowledge/conventions/no-upstream-restatement.md`: `TelemetryAggregateInteractor` here, plus the same pattern in `/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/infrastructure-types.json:70` (`SystemGitRepo`), `.../infrastructure-types.json:127` (`FsArchivedTelemetryFactoryAdapter`), and `.../cli_composition-types.json:63` (`persist_commit_hash_for_track`).",
+              "message": "Several updated `docs` fields restate downstream behavior/contract instead of staying at `change target + operation + anchor cite`, which violates `knowledge/conventions/no-upstream-restatement.md`: `TelemetryAggregateInteractor` here, plus the same pattern in `<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/infrastructure-types.json:70` (`SystemGitRepo`), `.../infrastructure-types.json:127` (`FsArchivedTelemetryFactoryAdapter`), and `.../cli_composition-types.json:63` (`persist_commit_hash_for_track`).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
               "line": 268,
               "category": "upstream restatement"
             }
@@ -1211,7 +1211,7 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Several updated `docs` fields restate the contract/wiring instead of pointing at the upstream anchors, which violates the no-upstream-restatement rule and creates a second source of truth for the type contract: `/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json` (`TelemetryAggregateInteractor` at line 259 and `ArchivedTelemetryFactoryPort` at line 316), `/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/infrastructure-types.json` (`SystemGitRepo` at line 61 and `FsArchivedTelemetryFactoryAdapter` at line 118), and `/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/cli_composition-types.json` (`persist_commit_hash_for_track` at line 55). These fields should be reduced to a terse type summary plus anchor cites.",
+              "message": "Several updated `docs` fields restate the contract/wiring instead of pointing at the upstream anchors, which violates the no-upstream-restatement rule and creates a second source of truth for the type contract: `<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json` (`TelemetryAggregateInteractor` at line 259 and `ArchivedTelemetryFactoryPort` at line 316), `<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/infrastructure-types.json` (`SystemGitRepo` at line 61 and `FsArchivedTelemetryFactoryAdapter` at line 118), and `<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/remote-sync-dedicated-command-2026-07-04/cli_composition-types.json` (`persist_commit_hash_for_track` at line 55). These fields should be reduced to a terse type summary plus anchor cites.",
               "severity": "P1",
               "file": null,
               "line": null,
@@ -1260,14 +1260,14 @@
             {
               "message": "`persist_commit_hash_for_track` is still a `pub fn` with the stringly-typed return type `Result<String, String>`. This layer is supposed to use typed composition errors so callers can handle failures structurally, not by parsing strings.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/review_v2/commit_hash.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/review_v2/commit_hash.rs",
               "line": 25,
               "category": "Result<_, String> in public API"
             },
             {
               "message": "The exported validators in this module still return `Result<(), String>` (`validate_track_id_str` and `validate_review_group_name_str`). Public CLI-composition entry points should return a typed error enum instead of leaking stringly failures.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/review_v2/scope.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/review_v2/scope.rs",
               "line": 102,
               "category": "Result<_, String> in public API"
             }
@@ -1282,14 +1282,14 @@
             {
               "message": "`TelemetryAggregateServiceImpl` is a secondary adapter implementation defined inside `cli_composition` and it implements `usecase::TelemetryAggregateService` here. That violates the layer boundary this scope is reviewing; the implementation belongs in `infrastructure`, with `cli_composition` only wiring it.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/telemetry.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/telemetry.rs",
               "line": 62,
               "category": "adapter defined here"
             },
             {
               "message": "`signal_check_gate` defines `AdrChainAdapter`, `SpecAdrChainAdapter`, and `LayerChainAdapter` locally and implements `AdrChainRunnerPort` / `SpecAdrChainRunnerPort` / `LayerChainRunnerPort` inside `cli_composition`. These are secondary adapter implementations in the composition layer instead of infrastructure.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/signal/gate_check.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/signal/gate_check.rs",
               "line": 76,
               "category": "adapter defined here"
             }
@@ -1304,21 +1304,21 @@
             {
               "message": "Delegating `track_archive` to `TrackGitInteractor::archive_track` removed the previous rollback-on-log-rename-failure behavior. If `git mv` succeeds and the follow-up `logs/` rename fails, the command now returns an error after leaving the track partially moved under `track/archive`, which is a data-loss regression.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/track/mod.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/track/mod.rs",
               "line": 513,
               "category": "correctness"
             },
             {
               "message": "`track_switch_base` no longer preserves the old contract of treating every non-zero `git pull --ff-only` result as a warning. `TrackGitInteractor::switch_to_base` now surfaces `SyncNonFastForward` and `SyncWorktreeUnresolved` as errors, so this path can fail where the previous composition returned exit 0 with a warning, breaking the bit-equivalent CLI behavior called out in the brief.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/track/branch_strategy.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/track/branch_strategy.rs",
               "line": 116,
               "category": "correctness"
             },
             {
               "message": "The old implementation forced `+refs/heads/<branch>:refs/remotes/origin/<branch>` before reading `origin/<branch>:track/items/.../metadata.json`; the new plain `fetch origin <branch>` path depends on the clone's default fetch refspec. On a single-branch or custom-refspec clone, `origin/<branch>` may not be refreshed, so omitted `--method` resolution can read stale track metadata.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/pr.rs",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/pr.rs",
               "line": 294,
               "category": "correctness"
             }
@@ -1476,9 +1476,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: The new `done` workflow docs overstate the sync failure contract. In [`/.harness/workflows/track/done.md:12`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/workflows/track/done.md#L12) and [`knowledge/conventions/branch-strategy.md:40`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/knowledge/conventions/branch-strategy.md#L40), the text says `UpstreamNotSet` / `NonFastForward` / `WorktreeUnresolved` are all downgraded to `[WARN]` and that `cargo make sync` is a generic pull/rebase path. The implementation only downgrades `SyncUpstreamNotSet`; `SyncNonFastForward` and `SyncWorktreeUnresolved` still bubble out as errors in [`libs/usecase/src/git_workflow.rs:650`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs#L650) and [`libs/usecase/src/git_workflow.rs:653`](/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs#L653). As written, `/track:done` will be documented as more failure-tolerant than it really is.",
+              "message": "P1: The new `done` workflow docs overstate the sync failure contract. In [`/.harness/workflows/track/done.md:12`](<machine-home>/individual/t-rust/templates/SoTOHE-core-003/.harness/workflows/track/done.md#L12) and [`knowledge/conventions/branch-strategy.md:40`](<machine-home>/individual/t-rust/templates/SoTOHE-core-003/knowledge/conventions/branch-strategy.md#L40), the text says `UpstreamNotSet` / `NonFastForward` / `WorktreeUnresolved` are all downgraded to `[WARN]` and that `cargo make sync` is a generic pull/rebase path. The implementation only downgrades `SyncUpstreamNotSet`; `SyncNonFastForward` and `SyncWorktreeUnresolved` still bubble out as errors in [`libs/usecase/src/git_workflow.rs:650`](<machine-home>/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs#L650) and [`libs/usecase/src/git_workflow.rs:653`](<machine-home>/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/git_workflow.rs#L653). As written, `/track:done` will be documented as more failure-tolerant than it really is.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/workflows/track/done.md",
+              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/.harness/workflows/track/done.md",
               "line": 12,
               "category": "convention contradiction"
             }

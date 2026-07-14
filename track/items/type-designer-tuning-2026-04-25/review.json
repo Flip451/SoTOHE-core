@@ -120,7 +120,7 @@
             {
               "message": "The rewritten internal pipeline no longer includes any step that refreshes `<layer>-types.md`. `type-signals` only writes the declaration/signals JSON, and `sync_rendered_views` is not invoked anywhere in the 9-step sequence, so the agent no longer fulfills its own ownership claim for all derived views.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "file": ".claude/agents/type-designer.md",
               "line": 107,
               "category": "behavioral coverage gap"
             }

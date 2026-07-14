@@ -169,14 +169,14 @@
             {
               "message": "T001 says `ScopeQueryInteractor` has only `scope_config` and `base` fields, but the same task also says `files()` calls `diff_getter.list_diff_files(&self.base)`. With no stored `diff_getter` field or equivalent state, this service cannot be implemented as written.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/plan.md",
               "line": 13,
               "category": "infeasibility"
             },
             {
               "message": "The `files` API is typed as `files(scope: ScopeName)`, but this module also says `UnknownScope` is emitted when the requested scope name is not in `scope_config.all_scope_names()`. Once the CLI has converted user input into `ScopeName`, there is no invalid-scope state left for the service to detect, so this error path is unreachable unless the API carries the raw string or a validation result.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/usecase-types.json",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/usecase-types.json",
               "line": 113,
               "category": "infeasibility"
             }
@@ -280,7 +280,7 @@
             {
               "message": "S1/T001 asks `ScopeQueryInteractor::classify` to emit `ScopeClassification::Excluded`, but the only documented domain input is `ReviewScopeConfig::classify(&[FilePath]) -> HashMap<ScopeName, Vec<FilePath>>` plus `contains_scope`/`all_scope_names`. That model can distinguish `Main` vs `Other`, but it has no way to tell whether a path missing from the map is `Other` or `<excluded>`, so the interactor cannot implement AC-03/AC-10 as written. The domain contract needs an explicit exclusion signal or the usecase type needs to drop `Excluded`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/plan.md",
               "line": 8,
               "category": "infeasibility"
             }
@@ -418,7 +418,7 @@
             {
               "message": "T003 wires `files` through `build_v2_shared` and only then validates `scope_config.contains_scope()`. `build_v2_shared` resolves the diff base first, so an invalid `--scope` can still fail on unrelated `.commit_hash`/`git rev-parse main` errors before the planned `Unknown scope: ...` path is reachable. That makes AC-08 order-dependent on diff-base state and contradicts the validation-first flow described in the same section.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/plan.md",
               "line": 32,
               "category": "infeasibility"
             }
@@ -504,7 +504,7 @@
             {
               "message": "`usecase-types.md` still leaves two T001-owned entries in mixed states: `PathClassification` is `Signal=🔵 / Cat-Spec=🟡` and `ScopeQueryInteractor` is `Signal=🟡 / Cat-Spec=🔵`. That conflicts with the same artifact set marking T001 as `done` in `impl-plan.json` / `plan.md`, so the generated plan artifacts are internally inconsistent about whether the completed task has fully resolved its usecase types.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/usecase-types.md",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/usecase-types.md",
               "line": 13,
               "category": "contradiction"
             }
@@ -519,14 +519,14 @@
             {
               "message": "T001 only calls out `ScopeQueryInteractor::files` tests for `UnknownScope` and `DiffGet` errors. The successful path of the public `files` API is missing from the plan, so a regression in the `contains_scope`/`classify` wiring could ship without any direct coverage.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/plan.md",
               "line": 11,
               "category": "test coverage"
             },
             {
               "message": "T003 promises human-readable handling for `DiffGet` failures, but the listed unit tests never exercise that branch. Add an explicit failure-path test for the CLI so the stderr/exit-status behavior cannot regress silently.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/plan.md",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/plan.md",
               "line": 32,
               "category": "test coverage"
             }
@@ -648,7 +648,7 @@
             {
               "message": "The `ScopeQueryService` description says the method signatures use domain types for both inputs and outputs, but the actual returns are `PathClassification` and `ScopeQueryError`, which are usecase-layer types. That makes the port contract text semantically misleading about the boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-lookup-commands-2026-04-30/usecase-types.json",
+              "file": "track/items/review-scope-lookup-commands-2026-04-30/usecase-types.json",
               "line": 6,
               "category": "factual error"
             }
@@ -695,14 +695,14 @@
             {
               "message": "The new `verify-plan-artifact-refs` branch only handles `[OK]` and `SpecRef hash mismatch`, but the verifier also emits unresolved anchors, invalid anchors, coverage violations, and I/O/JSON failures. Those outcomes are now undefined, so a non-hash verifier failure can neither be repaired nor failed closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
+              "file": ".claude/agents/review-fix-lead.md",
               "line": 125,
               "category": "missing error handling"
             },
             {
               "message": "The recovery path tells `type-designer` to refresh `<layer>-catalogue-spec-signals.json`, but that agent's own contract restricts Bash to its internal pipeline commands and does not include `catalogue-spec-signals` (`.claude/agents/type-designer.md:472-474`). The requested remediation is therefore outside the subagent's allowed tool scope and may never execute.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
+              "file": ".claude/agents/review-fix-lead.md",
               "line": 127,
               "category": "architecture"
             }

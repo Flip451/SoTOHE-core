@@ -61,21 +61,21 @@
             {
               "message": "T005 only adds `Bash` for `type-designer.md`, but `IN-09` and `AC-17` require `Write + Bash` for all three subagents and explicitly require `type-designer` to directly write `<layer>-types.json`. As written, this task cannot satisfy the acceptance criteria for subagent write permission.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/impl-plan.json",
+              "file": "track/items/track-plan-decomposition-2026-04-22/impl-plan.json",
               "line": 36,
               "category": "contradiction"
             },
             {
               "message": "`CN-10` says revised `track/*.md` bodies should contain only writer invocation and result receive, but `T007`/`AC-14` require a `TaskCreate` preamble in `/track:plan`. That preamble is extra command-body logic, so the plan contradicts its own command-slimming rule unless `CN-10` is relaxed first.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/spec.json",
+              "file": "track/items/track-plan-decomposition-2026-04-22/spec.json",
               "line": 932,
               "category": "contradiction"
             },
             {
               "message": "`AC-19` names `BranchMode::Create` as the false-path test condition, but `IN-10` and `T012` define the allowed true path as `BranchMode::Auto && already_materialized && resume_allowed`. The acceptance criterion is pointing at the wrong branch mode, so the required unit test is mis-specified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/spec.json",
+              "file": "track/items/track-plan-decomposition-2026-04-22/spec.json",
               "line": 1028,
               "category": "factual error"
             }
@@ -258,14 +258,14 @@
             {
               "message": "The spec still carries the promoted items as `informal_grounds.kind = \"user_directive\"` instead of moving them onto the new child ADR; `2026-04-22-0829` is not referenced anywhere in this file, so the claimed `blue: 59 / yellow: 0` state is not actually backed by the artifact contents. This starts at GO-05/GO-06 and repeats through the later IN/AC entries.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/spec.json",
+              "file": "track/items/track-plan-decomposition-2026-04-22/spec.json",
               "line": 81,
               "category": "contradiction"
             },
             {
               "message": "This ADR omits the repository-required `## Status` section, so the new index entry cannot be grounded in one of the documented lifecycle states (`Proposed` / `Accepted` / `Superseded` / `Deprecated`). That makes the README row fall back to an unlabeled `—` state.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
+              "file": "knowledge/adr/2026-04-22-0829-plan-command-structural-refinements.md",
               "line": 1,
               "category": "factual error"
             }
@@ -532,7 +532,7 @@
             {
               "message": "AC-17 conflicts with the tasking in `plan.md`: T005 and the plan summary require the three subagents' frontmatter `tools:` to be extended with `Write + Bash`, but this verification item upgrades that to `Write + Edit + Bash`. That changes the permission contract and makes the acceptance criterion ambiguous.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
               "line": 163,
               "category": "contradiction"
             }
@@ -613,14 +613,14 @@
             {
               "message": "AC-17 is recorded as satisfied by `Write + Bash`, but the next line says `Edit` was also added to the subagent frontmatter and is still awaiting follow-up formalization. That leaves the completed-state permission set inconsistent: the plan says only the minimum tools were added, while the verification says the actual contract is already broader.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
               "line": 165,
               "category": "contradiction"
             },
             {
               "message": "The OQ closure section references `OQ-10`, but the document's OQ definition table only defines `OQ-6`, `OQ-7`, and `OQ-8`. As written, the reader cannot map the closure claim back to a defined open question, so the `OQ-10` entry is a dangling/broken reference.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
               "line": 176,
               "category": "broken reference"
             }
@@ -635,7 +635,7 @@
             {
               "message": "The round-12 briefing says `verification.md` should record closure judgments for OQ-6/7/8/10, but this file only defines and closes OQ-6/7/8. OQ-10 is dropped from both the OQ definition table and the remaining-status summary, so the verification record is incomplete relative to the stated scope.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
               "line": 126,
               "category": "factual error (semantic)"
             }
@@ -650,7 +650,7 @@
             {
               "message": "The `結果 / 未解決事項` section says there are no unresolved items, but the Open Questions table only records OQ-6/OQ-7/OQ-8. OQ-10 from the round-12 verification scope is no longer represented anywhere in this file, so the completion claim is not fully supported by the artifact.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-plan-decomposition-2026-04-22/verification.md",
+              "file": "track/items/track-plan-decomposition-2026-04-22/verification.md",
               "line": 134,
               "category": "contradiction"
             }
@@ -938,7 +938,7 @@
             {
               "message": "This instruction routes Phase 1 through `bin/sotp track views sync` and `bin/sotp verify plan-artifact-refs`, but `track views sync` also syncs `plan.md` and `registry.md` (`libs/infrastructure/src/track/render.rs:1`) and the repo's spec-signal path is `sotp track signals` (`libs/domain/src/spec.rs:376`, `apps/cli/src/commands/track/signals.rs:64`). A spec-designer following this text can overwrite files outside its ownership and run the wrong gate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/spec-designer.md",
+              "file": ".claude/agents/spec-designer.md",
               "line": 37,
               "category": "architecture"
             }
@@ -975,14 +975,14 @@
             {
               "message": "`spec.md` is described as a generated artifact produced by `bin/sotp track signals`, but the generic `Write`/`Edit` allowance still covers it. That lets the agent bypass the renderer and manually edit a derived view, risking drift from `spec.json` and the signal counts.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/spec-designer.md",
+              "file": ".claude/agents/spec-designer.md",
               "line": 104,
               "category": "workflow"
             },
             {
               "message": "The scope explicitly allows direct writes to baseline and rendered-view artifacts, even though the internal pipeline says those files are produced by `bin/sotp track baseline-capture`, `type-graph`, `contract-map`, and `type-signals`. That opens the door to hand-editing derived artifacts outside the canonical generation path, which can leave the views inconsistent with `<layer>-types.json`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "file": ".claude/agents/type-designer.md",
               "line": 145,
               "category": "workflow"
             }
@@ -1055,14 +1055,14 @@
             {
               "message": "Phase 2's red path only resumes `/track:type-design` when the follow-up `/track:spec-design` result is 🔵. The parent workflow allows 🟡 here as well (it should return to the Phase 2 loop head), so a yellow spec rerun currently leaves the state machine with no next transition.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/plan.md",
+              "file": ".claude/commands/track/plan.md",
               "line": 95,
               "category": "workflow"
             },
             {
               "message": "The writer-ownership table does not list the type-designer's baseline artifact (`track/items/<id>/<catalogue-stem>-baseline.json`), even though the phase 2 agent explicitly captures and writes that file. Leaving it out makes the Phase 2 write scope incomplete and can let another writer touch an owned artifact.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/plan.md",
+              "file": ".claude/commands/track/plan.md",
               "line": 143,
               "category": "architecture"
             }
