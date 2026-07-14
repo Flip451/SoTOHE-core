@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-14T03:36:30Z",
+  "declaration_hash": "e386986cc685bff32da7d43f4e05dcec6558f24dc73de1334ae190bb864cc196",
+  "signals": [
+    {
+      "type_name": "FilePath",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

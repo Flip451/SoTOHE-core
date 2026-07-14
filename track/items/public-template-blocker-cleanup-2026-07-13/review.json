@@ -1,6 +1,420 @@
 {
   "schema_version": 2,
   "scopes": {
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdf57539cebb9aa527b4edbbd59ca6e55525e8b1cceb6b01d5dbb408420d451a",
+          "at": "2026-07-14T01:31:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-03 and IN-03 require the entire manifest-derived shipment to be self-contained, and ADR D3 explicitly includes unresolvable decision/constraint symbols in the prohibited references. AC-05 covers only concrete paths, while AC-06 checks those symbols only in shipped conventions. Other shipped files (commands, harness documents, README/configuration, etc.) can therefore retain unresolvable symbols while every AC still passes, leaving GO-03 without complete acceptance coverage.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json",
+              "line": 346,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:bdf57539cebb9aa527b4edbbd59ca6e55525e8b1cceb6b01d5dbb408420d451a",
+          "at": "2026-07-14T01:35:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-04 の「archive 業務ロジックを CLI / workflow に集約する」部分を検証する acceptance criterion がありません。AC-07 は command 文書が workflow を参照し、手動手順を含まないことだけを要求し、AC-08 は directory 由来の状態・表示だけを扱っています。そのため workflow が CLI に委譲せず archive 操作を再実装していても全 AC を満たせてしまい、GO-04 / IN-04 / D4 の単一業務ロジック化を完了条件として証明できません。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json",
+              "line": 356,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:04af3b8a3ddf343a2733bd41b2e211c7953d0c2eb28d216a3717287502aa16d1",
+          "at": "2026-07-14T01:39:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce86068f4cfa6b84ec43032d723f08fd6337a2daa6c2e4d57de758594e6fcd5c",
+          "at": "2026-07-14T01:42:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1932c865c75a56a3902086addda07052d2d8717364d6c1470eb10aeca54f09ac",
+          "at": "2026-07-14T03:32:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1932c865c75a56a3902086addda07052d2d8717364d6c1470eb10aeca54f09ac",
+          "at": "2026-07-14T03:35:58Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyArgs` は非公開の `project_root` フィールドを持つため `has_stripped_fields` は `true` であるべきですが、`false` になっており baseline shape と不一致です。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/cli-types.json",
+              "line": 38,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`VerifyPort` の `verify_sotp_version_tag` / `verify_machine_paths` / `verify_template_refs` は filesystem/network I/O を行うポートなのに `is_async: false` で、同期実行を選ぶ理由が docs にありません。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 108,
+              "category": "API shape"
+            },
+            {
+              "message": "`VerifyService` の読み取り専用メソッド群が `PathBuf` を値で受け取っています。実装は直ちに `&Path` としてポートへ渡しており、呼び出し側の所有権を奪う必要がありません。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 383,
+              "category": "API shape"
+            },
+            {
+              "message": "`infrastructure::verify::machine_paths::verify` の docs が AC-12 の「全 Git-tracked file を走査し、machine-specific absolute path を fail-closed で検出する」という契約を散文で再記述しています。docs は型の責務と `AC-12` の参照に留めるべきです。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 6,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`infrastructure::verify::sotp_version_tag::verify` の docs が AC-03 の remote 上の Git URL/tag 解決と fail-closed 判定を散文で再記述しています。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 26,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`infrastructure::verify::template_refs::verify` の docs が AC-15 の manifest-derived shipped-template 集合、具体 source-repository key 検査、fail-closed 動作を散文で再記述しています。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 46,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`TemplateExportPortError` の docs が AC-13/CN-03 の exported file における machine-specific absolute path 拒否契約を散文で再記述しています。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 737,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:e0da5a8346576973c82ed478374490eab875a41450625493e77f3dcf2ee148ce",
+          "at": "2026-07-14T01:35:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyService` declares read-only operations such as `verify_latest_track` with owned `std::path::PathBuf` parameters, although the interactor immediately borrows them to call `VerifyPort`; this unnecessarily transfers ownership. Use borrowed `&Path` parameters consistently or document the ownership requirement.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 383,
+              "category": "API shape"
+            }
+          ],
+          "hash": "rvw1:sha256:a5ff01486bffa0b8df52c214daf466d166f81cb4703c1b55c85f4c677e13a4b7",
+          "at": "2026-07-14T01:54:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_driver::VerifyInput::CatalogueSpecRefs.track_id` が `Option<domain::ids::TrackId>` を参照していますが、`domain::ids` は private module のため外部 crate から参照できず、契約実装がコンパイル不能です。同じ誤った FQN が `usecase::VerifyPort` と `VerifyService` にもあります（各 `verify_catalogue_spec_refs`）。cli_driver は `usecase` のみ依存し docs も re-export を示すため、cli_driver は `usecase::TrackId`、usecase は `domain::TrackId` にすべきです。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/cli_driver-types.json",
+              "line": 249,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:d5c899dfef5e29031f367a9a2aa04e270867ce3e56358fa448f5b872ce5b1f53",
+          "at": "2026-07-14T02:13:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyService` の読み取り専用メソッド（`verify_latest_track`、`verify_retention_gate` など）が `std::path::PathBuf` を値で受け取っています。ポート側は `&Path` であり、所有権を奪う必要がないため、呼び出し側に不要な move を強制します。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 383,
+              "category": "ownership signature smell"
+            }
+          ],
+          "hash": "rvw1:sha256:26b4099c12cc0453b0638e58597e06e958be4ee97790da6878921cd1c33e93be",
+          "at": "2026-07-14T02:30:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyService` の既存メソッド群が baseline の `PathBuf` 引数から `&Path` に一括変更されています（例: `verify_latest_track`）。briefing/spec が宣言する変更は3つの検証 route 追加であり、この未根拠の公開API変更は実装計画と baseline 契約を不整合にします。既存シグネチャを維持するか、変更を明示的に仕様化してください。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 383,
+              "category": "action incoherent with the declared change"
+            }
+          ],
+          "hash": "rvw1:sha256:2a5c554d73698bf851ae70b637ebeb8fa8f046e5a385a556b47bf6f52a6a5fa1",
+          "at": "2026-07-14T02:46:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c748f50658ae57e48a45c910c9c04389a0fcfcaa8f44300146ca0fe206c80bb",
+          "at": "2026-07-14T03:04:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c748f50658ae57e48a45c910c9c04389a0fcfcaa8f44300146ca0fe206c80bb",
+          "at": "2026-07-14T03:11:48Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001–T017 descriptions do not name a concrete target file or symbol; they name only broad concepts such as “template export”, “verifier”, “CLI command surface”, or “shipped documents”. An executor must invent the implementation boundary, so rewrite each task as target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001 restates the AC-01/AC-02 behavior contract in prose (“ignored temporary files are skipped” while other paths “remain fail-closed”) instead of limiting the task text to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004–T006 restate upstream acceptance/out-of-scope behavior (publish-readiness versus initial install, permitted absolute paths and directory allowlists, and the five reference fixtures/semantic-review boundary). These details belong in spec.json; the tasks should cite the relevant anchors after naming concrete symbols.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T017 repeats the D2/D3/D5/D6/D7 behavior contract (“uses the exported runtime”, “scans exported output”, “preserves the non-tag-dependent path”, and “fails closed”) rather than describing the concrete CI/smoke files and operation with anchor cites.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 102,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 and S5 descriptions restate upstream behavior and constraints (“ignoring only untracked ignored temporary input”, “full Git-tracked-file inventory”, and no directory allowlist). Plan sections should summarize task ordering and references, not duplicate the spec contract.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 120,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:a9372e1d8a277649c944279a14015324c6486c44bd09de3c9c93cd5bae207f8e",
+          "at": "2026-07-14T01:34:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Section S6 restates upstream design rationale in “This enforces the D6/D7 ordering constraint while connecting D2 verification to delivery checks.” Keep the section description to executable target/operation plus anchor citations per `no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 182,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:f52961facf64549761a923c6de09ac2e42da69e101294428e4b86aa7722e06c0",
+          "at": "2026-07-14T01:41:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T017 says to add all three verifier invocations to `template-export-smoke-local`, but the fixed-tag verifier would make export smoke depend on a resolvable tag, contradicting AC-04/OS-02. Specify that fixed-tag verification is CI-only and keep export smoke limited to export-safe gates.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 102,
+              "category": "out_of_scope leak into a task"
+            },
+            {
+              "message": "T014 maps AC-08 but only names the workflow, command bridge, and `execute_archive`; it does not name or validate the rendered registry/archive view derived from `track/archive/`. The task can therefore complete without covering the required Archived display behavior.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 84,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:8d2e7851aadbbed40f85f29221e532284b48072cc0f50909ca1bb12b352f449c",
+          "at": "2026-07-14T01:46:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06 is mapped only to T012, but T013 is the task that rewrites the remaining include/overlay shipped documents and configuration. Without mapping AC-06 to T013 (and citing it in T013), those files may retain concrete ADR/track references while coverage still passes.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/task-coverage.json",
+              "line": 33,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:bd7e4f9081de14894d615445cba8be00d70ca3e08b8ace7a98374e13011ef6f6",
+          "at": "2026-07-14T01:52:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 is mapped to T004, but T004 only adds the standalone version-tag verifier and tag fixtures; it does not wire or validate the export-smoke requirement that a fixed tag is not mandatory. Remove this mapping (and the corresponding T004 anchor) or add explicit smoke non-integration work; T017 is the described carrier for this behavior.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/task-coverage.json",
+              "line": 31,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:b9061899a6b7d41c6de631a24a1b5ff9358496626dde45998cbca88551c530f6",
+          "at": "2026-07-14T01:56:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T013 reviews the resolved shipped set before T014 rewrites `.claude/commands/track/archive.md` and creates the shipped `.harness/workflows/track/archive.md`; consequently the final shipped files are not covered by the AC-05/AC-06 review mapped only to T012/T013. Reorder T014 before the review or add a post-T014 reference check.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 78,
+              "category": "dependency cycle or wrong ordering"
+            },
+            {
+              "message": "T016 broadly instructs rewriting “host-specific or external temporary paths” without limiting changes to paths carrying work-machine information. This permits rewriting system/container/example paths that CN-03 and OS-05/AC-10 explicitly require preserving. Restrict T016 to remaining machine-path matches and qualifying external paths.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 96,
+              "category": "out_of_scope leak into a task"
+            }
+          ],
+          "hash": "rvw1:sha256:f71c11a58b2b3c05c1a91f3d4c8af1b7022527b3a371419dfcffb379db4ea4ec",
+          "at": "2026-07-14T02:04:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T013 appears before T014 in the task list, yet its AC-05/AC-06 review must cover files created or rewritten by T014. Make the T014→T013 dependency explicit in executable task ordering or add a post-T014 reference-check task.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 78,
+              "category": "dependency cycle or wrong ordering"
+            },
+            {
+              "message": "T016 permits rewriting “host-specific or external temporary paths” without requiring that the occurrence carries work-machine information. This can alter system, container, or example paths preserved by CN-03/OS-05/AC-10; restrict it to qualifying machine-path matches.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 96,
+              "category": "out_of_scope leak into a task"
+            }
+          ],
+          "hash": "rvw1:sha256:e827eeb9292f68cd625ed460569359f094561208abd1d6886529a4141dc77a75",
+          "at": "2026-07-14T02:08:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T015 は全 inventory の `workspace-rooted machine-path occurrences` を対象にする一方、T016 は同じ inventory の「remaining qualifying」matches としか定義していません。第1・第2バッチの具体的なパターン／対象境界がなく、実装者が T016 の対象を推測する必要があります。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 90,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:e6c5a660c697c651828e905c511f5a8ac0cc525b1096650268354a0cf37b76ad",
+          "at": "2026-07-14T02:13:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T015 is a split candidate: the complete tracked-file inventory currently contains 1,809 lines with the specified workspace prefix, so this single task would exceed the 500-line diff ceiling by multiple times. Split the rewrite into smaller semantic batches.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 90,
+              "category": "batch-size infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:e5269786fcebab0952e99352305b4522c1e35fdc321558304c56efa7b5da4115",
+          "at": "2026-07-14T02:20:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T015–T018 cannot cover the stated AC-09/AC-12 inventory: the current `git ls-files` tree contains 2,334 workspace-rooted machine-path lines, while the four batches promise only 450+450+450+459 = 1,809 findings. T018 can therefore finish with at least 525 matches remaining, after which T019 enables the fail-closed gate. Recompute the batch count from the actual inventory or make the final task explicitly gated on zero findings.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 108,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:3856a83ba2dc6865f5e8d87f1fd384200fd4cf2378846afc0aa1e2c2af85b74e",
+          "at": "2026-07-14T02:29:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f91341340815953c3e419aeaadcb794e95b735d6dea4a0d09c77baf005872af",
+          "at": "2026-07-14T02:34:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f91341340815953c3e419aeaadcb794e95b735d6dea4a0d09c77baf005872af",
+          "at": "2026-07-14T02:40:02Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {

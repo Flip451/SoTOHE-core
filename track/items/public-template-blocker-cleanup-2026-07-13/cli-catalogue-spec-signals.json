@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "da87fe1bb00df5fc83ba2b8d670da7ff72b998e066c6a0342f97ca6a0cf05d94",
+  "signals": [
+    {
+      "type_name": "VerifyArgs",
+      "signal": "blue",
+      "entry_hash": "dd577d936d15d5e88c6b22621e68fdb3f28730dc74cf16342ffbaad61420e6e0"
+    },
+    {
+      "type_name": "VerifyCommand",
+      "signal": "blue",
+      "entry_hash": "321ec9134b6cd0acb982c9a5b26015624cc0a96434a53687db9676192b9f8d92"
+    }
+  ]
+}

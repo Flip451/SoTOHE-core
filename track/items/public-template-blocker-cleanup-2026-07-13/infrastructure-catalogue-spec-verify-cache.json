@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "a65c81f864bd9b12e91005e20c08fd401da74f8a66c1875445f730421c9ee804",
+      "evidence_hash": "9f19bfa80ede153c4baa36d4e1e785fdcd659379f3baec537f5777e00f4ef92e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "公開前確認が設定済みの git_url と tag を公開 remote で解決できることを検証し、解決できない場合は公開可能と判定しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsVerifyAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "公開前確認が設定済みの git_url と tag を公開 remote で解決できることを検証し、解決できない場合は公開可能と判定しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a65c81f864bd9b12e91005e20c08fd401da74f8a66c1875445f730421c9ee804",
+      "evidence_hash": "033a024e5ab3682c9c1292d5e03ee204ffded7d4c9a269609692053af7d926b0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsVerifyAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。対象を directory 列挙で絞り込まず、この最低対象を超える検出範囲を必須要件にしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a65c81f864bd9b12e91005e20c08fd401da74f8a66c1875445f730421c9ee804",
+      "evidence_hash": "1162403d602a3b04ec8805cefeac36065bea91e0fdf151cb13d101335276d81c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "具体参照の名前キー検査は、境界 manifest の include / overlay 分類から導出した D3 の出荷対象集合だけを走査し、独自の directory 列挙を持たず、違反時は CI で fail-closed にする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsVerifyAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-15",
+          "text_label": "具体参照の名前キー検査は、境界 manifest の include / overlay 分類から導出した D3 の出荷対象集合だけを走査し、独自の directory 列挙を持たず、違反時は CI で fail-closed にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8707046281b0ef867c5e1b75700eebcafeafd221cd94c8d722e339f2fdc14265",
+      "evidence_hash": "033a024e5ab3682c9c1292d5e03ee204ffded7d4c9a269609692053af7d926b0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::verify::machine_paths::verify"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。対象を directory 列挙で絞り込まず、この最低対象を超える検出範囲を必須要件にしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2be553a038fd642a1fce5b007a31ebfd47ebe101f77d080ef9970da16b89b50a",
+      "evidence_hash": "9f19bfa80ede153c4baa36d4e1e785fdcd659379f3baec537f5777e00f4ef92e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "公開前確認が設定済みの git_url と tag を公開 remote で解決できることを検証し、解決できない場合は公開可能と判定しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::verify::sotp_version_tag::verify"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "公開前確認が設定済みの git_url と tag を公開 remote で解決できることを検証し、解決できない場合は公開可能と判定しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "54a378963939ae25001d2293dd8fa8f329189f04332fc11bbefaf307e98639df",
+      "evidence_hash": "1162403d602a3b04ec8805cefeac36065bea91e0fdf151cb13d101335276d81c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "具体参照の名前キー検査は、境界 manifest の include / overlay 分類から導出した D3 の出荷対象集合だけを走査し、独自の directory 列挙を持たず、違反時は CI で fail-closed にする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::verify::template_refs::verify"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-15",
+          "text_label": "具体参照の名前キー検査は、境界 manifest の include / overlay 分類から導出した D3 の出荷対象集合だけを走査し、独自の directory 列挙を持たず、違反時は CI で fail-closed にする。"
+        }
+      }
+    }
+  ]
+}

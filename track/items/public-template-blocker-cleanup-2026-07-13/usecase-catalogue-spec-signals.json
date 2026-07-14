@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "d64d4890e508bf44f5d856d97e387f13ab8937da53eee97b3bec853980a9bea4",
+  "signals": [
+    {
+      "type_name": "TemplateExportError",
+      "signal": "blue",
+      "entry_hash": "fa021792beb6e4a14496b98f2dc6e7f8c160e757058794976ab4f427baaaaf01"
+    },
+    {
+      "type_name": "TemplateExportPortError",
+      "signal": "blue",
+      "entry_hash": "ecde9c39af428088fab660fcf40e9ee6169fc5b2b1ff039d7b545962b038c8ef"
+    },
+    {
+      "type_name": "VerifyInteractor",
+      "signal": "blue",
+      "entry_hash": "c605868894a40f3fbacf4ad1628ebd2a9aa9baa03fbba523e9fcf982884a2aa8"
+    },
+    {
+      "type_name": "VerifyOutcome",
+      "signal": "blue",
+      "entry_hash": "82b009e3fa619d3df290d98c8a7fd2ba2c3723a7d8d0e996a23b1d8d174e0eca"
+    },
+    {
+      "type_name": "VerifyPortError",
+      "signal": "blue",
+      "entry_hash": "71b4695ad27d9fdaaf3f376005ffe575d8e1cf74fc23d498f3ec197d50c0459c"
+    },
+    {
+      "type_name": "VerifyPort",
+      "signal": "blue",
+      "entry_hash": "98ac7871915e9d755674a1c6e7214763d289bc13cd30de96990f230d530800d1"
+    },
+    {
+      "type_name": "VerifyService",
+      "signal": "blue",
+      "entry_hash": "84477343d53760a194f77eb6a768841cdbcb6951909cfa719095fa63195e2a48"
+    }
+  ]
+}

@@ -1,0 +1,994 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "TemplateExportPortError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportPortError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportPortError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportError",
+      "trait_ref": "core::convert::From<TemplateBoundaryManifestReadError>"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportError",
+      "trait_ref": "core::convert::From<TemplateExportPortError>"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportError",
+      "trait_ref": "core::convert::From<SelfBinaryTransplantError>"
+    },
+    {
+      "action": "modify",
+      "for_type": "VerifyInteractor",
+      "trait_ref": "VerifyService"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerifyPortError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerifyPortError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerifyPortError",
+      "trait_ref": "core::error::Error"
+    }
+  ],
+  "traits": {
+    "VerifyPort": {
+      "action": "modify",
+      "docs": "Secondary port for the `sotp verify` command family. Methods intentionally remain synchronous to preserve the established single-process CLI batch model without introducing an async runtime. Path parameters are technical execution roots, `skip_stale` is a gate-control switch, and catalogue-spec verification accepts the validated `TrackId` value object.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_latest_track",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_retention_gate",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_sotp_version_tag",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_machine_paths",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_template_refs",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_arch_docs",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_layers",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_hooks_path",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_spec_attribution",
+          "params": [
+            {
+              "name": "spec_path",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_spec_frontmatter",
+          "params": [
+            {
+              "name": "spec_path",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_canonical_modules",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_module_size",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_domain_purity",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_domain_strings",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_usecase_purity",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_doc_links",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_view_freshness",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_spec_signals",
+          "params": [
+            {
+              "name": "spec_path",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_plan_artifact_refs",
+          "params": [
+            {
+              "name": "track_dir",
+              "ty": "Option<&std::path::Path>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_catalogue_spec_refs",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<&domain::TrackId>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "skip_stale",
+              "ty": "bool"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        }
+      ],
+      "module_path": "verify",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "VerifyService": {
+      "action": "modify",
+      "docs": "Application service for the `sotp verify` command family. Existing routes retain baseline-owned parameters so this track does not change their ownership contract, while the three newly added routes borrow path inputs in alignment with `VerifyPort`.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_latest_track",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_retention_gate",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_sotp_version_tag",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_machine_paths",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_template_refs",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_arch_docs",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_layers",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_hooks_path",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_spec_attribution",
+          "params": [
+            {
+              "name": "spec_path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_spec_frontmatter",
+          "params": [
+            {
+              "name": "spec_path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_canonical_modules",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_module_size",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_domain_purity",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_domain_strings",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_usecase_purity",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_doc_links",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_view_freshness",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_spec_signals",
+          "params": [
+            {
+              "name": "spec_path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_plan_artifact_refs",
+          "params": [
+            {
+              "name": "track_dir",
+              "ty": "Option<std::path::PathBuf>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_catalogue_spec_refs",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<domain::TrackId>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "skip_stale",
+              "ty": "bool"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<VerifyOutcome, VerifyPortError>"
+        }
+      ],
+      "module_path": "verify",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    }
+  },
+  "types": {
+    "TemplateExportError": {
+      "action": "reference",
+      "docs": "Existing application-level template-export error referenced because its unchanged `From<TemplateExportPortError>` conversion carries the extended export failure surface to callers.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ManifestRead",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "TemplateBoundaryManifestReadError"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Export",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "TemplateExportPortError"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "BinaryTransplant",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "SelfBinaryTransplantError"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-13",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TemplateExportPortError": {
+      "action": "modify",
+      "docs": "Filesystem-export failure type. Existing `PathBuf` payloads identify technical filesystem failure locations, while `MachinePathDetected.path` uses the validated repo-relative `FilePath` value object. AC-13; CN-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OutputDirExists",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "OverlayMissing",
+            "payload": {
+              "fields": [
+                {
+                  "name": "pattern",
+                  "ty": "domain::template_export::TemplatePathPattern"
+                },
+                {
+                  "name": "overlay_path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "SourceMissing",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnclassifiedPath",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "domain::template_export::TemplatePathPattern"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "MachinePathDetected",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "domain::review_v2::FilePath"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-13",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "VerifyInteractor": {
+      "action": "reference",
+      "docs": "Existing verify interactor whose `VerifyService` implementation gains delegations for the three new verification operations while its public constructor and stored dependency shape remain unchanged.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "port",
+              "ty": "Arc<dyn VerifyPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "verify",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "VerifyOutcome": {
+      "action": "reference",
+      "docs": "Existing transport result for one verification operation; stdout and stderr are intentionally opaque presentation text, and the unconstrained `u8` mirrors a process exit status.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "exit_code",
+              "ty": "u8"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "success",
+          "params": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "failure",
+          "params": [
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "verify",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "VerifyPortError": {
+      "action": "reference",
+      "docs": "Existing adapter-level failure distinct from verifier findings; its `String` payload is intentionally unconstrained opaque diagnostic text.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unavailable",
+            "payload": {
+              "fields": [
+                "String"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "verify",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

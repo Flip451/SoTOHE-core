@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "1dde6cba1374562c27121b286c300032d6cb1ca3c7b3e18972cea13901ff2b2d",
+  "signals": [
+    {
+      "type_name": "VerifyInput",
+      "signal": "blue",
+      "entry_hash": "f854f70942d72951dcb95668b116e2d4e6500783339b44b209b1114b41fc63fa"
+    }
+  ]
+}

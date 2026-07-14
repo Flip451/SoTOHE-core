@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "f6a635f95d26e3d039e7b3af5bae357d29c45764bc2ac511c58168276bf3a140",
+      "evidence_hash": "d91eefb67dedd3f40482a5cf7e6e03de14a65e29fd3386f256a28cc58a47537a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "構造化成果物へ path を保存する境界は、repo-relative でない値を保存前に失敗として扱い、自由記述への混入検出は走査ゲートで補完する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/public-template-blocker-cleanup-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FilePath"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "構造化成果物へ path を保存する境界は、repo-relative でない値を保存前に失敗として扱い、自由記述への混入検出は走査ゲートで補完する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f6a635f95d26e3d039e7b3af5bae357d29c45764bc2ac511c58168276bf3a140",
+      "evidence_hash": "349278543571a68d63a508cc93579d62f6f4794ab967385215557ea0eb5eca70",
+      "verdict": {
+        "kind": "pass",
+        "citation": "今後の成果物を書き込む経路は repo-relative path を保存し、既存成果物の一括書き換え後に同じ作業機の絶対パスを再混入させない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/public-template-blocker-cleanup-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FilePath"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "今後の成果物を書き込む経路は repo-relative path を保存し、既存成果物の一括書き換え後に同じ作業機の絶対パスを再混入させない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f6a635f95d26e3d039e7b3af5bae357d29c45764bc2ac511c58168276bf3a140",
+      "evidence_hash": "86258f83ebe9f172c80e72813eed1a5371580a862fc9854a9347446356261688",
+      "verdict": {
+        "kind": "pass",
+        "citation": "path を保存する構造化成果物の codec 境界は repo-relative でない値を保存前に拒否し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/public-template-blocker-cleanup-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FilePath"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-14",
+          "text_label": "path を保存する構造化成果物の codec 境界は repo-relative でない値を保存前に拒否し、自由記述に対しては AC-12 および AC-13 の走査が同じ再混入を検出する。"
+        }
+      }
+    }
+  ]
+}

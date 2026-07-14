@@ -1,0 +1,125 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::verify::machine_paths::verify": {
+      "action": "add",
+      "docs": "Machine-path verification function for the repository working tree; `project_root` is a technical scan root. AC-12.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "project_root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-12",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "infrastructure::verify::sotp_version_tag::verify": {
+      "action": "add",
+      "docs": "Version-tag verification function for the configured SoTOHE release reference; `project_root` is a technical lookup root. AC-03.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "project_root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "infrastructure::verify::template_refs::verify": {
+      "action": "add",
+      "docs": "Shipped-template reference verification function; `project_root` is a technical scan root. AC-15.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "project_root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-15",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "FsVerifyAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsVerifyAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "FsVerifyAdapter",
+      "trait_ref": "usecase::verify::VerifyPort"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "FsVerifyAdapter": {
+      "action": "reference",
+      "docs": "Existing filesystem secondary adapter whose `usecase::verify::VerifyPort` implementation gains delegation for the three new verification operations while its unit shape and constructor remain unchanged.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "verify_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

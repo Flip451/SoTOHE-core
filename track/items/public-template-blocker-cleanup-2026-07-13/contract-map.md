@@ -1,0 +1,437 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_review_v2["domain::review_v2"]
+    direction TB
+  subgraph T22_domain_domain_FilePath["review_v2::types::FilePath"]
+    direction TB
+    T22_domain_domain_FilePath__self[FilePath]
+    T22_domain_domain_FilePath_new([new])
+    T22_domain_domain_FilePath_as_str([as_str])
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_template_export["usecase::template_export"]
+    direction TB
+  subgraph T35_usecase_usecase_TemplateExportError["template_export::TemplateExportError"]
+    direction TB
+    T35_usecase_usecase_TemplateExportError__self[TemplateExportError]
+    T35_usecase_usecase_TemplateExportError_ManifestRead[ManifestRead]
+    T35_usecase_usecase_TemplateExportError_Export[Export]
+    T35_usecase_usecase_TemplateExportError_BinaryTransplant[BinaryTransplant]
+  end
+  subgraph T39_usecase_usecase_TemplateExportPortError["template_export::TemplateExportPortError"]
+    direction TB
+    T39_usecase_usecase_TemplateExportPortError__self[TemplateExportPortError]
+    T39_usecase_usecase_TemplateExportPortError_OutputDirExists[OutputDirExists]
+    T39_usecase_usecase_TemplateExportPortError_OverlayMissing[OverlayMissing]
+    T39_usecase_usecase_TemplateExportPortError_SourceMissing[SourceMissing]
+    T39_usecase_usecase_TemplateExportPortError_UnclassifiedPath[UnclassifiedPath]
+    T39_usecase_usecase_TemplateExportPortError_Io[Io]
+    T39_usecase_usecase_TemplateExportPortError_MachinePathDetected[MachinePathDetected]
+  end
+  end
+  subgraph usecase_usecase_module_verify["usecase::verify"]
+    direction TB
+  subgraph T32_usecase_usecase_VerifyInteractor["verify::VerifyInteractor"]
+    direction TB
+    T32_usecase_usecase_VerifyInteractor__self[VerifyInteractor]
+    T32_usecase_usecase_VerifyInteractor_new([new])
+  end
+  subgraph T29_usecase_usecase_VerifyOutcome["verify::VerifyOutcome"]
+    direction TB
+    T29_usecase_usecase_VerifyOutcome__self[VerifyOutcome]
+    T29_usecase_usecase_VerifyOutcome_success([success])
+    T29_usecase_usecase_VerifyOutcome_failure([failure])
+  end
+  subgraph T31_usecase_usecase_VerifyPortError["verify::VerifyPortError"]
+    direction TB
+    T31_usecase_usecase_VerifyPortError__self[VerifyPortError]
+    T31_usecase_usecase_VerifyPortError_Unavailable[Unavailable]
+  end
+  subgraph R26_usecase_usecase_VerifyPort["verify::VerifyPort"]
+    direction TB
+    R26_usecase_usecase_VerifyPort__self[VerifyPort]
+    R26_usecase_usecase_VerifyPort_verify_latest_track([verify_latest_track])
+    R26_usecase_usecase_VerifyPort_verify_retention_gate([verify_retention_gate])
+    R26_usecase_usecase_VerifyPort_verify_sotp_version_tag([verify_sotp_version_tag])
+    R26_usecase_usecase_VerifyPort_verify_machine_paths([verify_machine_paths])
+    R26_usecase_usecase_VerifyPort_verify_template_refs([verify_template_refs])
+    R26_usecase_usecase_VerifyPort_verify_arch_docs([verify_arch_docs])
+    R26_usecase_usecase_VerifyPort_verify_layers([verify_layers])
+    R26_usecase_usecase_VerifyPort_verify_hooks_path([verify_hooks_path])
+    R26_usecase_usecase_VerifyPort_verify_spec_attribution([verify_spec_attribution])
+    R26_usecase_usecase_VerifyPort_verify_spec_frontmatter([verify_spec_frontmatter])
+    R26_usecase_usecase_VerifyPort_verify_canonical_modules([verify_canonical_modules])
+    R26_usecase_usecase_VerifyPort_verify_module_size([verify_module_size])
+    R26_usecase_usecase_VerifyPort_verify_domain_purity([verify_domain_purity])
+    R26_usecase_usecase_VerifyPort_verify_domain_strings([verify_domain_strings])
+    R26_usecase_usecase_VerifyPort_verify_usecase_purity([verify_usecase_purity])
+    R26_usecase_usecase_VerifyPort_verify_doc_links([verify_doc_links])
+    R26_usecase_usecase_VerifyPort_verify_view_freshness([verify_view_freshness])
+    R26_usecase_usecase_VerifyPort_verify_spec_signals([verify_spec_signals])
+    R26_usecase_usecase_VerifyPort_verify_plan_artifact_refs([verify_plan_artifact_refs])
+    R26_usecase_usecase_VerifyPort_verify_catalogue_spec_refs([verify_catalogue_spec_refs])
+  end
+  subgraph R29_usecase_usecase_VerifyService["verify::VerifyService"]
+    direction TB
+    R29_usecase_usecase_VerifyService__self[VerifyService]
+    R29_usecase_usecase_VerifyService_verify_latest_track([verify_latest_track])
+    R29_usecase_usecase_VerifyService_verify_retention_gate([verify_retention_gate])
+    R29_usecase_usecase_VerifyService_verify_sotp_version_tag([verify_sotp_version_tag])
+    R29_usecase_usecase_VerifyService_verify_machine_paths([verify_machine_paths])
+    R29_usecase_usecase_VerifyService_verify_template_refs([verify_template_refs])
+    R29_usecase_usecase_VerifyService_verify_arch_docs([verify_arch_docs])
+    R29_usecase_usecase_VerifyService_verify_layers([verify_layers])
+    R29_usecase_usecase_VerifyService_verify_hooks_path([verify_hooks_path])
+    R29_usecase_usecase_VerifyService_verify_spec_attribution([verify_spec_attribution])
+    R29_usecase_usecase_VerifyService_verify_spec_frontmatter([verify_spec_frontmatter])
+    R29_usecase_usecase_VerifyService_verify_canonical_modules([verify_canonical_modules])
+    R29_usecase_usecase_VerifyService_verify_module_size([verify_module_size])
+    R29_usecase_usecase_VerifyService_verify_domain_purity([verify_domain_purity])
+    R29_usecase_usecase_VerifyService_verify_domain_strings([verify_domain_strings])
+    R29_usecase_usecase_VerifyService_verify_usecase_purity([verify_usecase_purity])
+    R29_usecase_usecase_VerifyService_verify_doc_links([verify_doc_links])
+    R29_usecase_usecase_VerifyService_verify_view_freshness([verify_view_freshness])
+    R29_usecase_usecase_VerifyService_verify_spec_signals([verify_spec_signals])
+    R29_usecase_usecase_VerifyService_verify_plan_artifact_refs([verify_plan_artifact_refs])
+    R29_usecase_usecase_VerifyService_verify_catalogue_spec_refs([verify_catalogue_spec_refs])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_verify["infrastructure::verify"]
+    direction TB
+  F75_infrastructure_infrastructure_infrastructure__verify__machine_paths__verify[[verify]]
+  F78_infrastructure_infrastructure_infrastructure__verify__sotp_version_tag__verify[[verify]]
+  F75_infrastructure_infrastructure_infrastructure__verify__template_refs__verify[[verify]]
+  end
+  subgraph infrastructure_infrastructure_module_verify_adapter["infrastructure::verify_adapter"]
+    direction TB
+  subgraph T45_infrastructure_infrastructure_FsVerifyAdapter["verify_adapter::FsVerifyAdapter"]
+    direction TB
+    T45_infrastructure_infrastructure_FsVerifyAdapter__self[FsVerifyAdapter]
+    T45_infrastructure_infrastructure_FsVerifyAdapter_new([new])
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+  subgraph cli_driver_cli_driver_module_verify["cli_driver::verify"]
+    direction TB
+  subgraph T33_cli_driver_cli_driver_VerifyInput["verify::VerifyInput"]
+    direction TB
+    T33_cli_driver_cli_driver_VerifyInput__self[VerifyInput]
+    T33_cli_driver_cli_driver_VerifyInput_LatestTrack[LatestTrack]
+    T33_cli_driver_cli_driver_VerifyInput_RetentionGate[RetentionGate]
+    T33_cli_driver_cli_driver_VerifyInput_SotpVersionTag[SotpVersionTag]
+    T33_cli_driver_cli_driver_VerifyInput_MachinePaths[MachinePaths]
+    T33_cli_driver_cli_driver_VerifyInput_TemplateRefs[TemplateRefs]
+    T33_cli_driver_cli_driver_VerifyInput_ArchDocs[ArchDocs]
+    T33_cli_driver_cli_driver_VerifyInput_Layers[Layers]
+    T33_cli_driver_cli_driver_VerifyInput_HooksPath[HooksPath]
+    T33_cli_driver_cli_driver_VerifyInput_SpecAttribution[SpecAttribution]
+    T33_cli_driver_cli_driver_VerifyInput_SpecFrontmatter[SpecFrontmatter]
+    T33_cli_driver_cli_driver_VerifyInput_CanonicalModules[CanonicalModules]
+    T33_cli_driver_cli_driver_VerifyInput_ModuleSize[ModuleSize]
+    T33_cli_driver_cli_driver_VerifyInput_DomainPurity[DomainPurity]
+    T33_cli_driver_cli_driver_VerifyInput_DomainStrings[DomainStrings]
+    T33_cli_driver_cli_driver_VerifyInput_UsecasePurity[UsecasePurity]
+    T33_cli_driver_cli_driver_VerifyInput_DocLinks[DocLinks]
+    T33_cli_driver_cli_driver_VerifyInput_ViewFreshness[ViewFreshness]
+    T33_cli_driver_cli_driver_VerifyInput_SpecSignals[SpecSignals]
+    T33_cli_driver_cli_driver_VerifyInput_PlanArtifactRefs[PlanArtifactRefs]
+    T33_cli_driver_cli_driver_VerifyInput_CatalogueSpecRefs[CatalogueSpecRefs]
+  end
+  end
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+end
+subgraph cli["cli"]
+  direction TB
+  subgraph cli_cli_module_commands["cli::commands"]
+    direction TB
+  subgraph T18_cli_cli_VerifyArgs["commands::verify::VerifyArgs"]
+    direction TB
+    T18_cli_cli_VerifyArgs__self[VerifyArgs]
+  end
+  subgraph T21_cli_cli_VerifyCommand["commands::verify::VerifyCommand"]
+    direction TB
+    T21_cli_cli_VerifyCommand__self[VerifyCommand]
+    T21_cli_cli_VerifyCommand_LatestTrack[LatestTrack]
+    T21_cli_cli_VerifyCommand_RetentionGate[RetentionGate]
+    T21_cli_cli_VerifyCommand_SotpVersionTag[SotpVersionTag]
+    T21_cli_cli_VerifyCommand_MachinePaths[MachinePaths]
+    T21_cli_cli_VerifyCommand_TemplateRefs[TemplateRefs]
+    T21_cli_cli_VerifyCommand_ArchDocs[ArchDocs]
+    T21_cli_cli_VerifyCommand_Layers[Layers]
+    T21_cli_cli_VerifyCommand_HooksPath[HooksPath]
+    T21_cli_cli_VerifyCommand_SpecAttribution[SpecAttribution]
+    T21_cli_cli_VerifyCommand_SpecFrontmatter[SpecFrontmatter]
+    T21_cli_cli_VerifyCommand_CanonicalModules[CanonicalModules]
+    T21_cli_cli_VerifyCommand_ModuleSize[ModuleSize]
+    T21_cli_cli_VerifyCommand_DomainPurity[DomainPurity]
+    T21_cli_cli_VerifyCommand_DomainStrings[DomainStrings]
+    T21_cli_cli_VerifyCommand_UsecasePurity[UsecasePurity]
+    T21_cli_cli_VerifyCommand_DocLinks[DocLinks]
+    T21_cli_cli_VerifyCommand_ViewFreshness[ViewFreshness]
+    T21_cli_cli_VerifyCommand_SpecSignals[SpecSignals]
+    T21_cli_cli_VerifyCommand_PlanArtifactRefs[PlanArtifactRefs]
+    T21_cli_cli_VerifyCommand_CatalogueSpecRefs[CatalogueSpecRefs]
+    T21_cli_cli_VerifyCommand_items_dir([items_dir])
+  end
+  end
+end
+T22_domain_domain_FilePath_new --> T22_domain_domain_FilePath__self
+T35_usecase_usecase_TemplateExportError_Export --o|source| T39_usecase_usecase_TemplateExportPortError__self
+T39_usecase_usecase_TemplateExportPortError_MachinePathDetected --o|path| T22_domain_domain_FilePath__self
+T32_usecase_usecase_VerifyInteractor_new --o R26_usecase_usecase_VerifyPort__self
+T32_usecase_usecase_VerifyInteractor_new --> T32_usecase_usecase_VerifyInteractor__self
+T29_usecase_usecase_VerifyOutcome_success --> T29_usecase_usecase_VerifyOutcome__self
+T29_usecase_usecase_VerifyOutcome_failure --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_latest_track --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_latest_track --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_retention_gate --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_retention_gate --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_sotp_version_tag --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_sotp_version_tag --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_machine_paths --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_machine_paths --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_template_refs --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_template_refs --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_arch_docs --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_arch_docs --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_layers --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_layers --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_hooks_path --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_hooks_path --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_spec_attribution --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_spec_attribution --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_spec_frontmatter --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_spec_frontmatter --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_canonical_modules --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_canonical_modules --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_module_size --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_module_size --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_domain_purity --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_domain_purity --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_domain_strings --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_domain_strings --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_usecase_purity --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_usecase_purity --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_doc_links --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_doc_links --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_view_freshness --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_view_freshness --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_spec_signals --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_spec_signals --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_plan_artifact_refs --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_plan_artifact_refs --> T31_usecase_usecase_VerifyPortError__self
+R26_usecase_usecase_VerifyPort_verify_catalogue_spec_refs --> T29_usecase_usecase_VerifyOutcome__self
+R26_usecase_usecase_VerifyPort_verify_catalogue_spec_refs --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_latest_track --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_latest_track --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_retention_gate --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_retention_gate --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_sotp_version_tag --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_sotp_version_tag --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_machine_paths --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_machine_paths --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_template_refs --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_template_refs --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_arch_docs --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_arch_docs --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_layers --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_layers --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_hooks_path --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_hooks_path --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_spec_attribution --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_spec_attribution --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_spec_frontmatter --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_spec_frontmatter --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_canonical_modules --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_canonical_modules --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_module_size --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_module_size --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_domain_purity --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_domain_purity --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_domain_strings --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_domain_strings --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_usecase_purity --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_usecase_purity --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_doc_links --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_doc_links --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_view_freshness --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_view_freshness --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_spec_signals --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_spec_signals --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_plan_artifact_refs --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_plan_artifact_refs --> T31_usecase_usecase_VerifyPortError__self
+R29_usecase_usecase_VerifyService_verify_catalogue_spec_refs --> T29_usecase_usecase_VerifyOutcome__self
+R29_usecase_usecase_VerifyService_verify_catalogue_spec_refs --> T31_usecase_usecase_VerifyPortError__self
+T32_usecase_usecase_VerifyInteractor__self -.impl.-> R29_usecase_usecase_VerifyService__self
+T45_infrastructure_infrastructure_FsVerifyAdapter_new --> T45_infrastructure_infrastructure_FsVerifyAdapter__self
+T45_infrastructure_infrastructure_FsVerifyAdapter__self -.impl.-> R26_usecase_usecase_VerifyPort__self
+T21_cli_cli_VerifyCommand_LatestTrack --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_RetentionGate --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_SotpVersionTag --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_MachinePaths --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_TemplateRefs --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_ArchDocs --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_Layers --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_HooksPath --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_CanonicalModules --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_ModuleSize --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_DomainPurity --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_DomainStrings --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_UsecasePurity --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_DocLinks --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_ViewFreshness --o T18_cli_cli_VerifyArgs__self
+class T22_domain_domain_FilePath_new method_node
+class T22_domain_domain_FilePath_as_str method_node
+class T22_domain_domain_FilePath__self value_object
+class T35_usecase_usecase_TemplateExportError_ManifestRead variant_node
+class T35_usecase_usecase_TemplateExportError_Export variant_node
+class T35_usecase_usecase_TemplateExportError_BinaryTransplant variant_node
+class T35_usecase_usecase_TemplateExportError__self error_type
+class T39_usecase_usecase_TemplateExportPortError_OutputDirExists variant_node
+class T39_usecase_usecase_TemplateExportPortError_OverlayMissing variant_node
+class T39_usecase_usecase_TemplateExportPortError_SourceMissing variant_node
+class T39_usecase_usecase_TemplateExportPortError_UnclassifiedPath variant_node
+class T39_usecase_usecase_TemplateExportPortError_Io variant_node
+class T39_usecase_usecase_TemplateExportPortError_MachinePathDetected variant_node
+class T39_usecase_usecase_TemplateExportPortError__self error_type
+class T32_usecase_usecase_VerifyInteractor_new method_node
+class T32_usecase_usecase_VerifyInteractor__self interactor
+class T29_usecase_usecase_VerifyOutcome_success method_node
+class T29_usecase_usecase_VerifyOutcome_failure method_node
+class T29_usecase_usecase_VerifyOutcome__self dto
+class T31_usecase_usecase_VerifyPortError_Unavailable variant_node
+class T31_usecase_usecase_VerifyPortError__self error_type
+class R26_usecase_usecase_VerifyPort_verify_latest_track method_node
+class R26_usecase_usecase_VerifyPort_verify_retention_gate method_node
+class R26_usecase_usecase_VerifyPort_verify_sotp_version_tag method_node
+class R26_usecase_usecase_VerifyPort_verify_machine_paths method_node
+class R26_usecase_usecase_VerifyPort_verify_template_refs method_node
+class R26_usecase_usecase_VerifyPort_verify_arch_docs method_node
+class R26_usecase_usecase_VerifyPort_verify_layers method_node
+class R26_usecase_usecase_VerifyPort_verify_hooks_path method_node
+class R26_usecase_usecase_VerifyPort_verify_spec_attribution method_node
+class R26_usecase_usecase_VerifyPort_verify_spec_frontmatter method_node
+class R26_usecase_usecase_VerifyPort_verify_canonical_modules method_node
+class R26_usecase_usecase_VerifyPort_verify_module_size method_node
+class R26_usecase_usecase_VerifyPort_verify_domain_purity method_node
+class R26_usecase_usecase_VerifyPort_verify_domain_strings method_node
+class R26_usecase_usecase_VerifyPort_verify_usecase_purity method_node
+class R26_usecase_usecase_VerifyPort_verify_doc_links method_node
+class R26_usecase_usecase_VerifyPort_verify_view_freshness method_node
+class R26_usecase_usecase_VerifyPort_verify_spec_signals method_node
+class R26_usecase_usecase_VerifyPort_verify_plan_artifact_refs method_node
+class R26_usecase_usecase_VerifyPort_verify_catalogue_spec_refs method_node
+class R26_usecase_usecase_VerifyPort__self secondary_port
+class R29_usecase_usecase_VerifyService_verify_latest_track method_node
+class R29_usecase_usecase_VerifyService_verify_retention_gate method_node
+class R29_usecase_usecase_VerifyService_verify_sotp_version_tag method_node
+class R29_usecase_usecase_VerifyService_verify_machine_paths method_node
+class R29_usecase_usecase_VerifyService_verify_template_refs method_node
+class R29_usecase_usecase_VerifyService_verify_arch_docs method_node
+class R29_usecase_usecase_VerifyService_verify_layers method_node
+class R29_usecase_usecase_VerifyService_verify_hooks_path method_node
+class R29_usecase_usecase_VerifyService_verify_spec_attribution method_node
+class R29_usecase_usecase_VerifyService_verify_spec_frontmatter method_node
+class R29_usecase_usecase_VerifyService_verify_canonical_modules method_node
+class R29_usecase_usecase_VerifyService_verify_module_size method_node
+class R29_usecase_usecase_VerifyService_verify_domain_purity method_node
+class R29_usecase_usecase_VerifyService_verify_domain_strings method_node
+class R29_usecase_usecase_VerifyService_verify_usecase_purity method_node
+class R29_usecase_usecase_VerifyService_verify_doc_links method_node
+class R29_usecase_usecase_VerifyService_verify_view_freshness method_node
+class R29_usecase_usecase_VerifyService_verify_spec_signals method_node
+class R29_usecase_usecase_VerifyService_verify_plan_artifact_refs method_node
+class R29_usecase_usecase_VerifyService_verify_catalogue_spec_refs method_node
+class R29_usecase_usecase_VerifyService__self app_service
+class F75_infrastructure_infrastructure_infrastructure__verify__machine_paths__verify free_function
+class F75_infrastructure_infrastructure_infrastructure__verify__machine_paths__verify function_node
+class F78_infrastructure_infrastructure_infrastructure__verify__sotp_version_tag__verify free_function
+class F78_infrastructure_infrastructure_infrastructure__verify__sotp_version_tag__verify function_node
+class F75_infrastructure_infrastructure_infrastructure__verify__template_refs__verify free_function
+class F75_infrastructure_infrastructure_infrastructure__verify__template_refs__verify function_node
+class T45_infrastructure_infrastructure_FsVerifyAdapter_new method_node
+class T45_infrastructure_infrastructure_FsVerifyAdapter__self secondary_adapter
+class T33_cli_driver_cli_driver_VerifyInput_LatestTrack variant_node
+class T33_cli_driver_cli_driver_VerifyInput_RetentionGate variant_node
+class T33_cli_driver_cli_driver_VerifyInput_SotpVersionTag variant_node
+class T33_cli_driver_cli_driver_VerifyInput_MachinePaths variant_node
+class T33_cli_driver_cli_driver_VerifyInput_TemplateRefs variant_node
+class T33_cli_driver_cli_driver_VerifyInput_ArchDocs variant_node
+class T33_cli_driver_cli_driver_VerifyInput_Layers variant_node
+class T33_cli_driver_cli_driver_VerifyInput_HooksPath variant_node
+class T33_cli_driver_cli_driver_VerifyInput_SpecAttribution variant_node
+class T33_cli_driver_cli_driver_VerifyInput_SpecFrontmatter variant_node
+class T33_cli_driver_cli_driver_VerifyInput_CanonicalModules variant_node
+class T33_cli_driver_cli_driver_VerifyInput_ModuleSize variant_node
+class T33_cli_driver_cli_driver_VerifyInput_DomainPurity variant_node
+class T33_cli_driver_cli_driver_VerifyInput_DomainStrings variant_node
+class T33_cli_driver_cli_driver_VerifyInput_UsecasePurity variant_node
+class T33_cli_driver_cli_driver_VerifyInput_DocLinks variant_node
+class T33_cli_driver_cli_driver_VerifyInput_ViewFreshness variant_node
+class T33_cli_driver_cli_driver_VerifyInput_SpecSignals variant_node
+class T33_cli_driver_cli_driver_VerifyInput_PlanArtifactRefs variant_node
+class T33_cli_driver_cli_driver_VerifyInput_CatalogueSpecRefs variant_node
+class T33_cli_driver_cli_driver_VerifyInput__self dto
+class T18_cli_cli_VerifyArgs__self dto
+class T21_cli_cli_VerifyCommand_LatestTrack variant_node
+class T21_cli_cli_VerifyCommand_RetentionGate variant_node
+class T21_cli_cli_VerifyCommand_SotpVersionTag variant_node
+class T21_cli_cli_VerifyCommand_MachinePaths variant_node
+class T21_cli_cli_VerifyCommand_TemplateRefs variant_node
+class T21_cli_cli_VerifyCommand_ArchDocs variant_node
+class T21_cli_cli_VerifyCommand_Layers variant_node
+class T21_cli_cli_VerifyCommand_HooksPath variant_node
+class T21_cli_cli_VerifyCommand_SpecAttribution variant_node
+class T21_cli_cli_VerifyCommand_SpecFrontmatter variant_node
+class T21_cli_cli_VerifyCommand_CanonicalModules variant_node
+class T21_cli_cli_VerifyCommand_ModuleSize variant_node
+class T21_cli_cli_VerifyCommand_DomainPurity variant_node
+class T21_cli_cli_VerifyCommand_DomainStrings variant_node
+class T21_cli_cli_VerifyCommand_UsecasePurity variant_node
+class T21_cli_cli_VerifyCommand_DocLinks variant_node
+class T21_cli_cli_VerifyCommand_ViewFreshness variant_node
+class T21_cli_cli_VerifyCommand_SpecSignals variant_node
+class T21_cli_cli_VerifyCommand_PlanArtifactRefs variant_node
+class T21_cli_cli_VerifyCommand_CatalogueSpecRefs variant_node
+class T21_cli_cli_VerifyCommand_items_dir method_node
+class T21_cli_cli_VerifyCommand__self dto
+```
