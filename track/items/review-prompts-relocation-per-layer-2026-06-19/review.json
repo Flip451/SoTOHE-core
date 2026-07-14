@@ -223,7 +223,7 @@
             {
               "message": "The CLI policy still assigns adapter construction/DI to `apps/cli/`, but this repository's architecture places wiring in `apps/cli-composition/` and keeps `apps/cli` to parse/dispatch/output/ExitCode mapping. As written, the `usecase bypass` exception can hide direct domain/infrastructure construction in CLI and overlaps with the `cli_composition` briefing. Reframe this briefing so CLI is thin and wiring stays reportable in the composition layer.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/.harness/custom/review-prompts/cli.md",
+              "file": ".harness/custom/review-prompts/cli.md",
               "line": 3,
               "category": "architecture violation"
             }

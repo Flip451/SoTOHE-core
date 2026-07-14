@@ -49,3 +49,10 @@
 - Verifier command: `bin/sotp verify machine-paths --project-root .`
 - Before: FAILED (85 source-line findings remain; one above the plan's approximate 84-line residual for the reason recorded in T019).
 - After: PASSED (zero file-level violations and zero source-line findings).
+
+## 2026-07-15 — directory-structure follow-up
+
+- Target files: 23 tracked JSON artifacts.
+- Resolved: 557 path references: 554 personal directory-structure references across the checkout variants and 3 legacy escaped machine-home identity references.
+- Normalization: removed the machine-home and personal directory structure, retaining each repository-relative remainder; the two Markdown-link path values that began with `.` remain valid repo-relative `.harness/...` paths.
+- Verification: all three required residue scans returned zero files; `bin/sotp verify machine-paths --project-root .` PASSED; `jq empty` passed for all 24 currently changed JSON files; `cargo make ci-rust` and `git diff --check` PASSED.

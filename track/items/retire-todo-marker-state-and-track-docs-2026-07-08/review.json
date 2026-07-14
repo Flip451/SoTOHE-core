@@ -93,28 +93,28 @@
             {
               "message": "T004 restates upstream ADR content instead of staying at target + operation + anchor. It enumerates the decisions from `track/tech-stack.md` and `track/product-guidelines.md`, which violates `knowledge/conventions/no-upstream-restatement.md`.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/track/items/retire-todo-marker-state-and-track-docs-2026-07-08/impl-plan.json",
+              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/impl-plan.json",
               "line": 24,
               "category": "upstream restatement"
             },
             {
               "message": "T005 restates the product-vision source content instead of just specifying the README edit. The description replays the `track/product.md` sections and onboarding metaphor, which violates `knowledge/conventions/no-upstream-restatement.md`.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/track/items/retire-todo-marker-state-and-track-docs-2026-07-08/impl-plan.json",
+              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/impl-plan.json",
               "line": 30,
               "category": "upstream restatement"
             },
             {
               "message": "`task-contract.json` over-attributes T002 to `VerifyArgs` and `SpecVerifyArgs`, but the task only removes the `TechStack` subcommand/dispatch/tests. Those argument structs remain unchanged, so the contract is broader than the described edits.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/track/items/retire-todo-marker-state-and-track-docs-2026-07-08/task-contract.json",
+              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/task-contract.json",
               "line": 6,
               "category": "task-contract attribution mismatch"
             },
             {
               "message": "`task-contract.json` over-attributes T003 to `VerifyOutcome` and `VerifyPortError`, but the task only removes the `verify_tech_stack` path and the `tech_stack.rs` module. Those shared outcome/error types are untouched, so the attribution does not match the described edits.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/track/items/retire-todo-marker-state-and-track-docs-2026-07-08/task-contract.json",
+              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/task-contract.json",
               "line": 13,
               "category": "task-contract attribution mismatch"
             }
@@ -129,7 +129,7 @@
             {
               "message": "T011 should be trimmed to target + operation + anchor cite. The sentence \"The gate must be existence-based (no state fields, no TODO-marker checks) and fail-closed.\" restates the behavior contract already carried by AC-11/AC-12/AC-13 instead of letting the anchors speak for it, which violates `knowledge/conventions/no-upstream-restatement.md`.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/track/items/retire-todo-marker-state-and-track-docs-2026-07-08/impl-plan.json",
+              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/impl-plan.json",
               "line": 66,
               "category": "upstream restatement"
             }
@@ -365,7 +365,7 @@
             {
               "message": "`AC-14` mixes two machine-checkable grep requirements with a subjective requirement that the absorbed product-vision text be \"consistent with\" README's existing structure and preserve placeholder-free onboarding. That part is not deterministically verifiable as written, so downstream phases can only interpret it heuristically.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.md",
+              "file": "track/items/retire-todo-marker-state-and-track-docs-2026-07-08/spec.md",
               "line": 60,
               "category": "acceptance criterion non-observable"
             }
@@ -571,14 +571,14 @@
             {
               "message": "`knowledge/research/README.md:19` still tells bootstrap readers to update `track/tech-stack.md`, but that file is deleted in this PR. The overlay copy has already been migrated to ADR-based guidance, so the live repo docs are now inconsistent and this instruction points at a nonexistent file.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/knowledge/research/README.md",
+              "file": "knowledge/research/README.md",
               "line": 19,
               "category": "dead-reference"
             },
             {
               "message": "`knowledge/research/version-baseline-template.md:40` still has the checklist item for updating `track/tech-stack.md`. Since that document is removed, the template now instructs users to modify a nonexistent file instead of recording the baseline decision in an ADR.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/knowledge/research/version-baseline-template.md",
+              "file": "knowledge/research/version-baseline-template.md",
               "line": 40,
               "category": "dead-reference"
             }
@@ -611,7 +611,7 @@
             {
               "message": "D4 reads like an implementation checklist rather than a decision record: it names specific follow-up files (`CLAUDE.md`, `.claude/rules/08/09/10`, `Makefile`, `README`, boundary manifest/overlay) and says they must be updated in lockstep. That constrains downstream implementation work that should be captured in spec/impl-plan, not in the ADR body.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+              "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
               "line": 48,
               "category": "scope leakage into ADR body"
             }

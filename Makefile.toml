@@ -323,6 +323,24 @@ description = "[internal] Verify ADR decision signal grounds across knowledge/ad
 command = "cargo"
 args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-adr-user", "--gate", "commit"]
 
+[tasks.verify-sotp-version-tag-local]
+private = true
+description = "[internal] Pre-publication check (not a CI gate): verify the configured fixed SOTP version tag resolves on its public remote"
+script_runner = "@shell"
+script = ['cargo run --quiet -p cli -- verify sotp-version-tag --project-root .']
+
+[tasks.verify-machine-paths-local]
+private = true
+description = "[internal] Verify tracked repository files contain no work-machine paths"
+script_runner = "@shell"
+script = ['cargo run --quiet -p cli -- verify machine-paths --project-root .']
+
+[tasks.verify-template-refs-local]
+private = true
+description = "[internal] Verify shipped template files contain no concrete source references"
+script_runner = "@shell"
+script = ['cargo run --quiet -p cli -- verify template-refs --project-root .']
+
 [tasks.verify-spec-states-current-local]
 private = true
 description = "[internal] Chain ① spec→ADR signal gate. Active track auto-resolved from current branch; graceful skip when spec.json is absent (Phase 0 / pre-Phase-1 tracks — see ADR knowledge/adr/2026-06-03-1241-spec-states-gate-tolerate-missing-spec-artifact.md). Track-aware task: only invoked via ci-track-container / ci-track-local (PR CI, never push/base branch); the parent already fails-closed on non-track branches so the inner shell skips only on absent spec.json, not on branch shape."
@@ -420,7 +438,9 @@ cargo test --all-features
 cargo make --list-all-steps >/dev/null
 # File-based verify gates against the exported tree (parse the exported
 # architecture-rules.json fail-closed; scan the skeleton sources; purity trio runs
-# via the exported arch-rules verify opt-ins).
+# via the exported arch-rules verify opt-ins). The machine-path scan over the
+# export output runs inside `sotp template export` itself; the git-inventory
+# verifiers (machine-paths / template-refs) run at repo level in ci-local.
 bin/sotp verify layers
 bin/sotp verify module-size
 bin/sotp verify canonical-modules
@@ -447,7 +467,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 [tasks.ci-local]
 private = true
 description = "[internal] Run local repo-wide CI checks. Track-aware gates live in ci-track-local."
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-machine-paths-local", "verify-template-refs-local", "template-export-smoke-local"]
 
 [tasks.ci-track-local]
 private = true
@@ -460,7 +480,7 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "
 
 [tasks.ci-container]
 description = "[gate] Run repo-wide CI checks inside a pre-existing container (no docker compose). Track-aware gates that require an active track/<id> branch are in ci-track-container."
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "template-export-smoke-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-machine-paths-local", "verify-template-refs-local", "template-export-smoke-local"]
 
 [tasks.ci-track-container]
 description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + check liveness + spec/catalogue/impl signal chains + test-obligation check). Skip on base branch / non-track CI runs."

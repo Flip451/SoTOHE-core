@@ -8,9 +8,9 @@ Run T004-T011 in layer order: verifier modules, usecase, filesystem adapter, pri
 Run T012, then T014, then T013 so the manifest-resolved review sees the completed shipped set; execute T015-T020 as successive bounded finding batches over one inventory.
 Run T022 after T002; it is independent of T003 and precedes final enablement in T021.
 T021 is final enablement and is blocked on T012, T013, and T015-T020.
-Goal traceability: GO-01 → T001; GO-02 → T004/T007-T011/T021; GO-03 → T006/T012/T013/T021; GO-04 → T014; GO-05 → T002/T003/T005/T015-T022; GO-06 → T002/T003/T005/T007-T011/T015-T022; GO-07 → T006/T007-T011/T021.
+Goal traceability: GO-01 → T001; GO-02 → T004/T007-T011; GO-03 → T006/T012/T013/T021; GO-04 → T014; GO-05 → T002/T003/T005/T015-T022; GO-06 → T002/T003/T005/T007-T011/T015-T022; GO-07 → T006/T007-T011/T021.
 
-## Tasks (21/22 resolved)
+## Tasks (22/22 resolved)
 
 ### S1 — Template export classification and output protection
 
@@ -52,15 +52,15 @@ Goal traceability: GO-01 → T001; GO-02 → T004/T007-T011/T021; GO-03 → T006
 
 > T015-T020 each rerun the machine-path verifier and resolve the next bounded finding batch over one complete `git ls-files` inventory.
 
-- [x] **T015**: From the deterministic `infrastructure::verify::machine_paths::verify` finding order over the `git ls-files` inventory, resolve the first 450 source-line findings and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
-- [x] **T016**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
-- [x] **T017**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
-- [x] **T018**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
-- [x] **T019**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
-- [x] **T020**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the final at-most-84 remaining source-line findings, and record the zero-findings result (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05).
+- [x] **T015**: From the deterministic `infrastructure::verify::machine_paths::verify` finding order over the `git ls-files` inventory, resolve the first 450 source-line findings and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05). (`56b12548c742f530757c53b4846e156d10b19a71`)
+- [x] **T016**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05). (`56b12548c742f530757c53b4846e156d10b19a71`)
+- [x] **T017**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05). (`56b12548c742f530757c53b4846e156d10b19a71`)
+- [x] **T018**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05). (`56b12548c742f530757c53b4846e156d10b19a71`)
+- [x] **T019**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the next 450 remaining source-line findings, and retain the batch evidence (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05). (`56b12548c742f530757c53b4846e156d10b19a71`)
+- [x] **T020**: Rerun `infrastructure::verify::machine_paths::verify` over the `git ls-files` inventory, resolve the final at-most-84 remaining source-line findings, and record the zero-findings result (spec.json#GO-05, #IN-05, #CN-03, #AC-09, #AC-10, #AC-11, #OS-05). (`56b12548c742f530757c53b4846e156d10b19a71`)
 
-### S6 — Final CI and export-smoke enablement
+### S6 — Final CI enablement
 
-> After T012, T013, T015-T020, and the verifier-route sections, run T021 against `Makefile.toml` CI and export-smoke tasks (spec.json#AC-03, #AC-12, #AC-13, #AC-15).
+> After T012, T013, T015-T020, and the verifier-route sections, run T021 only in `Makefile.toml` CI tasks `ci-local` and `ci-container` to add the machine-path and template-reference verifier invocations (spec.json#AC-04, #AC-12, #AC-15).
 
-- [ ] **T021**: After T012, T013, and T015-T020, add all three verifier invocations to `Makefile.toml` CI tasks `ci-local` and `ci-container`; add only the machine-path and template-reference invocations to `template-export-smoke-local`, with gate-specific coverage (spec.json#GO-02, #GO-03, #GO-05, #GO-06, #GO-07, #IN-02, #IN-03, #IN-06, #IN-07, #CN-01, #CN-02, #CN-03, #CN-05, #AC-03, #AC-04, #AC-12, #AC-13, #AC-15).
+- [x] **T021**: After T012, T013, and T015-T020, update `Makefile.toml`: add `verify-machine-paths-local` and `verify-template-refs-local` to `ci-local` and `ci-container`; retain the standalone `verify-sotp-version-tag-local` task; leave `template-export-smoke-local` verifier wiring unchanged (spec.json#IN-03, #IN-06, #IN-07, #CN-01, #CN-02, #CN-03, #CN-05, #AC-04, #AC-10, #AC-12, #AC-15, #OS-05).

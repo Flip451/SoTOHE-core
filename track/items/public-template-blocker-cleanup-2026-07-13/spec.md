@@ -20,7 +20,7 @@ signals: { blue: 46, yellow: 0, red: 0 }
 
 ### In Scope
 - [IN-01] template export とその smoke 検査で、Git 管理外かつ gitignore 対象の一時生成物を配布対象外として skip する振る舞いを実現する。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D1] [tasks: T001]
-- [IN-02] 固定 tag 経路の公開 remote 上での解決可能性を公開前に確認する検査を整備する。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D2] [tasks: T004, T007, T008, T009, T010, T011, T021]
+- [IN-02] 固定 tag 経路の公開 remote 上での解決可能性を公開前に確認する検査を整備する。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D2] [tasks: T004, T007, T008, T009, T010, T011]
 - [IN-03] 境界 manifest の include / overlay 分類から導かれる出荷対象を自己完結化し、存在しない提供元固有の具体参照を除去する。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D3] [tasks: T012, T013, T021]
 - [IN-04] archive の業務ロジックを CLI と提供元非依存 workflow に集約し、command 文書と rendered view の archive 表示をこれに整合させる。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D4] [tasks: T014]
 - [IN-05] Git 管理下の既存成果物を対象に、作業機を指す絶対パスを意味に応じて repo-relative、汎用表記、削除、または伏せ字へ置き換える。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D5] [tasks: T003, T015, T016, T017, T018, T019, T020]
@@ -30,7 +30,7 @@ signals: { blue: 46, yellow: 0, red: 0 }
 
 ### Out of Scope
 - [OS-01] Git 管理下の file だけで作った clean checkout を export の唯一の回避策とする運用。通常の開発作業ツリーでの export 振る舞いは置き換えない。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D1] [tasks: T001]
-- [OS-02] 固定 tag を template export smoke の初回導入導線の必須条件にすること。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D2] [tasks: T004, T021]
+- [OS-02] 固定 tag を template export smoke の初回導入導線の必須条件にすること。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D2] [tasks: T004]
 - [OS-03] 提供元の全 ADR または track 履歴の同梱、あるいは export 用 overlay による convention の二重管理を参照解消手段として採用すること。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D3] [tasks: T012, T013]
 - [OS-04] archive 完了状態を metadata の status field で管理すること、または提供元別 command 文書に手動 archive 手順を維持すること。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D4] [tasks: T014]
 - [OS-05] 全 absolute path の一律禁止、absolute path の分類・waiver 制度、または D6 の home directory 配下という最低検出対象を超える検出範囲の追加。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D5, knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D6] [tasks: T005, T015, T016, T017, T018, T019, T020, T021]
@@ -46,7 +46,7 @@ signals: { blue: 46, yellow: 0, red: 0 }
 ## Acceptance Criteria
 - [ ] [AC-01] template export は、Git 管理外かつ gitignore 対象の一時生成物を入力 tree から skip し、その存在だけでは export または export smoke を失敗させない。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D1] [tasks: T001]
 - [ ] [AC-02] Git 管理下の file、gitignore 対象ではない生成 file、または新規の未分類 file が境界 manifest の分類外にある場合、template export は fail-closed で失敗する。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D1] [tasks: T001]
-- [ ] [AC-03] 公開前確認が設定済みの git_url と tag を公開 remote で解決できることを検証し、解決できない場合は公開可能と判定しない。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D2] [tasks: T004, T007, T008, T009, T010, T011, T021]
+- [ ] [AC-03] 公開前確認が設定済みの git_url と tag を公開 remote で解決できることを検証し、解決できない場合は公開可能と判定しない。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D2] [tasks: T004, T007, T008, T009, T010, T011]
 - [ ] [AC-04] template export smoke は export 結果に同梱された実行中の sotp を用いる初回導入導線を検証し、固定 tag の存在をこの smoke の必須条件にしない。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D2] [tasks: T021]
 - [ ] [AC-05] 境界 manifest の include / overlay 分類から導出される export 出力に、利用者の新規取得直後の作業ツリーに存在しない具体 path を現行前提で参照する file が残らない。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D3] [tasks: T012, T013]
 - [ ] [AC-06] 出荷される全 file は、具体 ADR file、具体 track、参照先を特定できない decision / constraint 符号に依存する参照を残さない。このうち convention は、規則の実行に必要な挙動・条件・例を本文だけで理解できる形にする。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D3] [tasks: T012, T013]
@@ -56,7 +56,7 @@ signals: { blue: 46, yellow: 0, red: 0 }
 - [ ] [AC-10] 作業機情報を含まない absolute path（例: /dev/null、/bin/false、container 内 path、一般例示 path）は D5 の書き換え対象にせず、absolute path の分類または waiver 制度を導入しない。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D5] [tasks: T005, T015, T016, T017, T018, T019, T020, T021]
 - [ ] [AC-11] 今後の成果物を書き込む経路は repo-relative path を保存し、既存成果物の一括書き換え後に同じ作業機の絶対パスを再混入させない。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D5] [tasks: T003, T015, T016, T017, T018, T019, T020]
 - [ ] [AC-12] 公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。verifier が用いる home directory は composition root が解決して構築時または引数として明示的に渡し、verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。対象を directory 列挙で絞り込まず、この最低対象を超える検出範囲を必須要件にしない。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D6] [tasks: T005, T007, T008, T009, T010, T011, T021]
-- [ ] [AC-13] template export smoke は export 出力を走査し、作業機の絶対パスを検出した場合に fail-closed で失敗する。出力走査に用いる home directory は composition root が解決して adapter / verifier の構築時または引数として明示的に渡し、adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D6] [tasks: T002, T021, T022]
+- [ ] [AC-13] template export smoke は export 出力を走査し、作業機の絶対パスを検出した場合に fail-closed で失敗する。出力走査に用いる home directory は composition root が解決して adapter / verifier の構築時または引数として明示的に渡し、adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D6] [tasks: T002, T022]
 - [ ] [AC-14] path を保存する構造化成果物の codec 境界は home directory を入力に取らず、repo-relative でない値をすべて構築時に拒否するため、環境依存を持たない。自由記述に対しては AC-12 および AC-13 の走査が同じ再混入を検出する。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D6] [tasks: T002, T003]
 - [ ] [AC-15] 具体参照の名前キー検査は、境界 manifest の include / overlay 分類から導出した D3 の出荷対象集合だけを走査し、独自の directory 列挙を持たず、違反時は CI で fail-closed にする。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D7] [tasks: T006, T007, T008, T009, T010, T011, T021]
 - [ ] [AC-16] 名前キー検査は、knowledge/adr/ 前置および .md 後置の有無にかかわらず、`\d{4}-\d{2}-\d{2}-\d{4}-[a-z0-9][a-z0-9-]*` に一致する token を具体 ADR 参照として違反にする。日付時刻だけで slug を伴わない token は違反にしない。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D7] [tasks: T006]

@@ -286,9 +286,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`T005` still instructs creation of the deleted hyphenated artifacts (`cli-composition-types.json` / `cli-driver-types.json`) instead of the canonical underscore-named files, so the plan is pointing at the wrong artifact set. The same mismatch is repeated in [impl-plan.json](<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/impl-plan.json#L29).",
+              "message": "`T005` still instructs creation of the deleted hyphenated artifacts (`cli-composition-types.json` / `cli-driver-types.json`) instead of the canonical underscore-named files, so the plan is pointing at the wrong artifact set. The same mismatch is repeated in [impl-plan.json](track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/impl-plan.json#L29).",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
               "line": 51,
               "category": "broken reference"
             }
@@ -310,7 +310,7 @@
             {
               "message": "T006 says the infrastructure catalogue is expected to remain empty, but this plan bundle also adds `CodexPlannerAdapter` to `infrastructure-types.json` and renders that node in the contract map. The acceptance criterion is therefore internally inconsistent.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
               "line": 57,
               "category": "contradiction"
             }
@@ -325,7 +325,7 @@
             {
               "message": "`plan.md` still describes the `cli_driver` catalogue as containing public `render_*` helpers from `apps/cli-driver/src/render.rs`, but the rendered artefacts only surface one `FreeFunction`: `cli_driver::ref_verify::format_pair_status` in the `ref_verify` module. That makes the phase plan and the generated catalogue disagree about where the free-function boundary actually is, so later reviewers will be looking in the wrong place.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
               "line": 47,
               "category": "contradiction"
             }
@@ -340,7 +340,7 @@
             {
               "message": "`PlannerPortError` and the surrounding usecase contract are still mechanism-specific: the port docs say it executes a subprocess, and the error enum exposes `BriefingFileNotFound` and `Subprocess(String)` instead of planner-level failures. That leaks infrastructure detail across the usecase boundary, so the adapter will have to surface subprocess/path wording to higher layers. Recast these as conceptual planner errors and keep process/file details inside the infrastructure adapter.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/usecase-types.json",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/usecase-types.json",
               "line": 27,
               "category": "factual error"
             }
@@ -355,7 +355,7 @@
             {
               "message": "`PlanCompositionRoot` is marked `modify` here, but the track plan says newly declared types in this round must use `add`, and it explicitly treats the plan composition root as a new addition. That makes the catalogue state inconsistent with the rest of the plan-artifacts set.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/cli_composition-types.json",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/cli_composition-types.json",
               "line": 206,
               "category": "contradiction"
             }
@@ -370,7 +370,7 @@
             {
               "message": "`spec.json` / `spec.md` still refer to `cli-composition-types.json` and `cli-driver-types.json` in IN-07 and AC-06, but the rest of this plan-artifacts bundle uses the underscore filenames `cli_composition-types.json` and `cli_driver-types.json`. That makes the acceptance criterion point at the wrong catalog files and breaks the cross-document reference.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
               "line": 342,
               "category": "broken reference"
             }
@@ -465,7 +465,7 @@
             {
               "message": "`IN-08` still specifies a direct `PlanDriver -> PlannerPort` wiring, but `IN-09` requires the final state to be `PlanDriver -> PlannerService -> PlannerInteractor -> PlannerPort`. The same mismatch is repeated later in `AC-11` vs `AC-12`, so the spec currently asks for two incompatible planner topologies.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.json",
               "line": 118,
               "category": "contradiction"
             }
@@ -480,14 +480,14 @@
             {
               "message": "AC-12 says the `*Service` trait_impls live under infrastructure `SecondaryAdapter` entries, but the actual catalogue places those implementations on the `*Interactor` types in `libs/usecase` (`ArchInteractor`, `ConventionsInteractor`, `FileInteractor`, `PlannerInteractor`, `VerifyInteractor`). That makes the acceptance criterion self-contradictory and points implementers at the wrong layer.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.md",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/spec.md",
               "line": 58,
               "category": "contradiction"
             },
             {
               "message": "`VerifyCompositionRoot` still exposes `verify_hooks_path(project_root) -> Result<CommandOutcome, CompositionError>` under the `CompositionRoot` role. ADR 1328 D2 says composition roots are wire-only and must not invoke use cases, so this leaves a command entry point in a type that is supposed to be pure composition and duplicates `VerifyDriver`'s responsibility.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/cli_composition-types.json",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/cli_composition-types.json",
               "line": 528,
               "category": "contradiction"
             }
@@ -502,7 +502,7 @@
             {
               "message": "`S6` attributes the \"keep the diff under 500 lines\" rationale to `CN-04`, but `CN-04` in this scope is the `CompositionRoot`/`PrimaryAdapter` placement rule, not a size-budget constraint. This mislabels the constraint in both `plan.md` and the mirrored `impl-plan.json` text, so readers will look at the wrong rule when checking the task split.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
               "line": 53,
               "category": "broken reference"
             }
@@ -669,7 +669,7 @@
             {
               "message": "T010 is still marked `todo` here, but the regenerated signal docs in `usecase-types.md` and `cli_driver-types.md` already show the File stack as implemented (`FileService`, `FileInteractor`, and `FileDriver` are all 🔵). That leaves the plan artifacts internally inconsistent: the task list says the work is unfinished while the layer signals say it is present. Either mark T010 done with its commit hash, or keep the signals yellow until the source change is actually part of this branch.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/impl-plan.json",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/impl-plan.json",
               "line": 58,
               "category": "contradiction"
             }
@@ -684,7 +684,7 @@
             {
               "message": "`S6` says the Arc<dyn *Service> adapter tasks depend on `T007`, but the plan already marks `T009` and `T010` done while `T007` is still todo. That makes the recorded state internally inconsistent: either the dependency is wrong or the completion order is. The same mismatch is reflected in `impl-plan.json` where `T007` is todo and `T009`/`T010` are done.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/plan.md",
               "line": 54,
               "category": "contradiction"
             }
@@ -756,7 +756,7 @@
             {
               "message": "The `plan_input_from_args` entry was downgraded from 🔵 to 🟡, but this plan-artifact refresh is supposed to reflect only the four intended signal flips (PlanDriver, PlanCompositionRoot, VerifyDriver, VerifyCompositionRoot). That leaves an extra unaccounted signal change in the generated catalogued artifacts.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/cli-types.md",
+              "file": "track/items/cli-layers-tddd-and-role-placement-lint-2026-06-24/cli-types.md",
               "line": 99,
               "category": "factual error (semantic)"
             }
@@ -803,7 +803,7 @@
             {
               "message": "`tee_stderr_to_file` now lives in `apps/cli`, so the bin layer itself owns the Codex subprocess stderr tee and log-file write. That is direct application I/O outside the driver/composition boundary; this helper should stay behind `cli_composition`/`infrastructure` instead of being implemented in the CLI command module.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/plan/codex_local.rs",
+              "file": "apps/cli/src/commands/plan/codex_local.rs",
               "line": 247,
               "category": "direct I/O in bin"
             }
@@ -818,7 +818,7 @@
             {
               "message": "`build_prompt` still performs a filesystem probe with `Path::is_file()` in bin-layer production code. That keeps application I/O in `apps/cli` instead of flowing through the driver/composition boundary, which violates the thin-bin contract for this scope.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/plan/codex_local.rs",
+              "file": "apps/cli/src/commands/plan/codex_local.rs",
               "line": 57,
               "category": "direct I/O in bin"
             }
@@ -847,7 +847,7 @@
             {
               "message": "`execute_codex_local` now builds the prompt with `resolve_prompt` instead of the validated `build_prompt` path, so production no longer checks that `--briefing-file` exists before launching the planner. A typoed briefing path will now proceed into Codex and fail later, which regresses the CLI's early validation behavior.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/plan/codex_local.rs",
+              "file": "apps/cli/src/commands/plan/codex_local.rs",
               "line": 24,
               "category": "business logic in bin"
             }
@@ -937,7 +937,7 @@
             {
               "message": "The `cli` layer’s `schema_export.notes` does not include the required explicit hint that T006 routes bin targets through `libs/infrastructure/src/schema_export/bin_target.rs`. It only says nightly rustdoc supports bin targets, so the architecture SSoT is still missing the documented handoff to the bin-target export path.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/architecture-rules.json",
+              "file": "architecture-rules.json",
               "line": 137,
               "category": "correctness"
             }
@@ -1242,7 +1242,7 @@
             {
               "message": "`PlannerInteractor::run_codex_local` probes the filesystem with `path.is_file()` before delegating. That makes the usecase layer reach into runtime state directly instead of staying a pure orchestrator, and it collapses path/permission failures into `MissingPromptSource` rather than keeping them behind a port or adapter.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/planner.rs",
+              "file": "libs/usecase/src/planner.rs",
               "line": 138,
               "category": "direct infrastructure reference"
             }
@@ -1257,7 +1257,7 @@
             {
               "message": "`PlannerUnavailable` carries an arbitrary `String` and `Display` prints it verbatim. The infrastructure adapter populates that field with raw process/OS error text, so any caller that surfaces `PlannerPortError` will leak internal host/path/process details across the usecase boundary. Replace this with a sanitized usecase-level variant or keep the raw cause out of the public display text.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/planner.rs",
+              "file": "libs/usecase/src/planner.rs",
               "line": 33,
               "category": "error type confusion"
             }
@@ -1332,7 +1332,7 @@
             {
               "message": "This capability reference is now stale: it still says `role` must be one of the 15 type-section values and that `RoleKind` covers `15 + 4 = 19` variants, but the updated kind-selection convention in `knowledge/conventions/type-designer-kind-selection.md` now defines 17 `DataRole` variants. The harness surface now has two incompatible SSoTs for the same catalogue schema, so agents following this doc will continue to reject `CompositionRoot` / `PrimaryAdapter` updates.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/.harness/capabilities/type-designer.md",
+              "file": ".harness/capabilities/type-designer.md",
               "line": 266,
               "category": "convention contradiction"
             }
@@ -1421,7 +1421,7 @@
             {
               "message": "`resolve_bin_target_name` silently returns the first `kind == \"bin\"` target from `cargo metadata`, and it ignores `default_run` and the presence of multiple `[[bin]]` entries. For any package with more than one binary target, this can export the wrong rustdoc JSON depending on metadata ordering instead of failing closed or selecting the canonical binary explicitly.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/schema_export/bin_target.rs",
+              "file": "libs/infrastructure/src/schema_export/bin_target.rs",
               "line": 105,
               "category": "non-fail-closed config"
             }
@@ -1450,7 +1450,7 @@
             {
               "message": "`resolve_target_dir` accepts a relative `CARGO_TARGET_DIR` and blindly joins it to `workspace_root`. A value like `../outside` escapes the trusted root, so the rustdoc adapter can operate outside the workspace without the containment check used elsewhere (`is_safe_briefing_path` / CN-04 fail-closed).",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/schema_export.rs",
+              "file": "libs/infrastructure/src/schema_export.rs",
               "line": 107,
               "category": "trusted-root violation"
             }
@@ -1487,14 +1487,14 @@
             {
               "message": "P1: On the timeout path this suppresses `child.kill()` failures and then always calls `child.wait()`. If the child cannot be terminated (or the kill race loses in a way that leaves it running), `wait()` can block indefinitely, so the adapter no longer fails closed on timeout. The previous code surfaced `PlannerUnavailable` immediately instead of hanging.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/codex_planner.rs",
+              "file": "libs/infrastructure/src/codex_planner.rs",
               "line": 148,
               "category": "missing error handling"
             },
             {
               "message": "P1: This now drops any function whose rustdoc path has only one segment. The existing baseline renderer already treats `[item_name]` as a valid degenerate path, so root-level free functions can exist; with this guard they disappear from Phase 2 entirely instead of being evaluated and reported. That silently omits legitimate items from the signal report.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
               "line": 218,
               "category": "contract regression"
             }
@@ -1521,16 +1521,16 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`prepare_session_log_path()` only combines the PID with a millisecond timestamp, so two `run()` calls in the same millisecond can generate the same log filename and `File::create` will truncate the earlier session log. The existing collision-safe pattern in [codex_common.rs](<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/codex_common.rs) uses an atomic counter for exactly this reason.",
+              "message": "`prepare_session_log_path()` only combines the PID with a millisecond timestamp, so two `run()` calls in the same millisecond can generate the same log filename and `File::create` will truncate the earlier session log. The existing collision-safe pattern in [codex_common.rs](libs/infrastructure/src/codex_common.rs) uses an atomic counter for exactly this reason.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/codex_planner.rs",
+              "file": "libs/infrastructure/src/codex_planner.rs",
               "line": 86,
               "category": "correctness"
             },
             {
               "message": "The bin-target path lookup uses `format!(\"{bin_name}.json\")` verbatim, unlike the lib path which normalizes `-` to `_`. A valid `[[bin]]` target with a hyphenated name will look for a nonexistent artifact and fail even though `cargo rustdoc --bin` succeeded.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/schema_export/bin_target.rs",
+              "file": "libs/infrastructure/src/schema_export/bin_target.rs",
               "line": 74,
               "category": "correctness"
             }
@@ -1552,7 +1552,7 @@
             {
               "message": "`build_function_identity_map` now strips the first path segment for every function (`skip(1)`), so a lib function like `cli::module::compute` collapses to `module::compute` just like a bin target. That makes the canonical function identity non-canonical and will mis-key or duplicate function signals unless every downstream caller has been updated to the same shortened form. If the goal was only to normalize `[[bin]]` targets, gate this on target kind instead of applying it unconditionally.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/mod.rs",
               "line": 218,
               "category": "fingerprint or hash drift"
             }
@@ -1794,7 +1794,7 @@
             {
               "message": "`RoleKind` now admits `FunctionRole` variants, but `NoRoleInMethodSignature` still only scans type and trait entries. That means a config like `forbidden_roles: [FreeFunction]` or `UseCaseFunction` parses successfully and then becomes a silent no-op instead of being rejected or enforced.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 291,
               "category": "typestate / parse-don't-validate gap"
             }
@@ -1809,7 +1809,7 @@
             {
               "message": "Adding `FunctionRole` to `RoleKind::ALL` makes `RuleTarget` able to name `FreeFunction`/`UseCaseFunction`, but only `KindLayerConstraint` was wired to inspect `catalogue.functions`. The other rule kinds still iterate only `type_entries_for_target`/`trait_entries_for_target`, so a function-only target now constructs successfully and then silently no-ops instead of being rejected. Either validate unsupported function-role targets up front or make the other branches function-aware.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_linter_eval.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval.rs",
               "line": 167,
               "category": "typestate / parse-don't-validate gap"
             }

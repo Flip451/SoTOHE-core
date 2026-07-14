@@ -72,7 +72,7 @@
             {
               "message": "`OS-02` still says the single-vs-split grounding ref type decision is deferred to Phase 2, but the Phase 2 artifacts have already closed that choice on a shared `DecisionGroundRef` (`domain-types.json` also makes `AdrDecisionCommon` use `Option<DecisionGroundRef>`). The plan set is internally inconsistent about whether this architecture decision is still open.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-003/track/items/review-grounding-precedence-2026-06-16/spec.json",
+              "file": "track/items/review-grounding-precedence-2026-06-16/spec.json",
               "line": 122,
               "category": "contradiction"
             }

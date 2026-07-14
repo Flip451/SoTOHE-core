@@ -189,21 +189,21 @@
             {
               "message": "The forbidden-command list is incomplete: it blocks `git add/commit/push/reset/checkout/switch`, but `git merge`, `git rebase`, and `git cherry-pick` are still allowed, and there is no ban on direct `codex exec review`. That leaves the repo's own guardrail bypassable by the exact operations this workflow says must be blocked.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/.codex/rules/default.rules",
+              "file": ".codex/rules/default.rules",
               "line": 31,
               "category": "guardrail"
             },
             {
               "message": "The allowlist only whitelists `bin/sotp ref-verify run`; it does not permit the native Codex fallback commands documented in `.codex/instructions.md` (`bin/sotp plan codex-local` and `bin/sotp review local`). Codex will be blocked from its supported planner/reviewer fallback path.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/.codex/rules/default.rules",
+              "file": ".codex/rules/default.rules",
               "line": 20,
               "category": "workflow"
             },
             {
               "message": "This claims `cargo make conventions-add ...` auto-updates the index, but no such task exists in this repo; the actual entrypoint is `bin/sotp conventions add ...`. As written, the primary conventions doc points contributors at a dead command.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/knowledge/conventions/README.md",
+              "file": "knowledge/conventions/README.md",
               "line": 55,
               "category": "documentation"
             }
@@ -233,14 +233,14 @@
             {
               "message": "This instruction tells Codex not to treat untracked local files as architectural authority, but this change introduces the new `.agents/skills` and `.codex/*` surfaces as working-tree files that will be untracked during review. A root-orchestrator session following this guidance could ignore the very wrappers and rules this patch is adding. Narrow the wording to scratch/runtime files, not repository files that are intentionally introduced in the working tree.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/.codex/instructions.md",
+              "file": ".codex/instructions.md",
               "line": 37,
               "category": "guardrails"
             },
             {
               "message": "The operating-context list never points the Codex session at `.codex/rules/default.rules`, even though that file is the new Codex-specific command-policy surface. As written, a Codex-root session is explicitly told to read `.claude/rules/` but not the repo-local Codex rules, so the deny/allow guardrails added in this patch are left out of the explicit contract. Add the Codex rules file to the first-read list.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/.codex/instructions.md",
+              "file": ".codex/instructions.md",
               "line": 12,
               "category": "guardrails"
             }
@@ -287,21 +287,21 @@
             {
               "message": "`verify_codex_project_surface()` never checks `.codex/instructions.md`, even though the track spec marks it as a required tracked Codex artifact. A repo can pass this gate with the root instructions file missing, and the new happy-path test in `orchestra_tests.rs` would not catch that regression.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
+              "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
               "line": 15,
               "category": "validation"
             },
             {
               "message": "`collect_forbidden_codex_config_keys()` stops at `value.as_table()`, so TOML arrays-of-tables are never traversed. That means forbidden keys nested under hook/config entries can evade the fail-closed scan, which weakens the Codex config validation.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
+              "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
               "line": 114,
               "category": "validation"
             },
             {
               "message": "`is_dangerous_codex_allow_pattern()` only treats bare `bash`/`sh`/`zsh` tokens followed by `-c`/`-lc` as dangerous. A rule that allows `/bin/bash -lc`, `dash -c`, or another path-qualified shell still slips past this guardrail, so the broad-shell deny check is not actually fail-closed.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
+              "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
               "line": 276,
               "category": "security"
             }
@@ -314,14 +314,14 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: [libs/infrastructure/src/verify/orchestra/constants.rs#L49]( <machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/constants.rs#L49 ) and [libs/infrastructure/src/verify/orchestra/codex.rs#L302]( <machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs#L302 ): the new dangerous-allow check only blocks a narrow hand-picked set of prefixes. A Codex rules file can still allow other mutating git commands (`git restore`, `git clean`, `git merge`, etc.) or a path-qualified direct review invocation (`/usr/bin/codex exec review`), and the verifier will accept it. That leaves the fail-closed guardrail bypassable with a trivial extra allow entry.",
+              "message": "P1: [libs/infrastructure/src/verify/orchestra/constants.rs#L49]( libs/infrastructure/src/verify/orchestra/constants.rs#L49 ) and [libs/infrastructure/src/verify/orchestra/codex.rs#L302]( libs/infrastructure/src/verify/orchestra/codex.rs#L302 ): the new dangerous-allow check only blocks a narrow hand-picked set of prefixes. A Codex rules file can still allow other mutating git commands (`git restore`, `git clean`, `git merge`, etc.) or a path-qualified direct review invocation (`/usr/bin/codex exec review`), and the verifier will accept it. That leaves the fail-closed guardrail bypassable with a trivial extra allow entry.",
               "severity": "P1",
               "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
               "line": 302,
               "category": "security"
             },
             {
-              "message": "P1: [libs/infrastructure/src/verify/orchestra/codex.rs#L355]( <machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs#L355 ) and [libs/infrastructure/src/verify/orchestra/codex.rs#L404]( <machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs#L404 ): the Codex agent/skill validation is still just substring/length heuristics. Any agent TOML that mentions `skill` anywhere passes, and any `SKILL.md` with a matching `name:` line plus >200 bytes passes, even if the agent is not actually wired to the intended workflow skill or the skill file is arbitrary placeholder prose. That means malformed or disconnected Codex surface files can still satisfy the new gate.",
+              "message": "P1: [libs/infrastructure/src/verify/orchestra/codex.rs#L355]( libs/infrastructure/src/verify/orchestra/codex.rs#L355 ) and [libs/infrastructure/src/verify/orchestra/codex.rs#L404]( libs/infrastructure/src/verify/orchestra/codex.rs#L404 ): the Codex agent/skill validation is still just substring/length heuristics. Any agent TOML that mentions `skill` anywhere passes, and any `SKILL.md` with a matching `name:` line plus >200 bytes passes, even if the agent is not actually wired to the intended workflow skill or the skill file is arbitrary placeholder prose. That means malformed or disconnected Codex surface files can still satisfy the new gate.",
               "severity": "P1",
               "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
               "line": 355,
@@ -360,14 +360,14 @@
             {
               "message": "P1: The Codex hook-bridge checks are substring-only in both `verify_codex_config` and `verify_codex_hook_adapter`. A config command or adapter script that merely echoes `.codex/hooks/sotp-hook.sh`, the hook id, and `hook dispatch` will satisfy the verifier without ever routing through `sotp hook dispatch`, so a broken or malicious Codex surface can still pass.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
+              "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
               "line": 60,
               "category": "security"
             },
             {
               "message": "P1: `has_codex_direct_review_pattern` only rejects the exact contiguous token triplet `codex exec review`. Any rule that inserts flags before `exec` (for example `codex --sandbox workspace-write exec review`) bypasses the dangerous-review ban, so the new Codex rules check is not fail-closed for direct review commands.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/orchestra/codex.rs",
+              "file": "libs/infrastructure/src/verify/orchestra/codex.rs",
               "line": 401,
               "category": "security"
             }

@@ -42,14 +42,14 @@
             {
               "message": "T011 is not executable as written: it leaves the `architecture-rules.json` schema change open between an opt-in verifier block and an explicit layer-role field, so the implementer has to invent the schema shape before coding.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
               "line": 65,
               "category": "task description non-executable"
             },
             {
               "message": "T012 is not executable as written: it leaves the `review-scope.json` sync strategy open between deriving patterns from `architecture-rules.json` and moving the mapping into `overlay`, so the source of truth is undefined.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
               "line": 71,
               "category": "task description non-executable"
             }
@@ -402,7 +402,7 @@
             {
               "message": "T008 adds explanatory prose for the root `Cargo.toml` edit (`so overlay placeholder crates do not join the sotp cargo workspace`). That restates the intended effect instead of staying in the required target + operation + anchor format; trim it and regenerate `plan.md` from the updated impl-plan. See `knowledge/conventions/no-upstream-restatement.md`.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
+              "file": "track/items/template-extraction-boundary-2026-07-06/impl-plan.json",
               "line": 47,
               "category": "upstream restatement"
             }
@@ -468,23 +468,23 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1, bootstrap: `install-sotp` shells out to `jq` to read `.harness/config/sotp-version.json`, but the bootstrap flow never checks for or installs jq. On a clean host without jq, `cargo make bootstrap` will fail midway with a shell error instead of a declared prerequisite. See [overlay/Makefile.toml](<machine-home>/individual/t-rust/templates/SoTOHE-core-004/overlay/Makefile.toml:101).",
+              "message": "P1, bootstrap: `install-sotp` shells out to `jq` to read `.harness/config/sotp-version.json`, but the bootstrap flow never checks for or installs jq. On a clean host without jq, `cargo make bootstrap` will fail midway with a shell error instead of a declared prerequisite. See [overlay/Makefile.toml](overlay/Makefile.toml:101).",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/overlay/Makefile.toml",
+              "file": "overlay/Makefile.toml",
               "line": 101,
               "category": "bootstrap"
             },
             {
-              "message": "P1, testing: the new public `GreetUser::execute` API only has a success-path test. The error branch where `SalutationProvider::salutation` returns `Err(GreetError::Unavailable)` is unverified, so the `?` propagation contract is not covered. See [overlay/libs/usecase/src/lib.rs](<machine-home>/individual/t-rust/templates/SoTOHE-core-004/overlay/libs/usecase/src/lib.rs:51) and the existing happy-path-only test at [overlay/libs/usecase/src/lib.rs](<machine-home>/individual/t-rust/templates/SoTOHE-core-004/overlay/libs/usecase/src/lib.rs:76).",
+              "message": "P1, testing: the new public `GreetUser::execute` API only has a success-path test. The error branch where `SalutationProvider::salutation` returns `Err(GreetError::Unavailable)` is unverified, so the `?` propagation contract is not covered. See [overlay/libs/usecase/src/lib.rs](overlay/libs/usecase/src/lib.rs:51) and the existing happy-path-only test at [overlay/libs/usecase/src/lib.rs](overlay/libs/usecase/src/lib.rs:76).",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/overlay/libs/usecase/src/lib.rs",
+              "file": "overlay/libs/usecase/src/lib.rs",
               "line": 51,
               "category": "testing"
             },
             {
-              "message": "P1, testing: the new public `GreetDriver::run` API is only exercised on the happy path. Add a failure-path test that injects an erroring `SalutationProvider` so the `success: false` rendering branch is covered. See [overlay/apps/cli-driver/src/lib.rs](<machine-home>/individual/t-rust/templates/SoTOHE-core-004/overlay/apps/cli-driver/src/lib.rs:30) and the current success-only test at [overlay/apps/cli-driver/src/lib.rs](<machine-home>/individual/t-rust/templates/SoTOHE-core-004/overlay/apps/cli-driver/src/lib.rs:57).",
+              "message": "P1, testing: the new public `GreetDriver::run` API is only exercised on the happy path. Add a failure-path test that injects an erroring `SalutationProvider` so the `success: false` rendering branch is covered. See [overlay/apps/cli-driver/src/lib.rs](overlay/apps/cli-driver/src/lib.rs:30) and the current success-only test at [overlay/apps/cli-driver/src/lib.rs](overlay/apps/cli-driver/src/lib.rs:57).",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/overlay/apps/cli-driver/src/lib.rs",
+              "file": "overlay/apps/cli-driver/src/lib.rs",
               "line": 30,
               "category": "testing"
             }
@@ -680,9 +680,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `TemplatePathPattern::try_new` accepts syntactically distinct but semantically identical paths like `libs/domain` and `./libs/domain`, while `TemplateBoundaryManifest::try_new` only checks duplicates by raw string equality. That lets the same workspace path appear twice with different classifications, bypassing the fail-closed duplicate guard and making `classify()` depend on the caller's spelling instead of the actual path. See [libs/domain/src/template_export/mod.rs:33](file://<machine-home>/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs#L33) and [libs/domain/src/template_export/mod.rs:141](file://<machine-home>/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs#L141).",
+              "message": "P1: `TemplatePathPattern::try_new` accepts syntactically distinct but semantically identical paths like `libs/domain` and `./libs/domain`, while `TemplateBoundaryManifest::try_new` only checks duplicates by raw string equality. That lets the same workspace path appear twice with different classifications, bypassing the fail-closed duplicate guard and making `classify()` depend on the caller's spelling instead of the actual path. See [libs/domain/src/template_export/mod.rs:33](file://libs/domain/src/template_export/mod.rs#L33) and [libs/domain/src/template_export/mod.rs:141](file://libs/domain/src/template_export/mod.rs#L141).",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs",
+              "file": "libs/domain/src/template_export/mod.rs",
               "line": 33,
               "category": "broken invariant in newtype constructor"
             }
@@ -697,7 +697,7 @@
             {
               "message": "`TemplatePathPattern::try_new` preserves a trailing `/` in the normalized value, so semantically identical workspace paths like `vendor` and `vendor/` become distinct `TemplatePathPattern`s. That lets `TemplateBoundaryManifest::try_new` accept conflicting rows for the same path and makes `classify()` depend on spelling rather than path identity.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/libs/domain/src/template_export/mod.rs",
+              "file": "libs/domain/src/template_export/mod.rs",
               "line": 88,
               "category": "broken invariant in newtype constructor"
             }
@@ -883,14 +883,14 @@
             {
               "message": "`template-export-smoke-local` is not portable to the exported template: it hardcodes `--overlay-dir overlay`, but `overlay/` is excluded by the boundary manifest (`.harness/config/template-boundary.json`), so the shipped task will fail in a fresh consumer checkout.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 375,
               "category": "template-distribution reference leak"
             },
             {
               "message": "The new smoke-task description embeds a source-only path, `libs/infrastructure/src/template_export/codec.rs::test_decode_real_repository_manifest_is_fail_closed_clean`. That file is not present in the exported skeleton, so the distributed Makefile now contains a dead reference to internal test code.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 361,
               "category": "template-distribution reference leak"
             }
@@ -1017,14 +1017,14 @@
             {
               "message": "`FsTemplateBoundaryManifestAdapter::read()` dereferences `manifest_path` with `std::fs::read_to_string()` and never rejects a symlinked leaf. This boundary loader is the manifest SSoT entrypoint, and the repo's other security-sensitive loaders reject symlinks before reading; without that check, a symlink can swap in an unexpected manifest and steer export with attacker-controlled classifications.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/template_export/mod.rs",
+              "file": "libs/infrastructure/src/template_export/mod.rs",
               "line": 75,
               "category": "symlink not rejected at boundary"
             },
             {
               "message": "`copy_tree()` uses `symlink_metadata()` to classify a symlink as a non-directory, then calls `std::fs::copy(source, destination)`, which follows the symlink target. As a result, an included or overlayed subtree can copy bytes from outside the workspace or overlay tree into the exported template instead of rejecting the symlink at the I/O boundary.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/template_export/mod.rs",
+              "file": "libs/infrastructure/src/template_export/mod.rs",
               "line": 267,
               "category": "symlink not rejected at boundary"
             }
@@ -1039,14 +1039,14 @@
             {
               "message": "`reject_manifest_symlink()` only lstat's the final path component. If `manifest_path` is reached through a symlinked parent directory, `read_to_string()` still follows that chain and loads a manifest from outside the intended tree. The repo's symlink-hardening pattern rejects the whole ancestor chain, not just the leaf.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/template_export/mod.rs",
+              "file": "libs/infrastructure/src/template_export/mod.rs",
               "line": 93,
               "category": "symlink not rejected at boundary"
             },
             {
               "message": "`export()` starts walking `command.workspace_root` and later resolves `command.overlay_dir` without any root-level symlink check. A symlinked workspace or overlay root can redirect the export outside the intended tree because `read_dir()`/`copy()` follow that root.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/template_export/mod.rs",
+              "file": "libs/infrastructure/src/template_export/mod.rs",
               "line": 194,
               "category": "symlink not rejected at boundary"
             }
@@ -1119,14 +1119,14 @@
             {
               "message": "`validate_layer_groups` treats `architecture-rules.json` as absent whenever `exists()` is false, so a dangling symlink at that path is silently classified as \"missing\" and the new drift guard is skipped instead of failing closed. That gives a PR author a way to neutralize the layer-group lockstep check by swapping the file for a broken symlink; use the same symlink-aware rejection pattern used elsewhere in the infra loaders before deciding the file is absent.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
               "line": 285,
               "category": "symlink not rejected at boundary"
             },
             {
               "message": "The config-driven purity scan walks each `<layer>/src` tree with `read_dir`/`read_to_string` but never rejects symlinked directories or files at the boundary. Because `layer.path` now comes from `architecture-rules.json`, a symlinked source tree can make the verifier traverse outside the trusted root; the same pattern exists in `domain_strings.rs` as well.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/verify/usecase_purity.rs",
+              "file": "libs/infrastructure/src/verify/usecase_purity.rs",
               "line": 103,
               "category": "symlink not rejected at boundary"
             }
@@ -1148,7 +1148,7 @@
             {
               "message": "P1: `validate_layer_groups` only enforces the one-way check from `architecture-rules.json` to `review-scope.json`. If a layer is renamed or deleted in arch-rules, any stale review-scope group with the old layer name is still accepted because there is no reverse check for surplus layer groups. That leaves the drift guard non-fail-closed and can keep routing files into an obsolete scope.",
               "severity": "P1",
-              "file": "<machine-home>/individual/t-rust/templates/SoTOHE-core-004/libs/infrastructure/src/review_v2/scope_config_loader.rs",
+              "file": "libs/infrastructure/src/review_v2/scope_config_loader.rs",
               "line": 310,
               "category": "non-fail-closed config"
             }
