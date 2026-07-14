@@ -1,12 +1,24 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-14T11:05:13Z",
-  "declaration_hash": "da87fe1bb00df5fc83ba2b8d670da7ff72b998e066c6a0342f97ca6a0cf05d94",
+  "generated_at": "2026-07-14T13:56:53Z",
+  "declaration_hash": "8f3a2bc9984d68f12c187422da49336b7213db1819d83b9345ff8428ae3eb152",
   "signals": [
+    {
+      "type_name": "CatalogueSpecRefsArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "VerifyCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::verify::parse_track_id",
+      "kind_tag": "free_function",
+      "signal": "blue",
       "found_type": true
     },
     {

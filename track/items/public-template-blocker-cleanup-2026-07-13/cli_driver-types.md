@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| VerifyInput | enum | modify | LatestTrack, RetentionGate, SotpVersionTag, MachinePaths, TemplateRefs, ArchDocs, Layers, HooksPath, SpecAttribution, SpecFrontmatter, CanonicalModules, ModuleSize, DomainPurity, DomainStrings, UsecasePurity, DocLinks, ViewFreshness, SpecSignals, PlanArtifactRefs, CatalogueSpecRefs | 🟡 | 🔵 |
+| VerifyInput | enum | modify | LatestTrack, RetentionGate, SotpVersionTag, MachinePaths, TemplateRefs, ArchDocs, Layers, HooksPath, SpecAttribution, SpecFrontmatter, CanonicalModules, ModuleSize, DomainPurity, DomainStrings, UsecasePurity, DocLinks, ViewFreshness, SpecSignals, PlanArtifactRefs, CatalogueSpecRefs | 🔵 | 🔵 |
 

@@ -145,6 +145,16 @@
             "anchor": "D7"
           }
         ]
+      },
+      {
+        "id": "IN-08",
+        "text": "`catalogue-spec-refs --track-id` を含む track ID を受け取る境界で、domain の `TrackId::try_new` へ検証を委譲し、検証済みの TrackId だけを下流へ渡す。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-19-0924-existing-dry-violation-cleanup.md",
+            "anchor": "D1"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -476,6 +486,16 @@
           "anchor": "D7"
         }
       ]
+    },
+    {
+      "id": "AC-20",
+      "text": "`catalogue-spec-refs --track-id` を含む track ID を受け取る境界は、domain の `TrackId::try_new` に検証を委譲し、検証済みの TrackId だけを下流へ渡す。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-19-0924-existing-dry-violation-cleanup.md",
+          "anchor": "D1"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -505,7 +525,7 @@
     }
   ],
   "signals": {
-    "blue": 44,
+    "blue": 46,
     "yellow": 0,
     "red": 0
   }

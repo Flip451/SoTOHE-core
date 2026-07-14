@@ -196,6 +196,10 @@ subgraph cli["cli"]
   direction TB
   subgraph cli_cli_module_commands["cli::commands"]
     direction TB
+  subgraph T29_cli_cli_CatalogueSpecRefsArgs["commands::verify::CatalogueSpecRefsArgs"]
+    direction TB
+    T29_cli_cli_CatalogueSpecRefsArgs__self[CatalogueSpecRefsArgs]
+  end
   subgraph T18_cli_cli_VerifyArgs["commands::verify::VerifyArgs"]
     direction TB
     T18_cli_cli_VerifyArgs__self[VerifyArgs]
@@ -225,6 +229,7 @@ subgraph cli["cli"]
     T21_cli_cli_VerifyCommand_CatalogueSpecRefs[CatalogueSpecRefs]
     T21_cli_cli_VerifyCommand_items_dir([items_dir])
   end
+  F45_cli_cli_cli__commands__verify__parse_track_id[[parse_track_id]]
   end
 end
 T22_domain_domain_FilePath_new --> T22_domain_domain_FilePath__self
@@ -335,6 +340,7 @@ T21_cli_cli_VerifyCommand_DomainStrings --o T18_cli_cli_VerifyArgs__self
 T21_cli_cli_VerifyCommand_UsecasePurity --o T18_cli_cli_VerifyArgs__self
 T21_cli_cli_VerifyCommand_DocLinks --o T18_cli_cli_VerifyArgs__self
 T21_cli_cli_VerifyCommand_ViewFreshness --o T18_cli_cli_VerifyArgs__self
+T21_cli_cli_VerifyCommand_CatalogueSpecRefs --o T29_cli_cli_CatalogueSpecRefsArgs__self
 class T22_domain_domain_FilePath_new method_node
 class T22_domain_domain_FilePath_as_str method_node
 class T22_domain_domain_FilePath__self value_object
@@ -431,6 +437,7 @@ class T33_cli_driver_cli_driver_VerifyInput_SpecSignals variant_node
 class T33_cli_driver_cli_driver_VerifyInput_PlanArtifactRefs variant_node
 class T33_cli_driver_cli_driver_VerifyInput_CatalogueSpecRefs variant_node
 class T33_cli_driver_cli_driver_VerifyInput__self dto
+class T29_cli_cli_CatalogueSpecRefsArgs__self dto
 class T18_cli_cli_VerifyArgs__self dto
 class T21_cli_cli_VerifyCommand_LatestTrack variant_node
 class T21_cli_cli_VerifyCommand_RetentionGate variant_node
@@ -454,4 +461,6 @@ class T21_cli_cli_VerifyCommand_PlanArtifactRefs variant_node
 class T21_cli_cli_VerifyCommand_CatalogueSpecRefs variant_node
 class T21_cli_cli_VerifyCommand_items_dir method_node
 class T21_cli_cli_VerifyCommand__self dto
+class F45_cli_cli_cli__commands__verify__parse_track_id free_function
+class F45_cli_cli_cli__commands__verify__parse_track_id function_node
 ```

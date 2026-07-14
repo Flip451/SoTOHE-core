@@ -3,7 +3,31 @@
   "layer": "cli",
   "entries": [
     {
-      "claim_hash": "dd577d936d15d5e88c6b22621e68fdb3f28730dc74cf16342ffbaad61420e6e0",
+      "claim_hash": "7b3b7d6691a55caeff53467da2da7ad463dd956c6477393cd3794531f965ae64",
+      "evidence_hash": "4a060f944a000debfc96d118f5668a45ccbf67bcf1fdae7a4d3b80722b1c3a12",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`catalogue-spec-refs --track-id` を含む track ID を受け取る境界は、domain の `TrackId::try_new` に検証を委譲し、検証済みの TrackId だけを下流へ渡す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/public-template-blocker-cleanup-2026-07-13/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueSpecRefsArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-20",
+          "text_label": "`catalogue-spec-refs --track-id` を含む track ID を受け取る境界は、domain の `TrackId::try_new` に検証を委譲し、検証済みの TrackId だけを下流へ渡す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "00d38552fecd7ca918ca6d5df245eeff4f8cf65966a43622290da76cbbf91df0",
       "evidence_hash": "9f19bfa80ede153c4baa36d4e1e785fdcd659379f3baec537f5777e00f4ef92e",
       "verdict": {
         "kind": "pass",
@@ -27,11 +51,11 @@
       }
     },
     {
-      "claim_hash": "dd577d936d15d5e88c6b22621e68fdb3f28730dc74cf16342ffbaad61420e6e0",
+      "claim_hash": "00d38552fecd7ca918ca6d5df245eeff4f8cf65966a43622290da76cbbf91df0",
       "evidence_hash": "a5e1050527ee0af864999ffbbe3cb33d012978ee2cb0718945ca598e92242c0a",
       "verdict": {
         "kind": "pass",
-        "citation": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。"
+        "citation": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -51,11 +75,11 @@
       }
     },
     {
-      "claim_hash": "dd577d936d15d5e88c6b22621e68fdb3f28730dc74cf16342ffbaad61420e6e0",
+      "claim_hash": "00d38552fecd7ca918ca6d5df245eeff4f8cf65966a43622290da76cbbf91df0",
       "evidence_hash": "1162403d602a3b04ec8805cefeac36065bea91e0fdf151cb13d101335276d81c",
       "verdict": {
         "kind": "pass",
-        "citation": "具体参照の名前キー検査は、境界 manifest の include / overlay 分類から導出した D3 の出荷対象集合だけを走査し、独自の directory 列挙を持たず、違反時は CI で fail-closed にする。"
+        "citation": "具体参照の名前キー検査は、境界 manifest の include / overlay 分類から導出した D3 の出荷対象集合だけを走査し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -143,6 +167,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-15",
           "text_label": "具体参照の名前キー検査は、境界 manifest の include / overlay 分類から導出した D3 の出荷対象集合だけを走査し、独自の directory 列挙を持たず、違反時は CI で fail-closed にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b94eca1ede1dfba395df3c54a6344374aa2fc9f5efffd532c0f9f3a665f4559",
+      "evidence_hash": "4a060f944a000debfc96d118f5668a45ccbf67bcf1fdae7a4d3b80722b1c3a12",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`catalogue-spec-refs --track-id` を含む track ID を受け取る境界は、domain の `TrackId::try_new` に検証を委譲し、検証済みの TrackId だけを下流へ渡す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/public-template-blocker-cleanup-2026-07-13/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::verify::parse_track_id"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-20",
+          "text_label": "`catalogue-spec-refs --track-id` を含む track ID を受け取る境界は、domain の `TrackId::try_new` に検証を委譲し、検証済みの TrackId だけを下流へ渡す。"
         }
       }
     }

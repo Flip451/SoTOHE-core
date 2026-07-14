@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 44, yellow: 0, red: 0 }
+signals: { blue: 46, yellow: 0, red: 0 }
 ---
 
 # 公開テンプレート配布前の阻害要因解消
@@ -26,6 +26,7 @@ signals: { blue: 44, yellow: 0, red: 0 }
 - [IN-05] Git 管理下の既存成果物を対象に、作業機を指す絶対パスを意味に応じて repo-relative、汎用表記、削除、または伏せ字へ置き換える。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D5] [tasks: T003, T015, T016, T017, T018, T019, T020]
 - [IN-06] 公開元リポジトリの verify ゲートと export smoke 側の走査からなる 2 つの検査面、および構造化成果物の path 永続化境界における repo-relative 強制を追加する。2 つの検査面が用いる作業機の home directory は composition root が解決し、adapter / verifier の構築時または引数として明示的に渡す。adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合は検査を fail-closed とする。codec 境界は home directory を入力に取らず、repo-relative でない値をすべて構築時に拒否するため、環境依存を持たない。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D6] [tasks: T002, T003, T005, T007, T008, T009, T010, T011, T015, T016, T017, T018, T019, T020, T021, T022]
 - [IN-07] 出荷対象集合に対する具体 ADR / track 参照の名前キー検査と、その許容・違反 fixture を追加する。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D7] [tasks: T006, T007, T008, T009, T010, T011, T012, T013, T021]
+- [IN-08] `catalogue-spec-refs --track-id` を含む track ID を受け取る境界で、domain の `TrackId::try_new` へ検証を委譲し、検証済みの TrackId だけを下流へ渡す。 [adr: knowledge/adr/2026-06-19-0924-existing-dry-violation-cleanup.md#D1] [tasks: T007, T009, T010]
 
 ### Out of Scope
 - [OS-01] Git 管理下の file だけで作った clean checkout を export の唯一の回避策とする運用。通常の開発作業ツリーでの export 振る舞いは置き換えない。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D1] [tasks: T001]
@@ -62,6 +63,7 @@ signals: { blue: 44, yellow: 0, red: 0 }
 - [ ] [AC-17] 名前キー検査は、track/items/ 直後の最初の path segment が `[a-z0-9][a-z0-9-]*-\d{4}-\d{2}-\d{2}` で終わる具体 track id を違反にする。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D7] [tasks: T006]
 - [ ] [AC-18] 名前キー検査は knowledge/adr/ directory 参照、knowledge/adr/README.md、角括弧の placeholder segment（track/items/<id>/ 等）、単なる日付、日付 suffix を持たない slug を許容する。code fence、comment、prose の文脈は区別せず、裸の CN- 数字型符号は将来の拡張候補として検出対象に含めない。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D7] [tasks: T006]
 - [ ] [AC-19] 名前キー検査には、実 ADR file 名は違反、knowledge/adr/README.md は許容、track/items/<id>/ は許容、日付単独は許容、日付 suffix 付き track id は違反、の 5 fixture を含める。 [adr: knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md#D7] [tasks: T006]
+- [ ] [AC-20] `catalogue-spec-refs --track-id` を含む track ID を受け取る境界は、domain の `TrackId::try_new` に検証を委譲し、検証済みの TrackId だけを下流へ渡す。 [adr: knowledge/adr/2026-06-19-0924-existing-dry-violation-cleanup.md#D1] [tasks: T007, T009, T010]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/coding-principles.md#No Panics in Library Code
@@ -74,5 +76,5 @@ signals: { blue: 44, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 44  🟡 0  🔴 0
+🔵 46  🟡 0  🔴 0
 

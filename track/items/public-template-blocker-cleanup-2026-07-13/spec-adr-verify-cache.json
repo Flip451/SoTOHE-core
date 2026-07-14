@@ -324,6 +324,29 @@
       }
     },
     {
+      "claim_hash": "64f2840b500f7afbd6adf55acc79f2cedc27a32cd7d72c0baddf1d1fc0962e1e",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "全コピーを削除し、`TrackId::try_new`（domain）への委譲に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`catalogue-spec-refs --track-id` を含む track ID を受け取る境界で、domain の `TrackId::try_new` へ検証を委譲し、検証済みの TrackId だけを下流へ渡す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-19-0924-existing-dry-violation-cleanup.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
       "claim_hash": "ab5b1dde106bf6998cfbe53a6d2865a77ef25eac9d19d477c3478385cabb2875",
       "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
       "verdict": {
@@ -1148,6 +1171,29 @@
         "data": {
           "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
           "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "4a060f944a000debfc96d118f5668a45ccbf67bcf1fdae7a4d3b80722b1c3a12",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "全コピーを削除し、`TrackId::try_new`（domain）への委譲に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-20",
+          "text_label": "`catalogue-spec-refs --track-id` を含む track ID を受け取る境界は、domain の `TrackId::try_new` に検証を委譲し、検証済みの TrackId だけを下流へ渡す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-19-0924-existing-dry-violation-cleanup.md",
+          "decision_id": "D1"
         }
       }
     }

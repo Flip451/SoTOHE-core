@@ -1,21 +1,290 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli_composition": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:71431006623b6e258c538d01ec76a96fb1030c2fe07c9156f2f20b9b35b58933",
-          "at": "2026-07-14T05:38:25Z"
+          "hash": "rvw1:sha256:a0a81d551e43fd127f167406475794daeaf27a75174392765ff6f66d917986be",
+          "at": "2026-07-14T04:07:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TemplateExportPort::export` は machine-path 検査対象を入力として受け取らない一方、唯一の `FsTemplateExportAdapter` 実装は `HOME` / `USERPROFILE` を `std::env::var_os` で暗黙に取得しています。そのため同じ command の結果が ambient environment に依存し、変数未設定時には export 自体が失敗します。これは `hexagonal-architecture.md` §Usecase Layer Purity Rules の implicit env dependency 禁止に反します。作業機 path は CLI composition root で解決・検証し、usecase entrypoint から明示的に渡してください。",
+              "severity": "P1",
+              "file": "libs/usecase/src/template_export/mod.rs",
+              "line": 284,
+              "category": "implicit time / env / process dependency"
+            }
+          ],
+          "hash": "rvw1:sha256:a0a81d551e43fd127f167406475794daeaf27a75174392765ff6f66d917986be",
+          "at": "2026-07-14T04:15:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:71431006623b6e258c538d01ec76a96fb1030c2fe07c9156f2f20b9b35b58933",
-          "at": "2026-07-14T05:48:07Z"
+          "hash": "rvw1:sha256:a0a81d551e43fd127f167406475794daeaf27a75174392765ff6f66d917986be",
+          "at": "2026-07-14T05:39:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c8e6bd661a508c91e8ab089e7a20e58fcc2c1bbfb02d269927dd20006dac8e6",
+          "at": "2026-07-14T11:56:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c8e6bd661a508c91e8ab089e7a20e58fcc2c1bbfb02d269927dd20006dac8e6",
+          "at": "2026-07-14T12:02:19Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a5abf6933d43e489169617590aad6b8b10d316fa661eedde80e2e6a38658077",
+          "at": "2026-07-14T11:55:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a5abf6933d43e489169617590aad6b8b10d316fa661eedde80e2e6a38658077",
+          "at": "2026-07-14T12:00:46Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "「No cross-scope ordering constraint exists」は、同じ workflow が `blocked_cross_scope` 時に他 scope の依存を先に修正して再起動する契約（Step 4/5）と矛盾します。復旧時の例外として明記してください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 100,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "並列 fixer は `track-active-gate` を実行し、共有の rendered views を書き換えます。target directory 分離だけでは共有 worktree の同時書き込みを防げず、別 scope の fixer が stale な `plan.md` 等を上書きして hash/gate を壊し得ます。共有 refresh の barrier または write ownership が必要です。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 92,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "`CARGO_TARGET_DIR_RELATIVE` を `Makefile.toml` の対応機能として参照していますが、Makefile.toml にこの変数の処理はなく、確認できるのは `CARGO_TARGET_DIR` と `WORKER_ID` です。したがって記載された build-lock 回避策は現状の `cargo make` では機能しません。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 101,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:735509d166c85e652737de241a4fac69999fdf6d97ca4a329c5f1b9db9373b6f",
+          "at": "2026-07-14T05:40:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18e06f46ae95f54375fea92807fb447e2a827d75f32353ff7548fa1960bf2182",
+          "at": "2026-07-14T05:49:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The documented build-lock recovery is not wired through fixer dispatch. `bin/sotp review fix-local` launches Codex with a cleared environment whose safe list includes neither `CARGO_TARGET_DIR_RELATIVE` nor `WORKER_ID`, while the Claude sentinel/subagent path also provides no per-fixer environment forwarding. Consequently, nested `cargo make ci-rust` executions still use Compose's shared default target, so operators cannot apply the prescribed isolation during the mandatory parallel wave. Pass unique values through both adapters/fixer runners or document an isolation command that actually reaches each fixer.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 102,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:18e06f46ae95f54375fea92807fb447e2a827d75f32353ff7548fa1960bf2182",
+          "at": "2026-07-14T05:54:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The parallel-wave guarantee is unsafe: every fixer runs the shared `task-contract-check`/`track-active-gate` chain, which rewrites common signal and rendered-view files in the same worktree. Cargo's build lock does not coordinate these writes or concurrent source edits, so one fixer can overwrite another's fresh artifacts or observe transient state. Add a synchronization/ownership barrier or isolate all mutable state before requiring unconditional parallel dispatch.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 102,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:bcdf156095fe693841aa9332fffba09a2dc5fa45465377ff5571a9390e4aef80",
+          "at": "2026-07-14T06:06:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:92e21d40c7e51557fa884c9a8af98b8e75d086671576c0d03e90f4b3bcf312ca",
+          "at": "2026-07-14T06:20:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 mandates concurrent fixers but leaves every invocation on the shared Cargo target directory and explicitly accepts build-lock contention. This contradicts `.claude/rules/07-dev-environment.md`, which requires a unique `CARGO_TARGET_DIR_RELATIVE` for parallel workers, and can serialize the fixers' mandatory `cargo make ci-rust` checks or cause timeouts. Specify per-scope target-directory isolation and ensure the fixer subprocess propagates it.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 104,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:92e21d40c7e51557fa884c9a8af98b8e75d086671576c0d03e90f4b3bcf312ca",
+          "at": "2026-07-14T06:30:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4's claim that concurrent fixers never edit shared files is false: each `track-local-review-fix` invocation runs `task-contract-check` and `track-active-gate`, which rewrite shared signal and rendered-view artifacts. These refreshes can interleave with other fixers' source edits, while the hash gate covers only scope files, so a recorded review may be based on stale or mixed artifacts. The unconditional parallel dispatch needs synchronization or isolated operational state.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 104,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:dc74412b8e12e074428d02b67f531b315553260bb0836e9eade885b9f18cda2d",
+          "at": "2026-07-14T06:51:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:378e67ed7df56ac4a732569cfa5864a98b85acf6ed391e9a6bbbb54129a4b066",
+          "at": "2026-07-14T06:57:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:378e67ed7df56ac4a732569cfa5864a98b85acf6ed391e9a6bbbb54129a4b066",
+          "at": "2026-07-14T07:04:45Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D7 defers the exact detection pattern and implementation to implementation time. Terms such as “date-time-shaped ADR filename” and “track ID with a date suffix” do not define the accepted grammar, path boundaries, or placeholder/false-positive handling, so downstream spec and implementations can produce materially different gates. Define observable matching rules and required cases before implementation.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+              "line": 109,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
+          "at": "2026-07-13T23:40:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
+          "at": "2026-07-14T00:28:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
+          "at": "2026-07-14T00:29:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
+          "at": "2026-07-14T05:40:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
+          "at": "2026-07-14T05:41:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
+          "at": "2026-07-14T05:47:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a34fb21f352d8159c83a37052bc4c902fa11d2b8faa39a079783b52161d55b0",
+          "at": "2026-07-14T07:03:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a34fb21f352d8159c83a37052bc4c902fa11d2b8faa39a079783b52161d55b0",
+          "at": "2026-07-14T07:07:52Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:703a5a045def573cd005db997451f0fc07c8d29fbe8cf0fdc3abaea343d05075",
+          "at": "2026-07-14T11:56:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueSpecRefs` の dispatch arm が `TrackId::try_new` によるドメイン検証、成否分岐、エラー用 `CommandOutcome` の生成まで bin 内で行っています。これは parse → `driver.handle(input)` → emit に限定する thin-bin 境界を越えます（ADR `2026-06-21-1328-cli-composition-split-presentation-layer.md` D5、`2026-05-27-0110-composition-root-dedicated-crate.md` D3）。Clap のパース段階で型付き値にするか、raw input を driver に渡して検証とエラー整形を driver 境界内へ移してください。",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 248,
+              "category": "business logic in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:703a5a045def573cd005db997451f0fc07c8d29fbe8cf0fdc3abaea343d05075",
+          "at": "2026-07-14T12:03:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:385e98478fbc67ccdab0a0949c9e9afcf588c8c987bb1c496e77c06abd74aabf",
+          "at": "2026-07-14T12:52:57Z"
         }
       ]
     },
@@ -377,228 +646,70 @@
           "findings": [],
           "hash": "rvw1:sha256:507053b40da05c2ee71a0a4f1bc95f9f2d2fbb0664d00e5ccce20eee4bd85728",
           "at": "2026-07-14T11:03:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b94fe7ffc217754ad20fbad7f1a1107f7f52c2bbfc42e6fdea98019c73b1af7e",
+          "at": "2026-07-14T11:56:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b94fe7ffc217754ad20fbad7f1a1107f7f52c2bbfc42e6fdea98019c73b1af7e",
+          "at": "2026-07-14T12:02:39Z"
         }
       ]
     },
-    "types": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`VerifyArgs` は非公開の `project_root` フィールドを持つため `has_stripped_fields` は `true` であるべきですが、`false` になっており baseline shape と不一致です。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/cli-types.json",
-              "line": 38,
-              "category": "SoT integrity"
-            },
-            {
-              "message": "`VerifyPort` の `verify_sotp_version_tag` / `verify_machine_paths` / `verify_template_refs` は filesystem/network I/O を行うポートなのに `is_async: false` で、同期実行を選ぶ理由が docs にありません。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
-              "line": 108,
-              "category": "API shape"
-            },
-            {
-              "message": "`VerifyService` の読み取り専用メソッド群が `PathBuf` を値で受け取っています。実装は直ちに `&Path` としてポートへ渡しており、呼び出し側の所有権を奪う必要がありません。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
-              "line": 383,
-              "category": "API shape"
-            },
-            {
-              "message": "`infrastructure::verify::machine_paths::verify` の docs が AC-12 の「全 Git-tracked file を走査し、machine-specific absolute path を fail-closed で検出する」という契約を散文で再記述しています。docs は型の責務と `AC-12` の参照に留めるべきです。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
-              "line": 6,
-              "category": "SoT integrity"
-            },
-            {
-              "message": "`infrastructure::verify::sotp_version_tag::verify` の docs が AC-03 の remote 上の Git URL/tag 解決と fail-closed 判定を散文で再記述しています。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
-              "line": 26,
-              "category": "SoT integrity"
-            },
-            {
-              "message": "`infrastructure::verify::template_refs::verify` の docs が AC-15 の manifest-derived shipped-template 集合、具体 source-repository key 検査、fail-closed 動作を散文で再記述しています。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
-              "line": 46,
-              "category": "SoT integrity"
-            },
-            {
-              "message": "`TemplateExportPortError` の docs が AC-13/CN-03 の exported file における machine-specific absolute path 拒否契約を散文で再記述しています。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
-              "line": 737,
-              "category": "SoT integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:e0da5a8346576973c82ed478374490eab875a41450625493e77f3dcf2ee148ce",
-          "at": "2026-07-14T01:35:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`VerifyService` declares read-only operations such as `verify_latest_track` with owned `std::path::PathBuf` parameters, although the interactor immediately borrows them to call `VerifyPort`; this unnecessarily transfers ownership. Use borrowed `&Path` parameters consistently or document the ownership requirement.",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
-              "line": 383,
-              "category": "API shape"
-            }
-          ],
-          "hash": "rvw1:sha256:a5ff01486bffa0b8df52c214daf466d166f81cb4703c1b55c85f4c677e13a4b7",
-          "at": "2026-07-14T01:54:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cli_driver::VerifyInput::CatalogueSpecRefs.track_id` が `Option<domain::ids::TrackId>` を参照していますが、`domain::ids` は private module のため外部 crate から参照できず、契約実装がコンパイル不能です。同じ誤った FQN が `usecase::VerifyPort` と `VerifyService` にもあります（各 `verify_catalogue_spec_refs`）。cli_driver は `usecase` のみ依存し docs も re-export を示すため、cli_driver は `usecase::TrackId`、usecase は `domain::TrackId` にすべきです。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/cli_driver-types.json",
-              "line": 249,
-              "category": "broken_reference"
-            }
-          ],
-          "hash": "rvw1:sha256:d5c899dfef5e29031f367a9a2aa04e270867ce3e56358fa448f5b872ce5b1f53",
-          "at": "2026-07-14T02:13:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`VerifyService` の読み取り専用メソッド（`verify_latest_track`、`verify_retention_gate` など）が `std::path::PathBuf` を値で受け取っています。ポート側は `&Path` であり、所有権を奪う必要がないため、呼び出し側に不要な move を強制します。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
-              "line": 383,
-              "category": "ownership signature smell"
-            }
-          ],
-          "hash": "rvw1:sha256:26b4099c12cc0453b0638e58597e06e958be4ee97790da6878921cd1c33e93be",
-          "at": "2026-07-14T02:30:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`VerifyService` の既存メソッド群が baseline の `PathBuf` 引数から `&Path` に一括変更されています（例: `verify_latest_track`）。briefing/spec が宣言する変更は3つの検証 route 追加であり、この未根拠の公開API変更は実装計画と baseline 契約を不整合にします。既存シグネチャを維持するか、変更を明示的に仕様化してください。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
-              "line": 383,
-              "category": "action incoherent with the declared change"
-            }
-          ],
-          "hash": "rvw1:sha256:2a5c554d73698bf851ae70b637ebeb8fa8f046e5a385a556b47bf6f52a6a5fa1",
-          "at": "2026-07-14T02:46:30Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0c748f50658ae57e48a45c910c9c04389a0fcfcaa8f44300146ca0fe206c80bb",
-          "at": "2026-07-14T03:04:17Z"
+          "hash": "rvw1:sha256:71431006623b6e258c538d01ec76a96fb1030c2fe07c9156f2f20b9b35b58933",
+          "at": "2026-07-14T05:38:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0c748f50658ae57e48a45c910c9c04389a0fcfcaa8f44300146ca0fe206c80bb",
-          "at": "2026-07-14T03:11:48Z"
+          "hash": "rvw1:sha256:71431006623b6e258c538d01ec76a96fb1030c2fe07c9156f2f20b9b35b58933",
+          "at": "2026-07-14T05:48:07Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:feef57ee6388b188f300b6b57c7c0a3ea763fad88196815e45971f7dd8c148bc",
-          "at": "2026-07-14T05:40:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`infrastructure::FsTemplateExportAdapter` の docs は、machine-home の構築時注入、ambient environment 非参照、未解決時の fail-closed という IN-06 / AC-13 の挙動契約を散文で再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、型の変更対象を示す短い名詞句と anchor cite のみにしてください。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
-              "line": 103,
-              "category": "upstream_restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:feef57ee6388b188f300b6b57c7c0a3ea763fad88196815e45971f7dd8c148bc",
-          "at": "2026-07-14T05:49:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TemplateExportPort::export` は filesystem I/O を行う同期ポートとして `is_async: false` ですが、entry docs は同期実行を選択した理由を説明していません。非同期化しない契約または単一プロセス同期実行の根拠を docs に明示してください。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
-              "line": 83,
-              "category": "sync/async color mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:bd538ae5ba1e2e341f919e5496a27cc9e278858267d87fb815a1255ddc5f59ee",
-          "at": "2026-07-14T06:05:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:33a8e42bfef1ad0df70c9796f4cad35956c45c905a443b16ad9868281fffd3cf",
-          "at": "2026-07-14T06:21:45Z"
+          "hash": "rvw1:sha256:39ac2cd856978fefa73bbc5895d12a81f02cbf4a80b0565e60f5c91609c0abd0",
+          "at": "2026-07-14T11:56:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:33a8e42bfef1ad0df70c9796f4cad35956c45c905a443b16ad9868281fffd3cf",
-          "at": "2026-07-14T06:29:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`FsVerifyAdapter` の `docs` が AC-12 の fail-closed／環境変数非参照という挙動契約を再記述しています。`docs` は型の責務・操作と anchor のみに留めてください。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
-              "line": 152,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "`infrastructure::verify::machine_paths::verify` の `docs` が AC-12 の fail-closed／環境変数非参照という挙動契約を再記述しています。`docs` は型の責務・操作と anchor のみに留めてください。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
-              "line": 6,
-              "category": "upstream_restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:29cc1f4a79bcaf4cd6a867e072452c5bc16942d6908cdfabf7d18e441a7f02fd",
-          "at": "2026-07-14T09:58:47Z"
-        },
+          "hash": "rvw1:sha256:39ac2cd856978fefa73bbc5895d12a81f02cbf4a80b0565e60f5c91609c0abd0",
+          "at": "2026-07-14T12:02:29Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b1524f64a55eb5945c39b4d2427b72c0a1744dd79c51e4ab6cdbecec7f4e8d0a",
-          "at": "2026-07-14T10:16:22Z"
+          "hash": "rvw1:sha256:4f1c4233ce871f086440b983a735def7b900ca7778f62bb735048a3a4af7c4dc",
+          "at": "2026-07-14T03:59:42Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b1524f64a55eb5945c39b4d2427b72c0a1744dd79c51e4ab6cdbecec7f4e8d0a",
-          "at": "2026-07-14T10:27:26Z"
+          "hash": "rvw1:sha256:4f1c4233ce871f086440b983a735def7b900ca7778f62bb735048a3a4af7c4dc",
+          "at": "2026-07-14T04:03:06Z"
         }
       ]
     },
@@ -938,213 +1049,77 @@
           "findings": [],
           "hash": "rvw1:sha256:3ccff6f24dcd373994d0a880947598ba849ce74ca70205ddad9fc017b7f13e29",
           "at": "2026-07-14T10:00:44Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D7 defers the exact detection pattern and implementation to implementation time. Terms such as “date-time-shaped ADR filename” and “track ID with a date suffix” do not define the accepted grammar, path boundaries, or placeholder/false-positive handling, so downstream spec and implementations can produce materially different gates. Define observable matching rules and required cases before implementation.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
-              "line": 109,
-              "category": "decision underspecified for downstream consumption"
-            }
-          ],
-          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
-          "at": "2026-07-13T23:40:26Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
-          "at": "2026-07-14T00:28:09Z"
+          "hash": "rvw1:sha256:fa20134437bac13e83be4c256fd9fd933413688e51c97ecc1dcac5ea79e19ec9",
+          "at": "2026-07-14T11:55:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
-          "at": "2026-07-14T00:29:59Z"
+          "hash": "rvw1:sha256:fa20134437bac13e83be4c256fd9fd933413688e51c97ecc1dcac5ea79e19ec9",
+          "at": "2026-07-14T12:01:22Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
-          "at": "2026-07-14T05:40:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
-          "at": "2026-07-14T05:41:00Z"
+          "hash": "rvw1:sha256:83ec33c2b8ba8e3c867c5f92b920d6acf69f97d0f6b97bf69ecb8250d0f30908",
+          "at": "2026-07-14T12:52:50Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
-          "at": "2026-07-14T05:47:48Z"
+          "hash": "rvw1:sha256:83ec33c2b8ba8e3c867c5f92b920d6acf69f97d0f6b97bf69ecb8250d0f30908",
+          "at": "2026-07-14T12:56:54Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5a34fb21f352d8159c83a37052bc4c902fa11d2b8faa39a079783b52161d55b0",
-          "at": "2026-07-14T07:03:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a34fb21f352d8159c83a37052bc4c902fa11d2b8faa39a079783b52161d55b0",
-          "at": "2026-07-14T07:07:52Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4f1c4233ce871f086440b983a735def7b900ca7778f62bb735048a3a4af7c4dc",
-          "at": "2026-07-14T03:59:42Z"
+          "hash": "rvw1:sha256:7c2808978405eb992191640114954e53a2572f2f56db4e63b227831e55f8d2cc",
+          "at": "2026-07-14T13:25:34Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4f1c4233ce871f086440b983a735def7b900ca7778f62bb735048a3a4af7c4dc",
-          "at": "2026-07-14T04:03:06Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "「No cross-scope ordering constraint exists」は、同じ workflow が `blocked_cross_scope` 時に他 scope の依存を先に修正して再起動する契約（Step 4/5）と矛盾します。復旧時の例外として明記してください。",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 100,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "並列 fixer は `track-active-gate` を実行し、共有の rendered views を書き換えます。target directory 分離だけでは共有 worktree の同時書き込みを防げず、別 scope の fixer が stale な `plan.md` 等を上書きして hash/gate を壊し得ます。共有 refresh の barrier または write ownership が必要です。",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 92,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "`CARGO_TARGET_DIR_RELATIVE` を `Makefile.toml` の対応機能として参照していますが、Makefile.toml にこの変数の処理はなく、確認できるのは `CARGO_TARGET_DIR` と `WORKER_ID` です。したがって記載された build-lock 回避策は現状の `cargo make` では機能しません。",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 101,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:735509d166c85e652737de241a4fac69999fdf6d97ca4a329c5f1b9db9373b6f",
-          "at": "2026-07-14T05:40:59Z"
+          "hash": "rvw1:sha256:7c2808978405eb992191640114954e53a2572f2f56db4e63b227831e55f8d2cc",
+          "at": "2026-07-14T13:29:50Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:18e06f46ae95f54375fea92807fb447e2a827d75f32353ff7548fa1960bf2182",
-          "at": "2026-07-14T05:49:42Z"
+          "hash": "rvw1:sha256:28804566b33e91467ae16e90315c36bdd296835ced3c81a3cf23312bd2ee6f68",
+          "at": "2026-07-14T13:37:42Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The documented build-lock recovery is not wired through fixer dispatch. `bin/sotp review fix-local` launches Codex with a cleared environment whose safe list includes neither `CARGO_TARGET_DIR_RELATIVE` nor `WORKER_ID`, while the Claude sentinel/subagent path also provides no per-fixer environment forwarding. Consequently, nested `cargo make ci-rust` executions still use Compose's shared default target, so operators cannot apply the prescribed isolation during the mandatory parallel wave. Pass unique values through both adapters/fixer runners or document an isolation command that actually reaches each fixer.",
+              "message": "T007 と T009 は AC-20/IN-08 の担当に追加されていますが、description の operation は無関係な「3 verifier route」の追加だけで、既存 catalogue-spec-refs 経路の `track_id` を検証済み `TrackId` として伝搬させる変更を指示していません。この記述どおりに実行しても AC-20/IN-08 を未実装のまま完了できるため、両 task に対象 field/signature と変更操作を明記してください。",
               "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 102,
-              "category": "adapter-SSoT synchronization"
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/impl-plan.json",
+              "line": 42,
+              "category": "task description non-executable"
             }
           ],
-          "hash": "rvw1:sha256:18e06f46ae95f54375fea92807fb447e2a827d75f32353ff7548fa1960bf2182",
-          "at": "2026-07-14T05:54:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The parallel-wave guarantee is unsafe: every fixer runs the shared `task-contract-check`/`track-active-gate` chain, which rewrites common signal and rendered-view files in the same worktree. Cargo's build lock does not coordinate these writes or concurrent source edits, so one fixer can overwrite another's fresh artifacts or observe transient state. Add a synchronization/ownership barrier or isolate all mutable state before requiring unconditional parallel dispatch.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 102,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:bcdf156095fe693841aa9332fffba09a2dc5fa45465377ff5571a9390e4aef80",
-          "at": "2026-07-14T06:06:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:92e21d40c7e51557fa884c9a8af98b8e75d086671576c0d03e90f4b3bcf312ca",
-          "at": "2026-07-14T06:20:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 4 mandates concurrent fixers but leaves every invocation on the shared Cargo target directory and explicitly accepts build-lock contention. This contradicts `.claude/rules/07-dev-environment.md`, which requires a unique `CARGO_TARGET_DIR_RELATIVE` for parallel workers, and can serialize the fixers' mandatory `cargo make ci-rust` checks or cause timeouts. Specify per-scope target-directory isolation and ensure the fixer subprocess propagates it.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 104,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:92e21d40c7e51557fa884c9a8af98b8e75d086671576c0d03e90f4b3bcf312ca",
-          "at": "2026-07-14T06:30:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 4's claim that concurrent fixers never edit shared files is false: each `track-local-review-fix` invocation runs `task-contract-check` and `track-active-gate`, which rewrite shared signal and rendered-view artifacts. These refreshes can interleave with other fixers' source edits, while the hash gate covers only scope files, so a recorded review may be based on stale or mixed artifacts. The unconditional parallel dispatch needs synchronization or isolated operational state.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 104,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:dc74412b8e12e074428d02b67f531b315553260bb0836e9eade885b9f18cda2d",
-          "at": "2026-07-14T06:51:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:378e67ed7df56ac4a732569cfa5864a98b85acf6ed391e9a6bbbb54129a4b066",
-          "at": "2026-07-14T06:57:44Z"
+          "hash": "rvw1:sha256:28804566b33e91467ae16e90315c36bdd296835ced3c81a3cf23312bd2ee6f68",
+          "at": "2026-07-14T13:42:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:378e67ed7df56ac4a732569cfa5864a98b85acf6ed391e9a6bbbb54129a4b066",
-          "at": "2026-07-14T07:04:45Z"
+          "hash": "rvw1:sha256:ae269b7ee784db9f5db7e75faa0f9b32ba1a6c23ef34e7db58237561eedfb292",
+          "at": "2026-07-14T13:46:23Z"
         }
       ]
     },
@@ -1235,39 +1210,328 @@
           "findings": [],
           "hash": "rvw1:sha256:ae2f2cbdd01c84dc0563acad02771b755f68bfcf222c5714d8461fe61a95af83",
           "at": "2026-07-14T07:07:37Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a0a81d551e43fd127f167406475794daeaf27a75174392765ff6f66d917986be",
-          "at": "2026-07-14T04:07:45Z"
+          "hash": "rvw1:sha256:f7a887bdc8afd443a5ef9c4f6c5d541b1630a6c88e2fd964149607fcef5a4356",
+          "at": "2026-07-14T13:24:36Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`TemplateExportPort::export` は machine-path 検査対象を入力として受け取らない一方、唯一の `FsTemplateExportAdapter` 実装は `HOME` / `USERPROFILE` を `std::env::var_os` で暗黙に取得しています。そのため同じ command の結果が ambient environment に依存し、変数未設定時には export 自体が失敗します。これは `hexagonal-architecture.md` §Usecase Layer Purity Rules の implicit env dependency 禁止に反します。作業機 path は CLI composition root で解決・検証し、usecase entrypoint から明示的に渡してください。",
+              "message": "AC-20 requires track-ID validation boundaries to delegate to `TrackId::try_new`, but none of IN-01..07 includes track-ID/slug validation or remediation of its duplicated implementations. Although the cited ADR D1 supports the behavior, this acceptance criterion mandates behavior outside this spec's declared in-scope set.",
               "severity": "P1",
-              "file": "libs/usecase/src/template_export/mod.rs",
-              "line": 284,
-              "category": "implicit time / env / process dependency"
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json",
+              "line": 482,
+              "category": "scope / acceptance_criteria contradiction"
             }
           ],
-          "hash": "rvw1:sha256:a0a81d551e43fd127f167406475794daeaf27a75174392765ff6f66d917986be",
-          "at": "2026-07-14T04:15:11Z"
+          "hash": "rvw1:sha256:f7a887bdc8afd443a5ef9c4f6c5d541b1630a6c88e2fd964149607fcef5a4356",
+          "at": "2026-07-14T13:28:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98f48e163249f21b2874e968853bd53e3e97cc3f3d90f0b5b75b969e5ca1e14f",
+          "at": "2026-07-14T13:37:47Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a0a81d551e43fd127f167406475794daeaf27a75174392765ff6f66d917986be",
-          "at": "2026-07-14T05:39:08Z"
+          "hash": "rvw1:sha256:98f48e163249f21b2874e968853bd53e3e97cc3f3d90f0b5b75b969e5ca1e14f",
+          "at": "2026-07-14T13:40:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d037ca7d38ebed9ba3635052dcfa86a1087d77e110be6479944c90323b8ec24",
+          "at": "2026-07-14T13:53:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d037ca7d38ebed9ba3635052dcfa86a1087d77e110be6479944c90323b8ec24",
+          "at": "2026-07-14T13:53:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d037ca7d38ebed9ba3635052dcfa86a1087d77e110be6479944c90323b8ec24",
+          "at": "2026-07-14T13:56:18Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyArgs` は非公開の `project_root` フィールドを持つため `has_stripped_fields` は `true` であるべきですが、`false` になっており baseline shape と不一致です。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/cli-types.json",
+              "line": 38,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`VerifyPort` の `verify_sotp_version_tag` / `verify_machine_paths` / `verify_template_refs` は filesystem/network I/O を行うポートなのに `is_async: false` で、同期実行を選ぶ理由が docs にありません。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 108,
+              "category": "API shape"
+            },
+            {
+              "message": "`VerifyService` の読み取り専用メソッド群が `PathBuf` を値で受け取っています。実装は直ちに `&Path` としてポートへ渡しており、呼び出し側の所有権を奪う必要がありません。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 383,
+              "category": "API shape"
+            },
+            {
+              "message": "`infrastructure::verify::machine_paths::verify` の docs が AC-12 の「全 Git-tracked file を走査し、machine-specific absolute path を fail-closed で検出する」という契約を散文で再記述しています。docs は型の責務と `AC-12` の参照に留めるべきです。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 6,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`infrastructure::verify::sotp_version_tag::verify` の docs が AC-03 の remote 上の Git URL/tag 解決と fail-closed 判定を散文で再記述しています。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 26,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`infrastructure::verify::template_refs::verify` の docs が AC-15 の manifest-derived shipped-template 集合、具体 source-repository key 検査、fail-closed 動作を散文で再記述しています。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 46,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`TemplateExportPortError` の docs が AC-13/CN-03 の exported file における machine-specific absolute path 拒否契約を散文で再記述しています。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 737,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:e0da5a8346576973c82ed478374490eab875a41450625493e77f3dcf2ee148ce",
+          "at": "2026-07-14T01:35:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyService` declares read-only operations such as `verify_latest_track` with owned `std::path::PathBuf` parameters, although the interactor immediately borrows them to call `VerifyPort`; this unnecessarily transfers ownership. Use borrowed `&Path` parameters consistently or document the ownership requirement.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 383,
+              "category": "API shape"
+            }
+          ],
+          "hash": "rvw1:sha256:a5ff01486bffa0b8df52c214daf466d166f81cb4703c1b55c85f4c677e13a4b7",
+          "at": "2026-07-14T01:54:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_driver::VerifyInput::CatalogueSpecRefs.track_id` が `Option<domain::ids::TrackId>` を参照していますが、`domain::ids` は private module のため外部 crate から参照できず、契約実装がコンパイル不能です。同じ誤った FQN が `usecase::VerifyPort` と `VerifyService` にもあります（各 `verify_catalogue_spec_refs`）。cli_driver は `usecase` のみ依存し docs も re-export を示すため、cli_driver は `usecase::TrackId`、usecase は `domain::TrackId` にすべきです。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/cli_driver-types.json",
+              "line": 249,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:d5c899dfef5e29031f367a9a2aa04e270867ce3e56358fa448f5b872ce5b1f53",
+          "at": "2026-07-14T02:13:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyService` の読み取り専用メソッド（`verify_latest_track`、`verify_retention_gate` など）が `std::path::PathBuf` を値で受け取っています。ポート側は `&Path` であり、所有権を奪う必要がないため、呼び出し側に不要な move を強制します。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 383,
+              "category": "ownership signature smell"
+            }
+          ],
+          "hash": "rvw1:sha256:26b4099c12cc0453b0638e58597e06e958be4ee97790da6878921cd1c33e93be",
+          "at": "2026-07-14T02:30:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyService` の既存メソッド群が baseline の `PathBuf` 引数から `&Path` に一括変更されています（例: `verify_latest_track`）。briefing/spec が宣言する変更は3つの検証 route 追加であり、この未根拠の公開API変更は実装計画と baseline 契約を不整合にします。既存シグネチャを維持するか、変更を明示的に仕様化してください。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 383,
+              "category": "action incoherent with the declared change"
+            }
+          ],
+          "hash": "rvw1:sha256:2a5c554d73698bf851ae70b637ebeb8fa8f046e5a385a556b47bf6f52a6a5fa1",
+          "at": "2026-07-14T02:46:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c748f50658ae57e48a45c910c9c04389a0fcfcaa8f44300146ca0fe206c80bb",
+          "at": "2026-07-14T03:04:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c748f50658ae57e48a45c910c9c04389a0fcfcaa8f44300146ca0fe206c80bb",
+          "at": "2026-07-14T03:11:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:feef57ee6388b188f300b6b57c7c0a3ea763fad88196815e45971f7dd8c148bc",
+          "at": "2026-07-14T05:40:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::FsTemplateExportAdapter` の docs は、machine-home の構築時注入、ambient environment 非参照、未解決時の fail-closed という IN-06 / AC-13 の挙動契約を散文で再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、型の変更対象を示す短い名詞句と anchor cite のみにしてください。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 103,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:feef57ee6388b188f300b6b57c7c0a3ea763fad88196815e45971f7dd8c148bc",
+          "at": "2026-07-14T05:49:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TemplateExportPort::export` は filesystem I/O を行う同期ポートとして `is_async: false` ですが、entry docs は同期実行を選択した理由を説明していません。非同期化しない契約または単一プロセス同期実行の根拠を docs に明示してください。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 83,
+              "category": "sync/async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:bd538ae5ba1e2e341f919e5496a27cc9e278858267d87fb815a1255ddc5f59ee",
+          "at": "2026-07-14T06:05:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33a8e42bfef1ad0df70c9796f4cad35956c45c905a443b16ad9868281fffd3cf",
+          "at": "2026-07-14T06:21:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33a8e42bfef1ad0df70c9796f4cad35956c45c905a443b16ad9868281fffd3cf",
+          "at": "2026-07-14T06:29:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsVerifyAdapter` の `docs` が AC-12 の fail-closed／環境変数非参照という挙動契約を再記述しています。`docs` は型の責務・操作と anchor のみに留めてください。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 152,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "`infrastructure::verify::machine_paths::verify` の `docs` が AC-12 の fail-closed／環境変数非参照という挙動契約を再記述しています。`docs` は型の責務・操作と anchor のみに留めてください。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 6,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:29cc1f4a79bcaf4cd6a867e072452c5bc16942d6908cdfabf7d18e441a7f02fd",
+          "at": "2026-07-14T09:58:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1524f64a55eb5945c39b4d2427b72c0a1744dd79c51e4ab6cdbecec7f4e8d0a",
+          "at": "2026-07-14T10:16:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1524f64a55eb5945c39b4d2427b72c0a1744dd79c51e4ab6cdbecec7f4e8d0a",
+          "at": "2026-07-14T10:27:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca35b30ae102f834e08689350224a6c6405bd67719b6426a4660211daf6b2b7b",
+          "at": "2026-07-14T12:53:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::commands::verify::parse_track_id` の `spec_refs` はすべて off-topic です。AC-03 は remote tag 解決、AC-12 は machine-home path 検査、AC-15 は出荷対象の具体参照検査を規定しており、catalogue-spec コマンドの track ID 検証を根拠付けません。この関数を直接要求する spec anchor を参照させる必要があります。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/cli-types.json",
+              "line": 19,
+              "category": "SoT integrity/spec_refs off-topic"
+            },
+            {
+              "message": "`CatalogueSpecRefsArgs` の変更も AC-03・AC-12・AC-15 のいずれとも整合しません。この DTO は catalogue-spec 検証対象の track ID と探索 path を表しますが、各 AC は remote tag、machine path、出荷 template reference の別々のゲートを規定しています。track ID の validated-type 化を直接根拠付ける spec anchor が必要です。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/cli-types.json",
+              "line": 105,
+              "category": "SoT integrity/spec_refs off-topic"
+            }
+          ],
+          "hash": "rvw1:sha256:ca35b30ae102f834e08689350224a6c6405bd67719b6426a4660211daf6b2b7b",
+          "at": "2026-07-14T12:57:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:859a11a23928c424e687e2f7b5c4185dddccd4b0a2ccb7a39407b8004fe43b3b",
+          "at": "2026-07-14T13:25:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:859a11a23928c424e687e2f7b5c4185dddccd4b0a2ccb7a39407b8004fe43b3b",
+          "at": "2026-07-14T13:29:29Z"
         }
       ]
     }

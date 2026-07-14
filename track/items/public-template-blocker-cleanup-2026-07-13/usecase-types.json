@@ -406,6 +406,10 @@
         {
           "anchor": "AC-15",
           "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
         }
       ],
       "supertrait_bounds": [
@@ -706,6 +710,10 @@
         },
         {
           "anchor": "AC-15",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-20",
           "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
         }
       ],

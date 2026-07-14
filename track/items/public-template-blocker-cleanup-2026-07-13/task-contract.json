@@ -34,7 +34,9 @@
     ],
     "T010": [
       {"layer": "cli", "entry_key": "VerifyArgs"},
-      {"layer": "cli", "entry_key": "VerifyCommand"}
+      {"layer": "cli", "entry_key": "VerifyCommand"},
+      {"layer": "cli", "entry_key": "CatalogueSpecRefsArgs"},
+      {"layer": "cli", "entry_key": "cli::commands::verify::parse_track_id"}
     ],
     "T011": [],
     "T012": [],

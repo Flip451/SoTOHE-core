@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "1dde6cba1374562c27121b286c300032d6cb1ca3c7b3e18972cea13901ff2b2d",
+  "catalogue_declaration_hash": "4d9f1809aa97cf96b82ce1498c2d8959b5913937ba67239e2489209ffc21dd5c",
   "signals": [
     {
       "type_name": "VerifyInput",
       "signal": "blue",
-      "entry_hash": "f854f70942d72951dcb95668b116e2d4e6500783339b44b209b1114b41fc63fa"
+      "entry_hash": "bc3403605f49c6283c52bcb1b0fa4c5ad1ff6372ff2302c2533b97fe05a7f90b"
     }
   ]
 }

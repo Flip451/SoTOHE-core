@@ -465,6 +465,9 @@ fn verify_command_gate_name(cmd: &commands::verify::VerifyCommand) -> &'static s
     match cmd {
         VerifyCommand::LatestTrack(_) => "verify-latest-track",
         VerifyCommand::RetentionGate(_) => "verify-retention-gate",
+        VerifyCommand::SotpVersionTag(_) => "verify-sotp-version-tag",
+        VerifyCommand::MachinePaths(_) => "verify-machine-paths",
+        VerifyCommand::TemplateRefs(_) => "verify-template-refs",
         VerifyCommand::ArchDocs(_) => "verify-arch-docs",
         VerifyCommand::Layers(_) => "verify-layers",
         VerifyCommand::HooksPath(_) => "verify-hooks-path",
