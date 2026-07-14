@@ -4,32 +4,35 @@
     {
       "id": "T001",
       "description": "In `libs/infrastructure/src/template_export/mod.rs`, update `FsTemplateExportAdapter::export` and its walk helpers to classify ignorable worktree entries before manifest traversal; add focused cases in `libs/infrastructure/src/template_export/tests.rs` (spec.json#GO-01, #IN-01, #CN-01, #AC-01, #AC-02, #OS-01).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "753b3d23d32e018c5d7ac00c265cfa8c522d0cc1"
     },
     {
       "id": "T002",
       "description": "In `libs/infrastructure/src/template_export/mod.rs::FsTemplateExportAdapter::export` and `libs/usecase/src/template_export/mod.rs::{TemplateExportError, TemplateExportPortError}`, add exported-output machine-path validation, error propagation, and focused acceptance/rejection tests (spec.json#GO-05, #GO-06, #IN-06, #CN-03, #AC-13, #AC-14).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "753b3d23d32e018c5d7ac00c265cfa8c522d0cc1"
     },
     {
       "id": "T003",
       "description": "At `libs/domain/src/review_v2/types.rs::FilePath::new` and its structured-artifact codec callers, route persisted path fields through the validated value object and add codec acceptance/rejection tests (spec.json#GO-05, #GO-06, #IN-05, #IN-06, #CN-03, #CN-04, #AC-11, #AC-14).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "753b3d23d32e018c5d7ac00c265cfa8c522d0cc1"
     },
     {
       "id": "T004",
       "description": "Add `libs/infrastructure/src/verify/sotp_version_tag.rs::verify`, export it from `libs/infrastructure/src/verify/mod.rs`, and cover deterministic remote-success and unavailable-tag fixtures (spec.json#GO-02, #IN-02, #CN-02, #AC-03, #OS-02).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T005",
       "description": "Add `libs/infrastructure/src/verify/machine_paths.rs::verify`, export it from `libs/infrastructure/src/verify/mod.rs`, and add Git-index fixture coverage for machine-path and retained system-path cases (spec.json#GO-05, #GO-06, #IN-06, #CN-02, #CN-03, #AC-10, #AC-12, #OS-05).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T006",
       "description": "Add `libs/infrastructure/src/verify/template_refs.rs::verify`, export it from `libs/infrastructure/src/verify/mod.rs`, and add the manifest-derived ADR/track name-key allow and violation fixtures (spec.json#GO-03, #GO-07, #IN-07, #CN-01, #CN-02, #CN-05, #AC-15, #AC-16, #AC-17, #AC-18, #AC-19, #OS-06).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T007",
@@ -109,7 +112,8 @@
     {
       "id": "T022",
       "description": "In `libs/infrastructure/src/template_export/mod.rs::FsTemplateExportAdapter` and the `usecase::template_export::TemplateExportPort` composition binding in `apps/cli-composition/src/template_export/mod.rs`, replace the adapter's ambient machine-home environment lookup with composition-root `HOME`/`USERPROFILE` resolution injected through its constructor, and add focused adapter/composition tests (spec.json#IN-06, #CN-03, #AC-13).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "753b3d23d32e018c5d7ac00c265cfa8c522d0cc1"
     }
   ],
   "plan": {

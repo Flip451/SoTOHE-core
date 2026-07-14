@@ -8,7 +8,7 @@ use domain::FreeText;
 use domain::review_v2::FilePath;
 use usecase::template_export::TemplateExportPortError;
 
-use super::filesystem::{io_error, non_symlink_metadata, sorted_dir_entries};
+use super::filesystem::{io_error, non_symlink_metadata};
 
 /// Rejects output containing the current work machine's home directory.
 pub(super) fn ensure_exported_output_has_no_machine_paths(
@@ -22,7 +22,8 @@ pub(super) fn ensure_exported_output_has_no_machine_paths(
         io_error(output_dir, &error)
     })?;
     let home_dir = normalized_machine_home_path_bytes(output_dir, home_dir)?;
-    scan_exported_output_for_machine_paths(output_dir, output_dir, &home_dir)
+    let mut scanned_entries = 0_usize;
+    scan_exported_output_for_machine_paths(output_dir, output_dir, &home_dir, &mut scanned_entries)
 }
 
 /// Returns whether output scanning is required for the injected machine home.
@@ -39,27 +40,60 @@ pub(super) fn exported_output_scan_is_required(
         return Ok(true);
     };
 
-    // Keep this validation aligned with the scanner's representation. An
-    // invalid home fails closed even when its raw prefix appears to be in the
-    // workspace.
-    normalized_machine_home_path_bytes(output_dir, machine_home_dir)?;
+    match machine_home_workspace_containment(output_dir, machine_home_dir, workspace_root)? {
+        MachineHomeWorkspaceContainment::WithinWorkspace => Ok(false),
+        MachineHomeWorkspaceContainment::OutsideWorkspace
+        | MachineHomeWorkspaceContainment::Unresolved => Ok(true),
+    }
+}
 
-    // Resolve both sides before containment testing so a relative workspace
-    // root and a symlinked container mount agree with the absolute home path.
-    // If either path cannot be resolved, retain the scan: a failed exception
-    // check must not weaken the exported-output protection.
-    let workspace_root = std::fs::canonicalize(workspace_root);
-    let machine_home_dir = std::fs::canonicalize(machine_home_dir);
-    match (workspace_root, machine_home_dir) {
+/// The relationship between an injected machine home and a workspace root.
+///
+/// `Unresolved` is deliberately distinct from `OutsideWorkspace`: callers
+/// decide whether their gate must reject a failed containment check or retain
+/// a conservative scan.  In either case, an unresolved path never receives
+/// the workspace-local exception.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum MachineHomeWorkspaceContainment {
+    /// The canonical machine-home path is inside the canonical workspace root.
+    WithinWorkspace,
+    /// The canonical machine-home path is outside the canonical workspace root.
+    OutsideWorkspace,
+    /// At least one path could not be canonicalized for containment checking.
+    Unresolved,
+}
+
+/// Classifies an injected machine home against a workspace root.
+///
+/// The home spelling is first validated with the same rules used by the byte
+/// scanner, so a lexical `..` component cannot obtain the workspace-local
+/// exception.  Both paths are then canonicalized before containment is tested.
+///
+/// # Errors
+///
+/// Returns an I/O-style export error when `machine_home_dir` is not an absolute
+/// path without parent-directory components.
+pub(crate) fn machine_home_workspace_containment(
+    error_path: &Path,
+    machine_home_dir: &Path,
+    workspace_root: &Path,
+) -> Result<MachineHomeWorkspaceContainment, TemplateExportPortError> {
+    normalized_machine_home_path_bytes(error_path, machine_home_dir)?;
+
+    match (std::fs::canonicalize(workspace_root), std::fs::canonicalize(machine_home_dir)) {
         (Ok(workspace_root), Ok(machine_home_dir)) => {
-            Ok(!machine_home_dir.starts_with(workspace_root))
+            if machine_home_dir.starts_with(workspace_root) {
+                Ok(MachineHomeWorkspaceContainment::WithinWorkspace)
+            } else {
+                Ok(MachineHomeWorkspaceContainment::OutsideWorkspace)
+            }
         }
-        _ => Ok(true),
+        _ => Ok(MachineHomeWorkspaceContainment::Unresolved),
     }
 }
 
 /// Returns the normalized, lossless representation used to scan machine paths.
-fn normalized_machine_home_path_bytes(
+pub(crate) fn normalized_machine_home_path_bytes(
     output_dir: &Path,
     machine_home_dir: &Path,
 ) -> Result<Vec<u8>, TemplateExportPortError> {
@@ -117,12 +151,13 @@ fn scan_exported_output_for_machine_paths(
     output_dir: &Path,
     directory: &Path,
     home_dir: &[u8],
+    scanned_entries: &mut usize,
 ) -> Result<(), TemplateExportPortError> {
-    for entry in sorted_dir_entries(directory)? {
+    for entry in sorted_dir_entries_within_scan_limit(directory, scanned_entries)? {
         let path = entry.path();
         let metadata = non_symlink_metadata(&path)?;
         if metadata.is_dir() {
-            scan_exported_output_for_machine_paths(output_dir, &path, home_dir)?;
+            scan_exported_output_for_machine_paths(output_dir, &path, home_dir, scanned_entries)?;
             continue;
         }
 
@@ -148,8 +183,48 @@ fn scan_exported_output_for_machine_paths(
     Ok(())
 }
 
+/// Reads one directory in deterministic order without allocating past the
+/// export scan's total entry limit.
+fn sorted_dir_entries_within_scan_limit(
+    directory: &Path,
+    scanned_entries: &mut usize,
+) -> Result<Vec<std::fs::DirEntry>, TemplateExportPortError> {
+    let mut entries = Vec::new();
+    let read_dir = std::fs::read_dir(directory).map_err(|error| io_error(directory, &error))?;
+    for entry in read_dir {
+        increment_scanned_entry_count(scanned_entries, directory)?;
+        entries.push(entry.map_err(|error| io_error(directory, &error))?);
+    }
+    entries.sort_by_key(std::fs::DirEntry::file_name);
+    Ok(entries)
+}
+
+fn increment_scanned_entry_count(
+    scanned_entries: &mut usize,
+    directory: &Path,
+) -> Result<(), TemplateExportPortError> {
+    *scanned_entries = scanned_entries.checked_add(1).ok_or_else(|| {
+        let error = std::io::Error::other("machine-path scan entry count overflowed");
+        io_error(directory, &error)
+    })?;
+    if *scanned_entries > MAX_MACHINE_PATH_SCAN_ENTRIES {
+        let error = std::io::Error::new(
+            std::io::ErrorKind::InvalidData,
+            format!(
+                "machine-path scan exceeds entry limit of {MAX_MACHINE_PATH_SCAN_ENTRIES} entries"
+            ),
+        );
+        return Err(io_error(directory, &error));
+    }
+    Ok(())
+}
+
 /// Number of bytes read at once while scanning an exported file.
 pub(super) const MACHINE_PATH_SCAN_CHUNK_SIZE: usize = 8 * 1024;
+/// Maximum bytes scanned in any one exported or tracked file.
+const MAX_MACHINE_PATH_SCAN_FILE_BYTES: u64 = 8 * 1024 * 1024;
+/// Maximum output-tree entries visited during one machine-path scan.
+const MAX_MACHINE_PATH_SCAN_ENTRIES: usize = 100_000;
 
 /// Reports whether `path` contains the machine home directory at path boundaries.
 ///
@@ -157,13 +232,20 @@ pub(super) const MACHINE_PATH_SCAN_CHUNK_SIZE: usize = 8 * 1024;
 /// export validation cannot allocate in proportion to the size of an exported
 /// file. Retaining a full home-path overlap also detects a path that spans two
 /// chunks.
-fn file_contains_machine_home_path(
+///
+/// # Errors
+///
+/// Returns an I/O-style export error when the file cannot be read or exceeds
+/// the machine-path scan size limit.
+pub(crate) fn file_contains_machine_home_path(
     path: &Path,
     home_dir: &[u8],
 ) -> Result<bool, TemplateExportPortError> {
-    let mut file = File::open(path).map_err(|error| io_error(path, &error))?;
+    let file = File::open(path).map_err(|error| io_error(path, &error))?;
+    let mut file = file.take(MAX_MACHINE_PATH_SCAN_FILE_BYTES.saturating_add(1));
     let mut chunk = [0_u8; MACHINE_PATH_SCAN_CHUNK_SIZE];
     let mut buffered = Vec::new();
+    let mut scanned_bytes = 0_u64;
     // When the overlap is trimmed, retain the byte that preceded it so a
     // candidate at offset zero keeps its original path-boundary context.
     let mut buffered_preceding_byte = None;
@@ -177,6 +259,25 @@ fn file_contains_machine_home_path(
                 true,
                 buffered_preceding_byte,
             ));
+        }
+
+        scanned_bytes = scanned_bytes
+            .checked_add(u64::try_from(read).map_err(|error| {
+                let error = std::io::Error::other(error);
+                io_error(path, &error)
+            })?)
+            .ok_or_else(|| {
+                let error = std::io::Error::other("machine-path scan byte count overflowed");
+                io_error(path, &error)
+            })?;
+        if scanned_bytes > MAX_MACHINE_PATH_SCAN_FILE_BYTES {
+            let error = std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                format!(
+                    "file exceeds machine-path scan size limit of {MAX_MACHINE_PATH_SCAN_FILE_BYTES} bytes"
+                ),
+            );
+            return Err(io_error(path, &error));
         }
 
         let read_bytes = chunk.get(..read).ok_or_else(|| {
@@ -247,4 +348,49 @@ fn is_machine_path_boundary(byte: u8) -> bool {
             | b'<'
             | b'>'
     )
+}
+
+#[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
+mod tests {
+    use tempfile::TempDir;
+
+    use super::{
+        MAX_MACHINE_PATH_SCAN_ENTRIES, MAX_MACHINE_PATH_SCAN_FILE_BYTES,
+        file_contains_machine_home_path, increment_scanned_entry_count,
+        sorted_dir_entries_within_scan_limit,
+    };
+
+    #[test]
+    fn test_file_contains_machine_home_path_oversized_file_returns_error() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("oversized.txt");
+        std::fs::File::create(&file_path)
+            .unwrap()
+            .set_len(MAX_MACHINE_PATH_SCAN_FILE_BYTES.saturating_add(1))
+            .unwrap();
+
+        assert!(file_contains_machine_home_path(&file_path, b"/work-machine/home").is_err());
+    }
+
+    #[test]
+    fn test_increment_scanned_entry_count_excessive_entries_returns_error() {
+        let mut scanned_entries = MAX_MACHINE_PATH_SCAN_ENTRIES;
+
+        assert!(
+            increment_scanned_entry_count(&mut scanned_entries, std::path::Path::new(".")).is_err()
+        );
+    }
+
+    #[test]
+    fn test_sorted_dir_entries_within_scan_limit_excessive_entries_returns_error() {
+        let temp_dir = TempDir::new().unwrap();
+        std::fs::write(temp_dir.path().join("a"), "").unwrap();
+        std::fs::write(temp_dir.path().join("b"), "").unwrap();
+        let mut scanned_entries = MAX_MACHINE_PATH_SCAN_ENTRIES.saturating_sub(1);
+
+        assert!(
+            sorted_dir_entries_within_scan_limit(temp_dir.path(), &mut scanned_entries).is_err()
+        );
+    }
 }

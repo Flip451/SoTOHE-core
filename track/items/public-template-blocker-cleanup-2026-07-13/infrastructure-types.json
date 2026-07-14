@@ -3,13 +3,17 @@
   "functions": {
     "infrastructure::verify::machine_paths::verify": {
       "action": "add",
-      "docs": "Machine-path verification function for the repository working tree; `project_root` is a technical scan root. AC-12.",
+      "docs": "Machine-path verifier over the tracked-file inventory with explicit machine-home input (AC-12).",
       "informal_grounds": [],
       "is_async": false,
       "params": [
         {
           "name": "project_root",
           "ty": "&std::path::Path"
+        },
+        {
+          "name": "machine_home_dir",
+          "ty": "Option<&std::path::Path>"
         }
       ],
       "returns": "domain::verify::VerifyOutcome",
@@ -71,7 +75,7 @@
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "action": "reference",
+      "action": "delete",
       "for_type": "FsVerifyAdapter",
       "trait_ref": "core::default::Default"
     },
@@ -144,13 +148,15 @@
       ]
     },
     "FsVerifyAdapter": {
-      "action": "reference",
-      "docs": "Existing filesystem secondary adapter whose `usecase::verify::VerifyPort` implementation gains delegation for the three new verification operations while its unit shape and constructor remain unchanged.",
+      "action": "modify",
+      "docs": "Filesystem verification adapter with construction-injected machine home (AC-03; AC-12; AC-15).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
         "shape": {
-          "kind": "unit"
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
         }
       },
       "methods": [
@@ -158,7 +164,12 @@
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
-          "params": [],
+          "params": [
+            {
+              "name": "machine_home_dir",
+              "ty": "Option<std::path::PathBuf>"
+            }
+          ],
           "returns": "Self"
         }
       ],

@@ -75,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "a65c81f864bd9b12e91005e20c08fd401da74f8a66c1875445f730421c9ee804",
+      "claim_hash": "dba449e330ba61aa1f583eb39a73496efedd1a4503ad3b60502a35bed5b9ea1f",
       "evidence_hash": "9f19bfa80ede153c4baa36d4e1e785fdcd659379f3baec537f5777e00f4ef92e",
       "verdict": {
         "kind": "pass",
@@ -99,11 +99,11 @@
       }
     },
     {
-      "claim_hash": "a65c81f864bd9b12e91005e20c08fd401da74f8a66c1875445f730421c9ee804",
+      "claim_hash": "dba449e330ba61aa1f583eb39a73496efedd1a4503ad3b60502a35bed5b9ea1f",
       "evidence_hash": "a5e1050527ee0af864999ffbbe3cb33d012978ee2cb0718945ca598e92242c0a",
       "verdict": {
         "kind": "pass",
-        "citation": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。verifier が用いる home directory は composition root が解決して構築時または引数として明示的に渡し、verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。"
+        "citation": "verifier が用いる home directory は composition root が解決して構築時または引数として明示的に渡し、verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -123,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "a65c81f864bd9b12e91005e20c08fd401da74f8a66c1875445f730421c9ee804",
+      "claim_hash": "dba449e330ba61aa1f583eb39a73496efedd1a4503ad3b60502a35bed5b9ea1f",
       "evidence_hash": "1162403d602a3b04ec8805cefeac36065bea91e0fdf151cb13d101335276d81c",
       "verdict": {
         "kind": "pass",
@@ -147,11 +147,11 @@
       }
     },
     {
-      "claim_hash": "8707046281b0ef867c5e1b75700eebcafeafd221cd94c8d722e339f2fdc14265",
+      "claim_hash": "8c544996a6982779db03582effab69fbbbe8ff52363dee6a4c3d686ceeb04b83",
       "evidence_hash": "a5e1050527ee0af864999ffbbe3cb33d012978ee2cb0718945ca598e92242c0a",
       "verdict": {
         "kind": "pass",
-        "citation": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。"
+        "citation": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。verifier が用いる home directory は composition root が解決して構築時または引数として明示的に渡し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

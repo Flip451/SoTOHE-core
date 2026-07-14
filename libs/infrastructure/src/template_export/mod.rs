@@ -23,12 +23,14 @@ use usecase::template_export::{
     TemplateExportPortError, TemplateExportReport,
 };
 
+use crate::capability_exec::bounded_read_utf8_file;
+
 pub mod codec;
 
 mod export_walk;
 mod filesystem;
 mod gitignore_classification;
-mod machine_path_scan;
+pub(crate) mod machine_path_scan;
 
 pub use codec::{
     MANIFEST_SCHEMA_VERSION, TemplateBoundaryManifestCodecError, TemplateBoundaryManifestDto,
@@ -80,7 +82,7 @@ impl TemplateBoundaryManifestPort for FsTemplateBoundaryManifestAdapter {
     ) -> Result<TemplateBoundaryManifest, TemplateBoundaryManifestReadError> {
         reject_manifest_symlink(manifest_path)?;
 
-        let content = std::fs::read_to_string(manifest_path).map_err(|error| {
+        let content = bounded_read_utf8_file(manifest_path).map_err(|error| {
             if error.kind() == std::io::ErrorKind::NotFound {
                 TemplateBoundaryManifestReadError::NotFound { path: manifest_path.to_path_buf() }
             } else {
@@ -95,7 +97,7 @@ impl TemplateBoundaryManifestPort for FsTemplateBoundaryManifestAdapter {
     }
 }
 
-/// Rejects a symlinked manifest before `read_to_string` can follow it.
+/// Rejects a symlinked manifest before the bounded reader can follow it.
 fn reject_manifest_symlink(manifest_path: &Path) -> Result<(), TemplateBoundaryManifestReadError> {
     match crate::track::symlink_guard::reject_symlinks_below(
         manifest_path,
@@ -135,6 +137,32 @@ fn decode_error_to_read_error(
         TemplateBoundaryManifestCodecError::Manifest { source } => {
             TemplateBoundaryManifestReadError::InvalidManifest { source }
         }
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
+mod bounded_manifest_read_tests {
+    use tempfile::TempDir;
+    use usecase::template_export::{
+        TemplateBoundaryManifestPort, TemplateBoundaryManifestReadError,
+    };
+
+    use super::FsTemplateBoundaryManifestAdapter;
+    use crate::capability_exec::MAX_CAPABILITY_EXEC_TEXT_BYTES;
+
+    #[test]
+    fn test_manifest_read_oversized_file_returns_io_error() {
+        let temp_dir = TempDir::new().unwrap();
+        let manifest_path = temp_dir.path().join("template-boundary.json");
+        std::fs::File::create(&manifest_path)
+            .unwrap()
+            .set_len(MAX_CAPABILITY_EXEC_TEXT_BYTES.saturating_add(1))
+            .unwrap();
+
+        let error = FsTemplateBoundaryManifestAdapter::new().read(&manifest_path).unwrap_err();
+
+        assert!(matches!(error, TemplateBoundaryManifestReadError::Io { .. }));
     }
 }
 

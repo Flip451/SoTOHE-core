@@ -1,93 +1,604 @@
 {
   "schema_version": 2,
   "scopes": {
-    "spec": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bdf57539cebb9aa527b4edbbd59ca6e55525e8b1cceb6b01d5dbb408420d451a",
-          "at": "2026-07-14T01:31:50Z"
+          "hash": "rvw1:sha256:71431006623b6e258c538d01ec76a96fb1030c2fe07c9156f2f20b9b35b58933",
+          "at": "2026-07-14T05:38:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71431006623b6e258c538d01ec76a96fb1030c2fe07c9156f2f20b9b35b58933",
+          "at": "2026-07-14T05:48:07Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "出力走査が symlink を拒否せず `std::fs::read` で追従します。既存の symlink guard と同様に明示的に検出して fail-closed にしてください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/template_export/mod.rs",
+              "line": 452,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "各ファイルを全量 `std::fs::read` しており、巨大な export 対象でメモリ枯渇し得ます。ストリーミング等の bounded read にしてください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/template_export/mod.rs",
+              "line": 452,
+              "category": "unbounded read"
+            },
+            {
+              "message": "home path の単純な substring 検索により、`/home/alice-old` のような別 path も `HOME=/home/alice` と誤判定します。path 境界を検証してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/template_export/mod.rs",
+              "line": 453,
+              "category": "factual error"
+            }
+          ],
+          "hash": "rvw1:sha256:ea73fbe4225771349cfb60552098e2a1912bab6854a83d06ab9a0ad07bf0d894",
+          "at": "2026-07-14T04:09:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.git` is only checked for existence; a symlink is accepted before `git ls-files`/`check-ignore` run. This can redirect Git classification to another repository and cause unclassified workspace files to be skipped. Reject symlinked `.git` entries while allowing normal worktree `.git` files.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/template_export/mod.rs",
+              "line": 377,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:edc1211eceae32f742e02337bfa7f7af67eca724289bfdbba463bd7d19498d00",
+          "at": "2026-07-14T04:20:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49db318a2f55c3981734f9c2ee9f7b30c50ce3ae830d1b7ede3749927e380664",
+          "at": "2026-07-14T04:26:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7c3c9327b5e620f7c4104be559b5c007ef9d830429f6fb8066974f41a04f5a3a",
+          "at": "2026-07-14T05:40:51Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "GO-03 and IN-03 require the entire manifest-derived shipment to be self-contained, and ADR D3 explicitly includes unresolvable decision/constraint symbols in the prohibited references. AC-05 covers only concrete paths, while AC-06 checks those symbols only in shipped conventions. Other shipped files (commands, harness documents, README/configuration, etc.) can therefore retain unresolvable symbols while every AC still passes, leaving GO-03 without complete acceptance coverage.",
+              "message": "`git_predicate` は終了コードしか必要ないのに `Command::output()` で stdout/stderr 全体をメモリへ読み込んでいます。特に `git ls-files --error-unmatch -- <directory>` は一致する全 tracked path を stdout に列挙するため、大規模な未分類 ancestor を検査すると入力規模に比例してメモリを消費し、export が OOM になり得ます。stdout を破棄して `status()` を使い、必要なら stderr も上限付きで取得してください。",
               "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json",
-              "line": 346,
-              "category": "missing AC coverage for a stated goal"
+              "file": "libs/infrastructure/src/template_export/mod.rs",
+              "line": 412,
+              "category": "unbounded I/O"
             }
           ],
-          "hash": "rvw1:sha256:bdf57539cebb9aa527b4edbbd59ca6e55525e8b1cceb6b01d5dbb408420d451a",
-          "at": "2026-07-14T01:35:56Z"
+          "hash": "rvw1:sha256:7c3c9327b5e620f7c4104be559b5c007ef9d830429f6fb8066974f41a04f5a3a",
+          "at": "2026-07-14T05:52:27Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "GO-04 の「archive 業務ロジックを CLI / workflow に集約する」部分を検証する acceptance criterion がありません。AC-07 は command 文書が workflow を参照し、手動手順を含まないことだけを要求し、AC-08 は directory 由来の状態・表示だけを扱っています。そのため workflow が CLI に委譲せず archive 操作を再実装していても全 AC を満たせてしまい、GO-04 / IN-04 / D4 の単一業務ロジック化を完了条件として証明できません。",
+              "message": "The injected machine-home path is converted and scanned without fail-closed validation. `to_string_lossy()` silently changes non-UTF-8 Unix paths, and a trailing separator (for example `/home/alice/`) makes descendant paths such as `/home/alice/project` fail the following-boundary check. Both cases can let real machine paths pass the export scan. Normalize the path and use a lossless platform representation, or return a typed I/O error when it cannot be scanned safely.",
               "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json",
-              "line": 356,
-              "category": "missing AC coverage for a stated goal"
+              "file": "libs/infrastructure/src/template_export/mod.rs",
+              "line": 441,
+              "category": "non-fail-closed config"
             }
           ],
-          "hash": "rvw1:sha256:04af3b8a3ddf343a2733bd41b2e211c7953d0c2eb28d216a3717287502aa16d1",
-          "at": "2026-07-14T01:39:24Z"
+          "hash": "rvw1:sha256:0b6c111c6b7a86320a9d79b9f23ea6cc5d6409c515c0d0799043769c7f5e6522",
+          "at": "2026-07-14T05:59:48Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ce86068f4cfa6b84ec43032d723f08fd6337a2daa6c2e4d57de758594e6fcd5c",
-          "at": "2026-07-14T01:42:30Z"
+          "hash": "rvw1:sha256:1b5f6af8d9d507a82af681e0714e2ef4116904f37dbac53bb336e276b1323680",
+          "at": "2026-07-14T06:07:43Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1932c865c75a56a3902086addda07052d2d8717364d6c1470eb10aeca54f09ac",
-          "at": "2026-07-14T03:32:59Z"
+          "hash": "rvw1:sha256:b75ea5b9af3e22789b6ae1dc4b4456950ad8a7953541f520935b1693de4862fe",
+          "at": "2026-07-14T07:32:55Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1932c865c75a56a3902086addda07052d2d8717364d6c1470eb10aeca54f09ac",
-          "at": "2026-07-14T03:35:58Z"
+          "hash": "rvw1:sha256:b75ea5b9af3e22789b6ae1dc4b4456950ad8a7953541f520935b1693de4862fe",
+          "at": "2026-07-14T07:38:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "生の `Path::starts_with` で workspace 配下と判定しているため、`/workspace/../home/user` のような `..` を含む machine home path を誤って信頼し、走査をスキップします。正規化・検証をこの分岐前に行わないと、出力中の作業機パスが検出されず漏えいします。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/template_export/mod.rs",
+              "line": 214,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:6b0f8f32a54b261418f2016c9e3ef498d21aa5bc37c4455978b06e84b23198f8",
+          "at": "2026-07-14T07:57:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CoverageManifestV4` and its nested serde DTOs lack `#[serde(deny_unknown_fields)]`, so extra fields in a versioned coverage record are silently ignored instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/coverage.rs",
+              "line": 44,
+              "category": "serde codec break"
+            },
+            {
+              "message": "The schema check rejects only versions greater than 2; a well-formed `schema_version: 0` record is accepted and processed as current data. Unknown/unsupported versions must be rejected fail-closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/store.rs",
+              "line": 73,
+              "category": "serde codec break"
+            }
+          ],
+          "hash": "rvw1:sha256:0921e1218eca1decf682ef403b9eedb32841867cbdc2dba2e139b60112cfb9e7",
+          "at": "2026-07-14T08:07:58Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e47814e90adc16b99442ac597490a08157fbd11b9a7e7e1d1d47af717911e1bd",
-          "at": "2026-07-14T05:38:07Z"
+          "hash": "rvw1:sha256:61c1a457039bef8a6428766b881d0e429dcd6559179104d8d5d4444255f1607c",
+          "at": "2026-07-14T08:16:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e47814e90adc16b99442ac597490a08157fbd11b9a7e7e1d1d47af717911e1bd",
-          "at": "2026-07-14T05:46:59Z"
+          "hash": "rvw1:sha256:61c1a457039bef8a6428766b881d0e429dcd6559179104d8d5d4444255f1607c",
+          "at": "2026-07-14T08:21:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`serde_json::from_value(envelope)` deserializes `DryCheckJsonV1`/record DTOs that lack `deny_unknown_fields`, so schema 1/2 files containing forward-added fields are silently truncated. Add strict serde attributes to the versioned envelope, record, verdict, and nested DTOs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/store.rs",
+              "line": 78,
+              "category": "serde codec break"
+            }
+          ],
+          "hash": "rvw1:sha256:0d53553f0965ce4dc366ca3bab0d5af900cf45cc1c8d8ac02d4cb6444b45aefd",
+          "at": "2026-07-14T08:51:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The chunk overlap drops the byte preceding a retained match. If a non-boundary character immediately precedes the machine-home path at a chunk boundary, the next scan sees the path at index 0 and `is_none_or` treats the missing predecessor as a boundary, falsely rejecting ordinary text. Preserve the preceding byte or boundary state and add a regression test.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/template_export/machine_path_scan.rs",
+              "line": 183,
+              "category": "machine-path scan correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4d9fa874db91da9ade6b14501ef526defbd194aaf7ae0d99675942fade52f55b",
+          "at": "2026-07-14T09:06:53Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ae2f2cbdd01c84dc0563acad02771b755f68bfcf222c5714d8461fe61a95af83",
-          "at": "2026-07-14T07:03:22Z"
+          "hash": "rvw1:sha256:54176492d3069e14dc210005a284ec29ee417a108e92794edb00ccdb50036b4d",
+          "at": "2026-07-14T09:15:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ae2f2cbdd01c84dc0563acad02771b755f68bfcf222c5714d8461fe61a95af83",
-          "at": "2026-07-14T07:07:37Z"
+          "hash": "rvw1:sha256:54176492d3069e14dc210005a284ec29ee417a108e92794edb00ccdb50036b4d",
+          "at": "2026-07-14T09:21:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SotpVersionPin` omits `schema_version` and lacks `deny_unknown_fields`; unsupported schema versions and unknown fields are silently accepted by `serde_json::from_str`, so the version pin is not fail-closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/sotp_version_tag.rs",
+              "line": 12,
+              "category": "serde codec break"
+            },
+            {
+              "message": "`read_to_string` follows a symlinked `.harness/config/sotp-version.json` or parent directory, allowing configuration outside the project boundary to be loaded. Reject symlinks before reading.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/sotp_version_tag.rs",
+              "line": 64,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The shared Git inventory does not reject a symlinked `.git` entry before invoking `git ls-files`; Git can therefore read another repository's index and produce a non-authoritative inventory. Fail closed like the existing export Git guard.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/git_inventory.rs",
+              "line": 14,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "Tracked paths are passed to `file_contains_machine_home_path`, whose `File::open` follows symlinks. A tracked symlink can redirect scanning outside the repository or bypass real-file semantics; reject symlinks before scanning.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/machine_paths.rs",
+              "line": 64,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`std::fs::read(project_root.join(&relative_path))` follows tracked symlinks when scanning shipped template files, so a symlink can redirect the verifier outside the workspace instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/template_refs.rs",
+              "line": 82,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:f4da7e754462c29a21806ae451b383235bad94881a8a151c7e152d9d30e9f7aa",
+          "at": "2026-07-14T10:02:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`git ls-files -z` is consumed through `Command::output()`, which buffers the entire repository inventory without a bound. A repository with a sufficiently large tracked-file set can exhaust verifier memory before the fail-closed check completes; parse the piped stdout incrementally or impose a safe bound.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/git_inventory.rs",
+              "line": 25,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "`std::fs::read(path)` loads each shipped file wholly into memory before scanning. An arbitrarily large tracked/exported file can exhaust verifier memory and prevent the fail-closed result; scan through a bounded chunked reader instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/template_refs.rs",
+              "line": 92,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:d5b81c58a0d5c58aa986306177dd73024c07a3fea705fc5b84982698697f0678",
+          "at": "2026-07-14T10:15:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_version_pin` uses unbounded `std::fs::read_to_string`, allowing an oversized repository-controlled config to exhaust verifier memory before the fail-closed result. Read with a bounded byte limit and reject oversized input, consistent with `template_refs` scanning.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/sotp_version_tag.rs",
+              "line": 90,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:cc6d708fc5d5dafc98de8208763c85329409a0b495eea054a3a385c7f36231a0",
+          "at": "2026-07-14T10:25:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "境界 manifest を `read_to_string` で無制限に読み込んでおり、リポジトリ管理下の巨大な設定ファイルでメモリ枯渇後に fail-closed できません。上限付き読み込みと超過時のエラーを追加してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/template_export/mod.rs",
+              "line": 83,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "machine-path scanner がファイル EOF まで無制限に `read` を繰り返します。巨大な tracked/exported file により検証が無制限の I/O を続けるため、上限を設けて超過時に fail-closed にしてください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/template_export/machine_path_scan.rs",
+              "line": 204,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:937b4ebd03465347dbd62f32e5e3e7809366866cf1a39e0e8bdab265eb2de8a4",
+          "at": "2026-07-14T10:32:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f65b3bc4fcf78de751d2c0a88bb464b346f97e2adbafd82ec641297b2877058c",
+          "at": "2026-07-14T10:42:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MAX_MACHINE_PATH_SCAN_ENTRIES` does not actually bound memory for a wide directory: `sorted_dir_entries` collects and sorts every `read_dir` entry before this loop increments or checks the counter. A directory with an excessive number of entries can therefore exhaust memory before the verifier fails closed. Bound collection while reading each directory, before sorting.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/template_export/machine_path_scan.rs",
+              "line": 156,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "The remote `git ls-remote` call uses `Command::output()` with neither a timeout nor bounded stdout/stderr capture. A stalled or hostile configured remote can hang the verification indefinitely or exhaust memory instead of producing a failed `VerifyOutcome`. Execute it with a deadline and capped output capture.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/verify/sotp_version_tag.rs",
+              "line": 56,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:f65b3bc4fcf78de751d2c0a88bb464b346f97e2adbafd82ec641297b2877058c",
+          "at": "2026-07-14T10:48:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`std::thread::spawn` は OS thread の生成失敗時に内部で `expect(\"failed to spawn thread\")` して panic します。この production adapter は drain ごとにこれを呼ぶため、リソース枯渇時に failed `VerifyOutcome` を返さずプロセスを落とします。`thread::Builder::spawn` の `io::Result` を伝播し、`VerifyFinding` に変換してください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/verify/sotp_version_tag.rs",
+              "line": 146,
+              "category": "panic-able adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:2af54c1ac00a6f712e263e843cf3133394e6c51087748cb6251255036cfdfa60",
+          "at": "2026-07-14T10:57:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:507053b40da05c2ee71a0a4f1bc95f9f2d2fbb0664d00e5ccce20eee4bd85728",
+          "at": "2026-07-14T11:03:48Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyArgs` は非公開の `project_root` フィールドを持つため `has_stripped_fields` は `true` であるべきですが、`false` になっており baseline shape と不一致です。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/cli-types.json",
+              "line": 38,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`VerifyPort` の `verify_sotp_version_tag` / `verify_machine_paths` / `verify_template_refs` は filesystem/network I/O を行うポートなのに `is_async: false` で、同期実行を選ぶ理由が docs にありません。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 108,
+              "category": "API shape"
+            },
+            {
+              "message": "`VerifyService` の読み取り専用メソッド群が `PathBuf` を値で受け取っています。実装は直ちに `&Path` としてポートへ渡しており、呼び出し側の所有権を奪う必要がありません。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 383,
+              "category": "API shape"
+            },
+            {
+              "message": "`infrastructure::verify::machine_paths::verify` の docs が AC-12 の「全 Git-tracked file を走査し、machine-specific absolute path を fail-closed で検出する」という契約を散文で再記述しています。docs は型の責務と `AC-12` の参照に留めるべきです。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 6,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`infrastructure::verify::sotp_version_tag::verify` の docs が AC-03 の remote 上の Git URL/tag 解決と fail-closed 判定を散文で再記述しています。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 26,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`infrastructure::verify::template_refs::verify` の docs が AC-15 の manifest-derived shipped-template 集合、具体 source-repository key 検査、fail-closed 動作を散文で再記述しています。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 46,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`TemplateExportPortError` の docs が AC-13/CN-03 の exported file における machine-specific absolute path 拒否契約を散文で再記述しています。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 737,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:e0da5a8346576973c82ed478374490eab875a41450625493e77f3dcf2ee148ce",
+          "at": "2026-07-14T01:35:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyService` declares read-only operations such as `verify_latest_track` with owned `std::path::PathBuf` parameters, although the interactor immediately borrows them to call `VerifyPort`; this unnecessarily transfers ownership. Use borrowed `&Path` parameters consistently or document the ownership requirement.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 383,
+              "category": "API shape"
+            }
+          ],
+          "hash": "rvw1:sha256:a5ff01486bffa0b8df52c214daf466d166f81cb4703c1b55c85f4c677e13a4b7",
+          "at": "2026-07-14T01:54:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_driver::VerifyInput::CatalogueSpecRefs.track_id` が `Option<domain::ids::TrackId>` を参照していますが、`domain::ids` は private module のため外部 crate から参照できず、契約実装がコンパイル不能です。同じ誤った FQN が `usecase::VerifyPort` と `VerifyService` にもあります（各 `verify_catalogue_spec_refs`）。cli_driver は `usecase` のみ依存し docs も re-export を示すため、cli_driver は `usecase::TrackId`、usecase は `domain::TrackId` にすべきです。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/cli_driver-types.json",
+              "line": 249,
+              "category": "broken_reference"
+            }
+          ],
+          "hash": "rvw1:sha256:d5c899dfef5e29031f367a9a2aa04e270867ce3e56358fa448f5b872ce5b1f53",
+          "at": "2026-07-14T02:13:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyService` の読み取り専用メソッド（`verify_latest_track`、`verify_retention_gate` など）が `std::path::PathBuf` を値で受け取っています。ポート側は `&Path` であり、所有権を奪う必要がないため、呼び出し側に不要な move を強制します。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 383,
+              "category": "ownership signature smell"
+            }
+          ],
+          "hash": "rvw1:sha256:26b4099c12cc0453b0638e58597e06e958be4ee97790da6878921cd1c33e93be",
+          "at": "2026-07-14T02:30:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`VerifyService` の既存メソッド群が baseline の `PathBuf` 引数から `&Path` に一括変更されています（例: `verify_latest_track`）。briefing/spec が宣言する変更は3つの検証 route 追加であり、この未根拠の公開API変更は実装計画と baseline 契約を不整合にします。既存シグネチャを維持するか、変更を明示的に仕様化してください。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 383,
+              "category": "action incoherent with the declared change"
+            }
+          ],
+          "hash": "rvw1:sha256:2a5c554d73698bf851ae70b637ebeb8fa8f046e5a385a556b47bf6f52a6a5fa1",
+          "at": "2026-07-14T02:46:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c748f50658ae57e48a45c910c9c04389a0fcfcaa8f44300146ca0fe206c80bb",
+          "at": "2026-07-14T03:04:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c748f50658ae57e48a45c910c9c04389a0fcfcaa8f44300146ca0fe206c80bb",
+          "at": "2026-07-14T03:11:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:feef57ee6388b188f300b6b57c7c0a3ea763fad88196815e45971f7dd8c148bc",
+          "at": "2026-07-14T05:40:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::FsTemplateExportAdapter` の docs は、machine-home の構築時注入、ambient environment 非参照、未解決時の fail-closed という IN-06 / AC-13 の挙動契約を散文で再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、型の変更対象を示す短い名詞句と anchor cite のみにしてください。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 103,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:feef57ee6388b188f300b6b57c7c0a3ea763fad88196815e45971f7dd8c148bc",
+          "at": "2026-07-14T05:49:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TemplateExportPort::export` は filesystem I/O を行う同期ポートとして `is_async: false` ですが、entry docs は同期実行を選択した理由を説明していません。非同期化しない契約または単一プロセス同期実行の根拠を docs に明示してください。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
+              "line": 83,
+              "category": "sync/async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:bd538ae5ba1e2e341f919e5496a27cc9e278858267d87fb815a1255ddc5f59ee",
+          "at": "2026-07-14T06:05:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33a8e42bfef1ad0df70c9796f4cad35956c45c905a443b16ad9868281fffd3cf",
+          "at": "2026-07-14T06:21:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33a8e42bfef1ad0df70c9796f4cad35956c45c905a443b16ad9868281fffd3cf",
+          "at": "2026-07-14T06:29:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FsVerifyAdapter` の `docs` が AC-12 の fail-closed／環境変数非参照という挙動契約を再記述しています。`docs` は型の責務・操作と anchor のみに留めてください。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 152,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "`infrastructure::verify::machine_paths::verify` の `docs` が AC-12 の fail-closed／環境変数非参照という挙動契約を再記述しています。`docs` は型の責務・操作と anchor のみに留めてください。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
+              "line": 6,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:29cc1f4a79bcaf4cd6a867e072452c5bc16942d6908cdfabf7d18e441a7f02fd",
+          "at": "2026-07-14T09:58:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1524f64a55eb5945c39b4d2427b72c0a1744dd79c51e4ab6cdbecec7f4e8d0a",
+          "at": "2026-07-14T10:16:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1524f64a55eb5945c39b4d2427b72c0a1744dd79c51e4ab6cdbecec7f4e8d0a",
+          "at": "2026-07-14T10:27:26Z"
         }
       ]
     },
@@ -413,6 +924,106 @@
           "findings": [],
           "hash": "rvw1:sha256:eccb848cca718dd213ffe1e6d892cc9de82da64451ceedd022a27aca2a320888",
           "at": "2026-07-14T07:10:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ccff6f24dcd373994d0a880947598ba849ce74ca70205ddad9fc017b7f13e29",
+          "at": "2026-07-14T09:58:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ccff6f24dcd373994d0a880947598ba849ce74ca70205ddad9fc017b7f13e29",
+          "at": "2026-07-14T10:00:44Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D7 defers the exact detection pattern and implementation to implementation time. Terms such as “date-time-shaped ADR filename” and “track ID with a date suffix” do not define the accepted grammar, path boundaries, or placeholder/false-positive handling, so downstream spec and implementations can produce materially different gates. Define observable matching rules and required cases before implementation.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+              "line": 109,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
+          "at": "2026-07-13T23:40:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
+          "at": "2026-07-14T00:28:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
+          "at": "2026-07-14T00:29:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
+          "at": "2026-07-14T05:40:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
+          "at": "2026-07-14T05:41:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
+          "at": "2026-07-14T05:47:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a34fb21f352d8159c83a37052bc4c902fa11d2b8faa39a079783b52161d55b0",
+          "at": "2026-07-14T07:03:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a34fb21f352d8159c83a37052bc4c902fa11d2b8faa39a079783b52161d55b0",
+          "at": "2026-07-14T07:07:52Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f1c4233ce871f086440b983a735def7b900ca7778f62bb735048a3a4af7c4dc",
+          "at": "2026-07-14T03:59:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f1c4233ce871f086440b983a735def7b900ca7778f62bb735048a3a4af7c4dc",
+          "at": "2026-07-14T04:03:06Z"
         }
       ]
     },
@@ -537,483 +1148,93 @@
         }
       ]
     },
-    "domain": {
+    "spec": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4f1c4233ce871f086440b983a735def7b900ca7778f62bb735048a3a4af7c4dc",
-          "at": "2026-07-14T03:59:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4f1c4233ce871f086440b983a735def7b900ca7778f62bb735048a3a4af7c4dc",
-          "at": "2026-07-14T04:03:06Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D7 defers the exact detection pattern and implementation to implementation time. Terms such as “date-time-shaped ADR filename” and “track ID with a date suffix” do not define the accepted grammar, path boundaries, or placeholder/false-positive handling, so downstream spec and implementations can produce materially different gates. Define observable matching rules and required cases before implementation.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
-              "line": 109,
-              "category": "decision underspecified for downstream consumption"
-            }
-          ],
-          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
-          "at": "2026-07-13T23:40:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
-          "at": "2026-07-14T00:28:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
-          "at": "2026-07-14T00:29:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
-          "at": "2026-07-14T05:40:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
-          "at": "2026-07-14T05:41:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
-          "at": "2026-07-14T05:47:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a34fb21f352d8159c83a37052bc4c902fa11d2b8faa39a079783b52161d55b0",
-          "at": "2026-07-14T07:03:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a34fb21f352d8159c83a37052bc4c902fa11d2b8faa39a079783b52161d55b0",
-          "at": "2026-07-14T07:07:52Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "出力走査が symlink を拒否せず `std::fs::read` で追従します。既存の symlink guard と同様に明示的に検出して fail-closed にしてください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/template_export/mod.rs",
-              "line": 452,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "各ファイルを全量 `std::fs::read` しており、巨大な export 対象でメモリ枯渇し得ます。ストリーミング等の bounded read にしてください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/template_export/mod.rs",
-              "line": 452,
-              "category": "unbounded read"
-            },
-            {
-              "message": "home path の単純な substring 検索により、`/home/alice-old` のような別 path も `HOME=/home/alice` と誤判定します。path 境界を検証してください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/template_export/mod.rs",
-              "line": 453,
-              "category": "factual error"
-            }
-          ],
-          "hash": "rvw1:sha256:ea73fbe4225771349cfb60552098e2a1912bab6854a83d06ab9a0ad07bf0d894",
-          "at": "2026-07-14T04:09:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`.git` is only checked for existence; a symlink is accepted before `git ls-files`/`check-ignore` run. This can redirect Git classification to another repository and cause unclassified workspace files to be skipped. Reject symlinked `.git` entries while allowing normal worktree `.git` files.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/template_export/mod.rs",
-              "line": 377,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:edc1211eceae32f742e02337bfa7f7af67eca724289bfdbba463bd7d19498d00",
-          "at": "2026-07-14T04:20:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:49db318a2f55c3981734f9c2ee9f7b30c50ce3ae830d1b7ede3749927e380664",
-          "at": "2026-07-14T04:26:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7c3c9327b5e620f7c4104be559b5c007ef9d830429f6fb8066974f41a04f5a3a",
-          "at": "2026-07-14T05:40:51Z"
+          "hash": "rvw1:sha256:bdf57539cebb9aa527b4edbbd59ca6e55525e8b1cceb6b01d5dbb408420d451a",
+          "at": "2026-07-14T01:31:50Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`git_predicate` は終了コードしか必要ないのに `Command::output()` で stdout/stderr 全体をメモリへ読み込んでいます。特に `git ls-files --error-unmatch -- <directory>` は一致する全 tracked path を stdout に列挙するため、大規模な未分類 ancestor を検査すると入力規模に比例してメモリを消費し、export が OOM になり得ます。stdout を破棄して `status()` を使い、必要なら stderr も上限付きで取得してください。",
+              "message": "GO-03 and IN-03 require the entire manifest-derived shipment to be self-contained, and ADR D3 explicitly includes unresolvable decision/constraint symbols in the prohibited references. AC-05 covers only concrete paths, while AC-06 checks those symbols only in shipped conventions. Other shipped files (commands, harness documents, README/configuration, etc.) can therefore retain unresolvable symbols while every AC still passes, leaving GO-03 without complete acceptance coverage.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/template_export/mod.rs",
-              "line": 412,
-              "category": "unbounded I/O"
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json",
+              "line": 346,
+              "category": "missing AC coverage for a stated goal"
             }
           ],
-          "hash": "rvw1:sha256:7c3c9327b5e620f7c4104be559b5c007ef9d830429f6fb8066974f41a04f5a3a",
-          "at": "2026-07-14T05:52:27Z"
+          "hash": "rvw1:sha256:bdf57539cebb9aa527b4edbbd59ca6e55525e8b1cceb6b01d5dbb408420d451a",
+          "at": "2026-07-14T01:35:56Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The injected machine-home path is converted and scanned without fail-closed validation. `to_string_lossy()` silently changes non-UTF-8 Unix paths, and a trailing separator (for example `/home/alice/`) makes descendant paths such as `/home/alice/project` fail the following-boundary check. Both cases can let real machine paths pass the export scan. Normalize the path and use a lossless platform representation, or return a typed I/O error when it cannot be scanned safely.",
+              "message": "GO-04 の「archive 業務ロジックを CLI / workflow に集約する」部分を検証する acceptance criterion がありません。AC-07 は command 文書が workflow を参照し、手動手順を含まないことだけを要求し、AC-08 は directory 由来の状態・表示だけを扱っています。そのため workflow が CLI に委譲せず archive 操作を再実装していても全 AC を満たせてしまい、GO-04 / IN-04 / D4 の単一業務ロジック化を完了条件として証明できません。",
               "severity": "P1",
-              "file": "libs/infrastructure/src/template_export/mod.rs",
-              "line": 441,
-              "category": "non-fail-closed config"
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json",
+              "line": 356,
+              "category": "missing AC coverage for a stated goal"
             }
           ],
-          "hash": "rvw1:sha256:0b6c111c6b7a86320a9d79b9f23ea6cc5d6409c515c0d0799043769c7f5e6522",
-          "at": "2026-07-14T05:59:48Z"
+          "hash": "rvw1:sha256:04af3b8a3ddf343a2733bd41b2e211c7953d0c2eb28d216a3717287502aa16d1",
+          "at": "2026-07-14T01:39:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1b5f6af8d9d507a82af681e0714e2ef4116904f37dbac53bb336e276b1323680",
-          "at": "2026-07-14T06:07:43Z"
+          "hash": "rvw1:sha256:ce86068f4cfa6b84ec43032d723f08fd6337a2daa6c2e4d57de758594e6fcd5c",
+          "at": "2026-07-14T01:42:30Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b75ea5b9af3e22789b6ae1dc4b4456950ad8a7953541f520935b1693de4862fe",
-          "at": "2026-07-14T07:32:55Z"
+          "hash": "rvw1:sha256:1932c865c75a56a3902086addda07052d2d8717364d6c1470eb10aeca54f09ac",
+          "at": "2026-07-14T03:32:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b75ea5b9af3e22789b6ae1dc4b4456950ad8a7953541f520935b1693de4862fe",
-          "at": "2026-07-14T07:38:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "生の `Path::starts_with` で workspace 配下と判定しているため、`/workspace/../home/user` のような `..` を含む machine home path を誤って信頼し、走査をスキップします。正規化・検証をこの分岐前に行わないと、出力中の作業機パスが検出されず漏えいします。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/template_export/mod.rs",
-              "line": 214,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:6b0f8f32a54b261418f2016c9e3ef498d21aa5bc37c4455978b06e84b23198f8",
-          "at": "2026-07-14T07:57:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CoverageManifestV4` and its nested serde DTOs lack `#[serde(deny_unknown_fields)]`, so extra fields in a versioned coverage record are silently ignored instead of failing closed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/coverage.rs",
-              "line": 44,
-              "category": "serde codec break"
-            },
-            {
-              "message": "The schema check rejects only versions greater than 2; a well-formed `schema_version: 0` record is accepted and processed as current data. Unknown/unsupported versions must be rejected fail-closed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/store.rs",
-              "line": 73,
-              "category": "serde codec break"
-            }
-          ],
-          "hash": "rvw1:sha256:0921e1218eca1decf682ef403b9eedb32841867cbdc2dba2e139b60112cfb9e7",
-          "at": "2026-07-14T08:07:58Z"
+          "hash": "rvw1:sha256:1932c865c75a56a3902086addda07052d2d8717364d6c1470eb10aeca54f09ac",
+          "at": "2026-07-14T03:35:58Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:61c1a457039bef8a6428766b881d0e429dcd6559179104d8d5d4444255f1607c",
-          "at": "2026-07-14T08:16:16Z"
+          "hash": "rvw1:sha256:e47814e90adc16b99442ac597490a08157fbd11b9a7e7e1d1d47af717911e1bd",
+          "at": "2026-07-14T05:38:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:61c1a457039bef8a6428766b881d0e429dcd6559179104d8d5d4444255f1607c",
-          "at": "2026-07-14T08:21:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`serde_json::from_value(envelope)` deserializes `DryCheckJsonV1`/record DTOs that lack `deny_unknown_fields`, so schema 1/2 files containing forward-added fields are silently truncated. Add strict serde attributes to the versioned envelope, record, verdict, and nested DTOs.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/store.rs",
-              "line": 78,
-              "category": "serde codec break"
-            }
-          ],
-          "hash": "rvw1:sha256:0d53553f0965ce4dc366ca3bab0d5af900cf45cc1c8d8ac02d4cb6444b45aefd",
-          "at": "2026-07-14T08:51:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The chunk overlap drops the byte preceding a retained match. If a non-boundary character immediately precedes the machine-home path at a chunk boundary, the next scan sees the path at index 0 and `is_none_or` treats the missing predecessor as a boundary, falsely rejecting ordinary text. Preserve the preceding byte or boundary state and add a regression test.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/template_export/machine_path_scan.rs",
-              "line": 183,
-              "category": "machine-path scan correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4d9fa874db91da9ade6b14501ef526defbd194aaf7ae0d99675942fade52f55b",
-          "at": "2026-07-14T09:06:53Z"
+          "hash": "rvw1:sha256:e47814e90adc16b99442ac597490a08157fbd11b9a7e7e1d1d47af717911e1bd",
+          "at": "2026-07-14T05:46:59Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:54176492d3069e14dc210005a284ec29ee417a108e92794edb00ccdb50036b4d",
-          "at": "2026-07-14T09:15:11Z"
+          "hash": "rvw1:sha256:ae2f2cbdd01c84dc0563acad02771b755f68bfcf222c5714d8461fe61a95af83",
+          "at": "2026-07-14T07:03:22Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:54176492d3069e14dc210005a284ec29ee417a108e92794edb00ccdb50036b4d",
-          "at": "2026-07-14T09:21:13Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`VerifyArgs` は非公開の `project_root` フィールドを持つため `has_stripped_fields` は `true` であるべきですが、`false` になっており baseline shape と不一致です。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/cli-types.json",
-              "line": 38,
-              "category": "SoT integrity"
-            },
-            {
-              "message": "`VerifyPort` の `verify_sotp_version_tag` / `verify_machine_paths` / `verify_template_refs` は filesystem/network I/O を行うポートなのに `is_async: false` で、同期実行を選ぶ理由が docs にありません。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
-              "line": 108,
-              "category": "API shape"
-            },
-            {
-              "message": "`VerifyService` の読み取り専用メソッド群が `PathBuf` を値で受け取っています。実装は直ちに `&Path` としてポートへ渡しており、呼び出し側の所有権を奪う必要がありません。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
-              "line": 383,
-              "category": "API shape"
-            },
-            {
-              "message": "`infrastructure::verify::machine_paths::verify` の docs が AC-12 の「全 Git-tracked file を走査し、machine-specific absolute path を fail-closed で検出する」という契約を散文で再記述しています。docs は型の責務と `AC-12` の参照に留めるべきです。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
-              "line": 6,
-              "category": "SoT integrity"
-            },
-            {
-              "message": "`infrastructure::verify::sotp_version_tag::verify` の docs が AC-03 の remote 上の Git URL/tag 解決と fail-closed 判定を散文で再記述しています。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
-              "line": 26,
-              "category": "SoT integrity"
-            },
-            {
-              "message": "`infrastructure::verify::template_refs::verify` の docs が AC-15 の manifest-derived shipped-template 集合、具体 source-repository key 検査、fail-closed 動作を散文で再記述しています。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
-              "line": 46,
-              "category": "SoT integrity"
-            },
-            {
-              "message": "`TemplateExportPortError` の docs が AC-13/CN-03 の exported file における machine-specific absolute path 拒否契約を散文で再記述しています。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
-              "line": 737,
-              "category": "SoT integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:e0da5a8346576973c82ed478374490eab875a41450625493e77f3dcf2ee148ce",
-          "at": "2026-07-14T01:35:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`VerifyService` declares read-only operations such as `verify_latest_track` with owned `std::path::PathBuf` parameters, although the interactor immediately borrows them to call `VerifyPort`; this unnecessarily transfers ownership. Use borrowed `&Path` parameters consistently or document the ownership requirement.",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
-              "line": 383,
-              "category": "API shape"
-            }
-          ],
-          "hash": "rvw1:sha256:a5ff01486bffa0b8df52c214daf466d166f81cb4703c1b55c85f4c677e13a4b7",
-          "at": "2026-07-14T01:54:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cli_driver::VerifyInput::CatalogueSpecRefs.track_id` が `Option<domain::ids::TrackId>` を参照していますが、`domain::ids` は private module のため外部 crate から参照できず、契約実装がコンパイル不能です。同じ誤った FQN が `usecase::VerifyPort` と `VerifyService` にもあります（各 `verify_catalogue_spec_refs`）。cli_driver は `usecase` のみ依存し docs も re-export を示すため、cli_driver は `usecase::TrackId`、usecase は `domain::TrackId` にすべきです。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/cli_driver-types.json",
-              "line": 249,
-              "category": "broken_reference"
-            }
-          ],
-          "hash": "rvw1:sha256:d5c899dfef5e29031f367a9a2aa04e270867ce3e56358fa448f5b872ce5b1f53",
-          "at": "2026-07-14T02:13:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`VerifyService` の読み取り専用メソッド（`verify_latest_track`、`verify_retention_gate` など）が `std::path::PathBuf` を値で受け取っています。ポート側は `&Path` であり、所有権を奪う必要がないため、呼び出し側に不要な move を強制します。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
-              "line": 383,
-              "category": "ownership signature smell"
-            }
-          ],
-          "hash": "rvw1:sha256:26b4099c12cc0453b0638e58597e06e958be4ee97790da6878921cd1c33e93be",
-          "at": "2026-07-14T02:30:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`VerifyService` の既存メソッド群が baseline の `PathBuf` 引数から `&Path` に一括変更されています（例: `verify_latest_track`）。briefing/spec が宣言する変更は3つの検証 route 追加であり、この未根拠の公開API変更は実装計画と baseline 契約を不整合にします。既存シグネチャを維持するか、変更を明示的に仕様化してください。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
-              "line": 383,
-              "category": "action incoherent with the declared change"
-            }
-          ],
-          "hash": "rvw1:sha256:2a5c554d73698bf851ae70b637ebeb8fa8f046e5a385a556b47bf6f52a6a5fa1",
-          "at": "2026-07-14T02:46:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c748f50658ae57e48a45c910c9c04389a0fcfcaa8f44300146ca0fe206c80bb",
-          "at": "2026-07-14T03:04:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c748f50658ae57e48a45c910c9c04389a0fcfcaa8f44300146ca0fe206c80bb",
-          "at": "2026-07-14T03:11:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:feef57ee6388b188f300b6b57c7c0a3ea763fad88196815e45971f7dd8c148bc",
-          "at": "2026-07-14T05:40:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`infrastructure::FsTemplateExportAdapter` の docs は、machine-home の構築時注入、ambient environment 非参照、未解決時の fail-closed という IN-06 / AC-13 の挙動契約を散文で再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、型の変更対象を示す短い名詞句と anchor cite のみにしてください。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/infrastructure-types.json",
-              "line": 103,
-              "category": "upstream_restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:feef57ee6388b188f300b6b57c7c0a3ea763fad88196815e45971f7dd8c148bc",
-          "at": "2026-07-14T05:49:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TemplateExportPort::export` は filesystem I/O を行う同期ポートとして `is_async: false` ですが、entry docs は同期実行を選択した理由を説明していません。非同期化しない契約または単一プロセス同期実行の根拠を docs に明示してください。",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/usecase-types.json",
-              "line": 83,
-              "category": "sync/async color mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:bd538ae5ba1e2e341f919e5496a27cc9e278858267d87fb815a1255ddc5f59ee",
-          "at": "2026-07-14T06:05:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:33a8e42bfef1ad0df70c9796f4cad35956c45c905a443b16ad9868281fffd3cf",
-          "at": "2026-07-14T06:21:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:33a8e42bfef1ad0df70c9796f4cad35956c45c905a443b16ad9868281fffd3cf",
-          "at": "2026-07-14T06:29:41Z"
+          "hash": "rvw1:sha256:ae2f2cbdd01c84dc0563acad02771b755f68bfcf222c5714d8461fe61a95af83",
+          "at": "2026-07-14T07:07:37Z"
         }
       ]
     },
@@ -1047,24 +1268,6 @@
           "findings": [],
           "hash": "rvw1:sha256:a0a81d551e43fd127f167406475794daeaf27a75174392765ff6f66d917986be",
           "at": "2026-07-14T05:39:08Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71431006623b6e258c538d01ec76a96fb1030c2fe07c9156f2f20b9b35b58933",
-          "at": "2026-07-14T05:38:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71431006623b6e258c538d01ec76a96fb1030c2fe07c9156f2f20b9b35b58933",
-          "at": "2026-07-14T05:48:07Z"
         }
       ]
     }
