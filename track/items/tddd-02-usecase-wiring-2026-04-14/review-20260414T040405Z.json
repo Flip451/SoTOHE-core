@@ -580,7 +580,7 @@
             {
               "message": "The ADR states that `knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md` is already accepted, but that referenced ADR still has `Proposed` as its status. This is a status drift between the parent ADR and the child ADR it points to.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
+              "file": "knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md",
               "line": 7,
               "category": "status drift"
             }
@@ -609,14 +609,14 @@
             {
               "message": "`verification.md` is self-contradictory: the Scope Verified checklist still leaves T012 and T013 unchecked, but the Result section says all 14 tasks are done, and the T013 summary uses the truncated status string `Accepted (Phase 1 complete)` instead of the final two-track status recorded in metadata.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
               "line": 21,
               "category": "consistency"
             },
             {
               "message": "The T010 manual success criterion expects `skipped=0`, but the recorded successful output in the Result section is `skipped=29`; the verification step and its own evidence do not match.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
+              "file": "track/items/tddd-02-usecase-wiring-2026-04-14/verification.md",
               "line": 56,
               "category": "consistency"
             }
@@ -767,7 +767,7 @@
             {
               "message": "Step 2 still hardcodes the serde/persistence rule as `domain: typestate, infra: serde enum DTO conversion`. That is leftover Phase 1 domain/infra language in a multilayer design command, and it leaves the new non-domain layers without matching guidance.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "file": ".claude/commands/track/design.md",
               "line": 92,
               "category": "design"
             }

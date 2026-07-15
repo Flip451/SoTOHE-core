@@ -786,7 +786,7 @@
             {
               "message": "The new `TreeEntryKind::Submodule` rejection path in `fetch_blob_safe` is not covered by any fixture test. Because this is a security-sensitive fail-closed branch, a regression in 160000 handling could ship without detection. Please add an integration test that commits a submodule and asserts `fetch_blob_safe` returns `BlobResult::CommandFailed` for it.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/show.rs",
+              "file": "libs/infrastructure/src/git_cli/show.rs",
               "line": 185,
               "category": "test coverage"
             }

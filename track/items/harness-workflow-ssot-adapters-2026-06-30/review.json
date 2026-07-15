@@ -170,16 +170,16 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md:13-16` still describes this wrapper as a Claude subagent with `model: opus`, but the routing source of truth in `/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/config/agent-profiles.json:51-54` sends `review-fix-lead` to `provider: codex` / `model: gpt-5.5`. That leaves the wrapper inconsistent with the active dispatch contract and can misroute anyone following it.",
+              "message": "`.claude/agents/review-fix-lead.md:13-16` still describes this wrapper as a Claude subagent with `model: opus`, but the routing source of truth in `.harness/config/agent-profiles.json:51-54` sends `review-fix-lead` to `provider: codex` / `model: gpt-5.5`. That leaves the wrapper inconsistent with the active dispatch contract and can misroute anyone following it.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/review-fix-lead.md",
+              "file": ".claude/agents/review-fix-lead.md",
               "line": 15,
               "category": "capability routing mismatch"
             },
             {
-              "message": "`/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/dry-fix-lead.md:13-16` has the same mismatch: it still claims the capability runs as a Claude subagent with `model: opus`, while `/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/config/agent-profiles.json:62-64` routes `dry-fix-lead` to `provider: codex` / `model: gpt-5.5`. The thin wrapper no longer matches the routing contract it is supposed to reflect.",
+              "message": "`.claude/agents/dry-fix-lead.md:13-16` has the same mismatch: it still claims the capability runs as a Claude subagent with `model: opus`, while `.harness/config/agent-profiles.json:62-64` routes `dry-fix-lead` to `provider: codex` / `model: gpt-5.5`. The thin wrapper no longer matches the routing contract it is supposed to reflect.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/dry-fix-lead.md",
+              "file": ".claude/agents/dry-fix-lead.md",
               "line": 15,
               "category": "capability routing mismatch"
             }
@@ -192,9 +192,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "[`track-init` skill](/home/flip451/individual/t-rust/templates/SoTOHE-core/.agents/skills/track-init/SKILL.md#L23) tells Codex to use `cargo make track-commit-message` during Phase 0, but the matching `/track:init` adapter is wired around `cargo make track-branch-create`, `bin/sotp track views sync`, and `cargo make verify-track-metadata`. That leaves the init skill pointing at a commit-stage wrapper that does not belong to the init flow, so the adapter and command surface diverge.",
+              "message": "[`track-init` skill](.agents/skills/track-init/SKILL.md#L23) tells Codex to use `cargo make track-commit-message` during Phase 0, but the matching `/track:init` adapter is wired around `cargo make track-branch-create`, `bin/sotp track views sync`, and `cargo make verify-track-metadata`. That leaves the init skill pointing at a commit-stage wrapper that does not belong to the init flow, so the adapter and command surface diverge.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.agents/skills/track-init/SKILL.md",
+              "file": ".agents/skills/track-init/SKILL.md",
               "line": 23,
               "category": "command wiring breakage"
             }
@@ -209,21 +209,21 @@
             {
               "message": "This says `implementer` is wired through a provider-specific Codex agent definition, but the current harness routes `implementer` to `claude` in `.harness/config/agent-profiles.json`, and `.claude/agents/README.md` documents it as main-session/ad-hoc delegation. The adapter is therefore pointing implementer consumers at the wrong provider path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.agents/skills/track-implement/SKILL.md",
+              "file": ".agents/skills/track-implement/SKILL.md",
               "line": 28,
               "category": "convention contradiction"
             },
             {
               "message": "This says `implementer` is wired through a provider-specific Codex agent definition, but the current harness routes `implementer` to `claude` in `.harness/config/agent-profiles.json`, and `.claude/agents/README.md` documents it as main-session/ad-hoc delegation. The adapter is therefore pointing implementer consumers at the wrong provider path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.agents/skills/track-full-cycle/SKILL.md",
+              "file": ".agents/skills/track-full-cycle/SKILL.md",
               "line": 27,
               "category": "convention contradiction"
             },
             {
               "message": "This pins implementation verification to `cargo make ci-rust`, but `.harness/workflows/track/implement.md` Step 4 requires `cargo make ci`-equivalent validation before completion. As written, the skill can report completion after only the Rust subset and miss non-Rust gates.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.agents/skills/track-implement/SKILL.md",
+              "file": ".agents/skills/track-implement/SKILL.md",
               "line": 31,
               "category": "command wiring breakage"
             }
@@ -281,7 +281,7 @@
             {
               "message": "Step 3.1 now says the lifecycle tail commit should stage review-operational artifacts produced by the tail review refresh (for example `review.json` and `<layer>-type-signals.json`), but Step 5 still aborts whenever `git status --short` contains anything outside `impl-plan.json` and `plan.md`. After a successful refresh, the workflow can legitimately have those extra files present and will then fail its own completion check.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/workflows/track/full-cycle.md",
+              "file": ".harness/workflows/track/full-cycle.md",
               "line": 181,
               "category": "command wiring breakage"
             }

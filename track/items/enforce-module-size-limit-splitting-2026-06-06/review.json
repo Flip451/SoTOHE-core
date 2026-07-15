@@ -237,14 +237,14 @@
             {
               "message": "The `#[cfg(test)]` state machine double-counts any line that follows the attribute unless it is a recognized `mod` declaration: `count += 1` runs inside the `saw_cfg_test` branch and then again unconditionally at the end of the loop. That inflates counts for real files that use top-level `#[cfg(test)]` helper items (for example, this repo has `#[cfg(test)] fn` shims in `apps/cli/src/commands/review/codex_local.rs`), so the verifier can emit false max-line errors.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
               "line": 104,
               "category": "correctness"
             },
             {
               "message": "The test-module exclusion only recognizes `mod ` and `pub mod ` immediately after `#[cfg(test)]`. Standard rustfmt-normalized forms already present in this repo, such as `#[cfg(test)] pub(crate) mod test_support {}` and `#[cfg(test)] #[path = \"...\"] mod tests;`, fall through to the counting path and are treated as production code. That means test-only modules can still push a file over `max_lines`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
               "line": 106,
               "category": "correctness"
             }
@@ -333,7 +333,7 @@
             {
               "message": "The cfg(test) exclusion is line-range based, so it drops the entire closing-brace line as soon as a test module is matched. Any production item written on the same physical line as that brace will also be excluded from the count, which undercounts the file and creates a bypass for `max_lines` enforcement.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
               "line": 95,
               "category": "correctness"
             }
@@ -346,9 +346,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1 correctness: [`libs/infrastructure/src/verify/module_size.rs`](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs#L121) only strips inline `#[cfg(test)] mod { ... }` blocks. File-backed test modules declared as `#[cfg(test)] mod tests;` - including the common `#[path = \"..._tests.rs\"] mod tests;` pattern used elsewhere in this repo - still fall through and are counted as production lines, so files that use that pattern can still trip `max_lines` even though the test code is supposed to be exempt.",
+              "message": "P1 correctness: [`libs/infrastructure/src/verify/module_size.rs`](libs/infrastructure/src/verify/module_size.rs#L121) only strips inline `#[cfg(test)] mod { ... }` blocks. File-backed test modules declared as `#[cfg(test)] mod tests;` - including the common `#[path = \"..._tests.rs\"] mod tests;` pattern used elsewhere in this repo - still fall through and are counted as production lines, so files that use that pattern can still trip `max_lines` even though the test code is supposed to be exempt.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
               "line": 121,
               "category": "correctness"
             }
@@ -363,7 +363,7 @@
             {
               "message": "`tests.rs` is excluded here, but the brief only asked for `_tests.rs` files and `tests/` directories. That extra basename exemption lets a large production module named `tests.rs` bypass the size gate entirely.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
               "line": 222,
               "category": "correctness"
             }
@@ -378,7 +378,7 @@
             {
               "message": "The new file filter still counts plain `tests.rs` modules, because it only skips files ending in `_tests.rs` and directories named `tests/`. This repo has large `#[cfg(test)]`-only modules such as `libs/domain/src/review_v2/tests.rs` and `libs/usecase/src/review_v2/tests.rs`, so the verifier will now emit false size findings on test-only code. Please skip `tests.rs` as well, or otherwise detect file-backed `#[cfg(test)]` modules.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
               "line": 231,
               "category": "correctness"
             }
@@ -408,7 +408,7 @@
             {
               "message": "`#[cfg(test)] mod foo;` is returned early here without subtracting the declaration line from the count. Files that use a file-backed test module still keep that `mod ...;` line in the production tally, so an otherwise test-only tail can still push a file over `max_lines` and trigger a false violation.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/module_size.rs",
+              "file": "libs/infrastructure/src/verify/module_size.rs",
               "line": 147,
               "category": "correctness"
             }
@@ -568,7 +568,7 @@
             {
               "message": "`format_type` now delegates to `format_short_type_with_policy`, but that helper does not preserve `Type::FunctionPointer`, `Type::Pat`, or `Type::QualifiedPath`. Those variants now fall through to `_`, so schema export will start emitting lossy TypeRef strings for function-pointer fields and associated-type projections instead of the previous representation.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export/format_helpers.rs",
+              "file": "libs/infrastructure/src/schema_export/format_helpers.rs",
               "line": 71,
               "category": "correctness"
             }

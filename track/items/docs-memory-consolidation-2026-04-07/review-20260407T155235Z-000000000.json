@@ -241,14 +241,14 @@
             {
               "message": "The TermBench section states ForgeCode is '#1 at 81.8%,' but the public Terminal-Bench 2.0 leaderboard currently shows Forge Code/Gemini 3.1 Pro at 78.4% in rank 1 and Claude Code/Opus 4.6 at 58.0% in rank 33. If this is a model-specific filtered result, it needs to say so explicitly; otherwise the rank/score are wrong.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
               "line": 444,
               "category": "factual_accuracy"
             },
             {
               "message": "The final verdict says ForgeCode has 'No subscription plan support,' but the cost section immediately above lists Free/Pro/Max subscription tiers and pricing. This contradiction makes the cost-based recommendation unreliable.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
+              "file": "knowledge/research/2026-04-07-2244-forgecode-comparison-mcp-integration.md",
               "line": 517,
               "category": "consistency"
             }

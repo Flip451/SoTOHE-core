@@ -73,7 +73,7 @@
             {
               "message": "This new mismatch test does not actually prove the no-write contract. It only asserts that `create_user`/`delete_user` are absent, so a failing path that rewrites some other part of `domain-types.json` would still pass. Snapshot the catalogue before the failing call and compare after, as you do in the tombstone test.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/tests/cli_catalog.rs",
+              "file": "apps/cli/tests/cli_catalog.rs",
               "line": 399,
               "category": "test coverage"
             }
@@ -148,21 +148,21 @@
             {
               "message": "Joining raw `track_id` here lets `../` or absolute inputs escape `items_dir`, and every verb reuses this helper before any root check. That creates a workspace traversal boundary break; validate `track_id` as a `TrackId` and verify the resolved directory stays under the trusted root.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/fs_access.rs",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/fs_access.rs",
               "line": 40,
               "category": "trusted-root violation"
             },
             {
               "message": "Catalogue I/O follows whatever path this helper returns with `read_to_string`/`write`, but it never rejects symlinked leaves or ancestors. A symlinked `*-types.json` can redirect reads and writes outside the workspace; reject symlinks at the boundary like the other infra loaders do.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/fs_access.rs",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/fs_access.rs",
               "line": 81,
               "category": "symlink not rejected at boundary"
             },
             {
               "message": "`unwrap_or_default()` masks all `load_spec_anchors` failures, not just a missing Phase-0 spec. A malformed or unreadable `spec.json` is treated as an empty anchor set, so `check` can proceed instead of failing closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/verb_check.rs",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/verb_check.rs",
               "line": 39,
               "category": "non-fail-closed config"
             }
@@ -177,14 +177,14 @@
             {
               "message": "The add/import/cite path reads catalogue files as raw `serde_json::Value` and rewrites them without any `schema_version` probe. That means a v4 or future catalogue is silently mutated instead of being rejected fail-closed, which is the same versioning footgun the strict DTO codecs are meant to prevent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/fs_access.rs",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/fs_access.rs",
               "line": 115,
               "category": "serde codec break"
             },
             {
               "message": "`check_layer` validates schema only after the `$todo` scan. If a catalogue is on an unsupported schema version but still contains holes, the function returns the hole verdict and never reaches `try_complete`, so the version error is not fail-closed. Commit-mode checks can therefore downgrade a schema break to an interim warning.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/verb_check.rs",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/verb_check.rs",
               "line": 77,
               "category": "serde codec break"
             }
@@ -413,7 +413,7 @@
             {
               "message": "`CatalogueToExtendedCratePort::encode()` no longer preserves delete actions: this implementation only walks `doc.types()`, `doc.traits()`, `doc.functions()`, and never consumes `doc.deletions()`. As a result, `action: delete` tombstones decoded by `CatalogueDocumentCodec` are silently dropped when building `ExtendedCrate`, so downstream phase-1/phase-2 signal evaluation cannot see delete-declared items at all.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/encoder.rs",
               "line": 200,
               "category": "port impl missing a domain trait method"
             }
@@ -591,14 +591,14 @@
             {
               "message": "`parse_trait_impl` now accepts any non-empty `TypeRef`, but the codec still requires `trait_ref` to be a path (`validate_trait_ref_is_path` in both decode and encode). `catalog add` can now persist rows like `?Sized` or `'a` that the existing codec will reject on the next round-trip.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/fragment.rs",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/fragment.rs",
               "line": 224,
               "category": "codec break"
             },
             {
               "message": "`split_top_level` drops empty fragments, so malformed inherent-impl generic/where lists are silently truncated instead of failing closed. For example, `T: Clone +` becomes `T: Clone`, which loses user input before `build_inherent_impls` serializes the DTO.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalog_gen/fragment.rs",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/fragment.rs",
               "line": 343,
               "category": "silent truncation"
             }
@@ -759,7 +759,7 @@
             {
               "message": "`CatalogService::init` / `CatalogPort::init` reuse the full `CatalogError`, but the `init` verb can only plausibly emit file-creation and I/O failures. Callers still have to handle dead branches such as `DuplicateEntry`, `AnchorNotFound`, `InvalidRole`, `ParseFragment`, `SchemaInvalid`, and `DraftIncomplete`, and the method docs do not narrow that subset or justify the broad enum.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
               "line": 280,
               "category": "per-method error imprecision"
             }
@@ -866,14 +866,14 @@
             {
               "message": "`ImplInfo.docs` restates the F2 rationale (`target_module_path` disambiguation) instead of keeping the catalogue text contract-only. Per policy, anchor this entry to AC-04/IN-08 without reproducing upstream reasoning.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
               "line": 214,
               "category": "upstream restatement"
             },
             {
               "message": "`FunctionInfo.docs` restates the cross-entry derive rationale (“Family-cohesion PartialEq/Eq derives added alongside ImplInfo”) instead of just describing the type contract. Keep the field anchor-only and move the rationale out of the catalogue.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
               "line": 230,
               "category": "upstream restatement"
             }
@@ -930,7 +930,7 @@
             {
               "message": "The `docs` fields for both `CatalogueDocument` and `DeletionRecord` restate the track’s behavior contract in prose instead of just anchoring to upstream spec/ADR refs. Examples: `CatalogueDocument` says the track \"adds a `deletions` collection\" and explains the role choice; `DeletionRecord` explains the tombstone semantics and variant mapping. Per the review policy, this belongs in `spec_refs[]`, not in `docs`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
               "line": 262,
               "category": "upstream restatement"
             }
@@ -945,7 +945,7 @@
             {
               "message": "`CatalogueDocument::validate_filename` is typed as `Result<(), CatalogueDocumentError>`, but the method can structurally only return `CrateNameMismatch`; the shared enum also contains `DuplicateTypeName`, `DuplicateTraitName`, `DuplicateFunctionPath`, and `InvalidIdentifier`, which this API cannot produce. The entry docs do not justify the broader error surface or narrow it to the producible subset.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
               "line": 1327,
               "category": "per-method error imprecision"
             }
@@ -989,7 +989,7 @@
             {
               "message": "P1 `domain-types.json:316` adds an upstream restatement in `StructShapeKind.docs`: it narrates the behavior contract in prose (`unit / tuple / plain`, pre-filter capture, stripped-field flag) even though the entry already has `spec_refs` to `AC-04` and `IN-08`. Per the scope policy, this field should not duplicate the spec text.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
               "line": 316,
               "category": "upstream restatement"
             }
@@ -1055,7 +1055,7 @@
             {
               "message": "The new `StructShapeKind` entry restates its enum-evolution contract in `docs` prose (`\"Exhaustive public enum\"`) instead of only anchoring that intent to upstream spec refs. This matches the review policy's \"upstream restatement\" case.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
               "line": 322,
               "category": "upstream restatement"
             }
@@ -1098,14 +1098,14 @@
             {
               "message": "P1 upstream restatement: `cli::CatalogAddArgs`, `cli::CatalogImportArgs`, and `cli::CatalogCiteArgs` now describe the new validation rules in prose inside `docs` instead of keeping those entries to surface-identification plus anchor cites. Per the no-upstream-restatement convention, that behavior text should be removed or moved upstream.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
               "line": 100,
               "category": "upstream restatement"
             },
             {
               "message": "P1 upstream restatement: `usecase::CatalogAddCommand`, `usecase::CatalogImportCommand`, and `usecase::CatalogCiteCommand` also paraphrase the new fail-closed rules in `docs` instead of just naming the surface and citing the relevant anchors. That repeats upstream contract text in a downstream catalogue entry, which the scope policy forbids.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
               "line": 53,
               "category": "upstream restatement"
             }
@@ -1148,35 +1148,35 @@
             {
               "message": "`CatalogAddArgs` now explains the add/import/cite contract in prose instead of just pointing at the spec anchors. The added text restates the field decomposition, validation, and tombstone/anchor rules from IN-03/IN-04/IN-05/IN-09/AC-03/AC-04/AC-06/AC-07, which is exactly the upstream-restatement pattern the type-catalogue review policy forbids.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
               "line": 103,
               "category": "upstream restatement"
             },
             {
               "message": "`CatalogAddInput` repeats the same add-shape contract in prose, and the adjacent `CatalogImportInput` / `CatalogCiteInput` docs do the same for delete-anchor and tombstone handling. These entries should reference the anchors, not reproduce the behavior contract in the catalogue text.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/cli_driver-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli_driver-types.json",
               "line": 103,
               "category": "upstream restatement"
             },
             {
               "message": "`CatalogAddCommand` restates the IN-03/IN-08/IN-09/AC-03/AC-07 contract in prose, instead of keeping the catalogue text as an anchor-only pointer. The same issue also appears in the import/cite command docs in this file.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/usecase-types.json",
               "line": 56,
               "category": "upstream restatement"
             },
             {
               "message": "`FsCatalogAdapter`'s docs spell out the generator's decomposition/validation steps and row-appending behavior in prose. That duplicates the spec/ADR contract inside the type catalogue instead of citing the upstream anchors only.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/infrastructure-types.json",
               "line": 15,
               "category": "upstream restatement"
             },
             {
               "message": "`DeletionRecord`'s docs restate the tombstone semantics in prose, even though the entry already carries the grounding fields needed to stand on its own. This should stay as an anchor-backed catalogue entry, not a paraphrase of the IN-04/GO-03/AC-04 contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/domain-types.json",
               "line": 394,
               "category": "upstream restatement"
             }
@@ -1191,14 +1191,14 @@
             {
               "message": "`CliCommand`'s docs add implementation rationale about unboxed clap payloads and the local clippy allow. That is upstream restatement / implementation detail rather than a short anchor-backed surface description, so it violates the no-upstream-restatement convention.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
               "line": 244,
               "category": "upstream restatement"
             },
             {
               "message": "`cli::commands::catalog::execute_add`'s docs restate the add-shape forwarding contract in prose. Keep this entry to the surface description plus anchors; move the behavior text upstream.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/cli-types.json",
               "line": 308,
               "category": "upstream restatement"
             }
@@ -1377,14 +1377,14 @@
             {
               "message": "GO-01 through GO-04 in `spec.json` have no corresponding entries in `task-coverage.json`; that file only maps `in_scope`/`out_of_scope`/`constraints`/`acceptance_criteria`, so the four goals are completely uncovered.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/task-coverage.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/task-coverage.json",
               "line": 3,
               "category": "task-coverage gap"
             },
             {
               "message": "T005 says `CatalogDraftError::Codec` is `Codec { message: String }`, but the contract in `infrastructure-types.json` defines `Codec { source: CatalogueDocumentCodecError }` and a `From<CatalogueDocumentCodecError>` conversion. Implementing the plan as written would produce the wrong error shape.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/plan.md",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/plan.md",
               "line": 41,
               "category": "task description non-executable"
             }
@@ -1399,7 +1399,7 @@
             {
               "message": "The Summary block at lines 6-12 is upstream-rationale prose (for example, \"type-designer inputs intent and fills `$todo` holes\") instead of the allowed target + operation + anchor-only form.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/plan.md",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/plan.md",
               "line": 6,
               "category": "upstream restatement"
             }
@@ -1414,49 +1414,49 @@
             {
               "message": "`T001`'s contract attributes `CatalogEntryName`, but the task text never claims to add or modify that entry. This overstates the task's catalogue-entry scope.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/task-contract.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/task-contract.json",
               "line": 5,
               "category": "task-contract attribution mismatch"
             },
             {
               "message": "`T002` explains why the commit must be atomic and why the lint shape matters. That's upstream rationale/behavior prose, not just target + operation + anchor cite, so it violates `knowledge/conventions/no-upstream-restatement.md`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
               "line": 11,
               "category": "upstream restatement"
             },
             {
               "message": "`T003` and `T004` provide only prose summaries of the usecase layer and do not cite any `AC-NN`/`IN-NN`/`CN-NN`/spec anchor. Under the scope policy that makes them non-executable.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
               "line": 17,
               "category": "task description non-executable"
             },
             {
               "message": "`T005`/`T006`/`T007` mix the implementation target with upstream behavior and rationale prose (`single place a draft crosses`, `schema authority`, `strict block`). That is the kind of restatement `knowledge/conventions/no-upstream-restatement.md` forbids.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
               "line": 29,
               "category": "upstream restatement"
             },
             {
               "message": "`T008` and `T009` omit an anchor cite, so the executable boundary is left implicit and the implementer has to infer the split from prose. That is non-executable under the scope policy.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
               "line": 47,
               "category": "task description non-executable"
             },
             {
               "message": "`T010` restates the upstream CLI semantics (`fail-closed`, strict exit behavior) instead of only pointing to the anchors. That is an upstream restatement.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
               "line": 59,
               "category": "upstream restatement"
             },
             {
               "message": "`T011` restates the gate semantics (`interim/skip/block`, strict phase2/merge behavior) instead of only citing the anchors. That is an upstream restatement.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
               "line": 65,
               "category": "upstream restatement"
             }
@@ -1668,7 +1668,7 @@
             {
               "message": "`plan.md` line 11 restates the upstream catalog-check behavior contract (`enforce ... completion semantics`) instead of staying in target + operation + anchor form. The same restatement also shows up again in S5/T011, so both should be trimmed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/plan.md",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/plan.md",
               "line": 11,
               "category": "upstream restatement"
             }
@@ -1697,21 +1697,21 @@
             {
               "message": "T006 restates upstream behavior in prose (`Reject function-entry method signatures whose parsed fn name differs from the entry name tail.`) instead of keeping the task text to target + operation + anchor cite only; see `knowledge/conventions/no-upstream-restatement.md`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
               "line": 36,
               "category": "upstream restatement"
             },
             {
               "message": "T007 restates upstream behavior in prose (`Reject anchors on delete imports and reject cite attempts against delete tombstones.`) instead of keeping the task text to target + operation + anchor cite only; see `knowledge/conventions/no-upstream-restatement.md`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
               "line": 42,
               "category": "upstream restatement"
             },
             {
               "message": "T010 restates upstream behavior in prose (`function signature/name mismatches, delete tombstone anchor rejection`) inside the test list instead of keeping the task text to target + operation + anchor cite only; see `knowledge/conventions/no-upstream-restatement.md`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
               "line": 60,
               "category": "upstream restatement"
             }
@@ -1769,35 +1769,35 @@
             {
               "message": "Task T006 restates the validation contract instead of just naming the work: `Shape slots must validate through the destination catalogue schema constructors/parsers such as TypeRef::new, FieldName::new, MethodName::new, ParamName::new, VariantName::new, and SelfReceiver::from_str rather than syn/Rust syntax validation` and `rejection of impl-level flags without matching trait-impl or inherent-method rows`. Per `knowledge/conventions/no-upstream-restatement.md`, that behavior prose belongs upstream, not in the impl-plan.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
               "line": 36,
               "category": "upstream restatement"
             },
             {
               "message": "Task T007 restates the delete-grounding contract in prose: `Delete imports must require at least one validated anchor, persist those anchors in the tombstone's spec_refs slot, and catalog cite must be able to add anchors to delete tombstones just like other entries`. That is upstream behavior text, not a task instruction.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
               "line": 42,
               "category": "upstream restatement"
             },
             {
               "message": "Task T010 restates the TypeRef acceptance rule as behavior prose: `CLI tests must show TypeRef-bearing add inputs are not rejected merely because a Rust syntax parser would reject them`. Per `knowledge/conventions/no-upstream-restatement.md`, this should be an anchor-cited task statement, not a prose contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
               "line": 60,
               "category": "upstream restatement"
             },
             {
               "message": "Task T011 restates the catalog-check failure matrix in prose: `add AC-11 check-outcome integration tests for missing files, $todo, schema errors, dangling anchors, and grounding absence / catalogue-spec signal Red for every action including Reference`. That is behavior-contract text, not a compact task instruction.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
               "line": 66,
               "category": "upstream restatement"
             },
             {
               "message": "Task T013 restates the delete-tombstone grounding behavior in prose: `Include DeletionRecord tombstones in catalogue traversal, spec-ref integrity, catalogue-spec signal evaluation, and per-entry hash lookup so delete entries cannot lose grounding`. Per the no-upstream-restatement convention, this belongs in upstream spec text, not the impl-plan.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/impl-plan.json",
               "line": 78,
               "category": "upstream restatement"
             }
@@ -1915,7 +1915,7 @@
             {
               "message": "`cargo make track-merge` is added as the new fail-closed merge path here, but the live `/track:merge` adapter still delegates straight to `bin/sotp pr wait-and-merge` (`.claude/commands/track/merge.md`), so the strict `catalog-check-merge` dependency never runs on the actual user-facing merge command. That leaves the gate bypass intact despite the new wrapper. Route the adapter through `cargo make track-merge` (or update the adapter to match the wrapper) so the branch is coherent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/workflows/track/merge.md",
+              "file": ".harness/workflows/track/merge.md",
               "line": 33,
               "category": "adapter-SSoT sync"
             }
@@ -2033,42 +2033,42 @@
             {
               "message": "`switch_base_error_to_outcome` formats the legacy checkout stdout/warning text in `cli_composition`. That presentation string belongs in `cli_driver`, so this is a render leak in the composition root.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/branch_strategy.rs",
+              "file": "apps/cli-composition/src/track/branch_strategy.rs",
               "line": 63,
               "category": "render leak"
             },
             {
               "message": "`track_branch_create` and `track_switch_base` now instantiate `TrackGitInteractor` and call its methods directly. The composition root should only wire the interactor into a driver, not execute git workflow itself.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/branch_strategy.rs",
+              "file": "apps/cli-composition/src/track/branch_strategy.rs",
               "line": 83,
               "category": "invoke leak"
             },
             {
               "message": "The new `track_branch_switch` and `track_archive` methods call `TrackGitInteractor` directly. That keeps command orchestration in `cli_composition` instead of limiting this layer to wiring.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/mod.rs",
+              "file": "apps/cli-composition/src/track/mod.rs",
               "line": 223,
               "category": "invoke leak"
             },
             {
               "message": "`pr_wait_and_merge` and `pr_poll_review` instantiate `PrGitInteractor` and invoke `fetch_and_read_metadata_at_ref` / `resolve_head` inline. This is the invoke leak the composition-layer policy forbids.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/pr.rs",
+              "file": "apps/cli-composition/src/pr.rs",
               "line": 272,
               "category": "invoke leak"
             },
             {
               "message": "`persist_commit_hash_for_track` now constructs `ReviewGitInteractor` and calls `resolve_head_for_track_branch` itself. That keeps git workflow execution in `cli_composition` instead of only wiring ports.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/commit_hash.rs",
+              "file": "apps/cli-composition/src/review_v2/commit_hash.rs",
               "line": 55,
               "category": "invoke leak"
             },
             {
               "message": "`resolve_diff_base` constructs `ReviewGitInteractor` and calls `resolve_diff_base` directly. The composition helper should only adapt ports; the git read belongs in the usecase layer.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/shared.rs",
+              "file": "apps/cli-composition/src/review_v2/shared.rs",
               "line": 334,
               "category": "invoke leak"
             }
@@ -2175,7 +2175,7 @@
             {
               "message": "`ForbidPrimitiveInTypes` still only scans a `TypeEntry`'s shape, methods, and inherent impls. The new `TypeEntry.generics` and `TypeEntry.where_predicates` fields are never collected here, so forbidden primitives can be hidden in type-declaration bounds and the domain linter will miss them.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_linter_eval_primitives.rs",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_primitives.rs",
               "line": 230,
               "category": "typestate / parse-don't-validate gap"
             }
@@ -2335,7 +2335,7 @@
             {
               "message": "AC-04 mixes an observable import behavior with the process claim `手動転記なし`; that part is not deterministically checkable from the branch state or CI output, so the acceptance criterion is not fully observable.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalog-generation-annotation-2026-07-04/spec.json",
+              "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json",
               "line": 476,
               "category": "acceptance criterion non-observable"
             }
@@ -2510,16 +2510,16 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md` lets `sotp catalog` auto-resolve the current track *and* accept `--track-id` as an override for `add/import/cite`. Those commands write under `track/items/<id>/`, so that wording conflicts with the established write-safety rule in [track-id default ADR](/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#L149-L157), which requires write operations to fail closed on a branch/id mismatch rather than allow cross-track overrides.",
+              "message": "`knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md` lets `sotp catalog` auto-resolve the current track *and* accept `--track-id` as an override for `add/import/cite`. Those commands write under `track/items/<id>/`, so that wording conflicts with the established write-safety rule in [track-id default ADR](knowledge/adr/2026-05-26-1813-track-id-default-active-track.md#L149-L157), which requires write operations to fail closed on a branch/id mismatch rather than allow cross-track overrides.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+              "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
               "line": 125,
               "category": "inconsistent decision"
             },
             {
               "message": "The phase-2 command surface is still missing an explicit way to supply a new type's own `generics` / `where` bounds. D1 says the catalog must preserve that information, but D6/D8 only expose member-level Rust signatures plus rustdoc import. As written, downstream tooling cannot unambiguously author or validate generic-bearing structs, traits, or impl blocks unless that encoding is stated somewhere explicit.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+              "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
               "line": 102,
               "category": "decision underspecified for downstream consumption"
             }
@@ -2534,7 +2534,7 @@
             {
               "message": "`D7` wires `sotp catalog check` into both the Phase 2 gate and the commit gate, but it never says whether that check is skipped or downgraded when a catalog file is still absent or only partially filled. As written, that reintroduces the Phase 0/1 commit-blocking behavior that `knowledge/adr/2026-06-01-0406-review-gate-tolerate-missing-catalogue.md` explicitly removed, and it also conflicts with `knowledge/adr/2026-06-16-1030-signal-gate-strictness-config.md`, which keeps TDDD catalogue-impl checks `interim` at commit time. The commit-gate semantics here are therefore inconsistent and underspecified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+              "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
               "line": 110,
               "category": "consistency"
             }
@@ -2549,7 +2549,7 @@
             {
               "message": "`catalog check` is coupled to a mandatory `.harness/config/signal-gates.json` and treats missing/malformed gate config as a hard failure. That turns a user-owned signal-gate setting into a framework-enforced prerequisite, which conflicts with `knowledge/conventions/responsibility-boundary.md`'s rule that signal-gate settings are provide+docs only, not CI-enforced. Downstream forks that intentionally omit the file will now be blocked before any catalogue work can run.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+              "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
               "line": 116,
               "category": "scope_leakage"
             }
@@ -2634,7 +2634,7 @@
             {
               "message": "D6 is internally inconsistent with the briefing's accepted contract: it says `TypeRef` slots must not be narrowed, but then explicitly adds `syn::Type` / `syn::Path` / `syn::GenericParam` parsing as an extra input-time gate. That reintroduces the rejected Rust-syntax narrowing and leaves the downstream CLI/spec ambiguous about whether schema-preserving raw `TypeRef` strings are accepted when they do not parse as those syn types.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+              "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
               "line": 104,
               "category": "inconsistent decisions within the same ADR"
             }
@@ -2664,7 +2664,7 @@
             {
               "message": "D8 leaves the `sotp catalog add` trait-impl contract underspecified: `--trait-impl` only maps to `TraitImplDeclV2.trait_ref`, but the ADR never states how `for_type` is supplied or when `--impl-generic` / `--impl-where` are valid. Downstream spec and implementation cannot derive whether these flags should be accepted, rejected, or attached to a specific impl entry.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+              "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
               "line": 123,
               "category": "decision underspecified for downstream consumption"
             }
@@ -2679,14 +2679,14 @@
             {
               "message": "D6 leaves the unsupported-input path non-deterministic by saying lossless decomposition should “reject or be held as `$todo`”. `sotp catalog add` / the spec writer cannot turn that into a stable acceptance criterion until the ADR decides which cases fail and which cases become `$todo`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+              "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
               "line": 104,
               "category": "decision underspecified for downstream consumption"
             },
             {
               "message": "D8 defines flags for type/trait shape data, but it never says how callers author the schema’s top-level `functions` and `inherent_impls` collections. Because D6 already treats function entries and impl blocks as part of the contract, the CLI/spec surface is incomplete for those first-class entry kinds.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+              "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
               "line": 123,
               "category": "decision underspecified for downstream consumption"
             }
@@ -2701,7 +2701,7 @@
             {
               "message": "`D3` says delete entries are satisfied by identity information alone, but later decisions make delete tombstones first-class grounded entries: `D7` requires delete tombstones to retain `spec_refs` / `informal_grounds`, and `D8` makes `--anchor` mandatory for `catalog import --action delete` and allows `catalog cite` to target them. As written, the ADR leaves downstream spec/CLI generation unable to tell whether delete records are identity-only or grounding-bearing, so `import`/`cite` validation will be specified inconsistently.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+              "file": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
               "line": 66,
               "category": "inconsistent decisions within the same ADR"
             }

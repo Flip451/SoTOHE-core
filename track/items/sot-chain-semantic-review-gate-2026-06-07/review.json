@@ -53,14 +53,14 @@
             {
               "message": "T001 says to parse ADR front-matter with `serde_yaml::Value` and manually walk `decisions[].id`. That conflicts with the typed-deserialization rule for `libs/infrastructure/src/verify/`, which requires typed `Deserialize` DTOs instead of untyped Value walking in verify/guard code.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
               "line": 13,
               "category": "contradiction"
             },
             {
               "message": "T003 makes `CatalogueSpecSignal.entry_hash` a required `ContentHash`, but T005 still requires decoding legacy `<layer>-catalogue-spec-signals.json` files without `entry_hash` and returning a `None`-equivalent. Those requirements cannot both be true as written; the codec needs either an explicit optional/migration wrapper or a non-optional field with a different legacy-handling rule.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
               "line": 38,
               "category": "contradiction"
             }
@@ -75,14 +75,14 @@
             {
               "message": "T008 still permits a `todo!()`-style stub in `libs/infrastructure/src/ref_verify.rs`. That is a panic path in library code, which conflicts with the repo's no-panics rule and makes the adapter path unsafe if the stub is ever exercised.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
               "line": 63,
               "category": "contradiction"
             },
             {
               "message": "The `RoundType` doc says `RefVerifierPort.verify_pair` takes `RoundType`, but `usecase-types.json` defines that port parameter as `domain::tddd::ModelTier`, and T008 explicitly says the adapter performs the `ModelTier -> RoundType` conversion. This catalogue entry is therefore stale and contradicts the layer boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/infrastructure-types.json",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/infrastructure-types.json",
               "line": 151,
               "category": "contradiction"
             }
@@ -473,7 +473,7 @@
             {
               "message": "`SemanticVerdict` is treated as a 3-state enum (`Pass` / `Fail` / `Pending`) here and in the downstream codec/usecase/CLI tasks, but the briefing for this scope defines the domain type as only `Pass { citation }` / `Fail { reason }`. That is a design contradiction: either the briefing needs to be updated or the plan needs to remove `Pending` everywhere it propagates.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
               "line": 22,
               "category": "contradiction"
             }
@@ -619,7 +619,7 @@
             {
               "message": "`T002` is marked resolved (`[x]` in `plan.md`, `status: \"done\"` in `impl-plan.json`), but the task body still says `T002 は未完了として扱う`. That is a direct status contradiction across the two plan artifacts and makes the progress state ambiguous.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
               "line": 26,
               "category": "contradiction"
             }
@@ -700,14 +700,14 @@
             {
               "message": "`T003` / `S3` says `TrackBlobReader.read_type_catalogue` should be expanded to return `(CatalogueDocument, String, HashMap<String, ContentHash>)`, but the type registry and contract map put that 3-tuple on `read_catalogue_for_spec_ref_check` and leave `read_type_catalogue` as `(Vec<u8>, String)`. As written, the plan targets the wrong port and leaves the actual new API unchanged.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
               "line": 107,
               "category": "contradiction"
             },
             {
               "message": "`AC-13` makes the missing-hash path key off `section_key`, but `RefreshCatalogueSpecSignalsError::MissingEntryHash` only carries `entry_key`. In the collision case that `section_key` was introduced to eliminate, the error cannot identify which entry actually missed a hash, so the fail-closed contract is not represented accurately.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
               "line": 245,
               "category": "contradiction"
             }
@@ -859,7 +859,7 @@
             {
               "message": "`T007` leaves the terminal outcome ambiguous when the same batch contains both a confirmed production `Fail` and a known_bad degradation / remaining `Pending` pair. The text says `HumanEscalationRequired` is returned when final-tier known_bad detection is still below threshold or `Pending` remains, but the next sentence says a confirmed production `Fail` returns `SemanticFailuresConfirmed`; there is no precedence rule for the overlap case.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
               "line": 60,
               "category": "contradiction"
             }
@@ -874,14 +874,14 @@
             {
               "message": "T007 is internally inconsistent on degraded batches: the core step says any final-tier confirmed `Fail` should be saved to the verify-cache and return `SemanticFailuresConfirmed`, but the new priority rule says that when known_bad detection is still below threshold after the final tier, `HumanEscalationRequired` must take precedence because the verifier is untrusted. The plan does not say whether confirmed `Fail` verdicts in that case are cached or suppressed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
               "line": 38,
               "category": "contradiction"
             },
             {
               "message": "T008 says citation-missing `Pass` outputs may be handled as a `fail-closed verdict`, but T007 requires citation-missing `Pass` to be rejected as an error at the adapter/codec boundary and never reach the usecase. Those two behaviors are incompatible unless the plan picks one and states it explicitly.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
               "line": 43,
               "category": "contradiction"
             }
@@ -911,7 +911,7 @@
             {
               "message": "`T007` gives two incompatible outcomes for a healthy final-tier batch that contains both `Fail` and `Pending`: the first rule says `HumanEscalationRequired` is returned whenever final-tier `Pending` remains, but clause (b) later says the same mixed batch should save the `Fail` verdict and return `SemanticFailuresConfirmed`. The caller cannot determine whether mixed Fail/Pending results should escalate to humans or be handed back to the fix loop. Align this contract in both `impl-plan.json` and the mirrored text in `plan.md`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
               "line": 37,
               "category": "contradiction"
             }
@@ -926,7 +926,7 @@
             {
               "message": "The return-order policy is inconsistent: this summary says that if `Pending` remains after final tier, the result should be `HumanEscalationRequired`, but the task body later says a healthy batch with a confirmed `Fail` should still return `SemanticFailuresConfirmed` even if `Pending` also remains. Please make the precedence explicit and consistent across the section.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
               "line": 60,
               "category": "contradiction"
             }
@@ -941,7 +941,7 @@
             {
               "message": "The T007 return rules are internally inconsistent: this block says any final-tier batch with remaining `Pending` should return `HumanEscalationRequired`, but it later says a healthy batch with a confirmed `Fail` should return `SemanticFailuresConfirmed` even when `Pending` also remains. Implementers cannot tell whether mixed `Fail`+`Pending` batches should escalate or confirm. The same wording is mirrored in `impl-plan.json`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
               "line": 60,
               "category": "contradiction"
             }
@@ -1029,7 +1029,7 @@
             {
               "message": "`AgentExecutionRunner` is described in T008 as an infrastructure-local callable runner abstraction (`dyn Fn(...)`), so classifying it as a `value_object` is semantically wrong. The same row is also marked blue even though T008 is still `in_progress` in the plan, which makes the type catalogue and task status inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/infrastructure-types.md",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/infrastructure-types.md",
               "line": 13,
               "category": "contradiction"
             }
@@ -1044,7 +1044,7 @@
             {
               "message": "This artifact is internally inconsistent with the plan status updates: `plan.md` and `impl-plan.json` both mark T004/T008 as done, but the infrastructure type catalogue still leaves both verify-cache codec entries (`CatalogueSpecVerifyCacheDocumentCodec` and `SpecAdrVerifyCacheDocumentCodec`) yellow. That contradicts the claimed completion of the codec layer that T008 depends on, so the plan snapshot cannot be treated as coherent yet.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/infrastructure-types.md",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/infrastructure-types.md",
               "line": 33,
               "category": "contradiction"
             }
@@ -1074,7 +1074,7 @@
             {
               "message": "`T005` and `T007` are marked `done` here even though both descriptions still list `T003` as a prerequisite, and `T003` is still `todo` above. That makes the dependency graph impossible as recorded: the downstream work is closed before the atomic `CatalogueSpecSignal`/traversal boundary is complete, so the ref-verify branch cannot be considered finished in this state. `T008` inherits the same problem through `T007`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
               "line": 27,
               "category": "infeasibility"
             }
@@ -1161,7 +1161,7 @@
             {
               "message": "CN-11 says the `ref-verifier` adapter must not require external file reads or side effects and should be closed over the prompt payload, but T008 still requires `AgentRefVerifierAdapter` to load `prompt_template_path` from disk and treats prompt-template load failures as `RefVerifyError::VerifierPort`. Those requirements conflict, and there is no separate task that moves prompt rendering outside the adapter, so the plan is not internally consistent as written.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json",
               "line": 346,
               "category": "contradiction"
             }
@@ -1205,7 +1205,7 @@
             {
               "message": "`plan.md` and `task-coverage.json` now introduce `T013` for the CN-11 provider-runner work, and `T012` explicitly depends on `T013`, but this machine-readable implementation plan still ends at `T012`. That leaves the task graph incomplete: the final CI step is waiting on a task that has no node in `impl-plan.json`, so the plan cannot be executed end-to-end from the source-of-truth artifact set.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
               "line": 102,
               "category": "infeasibility"
             }
@@ -1279,7 +1279,7 @@
             {
               "message": "`RefVerifyPair` still says known_bad monitor probes are \"evaluated every run\", but the same artifact later defines the interactor to skip those probes when production cache miss = 0, and AC-16 in the spec codifies that skip. Those requirements conflict: an all-cache-hit run cannot both evaluate known_bad probes every run and never evaluate them.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
               "line": 87,
               "category": "contradiction"
             }
@@ -1294,14 +1294,14 @@
             {
               "message": "`RefVerifyScopeResolverError::InvalidLayerId` is documented as being raised when `architecture-rules.json` contains an unparseable TDDD layer id, but the resolver contract in the same artifact says `RefVerifyScopeResolver::resolve` determines scope from `spec.json` and the TDDD catalogue files. That ties the error case to a different input source than the resolver actually consumes, so the resolver contract is internally inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/infrastructure-types.json",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/infrastructure-types.json",
               "line": 530,
               "category": "contradiction"
             },
             {
               "message": "T013 still includes `provider_bin (env var 経由の binary 解決)` in the ref-verifier runner move, but the target runner spec says binaries are fixed PATH names and that no env-var lookup is performed. Those two binary-resolution strategies conflict, so the implementation plan does not describe a single coherent launcher contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
               "line": 63,
               "category": "contradiction"
             }
@@ -1331,7 +1331,7 @@
             {
               "message": "`T006`/`AC-12` still require per-capability `timeout_seconds` plus a `resolve_timeout_seconds(...)` path, but the updated infrastructure catalog removes both the `CapabilityConfigDto.timeout_seconds` accessor and `AgentProfiles::resolve_timeout_seconds` entirely. That leaves the plan internally inconsistent: the task description still asks for timeout-aware configuration and tests, while the type catalog only models `prompt_template_path`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/plan.md",
               "line": 51,
               "category": "contradiction"
             }
@@ -1412,7 +1412,7 @@
             {
               "message": "`T006` still requires `timeout_seconds` on each ref-verifier capability and a `resolve_timeout_seconds(...)` path, but the infrastructure catalogue has already removed timeout support (`timeout_seconds removed by D13-1/CN-13` and only `resolve_prompt_template_path` remains). That leaves the plan and type catalogue asserting incompatible capability contracts, so the timeout-related parts of `T006`/`T008`/`T013` are not implementable as written.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json",
               "line": 136,
               "category": "contradiction"
             }
@@ -1440,9 +1440,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`MissingEntryHash` still carries `entry_key` here, but the contract in [spec.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json#L566) and [impl-plan.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json#L18) has already standardized this error on `section_key` because the per-entry hash map is keyed by section-qualified names. Keeping the bare-key field makes the failure payload ambiguous and reintroduces the collision risk this change is meant to remove.",
+              "message": "`MissingEntryHash` still carries `entry_key` here, but the contract in [spec.json](track/items/sot-chain-semantic-review-gate-2026-06-07/spec.json#L566) and [impl-plan.json](track/items/sot-chain-semantic-review-gate-2026-06-07/impl-plan.json#L18) has already standardized this error on `section_key` because the per-entry hash map is keyed by section-qualified names. Keeping the bare-key field makes the failure payload ambiguous and reintroduces the collision risk this change is meant to remove.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
+              "file": "track/items/sot-chain-semantic-review-gate-2026-06-07/usecase-types.json",
               "line": 283,
               "category": "contradiction"
             }
@@ -1814,7 +1814,7 @@
             {
               "message": "Missing `entry_hashes` entries are silently replaced with `ContentHash::from_bytes([0; 32])`. That fabricates a valid-looking but incorrect `entry_hash` in `<layer>-catalogue-spec-signals.json` if the adapter/key-derivation ever drifts, which should fail closed instead of persisting corrupted integrity metadata.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
+              "file": "libs/usecase/src/catalogue_spec_signals.rs",
               "line": 206,
               "category": "error handling"
             }
@@ -1836,7 +1836,7 @@
             {
               "message": "The new shared traversal helper is public and now drives both `catalogue_spec_refs` and `catalogue_spec_signals`, but the added tests only cover type entries. There is no direct coverage for trait/function traversal or for a same-short-name cross-section collision, so a regression in `section_key` formatting or section order would reach production unnoticed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_traversal.rs",
+              "file": "libs/usecase/src/catalogue_traversal.rs",
               "line": 69,
               "category": "test_coverage"
             }
@@ -1887,7 +1887,7 @@
             {
               "message": "`merge_gate.rs` now has 752 lines of production code before `#[cfg(test)]`, which exceeds the repo's 700-line maximum for production modules. This is an architecture violation and should be split into smaller modules.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/merge_gate.rs",
+              "file": "libs/usecase/src/merge_gate.rs",
               "line": 753,
               "category": "architecture"
             }
@@ -1945,14 +1945,14 @@
             {
               "message": "The cache merge is inverted: `retained` keeps existing entries whose `(claim_hash, evidence_hash)` do not match any current production pair, so cache-hit entries are dropped instead of preserved. A mixed hit/miss run will rewrite the cache without the hits, defeating AC-07 and forcing needless re-review on the next run.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "file": "libs/usecase/src/ref_verify.rs",
               "line": 650,
               "category": "correctness"
             },
             {
               "message": "Fast-tier evaluation is still fully sequential. `RefVerifyConfig::max_parallelism` is validated and stored, but `execute` never consults it; both fast passes use plain iterator collection (`.iter().map(...).collect()`). That misses the required parallel fast-tier execution / worker-cap behavior and leaves the configuration dead.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "file": "libs/usecase/src/ref_verify.rs",
               "line": 513,
               "category": "architecture"
             }
@@ -1967,21 +1967,21 @@
             {
               "message": "Any cache entry whose hashes match a current production pair is treated as a hit regardless of the stored verdict, so a cached `Fail`/`Pending` is never re-checked. The later merge at `639-669` then filters those same entries out of the rewritten artifact and never adds them back, so current cache hits can disappear entirely on the next save. That breaks AC-07 and can let stale failures vanish from the gate.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "file": "libs/usecase/src/ref_verify.rs",
               "line": 497,
               "category": "correctness"
             },
             {
               "message": "The return order is backwards for degraded calibration: `SemanticFailuresConfirmed` is emitted before `final_calibration_healthy` is checked. If known-bad detection stays below threshold and a production `Fail` is also confirmed, the degraded verifier's verdict is still trusted instead of escalating to `HumanEscalationRequired`, which contradicts the intended precedence.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "file": "libs/usecase/src/ref_verify.rs",
               "line": 673,
               "category": "correctness"
             },
             {
               "message": "As written, the fast/final verifier loops are strictly serial iterator chains, so the interactor never uses `RefVerifyParallelism` and can only issue one model call at a time. That makes the validated `max_parallelism` config dead and violates the requirement that fast-tier review be parallelized per pair.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "file": "libs/usecase/src/ref_verify.rs",
               "line": 513,
               "category": "architecture"
             }
@@ -1996,14 +1996,14 @@
             {
               "message": "`save_entries` runs before the final known-bad health check, so a batch that ends in `HumanEscalationRequired` still persists the final-tier verdicts from a degraded verifier into the verify-cache. The ADR/spec text says degraded-verifier verdicts are not trustworthy and should not be cached; gate cache writes on `final_calibration_healthy` (or defer persistence until after this check).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "file": "libs/usecase/src/ref_verify.rs",
               "line": 660,
               "category": "correctness"
             },
             {
               "message": "The production portion of this module is 767 lines long before the `#[cfg(test)]` block starts at line 770, which exceeds the repository's 700-line production-module limit.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify.rs",
+              "file": "libs/usecase/src/ref_verify.rs",
               "line": 770,
               "category": "architecture"
             }
@@ -2018,7 +2018,7 @@
             {
               "message": "The new public `RefVerifyApplicationService::execute` path is only covered on success-oriented scenarios; there is no test that stubs `RefVerifyPairSourcePort`, `RefVerifyVerifierPort`, or `RefVerifyCachePort` to return an error and asserts the corresponding fail-closed `RefVerifyError` variant is propagated. That leaves the main error-handling contract for this usecase unverified, which is a P1 coverage gap for a new public API.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "file": "libs/usecase/src/ref_verify/interactor.rs",
               "line": 71,
               "category": "test coverage gap"
             }
@@ -2055,7 +2055,7 @@
             {
               "message": "On the first `Err` or panic from a worker, this returns immediately and drops the remaining `JoinHandle`s for the chunk. Those threads keep running detached, so a failed batch can still continue calling the verifier after the use case has already reported failure. Join or cancel the rest of the chunk before returning so the gate actually aborts fail-closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "file": "libs/usecase/src/ref_verify/interactor.rs",
               "line": 331,
               "category": "correctness"
             }
@@ -2107,7 +2107,7 @@
             {
               "message": "`Pending` is checked before `Fail`, so a healthy batch that contains both verdicts returns `HumanEscalationRequired` instead of `SemanticFailuresConfirmed`. The intended rule is to prioritize confirmed failures in this mixed case so the writer/fix loop can act on them.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "file": "libs/usecase/src/ref_verify/interactor.rs",
               "line": 292,
               "category": "correctness"
             }
@@ -2122,7 +2122,7 @@
             {
               "message": "Cache retention is global across scopes: `fresh_hashes` is built without `cache_scope`, and the retain filter drops any existing entry whose `(claim_hash, evidence_hash)` appears in any freshly evaluated pair. If the same hash pair exists in another scope, saving this run will delete that scope's cache entry even though it was never re-evaluated. The pruning needs to be scope-local because caches are stored in separate artifacts per scope.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/ref_verify/interactor.rs",
+              "file": "libs/usecase/src/ref_verify/interactor.rs",
               "line": 241,
               "category": "correctness"
             }
@@ -2331,14 +2331,14 @@
             {
               "message": "Staging happens before the new semantic gate runs, but `bin/sotp ref-verify run` writes `spec-adr-verify-cache.json` and `<layer>-catalogue-spec-verify-cache.json` under `track/items/<track-id>`. Those files are created after `git add-all`, so the commit can omit the cache artifacts that the gate just produced unless you restage or move staging to the end.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 594,
               "category": "workflow correctness"
             },
             {
               "message": "This describes the commit path as an all-chain semantic gate, but the wrapper only shells out to `bin/sotp ref-verify run` with no explicit all-chain mode. In the current ref-verify flow that command is context-scoped, so an in-progress track can still skip Chain1; the gate can therefore pass with stale or missing Chain1 semantic cache.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/workflow.md",
+              "file": "track/workflow.md",
               "line": 127,
               "category": "coverage"
             }
@@ -2530,7 +2530,7 @@
             {
               "message": "The new ref-verify integration handles only `[OK]` and `[BLOCKED]`, but `.claude/commands/track/ref-verify.md` defines `[ESCALATE]` as a distinct supported outcome that should be reported to the user and not retried. `/track:plan` has no branch for that outcome in either the Phase 1 or Phase 2 loops, so a supported result currently falls through undefined behavior.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/plan.md",
+              "file": ".claude/commands/track/plan.md",
               "line": 77,
               "category": "logic"
             }
@@ -2622,14 +2622,14 @@
             {
               "message": "`ref_verify_run` wires `AgentRefVerifierAdapter` to an `AgentExecutionRunner` that always returns `VerifierPort` (`\"model invocation not yet wired in this build\"`). Any real track with at least one pair will fail before a verdict is produced, so `sotp ref-verify run` is not functional.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 201,
               "category": "logic"
             },
             {
               "message": "`resolve_ref_verify_scope` ignores both inputs and always returns `RefVerifyScope::All`. That violates the documented phase-based routing contract, so the CLI never narrows to Chain1 after spec-design or Chain2 after type-design.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 139,
               "category": "architecture"
             }
@@ -2659,14 +2659,14 @@
             {
               "message": "`existing_chain2_layers()` only keeps layers whose catalogue file already exists. If `architecture-rules.json` declares a TDDD layer but its `<layer>-types.json` is missing, `resolve_ref_verify_scope()` will silently drop that layer, so `ref_verify run` and `check-approved` can skip part of Chain-2 instead of failing closed. The downstream pair enumerator already errors on a missing catalogue, so the resolver should not pre-filter the declared layers.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 181,
               "category": "correctness"
             },
             {
               "message": "`run_ref_verifier_agent()` rejects `ResolvedExecution.model == None`, even though `AgentProfiles` explicitly allows providers that do not need a model. Any ref-verifier configuration routed to such a provider will fail before the runner is invoked, so the new capability is not actually provider-agnostic.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 255,
               "category": "correctness"
             }
@@ -2681,14 +2681,14 @@
             {
               "message": "`existing_chain2_layers()` collects every declared TDDD layer as soon as it sees one catalogue file, so `resolve_ref_verify_scope()` can select `Chain2All` with layers whose catalogues are still absent. `enumerate_chain2_all_layers()` then errors on those missing files, which blocks `ref-verify run/check-approved` on partially rolled-out type-design tracks instead of skipping the absent layers.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 145,
               "category": "correctness"
             },
             {
               "message": "The new public `CliApp::ref_verify_run` and `CliApp::ref_verify_check_approved` APIs only have validation/error-path tests; there is no deterministic happy-path test for a successful run or for a non-vacuous Pass-cache approval case. A regression in the success path would therefore ship without coverage.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 711,
               "category": "testing"
             }
@@ -2703,7 +2703,7 @@
             {
               "message": "`ref_verify_check_approved` treats 'has any Pass entry' as sufficient. If a cache artifact contains both Pass and Fail/Pending rows for the same `(claim_hash, evidence_hash)` pair, the Fail/Pending row is ignored and the gate returns success, which contradicts the documented fail-closed behavior. There is also no regression test covering the blocking-path case.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 641,
               "category": "correctness"
             }
@@ -2740,21 +2740,21 @@
             {
               "message": "This path fabricates `current_branch = format!(\"track/{track_id}\")` instead of discovering the actual git branch, so the usecase's active-track guard never runs here. `ref_verify check-approved` can therefore return success from `main` or a detached HEAD as long as the cache files exist.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 592,
               "category": "correctness"
             },
             {
               "message": "`check-approved` reconstructs production pairs with `RefVerifyConfig::default()` instead of the configuration loaded from `.harness/config/ref-verify.json`. If the configured known-bad injection rate differs from the default, the gate will inspect the wrong pair set and can either miss real production pairs or block on probe pairs, so approval no longer matches the run path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 594,
               "category": "correctness"
             },
             {
               "message": "The Claude provider is launched without the repo's read-only tool restrictions (`--allowedTools ...` / `--disallowedTools Edit Write`) that are used elsewhere for Claude-based agents. With the local Claude settings allowing `Write`/`Edit`, this subprocess is not structurally read-only and can mutate the workspace during verification.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 322,
               "category": "security"
             }
@@ -2784,14 +2784,14 @@
             {
               "message": "`process_success_or_error()` forwards the child process stderr verbatim into the user-facing error string. That can leak prompt contents, local paths, or stack traces from the model runner; redact it or collapse it to a generic failure summary before returning an error.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 450,
               "category": "security"
             },
             {
               "message": "The new `ref_verify_check_approved()` path does not have a regression test for the fail-closed branch where a current production pair is completely missing from the cache (`matching_entries.is_empty()`). The suite covers empty-spec and mixed Pass/Fail artifacts, but not the missing-pair case, so a regression that treats absent pairs as approved would still ship.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 662,
               "category": "testing"
             }
@@ -2976,14 +2976,14 @@
             {
               "message": "The `run` scope resolver short-circuits to `All` whenever `track/<id>/impl-plan.json` exists, so any post-spec/type-design track that already has an impl plan will skip the intended Chain2-only phase and re-run both chains. That contradicts the phase-aware scope resolution required by T009/AC-02.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 106,
               "category": "logic"
             },
             {
               "message": "The approved gate reconstructs production pairs with `RefVerifyConfig::default()` instead of the runtime config loaded from `.harness/config/ref-verify.json`, so non-default known-bad injection or threshold settings make `check-approved` inspect a different pair set than `ref_verify_run` produced. That can approve the wrong cache state or block a valid one.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 598,
               "category": "logic"
             }
@@ -3013,14 +3013,14 @@
             {
               "message": "`execute_ref_verify_plan()` aborts on the first `Err` inside the layer loop, so a `Chain2All` run stops after the first failing layer and never evaluates or caches the remaining layers. For multi-layer type-design tracks, that makes the result depend on layer order and leaves unrelated cache artifacts stale.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 195,
               "category": "logic"
             },
             {
               "message": "`ref_verify_check_approved()` loads `.harness/config/ref-verify.json` and feeds it into pair enumeration even though the approval gate only needs current production pairs and verify-cache contents. A missing or malformed runtime config can therefore block `check-approved` before cache completeness is checked, which couples an independent gate to unrelated runtime settings.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 631,
               "category": "architecture"
             }
@@ -3035,7 +3035,7 @@
             {
               "message": "The production portion of this module runs through line 754, so it exceeds the repo's 700-line cap for non-test code. Split the composition helpers into smaller modules before merging; otherwise this file is out of policy and harder to review safely.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 1,
               "category": "architecture"
             }
@@ -3050,14 +3050,14 @@
             {
               "message": "If one scope reports `HumanEscalationRequired` and another reports `SemanticFailuresConfirmed`, this function still returns only the semantic-failure path because `semantic_failure_count` is checked before `human_escalation_count`. That masks verifier-degradation cases that are supposed to force human escalation and can send the gate down the wrong remediation path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 219,
               "category": "correctness"
             },
             {
               "message": "A cache read failure is converted into a per-pair `cache read failed` message and the command still returns `Ok(CommandOutcome { exit_code: 1 })`. That swallows cache I/O/corruption errors into an approval miss, making broken storage indistinguishable from a legitimately unapproved pair and hiding the underlying infrastructure failure.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 391,
               "category": "error_handling"
             }
@@ -3226,7 +3226,7 @@
             {
               "message": "The success-path coverage for the public `CliApp::dry_run_fix_local` entry point was replaced with a direct `run_dry_fix_codex` test, so regressions in wrapper logic such as agent-profile loading, provider selection, and model fallback are no longer exercised. Keep at least one happy-path test on the public API itself.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 943,
               "category": "testing"
             }
@@ -3241,14 +3241,14 @@
             {
               "message": "The new `type-design`/`--layer` branch in `invocation_context_from_cli` is not covered by any test in this scope. Right now the file only exercises `spec-design` and `standalone`, so a regression in the new CLI-to-context mapping or the required missing-`--layer` error would still pass CI.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 97,
               "category": "test coverage"
             },
             {
               "message": "These `dry_run_fix_local` tests only assert that execution reaches provider dispatch, which does not distinguish `model: Some(...)` from the profile fallback. A bug that ignored the explicit model override would still pass here, so the new wrapper behavior is not actually verified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 953,
               "category": "test coverage"
             }
@@ -3263,14 +3263,14 @@
             {
               "message": "`test_dry_run_fix_local_none_model_falls_back_to_profile_model_and_reaches_dispatch` and `test_dry_run_fix_local_explicit_model_bypasses_profile_model_and_reaches_dispatch` invoke `dry_run_fix_local` without `process_env_lock`, but that path shells out through `SystemGitRepo::discover()` and this module mutates `PATH` in other tests. Under parallel test execution these cases can inherit a fake `git`/PATH from a concurrent test and fail nondeterministically.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 960,
               "category": "testing"
             },
             {
               "message": "`ref_verify_run` gained a new `type-design`/`layer` branch, but the added tests only cover `invocation_context_from_cli` directly. There is no end-to-end test that `CliApp::ref_verify_run` forwards `input.layer` into `RefVerifyScopeResolver` or surfaces the `--layer` missing/invalid errors through the public API, so a regression in the new CLI-to-scope wiring would still pass the suite.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 122,
               "category": "test coverage"
             }
@@ -3285,14 +3285,14 @@
             {
               "message": "This replacement drops the only end-to-end success assertion for `CliApp::dry_run_fix_local`. The remaining coverage only checks error paths or the lower-level `run_dry_fix_codex` helper, so a regression in the wrapper's profile loading / model fallback / provider dispatch would no longer fail CI.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 1045,
               "category": "testing"
             },
             {
               "message": "The new `type-design` wiring is still not covered on a successful path. The current test only proves that a contrived invalid rules file reaches scope resolution; it never verifies that a valid `--layer` flows through `invocation_context_from_cli` into `RefVerifyScopeResolver` and then into a successful `ref_verify_run` execution. That leaves the new public branch unguarded against wiring regressions.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 967,
               "category": "testing"
             }
@@ -3328,14 +3328,14 @@
             {
               "message": "`ref_verify_run` now trusts a caller-supplied `context`/`layer` tuple and has no fallback to derive the invocation surface from the active track or branch. That means any caller that still invokes `sotp ref-verify run --track-id ...` without explicitly setting `--context` will silently resolve to `standalone -> All`, which regresses the previous phase-aware routing and can run the wrong chain on spec/design or type/design tracks.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 7,
               "category": "correctness"
             },
             {
               "message": "The new `type-design` happy-path test uses an empty catalogue, so it never exercises `AgentRefVerifierAdapter` or proves that `RefVerifyInvocationContext::TypeDesign` actually routes to the `ref-verifier-chain2` capability. A regression in the real chain2/provider wiring would still pass this suite, leaving the public API's most important branch unverified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 1004,
               "category": "testing"
             }
@@ -3372,7 +3372,7 @@
             {
               "message": "`ref_verify_run` reads `current_git_branch` before it translates/validates `input.context` and `input.layer`. That means the new type-design API paths can return a git-repo error from a temp directory instead of the required `--layer`/`--context` diagnostic, and the new tests at lines 933-1001 cannot reach the intended scope-resolution assertions without a fake git setup. Validate the invocation context first, then read the branch.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 133,
               "category": "correctness"
             }
@@ -3394,7 +3394,7 @@
             {
               "message": "The new `dry_run_fix_local` model-selection tests only assert that execution reaches the unsupported-`claude` provider branch. They never observe the model passed to the fixer, so a regression that ignores `input.model` or stops falling back to the profile model would still pass both tests at lines 961 and 1014. Capture the selected model on the codex path if you want this contract covered.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 961,
               "category": "Testing"
             }
@@ -3409,7 +3409,7 @@
             {
               "message": "`test_ref_verify_run_type_design_valid_layer_is_forwarded_to_scope_resolver` never fakes the active git branch. `ref_verify_run()` checks `current_git_branch()` before scope resolution, so on a normal checkout this test will fail with `track is not active` and will not exercise the resolver path it claims to cover. Wrap it in `with_fake_track_branch(...)` (or otherwise stub branch discovery) to make the assertion meaningful.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 976,
               "category": "test"
             }
@@ -3424,7 +3424,7 @@
             {
               "message": "`ref_verify_run` now has a new public `Standalone`/`CommitGate -> All` path, but this module only exercises the `spec-design` happy path and an empty-catalogue `type-design` case. There is no end-to-end cli-composition test that actually drives the default All-scope branch through `RefVerifyScopeResolver` and `make_ref_verifier_process_runner`, so a regression in the new DI wiring or default context handling could still pass the suite.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 122,
               "category": "testing"
             }
@@ -3439,7 +3439,7 @@
             {
               "message": "The new `standalone` success test does not actually exercise the DI path it claims to validate. Its fixture has no `adr_refs` and no TDDD catalogues, so `RefVerifyPairSourceAdapter::load_pairs()` returns zero pairs and `AgentRefVerifierAdapter` / `make_ref_verifier_process_runner()` are never invoked. A regression in the new subprocess wiring would still pass this test, leaving the critical integration path unverified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 1092,
               "category": "testing"
             }
@@ -3454,14 +3454,14 @@
             {
               "message": "This 'standalone -> All' test is still scope-blind: `write_chain1_fixture()` only seeds Chain1 data, so the test will stay green if `standalone` accidentally resolves to Chain1 or never reaches the verifier. Add a fixture that distinguishes All from Chain1, or assert on the resolved scope.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 1090,
               "category": "testing"
             },
             {
               "message": "The positive `check-approved` path has the same blind spot: it uses only Chain1 fixtures, so it would not fail if `ref_verify_check_approved()` stopped resolving `CommitGate` to `All`. Add an All/Chain2-sensitive fixture or an assertion on the resolved scope.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 720,
               "category": "testing"
             }
@@ -3490,14 +3490,14 @@
             {
               "message": "P1: `ref_verify_run` validates the repo path and discovers the git root before it validates `--context`/`--layer`. The comment says the opposite, and a bad context or missing layer can now be masked by an unrelated filesystem/git error. Validate `invocation_context_from_cli` first, then do repo discovery.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 130,
               "category": "correctness"
             },
             {
               "message": "P1: The new `standalone` integration test only asserts that the Chain2 cache file exists. A regression that maps `standalone` to `Chain2` instead of `All` would still pass, so the default All-scope branch is not actually protected. Assert a Chain1 artifact as well, or this test leaves the main routing regression untested.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 1203,
               "category": "test coverage"
             }
@@ -3613,7 +3613,7 @@
             {
               "message": "`build_catalogue_entry_hashes` keys the returned `HashMap` only by the bare entry name. Type and trait short names are not globally unique in a catalogue, so a same-named type/trait pair will overwrite one another here and later be assigned the wrong `entry_hash` when the refresher looks up hashes by the same bare key. This silently corrupts the generated `<layer>-catalogue-spec-signals.json` for valid catalogues that contain such collisions; the key needs to include the section (or another disambiguator).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
               "line": 434,
               "category": "correctness"
             }
@@ -3628,7 +3628,7 @@
             {
               "message": "`build_catalogue_entry_hashes` uses a flat `HashMap<String, ContentHash>` keyed only by the bare entry name, but `CatalogueDocument` only guarantees uniqueness within each of `types`, `traits`, and `functions`. A valid catalogue can therefore contain the same short name in different sections; this code will reject it as a collision and the refresher cannot distinguish the hashes. The key needs a section discriminator, or the structure needs to be nested by section, so cross-section name overlaps still round-trip correctly.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
               "line": 429,
               "category": "correctness"
             }
@@ -3664,7 +3664,7 @@
             {
               "message": "Validate `schema_version` before converting `layer` into a `LayerId`. As written, a future artifact with an unsupported schema version but a changed/invalid `layer` value will fail with `Validation` instead of `UnsupportedSchemaVersion`, which misclassifies the format error and breaks forward-compatibility behavior.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/semantic_verify_codec.rs",
+              "file": "libs/infrastructure/src/tddd/semantic_verify_codec.rs",
               "line": 330,
               "category": "error handling"
             }
@@ -3707,21 +3707,21 @@
             {
               "message": "`read_adr_anchor_text` never matches the ADR structure used in this repo: it only looks for `## ` headings and never parses the front-matter `decisions` list or the actual `### Dn` sections. As a result, Chain-1 pairs fall back to the whole ADR text instead of the referenced decision section, which can make the verifier accept claims against unrelated content.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 195,
               "category": "correctness"
             },
             {
               "message": "`extract_json_object` counts `{`/`}` bytes without tracking JSON string state. A valid model response whose `citation` or `reason` contains an unmatched brace character will be treated as \"no JSON object\" and rejected even though the JSON itself is valid.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 652,
               "category": "correctness"
             },
             {
               "message": "When a `SpecRef.anchor` cannot be resolved, Chain-2 enumeration silently fabricates `\"[anchor] (not found)\"` evidence instead of failing the port. That turns broken catalogue/spec links into cacheable semantic pairs and hides structural reference errors.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 277,
               "category": "correctness"
             }
@@ -3736,28 +3736,28 @@
             {
               "message": "Chain-1 evidence extraction does not match the ADR format in this repo. `read_adr_anchor_text` only scans `##` headings and never parses the front-matter `decisions` list or the actual `### Dn` sections, so it usually falls back to the whole ADR text. That makes the verifier compare claims against unrelated content instead of the referenced decision section.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 195,
               "category": "correctness"
             },
             {
               "message": "For Chain-1 the cache key is supposed to use the ADR file's git blob hash, but `enumerate_chain1_pairs` hashes the extracted anchor text (`evidence_text`) instead. Any change outside the anchored excerpt will therefore reuse a stale cache entry and skip re-review.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 171,
               "category": "correctness"
             },
             {
               "message": "When a `SpecRef.anchor` cannot be resolved, Chain-2 enumeration fabricates `\"[anchor] (not found)\"` and still returns a pair. That turns a broken reference into a cacheable semantic result instead of failing closed, so structural link errors can be silently masked.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 277,
               "category": "correctness"
             },
             {
               "message": "The JSON extractor is not string-aware: it balances raw `{`/`}` bytes without tracking whether they appear inside a quoted string. A valid `citation` or `reason` containing an unmatched brace will be truncated or rejected even though the model returned valid JSON.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 652,
               "category": "correctness"
             }
@@ -3772,21 +3772,21 @@
             {
               "message": "The section-end calculation is off by one: for `###` headings it only stops at `##`/`#`, so a matched ADR decision can absorb later sibling `###` decisions and return the wrong evidence block.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 221,
               "category": "correctness"
             },
             {
               "message": "The anchor matcher uses `contains(anchor)`, so anchors like `D1` can match `D10`/`D11` and resolve the wrong section instead of failing when the exact decision id is absent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 236,
               "category": "correctness"
             },
             {
               "message": "This parse-error path logs `raw_output` verbatim. The raw model response includes the full prompt context, so a malformed verifier reply can leak claim/evidence text into logs or error reports.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 651,
               "category": "security"
             }
@@ -3799,23 +3799,23 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`RefVerifyPairSourceAdapter` reads `AdrRef.file` straight from `spec.json` with `project_root.join(...)` and `read_to_string(...)` instead of the repo-root/symlink guard used elsewhere. A crafted ADR ref can escape the track root and make `ref-verify` read arbitrary local files, which are then forwarded to the model. See [ref_verify.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs#L170).",
+              "message": "`RefVerifyPairSourceAdapter` reads `AdrRef.file` straight from `spec.json` with `project_root.join(...)` and `read_to_string(...)` instead of the repo-root/symlink guard used elsewhere. A crafted ADR ref can escape the track root and make `ref-verify` read arbitrary local files, which are then forwarded to the model. See [ref_verify.rs](libs/infrastructure/src/ref_verify.rs#L170).",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 170,
               "category": "security"
             },
             {
-              "message": "`read_adr_anchor_text` falls back to the whole ADR when no heading matches `adr_refs[].anchor` instead of returning an error. That turns a broken anchor into a semantic review of the wrong source rather than failing closed. See [ref_verify.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs#L262).",
+              "message": "`read_adr_anchor_text` falls back to the whole ADR when no heading matches `adr_refs[].anchor` instead of returning an error. That turns a broken anchor into a semantic review of the wrong source rather than failing closed. See [ref_verify.rs](libs/infrastructure/src/ref_verify.rs#L262).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 262,
               "category": "error handling"
             },
             {
-              "message": "`enumerate_chain2_pairs_for_layer` treats a missing `<layer>-types.json` as `Ok(Vec::new())`. In an explicit `Chain2 { layer }` run, a deleted or renamed catalogue becomes a no-op, so the gate can pass without verifying that layer at all. See [ref_verify.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs#L273).",
+              "message": "`enumerate_chain2_pairs_for_layer` treats a missing `<layer>-types.json` as `Ok(Vec::new())`. In an explicit `Chain2 { layer }` run, a deleted or renamed catalogue becomes a no-op, so the gate can pass without verifying that layer at all. See [ref_verify.rs](libs/infrastructure/src/ref_verify.rs#L273).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 273,
               "category": "correctness"
             }
@@ -3874,14 +3874,14 @@
             {
               "message": "`create_dir_all(parent)` runs before the cache-path symlink guard. If `track/items/<track_id>` or one of its ancestors is a symlink, this can already redirect directory creation outside the workspace before the guard rejects the path, so the cache write protection is not actually enforced at the mutation point.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 239,
               "category": "security"
             },
             {
               "message": "`extract_json_object_parsed` only ever starts at the first `{` in the entire response. A valid JSON verdict that is preceded by any stray brace in prose or a code sample will fail closed even though parseable JSON appears later, which makes the verifier brittle to normal model output noise.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 495,
               "category": "robustness"
             }
@@ -3896,14 +3896,14 @@
             {
               "message": "`save_entries` only checks the cache path for symlinks before `create_dir_all`/`write`. A concurrent replacement of `track/items/<track_id>` or one of its ancestors with a symlink between that guard and the write can redirect `spec-adr-verify-cache.json` or `<layer>-catalogue-spec-verify-cache.json` outside the workspace. This is a TOCTOU security hole in a path that is explicitly intended to resist redirect attacks.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 243,
               "category": "security"
             },
             {
               "message": "`RefVerifyPairSourceAdapter::load_pairs` is the core public entrypoint for chain routing, file resolution, and known-bad probe injection, but there is no end-to-end test covering it. The current suite only exercises helpers and the cache/verifier adapters, so regressions in the primary adapter path would not be caught.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 96,
               "category": "testing"
             }
@@ -3918,14 +3918,14 @@
             {
               "message": "`save_entries` does a separate symlink check and then writes in place with `std::fs::write`. That leaves a TOCTOU window where a concurrent symlink swap on an ancestor can redirect the cache write outside the workspace, and a crash can leave a truncated JSON cache. This should use the repo's `WriteGuard` + `atomic_write_file` pattern instead of direct writes.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 278,
               "category": "security"
             },
             {
               "message": "`verify_pair` validates the prompt-template path and then reuses the same path for `read_to_string`. A symlink swap after `validate_template_path` succeeds but before the read can redirect this into an arbitrary host-file read; the same race exists in `load_entries`. The file needs to be opened through a stable no-follow handle, not just checked by path first.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 413,
               "category": "security"
             }
@@ -3940,14 +3940,14 @@
             {
               "message": "Prompt rendering is order-dependent: the chained `replace()` calls can rewrite placeholder strings that were already inserted from `claim` or `evidence`. If either input contains `{{evidence}}` or `{{tier}}`, the prompt sent to the model is silently corrupted, which can change verifier outcomes. Render the template in one pass or escape substituted values before interpolation.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 570,
               "category": "correctness"
             },
             {
               "message": "`extract_json_object_parsed()` accepts the first parseable JSON object anywhere in the model output. That means a response containing an example/prologue object before the actual verdict will be misread as the final verdict, producing a silent wrong Pass/Fail/Pending result. The parser needs a stricter rule (for example, only accept a single top-level object or the last object) and coverage for multi-object outputs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 645,
               "category": "correctness"
             }
@@ -3962,7 +3962,7 @@
             {
               "message": "P1: `read_adr_anchor_text()` is resolving `AdrRef.anchor` against markdown headings (`###`/`##`) instead of the ADR YAML front-matter `decisions[].id` list that this repo actually uses. The ADR for this track stores `D1`..`D9` in front-matter at the top of the file, and the existing structural checker already resolves anchors that way, so legitimate ADR refs will fail to load here unless the ADR happens to duplicate the decision id as a heading. That makes Chain-1 pair enumeration reject normal tracks.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 171,
               "category": "correctness"
             }
@@ -3977,14 +3977,14 @@
             {
               "message": "`read_adr_anchor_text()` validates `adr_path` up front but then re-opens it with `std::fs::read_to_string()`. That creates a TOCTOU window: a local attacker can swap the file or an ancestor symlink after the guard passes and make the verifier read outside `project_root`. The same check-then-open pattern is used for the spec/catalogue reads elsewhere in this module, and `CacheWriteGuard::acquire()` has a similar race around `create_dir_all()`. Use the no-follow/held-descriptor helper instead of reopening by path.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 193,
               "category": "security"
             },
             {
               "message": "`verify_pair()` includes the first 120 bytes of raw model output in the parse-error message. Because the prompt carries the full claim/evidence pair, a malformed or echoing response can leak internal track content into logs. Return an opaque error or a redacted/hash-only snippet instead.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 585,
               "category": "security"
             }
@@ -3999,14 +3999,14 @@
             {
               "message": "[P1] `matches!(cmd.scope, ...)` moves `cmd.scope` out of `&RefVerifyCommand`, and the later `match &cmd.scope` borrows it again. This does not compile as written; borrow the enum (`matches!(&cmd.scope, ...)`) or clone it before the first match.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 304,
               "category": "correctness"
             },
             {
               "message": "[P0] `save_entries` still performs a path-validated, path-based write via `atomic_write_file(&path, ...)` after `CacheWriteGuard::acquire`. That leaves a TOCTOU window where an ancestor symlink swap can redirect the temp-file creation/rename outside `project_root`; this needs a held directory handle or openat-style write, not a post-write recheck.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 437,
               "category": "security"
             }
@@ -4073,7 +4073,7 @@
             {
               "message": "`resolve_and_guard_path` normalizes the candidate path but not `project_root`, then checks `resolved.starts_with(project_root)`. With the repo's common relative roots (for example `.` or any root containing `.` segments), this rejects otherwise valid `track/items/<id>/...` paths as \"path escapes project root\", so Chain-1/Chain-2 enumeration breaks unless the caller canonicalizes first. Canonicalize/normalize `project_root` before this containment check.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 68,
               "category": "correctness"
             }
@@ -4086,9 +4086,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1 correctness: [`libs/infrastructure/src/ref_verify/pair_source.rs:66`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs#L66) compares a canonicalized `project_root` against `resolved`, which is only lexically normalized. With non-canonical roots, valid `track/items/...` paths can be rejected as escaping the project root, breaking Chain-1/Chain-2 enumeration. Canonicalize or normalize both sides before the containment check.",
+              "message": "P1 correctness: [`libs/infrastructure/src/ref_verify/pair_source.rs:66`](file://libs/infrastructure/src/ref_verify/pair_source.rs#L66) compares a canonicalized `project_root` against `resolved`, which is only lexically normalized. With non-canonical roots, valid `track/items/...` paths can be rejected as escaping the project root, breaking Chain-1/Chain-2 enumeration. Canonicalize or normalize both sides before the containment check.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 66,
               "category": "correctness"
             }
@@ -4103,7 +4103,7 @@
             {
               "message": "Symlink validation here is still check-then-open: after `reject_symlinks_below()` succeeds, a concurrent rename/symlink swap can redirect `open_nofollow_read()` to a different file outside the trusted root. Because this helper is used for `spec.json`, catalogues, ADRs, and prompt templates, the verifier can be fed attacker-controlled content or wrong cache keys under a filesystem race. Use a dirfd-pinned/openat-style read path (similar to the write side) or another atomic read strategy.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 32,
               "category": "security"
             }
@@ -4116,9 +4116,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1 security issue: [libs/infrastructure/src/ref_verify.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs#L35) still does symlink validation before opening the file. Because this helper reads `spec.json`, catalogues, ADRs, and prompt templates, a concurrent rename/symlink swap between `reject_symlinks_below()` and `open_child_in_dir()` can make the verifier consume a different file than the one it validated. This needs a dirfd-pinned/openat-style read path end-to-end, not a validate-then-open sequence.",
+              "message": "P1 security issue: [libs/infrastructure/src/ref_verify.rs](libs/infrastructure/src/ref_verify.rs#L35) still does symlink validation before opening the file. Because this helper reads `spec.json`, catalogues, ADRs, and prompt templates, a concurrent rename/symlink swap between `reject_symlinks_below()` and `open_child_in_dir()` can make the verifier consume a different file than the one it validated. This needs a dirfd-pinned/openat-style read path end-to-end, not a validate-then-open sequence.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 35,
               "category": "security"
             }
@@ -4133,7 +4133,7 @@
             {
               "message": "The non-Unix path guards still use validate-then-open / validate-then-rename I/O (`reject_symlinks_below` followed by `open(path)` or `atomic_write_file(path, ...)`). A concurrent symlink or rename swap between the check and the actual open can redirect `ref-verify` reads or writes outside `project_root` on Windows/non-Unix builds. The Unix fd-pinned path is safe, but this branch remains raceable.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 69,
               "category": "security"
             }
@@ -4148,7 +4148,7 @@
             {
               "message": "The new guarded filesystem boundary is only exercised on the happy path. There is no adapter-level negative test that drives `RefVerifyPairSourceAdapter::load_pairs` or the cache write path with a rejected `AdrRef.file`, symlinked artifact, or other path-escape case, so a regression in the security guard would still ship green.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 293,
               "category": "Testing"
             }
@@ -4178,14 +4178,14 @@
             {
               "message": "`read_dir(track_dir)` follows a symlinked `track/items/<track_id>` directory instead of using the guarded, descriptor-pinned opening pattern used everywhere else in this module. In `All` scope, layer discovery can therefore depend on the symlink target's directory contents rather than staying confined to the repository root.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 598,
               "category": "security"
             },
             {
               "message": "This parser accepts any nested JSON object that matches `VerdictResponseDto` because it scans every `{` and keeps the last parseable slice. A malformed wrapper such as `{\"meta\":{\"kind\":\"pass\",\"citation\":\"x\"}}` will be treated as a valid pass even though the top-level JSON is not a verdict object.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 565,
               "category": "logic"
             }
@@ -4200,14 +4200,14 @@
             {
               "message": "Reject model responses that contain more than one top-level JSON object. `extract_json_object_parsed` keeps the last parseable object, so a malformed response like `{\"kind\":\"fail\",...}{\"kind\":\"pass\",...}` is accepted and the trailing object silently overrides the real verdict. That is a fail-open boundary on untrusted model output.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 569,
               "category": "security"
             },
             {
               "message": "Chain-1 evidence hashes are supposed to use the ADR git blob hash per the spec/ADR, but this code hashes the raw file text with SHA-256. That produces a cache key that does not match the required git-blob identity, so the Chain-1 verify-cache contract is wrong for every ADR-backed pair.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 187,
               "category": "correctness"
             }
@@ -4222,14 +4222,14 @@
             {
               "message": "`RefVerifyPairSourceAdapter::load_pairs` is the main file-system-driven entrypoint in this module, but the tests here only cover empty/no-op and rejection cases. There is still no end-to-end fixture that produces at least one valid Chain1 or Chain2 pair and exercises the known-bad probe path, so regressions in hash computation, cache-scope routing, or probe injection can ship unnoticed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 392,
               "category": "test coverage"
             },
             {
               "message": "`RefVerifyCacheAdapter::load_entries` already has a layer-mismatch test, but there is no regression test for malformed on-disk cache JSON. A truncated or invalid `spec-adr-verify-cache.json` / `<layer>-catalogue-spec-verify-cache.json` should fail closed with `CachePersistence`, and that error path is currently unverified for a public API.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 454,
               "category": "test coverage"
             }
@@ -4280,14 +4280,14 @@
             {
               "message": "`extract_json_object_parsed` only balance-matches `{}`/`[]`, so brace-like prose before the verdict (for example `{not json}` or a markdown fragment) is treated as a top-level object. That makes `AgentRefVerifierAdapter::verify_pair` reject a valid response as \"multiple top-level JSON objects\" or \"no valid JSON object found\" even when a correct JSON verdict is present later in the output.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source_json.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source_json.rs",
               "line": 55,
               "category": "correctness"
             },
             {
               "message": "`enumerate_chain2_all_layers` discovers layers by scanning existing `*-types.json` files and silently skips any missing layer. In `All` scope, deleting or omitting an entire layer catalogue therefore yields zero pairs and no error, so the final `ref-verify` gate can pass without ever reviewing that layer. This should fail closed instead of treating missing layers as \"not present\".",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 552,
               "category": "correctness"
             }
@@ -4376,14 +4376,14 @@
             {
               "message": "`catalogue_file_for_layer()` falls back to the default `<layer>-types.json` whenever `architecture-rules.json` is missing, unreadable, or does not name the layer. That makes explicit `RefVerifyScope::Chain2 { layer }` runs verify the wrong file for layers that use a custom `tddd.catalogue_file`, instead of failing closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 591,
               "category": "correctness"
             },
             {
               "message": "`load_tddd_layer_bindings()` converts any read/symlink failure on `architecture-rules.json` into `Ok(None)`, and `enumerate_chain2_all_layers()` then returns an empty Chain-2 set. In `RefVerifyScope::All`, a missing or unreadable rules file therefore suppresses the entire catalogue→spec sweep instead of failing closed, leaving the gate with only Chain-1 coverage.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 575,
               "category": "correctness"
             }
@@ -4418,14 +4418,14 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1, [libs/infrastructure/src/ref_verify/pair_source.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs#L399): a missing catalogue for a declared TDDD layer can still resolve to `Ok(Vec::new())`, so `RefVerifyScope::All` can silently drop that layer from coverage instead of forcing an explicit failure.",
+              "message": "P1, [libs/infrastructure/src/ref_verify/pair_source.rs](libs/infrastructure/src/ref_verify/pair_source.rs#L399): a missing catalogue for a declared TDDD layer can still resolve to `Ok(Vec::new())`, so `RefVerifyScope::All` can silently drop that layer from coverage instead of forcing an explicit failure.",
               "severity": "P1",
               "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 399,
               "category": "correctness"
             },
             {
-              "message": "P1, [libs/infrastructure/src/ref_verify/pair_source_json.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source_json.rs#L60): `extract_json_object_parsed()` only rejects a later malformed object when the intervening text contains one of the exact marker strings (`Final:`, `Verdict:`, `Answer:` etc.), so a response with an earlier valid example object and a malformed trailing block can still be parsed as a valid verdict.",
+              "message": "P1, [libs/infrastructure/src/ref_verify/pair_source_json.rs](libs/infrastructure/src/ref_verify/pair_source_json.rs#L60): `extract_json_object_parsed()` only rejects a later malformed object when the intervening text contains one of the exact marker strings (`Final:`, `Verdict:`, `Answer:` etc.), so a response with an earlier valid example object and a malformed trailing block can still be parsed as a valid verdict.",
               "severity": "P1",
               "file": "libs/infrastructure/src/ref_verify/pair_source_json.rs",
               "line": 60,
@@ -4442,7 +4442,7 @@
             {
               "message": "`extract_json_object_parsed()` accepts a valid verdict object and then ignores later malformed top-level brace blocks when the valid object was preceded by a verdict marker. That means a response like `Final: {...} trailing note {not json}` is treated as success even though the prompt requires the entire reply to be a single JSON object, so corrupted model output can slip through instead of failing closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source_json.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source_json.rs",
               "line": 66,
               "category": "parser correctness"
             }
@@ -4455,9 +4455,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: [`extract_json_object_parsed()`](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source_json.rs#L42-L69) no longer enforces a strict single-object response. It returns the first successfully deserialized object and only fails on later malformed top-level brace blocks when they are encountered, so corrupted model output can still be treated as a successful verdict instead of failing closed.",
+              "message": "P1: [`extract_json_object_parsed()`](libs/infrastructure/src/ref_verify/pair_source_json.rs#L42-L69) no longer enforces a strict single-object response. It returns the first successfully deserialized object and only fails on later malformed top-level brace blocks when they are encountered, so corrupted model output can still be treated as a successful verdict instead of failing closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source_json.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source_json.rs",
               "line": 42,
               "category": "parser correctness"
             }
@@ -4515,14 +4515,14 @@
             {
               "message": "All-scope runs with no TDDD catalogues are supposed to be legal here, but this helper still unconditionally iterates every binding and errors on the first missing catalogue. That means the new pre-Phase-2 `RefVerifyScope::All` path fails instead of returning zero Chain-2 pairs for tracks that have `architecture-rules.json` but no catalogue files yet.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 643,
               "category": "correctness"
             },
             {
               "message": "On JSON parse failure, the adapter now includes up to 4 KB of raw model output in the error string. Because the model can echo the full claim/evidence prompt, this can leak sensitive track content into logs; the previous redaction was safer and better matches the repo's no-sensitive-data-in-errors rule.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 659,
               "category": "security"
             }
@@ -4603,14 +4603,14 @@
             {
               "message": "`RefVerifyScopeResolver` now treats a missing `architecture-rules.json` as an empty TDDD set, but this path still unconditionally calls `load_tddd_layer_bindings()`. As a result, `CommitGate`/`Standalone` can resolve to `All` and then fail later while enumerating Chain-2 pairs in a pre-Phase-2 repo, instead of returning the intended Chain1-only result.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 654,
               "category": "correctness"
             },
             {
               "message": "`VerdictResponseDto` models `citation` and `reason` as optional, and the `Fail` branch turns a missing `reason` into an empty string. That means malformed verifier output like `{\"kind\":\"fail\"}` is accepted as a valid verdict instead of failing closed at the codec boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 566,
               "category": "correctness"
             }
@@ -4625,14 +4625,14 @@
             {
               "message": "`make_known_bad_probe()` hard-codes `cache_scope: RefVerifyCacheScope::SpecAdr`, so every known-bad probe is routed through `ref-verifier-chain1` even during Chain2 runs. That leaves the fast/final calibration gate blind to Chain2-specific verifier regressions and can let degraded Chain2 verdicts be cached as if calibration had passed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 741,
               "category": "correctness"
             },
             {
               "message": "The flat verdict DTO models `citation` and `reason` as `Option<String>`, and the `Pending` arm accepts the deserialized value without checking that those required fields were actually present. A schema-invalid payload like `{\"kind\":\"pending\"}` will therefore be accepted as `Pending` instead of failing closed at the codec boundary, which defeats the `required` contract in the structured-output schema.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 547,
               "category": "validation"
             }
@@ -4647,7 +4647,7 @@
             {
               "message": "`VerdictResponseDto` models `citation` and `reason` as `Option<String>`, and the `Pending` branch accepts the deserialized value without verifying that those schema-required fields were actually present. A payload like `{\"kind\":\"pending\"}` therefore passes as a valid verdict instead of failing closed at the structured-output boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 713,
               "category": "validation"
             }
@@ -4662,14 +4662,14 @@
             {
               "message": "`VerdictResponseDto` models `citation` and `reason` as `Option<String>`, so serde treats missing keys as `None`. `verify_pair()` only rechecks field presence for `Pending`; `Pass` and `Fail` accept responses that violate the declared `required` structured-output schema, e.g. `{\"kind\":\"pass\",\"citation\":\"...\"}` or `{\"kind\":\"fail\",\"reason\":\"...\"}`. That weakens the fail-closed boundary this change is meant to enforce.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 570,
               "category": "missing error handling"
             },
             {
               "message": "In `All` scope, probe injection switches odd probes to `CatalogueSpec` whenever `first_tddd_layer_scope()` finds a TDDD binding, even if `enumerate_chain2_all_layers()` just returned zero Chain-2 pairs because all catalogues are still absent. That introduces Chain-2 probe traffic into the legal pre-Phase-2 path that is supposed to have no Chain-2 pairs, and it can break runs when Chain-2 capability/template is not configured.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 410,
               "category": "logic error"
             }
@@ -4684,14 +4684,14 @@
             {
               "message": "Treating `stdout` as a fallback when `--output-last-message` is empty makes the Codex path accept a verdict even when the authoritative file is missing or blank. That can hide wrapper regressions or partial writes and breaks the fail-closed contract used by the other reviewer wrappers. If the file is empty, return an error instead of parsing stdout.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/process_runner.rs",
+              "file": "libs/infrastructure/src/ref_verify/process_runner.rs",
               "line": 215,
               "category": "error handling"
             },
             {
               "message": "`Pass` only validates `citation`, and `Fail` only validates `reason`. Because both fields are `Option<String>`, malformed JSON such as `{\"kind\":\"fail\",\"citation\":\"x\"}` or `{\"kind\":\"pass\",\"reason\":\"x\"}` is accepted even though the schema declares both keys required. That leaves invalid model output inside the trusted verdict path; validate both keys for every variant or use a custom deserializer.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 699,
               "category": "error handling"
             }
@@ -4706,7 +4706,7 @@
             {
               "message": "All-scope probe injection can still produce zero Chain2 probes when `probe_count == 1`, because the loop always starts with `SpecAdr` at `i == 0` and only routes odd indices to Chain2. That leaves Chain2 uncalibrated on small runs even when Chain2 pairs exist, so a broken Chain2 verifier can slip through the health check.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 422,
               "category": "logic"
             }
@@ -4721,14 +4721,14 @@
             {
               "message": "The flat `VerdictResponseDto` still accepts schema-invalid replies that omit required fields: `Pass` only enforces a non-empty `citation`, `Fail` only enforces a non-empty `reason`, and only `Pending` checks for both keys. A response like `{\"kind\":\"pass\",\"citation\":\"...\"}` is accepted as a valid verdict instead of failing closed, which violates the structured-output contract and can hide provider regressions.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify.rs",
+              "file": "libs/infrastructure/src/ref_verify.rs",
               "line": 693,
               "category": "correctness"
             },
             {
               "message": "`first_tddd_layer_scope` collapses every load/parse error from `architecture-rules.json` into `None`. If the rules file becomes unreadable or malformed after Chain-2 pairs were already loaded, All-scope known-bad probes silently fall back to `SpecAdr` instead of surfacing the failure, so the new Chain-2 path can be under-verified without any error.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 732,
               "category": "correctness"
             }
@@ -4772,14 +4772,14 @@
             {
               "message": "`first_tddd_layer_scope()` silently converts any `architecture-rules.json` load/parse/validation failure into `None`, and the caller immediately falls back to `SpecAdr`. That means an All-scope run with Chain-2 pairs can lose its Chain-2 known-bad probe if the rules file is unreadable or changes between pair enumeration and probe injection, which breaks the new “same chain capability as the real pairs” guarantee. Propagate the failure instead of treating it like “no TDDD layers”.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/pair_source.rs",
+              "file": "libs/infrastructure/src/ref_verify/pair_source.rs",
               "line": 636,
               "category": "correctness"
             },
             {
               "message": "The new public runner boundary has no success-path test coverage: the tests here only cover argv construction and negative validation, but nothing exercises a successful `make_ref_verifier_process_runner()` / `run_codex_ref_verifier()` / `run_gemini_ref_verifier()` invocation. A regression in subprocess spawning, `--output-last-message` handling, or stderr-tail capture would therefore ship undetected, which is a P1 test-coverage gap for the new infrastructure seam.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/ref_verify/process_runner.rs",
+              "file": "libs/infrastructure/src/ref_verify/process_runner.rs",
               "line": 82,
               "category": "testing"
             }

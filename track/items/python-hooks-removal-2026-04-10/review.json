@@ -10,7 +10,7 @@
             {
               "message": "`detect_track_id_from_branch` ignores the `project_root` passed from `execute_views` and always discovers the repo from the process CWD. That means `track views sync --project-root <repo>` can silently inspect the wrong git checkout or fall back to registry-only mode when invoked outside the repo root, so the new auto-detect is not reliable for non-default project roots.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/views.rs",
+              "file": "apps/cli/src/commands/track/views.rs",
               "line": 49,
               "category": "correctness"
             }
@@ -450,7 +450,7 @@
             {
               "message": "`verification.md` records T01 as already completed (`[x]` entries and a `T01` result block claiming CI/verify success), but `metadata.json` still leaves task `T01` in `in_progress`. That makes the track state internally inconsistent and the verification record premature for a status-flip commit.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-hooks-removal-2026-04-10/verification.md",
+              "file": "track/items/python-hooks-removal-2026-04-10/verification.md",
               "line": 27,
               "category": "correctness"
             }

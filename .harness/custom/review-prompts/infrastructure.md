@@ -13,8 +13,8 @@ Report findings ONLY for the following categories:
 - **trusted-root violation**: a path-handling code path that resolves user
   / config input via `Path::join` / canonicalize WITHOUT verifying the
   resolved path stays under a `trusted_root: &Path` (path traversal).
-  Cite the existing `is_safe_briefing_path` pattern and CN-04 fail-closed
-  policy.
+  Cite the existing `is_safe_briefing_path` pattern and the fail-closed
+  trusted-root policy.
 - **symlink not rejected at boundary**: a file load that follows symlinks
   (the default for `std::fs::read_to_string` / `read_dir`) without an
   explicit `symlink_metadata().file_type().is_symlink()` check + reject when

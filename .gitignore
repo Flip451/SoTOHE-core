@@ -76,8 +76,7 @@ track/items/**/*-baseline.json
 # Legacy suffix-less path retained for backward compatibility (no new outputs land here);
 # active cluster-mode outputs use the depth-suffixed pattern below.
 track/items/**/*-graph/
-# Depth-suffixed cluster-mode dirs introduced by ADR
-# `2026-04-25-0530-type-designer-recon-options-defaults.md` D2
+# Depth-suffixed cluster-mode dirs hold the current depth-specific outputs
 # (e.g. `domain-graph-d1/`, `domain-graph-d2/`).
 track/items/**/*-graph-d*/
 

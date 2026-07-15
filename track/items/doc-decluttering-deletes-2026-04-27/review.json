@@ -32,14 +32,14 @@
             {
               "message": "AC-04 is incompatible with CN-02 as written: CN-02 forbids changing Tier 0 SoT files, but the plan still treats the stale `knowledge/WORKFLOW.md` links in those unchanged files as part of AC-04. That makes the acceptance criterion impossible to satisfy without narrowing AC-04 or widening the scope.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/doc-decluttering-deletes-2026-04-27/spec.json",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/spec.json",
               "line": 217,
               "category": "contradiction"
             },
             {
               "message": "The plan summary defers the AC-04/CN-02 issue to an `Open Questions` section, but no such section exists in the plan artifacts. The referenced resolution path is therefore dangling.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/doc-decluttering-deletes-2026-04-27/impl-plan.json",
+              "file": "track/items/doc-decluttering-deletes-2026-04-27/impl-plan.json",
               "line": 22,
               "category": "broken reference"
             }

@@ -83,8 +83,8 @@ Report findings ONLY for the following categories:
   only)
 - Re-ordering of `permissions.allow` entries
 - Adding "(optional)" / "(recommended)" labels to convention rules
-- Suggested CI gates for things D6 / similar decisions have
-  explicitly deferred — those are decided out-of-scope
+- Suggested CI gates for concerns whose decision explicitly deferred them — those
+  are decided out-of-scope
 - Adding cross-links between conventions when the existing structure
   already covers the rule
 - Re-organizing `.claude/commands/` directory layout
@@ -113,8 +113,8 @@ Report findings ONLY for the following categories:
   - **Consumer-runtime data under a runtime-created tree**:
     `track/items/<consumer-actual-track-id>/...`,
     `track/items/<id>/review.json`, `track/registry.md`, and similar.
-    These come into existence after the consumer runs `/track:init`;
-    the distribution ships an empty `track/items/` tree.
+    These come into existence after the consumer runs `/track:init`; the
+    distribution need not contain the runtime-created `track/items/` tree.
   - **References to a path that matches a harness-policy pattern but
     is gitignored**: `.claude/settings.local.json` or similar
     consumer-local files. The matching pattern includes them, but git

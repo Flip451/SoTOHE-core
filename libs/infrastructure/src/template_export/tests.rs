@@ -4,6 +4,7 @@
 #![allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
 use std::path::{Path, PathBuf};
+use std::process::Command;
 
 use tempfile::TempDir;
 use usecase::template_export::{
@@ -30,6 +31,46 @@ fn write_file(root: &Path, rel: &str, content: &str) {
 
 fn read_file(root: &Path, rel: &str) -> String {
     std::fs::read_to_string(root.join(rel)).unwrap()
+}
+
+fn run_git(root: &Path, args: &[&str]) {
+    let output = Command::new("git").args(args).current_dir(root).output().unwrap();
+    assert!(
+        output.status.success(),
+        "git {} failed: {}",
+        args.join(" "),
+        String::from_utf8_lossy(&output.stderr)
+    );
+}
+
+fn initialize_git_repository(root: &Path) {
+    run_git(root, &["init", "--quiet"]);
+}
+
+fn export_adapter() -> FsTemplateExportAdapter {
+    FsTemplateExportAdapter::new(Some(PathBuf::from("/work-machine/home")))
+}
+
+fn relative_path_from(base: &Path, target: &Path) -> PathBuf {
+    let base_components: Vec<_> = base.components().collect();
+    let target_components: Vec<_> = target.components().collect();
+    let shared_components = base_components
+        .iter()
+        .zip(&target_components)
+        .take_while(|(base, target)| base == target)
+        .count();
+
+    let mut relative_path = PathBuf::new();
+    for _ in &base_components[shared_components..] {
+        relative_path.push("..");
+    }
+    for component in &target_components[shared_components..] {
+        relative_path.push(component.as_os_str());
+    }
+    if relative_path.as_os_str().is_empty() {
+        relative_path.push(".");
+    }
+    relative_path
 }
 
 /// Collects every file path (relative to `root`) in sorted order.
@@ -230,13 +271,25 @@ fn full_manifest() -> domain::TemplateBoundaryManifest {
     manifest_from_json(FULL_MANIFEST)
 }
 
+fn gitignore_manifest() -> domain::TemplateBoundaryManifest {
+    manifest_from_json(
+        r#"{
+  "schema_version": 1,
+  "entries": [
+    { "pattern": ".git", "classification": "exclude" },
+    { "pattern": ".gitignore", "classification": "include" }
+  ]
+}"#,
+    )
+}
+
 #[test]
 fn test_export_applies_all_classifications() {
     let dir = TempDir::new().unwrap();
     let command = export_fixture(&dir);
     let manifest = full_manifest();
 
-    let report = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap();
+    let report = export_adapter().export(&command, &manifest).unwrap();
 
     assert_eq!(report.included_count, 1);
     assert_eq!(report.excluded_count, 1);
@@ -263,8 +316,8 @@ fn test_export_is_deterministic() {
     let mut second = command.clone();
     second.output_dir = dir.path().join("out-2");
 
-    FsTemplateExportAdapter::new().export(&first, &manifest).unwrap();
-    FsTemplateExportAdapter::new().export(&second, &manifest).unwrap();
+    export_adapter().export(&first, &manifest).unwrap();
+    export_adapter().export(&second, &manifest).unwrap();
 
     let files_first = collect_files(&first.output_dir);
     let files_second = collect_files(&second.output_dir);
@@ -283,7 +336,7 @@ fn test_export_existing_output_dir_returns_output_dir_exists() {
     let manifest = full_manifest();
     std::fs::create_dir_all(&command.output_dir).unwrap();
 
-    let err = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap_err();
+    let err = export_adapter().export(&command, &manifest).unwrap_err();
     assert!(
         matches!(err, TemplateExportPortError::OutputDirExists { .. }),
         "unexpected error: {err}"
@@ -297,7 +350,7 @@ fn test_export_output_inside_workspace_source_returns_io_error() {
     command.output_dir = command.workspace_root.join("libs/domain/out");
     let manifest = full_manifest();
 
-    let err = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap_err();
+    let err = export_adapter().export(&command, &manifest).unwrap_err();
     assert!(
         matches!(err, TemplateExportPortError::Io { ref path, .. } if path == &command.output_dir),
         "unexpected error: {err}"
@@ -326,7 +379,7 @@ fn test_export_output_inside_overlay_source_returns_io_error() {
 }"#,
     );
 
-    let err = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap_err();
+    let err = export_adapter().export(&command, &manifest).unwrap_err();
     assert!(
         matches!(err, TemplateExportPortError::Io { ref path, .. } if path == &command.output_dir),
         "unexpected error: {err}"
@@ -345,7 +398,7 @@ fn test_export_output_parent_symlink_returns_io_error() {
     command.output_dir = link_out_parent.join("out");
     let manifest = full_manifest();
 
-    let err = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap_err();
+    let err = export_adapter().export(&command, &manifest).unwrap_err();
     assert!(
         matches!(err, TemplateExportPortError::Io { ref path, .. } if path == &command.output_dir),
         "unexpected error: {err}"
@@ -363,7 +416,7 @@ fn test_export_workspace_root_symlink_returns_io_error() {
     std::os::unix::fs::symlink(&real_workspace_path, &workspace_path).unwrap();
     let manifest = full_manifest();
 
-    let err = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap_err();
+    let err = export_adapter().export(&command, &manifest).unwrap_err();
     assert!(
         matches!(err, TemplateExportPortError::Io { ref path, .. } if path == &command.workspace_root),
         "unexpected error: {err}"
@@ -381,7 +434,7 @@ fn test_export_overlay_root_symlink_returns_io_error() {
     std::os::unix::fs::symlink(&real_overlay_path, &overlay_path).unwrap();
     let manifest = full_manifest();
 
-    let err = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap_err();
+    let err = export_adapter().export(&command, &manifest).unwrap_err();
     assert!(
         matches!(err, TemplateExportPortError::Io { ref path, .. } if path == &command.overlay_dir),
         "unexpected error: {err}"
@@ -396,7 +449,7 @@ fn test_export_missing_overlay_returns_overlay_missing() {
     std::fs::remove_file(dir.path().join("overlay/Makefile.toml")).unwrap();
     let manifest = full_manifest();
 
-    let err = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap_err();
+    let err = export_adapter().export(&command, &manifest).unwrap_err();
     assert!(
         matches!(
             err,
@@ -419,7 +472,7 @@ fn test_export_overlay_symlink_path_returns_io_error() {
     std::os::unix::fs::symlink(&outside_path, &overlay_path).unwrap();
     let manifest = full_manifest();
 
-    let err = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap_err();
+    let err = export_adapter().export(&command, &manifest).unwrap_err();
     assert!(
         matches!(err, TemplateExportPortError::Io { ref path, .. } if path == &overlay_path),
         "unexpected error: {err}"
@@ -434,7 +487,7 @@ fn test_export_unclassified_path_fails_closed() {
     write_file(dir.path(), "workspace/README.md", "# unclassified\n");
     let manifest = full_manifest();
 
-    let err = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap_err();
+    let err = export_adapter().export(&command, &manifest).unwrap_err();
     assert!(
         matches!(
             err,
@@ -442,6 +495,425 @@ fn test_export_unclassified_path_fails_closed() {
                 if path.as_str() == "README.md"
         ),
         "unexpected error: {err}"
+    );
+}
+
+#[test]
+fn test_export_gitignored_untracked_directory_is_skipped() {
+    let dir = TempDir::new().unwrap();
+    let root = dir.path();
+    write_file(root, "workspace/.gitignore", "generated/\n");
+    write_file(root, "workspace/generated/cache.bin", "temporary\n");
+    std::fs::create_dir_all(root.join("overlay")).unwrap();
+    initialize_git_repository(&root.join("workspace"));
+    let command = TemplateExportCommand {
+        workspace_root: root.join("workspace"),
+        manifest_path: root.join("boundary.json"),
+        overlay_dir: root.join("overlay"),
+        output_dir: root.join("out"),
+    };
+
+    let report = export_adapter().export(&command, &gitignore_manifest()).unwrap();
+
+    assert_eq!(report.included_count, 1);
+    assert!(!command.output_dir.join("generated").exists());
+    assert_eq!(read_file(&command.output_dir, ".gitignore"), "generated/\n");
+}
+
+#[test]
+fn test_export_include_subtree_with_ignored_untracked_entry_excludes_it() {
+    let dir = TempDir::new().unwrap();
+    let root = dir.path();
+    write_file(root, "workspace/.gitignore", ".claude/logs/\n");
+    write_file(root, "workspace/.claude/rules/keep.md", "tracked rule\n");
+    write_file(
+        root,
+        "workspace/.claude/logs/post-implementation-review-state.json",
+        "{\"workspace\": \"/work-machine/home/project\"}\n",
+    );
+    std::fs::create_dir_all(root.join("overlay")).unwrap();
+    initialize_git_repository(&root.join("workspace"));
+    run_git(&root.join("workspace"), &["add", ".gitignore", ".claude/rules/keep.md"]);
+    let command = TemplateExportCommand {
+        workspace_root: root.join("workspace"),
+        manifest_path: root.join("boundary.json"),
+        overlay_dir: root.join("overlay"),
+        output_dir: root.join("out"),
+    };
+    let manifest = manifest_from_json(
+        r#"{
+  "schema_version": 1,
+  "entries": [
+    { "pattern": ".claude", "classification": "include" },
+    { "pattern": ".git", "classification": "exclude" },
+    { "pattern": ".gitignore", "classification": "include" }
+  ]
+}"#,
+    );
+
+    let report = export_adapter().export(&command, &manifest).unwrap();
+
+    assert_eq!(report.included_count, 2);
+    assert_eq!(read_file(&command.output_dir, ".claude/rules/keep.md"), "tracked rule\n");
+    assert!(!command.output_dir.join(".claude/logs").exists());
+}
+
+#[test]
+fn test_export_gitignored_tracked_file_fails_closed() {
+    let dir = TempDir::new().unwrap();
+    let root = dir.path();
+    write_file(root, "workspace/.gitignore", "generated.tmp\n");
+    write_file(root, "workspace/generated.tmp", "tracked despite ignore rule\n");
+    std::fs::create_dir_all(root.join("overlay")).unwrap();
+    initialize_git_repository(&root.join("workspace"));
+    run_git(&root.join("workspace"), &["add", "--force", "generated.tmp"]);
+    let command = TemplateExportCommand {
+        workspace_root: root.join("workspace"),
+        manifest_path: root.join("boundary.json"),
+        overlay_dir: root.join("overlay"),
+        output_dir: root.join("out"),
+    };
+
+    let err = export_adapter().export(&command, &gitignore_manifest()).unwrap_err();
+
+    assert!(
+        matches!(
+            err,
+            TemplateExportPortError::UnclassifiedPath { ref path }
+                if path.as_str() == "generated.tmp"
+        ),
+        "unexpected error: {err}"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn test_export_gitignored_path_with_symlinked_git_entry_returns_io_error() {
+    let dir = TempDir::new().unwrap();
+    let root = dir.path();
+    write_file(root, "workspace/.gitignore", "generated/\n");
+    write_file(root, "workspace/generated/cache.bin", "temporary\n");
+    std::fs::create_dir_all(root.join("overlay")).unwrap();
+    initialize_git_repository(&root.join("workspace"));
+    let other_repository = root.join("other-repository");
+    std::fs::create_dir_all(&other_repository).unwrap();
+    initialize_git_repository(&other_repository);
+    let git_dir = root.join("workspace/.git");
+    std::fs::remove_dir_all(&git_dir).unwrap();
+    std::os::unix::fs::symlink(other_repository.join(".git"), &git_dir).unwrap();
+    let command = TemplateExportCommand {
+        workspace_root: root.join("workspace"),
+        manifest_path: root.join("boundary.json"),
+        overlay_dir: root.join("overlay"),
+        output_dir: root.join("out"),
+    };
+
+    let err = export_adapter().export(&command, &gitignore_manifest()).unwrap_err();
+
+    assert!(
+        matches!(err, TemplateExportPortError::Io { ref path, .. } if path == &git_dir),
+        "unexpected error: {err}"
+    );
+}
+
+#[test]
+fn test_export_rejects_machine_path_in_exported_output() {
+    let dir = TempDir::new().unwrap();
+    let command = export_fixture(&dir);
+    let home = PathBuf::from("/work-machine/home");
+    write_file(
+        dir.path(),
+        "workspace/libs/domain/src/lib.rs",
+        &format!("source artifact from {}", home.display()),
+    );
+
+    let err =
+        FsTemplateExportAdapter::new(Some(home)).export(&command, &full_manifest()).unwrap_err();
+
+    assert!(
+        matches!(
+            err,
+            TemplateExportPortError::MachinePathDetected { ref path }
+                if path.as_str() == "libs/domain/src/lib.rs"
+        ),
+        "unexpected error: {err}"
+    );
+}
+
+#[test]
+fn test_export_workspace_home_path_fails_closed() {
+    let dir = TempDir::new().unwrap();
+    let command = export_fixture(&dir);
+    let home = command.workspace_root.join("libs/domain/.cache/home");
+    std::fs::create_dir_all(&home).unwrap();
+    let content = format!("container home: {}\n", home.display());
+    write_file(dir.path(), "workspace/libs/domain/src/lib.rs", &content);
+
+    let err =
+        FsTemplateExportAdapter::new(Some(home)).export(&command, &full_manifest()).unwrap_err();
+
+    assert!(
+        matches!(err, TemplateExportPortError::Io { ref path, ref reason }
+            if path == &command.output_dir && reason.as_str().contains("container-local home")),
+        "unexpected error: {err}"
+    );
+}
+
+#[test]
+fn test_export_nonexistent_workspace_home_fails_closed() {
+    let dir = TempDir::new().unwrap();
+    let command = export_fixture(&dir);
+    let home = command.workspace_root.join("libs/domain/.cache/missing-home");
+    write_file(
+        dir.path(),
+        "workspace/libs/domain/src/lib.rs",
+        &format!("container home: {}\n", home.display()),
+    );
+
+    let err =
+        FsTemplateExportAdapter::new(Some(home)).export(&command, &full_manifest()).unwrap_err();
+
+    assert!(
+        matches!(err, TemplateExportPortError::Io { ref path, ref reason }
+            if path == &command.output_dir && reason.as_str().contains("container-local home")),
+        "unexpected error: {err}"
+    );
+}
+
+#[test]
+fn test_export_relative_workspace_root_with_existing_machine_home_fails_closed() {
+    let dir = TempDir::new().unwrap();
+    let mut command = export_fixture(&dir);
+    let home = command.workspace_root.join("libs/domain/.cache/home");
+    std::fs::create_dir_all(&home).unwrap();
+    let content = format!("container home: {}\n", home.display());
+    write_file(dir.path(), "workspace/libs/domain/src/lib.rs", &content);
+
+    let current_dir = std::env::current_dir().unwrap();
+    let workspace_root = relative_path_from(&current_dir, &command.workspace_root);
+    assert!(!workspace_root.is_absolute());
+    assert_eq!(
+        std::fs::canonicalize(&workspace_root).unwrap(),
+        std::fs::canonicalize(&command.workspace_root).unwrap()
+    );
+    command.workspace_root = workspace_root;
+
+    let err =
+        FsTemplateExportAdapter::new(Some(home)).export(&command, &full_manifest()).unwrap_err();
+
+    assert!(
+        matches!(err, TemplateExportPortError::Io { ref path, ref reason }
+            if path == &command.output_dir && reason.as_str().contains("container-local home")),
+        "unexpected error: {err}"
+    );
+}
+
+#[test]
+fn test_export_machine_home_with_parent_component_returns_io_error() {
+    let dir = TempDir::new().unwrap();
+    let command = export_fixture(&dir);
+    let home = command.workspace_root.join("../machine-home");
+    write_file(
+        dir.path(),
+        "workspace/libs/domain/src/lib.rs",
+        &format!("source artifact from {}\n", home.display()),
+    );
+
+    let err =
+        FsTemplateExportAdapter::new(Some(home)).export(&command, &full_manifest()).unwrap_err();
+
+    assert!(
+        matches!(err, TemplateExportPortError::Io { ref path, .. } if path == &command.output_dir),
+        "unexpected error: {err}"
+    );
+}
+
+#[test]
+fn test_export_rejects_machine_path_when_home_has_trailing_separator() {
+    let dir = TempDir::new().unwrap();
+    let command = export_fixture(&dir);
+    let home = PathBuf::from("/work-machine/home/");
+    write_file(
+        dir.path(),
+        "workspace/libs/domain/src/lib.rs",
+        "source artifact from /work-machine/home/project\n",
+    );
+
+    let err =
+        FsTemplateExportAdapter::new(Some(home)).export(&command, &full_manifest()).unwrap_err();
+
+    assert!(
+        matches!(
+            err,
+            TemplateExportPortError::MachinePathDetected { ref path }
+                if path.as_str() == "libs/domain/src/lib.rs"
+        ),
+        "unexpected error: {err}"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn test_scan_rejects_non_utf8_machine_home_path() {
+    use std::ffi::OsString;
+    use std::os::unix::ffi::OsStringExt as _;
+
+    let dir = TempDir::new().unwrap();
+    let output_dir = dir.path().join("out");
+    std::fs::create_dir_all(&output_dir).unwrap();
+    std::fs::write(
+        output_dir.join("machine-path.txt"),
+        b"source artifact from /work-machine/\xffhome/project\n",
+    )
+    .unwrap();
+    let home = PathBuf::from(OsString::from_vec(b"/work-machine/\xffhome".to_vec()));
+
+    let err = super::machine_path_scan::ensure_exported_output_has_no_machine_paths(
+        &output_dir,
+        Some(&home),
+    )
+    .unwrap_err();
+
+    assert!(
+        matches!(
+            err,
+            TemplateExportPortError::MachinePathDetected { ref path }
+                if path.as_str() == "machine-path.txt"
+        ),
+        "unexpected error: {err}"
+    );
+}
+
+#[test]
+fn test_scan_relative_machine_home_path_returns_io_error() {
+    let dir = TempDir::new().unwrap();
+    let output_dir = dir.path().join("out");
+    std::fs::create_dir_all(&output_dir).unwrap();
+
+    let err = super::machine_path_scan::ensure_exported_output_has_no_machine_paths(
+        &output_dir,
+        Some(Path::new("work-machine/home")),
+    )
+    .unwrap_err();
+
+    assert!(
+        matches!(err, TemplateExportPortError::Io { ref path, .. } if path == &output_dir),
+        "unexpected error: {err}"
+    );
+}
+
+#[test]
+fn test_export_unresolved_machine_home_returns_io_error() {
+    let dir = TempDir::new().unwrap();
+    let command = export_fixture(&dir);
+
+    let err = FsTemplateExportAdapter::new(None).export(&command, &full_manifest()).unwrap_err();
+
+    assert!(
+        matches!(err, TemplateExportPortError::Io { ref path, .. } if path == &command.output_dir),
+        "unexpected error: {err}"
+    );
+}
+
+#[test]
+fn test_export_allows_machine_home_prefix_with_different_path_component() {
+    let dir = TempDir::new().unwrap();
+    let command = export_fixture(&dir);
+    let home = PathBuf::from("/work-machine/home");
+    write_file(
+        dir.path(),
+        "workspace/libs/domain/src/lib.rs",
+        &format!("decoy path: {}-archived\n", home.display()),
+    );
+
+    let report =
+        FsTemplateExportAdapter::new(Some(home)).export(&command, &full_manifest()).unwrap();
+
+    assert_eq!(report.included_count, 1);
+}
+
+#[test]
+fn test_export_allows_nonboundary_machine_home_across_scan_chunks() {
+    let dir = TempDir::new().unwrap();
+    let command = export_fixture(&dir);
+    let home = PathBuf::from("/work-machine/home");
+    let home_path = home.to_string_lossy();
+    let filler = "x".repeat(
+        super::machine_path_scan::MACHINE_PATH_SCAN_CHUNK_SIZE
+            .saturating_sub(home_path.len().saturating_add(2)),
+    );
+    let content = format!("{filler}x{home_path}\ntrailing\n");
+    write_file(dir.path(), "workspace/libs/domain/src/lib.rs", &content);
+
+    let report =
+        FsTemplateExportAdapter::new(Some(home)).export(&command, &full_manifest()).unwrap();
+
+    assert_eq!(report.included_count, 1);
+    assert_eq!(read_file(&command.output_dir, "libs/domain/src/lib.rs"), content);
+}
+
+#[test]
+fn test_export_detects_machine_path_across_scan_chunks() {
+    let dir = TempDir::new().unwrap();
+    let command = export_fixture(&dir);
+    let home = PathBuf::from("/work-machine/home");
+    let filler =
+        format!("{} ", "x".repeat(super::machine_path_scan::MACHINE_PATH_SCAN_CHUNK_SIZE - 2));
+    let content = format!("{filler}{}\n", home.display());
+    write_file(dir.path(), "workspace/libs/domain/src/lib.rs", &content);
+
+    let err =
+        FsTemplateExportAdapter::new(Some(home)).export(&command, &full_manifest()).unwrap_err();
+
+    assert!(
+        matches!(
+            err,
+            TemplateExportPortError::MachinePathDetected { ref path }
+                if path.as_str() == "libs/domain/src/lib.rs"
+        ),
+        "unexpected error: {err}"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn test_scan_exported_output_with_symlink_returns_io_error() {
+    let dir = TempDir::new().unwrap();
+    let output_dir = dir.path().join("out");
+    let outside_path = dir.path().join("outside.txt");
+    let symlink_path = output_dir.join("linked.txt");
+    std::fs::create_dir_all(&output_dir).unwrap();
+    std::fs::write(&outside_path, "outside\n").unwrap();
+    std::os::unix::fs::symlink(&outside_path, &symlink_path).unwrap();
+
+    let err = super::machine_path_scan::ensure_exported_output_has_no_machine_paths(
+        &output_dir,
+        Some(Path::new("/work-machine/home")),
+    )
+    .unwrap_err();
+
+    assert!(
+        matches!(err, TemplateExportPortError::Io { ref path, .. } if path == &symlink_path),
+        "unexpected error: {err}"
+    );
+}
+
+#[test]
+fn test_export_allows_system_container_and_example_paths() {
+    let dir = TempDir::new().unwrap();
+    let command = export_fixture(&dir);
+    write_file(
+        dir.path(),
+        "workspace/libs/domain/src/lib.rs",
+        "system: /dev/null\ncommand: /bin/false\ncontainer: /workspace/app\nexample: /example/project\n",
+    );
+
+    let report = export_adapter().export(&command, &full_manifest()).unwrap();
+
+    assert_eq!(report.included_count, 1);
+    assert_eq!(
+        read_file(&command.output_dir, "libs/domain/src/lib.rs"),
+        "system: /dev/null\ncommand: /bin/false\ncontainer: /workspace/app\nexample: /example/project\n"
     );
 }
 
@@ -460,7 +932,7 @@ fn test_export_missing_include_source_returns_source_missing() {
 }"#,
     );
 
-    let err = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap_err();
+    let err = export_adapter().export(&command, &manifest).unwrap_err();
     let expected = command.workspace_root.join("libs/does-not-exist");
     assert!(
         matches!(err, TemplateExportPortError::SourceMissing { ref path } if path == &expected),
@@ -484,7 +956,7 @@ fn test_export_overlay_row_missing_both_sources_returns_source_missing() {
 }"#,
     );
 
-    let err = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap_err();
+    let err = export_adapter().export(&command, &manifest).unwrap_err();
     let expected = command.workspace_root.join("missing-overlay-anchor");
     assert!(
         matches!(err, TemplateExportPortError::SourceMissing { ref path } if path == &expected),
@@ -512,7 +984,7 @@ fn test_export_overlay_only_anchor_emits_overlay_content() {
 }"#,
     );
 
-    let report = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap();
+    let report = export_adapter().export(&command, &manifest).unwrap();
 
     // Makefile.toml (anchor present, via walk) + track/registry.md (overlay-only).
     assert_eq!(report.overlay_applied_count, 2);
@@ -538,7 +1010,7 @@ fn test_export_absent_exclude_row_succeeds() {
 }"#,
     );
 
-    let report = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap();
+    let report = export_adapter().export(&command, &manifest).unwrap();
 
     assert_eq!(report.included_count, 1);
     assert_eq!(report.overlay_applied_count, 1);
@@ -559,7 +1031,7 @@ fn test_export_include_symlink_path_returns_io_error() {
     std::os::unix::fs::symlink(&outside_path, &include_path).unwrap();
     let manifest = full_manifest();
 
-    let err = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap_err();
+    let err = export_adapter().export(&command, &manifest).unwrap_err();
     assert!(
         matches!(err, TemplateExportPortError::Io { ref path, .. } if path == &include_path),
         "unexpected error: {err}"
@@ -584,7 +1056,7 @@ fn test_export_descends_into_unclassified_directory() {
     };
     let manifest = full_manifest();
 
-    let report = FsTemplateExportAdapter::new().export(&command, &manifest).unwrap();
+    let report = export_adapter().export(&command, &manifest).unwrap();
     assert_eq!(report.included_count, 1);
     assert!(command.output_dir.join("libs/domain/src/lib.rs").exists());
 }

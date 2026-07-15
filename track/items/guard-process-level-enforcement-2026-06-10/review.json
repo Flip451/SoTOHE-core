@@ -106,7 +106,7 @@
             {
               "message": "P1: The new public `CliApp::verify_hooks_path` entry point is added without any corresponding happy-path or failure-path tests in this scope. That leaves the new `verify hooks-path` wiring unverified, which is a coverage gap for a public API and makes regressions in the adapter easy to miss.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/verify.rs",
+              "file": "apps/cli-composition/src/verify.rs",
               "line": 281,
               "category": "testing"
             }
@@ -316,9 +316,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: This adds a new public `verify hooks-path` subcommand and dispatch arm, but there is no matching parser/dispatch coverage in the verify test suite. The existing `verify_tests.rs` file exercises the other `VerifyCommand` variants; without success/failure tests for `HooksPath`, a clap rename or dispatch regression here could ship unnoticed. See [apps/cli/src/commands/verify.rs:45](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs#L45) and [apps/cli/src/commands/verify.rs:157](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs#L157).",
+              "message": "P1: This adds a new public `verify hooks-path` subcommand and dispatch arm, but there is no matching parser/dispatch coverage in the verify test suite. The existing `verify_tests.rs` file exercises the other `VerifyCommand` variants; without success/failure tests for `HooksPath`, a clap rename or dispatch regression here could ship unnoticed. See [apps/cli/src/commands/verify.rs:45](apps/cli/src/commands/verify.rs#L45) and [apps/cli/src/commands/verify.rs:157](apps/cli/src/commands/verify.rs#L157).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli/src/commands/verify.rs",
+              "file": "apps/cli/src/commands/verify.rs",
               "line": 45,
               "category": "testing"
             }
@@ -430,14 +430,14 @@
             {
               "message": "P1: `contains_git_invocation` misses `env`-prefixed invocations because `env` is not in `COMMAND_LAUNCHERS`. That leaves a fail-closed bypass in `GuardHookHandler`: `env git ...` and `sudo env git ...` are parsed as `env`, not `git`, so the new hooks-path gate will not trip even though the command still executes git. `env` is already treated as a wrapper elsewhere in the repo, so this needs to be handled here and regression-tested.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
+              "file": "libs/domain/src/guard/policy.rs",
               "line": 14,
               "category": "correctness"
             },
             {
               "message": "P1: The new public API `contains_git_invocation` was added without any unit tests in this module. That leaves the launcher-stripping behavior and the new git-detection path unverified, which conflicts with the repo policy that public APIs need happy-path and error/bypass coverage. Add regression tests for direct git, launcher-wrapped git, and at least one non-git case.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
+              "file": "libs/domain/src/guard/policy.rs",
               "line": 143,
               "category": "testing"
             }
@@ -452,7 +452,7 @@
             {
               "message": "`contains_git_invocation()` only strips tokens in `COMMAND_LAUNCHERS`, and `env` is not included there. As a result, `env git status`, `env -i git status`, and `sudo env git status` are parsed as `env` here and return `false`, which bypasses the new fail-closed hooks-path gate even though git still executes.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
+              "file": "libs/domain/src/guard/policy.rs",
               "line": 143,
               "category": "security"
             }
@@ -467,7 +467,7 @@
             {
               "message": "`env -i` is still treated as an arg-consuming launcher option here because the final `LAUNCHER_OPTIONS_WITH_ARG` check returns `true` after the `env` special-case. That makes `skip_command_launchers()` skip the real `git` token in `env -i git add`, so the direct-git block is bypassed.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/guard/policy.rs",
+              "file": "libs/domain/src/guard/policy.rs",
               "line": 443,
               "category": "security"
             }
@@ -958,7 +958,7 @@
             {
               "message": "`T002` is not executable as written: it tells `HookDispatchInteractor::resolve_handler` to return `Box::new(GitRefUpdateHandler)` and `Box::new(GitPrePushHandler)`, but the type catalogue marks both handlers as having stripped/private fields and documents a required `parser: Arc<dyn ShellParser>` dependency. The plan needs an explicit constructor or wiring step for that dependency; otherwise the new handlers cannot be instantiated.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/guard-process-level-enforcement-2026-06-10/impl-plan.json",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/impl-plan.json",
               "line": 12,
               "category": "infeasibility"
             }
@@ -1281,7 +1281,7 @@
             {
               "message": "The redirect-target contract is split across the plan artifacts: this file introduces `SimpleCommand.output_redirect_texts` as the field to scan, but `plan.md`/`impl-plan.json` and the scope spec still describe CN-07/IN-05 in terms of `SimpleCommand.redirect_texts`. That leaves two competing source-of-truth field names for the same behavior, so implementers cannot tell which contract is canonical.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/guard-process-level-enforcement-2026-06-10/domain-types.json",
+              "file": "track/items/guard-process-level-enforcement-2026-06-10/domain-types.json",
               "line": 131,
               "category": "contradiction"
             }
@@ -1498,7 +1498,7 @@
             {
               "message": "The new redirect scan treats every `redirect_texts` entry as an output target, but this field also carries input-redirect words and heredoc bodies in the parser. As written, benign commands like `cat < tests/foo.rs` or a heredoc that mentions `tests/foo.rs` will be blocked even though they do not truncate a test file.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 155,
               "category": "logic"
             }
@@ -1550,7 +1550,7 @@
             {
               "message": "The new raw-token guard is too broad: `command.contains(SOTP_GUARDED_TOKEN)` blocks any command string that merely contains `SOTP_GUARDED_GIT` as a substring, including benign literals such as comments, echoed text, or filenames like `SOTP_GUARDED_GITX`. The downstream domain check uses exact token/assignment matching specifically to avoid this class of false positive, so the pre-parse scan should use token boundaries rather than a plain substring search.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 54,
               "category": "correctness"
             }
@@ -1565,7 +1565,7 @@
             {
               "message": "The new redirect check is direction-blind: `redirect_texts` contains input-redirect targets and heredoc bodies as well as output targets, so any command that merely reads from a test file and also has an output redirect (or a heredoc body that looks like a test path) will be blocked even though it is not truncating the test file. This needs redirect-type filtering, not a flat scan of `redirect_texts`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 198,
               "category": "correctness"
             }
@@ -1580,14 +1580,14 @@
             {
               "message": "Redirect-to-test-file blocking is only applied once to the top-level raw command string and only recognizes stdout-style operators. A nested payload like `bash -c 'echo hi > tests/foo.rs'` is never checked, and redirects such as `2>`, `1>` or `&>` are ignored, so the truncation bypass remains.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 185,
               "category": "security"
             },
             {
               "message": "`raw_command_contains_guarded_token` only checks the trailing boundary, so it also matches the token as a suffix inside longer identifiers like `MY_SOTP_GUARDED_GIT=1`. That contradicts the exact-match behavior in the domain policy and will falsely block unrelated commands.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 353,
               "category": "correctness"
             }
@@ -1683,7 +1683,7 @@
             {
               "message": "The new redirect guard only compares the unevaluated `redirect_texts` / raw token text against `is_test_file`, so shell-expanded destinations are still a bypass. A command like `echo hi > $TEST_DIR/foo.rs`, `echo hi > ${VAR}/tests/foo.rs`, or `echo hi > $(printf tests/foo.rs)` will not match the literal test-file patterns here, and the parse-failure fallback at `raw_mentions_output_redirect_to_test_file` has the same blind spot. That leaves the test-file truncation vector open for dynamically constructed redirect targets.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 180,
               "category": "security"
             }
@@ -1698,14 +1698,14 @@
             {
               "message": "The parse-error fallback is not actually fail-closed for writable redirects because it explicitly skips `<>` as if it were read-only. A malformed command such as `echo foo <> tests/foo.rs` can therefore bypass the new guard and reach `allow()` even though `<>` is a write-capable redirect.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 428,
               "category": "security"
             },
             {
               "message": "The raw redirect scanner tokenizes targets by raw whitespace and only trims outer quotes, so quoted or escaped redirect paths with spaces are missed in the parse-error fallback. For example, `echo foo > \"tests/foo bar.rs\"` or `echo foo > tests/foo\\ bar.rs` will not be recognized as test-file redirects after a parse failure, which breaks the intended fail-closed behavior.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 446,
               "category": "security"
             }
@@ -1720,7 +1720,7 @@
             {
               "message": "`redirect_target_has_shell_expansion()` only treats `$` and backticks as dynamic. That leaves Bash process substitution and other non-`$` expansion forms unblocked, so a command like `echo hi > >(cat > tests/foo.rs)` can still reach a test-file write path without tripping either the parsed redirect check or the raw fallback. This is a bypass of the new truncation guard.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 516,
               "category": "security"
             }
@@ -1765,14 +1765,14 @@
             {
               "message": "`read_raw_redirect_target` only skips spaces and tabs before the target, so a writable redirect split across a newline (`echo foo >\\n tests/foo.rs`) is not recognized. That lets a test-file truncation bypass the new guard.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 591,
               "category": "security"
             },
             {
               "message": "The new raw-string redirect scan is applied to the entire shell input, so it cannot distinguish literal heredoc/comment text from a real redirect. A harmless heredoc like `cat <<EOF > /tmp/out.txt\\n> tests/foo.rs\\nEOF` will be blocked because the body line is rescanned as `>` + test-file target.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 185,
               "category": "correctness"
             }
@@ -1787,7 +1787,7 @@
             {
               "message": "`guarded_output_redirect_target_in_chars` recurses on every nested `$(...)` it sees in a redirect target, but there is no depth cap or iterative limit. A deeply nested command-substitution payload can exhaust the stack and crash the hook before parsing, which is a denial-of-service risk on untrusted input.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 451,
               "category": "security"
             }
@@ -1802,7 +1802,7 @@
             {
               "message": "`redirect_target_has_shell_expansion()` does not recognize tilde expansion or Bash extglob forms, so a command like `echo foo > ~/tests/foo.rs` can resolve to a protected test file without being blocked. Because `check_output_redirects_for_test_files()` relies on this helper for both parsed and fail-closed paths, this is a guard bypass.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 808,
               "category": "security"
             }
@@ -2078,14 +2078,14 @@
             {
               "message": "P0: The raw redirect scan treats arithmetic expansion as opaque and skips past it before checking for `$(...)`/backticks. Bash allows command substitutions inside `$((...))`, so a command like `echo $(( $(echo ok > tests/foo.rs) + 1 ))` can hide the test-file redirect from this guard. This is a security bypass in the new `block-test-file-deletion` path.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 318,
               "category": "security"
             },
             {
               "message": "P0: `scan_substitution_at` stops descending once `MAX_RAW_REDIRECT_SCAN_DEPTH` is reached and silently returns `None`, so deeply nested but valid command substitutions are not inspected at all. An attacker can wrap `> tests/foo.rs` in more than 16 nested `$()`/backticks and bypass the test-file redirect block.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 367,
               "category": "security"
             }
@@ -2100,7 +2100,7 @@
             {
               "message": "`check_output_redirects_for_test_files()` now short-circuits to the raw-string scanner for every parsed Bash command, but `read_raw_word()` stops at the first unquoted whitespace. A valid redirect such as `echo content > $(printf tests/foo.rs)` is therefore reduced to the literal target `$(printf)` and the nested substitution that yields `tests/foo.rs` is never examined, so the new test-file redirect guard can be bypassed on the main success path. This needs to inspect `cmd.redirect_texts` or recurse through substitution content instead of relying only on the raw substring.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 108,
               "category": "security"
             }
@@ -2115,7 +2115,7 @@
             {
               "message": "P1: Successful parses never consult `SimpleCommand.redirect_texts` here because the `Some(raw_command)` branch returns immediately after the raw scan. That makes the new redirect guard bypassable for valid test-file names that contain characters the raw scanner treats as terminators, such as `)` or `&` (for example, `echo > tests/foo(test).rs` or `echo > tests/foo&bar.rs`).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 108,
               "category": "security"
             }
@@ -2130,14 +2130,14 @@
             {
               "message": "P0: `raw_text_substitution_mentions_test_file` only matches contiguous literals inside `$()`/backticks, so a redirect target assembled from pieces (for example `$(printf '%s%s' tests/ foo.rs)`) is missed and the guard can still allow writes to `tests/foo.rs`.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 545,
               "category": "security"
             },
             {
               "message": "P1: `scan_raw_redirect_targets` recurses into every command substitution in the whole command, not just the redirect target, so a harmless command like `echo \"$(printf 'tests/foo.rs')\" > /tmp/out` will be blocked even though the redirected file is safe.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 326,
               "category": "correctness"
             }
@@ -2152,14 +2152,14 @@
             {
               "message": "`raw_text_substitution_mentions_test_file` only rejoins up to 5 tokens. A command substitution can split `tests/foo.rs` across 6+ pieces and bypass the `tests/` detection, so a redirect like `> $(printf '%s%s%s%s%s%s' t e s t s /foo.rs)` can still truncate a test file.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 545,
               "category": "security"
             },
             {
               "message": "The new raw redirect scan only runs when `cmd.has_output_redirect` is already true. If the shell parser successfully tokenizes a command but misses an output-redirect classification, this guard never runs and the truncation bypass remains open for any redirect syntax the parser does not recognize.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 106,
               "category": "security"
             }
@@ -2174,7 +2174,7 @@
             {
               "message": "`raw_text_substitution_mentions_test_file()` only reconstructs a candidate path by concatenating literal tokens, so it misses command substitutions that synthesize a test-file target through format strings or shell variables. For example, `echo content > $(printf '%s/%s' tests foo.rs)` can still resolve to `tests/foo.rs` but will not match `is_test_file()`, so the new redirect guard can be bypassed.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 545,
               "category": "security"
             }
@@ -2204,7 +2204,7 @@
             {
               "message": "The new redirect guard still only catches literal targets and a narrow subset of substitutions. A redirect like `echo foo > $OUT`, `echo foo > ${DIR}/tests/foo.rs`, or `echo foo > \"$(echo tests/foo.rs)\"` can still resolve to a test file and bypass this check, so the truncation/deletion vector remains open.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 107,
               "category": "security"
             }
@@ -2219,7 +2219,7 @@
             {
               "message": "The new pre-parse redirect scanner treats every bare `>` outside `[[...]]`/arithmetic/substitution as an output redirection. That means valid POSIX `[` comparisons such as `[ \"$a\" > tests/foo.rs ]` are now blocked even though no file is being written. This is a correctness regression in the hook’s Bash handling.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 333,
               "category": "correctness"
             }
@@ -2234,7 +2234,7 @@
             {
               "message": "`raw_text_substitution_mentions_test_file()` does not model inline parameter expansion inside a path fragment, so redirects like `echo content > te${X}sts/foo.rs` (or `tes${X}t_user.rs`) can expand to a test file without matching `is_test_file()` or the current tokenization heuristics. Because `check_output_redirects_for_test_files()` relies on this helper for both parse-success and parse-error paths, this is a bypass of the new redirect-to-test-file guard.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 549,
               "category": "security"
             }
@@ -2249,14 +2249,14 @@
             {
               "message": "`raw_text_substitution_mentions_test_file()` only simulates command substitutions through token joining and `%s`-style `printf` rendering. A redirect target synthesized with other common `printf` forms such as `%b`/``-style escapes is not recognized, so a command like `echo > $(printf '%b' '\\164\\145\\163\\164\\163/\\146\\157\\157\\.\\162\\163')` can still write to `tests/foo.rs` without being blocked.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 552,
               "category": "security"
             },
             {
               "message": "The production portion of this module is now 706 lines, which exceeds the repository's 700-line maximum for a module. This pushes `libs/usecase/src/hook.rs` over the allowed size threshold and makes the hook layer harder to reason about safely.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/hook.rs",
+              "file": "libs/usecase/src/hook.rs",
               "line": 706,
               "category": "architecture"
             }
@@ -2624,7 +2624,7 @@
             {
               "message": "Add coverage for the `Err(e)` path in `verify`. The current tests exercise the pass case plus two config-state failures, but they never force `Command::new(\"git\").output()` to fail. A missing `git` binary or PATH failure would therefore bypass unit coverage on this new public API.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/verify/hooks_path.rs",
+              "file": "libs/infrastructure/src/verify/hooks_path.rs",
               "line": 17,
               "category": "tests"
             }

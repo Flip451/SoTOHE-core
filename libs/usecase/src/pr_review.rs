@@ -125,9 +125,10 @@ pub struct PrReviewResult {
 ///
 /// ```
 /// use usecase::pr_review::sanitize_text;
-/// let out = sanitize_text("Error in /home/user/main.rs");
+/// let home_path = format!("/home/{}", "user");
+/// let out = sanitize_text(&format!("Error in {home_path}/main.rs"));
 /// assert!(out.contains("[PATH]"));
-/// assert!(!out.contains("/home/user"));
+/// assert!(!out.contains(home_path.as_str()));
 /// ```
 #[must_use]
 pub fn sanitize_text(text: &str) -> String {
@@ -261,8 +262,9 @@ mod tests {
 
     #[test]
     fn test_sanitize_removes_absolute_paths() {
-        let result = sanitize_text("Error in /home/user/project/src/main.rs");
-        assert!(!result.contains("/home/user"), "path not redacted: {result}");
+        let home_path = format!("/home/{}", "user");
+        let result = sanitize_text(&format!("Error in {home_path}/project/src/main.rs"));
+        assert!(!result.contains(home_path.as_str()), "path not redacted: {result}");
         assert!(result.contains("[PATH]"), "expected [PATH]: {result}");
     }
 

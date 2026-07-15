@@ -135,8 +135,9 @@ cargo make ci
 
 ## Parallel Worker Isolation (CARGO_TARGET_DIR_RELATIVE)
 
-Agent Teams で複数ワーカーが同時にビルドする場合、`CARGO_TARGET_DIR_RELATIVE` 環境変数で
-`CARGO_TARGET_DIR` を分離して build lock 競合を防ぐ：
+起動側が worker ごとに環境変数を設定できる経路（Agent Teams 等）で複数ワーカーが同時に
+ビルドする場合、`CARGO_TARGET_DIR_RELATIVE` 環境変数で `CARGO_TARGET_DIR` を分離すると
+build lock 競合による待ちを避けられる：
 
 ```bash
 # Worker ごとに固有の target dir を設定
@@ -153,6 +154,12 @@ cargo make test                                        # → target/
 | `CARGO_TARGET_DIR_RELATIVE=target-w1` | `CARGO_TARGET_DIR=/workspace/target-w1` |
 | sccache | ワーカー間で共有（`SCCACHE_DIR` は共通） |
 | 対象タスク | `run --rm` ラッパー（`cargo make test`, `cargo make clippy` 等） |
+
+この分離は**性能最適化であって安全性の前提条件ではない**。共有 target のまま並行ビルド
+しても、cargo の build lock が内部で直列化するだけで成果物は壊れない。review fixer
+dispatch（`bin/sotp review fix-local`）は worker への環境変数 forwarding を持たず共有
+target で動作する。並行 review の安全性は review scope partition の互いに素性と hash gate
+が担う（`.harness/workflows/track/review.md` Step 4）。
 
 ## Project Bootstrap (Version Research)
 

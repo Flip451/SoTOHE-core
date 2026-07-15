@@ -225,14 +225,14 @@
             {
               "message": "D4 is missing the required `> Note:` explaining that the ADR-first gate is recorded in `spec.json::constraints`, and the ADR ends without a `## References` section. Add both so the Nygard structure matches the review brief and the process/decision split stays explicit.",
               "severity": "P2",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+              "file": "knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
               "line": 172,
               "category": "documentation"
             },
             {
               "message": "`Reassess When` stops after two items. The brief expects a fuller trigger list, including an explicit condition for revisiting B2 if cross-track mistakes increase. Add the missing triggers so future re-evaluation criteria are concrete.",
               "severity": "P2",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
+              "file": "knowledge/adr/2026-04-15-1012-catalogue-active-guard-fix.md",
               "line": 257,
               "category": "documentation"
             }
@@ -350,7 +350,7 @@
             {
               "message": "Move `architecture-rules.json` loading behind the `is_done_or_archived` guard. Right now frozen tracks still parse the repo-level rules file, so a malformed or unreadable rules file will make `sync_rendered_views` fail even though the type-catalogue path should be a no-op for done/archived tracks.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "file": "libs/infrastructure/src/track/render.rs",
               "line": 579,
               "category": "error handling"
             }

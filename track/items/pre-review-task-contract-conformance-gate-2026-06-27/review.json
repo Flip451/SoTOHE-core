@@ -10,7 +10,7 @@
             {
               "message": "The ownership paragraph is stale: it still says this capability owns only `impl-plan.json` and `task-coverage.json`, but the same file now declares `task-contract.json` as a third Phase 3 artifact and allows writing it. That leaves the harness contract internally inconsistent about what `impl-planner` owns.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/capabilities/impl-planner.md",
+              "file": ".harness/capabilities/impl-planner.md",
               "line": 25,
               "category": "convention contradiction"
             }
@@ -39,7 +39,7 @@
             {
               "message": "The new gate parses `--group`, but the actual review-fix wrapper contract still uses `--scope` on the caller side and `bin/sotp review fix-local` itself expects `--scope`. That means the pre-review gate is unreachable for the documented invocation path, and any invocation that does pass `--group` will be forwarded unchanged to `review fix-local` and fail there. The task-contract check/briefing append therefore does not wire into the real fix workflow.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 645,
               "category": "command wiring breakage"
             }
@@ -133,7 +133,7 @@
             {
               "message": "`track-contract-gate` lost the non-`track/<id>` branch guard from the briefing. It now always runs `bin/sotp task-contract check --items-dir track/items`, and that command self-resolves from the current branch and fails on `main`/detached HEAD. As a result, `cargo make track-local-review-fix-codex` now hard-fails outside a track branch instead of skipping cleanly.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 642,
               "category": "command wiring breakage"
             }
@@ -148,7 +148,7 @@
             {
               "message": "`.claude/commands/track/review.md` now tells both fast and final Codex rounds to run `cargo make track-local-review-fix`, and `.claude/settings.json` / `.codex/rules/default.rules` whitelist that same task name, but `Makefile.toml` only defines `[tasks.track-local-review]` at line 655. As written, the orchestrator will invoke a non-existent cargo-make task, while the real task name is not permitted by the sandbox allowlist, so the Codex review path cannot launch.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.claude/commands/track/review.md",
+              "file": ".claude/commands/track/review.md",
               "line": 87,
               "category": "command wiring breakage"
             }
@@ -170,7 +170,7 @@
             {
               "message": "`review-fix-lead-codex.md` still says the `cargo make track-local-review` wrapper chains `track-sync-views` before review, but `Makefile.toml` now wires `track-local-review` through `track-contract-gate` only. That makes the briefing describe a pre-review view sync that no longer happens, so the fixer can run against stale rendered views.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/briefings/review-fix-lead-codex.md",
+              "file": ".harness/briefings/review-fix-lead-codex.md",
               "line": 72,
               "category": "command wiring breakage"
             }
@@ -280,7 +280,7 @@
             {
               "message": "`track-local-review` and `track-local-review-fix` no longer propagate the caller-supplied `--track-id` into the pre-review `task-contract` gate; the dependency chain now auto-resolves from the current branch instead. That makes the review flow unsafe when the explicit track id and working branch diverge, because the gate can validate a different track than the one requested by `.claude/commands/track/review.md`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 657,
               "category": "command wiring breakage"
             }
@@ -389,7 +389,7 @@
             {
               "message": "The new `--track-id` branch mismatch guard runs inside the task script, but `task-contract-check` is still a cargo-make dependency, so that gate executes before this check. On a wrong branch, the task will still auto-resolve and run the task-contract gates against the current branch, and only then exit 2; that defeats the stated protection for both `track-local-review` and `track-local-review-fix`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 677,
               "category": "command wiring breakage"
             }
@@ -418,7 +418,7 @@
             {
               "message": "`track-local-review` and `track-local-review-fix` now run `bin/sotp task-contract coverage` before every review round. That changes the pre-review wiring: the accepted contract for this gate keeps `task-contract coverage` in `cargo make ci` and reserves `track-local-review` for `signal calc-impl-catalog && task-contract check` before `bin/sotp review local` (`knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md:93-109`). As written, any orphaned or missing `task-contract.json` entry will block reviewer entry, so review rounds can no longer start on tracks that should still be reviewable under the documented workflow.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 700,
               "category": "command wiring breakage"
             }
@@ -448,7 +448,7 @@
             {
               "message": "Step 2.5 still tells Codex to run `cargo make track-review-results`, but Makefile.toml no longer defines that task. The canonical review-results check is now unreachable from this briefing, so agents cannot verify `zero_findings` and complete the round.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/.harness/briefings/review-fix-lead-codex.md",
+              "file": ".harness/briefings/review-fix-lead-codex.md",
               "line": 103,
               "category": "command wiring breakage"
             }
@@ -965,7 +965,7 @@
             {
               "message": "The generated plan still describes the task-contract API as `group`/`--group` in several places, but the updated catalogues now model it as optional `layer`/`--layer` (`usecase-types.json`, `cli_driver-types.json`, `cli_types.json`, `cli_composition-types.json`). In this file, T002/T004/T005/T006/T008 all keep the old `group` shape, so the plan is internally contradictory and the public CLI/service contract is ambiguous.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
               "line": 12,
               "category": "contradiction"
             }
@@ -1001,7 +1001,7 @@
             {
               "message": "The new `read_optional_signals` contract says a missing `<layer>-type-signals.json` can be classified as `Ok(None)` and then “skip layers without a signal document silently” (`usecase-types.json`), but the surrounding plan artifacts still describe the gate as checking all 6 canonical layers in sequence and `FsImplCatalogSignalReader` as mapping read failures to `SignalReadFailed`. As written, a canonical layer with an absent signal file can be ignored instead of blocking the gate, so the all-layers mode is no longer actually fail-closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
               "line": 164,
               "category": "contradiction"
             }
@@ -1058,7 +1058,7 @@
             {
               "message": "`TaskContractCheckArgs` now has a fourth field, `briefing_file`, but the doc string still enumerates only `layer`, `track_id`, and `items_dir`. That makes the artifact's contract text inaccurate and hides the new CLI input from downstream implementers.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
               "line": 85,
               "category": "factual error"
             }
@@ -1109,7 +1109,7 @@
             {
               "message": "`T005` still specifies `TaskContractCheckArgs.track_id: String`, but the generated CLI catalogue for the same artifact makes `track_id` optional and adds `detect_active_track_from_branch_cwd` so `sotp task-contract check` can auto-resolve the active track when `--track-id` is omitted. As written, the plan would force the CLI to reject the documented no-flag invocation path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/plan.md",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/plan.md",
               "line": 33,
               "category": "contradiction"
             }
@@ -1139,7 +1139,7 @@
             {
               "message": "`task-contract.json` attributes `PreReviewGateInteractor` only to `T010`, but the actual status-filtering work is introduced later in `T015` (`impl-plan.json` says `T015` narrows `PreReviewGateInteractor::check` with `impl-plan.json` task status). That leaves the final D7 gate logic outside the task contract, so the new per-task check can treat `T015` as out of scope and miss the code that makes the gate behave as specified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/task-contract.json",
               "line": 53,
               "category": "contradiction"
             }
@@ -1330,14 +1330,14 @@
             {
               "message": "`CoverageViolation` is still described as a pure \"attribution-completeness\" violation, but the newly added `MissingSignalDocument` variant is a signal-document availability failure, not an attribution failure. That makes the enum contract internally inconsistent and leaves implementors without a clear boundary between coverage and liveness handling.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json",
               "line": 152,
               "category": "factual error"
             },
             {
               "message": "The coverage CLI path is still specified as if only `MissingTaskContract`, `OrphanEntry`, and `InvalidEntryRef` can be blocked. With `MissingSignalDocument` added in T009 and T010 explicitly failing closed on absent signal docs, the plan has no rendering or propagation rule for that fourth violation, so the new fail-closed case can be dropped at the CLI boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/impl-plan.json",
               "line": 72,
               "category": "contradiction"
             }
@@ -1432,7 +1432,7 @@
             {
               "message": "`RunReviewFixError` still describes `SmokeTestFailed` as failing \"per CN-04\", but this track explicitly retired `CN-04`. That leaves a stale cross-document reference in the source JSON, and the generated markdown mirrors it.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
               "line": 164,
               "category": "broken reference"
             }
@@ -1462,7 +1462,7 @@
             {
               "message": "`RunReviewFixError` is introduced as a `modify` entry with no `spec_refs`, so the generated catalogue stays `Cat-Spec` yellow. The briefing only accepted catalogue↔impl yellow; this leaves the new usecase type ungrounded in the spec and makes the task-contract / contract-map additions semantically inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
               "line": 148,
               "category": "factual error"
             }
@@ -1551,7 +1551,7 @@
             {
               "message": "T017 is attributed to IN-05/AC-06 here, but its own plan text describes a sentinel pass-through fix in `review_run_fix_local` / `run_fix_local`, not a change to the pre-review gate wiring or fail-closed gate behavior. That makes the coverage claim semantically too strong: the spec/task-coverage map now says the gate requirement is covered by a task that does not actually implement the gate requirement.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.md",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/spec.md",
               "line": 22,
               "category": "factual error"
             }
@@ -1758,7 +1758,7 @@
             {
               "message": "`cli::commands::track::views::detect_active_track_from_branch` is modeled as a `reference` here, but its own docs say it was removed in this track. The same symbol is then still carried forward into `contract-map.md`, so the final plan is internally inconsistent about whether this helper exists or has been deleted.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/cli-types.json",
               "line": 222,
               "category": "contradiction"
             }
@@ -1861,7 +1861,7 @@
             {
               "message": "`CoverageVerifyInteractor` is described as holding \"two injected secondary ports\", but the constructor immediately below now takes three parameters (`impl_plan_reader` is included). This leaves the plan artifact internally inconsistent about the interactor's dependency shape for the D9 change.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
+              "file": "track/items/pre-review-task-contract-conformance-gate-2026-06-27/usecase-types.json",
               "line": 138,
               "category": "contradiction"
             }
@@ -1937,14 +1937,14 @@
             {
               "message": "This adapter reads `<items_dir>/<track_id>/task-contract.json` directly with `std::fs::read` and never rejects symlinks on the leaf or ancestor chain. A symlinked track directory or file can redirect the pre-review gate to attacker-controlled content; the existing filesystem loaders in this repo use `symlink_metadata`/`reject_symlinks_below` and fail closed here.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/task_contract_reader.rs",
+              "file": "libs/infrastructure/src/task_contract_reader.rs",
               "line": 44,
               "category": "symlink not rejected at boundary"
             },
             {
               "message": "This adapter follows the same unchecked read path for `<items_dir>/<track_id>/<layer>-type-signals.json`. Because there is no boundary symlink rejection before `std::fs::read`, a symlinked `track_id` directory or signal file can bypass the intended real-file semantics used by the other infrastructure readers.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
               "line": 50,
               "category": "symlink not rejected at boundary"
             }
@@ -1959,14 +1959,14 @@
             {
               "message": "Reject `self.items_dir` itself before the below-root walk. `reject_symlinks_below(&path, &self.items_dir)` only checks descendants; if `--items-dir` is a symlink, `task-contract.json` can be read through the redirected root. `FsSpecFileLoader` shows the required fail-closed trusted_root check.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/task_contract_reader.rs",
+              "file": "libs/infrastructure/src/task_contract_reader.rs",
               "line": 47,
               "category": "trusted-root violation"
             },
             {
               "message": "Reject `self.items_dir` itself before the below-root walk. `reject_symlinks_below(&path, &self.items_dir)` only checks descendants; if `--items-dir` is a symlink, `*-type-signals.json` can be read through the redirected root. `FsSpecFileLoader` shows the required fail-closed trusted_root check.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
               "line": 53,
               "category": "trusted-root violation"
             }
@@ -1981,7 +1981,7 @@
             {
               "message": "`entries` is deserialized as a plain `BTreeMap`, so duplicate task IDs in `task-contract.json` will be accepted with last-write-wins semantics during `serde_json::from_slice`. That silently drops contracted entries and can make the pre-review gate evaluate a different contract than the file actually encodes. Other strict infrastructure codecs in this repo reject duplicate map keys explicitly; this codec should fail closed too.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/task_contract_codec.rs",
+              "file": "libs/infrastructure/src/task_contract_codec.rs",
               "line": 78,
               "category": "serde codec break"
             }
@@ -2068,7 +2068,7 @@
             {
               "message": "`symlink_metadata(&path)` is used as the only presence probe before returning `Ok(None)`. That probe can traverse symlinked parent components, so a symlinked `track_id` directory that points outside the trusted root but has no leaf file is classified as “missing” instead of being rejected. This weakens the boundary check; use `reject_symlinks_below` (or an equivalent fail-closed check) before treating `NotFound` as absence.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
               "line": 61,
               "category": "symlink not rejected at boundary"
             }
@@ -2303,7 +2303,7 @@
             {
               "message": "`PreReviewGateOutcome::Blocked` no longer matches the tracked domain contract: the variant lost `#[non_exhaustive]` and its payload type changed from `Vec<PreReviewGateViolation>` to the new `PreReviewGateViolations` wrapper. That diverges from `track/items/pre-review-task-contract-conformance-gate-2026-06-27/domain-types.json` and breaks consumers generated against the declared shape.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/domain/src/task_contract.rs",
+              "file": "libs/domain/src/task_contract.rs",
               "line": 217,
               "category": "catalogue-contract"
             }
@@ -2318,7 +2318,7 @@
             {
               "message": "`PreReviewGateOutcome::Blocked` no longer matches the declared domain contract: `domain-types.json` says the payload is `Vec<PreReviewGateViolation>` (and marks the variant non-exhaustive), but this implementation exposes the new public `PreReviewGateViolations` wrapper instead. That breaks shape parity for generated consumers and makes the domain API diverge from the catalog the rest of the track is built against.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/domain/src/task_contract.rs",
+              "file": "libs/domain/src/task_contract.rs",
               "line": 217,
               "category": "typestate / parse-don't-validate gap"
             }
@@ -2443,7 +2443,7 @@
             {
               "message": "The `None` branch swallows every `SignalReadFailed`, but `check_layer()` also raises that error for malformed signal documents (for example, invalid `type_name` values are converted to `SignalReadFailed` here). As a result, a corrupt or unreadable layer can be treated as if it simply had no document, and all-layers mode can return `Passed` instead of surfacing the failure.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "file": "libs/usecase/src/pre_review_gate.rs",
               "line": 338,
               "category": "error handling"
             }
@@ -2458,7 +2458,7 @@
             {
               "message": "All-layers skip logic keys off the human-readable `message` inside `PreReviewGateError::SignalReadFailed` instead of a typed not-found variant. Because that diagnostic is documented as opaque, a real read/decode failure can be misclassified as a missing document and silently skipped, which breaks the fail-closed behavior in the `None` branch.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "file": "libs/usecase/src/pre_review_gate.rs",
               "line": 204,
               "category": "error type confusion"
             }
@@ -2488,7 +2488,7 @@
             {
               "message": "P1: `None`-layer mode now depends on `read_optional_signals()`, but this file only adds a default shim that calls `read_signals()`. The production filesystem adapter still reports a missing `*-type-signals.json` as `SignalReadFailed`, so the new all-layers path will still abort on absent layers instead of skipping them silently. The added passing test only uses a mock that overrides the new hook, so it does not cover the real adapter path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/libs/usecase/src/pre_review_gate.rs",
+              "file": "libs/usecase/src/pre_review_gate.rs",
               "line": 141,
               "category": "error handling"
             }
@@ -2741,7 +2741,7 @@
             {
               "message": "[render leak] The composition root formats the final user-facing failure string here (`format!(...)`) and injects the raw append error into it. That output construction belongs in `cli_driver`; this layer should surface a typed composition error or let the driver render the failure, otherwise the wiring layer is leaking presentation concerns and may expose filesystem details in the message.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli-composition/src/task_contract.rs",
+              "file": "apps/cli-composition/src/task_contract.rs",
               "line": 84,
               "category": "render leak"
             }
@@ -2893,14 +2893,14 @@
             {
               "message": "This code performs application-level file I/O from the CLI layer (`OpenOptions::new().create(true).append(true)` plus `writeln!`). That breaks the thin-bin boundary in the scope policy/ADR D8; `apps/cli` should only parse and dispatch, with the append handled behind `cli_driver`/`cli_composition`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/task_contract.rs",
+              "file": "apps/cli/src/commands/task_contract.rs",
               "line": 145,
               "category": "direct I/O in bin"
             },
             {
               "message": "The new `--briefing-file` branch has no tests for either the append success path or the IO-error fail-closed path. The current tests only exercise clap parsing, so regressions in the new side effect and exit-code behavior can slip through undetected.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/task_contract.rs",
+              "file": "apps/cli/src/commands/task_contract.rs",
               "line": 103,
               "category": "test coverage gap"
             }
@@ -2950,7 +2950,7 @@
             {
               "message": "`task_contract_check_core` and the matching coverage helper print skip notices with `println!` before returning success. That is direct application output from the bin layer instead of flowing through a driver `CommandOutcome`, which violates the CLI boundary and can pollute stdout for scripted callers.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/task_contract.rs",
+              "file": "apps/cli/src/commands/task_contract.rs",
               "line": 155,
               "category": "direct I/O in bin"
             }
@@ -2979,14 +2979,14 @@
             {
               "message": "`check_spec_adr` now derives the fallback `spec.json` path from `std::env::current_dir()` and then appends `track/items/<id>/spec.json`. If the command is run from any subdirectory of the repo, this points at the wrong location and the command will incorrectly take the graceful-skip path even when the active track's spec exists at the repository root. Resolve the repo/workspace root first, then build the fallback path from that root.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/signal/check_spec_adr.rs",
+              "file": "apps/cli/src/commands/signal/check_spec_adr.rs",
               "line": 66,
               "category": "business logic in bin"
             },
             {
               "message": "The skip branches in `resolve_spec_json_path_or_skip` emit notices with `println!` before returning `CommandOutcome::success(None)`. That is direct stdout I/O in the thin-bin layer, bypassing the normal `CommandOutcome` emission path and making the skip output impossible to control consistently. Return the notice through `CommandOutcome::success(Some(...))` instead, or let the driver emit it.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/signal/check_spec_adr.rs",
+              "file": "apps/cli/src/commands/signal/check_spec_adr.rs",
               "line": 77,
               "category": "direct I/O in bin"
             }
@@ -3001,7 +3001,7 @@
             {
               "message": "`resolve_track_id(...)` is the read resolver, so an explicit `--track-id` is returned unchanged here. That means `sotp review fix-local --track-id <other-track>` can bypass the branch-mismatch guard and operate on the wrong track, which is exactly the failure mode the write-side guard is meant to prevent. Use the `*_for_write` resolver for this path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/review/fix_local.rs",
+              "file": "apps/cli/src/commands/review/fix_local.rs",
               "line": 72,
               "category": "business logic in bin"
             }
@@ -3038,14 +3038,14 @@
             {
               "message": "`execute_task_contract_check` and `execute_task_contract_coverage` both collapse `resolve_active_track(None)` with `.ok().flatten()`. That discards the new helper's `Err` path, so a missing `git`, a non-work-tree cwd, or any other discovery failure is treated the same as \"no active track\" and the command exits `SUCCESS` without running the gate. This is a fail-open regression for the pre-review gate; propagate the error instead of converting it to `None`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/task_contract.rs",
+              "file": "apps/cli/src/commands/task_contract.rs",
               "line": 133,
               "category": "missing error propagation"
             },
             {
               "message": "The no-`--track-id` branch now routes through `common::resolve_active_track(Some(&project_root))`, which turns git-discovery failures into a hard error. `track views sync` is documented to preserve registry-only mode when no active track is resolvable, so this changes a supported fallback into an abort on non-git checkouts or broken git environments. Keep the previous `None` fallback here and only fail on explicit WRITE-guard mismatches.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-003/apps/cli/src/commands/track/views.rs",
+              "file": "apps/cli/src/commands/track/views.rs",
               "line": 31,
               "category": "behavior regression"
             }

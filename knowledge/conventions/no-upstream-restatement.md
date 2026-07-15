@@ -46,11 +46,9 @@ artifact 間矛盾の発生源が増える。挙動契約の本文は上流だ�
 - [ ] `<layer>-types.json` entry の `docs` / `intent` が上流の設計理由・挙動契約を散文で
       再説明していないか
 
-## Decision Reference
+## Related Documents
 
-- `knowledge/adr/2026-07-02-1600-review-load-batch-findings-no-restatement.md`
-  — 本 convention の原典 ADR (D2)。`knowledge/adr/README.md` の索引から辿る
-  (テンプレート抽出後のツリーには ADR 本体が同梱されないため、リンクではなくパス表記で参照する)
+- `knowledge/adr/README.md` — 設計判断の索引（履歴を確認する必要がある場合）
 - [enforce-by-mechanism.md](./enforce-by-mechanism.md) — 本 convention は reviewer severity policy
   (`.harness/custom/review-prompts/impl-plan.md` / `types.md`) の finding class とセットで
   review gate から強制される

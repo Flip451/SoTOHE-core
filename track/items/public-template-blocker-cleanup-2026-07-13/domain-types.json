@@ -1,0 +1,104 @@
+{
+  "crate_name": "domain",
+  "functions": {},
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "FilePath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "FilePath",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "FilePath",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "FilePath",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "FilePath",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "reference",
+      "for_type": "FilePath",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "action": "reference",
+      "for_type": "FilePath",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "action": "reference",
+      "for_type": "FilePath",
+      "trait_ref": "core::fmt::Display"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "FilePath": {
+      "action": "reference",
+      "docs": "Validated repo-relative path reused at structured-artifact persistence boundaries; its constructor rejects empty, absolute, and traversal-bearing values before storage.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "s",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, FilePathError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "review_v2::types",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-04",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

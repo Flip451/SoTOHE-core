@@ -56,6 +56,70 @@ fn test_retention_gate_clap_parses_project_root_flag() {
 }
 
 #[test]
+fn test_sotp_version_tag_clap_parses_project_root_flag() {
+    let cli =
+        TestCli::try_parse_from(["sotp", "sotp-version-tag", "--project-root", "workspace-root"])
+            .unwrap();
+
+    match cli.cmd {
+        VerifyCommand::SotpVersionTag(args) => {
+            assert_eq!(args.project_root, std::path::Path::new("workspace-root"));
+        }
+        _ => panic!("expected SotpVersionTag variant"),
+    }
+}
+
+#[test]
+fn test_machine_paths_clap_parses_project_root_flag() {
+    let cli =
+        TestCli::try_parse_from(["sotp", "machine-paths", "--project-root", "workspace-root"])
+            .unwrap();
+
+    match cli.cmd {
+        VerifyCommand::MachinePaths(args) => {
+            assert_eq!(args.project_root, std::path::Path::new("workspace-root"));
+        }
+        _ => panic!("expected MachinePaths variant"),
+    }
+}
+
+#[test]
+fn test_template_refs_clap_parses_project_root_flag() {
+    let cli =
+        TestCli::try_parse_from(["sotp", "template-refs", "--project-root", "workspace-root"])
+            .unwrap();
+
+    match cli.cmd {
+        VerifyCommand::TemplateRefs(args) => {
+            assert_eq!(args.project_root, std::path::Path::new("workspace-root"));
+        }
+        _ => panic!("expected TemplateRefs variant"),
+    }
+}
+
+#[test]
+fn test_new_verifier_subcommands_dispatch_to_wired_routes() {
+    let root = TempDir::new().unwrap();
+    let driver = cli_composition::VerifyCompositionRoot::new().verify_driver();
+    let commands = [
+        (VerifyCommand::SotpVersionTag(make_args(root.path())), "--- verify sotp version tag ---"),
+        (VerifyCommand::MachinePaths(make_args(root.path())), "--- verify machine paths ---"),
+        (VerifyCommand::TemplateRefs(make_args(root.path())), "--- verify template refs ---"),
+    ];
+
+    for (command, expected_label) in commands {
+        let outcome = dispatch_to_outcome(&driver, command);
+
+        assert_eq!(outcome.exit_code, 1, "missing fixture inputs must fail closed");
+        let stdout = outcome.stdout.unwrap_or_default();
+        assert!(
+            stdout.contains(expected_label),
+            "expected route label {expected_label:?}: {stdout}"
+        );
+    }
+}
+
+#[test]
 fn test_retention_gate_subcommand_returns_success_for_clean_surface() {
     let tmp = TempDir::new().unwrap();
     write_file(tmp.path(), "README.md", "# Clean\n");
@@ -615,4 +679,26 @@ fn test_dispatch_catalogue_spec_refs_fail_closed_on_resolver_error() {
         Some(ExitCode::FAILURE),
         "CatalogueSpecRefs must return Some(FAILURE) (fail-closed) when resolver errors"
     );
+}
+
+#[test]
+fn test_catalogue_spec_refs_invalid_track_id_is_rejected_by_parser() {
+    let result =
+        TestCli::try_parse_from(["sotp", "catalogue-spec-refs", "--track-id", "../escape"]);
+
+    assert!(result.is_err(), "invalid track IDs must be rejected during argument parsing");
+}
+
+#[test]
+fn test_catalogue_spec_refs_valid_track_id_is_parsed_as_driver_input() {
+    let cli =
+        TestCli::try_parse_from(["sotp", "catalogue-spec-refs", "--track-id", "my-track-2026"])
+            .unwrap();
+
+    match cli.cmd {
+        VerifyCommand::CatalogueSpecRefs(args) => {
+            assert_eq!(args.track_id.as_ref().map(AsRef::as_ref), Some("my-track-2026"));
+        }
+        _ => panic!("expected CatalogueSpecRefs variant"),
+    }
 }

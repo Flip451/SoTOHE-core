@@ -4,7 +4,7 @@
 
 ファイル名は日時プレフィックス形式を使う:
 
-- `YYYY-MM-DD-HHmm-<topic>.md`（例: `2026-04-06-1257-crate-survey.md`）
+- `YYYY-MM-DD-HHmm-<topic>.md`（例: `<date>-<time>-<topic>.md`）
 
 ## Version Baseline Workflow
 

@@ -186,14 +186,14 @@
             {
               "message": "The contract map was not updated for the new `TrackSnapshot` DTO: `infrastructure-types.json`/`infrastructure-types.md` include it, but `contract-map.md` still stops at `ImplPlanSectionDto`. That leaves the generated contract graph inconsistent with the catalogue and omits the new render-layer type entirely.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/contract-map.md",
               "line": 37,
               "category": "contradiction"
             },
             {
               "message": "`TrackSnapshot` reintroduces a legacy fallback to a stored `status` value for v2/v3/v4 tracks, but this plan makes `metadata.json` v5 identity-only and removes `status` from the metadata path. A snapshot model that still reads the old persisted status conflicts with the new single-source-of-truth status model and the legacy-track skip policy documented in the ADR.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/infrastructure-types.json",
               "line": 121,
               "category": "contradiction"
             }
@@ -425,7 +425,7 @@
             {
               "message": "`ActivateTrackUseCase` now checks `derive_track_status(None, track.status_override())`, so it can no longer reject a branchless track whose `impl-plan.json` already has `in_progress` or `done` tasks. `resolve_phase` and the v5 verifier derive status from `impl-plan.json` + override, so this can materialize a track that should still be blocked from activation.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/track_activation.rs",
+              "file": "libs/usecase/src/track_activation.rs",
               "line": 61,
               "category": "correctness"
             }
@@ -706,14 +706,14 @@
             {
               "message": "This pre-commit guard still treats a missing `impl-plan.json` on a materialized track as `Planned` because `derive_track_status(None, ...)` defaults to `Planned`, so the hook will continue instead of blocking a corrupted active track. That means `bin/sotp git commit-from-file` can proceed and stage regenerated files even when the track's plan file has been deleted or corrupted.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 672,
               "category": "correctness"
             },
             {
               "message": "The auto-resume path has the same fail-open behavior: if an already-materialized track is missing `impl-plan.json`, `derive_track_status(None, ...)` returns `Planned`, so `activation_resume_allowed` can approve `/track:activate` instead of failing closed on a corrupted materialized track. This needs an explicit missing-plan check before deriving the status.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/activate.rs",
+              "file": "apps/cli/src/commands/track/activate.rs",
               "line": 80,
               "category": "correctness"
             }

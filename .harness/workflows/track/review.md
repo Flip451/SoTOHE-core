@@ -89,6 +89,30 @@ cargo make track-local-review-fix -- --scope {scope} \
   --round-type fast
 ```
 
+Dispatch is a single wave: launch every `required` scope's fixer before waiting on any of
+them. Serializing scopes — waiting for one scope's round to finish before launching another
+scope's round — is a workflow violation. The only ordering constraints in this workflow are:
+
+1. Within one scope, `fast` precedes `final` (Step 5).
+2. The DRY fixpoint (DFP) and this review fixpoint must not run concurrently
+   (`full-cycle.md` orders DFP before Review).
+
+No cross-scope ordering constraint exists for the initial wave. A
+`blocked_cross_scope` terminal status is the recovery exception: resolve that dependency, then
+relaunch the affected scope as specified below.
+
+Fix boundaries are disjoint: the CLI derives the review partition from
+`.harness/config/review-scope.json` (named groups plus the mandatory `other` complement), so
+every file belongs to exactly one scope, and each fixer may modify only its own scope's file
+list (`bin/sotp review files --scope <scope>`); a fix that needs another scope's files must
+stop as `blocked_cross_scope`.
+
+Shared operational artifacts (signal snapshots, rendered views) are CLI-owned deterministic
+regenerations, not fixer-owned edits: the wrapper refreshes them at each invocation, and the
+commit gate re-runs the full verification serially before any commit. Dispatch-level
+synchronization of those refreshes and per-fixer build isolation are intentionally outside
+this workflow's scope.
+
 The `cargo make track-local-review-fix` wrapper runs an inline `signal calc-impl-catalog`
 refresh + pre-review task-contract check, then delegates to `bin/sotp review fix-local`. The
 CLI resolves `capabilities.review-fix-lead.provider` from `.harness/config/agent-profiles.json`

@@ -22,27 +22,27 @@
 
 各 ADR ファイルは MD body の前に YAML front-matter ブロックを置く。`bin/sotp signal check-adr-user` がこの front-matter を読み取って各 decision の根拠 trace と lifecycle を検証する。
 
-front-matter の起点は `2026-04-27-1234-adr-decision-traceability-lifecycle.md` D1-D3。
+front-matter は decision ごとの根拠 trace と lifecycle を機械検証できるようにするための形式である。
 
 ### Schema
 
 top-level key は以下 2 つのみ (`deny_unknown_fields`):
 
 - `adr_id` (required, non-empty string): スラグ識別子。通常はファイル名から `.md` を除いたもの。
-- `decisions[]` (optional list, default empty): 各 decision のメタデータ配列。本文の `### D<n>` 1 つにつき 1 entry を対応させる。
+- `decisions[]` (optional list, default empty): 各 decision のメタデータ配列。本文の各 decision 見出しにつき 1 entry を対応させる。
 
 `decisions[]` 各 entry のフィールド:
 
 | field | type | 必須条件 | 意味 |
 |---|---|---|---|
-| `id` | non-empty string | 必須 | decision 識別子 (`D1`, `D2`, ...; grandfathered legacy では `<file-stem>_grandfathered` 等)。同一 ADR 内で unique であれば良い。 |
+| `id` | non-empty string | 必須 | decision 識別子（例: `decision-1`; grandfathered legacy では `<file-stem>_grandfathered` 等）。同一 ADR 内で unique であれば良い。 |
 | `user_decision_ref` | string | optional | ユーザー明示承認の参照 (chat segment ref, approval marker 等)。値が non-null **かつ `review_finding_ref` 未設定**のとき 🔵 Blue。空文字 / 空白のみは domain newtype 構築時に reject される (fail-closed)。 |
 | `review_finding_ref` | string | optional | review process で発見された根拠の参照。値が non-null なら **`user_decision_ref` の有無に関わらず** 🟡 Yellow。review 由来の未昇格根拠が残る状態は注意色に留め、`user_decision_ref` で silently 🔵 に格上げされない。空文字 / 空白のみは domain newtype 構築時に reject される (fail-closed)。 |
 | `candidate_selection` | string | optional | `## Rejected Alternatives` で評価した候補からの選択 (例: `"from:[A,B,C,D,E] chose:A"`)。 |
 | `status` | string | 必須 | `proposed` / `accepted` / `implemented` / `superseded` / `deprecated` のいずれか。それ以外は parse 時に reject。 |
 | `superseded_by` | string | `status: superseded` のとき必須、他では禁止 | 後継 decision への参照 (`<adr-slug>.md#<id>` 形式)。`null` も禁止 (raw key-presence check)。 |
 | `implemented_in` | string | `status: implemented` のとき必須、他では禁止 | 実装を identify する non-empty な commit hash / reference。`null` も禁止 (raw key-presence check)。 |
-| `grandfathered` | bool | optional | `true` のとき verify-adr-signals の Red/Yellow 判定対象から除外 (D4 exemption)。 |
+| `grandfathered` | bool | optional | `true` のとき verify-adr-signals の Red/Yellow 判定対象から除外。 |
 
 ### Status と typestate dispatch
 
@@ -63,7 +63,7 @@ dispatch の実体は `parse_adr_frontmatter`(`libs/infrastructure/src/adr_decis
 `pre-track-adr-authoring.md` はファイル全体の `## Status` 見出し (`Proposed` / `Accepted` / 等の summary status) を**禁止**している。本 convention の `decisions[].status` はそれとは別 axis で、**decision 粒度** の lifecycle を表す:
 
 - ファイル全体の summary status は形骸化しやすく (実装が進んでも誰も更新しない)、機械検証もできなかった → 廃止。
-- decision 個別 status は機械検証可能 (`verify-adr-signals` が typestate dispatch を通じて評価) であり、partial supersession (同一 ADR 内の D1 だけ superseded、D2 は active) や implementation tracking (`implemented_in` で commit を指す) を encode できる → 追加。
+- decision 個別 status は機械検証可能 (`verify-adr-signals` が typestate dispatch を通じて評価) であり、同一 ADR 内の一部だけを superseded にする場合や implementation tracking (`implemented_in` で commit を指す) を encode できる → 追加。
 
 `workflow-ceremony-minimization.md` の「人工的な状態フィールドを作らない」原則とも衝突しない:
 
@@ -80,13 +80,13 @@ dispatch の実体は `parse_adr_frontmatter`(`libs/infrastructure/src/adr_decis
 
 いずれにも該当しない decision は 🔴 Red と評価され、`cargo make verify-adr-signals` が non-zero exit して CI を block する。
 
-`user_decision_ref` と `review_finding_ref` を両方持つ decision は 🟡 Yellow になる。review 由来の未昇格根拠が残るため、`user_decision_ref` の存在だけで 🔵 に昇格させない設計（review-priority rule, `knowledge/adr/2026-06-16-0042-adr-signal-review-grounding-precedence.md` §D1, supersedes `knowledge/adr/2026-04-27-1234-adr-decision-traceability-lifecycle.md` §D1）。
+`user_decision_ref` と `review_finding_ref` を両方持つ decision は 🟡 Yellow になる。review 由来の未昇格根拠が残るため、`user_decision_ref` の存在だけで 🔵 に昇格させない。
 
-`user_decision_ref` / `review_finding_ref` の値文字列は domain `DecisionGroundRef` newtype として保持され、構築時に空文字 / 空白のみは `ValidationError::EmptyDecisionGroundRef` で reject される。infrastructure の YAML codec はその構築エラーを `AdrFrontMatterCodecError::InvalidDecisionField` として伝播させ、`verify-adr-signals` を fail させる (fail-closed, ADR 2026-06-16-0042 §D2)。
+`user_decision_ref` / `review_finding_ref` の値文字列は domain `DecisionGroundRef` newtype として保持され、構築時に空文字 / 空白のみは `ValidationError::EmptyDecisionGroundRef` で reject される。infrastructure の YAML codec はその構築エラーを `AdrFrontMatterCodecError::InvalidDecisionField` として伝播させ、`verify-adr-signals` を fail させる。
 
 ### grandfathered 用途
 
-`grandfathered: true` は次の場合に限定して使う (D4):
+`grandfathered: true` は次の場合に限定して使う:
 
 - 対象 ADR が本 front-matter フォーマット採択前に作成されたもの
 - 根拠 trace フィールド (`user_decision_ref` / `review_finding_ref`) を遡って確定するコストが高い
@@ -95,7 +95,7 @@ dispatch の実体は `parse_adr_frontmatter`(`libs/infrastructure/src/adr_decis
 
 ### Fail-closed 振る舞い
 
-`bin/sotp signal check-adr-user` は `knowledge/adr/` 配下の全 `*.md` を走査する。front-matter のない `.md` ファイルは **即座に fail** する — `parse_adr_frontmatter` が内部で `MissingAdrId` を返し、filesystem adapter がそれを read error として伝播させる (新規 ADR が未記入のまま slip-through するのを防ぐ fail-closed 設計, CN-04)。
+`bin/sotp signal check-adr-user` は `knowledge/adr/` 配下の全 `*.md` を走査する。front-matter のない `.md` ファイルは **即座に fail** する — `parse_adr_frontmatter` が内部で `MissingAdrId` を返し、filesystem adapter がそれを read error として伝播させる。これにより、新規 ADR が front-matter 未記入のまま通過しない。
 
 新規 ADR を追加する際は必ず先に front-matter を入れる。`grandfathered: true` は本 front-matter フォーマット採択前の既存 ADR に遡って back-fill する場合にのみ使用できる (`grandfathered 用途` セクション参照)。新規 ADR では必ず `user_decision_ref` または `review_finding_ref` を埋める。
 
@@ -103,12 +103,12 @@ dispatch の実体は `parse_adr_frontmatter`(`libs/infrastructure/src/adr_decis
 
 ```yaml
 ---
-adr_id: 2026-04-27-1234-example
+adr_id: "<YYYY-MM-DD-HHMM>-example"
 decisions:
-  - id: D1
+  - id: decision-1
     user_decision_ref: "chat_segment:session-XXX:2026-04-27"
     status: accepted
-  - id: D2
+  - id: decision-2
     review_finding_ref: "RF-12"
     status: proposed
 ---

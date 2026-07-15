@@ -42,10 +42,8 @@ rule ほど mechanism 化の優先度を上げる。
 
 - Good: `deny.toml` と `architecture-rules.json` による layer 依存の機械的検証
   (`cargo make check-layers`、CI gate レベル)
-- Good: signal 評価結果の CI gate 化 (ADR `2026-04-18-1400-tddd-ci-gate-and-signals-separation` §D2 /
-  §D5、pre-commit 自動再計算 + stale 検出)
+- Good: signal 評価結果の CI gate 化（pre-commit での自動再計算と stale 検出を含む）
 - Good: `/track:plan` state machine での gate 自動評価 + back-and-forth
-  (ADR `2026-04-19-1242-plan-artifact-workflow-restructure` §D0.1)
 - Good: schema-version bump で旧 schema を decode 拒否する codec
   (型システムレベル、no-backward-compat convention と組み合わせ)
 - Bad: AI agent memory のみで「commit 前に X を確認」と指示し、CI gate や hook で検出していない

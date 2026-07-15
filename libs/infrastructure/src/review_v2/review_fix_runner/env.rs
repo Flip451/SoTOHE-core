@@ -180,7 +180,7 @@ mod tests {
 
     #[test]
     fn test_build_codex_fixer_invocation_contains_workspace_write_sandbox() {
-        let codex_home = PathBuf::from("/home/user/.codex");
+        let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let olm = dummy_output_last_message();
         let args = build_codex_fixer_invocation("gpt-5.5", &codex_home, &olm);
         let args_str: Vec<String> = args.iter().map(|a| a.to_string_lossy().into_owned()).collect();
@@ -194,7 +194,7 @@ mod tests {
 
     #[test]
     fn test_build_codex_fixer_invocation_contains_writable_roots_config() {
-        let codex_home = PathBuf::from("/home/user/.codex");
+        let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let olm = dummy_output_last_message();
         let args = build_codex_fixer_invocation("gpt-5.5", &codex_home, &olm);
         let args_str: Vec<String> = args.iter().map(|a| a.to_string_lossy().into_owned()).collect();
@@ -219,7 +219,7 @@ mod tests {
 
     #[test]
     fn test_build_codex_fixer_invocation_contains_network_access_config() {
-        let codex_home = PathBuf::from("/home/user/.codex");
+        let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let olm = dummy_output_last_message();
         let args = build_codex_fixer_invocation("gpt-5.5", &codex_home, &olm);
         let args_str: Vec<String> = args.iter().map(|a| a.to_string_lossy().into_owned()).collect();
@@ -230,7 +230,7 @@ mod tests {
 
     #[test]
     fn test_build_codex_fixer_invocation_contains_output_last_message_flag() {
-        let codex_home = PathBuf::from("/home/user/.codex");
+        let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let olm = PathBuf::from("/tmp/review-fix-test-last-message.txt");
         let args = build_codex_fixer_invocation("gpt-5.5", &codex_home, &olm);
         let args_str: Vec<String> = args.iter().map(|a| a.to_string_lossy().into_owned()).collect();
@@ -247,7 +247,7 @@ mod tests {
 
     #[test]
     fn test_build_codex_fixer_invocation_has_no_prompt_positional_argument() {
-        let codex_home = PathBuf::from("/home/user/.codex");
+        let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let olm = dummy_output_last_message();
         let args = build_codex_fixer_invocation("gpt-5.5", &codex_home, &olm);
         let olm_pos = args.iter().position(|a| a == "--output-last-message");
@@ -277,7 +277,7 @@ mod tests {
     #[test]
     fn test_build_safe_env_passes_through_path() {
         let safe_home = PathBuf::from("/tmp/safe-home");
-        let codex_home = PathBuf::from("/home/user/.codex");
+        let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let env = build_safe_env(&safe_home, &codex_home, None).unwrap();
         let has_path = env.iter().any(|(k, _)| k == "PATH");
         // PATH passthrough is present when the environment has PATH set (which it always does in CI)
@@ -289,7 +289,7 @@ mod tests {
     #[test]
     fn test_build_safe_env_excludes_github_token() {
         let safe_home = PathBuf::from("/tmp/safe-home");
-        let codex_home = PathBuf::from("/home/user/.codex");
+        let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let env = build_safe_env(&safe_home, &codex_home, None).unwrap();
         let keys: Vec<String> = env.iter().map(|(k, _)| k.to_string_lossy().into_owned()).collect();
         assert!(!keys.contains(&"GITHUB_TOKEN".to_owned()), "GITHUB_TOKEN must be excluded");
@@ -298,7 +298,7 @@ mod tests {
     #[test]
     fn test_build_safe_env_excludes_ssh_auth_sock() {
         let safe_home = PathBuf::from("/tmp/safe-home");
-        let codex_home = PathBuf::from("/home/user/.codex");
+        let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let env = build_safe_env(&safe_home, &codex_home, None).unwrap();
         let keys: Vec<String> = env.iter().map(|(k, _)| k.to_string_lossy().into_owned()).collect();
         assert!(!keys.contains(&"SSH_AUTH_SOCK".to_owned()), "SSH_AUTH_SOCK must be excluded");
@@ -307,7 +307,7 @@ mod tests {
     #[test]
     fn test_build_safe_env_sets_git_ssh_command_to_false() {
         let safe_home = PathBuf::from("/tmp/safe-home");
-        let codex_home = PathBuf::from("/home/user/.codex");
+        let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let env = build_safe_env(&safe_home, &codex_home, None).unwrap();
         let git_ssh_cmd = env
             .iter()
@@ -323,7 +323,7 @@ mod tests {
     #[test]
     fn test_build_safe_env_sets_home_to_safe_home() {
         let safe_home = PathBuf::from("/tmp/my-safe-home");
-        let codex_home = PathBuf::from("/home/user/.codex");
+        let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let env = build_safe_env(&safe_home, &codex_home, None).unwrap();
         let home_val =
             env.iter().find(|(k, _)| k == "HOME").map(|(_, v)| v.to_string_lossy().into_owned());
@@ -337,7 +337,7 @@ mod tests {
     #[test]
     fn test_build_safe_env_sets_codex_home_to_real_codex_home() {
         let safe_home = PathBuf::from("/tmp/safe-home");
-        let codex_home = PathBuf::from("/home/user/.codex");
+        let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let env = build_safe_env(&safe_home, &codex_home, None).unwrap();
         let codex_home_val = env
             .iter()
@@ -345,7 +345,7 @@ mod tests {
             .map(|(_, v)| v.to_string_lossy().into_owned());
         assert_eq!(
             codex_home_val.as_deref(),
-            Some("/home/user/.codex"),
+            Some("/srv/codex-home/.codex"),
             "CODEX_HOME must be real codex home"
         );
     }
@@ -371,7 +371,7 @@ mod tests {
     #[test]
     fn test_build_safe_env_with_extra_path_prefix_prepends_dir() {
         let safe_home = PathBuf::from("/tmp/safe-home");
-        let codex_home = PathBuf::from("/home/user/.codex");
+        let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let prefix = Path::new("/real/node/bin");
         let env = build_safe_env(&safe_home, &codex_home, Some(prefix)).unwrap();
         let path_val = env

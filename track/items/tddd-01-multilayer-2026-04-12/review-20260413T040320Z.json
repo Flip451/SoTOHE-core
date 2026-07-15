@@ -25,14 +25,14 @@
             {
               "message": "Step 4 still refers to `domain-type-signals`, but the CLI subcommand has been renamed to `type-signals`; this is a dead command reference and will send operators to a non-existent invocation.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "file": ".claude/commands/track/design.md",
               "line": 118,
               "category": "broken reference"
             },
             {
               "message": "The baseline filename guidance uses `<layer>-types-baseline.json`, but multilayer bindings derive the baseline from `catalogue_file` as `<stem>-baseline.json`. For any layer whose catalogue file is not the default `<layer>-types.json`, this points at the wrong file and contradicts the current layer-binding rules.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "file": ".claude/commands/track/design.md",
               "line": 123,
               "category": "logical contradiction"
             }
@@ -47,7 +47,7 @@
             {
               "message": "This claims the multilayer flow is already supported (`--layer` on `type-signals` and `baseline-capture`), but the current CLI still hardcodes the `domain` path: `apps/cli/src/commands/track/tddd/baseline.rs` always writes `domain-types-baseline.json` and ignores `--layer`, and `apps/cli/src/commands/track/tddd/signals.rs` still rejects non-domain layers. The doc therefore points users at a workflow that does not exist yet.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "file": ".claude/commands/track/design.md",
               "line": 14,
               "category": "correctness"
             }
@@ -62,7 +62,7 @@
             {
               "message": "The intro paragraph says the `--layer` flag on both `sotp track type-signals` and `baseline-capture` returns an error for non-`domain` values until Phase 2, but `baseline-capture` currently ignores `--layer` and still writes `domain-types-baseline.json`. That makes the documented Phase 1 behavior incorrect for the baseline command.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/design.md",
+              "file": ".claude/commands/track/design.md",
               "line": 13,
               "category": "logical contradiction"
             }
@@ -169,7 +169,7 @@
             {
               "message": "`T004` still describes `TypeNode::outgoing` as being derived from `FunctionInfo::return_type_names`, but the authoritative ADR update now defines `outgoing` as derived from `methods`' return types after `MethodDeclaration` is introduced. This keeps the plan out of sync with the design and can make the implementation preserve the old typestate path instead of switching to the `MethodDeclaration`-based flow.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
               "line": 26,
               "category": "consistency"
             }
@@ -184,7 +184,7 @@
             {
               "message": "Rendered spec view is stale: `spec.md` still says `status: draft` and omits `approved_at`, but `spec.json` is already `status: approved` with an approval timestamp and content hash. This breaks the rendered-view contract used by track tooling and can make `activate`/`review` read the wrong state.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-01-multilayer-2026-04-12/spec.md",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/spec.md",
               "line": 3,
               "category": "consistency"
             }
@@ -214,7 +214,7 @@
             {
               "message": "`Q2` still instructs readers to keep `signature: String` on `FunctionInfo`, but ADR C1 and the updated track metadata/spec have already decided to delete it. Because this document is used as the source for the canonical blocks copied into `plan.md`/`DESIGN.md`, leaving the superseded choice unannotated can propagate the wrong schema back into implementation. Please add a C1 supersession note or rewrite this section to match the accepted decision.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/research/2026-04-12-0709-planner-tddd-01.md",
+              "file": "knowledge/research/2026-04-12-0709-planner-tddd-01.md",
               "line": 486,
               "category": "consistency"
             }
@@ -817,7 +817,7 @@
             {
               "message": "This generated plan is stale relative to `metadata.json` and the ADR: T007 is marked `done` in metadata, but the rendered plan still shows the task unchecked and keeps the old `2026-04-12` acceptance date. That leaves the track artifacts inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-01-multilayer-2026-04-12/plan.md",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/plan.md",
               "line": 48,
               "category": "logical contradiction"
             }
@@ -832,7 +832,7 @@
             {
               "message": "The track metadata still records the ADR acceptance date as `2026-04-12`, but the ADR status was updated to `2026-04-13`. Because `plan.md` is generated from this metadata, the rendered plan will stay inconsistent with the ADR until this date is corrected.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-01-multilayer-2026-04-12/metadata.json",
+              "file": "track/items/tddd-01-multilayer-2026-04-12/metadata.json",
               "line": 48,
               "category": "logical contradiction"
             }
@@ -1017,7 +1017,7 @@
             {
               "message": "`method_to_dto` still serializes `MethodDeclaration`/`ParamDeclaration` values verbatim, but `decode()` now rejects any `ty` or `returns` containing `::`. Because the public constructors for those domain types do not validate that rule, a catalogue built in memory can be encoded successfully and then fail to decode immediately, so the codec no longer round-trips all representable `TypeCatalogueDocument` values.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
               "line": 467,
               "category": "Codec round-trip loss"
             }
@@ -1032,7 +1032,7 @@
             {
               "message": "`encode()` still serializes `doc.schema_version()` unchanged, so any in-memory `TypeCatalogueDocument::new(1, ...)` will now emit `schema_version: 1` JSON even though `decode()` only accepts `2`. That breaks the codec's round-trip guarantee and leaves a public path that can write files the new decoder rejects.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
               "line": 441,
               "category": "Schema version drift"
             }
@@ -1076,7 +1076,7 @@
             {
               "message": "`default_domain_binding()` uses `expect()` in non-test library code, so the fallback path taken when `architecture-rules.json` is absent can panic instead of returning a `Finding::error` if the embedded JSON or parser behavior ever changes. This violates the no-panics policy on a runtime code path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/spec_states.rs",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
               "line": 163,
               "category": "panic"
             }
@@ -1091,7 +1091,7 @@
             {
               "message": "`crate` and `catalogue_file` are accepted verbatim here and later used to build filesystem/git paths. Because neither field is constrained to a safe relative filename, a crafted `architecture-rules.json` can inject `../` or an absolute path and make the verifier/merge gate read outside the intended track catalogue directory.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/tddd_layers.rs",
+              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
               "line": 137,
               "category": "security"
             }
@@ -1143,7 +1143,7 @@
             {
               "message": "`parse_tddd_layers` treats an explicit empty `schema_export.targets: []` as if the field were omitted and silently substitutes `[layer_id]`. That masks a malformed `architecture-rules.json` entry and can make the exporter/validator operate on the wrong crate set instead of failing closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/tddd_layers.rs",
+              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
               "line": 196,
               "category": "missing error handling"
             }
@@ -1187,7 +1187,7 @@
             {
               "message": "An enabled layer with `tddd.schema_export` present but no `targets` is rejected as `EmptyTargets` here, but the T007 contract says omitted `targets` should default to `[layer_id]`. That makes valid `architecture-rules.json` entries fail-closed in both `verify_from_spec_json` and the merge-gate layer reader.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/tddd_layers.rs",
+              "file": "libs/infrastructure/src/verify/tddd_layers.rs",
               "line": 214,
               "category": "behavior regression"
             }

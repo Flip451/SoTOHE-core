@@ -105,7 +105,7 @@
             {
               "message": "`run_pre_commit_type_signals()` snapshots `architecture-rules.json` into `bindings` before calling `execute_type_signals()`, but `execute_type_signals()` re-reads the file. If the rules file changes in between, the recomputation can write a different layer set while the staging/classification loop still inspects the stale snapshot, so a newly enabled layer with Red signals is never checked and the commit can be allowed incorrectly.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 620,
               "category": "logic"
             }
@@ -633,7 +633,7 @@
             {
               "message": "`signal_file()` is documented as returning `<catalogue-stem>-signals.json`, but this ADR and the rest of the design define the evaluation-result file as `<layer>-type-signals.json`. As written, the accessor would resolve the wrong path for both the CLI writer and the CI reader.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-ci-gate-and-signals-separation-2026-04-18/infrastructure-types.json",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/infrastructure-types.json",
               "line": 17,
               "category": "factual error"
             }
@@ -779,7 +779,7 @@
             {
               "message": "The task records no longer include `commit_hash` at all. That contradicts the briefing's stated intermediate state (`commit_hash` stays present as `null` until the post-commit update) and drops the field other track metadata uses to represent pending vs. linked commits.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-ci-gate-and-signals-separation-2026-04-18/metadata.json",
+              "file": "track/items/tddd-ci-gate-and-signals-separation-2026-04-18/metadata.json",
               "line": 80,
               "category": "contradiction"
             }

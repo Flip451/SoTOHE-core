@@ -96,7 +96,7 @@
             {
               "message": "`T001` changes the canon structure in a way that is incompatible with the downstream steps: it proposes a placeholder-keyed map or even a `Vec<(String, String)>`, but `T002`/`T003` still assume `format_type_with_canon` can resolve generic names, and `Type::ImplTrait` has no stable key in the described map to map it to `#0/#1`. As written, the plan does not describe a workable data flow for either generic-name canonicalization or `impl Trait` lookup.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-codec-generic-name-collision-fix-2026-05-25/plan.md",
+              "file": "track/items/tddd-codec-generic-name-collision-fix-2026-05-25/plan.md",
               "line": 11,
               "category": "infeasibility"
             }
@@ -215,7 +215,7 @@
             {
               "message": "`Type::DynTrait` now renders each bound before calling `sort_unstable()`, so the shared impl-Trait cursor is consumed in source order rather than canonical order. If two equivalent trait-object bounds contain nested `impl Trait`/synthetic generic args, reordering the bounds changes which occurrence gets `#0` vs `#1`, and semantically identical types can compare unequal.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/format.rs",
               "line": 482,
               "category": "correctness"
             }

@@ -43,7 +43,7 @@
             {
               "message": "D9’s commit-size budget for T005 does not match the rest of the planning artifacts. This ADR budgets Commit 5 at ~15 lines, but the generated task artifacts describe the same T005 scope as README index + verification.md handoff work at ~33 lines (`metadata.json`/`plan.md` summary and `spec.json` T005). If the 5-commit split is meant to be internally consistent, these estimates need to be aligned.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
               "line": 251,
               "category": "consistency"
             }
@@ -80,14 +80,14 @@
             {
               "message": "T003 under-specifies the conversion set: it says only 7 `From<&domain::T> for TDto` impls will be added, but the same spec later requires all 8 DTOs to have `From` impls, and the planner canonical block already includes `From<&TypeKind> for TypeKindDto`. As written, `TypeKindDto` has no conversion path, so the acceptance criterion cannot be satisfied.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/domain-serde-ripout-2026-04-15/spec.md",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.md",
               "line": 24,
               "category": "plan inconsistency"
             },
             {
               "message": "The T003 unit-test description says to convert `From<&SchemaExport>` and then call `encode(&dto, false)`, but the same task defines `encode(schema: &SchemaExport, pretty: bool)`. That test shape cannot compile under the stated API; it needs to call `encode(&schema, false)` (or split the `From` assertion from the encode assertion).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "file": "track/items/domain-serde-ripout-2026-04-15/metadata.json",
               "line": 98,
               "category": "plan inconsistency"
             }
@@ -688,21 +688,21 @@
             {
               "message": "The plan summary still describes T003 as `yellow=8 -> blue=8` and the track as an 8-entry seed, but the corrected T003 block below says `blue=9` and `infrastructure-types.json` now has 9 entries. That leaves the metadata/plan view internally inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "file": "track/items/domain-serde-ripout-2026-04-15/metadata.json",
               "line": 80,
               "category": "consistency"
             },
             {
               "message": "The top-level goal still says the track seeds 8 entries and reaches `Blue=8`, but the same spec later requires 9 entries / `blue=9` in scope and acceptance criteria, and the rendered `spec.md` mirrors the stale 8-entry goal. The spec is therefore contradictory.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/domain-serde-ripout-2026-04-15/spec.json",
+              "file": "track/items/domain-serde-ripout-2026-04-15/spec.json",
               "line": 9,
               "category": "consistency"
             },
             {
               "message": "§D8/D9 still carry the pre-correction 8-entry story: `TypeKindDto` is described as a private/excluded enum at line 253, and the commit split at lines 262-269 still says `yellow=8 -> blue=8`. That conflicts with the correction note earlier in §D8 (8 -> 9) and with the live 9-entry catalogue.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
+              "file": "knowledge/adr/2026-04-14-1531-domain-serde-ripout.md",
               "line": 253,
               "category": "consistency"
             }
@@ -753,7 +753,7 @@
             {
               "message": "Rendered view header attributes this file to `domain-types.json`, but the content is the infrastructure catalogue view and should point at `infrastructure-types.json`. The source attribution is wrong.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/domain-serde-ripout-2026-04-15/infrastructure-types.md",
+              "file": "track/items/domain-serde-ripout-2026-04-15/infrastructure-types.md",
               "line": 1,
               "category": "source_attribution"
             }
@@ -1141,7 +1141,7 @@
             {
               "message": "`verification.md` marks T005 complete, but the track state was not transitioned to done: `metadata.json` still has root `status: \"in_progress\"` and the T005 task remains `todo` (the generated `plan.md` still shows the final checklist item unchecked). Downstream tooling will keep treating this track as unfinished.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/domain-serde-ripout-2026-04-15/metadata.json",
+              "file": "track/items/domain-serde-ripout-2026-04-15/metadata.json",
               "line": 86,
               "category": "consistency"
             }

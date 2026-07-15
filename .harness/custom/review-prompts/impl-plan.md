@@ -40,7 +40,7 @@ specific `task_id` or `section.id`, or quote the offending text.
   spec element with no task mapping it, **or** a task mapping no spec element.
   The binary gate catches structural absence; the reviewer catches *load-bearing*
   coverage that exists in `task-coverage.json` but whose mapping is implausible
-  (e.g., AC-13 mapped to a task whose description has no validation step).
+  (e.g., an acceptance criterion mapped to a task whose description has no validation step).
   `GO-NN` elements are NOT coverable in `task-coverage.json` by design: its
   schema has no `goal` section (`TaskCoverageDocument` carries only `in_scope` /
   `out_of_scope` / `constraints` / `acceptance_criteria`, and the codec rejects

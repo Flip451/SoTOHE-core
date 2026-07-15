@@ -23,7 +23,7 @@
 - [x] `github_pat_*` / `glpat-*` トークンがサニタイズされる
 - [x] paginated GitHub API レスポンスが正しくパースされる (TestParsePaginatedJson)
 - [x] エラーメッセージが sanitize_text を経由して出力される
-- [x] 絶対パスサニタイズが /etc, /opt, /srv, /workspace, /root, /usr/local をカバー
+- [x] 絶対パスサニタイズが /etc, /opt, /srv, /workspace, root ユーザーの home, /usr/local をカバー
 - [x] multi-line inline comment の line/end_line が正しくマッピングされる (test_multiline_comment_line_range)
 
 ## Manual Verification Steps

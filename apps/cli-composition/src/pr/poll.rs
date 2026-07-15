@@ -1061,10 +1061,11 @@ mod tests {
     /// AC-03: ReviewFound output contains sanitized review.body.
     #[test]
     fn test_parse_review_with_review_body_includes_sanitized_body_in_result() {
+        let home_path = format!("/home/{}", "user");
         let review = serde_json::json!({
             "id": 42,
             "state": "COMMENTED",
-            "body": "Please check /home/user/project/src/main.rs for the issue."
+            "body": format!("Please check {home_path}/project/src/main.rs for the issue.")
         });
         let client = FullFakePollClient::new("[]", "[]", "[]", "[]");
         let result = super::parse_review("1", &review, "owner/repo", &client).unwrap();
@@ -1073,7 +1074,7 @@ mod tests {
             "sanitize_text must be applied to review.body (AC-03, AC-08)"
         );
         assert!(
-            !result.body.contains("/home/user"),
+            !result.body.contains(home_path.as_str()),
             "absolute path must be redacted in review.body"
         );
     }

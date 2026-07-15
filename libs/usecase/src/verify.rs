@@ -8,6 +8,8 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use crate::TrackId;
+
 /// Outcome of a single verify subcommand.
 pub struct VerifyOutcome {
     /// Human-readable output (stdout).
@@ -50,6 +52,18 @@ pub trait VerifyPort: Send + Sync {
 
     /// Check the retention live surface for retired gate/document identifiers.
     fn verify_retention_gate(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
+
+    /// Verify that the configured fixed SOTP version tag resolves on its remote.
+    fn verify_sotp_version_tag(
+        &self,
+        project_root: &Path,
+    ) -> Result<VerifyOutcome, VerifyPortError>;
+
+    /// Verify that tracked repository files do not contain work-machine paths.
+    fn verify_machine_paths(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
+
+    /// Verify that shipped template files contain no concrete source references.
+    fn verify_template_refs(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check architecture docs synchronization and text patterns.
     fn verify_arch_docs(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
@@ -106,7 +120,7 @@ pub trait VerifyPort: Send + Sync {
     /// Returns a skip outcome (inside `Ok`) when not on a track branch.
     fn verify_catalogue_spec_refs(
         &self,
-        track_id: Option<&str>,
+        track_id: Option<&TrackId>,
         items_dir: &Path,
         workspace_root: &Path,
         skip_stale: bool,
@@ -127,6 +141,18 @@ pub trait VerifyService: Send + Sync {
         &self,
         project_root: PathBuf,
     ) -> Result<VerifyOutcome, VerifyPortError>;
+
+    /// Verify that the configured fixed SOTP version tag resolves on its remote.
+    fn verify_sotp_version_tag(
+        &self,
+        project_root: &Path,
+    ) -> Result<VerifyOutcome, VerifyPortError>;
+
+    /// Verify that tracked repository files do not contain work-machine paths.
+    fn verify_machine_paths(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
+
+    /// Verify that shipped template files contain no concrete source references.
+    fn verify_template_refs(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError>;
 
     /// Check architecture docs synchronization and text patterns.
     fn verify_arch_docs(&self, project_root: PathBuf) -> Result<VerifyOutcome, VerifyPortError>;
@@ -191,7 +217,7 @@ pub trait VerifyService: Send + Sync {
     /// Verify catalogue-spec ref integrity (SoT Chain binary gate).
     fn verify_catalogue_spec_refs(
         &self,
-        track_id: Option<String>,
+        track_id: Option<TrackId>,
         items_dir: PathBuf,
         workspace_root: PathBuf,
         skip_stale: bool,
@@ -220,6 +246,21 @@ impl VerifyService for VerifyInteractor {
         project_root: PathBuf,
     ) -> Result<VerifyOutcome, VerifyPortError> {
         self.port.verify_retention_gate(project_root.as_path())
+    }
+
+    fn verify_sotp_version_tag(
+        &self,
+        project_root: &Path,
+    ) -> Result<VerifyOutcome, VerifyPortError> {
+        self.port.verify_sotp_version_tag(project_root)
+    }
+
+    fn verify_machine_paths(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
+        self.port.verify_machine_paths(project_root)
+    }
+
+    fn verify_template_refs(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
+        self.port.verify_template_refs(project_root)
     }
 
     fn verify_arch_docs(&self, project_root: PathBuf) -> Result<VerifyOutcome, VerifyPortError> {
@@ -304,13 +345,13 @@ impl VerifyService for VerifyInteractor {
 
     fn verify_catalogue_spec_refs(
         &self,
-        track_id: Option<String>,
+        track_id: Option<TrackId>,
         items_dir: PathBuf,
         workspace_root: PathBuf,
         skip_stale: bool,
     ) -> Result<VerifyOutcome, VerifyPortError> {
         self.port.verify_catalogue_spec_refs(
-            track_id.as_deref(),
+            track_id.as_ref(),
             items_dir.as_path(),
             workspace_root.as_path(),
             skip_stale,
@@ -328,11 +369,26 @@ mod tests {
     #[derive(Default)]
     struct RecordingPort {
         retention_root: Mutex<Option<PathBuf>>,
+        verifier_roots: Mutex<Vec<(&'static str, PathBuf)>>,
+        fail_verifier_routes: bool,
     }
 
     impl RecordingPort {
         fn unused(&self) -> Result<VerifyOutcome, VerifyPortError> {
             Err(VerifyPortError::Unavailable("unused test route".to_owned()))
+        }
+
+        fn record_verifier_route(
+            &self,
+            route: &'static str,
+            project_root: &Path,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            self.verifier_roots.lock().unwrap().push((route, project_root.to_path_buf()));
+            if self.fail_verifier_routes {
+                Err(VerifyPortError::Unavailable(format!("{route} unavailable")))
+            } else {
+                Ok(VerifyOutcome::success(Some(route.to_owned())))
+            }
         }
     }
 
@@ -368,6 +424,27 @@ mod tests {
             Ok(VerifyOutcome::success(Some("ok".to_owned())))
         }
 
+        fn verify_sotp_version_tag(
+            &self,
+            project_root: &Path,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            self.record_verifier_route("sotp_version_tag", project_root)
+        }
+
+        fn verify_machine_paths(
+            &self,
+            project_root: &Path,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            self.record_verifier_route("machine_paths", project_root)
+        }
+
+        fn verify_template_refs(
+            &self,
+            project_root: &Path,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            self.record_verifier_route("template_refs", project_root)
+        }
+
         fn verify_plan_artifact_refs(
             &self,
             _: Option<&Path>,
@@ -377,7 +454,7 @@ mod tests {
 
         fn verify_catalogue_spec_refs(
             &self,
-            _: Option<&str>,
+            _: Option<&TrackId>,
             _: &Path,
             _: &Path,
             _: bool,
@@ -397,5 +474,43 @@ mod tests {
 
         assert_eq!(outcome.exit_code, 0);
         assert_eq!(port.retention_root.lock().unwrap().as_deref(), Some(root.as_path()));
+    }
+
+    #[test]
+    fn test_verify_interactor_new_verifier_routes_delegate_borrowed_project_root() {
+        let port = Arc::new(RecordingPort::default());
+        let service_port: Arc<dyn VerifyPort> = port.clone();
+        let interactor = VerifyInteractor::new(service_port);
+        let root = PathBuf::from("workspace-root");
+
+        assert_eq!(interactor.verify_sotp_version_tag(&root).unwrap().exit_code, 0);
+        assert_eq!(interactor.verify_machine_paths(&root).unwrap().exit_code, 0);
+        assert_eq!(interactor.verify_template_refs(&root).unwrap().exit_code, 0);
+
+        assert_eq!(
+            *port.verifier_roots.lock().unwrap(),
+            vec![
+                ("sotp_version_tag", root.clone()),
+                ("machine_paths", root.clone()),
+                ("template_refs", root),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_verify_interactor_new_verifier_route_transports_port_error() {
+        let port = Arc::new(RecordingPort {
+            retention_root: Mutex::new(None),
+            verifier_roots: Mutex::new(Vec::new()),
+            fail_verifier_routes: true,
+        });
+        let service_port: Arc<dyn VerifyPort> = port;
+        let interactor = VerifyInteractor::new(service_port);
+
+        let result = interactor.verify_machine_paths(Path::new("workspace-root"));
+
+        assert!(
+            matches!(result, Err(VerifyPortError::Unavailable(message)) if message == "machine_paths unavailable")
+        );
     }
 }

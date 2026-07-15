@@ -33,7 +33,7 @@ Report findings ONLY for the following categories:
   grounding for a decision but whose content contradicts or fails to support
   the decision being made.
 - **scope leakage into ADR body**: the ADR claims to decide X but the body
-  inadvertently constrains downstream Y (e.g., D1 about "review scope" silently
+  inadvertently constrains downstream Y (e.g., a decision about "review scope" silently
   prescribes a CI gate that belongs in a separate ADR).
 
 ## What NOT to report

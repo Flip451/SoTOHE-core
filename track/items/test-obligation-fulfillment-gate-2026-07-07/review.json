@@ -39,7 +39,7 @@
             {
               "message": "D14 classifies `sotp test-obligation results` as part of the fail-closed gate, but the same decision later says it is informational, always exits 0, and that `check` alone owns pass/fail. That makes the ADR internally inconsistent on whether `results` is a gate or a viewer, so downstream CLI/spec implementers cannot derive one observable contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+              "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
               "line": 347,
               "category": "inconsistent decisions within the same ADR"
             }
@@ -181,70 +181,70 @@
             {
               "message": "The Summary block restates the upstream design intent for the whole track in prose instead of keeping the text to target + operation + anchor cite.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
               "line": 6,
               "category": "upstream restatement"
             },
             {
               "message": "S1 restates the semantic-verdict migration contract in prose; T001/T002 should be described only as target + operation + anchor cite per `knowledge/conventions/no-upstream-restatement.md`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
               "line": 20,
               "category": "upstream restatement"
             },
             {
               "message": "S2 restates the rules/config behavior contract in prose, including the default config contents; T003-T005 should stay at target + operation + anchor cite.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
               "line": 27,
               "category": "upstream restatement"
             },
             {
               "message": "S3 restates the domain-model contract in prose instead of limiting itself to executable task text.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
               "line": 35,
               "category": "upstream restatement"
             },
             {
               "message": "S4 restates the codec behavior contract in prose; the section should not re-explain the serialization guarantees.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
               "line": 44,
               "category": "upstream restatement"
             },
             {
               "message": "S5 restates the scanner/verifier behavior contract in prose; T013-T015 should avoid re-describing the upstream semantics.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
               "line": 52,
               "category": "upstream restatement"
             },
             {
               "message": "S6 restates the derive/check/evaluate/results contracts in prose, including deterministic projection, totality, cache freezing, and aggregation semantics.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
               "line": 60,
               "category": "upstream restatement"
             },
             {
               "message": "S7 restates the CLI wiring contract in prose; T020-T022 should be trimmed to target + operation + anchor cite.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
               "line": 69,
               "category": "upstream restatement"
             },
             {
               "message": "S8 restates the capability-registration contract in prose instead of keeping the section to the executable change description.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/plan.md",
               "line": 77,
               "category": "upstream restatement"
             },
             {
               "message": "T006's contract attributes `RoleName` and `DiagnosticMessage`, but the task text only scopes hashes/ids plus `WaivedReason`; that attribution is broader than the described work.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
               "line": 50,
               "category": "task-contract attribution mismatch"
             }
@@ -259,42 +259,42 @@
             {
               "message": "T005 restates ADR D13 content (`data_roles (17), contract_roles (4), function_roles (2), patterns.typestate, trait_impls sections`) instead of keeping the task to target + operation + anchor cite; this violates `knowledge/conventions/no-upstream-restatement.md`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
               "line": 30,
               "category": "upstream restatement"
             },
             {
               "message": "S3 (T006-T008) embeds upstream behavior prose (`deterministic from identity fields only`, `cache-key triple invalidates verdict`, `six variants`) rather than just executable task directives; strip the contract prose and keep the target/operation/anchor cites.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
               "line": 36,
               "category": "upstream restatement"
             },
             {
               "message": "S5 (T014-T015) restates verifier prompt semantics and fail-category behavior (`required supporting quotations`, `three-fail-type discrimination`, `edge-local self-containment`) in the task text; that belongs in the spec, not the impl-plan wording.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
               "line": 84,
               "category": "upstream restatement"
             },
             {
               "message": "S6 (T016-T019) embeds the derive/check/evaluate/results behavioral contract (`Deterministic projection`, `Pure-read totality gate`, `always returns success outcome`, cache/traversal semantics) directly in task prose, which is upstream restatement.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
               "line": 96,
               "category": "upstream restatement"
             },
             {
               "message": "T022 restates CLI behavior and exit semantics (`No --lenient / --force / --context / --layer / --scope flags`, `results exit is always 0`) instead of staying at target + operation + anchor cite.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
               "line": 132,
               "category": "upstream restatement"
             },
             {
               "message": "T023 restates capability-routing behavior (`fast → final escalation resolves per capability`) rather than just naming the config/registry edits and anchor cite.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
               "line": 138,
               "category": "upstream restatement"
             }
@@ -967,7 +967,7 @@
             {
               "message": "T018 includes explanatory prose after the anchor cite, for example: 'the non-empty newtypes are consumed by ObligationEvaluateError variants that carry structured evaluate outcomes; the pair value objects are the SemanticEscalationDriverPort's Pair type parameter, and TestsSource / EntryDeclaration / AnchorText are the validated non-empty String newtypes composing them.' That is upstream-style rationale, not the required target + operation + anchor form. Trim that restatement so the task stays executable and compliant with `no-upstream-restatement`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
               "line": 105,
               "category": "upstream restatement"
             }
@@ -1069,7 +1069,7 @@
             {
               "message": "`T021` includes rationale text, not just target/operation/anchor cites: \"the minimal infrastructure adapters required to keep that composition root wiring-only\". The impl-plan scope policy only permits target + operation + anchor cite in task text, so this should be trimmed to keep the task mechanically executable. The same wording is mirrored in the rendered plan.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
               "line": 124,
               "category": "upstream restatement"
             }
@@ -1133,14 +1133,14 @@
             {
               "message": "T027 restates upstream behavior instead of staying in executable-plan form: phrases like `read-only and never writing the artifact` and the `explicit --track-id ... omitted --track-id ...` branch-handling prose are contract text, not target + operation + anchor cite. Per `knowledge/conventions/no-upstream-restatement.md`, trim this task to the implementation surface only.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/impl-plan.json",
               "line": 162,
               "category": "upstream restatement"
             },
             {
               "message": "T027 claims `apps/cli-composition test_obligation` and `bindings_skeleton_handler()` wiring on `TestObligationCompositionRoot`, but the T027 block only attributes usecase/cli_driver/cli entries. The `cli_composition::TestObligationCompositionRoot` entry is missing from this task's contract attribution, so the composition-root work is left unattributed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/task-contract.json",
               "line": 230,
               "category": "task-contract attribution mismatch"
             }
@@ -1420,7 +1420,7 @@
             {
               "message": "`JsonTestObligationRulesLoader::load` reads `config_path` with `read_to_string` but never rejects symlinks. That means a symlinked `test-obligation-rules.json` will be followed to its target instead of enforcing real-file semantics, unlike the other config loaders in this repo that `symlink_metadata()` and fail closed before reading.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/test_obligation/rules_codec.rs",
+              "file": "libs/infrastructure/src/test_obligation/rules_codec.rs",
               "line": 210,
               "category": "symlink not rejected at boundary"
             }
@@ -1435,7 +1435,7 @@
             {
               "message": "This guard only rejects symlinks; it never canonicalizes or verifies that `config_path` stays within a fixed trusted root. A non-symlink path with `..` components can therefore escape the expected `.harness/config` boundary and be read directly. The existing `scope_config_loader.rs` pattern canonicalizes the root/path and `starts_with`-checks containment before reading.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/test_obligation/rules_codec.rs",
+              "file": "libs/infrastructure/src/test_obligation/rules_codec.rs",
               "line": 223,
               "category": "trusted-root violation"
             }
@@ -1529,14 +1529,14 @@
             {
               "message": "`location.module_path()` is split into `crate_name`/`rest` and both are concatenated into `workspace_root/...` with `join`/`push` but no containment check against `workspace_root`. A crafted module path containing `..` or an absolute component can escape the worktree before `read_to_string` runs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/test_obligation/source_scanner.rs",
+              "file": "libs/infrastructure/src/test_obligation/source_scanner.rs",
               "line": 57,
               "category": "trusted-root violation"
             },
             {
               "message": "`std::fs::read_to_string(&file)` will follow symlinks, but this scanner never does a `symlink_metadata()`/reject check on candidate files or the workspace root. That means a symlinked test source under the worktree is accepted instead of being fail-closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/test_obligation/source_scanner.rs",
+              "file": "libs/infrastructure/src/test_obligation/source_scanner.rs",
               "line": 187,
               "category": "symlink not rejected at boundary"
             }
@@ -1551,7 +1551,7 @@
             {
               "message": "`guarded_workspace_root()` canonicalizes the caller-supplied workspace root after only checking the final path component for symlinks. That can follow symlinked ancestor components and re-anchor the scanner on the target tree, which violates the trusted-root boundary. The existing `verify/trusted_root.rs` pattern keeps the root lexical and only rejects a symlinked root instead of calling `canonicalize()` here.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/test_obligation/source_scanner.rs",
+              "file": "libs/infrastructure/src/test_obligation/source_scanner.rs",
               "line": 82,
               "category": "trusted-root violation"
             }
@@ -1581,7 +1581,7 @@
             {
               "message": "`read_track_metadata` and `load_impl_plan_for_track` still call `std::fs::read_to_string` on `items_dir.join(id)` paths without the `symlink_metadata` / `reject_symlinks_below` guard that `read_track_status_str` applies. A symlinked `items_dir` or track directory will be followed and can read outside the trusted root, so these public helpers do not fail closed at the filesystem boundary.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/fs_store.rs",
+              "file": "libs/infrastructure/src/track/fs_store.rs",
               "line": 312,
               "category": "symlink not rejected at boundary"
             }
@@ -1596,7 +1596,7 @@
             {
               "message": "`guarded_items_dir()` canonicalizes `items_dir` lexically before any containment check, so a path like `.../link/../items` can hide a symlinked component from `reject_symlinked_items_dir_chain()` and be re-anchored outside the intended track tree. `read_track_metadata()` / `load_impl_plan_for_track()` then trust that escaped directory as the root; this needs the same fail-closed `ParentDir`/containment guard used by the existing symlink-safe loaders.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/fs_store.rs",
+              "file": "libs/infrastructure/src/track/fs_store.rs",
               "line": 304,
               "category": "trusted-root violation"
             }
@@ -1733,7 +1733,7 @@
             {
               "message": "`FsSpecDocumentLoader::load` reads `spec.json` with `std::fs::read_to_string` directly, so a symlinked leaf or ancestor is followed instead of being rejected at the filesystem boundary. That lets workspace-controlled `spec.json` paths escape the trusted root and diverges from the repo's established `reject_symlinks_below` pattern used for config loaders such as `review_v2/scope_config_loader.rs` before reading. Add an explicit symlink guard before the read.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/spec/document_loader.rs",
+              "file": "libs/infrastructure/src/spec/document_loader.rs",
               "line": 23,
               "category": "symlink not rejected at boundary"
             }
@@ -1746,9 +1746,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `FsSpecDocumentLoader` does not have a real trusted root. In `reject_spec_path_symlinks()` it derives `trusted_root` from `spec_path.ancestors().last()` ([`document_loader.rs`](/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/spec/document_loader.rs#L54)), which is `\"\"` for relative paths and the filesystem root for absolute paths. That means the loader will accept caller-supplied `../...` paths and can read outside the workspace as long as the path is not a symlink. Thread the workspace/items root into the adapter and reject paths that are not contained under it before calling `read_to_string`.",
+              "message": "P1: `FsSpecDocumentLoader` does not have a real trusted root. In `reject_spec_path_symlinks()` it derives `trusted_root` from `spec_path.ancestors().last()` ([`document_loader.rs`](libs/infrastructure/src/spec/document_loader.rs#L54)), which is `\"\"` for relative paths and the filesystem root for absolute paths. That means the loader will accept caller-supplied `../...` paths and can read outside the workspace as long as the path is not a symlink. Thread the workspace/items root into the adapter and reject paths that are not contained under it before calling `read_to_string`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/spec/document_loader.rs",
+              "file": "libs/infrastructure/src/spec/document_loader.rs",
               "line": 54,
               "category": "trusted-root violation"
             }
@@ -1763,7 +1763,7 @@
             {
               "message": "`FsSpecDocumentLoader` only rejects a symlink at the `trusted_root` leaf and below it. Because `reject_symlinks_below` treats the anchor as trusted, a symlink in any ancestor of `trusted_root` is still followed, so a caller that passes a symlinked workspace/items root can read `spec.json` outside the intended boundary. This needs a root-level real-path check before the descendant walk.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/spec/document_loader.rs",
+              "file": "libs/infrastructure/src/spec/document_loader.rs",
               "line": 49,
               "category": "symlink not rejected at boundary"
             }
@@ -2174,21 +2174,21 @@
             {
               "message": "This usecase re-parses raw `spec.json` locally instead of consuming the parsed `SpecDocument` boundary. That duplicates codec/schema logic in `check` and can drift from the canonical parser used elsewhere for uncited AC/CN detection.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
+              "file": "libs/usecase/src/test_obligation/check.rs",
               "line": 166,
               "category": "business logic leak"
             },
             {
               "message": "`current_bound_hash` here, and the same helper pattern in `evaluate.rs`, drop `TestSourceScanError`s and hash only the bodies that happened to load. A missing or unreadable test source therefore looks like a successful binding over partial evidence, so freshness checks can proceed on incomplete data.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
+              "file": "libs/usecase/src/test_obligation/check.rs",
               "line": 177,
               "category": "business logic leak"
             },
             {
               "message": "In `execute`, catalogue / obligations / bindings / spec load failures are all returned as `CacheWrite`. That public error type says persistence failed even when the actual failure was reading inputs, so callers get the wrong remediation path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/evaluate.rs",
+              "file": "libs/usecase/src/test_obligation/evaluate.rs",
               "line": 360,
               "category": "error type confusion"
             }
@@ -2210,21 +2210,21 @@
             {
               "message": "When both obligations and bindings are absent, `execute` returns before rewriting the verdict caches. That leaves any previously materialized fulfillment/waiver cache files on disk, so a later `results` run can report stale verdicts for an empty scope.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/evaluate.rs",
+              "file": "libs/usecase/src/test_obligation/evaluate.rs",
               "line": 380,
               "category": "state-consistency"
             },
             {
               "message": "`detect_orphaned` only inspects `TestBindingRecord::Fulfillment`. Waiver bindings that survive after their edge is no longer derived are never marked orphaned, because `resolve_edges` only walks current obligations. That lets stale waiver records slip through a clean `check` run.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
+              "file": "libs/usecase/src/test_obligation/check.rs",
               "line": 289,
               "category": "drift-detection"
             },
             {
               "message": "`WaiverVerdict::Fail` is recorded as `EdgeResolutionOutcome::MissingBinding`. That misclassifies a rejected waiver as an absent binding, so the results output cannot distinguish the two failure modes.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/results.rs",
+              "file": "libs/usecase/src/test_obligation/results.rs",
               "line": 300,
               "category": "output-correctness"
             }
@@ -2517,14 +2517,14 @@
             {
               "message": "`TestObligationResultsInteractor` maps both `ObligationsArtifactPort::load` and `TestBindingsArtifactPort::load` failures to `MalformedArtifact`, so a plain I/O failure is reported as corruption and the `IoError` branch on `ObligationResultsError` is never used here. Callers lose the retry-vs-corruption distinction for results loading.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/results.rs",
+              "file": "libs/usecase/src/test_obligation/results.rs",
               "line": 186,
               "category": "error type confusion"
             },
             {
               "message": "Workspace-qualified trait refs lose their `crate_name` here: `TraitRefScope::Workspace { crate_name, bare_name }` is collapsed to `bare_name`, then the first catalogue entry with that name wins. If two workspace crates expose the same trait name, `impl usecase::Foo for Bar` can be projected against the wrong role/anchors depending on catalogue order.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/derive.rs",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
               "line": 335,
               "category": "business logic leak"
             }
@@ -2539,14 +2539,14 @@
             {
               "message": "`cited_anchor_ids()` treats deletion tombstones as active citations because it walks `iter_catalogue_entries()` without checking `entry.action`. That means an `AC`/`CN` requirement cited only by a deleted catalogue entry will be suppressed instead of being reported as uncited. Filter out `ItemAction::Delete` entries here (or in the traversal helper) before building the cited set.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/mod.rs",
+              "file": "libs/usecase/src/test_obligation/mod.rs",
               "line": 153,
               "category": "business logic leak"
             },
             {
               "message": "This branch maps `scan_test_body() == Ok(None)` to `TestSourceScanError::Parse`, but the scanner contract uses `None` for an absent test/file, not a parse failure. That misclassifies missing source as malformed source and makes `check`'s error surface inconsistent with `evaluate`, which treats the same condition as I/O-style absence. Map the `None` case to an absence/I-O path instead of `Parse`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
+              "file": "libs/usecase/src/test_obligation/check.rs",
               "line": 189,
               "category": "error type confusion"
             }
@@ -2561,14 +2561,14 @@
             {
               "message": "Declaration lookup is keyed only by the bare entry name. If a type, trait, or function shares that name in another section, `find_declaration_text` can return the wrong declaration, so `check`/`evaluate` will freeze or verify against the wrong AST and report stale/fresh results incorrectly. The existing `CatalogueEntryRef.section_key` should be used to disambiguate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/mod.rs",
+              "file": "libs/usecase/src/test_obligation/mod.rs",
               "line": 104,
               "category": "orchestration correctness"
             },
             {
               "message": "`save_caches` writes the fulfillment cache before the waiver cache. If the second save fails, `evaluate` returns `Err` after mutating only one artifact, leaving the pair out of sync and allowing later `check`/`results` runs to observe a mixed-generation state. The cache writes need to be atomic or rolled back on failure.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/evaluate/mod.rs",
+              "file": "libs/usecase/src/test_obligation/evaluate/mod.rs",
               "line": 570,
               "category": "error handling"
             }
@@ -2583,7 +2583,7 @@
             {
               "message": "Voluntary bindings never migrate onto a newly derived obligation. `check` ignores `TestBindingRecord::VoluntaryBinding` when it looks for fulfillment bindings, and `evaluate` keeps freezing those records under a synthetic obligation id instead of resolving an existing obligation for the same edge. That breaks AC-12 inheritance: after a decision-table update creates a real obligation, the old voluntary binding is still reported as missing / workspace-only instead of counting as that obligation's fulfillment.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/check.rs",
+              "file": "libs/usecase/src/test_obligation/check.rs",
               "line": 295,
               "category": "correctness"
             }
@@ -2627,7 +2627,7 @@
             {
               "message": "`execute_inner` treats a half-materialised scope as a clean zero-pair run: if either `obligations` or `bindings` is `None`, it clears both verdict caches and returns `Ok(0, 0, 0)`. That silently masks a missing artifact instead of surfacing the incomplete scope.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/test_obligation/evaluate/mod.rs",
+              "file": "libs/usecase/src/test_obligation/evaluate/mod.rs",
               "line": 499,
               "category": "error handling"
             }
@@ -3172,21 +3172,21 @@
             {
               "message": "Ownership smell: `ObligationFulfillmentVerifierPort::verify_pair` takes `tests_source`, `entry_declaration`, and `anchor_text` as owned `String`s even though the port is read-only and could borrow `&str`; this forces avoidable allocation/cloning at the usecase boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 1036,
               "category": "ownership signature smell"
             },
             {
               "message": "Ownership smell: `WaiverVerifierPort::verify_pair` takes `waived_reason`, `entry_declaration`, and `anchor_text` as owned `String`s even though the port is read-only and could borrow `&str`; this forces avoidable allocation/cloning at the usecase boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 1327,
               "category": "ownership signature smell"
             },
             {
               "message": "Lossy boundary downgrade: `ObligationCheckError::DriftsDetected`, `UnresolvedEdges`, and `StaleVerdicts` collapse structured failure data into counts, while `CheckTestObligationsOutcome` already carries the full `Vec<TestObligationDrift>`, `Vec<TestObligationEdgeId>`, and `Vec<UncitedSpecElementFinding>`; the error shape drops actionable detail without justification.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 1801,
               "category": "lossy boundary downgrade"
             }
@@ -3201,21 +3201,21 @@
             {
               "message": "`test_obligation::evaluate::TestObligationEvaluateConfig::try_new` returns `ObligationEvaluateError`, but this constructor can only reject invalid config values. Callers still have to handle `TrackNotActive`, `VerifierPort`, `CachePersistence`, `SemanticFailuresConfirmed`, and `HumanEscalationRequired`, none of which are reachable at this boundary. Narrow the error type or document why the full enum is intentional.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 772,
               "category": "per-method error imprecision"
             },
             {
               "message": "`semantic_verdict_core::driver::SemanticEscalationDriverPort::evaluate_with_escalation` also returns `ObligationEvaluateError`, but the method only takes `key` and `initial_tier`. The config-only and track-only variants (`InvalidConfig`, `TrackNotActive`) are not structurally reachable here, so the shared error enum is broader than the port boundary warrants unless the catalogue explains that reuse.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 136,
               "category": "per-method error imprecision"
             },
             {
               "message": "`ObligationFulfillmentVerifierPort::verify_pair` and `WaiverVerifierPort::verify_pair` are synchronous `&self` methods even though both docs describe dispatching to LLM capabilities. That hides blocking external I/O behind a sync boundary without any justification in the catalogue; make the ports async or explicitly document the blocking choice.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 1044,
               "category": "sync/async color mismatch"
             }
@@ -3535,14 +3535,14 @@
             {
               "message": "`ValidationError.docs` restates upstream rationale and rollout state instead of acting as a catalog anchor: it explains that this track adds `InvalidObligationMinimum(usize)` to support `TestObligationMinimum`, and even describes the Yellow signal / pre-review gate posture. In `<layer>-types.json`, this field should reference the upstream anchor, not reproduce the briefing narrative.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 4825,
               "category": "upstream restatement"
             },
             {
               "message": "`core::convert::From<ValidationError>` for `DomainError` is marked `modify`, but the only branch change here is the new `ValidationError::InvalidObligationMinimum` variant; the `DomainError` conversion impl itself is unchanged. This overstates the diff and should be `reference`/omitted, as in the same pattern on prior tracks.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 1015,
               "category": "action incoherent with diff"
             }
@@ -3557,14 +3557,14 @@
             {
               "message": "`SemanticEscalationFuture`'s docs explain the object-safety/worker-task rationale instead of just anchoring the contract, which is an upstream restatement in the type catalogue.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 1059,
               "category": "upstream restatement"
             },
             {
               "message": "`SemanticEscalationDriverPort` over-constrains `V` and `E` with `Sync`; the boxed `Send` future only needs them to be `Send`, so this rejects valid implementors without adding safety.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 201,
               "category": "Liskov violation in trait design"
             }
@@ -3579,7 +3579,7 @@
             {
               "message": "`SemanticEscalationFuture` is missing the borrow lifetime from the source alias. In `libs/usecase/src/semantic_verdict_core/driver.rs` the alias is `SemanticEscalationFuture<'a, V, E>`, but this catalogue entry only records `V` and `E`, and the port method below it returns `SemanticEscalationFuture<'_, V, E>` without any lifetime parameter in the contract. That makes the type contract incomplete and can mislead consumers about the future's borrow relationship to `&self` / the inputs.",
               "severity": "medium",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 1046,
               "category": "API shape"
             }
@@ -3592,16 +3592,16 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`SemanticEscalationDriverPort` is under-specified in the catalogue: [`usecase-types.json`]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json ) records `P`/`K` as `Send + Sync`, but it only records `V`/`E` as `Send`. The implementation at [`libs/usecase/src/semantic_verdict_core/driver.rs`]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/usecase/src/semantic_verdict_core/driver.rs#L28-L33 ) requires `V`/`E: Send + Sync` as well, so the published port contract is too permissive and would admit non-Sync verdict/error types that cannot actually implement the trait.",
+              "message": "`SemanticEscalationDriverPort` is under-specified in the catalogue: [`usecase-types.json`]( track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json ) records `P`/`K` as `Send + Sync`, but it only records `V`/`E` as `Send`. The implementation at [`libs/usecase/src/semantic_verdict_core/driver.rs`]( libs/usecase/src/semantic_verdict_core/driver.rs#L28-L33 ) requires `V`/`E: Send + Sync` as well, so the published port contract is too permissive and would admit non-Sync verdict/error types that cannot actually implement the trait.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 183,
               "category": "Liskov violation in trait design"
             },
             {
-              "message": "`DomainError` now exposes a `Transition` arm whose payload is `TransitionError`, but none of the reviewed type catalogues declare `TransitionError` as a tracked type. The source definition exists at [`libs/domain/src/error.rs`]( /home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/error.rs#L104-L110 ), yet the catalogue and contract map never surface the payload type, so `DomainError::Transition` is only partially representable in the type SSoT.",
+              "message": "`DomainError` now exposes a `Transition` arm whose payload is `TransitionError`, but none of the reviewed type catalogues declare `TransitionError` as a tracked type. The source definition exists at [`libs/domain/src/error.rs`]( libs/domain/src/error.rs#L104-L110 ), yet the catalogue and contract map never surface the payload type, so `DomainError::Transition` is only partially representable in the type SSoT.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 4819,
               "category": "unconstructible error variant (dead vocabulary)"
             }
@@ -3616,7 +3616,7 @@
             {
               "message": "`domain::error::DomainError`'s docs field explains the rationale for keeping this entry as a reference instead of just anchoring the change to IN-02/T003. That prose restates upstream design intent in a `docs` field, which the no-upstream-restatement convention forbids for `<layer>-types.json` entries.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 1683,
               "category": "upstream restatement"
             }
@@ -3629,7 +3629,7 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: [`domain-types.json`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L4488-L4504) narrows `ValidationError` to only `InvalidObligationMinimum(usize)`, but the same file still exposes multiple public `try_new` constructors that return `Result<_, ValidationError>` for unrelated text/newtype validation, e.g. [`RoleName::try_new`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L2528-L2555), [`TestObligationBrief::try_new`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L3273-L3297), [`TestObligationAnchorId::try_new`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L3216-L3243), and [`WaivedReason::try_new`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L4565-L4588). Those constructors cannot structurally produce the only remaining variant, so callers are forced to handle an impossible branch and the failure space for those APIs is no longer represented.",
+              "message": "P1: [`domain-types.json`](file://track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L4488-L4504) narrows `ValidationError` to only `InvalidObligationMinimum(usize)`, but the same file still exposes multiple public `try_new` constructors that return `Result<_, ValidationError>` for unrelated text/newtype validation, e.g. [`RoleName::try_new`](file://track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L2528-L2555), [`TestObligationBrief::try_new`](file://track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L3273-L3297), [`TestObligationAnchorId::try_new`](file://track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L3216-L3243), and [`WaivedReason::try_new`](file://track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json#L4565-L4588). Those constructors cannot structurally produce the only remaining variant, so callers are forced to handle an impossible branch and the failure space for those APIs is no longer represented.",
               "severity": "P1",
               "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 4488,
@@ -3644,9 +3644,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`domain::ValidationError` is catalogued as if every pre-existing data-carrying variant were unit-shaped, but the real enum in [`libs/domain/src/error.rs`](file:///home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/error.rs#L16) has payloads for variants such as `InvalidTrackId(String)`, `BranchIdMismatch { .. }`, `StatusOverrideMismatch { .. }`, `TrackActivationRequiresPlanningOnly { .. }`, `TrackActivationRequiresSchemaV3 { .. }`, `TrackAlreadyMaterialized { .. }`, `TaskDescriptionMutated { .. }`, and `TaskRemoved { .. }`. That strips the public contract down to an incorrect shape and would mislead downstream consumers.",
+              "message": "`domain::ValidationError` is catalogued as if every pre-existing data-carrying variant were unit-shaped, but the real enum in [`libs/domain/src/error.rs`](file://libs/domain/src/error.rs#L16) has payloads for variants such as `InvalidTrackId(String)`, `BranchIdMismatch { .. }`, `StatusOverrideMismatch { .. }`, `TrackActivationRequiresPlanningOnly { .. }`, `TrackActivationRequiresSchemaV3 { .. }`, `TrackAlreadyMaterialized { .. }`, `TaskDescriptionMutated { .. }`, and `TaskRemoved { .. }`. That strips the public contract down to an incorrect shape and would mislead downstream consumers.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 4488,
               "category": "SoT integrity"
             }
@@ -3661,7 +3661,7 @@
             {
               "message": "`DomainError` is marked `reference`, but the catalogue is not baseline-identical: it only declares `From<ValidationError>` and omits the rustdoc-visible `Debug`, `Error`, and `From<TransitionError>` impls from `libs/domain/src/error.rs`. Because `TransitionError` has no type entry anywhere in this scope, the `Transition` arm's payload is invisible to the type SSoT.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 1681,
               "category": "action incoherent with diff"
             }
@@ -3676,7 +3676,7 @@
             {
               "message": "`ValidationError` is catalogued with `unit` payloads for variants that are payload-bearing in the real domain enum (`libs/domain/src/error.rs:16`), for example `InvalidTrackId`, `BranchIdMismatch`, `StatusOverrideMismatch`, `TrackActivationRequiresPlanningOnly`, `TrackActivationRequiresSchemaV3`, `TrackAlreadyMaterialized`, `TaskDescriptionMutated`, and `TaskRemoved`. That makes the domain type contract lossy and incorrect for downstream consumers.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 4508,
               "category": "cross-layer contract"
             }
@@ -3706,7 +3706,7 @@
             {
               "message": "`JsonTestObligationRulesLoader::new` is catalogued with only `config_path: PathBuf`, but the implementation also requires `trusted_root: PathBuf` and stores it for path-guarding. That leaves the new adapter contract incomplete and inconsistent with the actual public API (`libs/infrastructure/src/test_obligation/rules_codec.rs:207`).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
               "line": 973,
               "category": "missing companion modify"
             }
@@ -3801,14 +3801,14 @@
             {
               "message": "`domain::ValidationError`'s `docs` field is change-log prose, not a contract note: it narrates the `String -> DiagnosticMessage` refactor, mentions `T006`, and defers work to an implementer follow-up. The catalog should just anchor the contract and avoid restating upstream rationale.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 4881,
               "category": "upstream restatement"
             },
             {
               "message": "`test_obligation::obligations_codec::ObligationCatalogueEntryRefDto`'s `docs` field does the same thing: it explains the alias split and evaluator symbol-disambiguation rationale in prose instead of staying at the catalog-contract level. That violates the no-upstream-restatement rule for `docs` / `intent` fields.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
               "line": 2276,
               "category": "upstream restatement"
             }
@@ -3823,7 +3823,7 @@
             {
               "message": "`CatalogueEntryRefDto` is added as a public DTO, but this catalog entry records no inherent methods even though the implementation now exposes `from_domain` and `into_domain`. That leaves the post-change API shape incomplete in the type SSoT.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
               "line": 2326,
               "category": "missing companion modify"
             }
@@ -3838,7 +3838,7 @@
             {
               "message": "Both `ObligationCatalogueEntryRefDto::into_domain` and `CatalogueEntryRefDto::into_domain` expose `domain::ValidationError`, but the only structurally reachable failure is `ValidationError::EmptyString` from `CatalogueEntryKey::try_new`; the other 35 variants are impossible at this boundary. Narrow the return type or document why callers must handle the whole enum.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
               "line": 2304,
               "category": "per-method error imprecision"
             }
@@ -3853,7 +3853,7 @@
             {
               "message": "`CatalogueEntryRefDto` is the preexisting `semantic_verify_codec` DTO, so this entry should not be `action: add`. The source type is still a serde wire DTO, but the catalog now treats it as a brand-new struct and only lists `Debug`/`Clone`/`PartialEq`/`Eq`, dropping the `Serialize` / `Deserialize` trait_impls that the Rust code derives.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
               "line": 2326,
               "category": "action incoherent with diff"
             }
@@ -3868,7 +3868,7 @@
             {
               "message": "`test_obligation::obligations_codec::ObligationCatalogueEntryRefDto` is a structural duplicate of `tddd::semantic_verify_codec::CatalogueEntryRefDto`: same empty DTO shape, same `from_domain`/`into_domain` signatures, and the same `CatalogueEntryRef` validation path. Because the catalogue does not declare a `reference` relation between them, the same wire contract now has to be maintained in two places (also mirrored in `contract-map.md`).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
               "line": 2274,
               "category": "DRY"
             }
@@ -3883,21 +3883,21 @@
             {
               "message": "`ObligationCatalogueEntryRefDto`'s `docs` field restates the duplication rationale in prose ('independent struct', 'genuine local type', 'contract, not type reuse') instead of staying at the contract level. The accepted duplicate itself is fine; the docs field should not become a second source of truth for that decision.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
               "line": 2303,
               "category": "upstream restatement"
             },
             {
               "message": "`ObligationCatalogueEntryRefDto::into_domain` and `CatalogueEntryRefDto::into_domain` both expose the full `domain::ValidationError` enum even though the only reachable failure is `ValidationError::EmptyString` from `CatalogueEntryKey::try_new`. That leaves the rest of the enum as dead vocabulary at this boundary without justification.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
               "line": 2331,
               "category": "per-method error imprecision"
             },
             {
-              "message": "`infrastructure::track::fs_store::load_impl_plan_for_track` is catalogued as `Result<Option<domain::ImplPlanDocument>, domain::RepositoryError>`, but the implementation at `/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/infrastructure/src/track/fs_store.rs:475` returns `Option<ImplPlanDocument>` and swallows all failures with `ok()?`. The catalog advertises an error path that cannot actually occur.",
+              "message": "`infrastructure::track::fs_store::load_impl_plan_for_track` is catalogued as `Result<Option<domain::ImplPlanDocument>, domain::RepositoryError>`, but the implementation at `libs/infrastructure/src/track/fs_store.rs:475` returns `Option<ImplPlanDocument>` and swallows all failures with `ok()?`. The catalog advertises an error path that cannot actually occur.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
               "line": 17,
               "category": "per-method error imprecision"
             }
@@ -3912,14 +3912,14 @@
             {
               "message": "`tddd::semantic_verify_codec::CatalogueEntryRefDto` is a preexisting cross-track DTO, but this catalog entry is marked `action: add` and its serde trait impls are also recorded as `add`. The branch is claiming a new API surface here instead of referencing the existing type, so the type SSoT overstates the diff.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
               "line": 2353,
               "category": "action incoherent with diff"
             },
             {
               "message": "The `docs` field for `infrastructure::track::fs_store::load_impl_plan_for_track` restates the helper's behavior and rationale (`None` on any failure, render-only helper for the T013 hardening path) instead of keeping the catalog entry to target + operation + anchor cite. That violates the no-upstream-restatement rule for `<layer>-types.json` docs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
               "line": 21,
               "category": "upstream restatement"
             }
@@ -3934,14 +3934,14 @@
             {
               "message": "`CatalogueEntryRefDto` is catalogued as `action: add`, but this is the preexisting shared DTO in `tddd::semantic_verify_codec` that the track plan says to reference. The associated serde impls on the same surface are also marked `add`; they should be `reference` entries so the catalog reflects reuse rather than a new public type.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
               "line": 2353,
               "category": "action incoherent with diff"
             },
             {
               "message": "`infrastructure::track::fs_store::load_impl_plan_for_track` is tied to `CN-14`, but that spec item is about test-source body handling and artifact-side hashes, not impl-plan loading. The anchor is off-topic for this helper, so the traceability link is misleading.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
               "line": 22,
               "category": "spec_refs missing or off-topic"
             }
@@ -3956,7 +3956,7 @@
             {
               "message": "`tddd::semantic_verify_codec::CatalogueEntryRefDto` is a preexisting cross-track DTO: the underlying Rust source in `libs/infrastructure/src/tddd/semantic_verify_codec.rs` is unchanged in this PR. This catalogue entry should therefore be `action: reference`, not `add`, and the attached `core::fmt::Debug` / `Clone` / `Eq` / `PartialEq` / `Serialize` / `Deserialize` rows should be `reference` as well; otherwise the track falsely claims ownership of an unchanged type.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
               "line": 2326,
               "category": "action incoherent with diff"
             }
@@ -3985,21 +3985,21 @@
             {
               "message": "`SpecDocumentLoaderPort`'s entry docs at this block are doing upstream prose work instead of staying anchor-only: they explain the parsed-document design, the AC/CN detection use case, and the hexagonal-purity rationale. That violates the no-upstream-restatement rule for `<layer>-types.json` docs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 1484,
               "category": "upstream restatement"
             },
             {
               "message": "`ContentHasherPort`'s docs restate the design rationale for why the port exists and where its implementation lives (`sha2` avoidance, three-hash cache key freezing, infrastructure placement) instead of reducing to a short symbol summary plus anchors.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 1522,
               "category": "upstream restatement"
             },
             {
               "message": "`SpecDocumentLoadError`'s docs go beyond an entry summary and restate the error contract in prose (`file I/O` vs `spec.json` parse failures, serde avoidance, Path A rationale). That belongs in the upstream spec/ADR, not the type catalogue docs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 5522,
               "category": "upstream restatement"
             }
@@ -4014,28 +4014,28 @@
             {
               "message": "`SpecDocumentLoadError` is catalogued as an empty tuple struct here, but `libs/domain/src/spec_document_loader_port.rs` defines it as an enum with `NotFound`, `Io`, `JsonParse`, and `Invariant` variants. The contract map mirrors the same loss as a single opaque error node, so the catalogue is hiding the actual failure vocabulary. Change this entry to an enum shape.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 5507,
               "category": "role / kind mismatch"
             },
             {
               "message": "`CheckTestObligationsInteractor` still declares `spec_reader` as `SpecFileLoaderPort` in the catalogue, but the implementation in `libs/usecase/src/test_obligation/check.rs` now injects `SpecDocumentLoaderPort`. That leaves the post-change constructor signature undeclared and will miswire the checker against the old raw-file loader instead of the parsed-spec loader.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 381,
               "category": "missing companion modify"
             },
             {
               "message": "`SpecDocumentLoaderPort::load`'s catalogue docs at this block restate upstream rationale and behavior instead of staying anchor-only: they explain the parse/deserialize path, the serde boundary, and the `CatalogueDocumentLoaderPort` parallel. That violates the no-upstream-restatement rule for the type catalogue.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 1479,
               "category": "upstream restatement"
             },
             {
               "message": "`ContentHasherPort::sha256`'s catalogue docs do the same thing: they explain why the port exists, which interactor consumes it, and why `sha2` stays out of the usecase layer instead of giving a short contract summary plus anchors. That is upstream restatement in `domain-types.json`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 1517,
               "category": "upstream restatement"
             }
@@ -4386,7 +4386,7 @@
             {
               "message": "`TraitImplDeclV2` is marked `modify`, but this key is absent from `HEAD` entirely, so the catalogue is introducing a new type rather than mutating an existing one. It should be declared as `add` to keep the type delta and generated signals coherent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 5768,
               "category": "action incoherent with diff"
             }
@@ -4401,14 +4401,14 @@
             {
               "message": "`SpecDocumentLoaderPort`'s docs explain the domain-placement rationale and compare it to `CatalogueDocumentLoaderPort`, which restates the hexagonal-architecture convention inline instead of keeping the catalogue anchor-only.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 1450,
               "category": "upstream restatement"
             },
             {
               "message": "`CheckTestObligationsCommand` and `DeriveTestObligationsCommand` are exact three-field copies (`track_id`, `current_branch`, `catalogue_paths`) with the same `new(...)` signature. That duplicates a public command contract in the same layer without a shared abstraction, so any input-shape change has to be made twice.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 342,
               "category": "duplicated structural declaration"
             }
@@ -4423,28 +4423,28 @@
             {
               "message": "These existing usecase identities were reshaped but still say `action: add`, so the catalogue will treat them as brand-new instead of modified baseline APIs: `EvaluateTestObligationsApplicationService`, `CheckTestObligationsCommand`, `DeriveTestObligationsCommand`, `CheckTestObligationsInteractor`, `DeriveTestObligationsInteractor`, `EvaluateTestObligationsInteractor`, `TestObligationResultsInteractor`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 80,
               "category": "missing companion modify"
             },
             {
               "message": "The usecase result/config DTOs also changed in place without switching to `modify`: `CheckTestObligationsOutcome`, `EvaluateTestObligationsOutcome`, `TestObligationEvaluateConfig`, `TestObligationLaneSummary`, `TestObligationResultsOutput`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 444,
               "category": "missing companion modify"
             },
             {
               "message": "The domain error enums changed variant sets and payload shapes but remain `action: add`: `ObligationCheckError` and `ObligationEvaluateError`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 2800,
               "category": "missing companion modify"
             },
             {
               "message": "`EvaluateTestObligationsFuture`'s docs describe why the alias is boxed and Send-safe rather than just stating the contract; that implementation rationale belongs upstream, not in the catalogue docs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 1414,
               "category": "upstream restatement"
             }
@@ -4532,14 +4532,14 @@
             {
               "message": "`RefVerifyConfig` is a newly introduced key in this diff, but the entry is marked `action: modify`. The baseline catalogue in `HEAD` has no `RefVerifyConfig`, so this should be `add` to match the actual change set.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 1322,
               "category": "action incoherent with diff"
             },
             {
               "message": "`RefVerifyPercent` is a newly introduced key in this diff, but the entry is marked `action: modify`. The baseline catalogue in `HEAD` has no `RefVerifyPercent`, so this should be `add` to match the actual change set.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 1420,
               "category": "action incoherent with diff"
             }
@@ -4554,21 +4554,21 @@
             {
               "message": "`CliCommand` is introduced as a new top-level enum in this diff, but the catalogue marks it `modify` and its clap trait impls as `reference`. The base `cli-types.json` had no `CliCommand` entry, so this should be `add`; otherwise the contract map treats a new public surface as an existing one.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
               "line": 389,
               "category": "action incoherent with diff"
             },
             {
               "message": "`RefVerifyConfig` is a brand-new entry in this file, but it is marked `modify` and its trait impls are marked `reference`. The baseline `usecase-types.json` had no `RefVerifyConfig`, so this should be `add`; otherwise the catalogue misclassifies a newly introduced API shape as a mutation of an existing one.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 1322,
               "category": "action incoherent with diff"
             },
             {
               "message": "`RefVerifyPercent` is also new in this diff, but it is marked `modify` and its trait impls are marked `reference`. The baseline `usecase-types.json` had no `RefVerifyPercent`, so this should be `add`; the current action makes the catalogue understate the API change.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 1421,
               "category": "action incoherent with diff"
             }
@@ -4583,21 +4583,21 @@
             {
               "message": "`CheckTestObligationsInteractor` is under-rendered in `contract-map.md`: `usecase-types.json:731` declares an 8-parameter `new(...)` that injects the rules loader, obligations/bindings ports, scanner, both caches, and both readers, but `contract-map.md:732` only shows `new -> self` and drops every dependency edge. The integrated view is stale and no longer reflects the constructor contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/contract-map.md",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/contract-map.md",
               "line": 732,
               "category": "stale generated view"
             },
             {
               "message": "`TestObligationResultsInteractor` has the same contract-map problem: `usecase-types.json:1973` declares four injected ports, but `contract-map.md:819` renders only `new -> self`. The results wiring is hidden from the rendered SoT, which defeats the point of the integrated contract map.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/contract-map.md",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/contract-map.md",
               "line": 819,
               "category": "stale generated view"
             },
             {
               "message": "`TestObligationResultsInteractor` is missing one of the upstream anchors its own docs cite. The docs at `usecase-types.json:1975` say `see IN-10 / AC-09`, but `spec_refs[]` starting at `usecase-types.json:2015` only includes `IN-10`. Add `AC-09` so the results interactor stays directly grounded to the acceptance criterion it claims to implement.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 1973,
               "category": "spec_refs missing"
             }
@@ -4612,7 +4612,7 @@
             {
               "message": "`SemanticCalibrationProbeConfig` is marked `action: add`, but the entry grew new public accessors (`injection()` and `threshold()`) on top of the pre-existing constructor. That is a modification to an existing type, so the catalogue should declare `modify` to stay aligned with the actual diff and the type SSoT.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 1494,
               "category": "action incoherent with diff"
             }
@@ -4713,14 +4713,14 @@
             {
               "message": "The branch-resolution helper docs in this file (`current_branch`, `read_command_branch`, and `read_only_command_context`) spell out the detached-HEAD / explicit-`--track-id` rule in prose. That is upstream contract text, not type-catalogue metadata; trim these to short purpose summaries and leave the rule itself to the anchors.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
               "line": 254,
               "category": "upstream restatement"
             },
             {
               "message": "`TestBindingsSkeletonRecord.docs` restates the wire-shape projection rationale (`already extracted`, `stdout renders the exact test-bindings.json wire form`, `without a second projection`) instead of just identifying the DTO and citing the spec anchors. That prose belongs in the spec/ADR, not in the type catalogue.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
               "line": 1892,
               "category": "upstream restatement"
             }
@@ -4735,7 +4735,7 @@
             {
               "message": "`cli::commands::test_obligation::command_root` and `cli::commands::test_obligation::current_branch` are part of the new `bindings-skeleton` helper surface, but their `spec_refs[]` only cite AC-14/CN-09. The sibling bindings-skeleton additions in this file all cite IN-06, so these two helpers lose traceability to the spec item that introduced them.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
               "line": 23,
               "category": "spec_refs missing or off-topic"
             }
@@ -4807,7 +4807,7 @@
             {
               "message": "`ObligationCheckError.docs` now repeats the load-up-front / fail-closed behavior contract in prose instead of keeping the catalogue text to a brief purpose statement plus anchor cites. That is an upstream restatement in `domain-types.json` and belongs in the Rust doc comment, not the catalogue contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+              "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
               "line": 2790,
               "category": "upstream restatement"
             }
@@ -4991,21 +4991,21 @@
             {
               "message": "This composition root defines `FsSpecDocumentLoader` and implements `SpecDocumentLoaderPort` locally. Port implementations belong in `libs/infrastructure`; `cli_composition` should only wire the adapter.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/test_obligation.rs",
+              "file": "apps/cli-composition/src/test_obligation.rs",
               "line": 265,
               "category": "adapter defined here"
             },
             {
               "message": "This composition root defines `FailingFulfillmentVerifier` and implements `ObligationFulfillmentVerifierPort` locally. That secondary adapter should live in `libs/infrastructure`, with the root only selecting and wiring it.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/test_obligation.rs",
+              "file": "apps/cli-composition/src/test_obligation.rs",
               "line": 288,
               "category": "adapter defined here"
             },
             {
               "message": "This composition root defines `FailingWaiverVerifier` and implements `WaiverVerifierPort` locally. That secondary adapter should live in `libs/infrastructure`, with the root only selecting and wiring it.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/test_obligation.rs",
+              "file": "apps/cli-composition/src/test_obligation.rs",
               "line": 304,
               "category": "adapter defined here"
             }
@@ -5020,7 +5020,7 @@
             {
               "message": "P1 invoke leak: `ref_verify_run` constructs `VerifySemanticRefsInteractor` and calls `interactor.execute(&cmd)` directly instead of routing through the `RefVerifyDriver`/infrastructure aggregate adapter. That bypasses the composition boundary the scope policy is trying to enforce, and it duplicates the hardened wiring that already exists in `FsRefVerifyRunAdapter` / `FsRefVerifyAggregateAdapter`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/apps/cli-composition/src/ref_verify.rs",
+              "file": "apps/cli-composition/src/ref_verify.rs",
               "line": 172,
               "category": "invoke leak"
             }
@@ -5479,7 +5479,7 @@
             {
               "message": "`trait_ref_scope()` strips trailing `::` before classification, so malformed `TypeRef`s like `Foo::` are treated as `SelfCrate` instead of failing closed to `External`. Because `TypeRef` only guarantees non-empty input, invalid trait refs can still reach this path and be resolved to the wrong catalogue trait.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core-002/libs/domain/src/tddd/catalogue_v2/traits.rs",
+              "file": "libs/domain/src/tddd/catalogue_v2/traits.rs",
               "line": 193,
               "category": "typestate / parse-don't-validate gap"
             }

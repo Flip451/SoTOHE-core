@@ -1,0 +1,196 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::verify::machine_paths::verify": {
+      "action": "add",
+      "docs": "Machine-path verifier over the tracked-file inventory with explicit machine-home input (AC-12).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "project_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "machine_home_dir",
+          "ty": "Option<&std::path::Path>"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-12",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "infrastructure::verify::sotp_version_tag::verify": {
+      "action": "add",
+      "docs": "Version-tag verification function for the configured SoTOHE release reference; `project_root` is a technical lookup root. AC-03.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "project_root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "infrastructure::verify::template_refs::verify": {
+      "action": "add",
+      "docs": "Shipped-template reference verification function; `project_root` is a technical scan root. AC-15.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "project_root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-15",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "FsVerifyAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "delete",
+      "for_type": "FsVerifyAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "FsVerifyAdapter",
+      "trait_ref": "usecase::verify::VerifyPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsTemplateExportAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "delete",
+      "for_type": "FsTemplateExportAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsTemplateExportAdapter",
+      "trait_ref": "usecase::template_export::TemplateExportPort"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "FsTemplateExportAdapter": {
+      "action": "modify",
+      "docs": "Filesystem template-export adapter with construction-injected machine-home scan input (IN-06; CN-03; AC-13).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "machine_home_dir",
+              "ty": "Option<std::path::PathBuf>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "FsVerifyAdapter": {
+      "action": "modify",
+      "docs": "Filesystem verification adapter with construction-injected machine home (AC-03; AC-12; AC-15).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "machine_home_dir",
+              "ty": "Option<std::path::PathBuf>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "verify_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

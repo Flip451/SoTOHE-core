@@ -36,7 +36,7 @@ Report findings ONLY for the following categories:
 - **broken invariant in newtype constructor**: a `try_new` / `new` that
   accepts inputs the type's documented invariant says it should reject (e.g.,
   empty string for a Newtype documented as "non-empty"), or accepts inputs
-  silently when fail-closed is required (cite CN-04 patterns).
+  silently when fail-closed validation is required.
 
 ## What NOT to report
 

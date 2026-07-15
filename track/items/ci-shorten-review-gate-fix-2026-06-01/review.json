@@ -246,7 +246,7 @@
             {
               "message": "Decision D1/D2 removes `--scope-files` from `sotp review fix-local`, but the related fixer ADR `knowledge/adr/2026-05-31-0542-review-fix-codex-hexagonal-nested-session.md` still defines the fixer contract and CLI surface around a `scope-files` input. As written, the two ADRs prescribe incompatible boundary contracts for the same feature; this needs an explicit supersession/update note or the older ADR should be revised.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
+              "file": "knowledge/adr/2026-06-01-2300-review-fixer-self-resolve-scope-files.md",
               "line": 27,
               "category": "contradiction"
             }
@@ -757,14 +757,14 @@
             {
               "message": "This test still asserts `Err` when `domain-types.json` is absent, but the new type-signals behavior skips missing catalogues unconditionally. With the fixture as written, `execute_type_signals(...)` will return `Ok`, so this test will fail and no longer matches the intended contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
               "line": 128,
               "category": "testing"
             },
             {
               "message": "This `--layer usecase` regression test is still expecting an error even though the fixture omits `usecase-types.json`, and absent catalogues are now always skipped. The command will return `Ok` here, so the test no longer validates layer dispatch and will fail as written.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
               "line": 199,
               "category": "testing"
             }

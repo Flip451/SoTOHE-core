@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "track_id": "public-template-blocker-cleanup-2026-07-13",
+  "entries": {
+    "T001": [],
+    "T002": [
+      {"layer": "usecase", "entry_key": "TemplateExportError"},
+      {"layer": "usecase", "entry_key": "TemplateExportPortError"}
+    ],
+    "T003": [
+      {"layer": "domain", "entry_key": "FilePath"}
+    ],
+    "T004": [
+      {"layer": "infrastructure", "entry_key": "infrastructure::verify::sotp_version_tag::verify"}
+    ],
+    "T005": [
+      {"layer": "infrastructure", "entry_key": "infrastructure::verify::machine_paths::verify"}
+    ],
+    "T006": [
+      {"layer": "infrastructure", "entry_key": "infrastructure::verify::template_refs::verify"}
+    ],
+    "T007": [
+      {"layer": "usecase", "entry_key": "VerifyInteractor"},
+      {"layer": "usecase", "entry_key": "VerifyOutcome"},
+      {"layer": "usecase", "entry_key": "VerifyPort"},
+      {"layer": "usecase", "entry_key": "VerifyPortError"},
+      {"layer": "usecase", "entry_key": "VerifyService"}
+    ],
+    "T008": [
+      {"layer": "infrastructure", "entry_key": "FsVerifyAdapter"}
+    ],
+    "T009": [
+      {"layer": "cli_driver", "entry_key": "VerifyInput"}
+    ],
+    "T010": [
+      {"layer": "cli", "entry_key": "VerifyArgs"},
+      {"layer": "cli", "entry_key": "VerifyCommand"},
+      {"layer": "cli", "entry_key": "CatalogueSpecRefsArgs"},
+      {"layer": "cli", "entry_key": "cli::commands::verify::parse_track_id"}
+    ],
+    "T011": [],
+    "T012": [],
+    "T013": [],
+    "T014": [],
+    "T015": [],
+    "T016": [],
+    "T017": [],
+    "T018": [],
+    "T019": [],
+    "T020": [],
+    "T021": [],
+    "T022": [
+      {"layer": "infrastructure", "entry_key": "FsTemplateExportAdapter"},
+      {"layer": "usecase", "entry_key": "TemplateExportPort"}
+    ]
+  }
+}

@@ -1,0 +1,1201 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "c031e87517e88a2eb5731dc95dc8fdd682f890a953dfbc2938067d0350e5088b",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.fastembed_cache/`、`.semantic_index*`、ローカルのロック、ローカルのビルド・一時保存 directory など、`gitignore` 対象かつ Git 管理外の一時生成物は配布内容外として扱い、export 成否を左右させない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "通常の開発作業ツリーでの template export が、Git 管理外かつ gitignore 対象の一時生成物によって阻害されず、未分類の配布候補は fail-closed のまま扱われる状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "0e64038c0323b55fdd58cb3b9d4ea991c35923d259b323fdbba0bb7194773c90",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "公開前には、設定された `git_url` と `tag` が公開 remote 上で解決できることを公開前確認一覧または verify task で確認する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "固定 tag による更新・他ホスト再導入経路を、公開前に到達可能性を確認する約束事として維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "39502dac557d03e4235e207345875e733fa29cd30bd73856de94dfa0875587af",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出荷対象の file から、利用者が新しく取得した直後の作業ツリーに存在しない具体 path を現行前提として参照しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "export されるテンプレートが、新規取得直後に存在しない提供元固有の具体参照なしに自己完結して利用できる状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "29d56d0c95a3fdc350ce09c713e4b09ddad67274c3adb1a29600bc461b80e993",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "archive の業務ロジックは CLI (`sotp track archive`) と提供元非依存の workflow SSoT に集約する。archive 完了状態の唯一の SSoT は directory 位置とする。track directory が `track/archive/` 配下に存在すること自体を archived 状態とし、metadata に status field を追加せず、archive 時にも metadata status を更新しない。registry などの rendered view における Archived 表示も同じ directory 位置から導出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-04",
+          "text_label": "track archive の操作と表示を CLI / workflow の単一の業務ロジックおよび directory 位置から導出する状態に統一する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "0e0a8bf04403072083ff49109b0a5989a016934bfc19d7c1daa34f978282c47c",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「workspace 内を指す絶対パスは repo-relative path に正規化する。workspace 外の一時領域・一時保存領域・host 固有 path は、意味を保つ必要がある場合のみ汎用表記に置き換え、意味を持たない診断情報なら削除または伏せ字化する。」また、「今後の成果物を書き込む処理は repo-relative path を保存するように修正する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-05",
+          "text_label": "公開元リポジトリと exported template の双方から作業機を特定し得る絶対パスを除去し、将来の再混入を防ぐ。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "abf9f199b3108e8bf8c71d9c8032e4955b7990fd27faf54ca132994aaa2b0904",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D5 の完了条件を手動確認に留めず、機械検査に接続する。検査面は 2 つ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-06",
+          "text_label": "作業機の絶対パス混入を、公開元リポジトリと export 出力の機械検査によって CI 時点で fail-closed に検出する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "5391acc99b6ef24d18478064a128ac23e588afd45715f63b88aad86c88d647e3",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の一括整理後に、同じ出荷対象集合へ存在しない具体参照が再混入することを防ぐ fail-closed の verify ゲートを有効化し、CI に接続する。検査対象は独自の directory 列挙を持たず、境界 manifest の分類から D3 の出荷対象集合を導出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-07",
+          "text_label": "出荷対象に対する具体 ADR 参照および具体 track 参照の再混入を、境界 manifest 由来の字面検査で CI 時点に fail-closed 検出する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b5ce40d74c5406e7f7b10a066ec8dd60adaa45a59f738cba582fa947b2da5da",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` と template export smoke は、Git 管理下の file または `gitignore` 対象ではない file の未分類 path には引き続き fail-closed する。一方で、`.fastembed_cache/`、`.semantic_index*`、ローカルのロック、ローカルのビルド・一時保存 directory など、`gitignore` 対象かつ Git 管理外の一時生成物は配布内容外として扱い、export 成否を左右させない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "template export とその smoke 検査で、Git 管理外かつ gitignore 対象の一時生成物を配布対象外として skip する振る舞いを実現する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "091367cd92801c82555f06d038d3300b027f90a3b431428348ec03fb4ac191b0",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "公開前には、設定された `git_url` と `tag` が公開 remote 上で解決できることを公開前確認一覧または verify task で確認する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "固定 tag 経路の公開 remote 上での解決可能性を公開前に確認する検査を整備する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "88e1940f3696cbce8f61451c76758f891895e67ae5e511618f597320aa98fed2",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 manifest の `include` および `overlay` 分類から導出される最終 export 全体を、テンプレートの出荷対象として扱う。具体参照の排除は、そこに含まれる参照を記述し得るすべての file に適用する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "境界 manifest の include / overlay 分類から導かれる出荷対象を自己完結化し、存在しない提供元固有の具体参照を除去する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "2c779d1c8a505aba391338d3fb317d7c2fd7019af0e96c4db6e49a2375c488ae",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "archive の業務ロジックは CLI (`sotp track archive`) と提供元非依存の workflow SSoT に集約する。... registry などの rendered view における Archived 表示も同じ directory 位置から導出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "archive の業務ロジックを CLI と提供元非依存 workflow に集約し、command 文書と rendered view の archive 表示をこれに整合させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "7c76bd431b55539606fd207a1302b5ea2c4ed9997b9530fd8df5e47fef365ea5",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "workspace 内を指す絶対パスは repo-relative path に正規化する。workspace 外の一時領域・一時保存領域・host 固有 path は、意味を保つ必要がある場合のみ汎用表記に置き換え、意味を持たない診断情報なら削除または伏せ字化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "Git 管理下の既存成果物を対象に、作業機を指す絶対パスを意味に応じて repo-relative、汎用表記、削除、または伏せ字へ置き換える。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "c1b1de1c77c3f6a11a11fbdf1488ec89c68e701965c74a979363f57a6fc24882",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "2 つの検査面が用いる作業機の home directory は composition root が解決し、adapter / verifier の構築時または引数として明示的に渡す。adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まない。...作業機の home directory を解決できない場合は検査を fail-closed する。補助の型は home directory を入力に取らず、repo-relative でない値をすべて構築時に拒否するため、環境依存を持たない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "公開元リポジトリの verify ゲートと export smoke 側の走査からなる 2 つの検査面、および構造化成果物の path 永続化境界における repo-relative 強制を追加する。2 つの検査面が用いる作業機の home directory は composition root が解決し、adapter / verifier の構築時または引数として明示的に渡す。adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合は検査を fail-closed とする。codec 境界は home directory を入力に取らず、repo-relative でない値をすべて構築時に拒否するため、環境依存を持たない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "935f23fd7c7ebcd5189b0b2294a9eb17bc401b5df7520328a68a0ce96cef41f1",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械検査は、参照の字面だけで具体性を判定できる名前キーを走査する。必須の検出対象は、`knowledge/adr/` 配下の日付時刻型 file 名を伴う具体 ADR 参照と、`track/items/` 配下の日付 suffix 付き track id を伴う具体 track 参照とする。`knowledge/adr/` directory および `knowledge/adr/README.md` への汎用参照と、`<id>` など角括弧形式の placeholder は許容する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "出荷対象集合に対する具体 ADR / track 参照の名前キー検査と、その許容・違反 fixture を追加する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "64f2840b500f7afbd6adf55acc79f2cedc27a32cd7d72c0baddf1d1fc0962e1e",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "全コピーを削除し、`TrackId::try_new`（domain）への委譲に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`catalogue-spec-refs --track-id` を含む track ID を受け取る境界で、domain の `TrackId::try_new` へ検証を委譲し、検証済みの TrackId だけを下流へ渡す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-19-0924-existing-dry-violation-cleanup.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab5b1dde106bf6998cfbe53a6d2865a77ef25eac9d19d477c3478385cabb2875",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "smoke gate 側で Git 管理下の file だけから作った作業ツリーを export する方式は補助的には有効だが、通常の開発作業ツリーで利用者が export を実行する導線を隠すだけになるため、根本対策とはしない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "Git 管理下の file だけで作った clean checkout を export の唯一の回避策とする運用。通常の開発作業ツリーでの export 振る舞いは置き換えない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "059bf1f38b8e74b6ecd981e5552f77b5f5e527f46a95a6ad85f848ecad555d6a",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template export smoke は初回導入導線を検証するため、固定 tag の存在を必須にしない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "固定 tag を template export smoke の初回導入導線の必須条件にすること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "496c151004706f33c7698533e3677f273fa7f38d79e7d7a5bd81d153efe78796",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "選別済み ADR の同梱と、export 用 overlay による convention の差し替えは、参照解消の手段として採用しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "提供元の全 ADR または track 履歴の同梱、あるいは export 用 overlay による convention の二重管理を参照解消手段として採用すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "a2f7d4006f3000c2672ccaf6dd4d7649c71a493a6fccd7255f1ac3dcdcac1a76",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:archive` の提供元別 command 文書は、metadata 直接編集、手動 `git mv`、手動 stage file 作成の長文手順を保持しない。archive 完了状態の唯一の SSoT は directory 位置とする。track directory が `track/archive/` 配下に存在すること自体を archived 状態とし、metadata に status field を追加せず、archive 時にも metadata status を更新しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "archive 完了状態を metadata の status field で管理すること、または提供元別 command 文書に手動 archive 手順を維持すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "a1bd8ef8a9a69bec3c4eab4558c85a8957f2d5b7ff47966a9bc862e5f837d244",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Git 管理下の成果物に残る作業機の絶対パスは、公開前に全件書き換える。workspace 内を指す絶対パスは repo-relative path に正規化する。workspace 外の一時領域・一時保存領域・host 固有 path は、意味を保つ必要がある場合のみ汎用表記に置き換え、意味を持たない診断情報なら削除または伏せ字化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "全 absolute path の一律禁止、absolute path の分類・waiver 制度、または D6 の home directory 配下という最低検出対象を超える検出範囲の追加。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "a1bd8ef8a9a69bec3c4eab4558c85a8957f2d5b7ff47966a9bc862e5f837d244",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検出の最低対象は home directory 配下を指す絶対パスとする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "全 absolute path の一律禁止、absolute path の分類・waiver 制度、または D6 の home directory 配下という最低検出対象を超える検出範囲の追加。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "ca012df93875ff85f54b6a433e105cde2a28cc7dc41db172abb281223bab4ecf",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "字面だけでは正当な実行時説明と区別できない参照は、このゲートへ含めない。`tmp/`、`target/`、`.semantic_index/` などを存在前提にした説明、削除済み file への参照、裸の符号の意味論上の不備は、既存の出荷対象 review policy が文脈を読んで検出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-06",
+          "text_label": "字面だけで正当な実行時説明と区別できない参照、削除済み file 参照、裸の符号の意味論上の不備を名前キー検査だけで判定すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "b04fb1a1aa5b48aaab7c53eb73897ffa7794f0b254f0ced970cb588e2a255d81",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 manifest の `include` および `overlay` 分類から導出される最終 export 全体を、テンプレートの出荷対象として扱う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "export と出荷対象の検査は、独自の directory 列挙ではなく境界 manifest の分類から対象集合を導出する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "b04fb1a1aa5b48aaab7c53eb73897ffa7794f0b254f0ced970cb588e2a255d81",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検査対象は独自の directory 列挙を持たず、境界 manifest の分類から D3 の出荷対象集合を導出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "export と出荷対象の検査は、独自の directory 列挙ではなく境界 manifest の分類から対象集合を導出する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "9dae49687b6c78c631d9140ad48fc04a0f9e55e4ee8b8a600b7b0845a01c3d8b",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "公開元リポジトリ側: Git 管理下の全 file に作業機の絶対パスが含まれていないことを検査する verify ゲートを追加し、CI に接続する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "この track で導入する公開前検査は、SoTOHE framework 自身の出荷物・コード・方法論の整合性だけを fail-closed にし、テンプレート利用者の provider / agent 設定を期待値照合の対象にしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "9dae49687b6c78c631d9140ad48fc04a0f9e55e4ee8b8a600b7b0845a01c3d8b",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「同じ出荷対象集合へ存在しない具体参照が再混入することを防ぐ fail-closed の verify ゲートを有効化し、CI に接続する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "この track で導入する公開前検査は、SoTOHE framework 自身の出荷物・コード・方法論の整合性だけを fail-closed にし、テンプレート利用者の provider / agent 設定を期待値照合の対象にしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "4793c3d343a1b6a6514479391fa1db4d6894dcb464686ae7dc2962a1669c25f4",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "workspace 内を指す絶対パスは repo-relative path に正規化する。workspace 外の一時領域・一時保存領域・host 固有 path は、意味を保つ必要がある場合のみ汎用表記に置き換え、意味を持たない診断情報なら削除または伏せ字化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "絶対パスの修正と検査は作業機情報を含む path に限定し、作業機情報を含まない system path、container 内 path、または一般例示 path の意味を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "4793c3d343a1b6a6514479391fa1db4d6894dcb464686ae7dc2962a1669c25f4",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検出の最低対象は home directory 配下を指す絶対パスとする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "絶対パスの修正と検査は作業機情報を含む path に限定し、作業機情報を含まない system path、container 内 path、または一般例示 path の意味を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "d91eefb67dedd3f40482a5cf7e6e03de14a65e29fd3386f256a28cc58a47537a",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同時に、今後の成果物を書き込む処理は repo-relative path を保存するように修正する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "構造化成果物へ path を保存する境界は、repo-relative でない値を保存前に失敗として扱い、自由記述への混入検出は走査ゲートで補完する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "d91eefb67dedd3f40482a5cf7e6e03de14a65e29fd3386f256a28cc58a47537a",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "補助として、path を永続化する構造化成果物の codec 境界には、repo-relative であることを構築時に強制する型を導入する。型による強制は構造化データ側の再混入を塞ぐが、自由記述には効かないため、走査ゲートと併用する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "構造化成果物へ path を保存する境界は、repo-relative でない値を保存前に失敗として扱い、自由記述への混入検出は走査ゲートで補完する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "fe2555901e0bb9453a56b31686b76d64eb3173bfd51ff46557d612198dd650d3",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出荷対象の file から、利用者が新しく取得した直後の作業ツリーに存在しない具体 path を現行前提として参照しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "名前キー検査は安定して字面判定できる具体参照に限定し、字面判定できない参照漏れは既存の出荷対象 review policy で扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "fe2555901e0bb9453a56b31686b76d64eb3173bfd51ff46557d612198dd650d3",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械検査は、参照の字面だけで具体性を判定できる名前キーを走査する。」「字面だけでは正当な実行時説明と区別できない参照は、このゲートへ含めない。」「機械検査と意味論 review の 2 層を維持し、機械検査の対象拡大だけで review lane を置き換えない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "名前キー検査は安定して字面判定できる具体参照に限定し、字面判定できない参照漏れは既存の出荷対象 review policy で扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "118d59b8763e2ba36e75324460f856a3861433f98f4ace4b0ed10a84dd802bcb",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`gitignore` 対象かつ Git 管理外の一時生成物は配布内容外として扱い、export 成否を左右させない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "template export は、Git 管理外かつ gitignore 対象の一時生成物を入力 tree から skip し、その存在だけでは export または export smoke を失敗させない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "74e0d6f18055de7f39fb78f527ed18c4f677ee33c0f5fa2001108db471a86c97",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Git 管理下の file、無視対象ではない生成 file、または作業ツリーに新しく追加された未分類 file は引き続き阻害要因として失敗させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "Git 管理下の file、gitignore 対象ではない生成 file、または新規の未分類 file が境界 manifest の分類外にある場合、template export は fail-closed で失敗する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "9f19bfa80ede153c4baa36d4e1e785fdcd659379f3baec537f5777e00f4ef92e",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "公開前には、設定された `git_url` と `tag` が公開 remote 上で解決できることを公開前確認一覧または verify task で確認する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "公開前確認が設定済みの git_url と tag を公開 remote で解決できることを検証し、解決できない場合は公開可能と判定しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "89bf51569a1a879726353af2009203e2b79517ec75cd81b38d830a940c86d2e0",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実行中の `sotp` を export 結果に同梱することにより、初回導入は固定 tag 非依存にする。template export smoke は初回導入導線を検証するため、固定 tag の存在を必須にしない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "template export smoke は export 結果に同梱された実行中の sotp を用いる初回導入導線を検証し、固定 tag の存在をこの smoke の必須条件にしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "113811aac44512e9b40854df959e667a789e5ddb235e559c0c4fb6f5123e6630",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出荷対象の file から、利用者が新しく取得した直後の作業ツリーに存在しない具体 path を現行前提として参照しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "境界 manifest の include / overlay 分類から導出される export 出力に、利用者の新規取得直後の作業ツリーに存在しない具体 path を現行前提で参照する file が残らない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "f1647cd2d41b10b78b36496f9478a3f5cdf2f9755ccff373fd02d068035028eb",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "具体 ADR file への参照、および参照先文書を特定できない符号は、convention 本文の自己完結化で解消する。規則の実行に必要な挙動・条件・例を convention 本文で完結させ、出典表示・supersession 来歴・決定符号への依存を外す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "出荷される全 file は、具体 ADR file、具体 track、参照先を特定できない decision / constraint 符号に依存する参照を残さない。このうち convention は、規則の実行に必要な挙動・条件・例を本文だけで理解できる形にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "d6125c32a36e225e2256b84478f232b83ea3b1ddf74edc2feb7d774a9402dc62",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`/track:archive` の提供元別 command 文書は、metadata 直接編集、手動 `git mv`、手動 stage file 作成の長文手順を保持しない。archive の業務ロジックは CLI (`sotp track archive`) と提供元非依存の workflow SSoT に集約する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "archive workflow は archive 操作を CLI の `sotp track archive` に委譲し、同じ業務ロジックを再実装しない。提供元別 command 文書は workflow SSoT を冒頭で参照する薄い接続文書となり、metadata 直接編集、手動の directory 移動、または手動 stage file 作成の手順を含まない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "2df3ac5be41f4476380c5cbf46164372a297041a5b5c2b582c7cfc1df3c9dcf7",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "archive 完了状態の唯一の SSoT は directory 位置とする。track directory が `track/archive/` 配下に存在すること自体を archived 状態とし、metadata に status field を追加せず、archive 時にも metadata status を更新しない。registry などの rendered view における Archived 表示も同じ directory 位置から導出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "track directory が track/archive/ 配下にあることだけで archived 状態が導出され、metadata に archive status field を追加・更新せず、registry の Archived 表示も同じ directory 位置から導出される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "86939f33602177914d3cce74b85457745cebd33cc577eee6e65b57c701aeddad",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Git 管理下の成果物に残る作業機の絶対パスは、公開前に全件書き換える。対象は directory 列挙で絞り込まず、workspace 内を指す絶対パスは repo-relative path に正規化する。workspace 外の一時領域・一時保存領域・host 固有 path は、意味を保つ必要がある場合のみ汎用表記に置き換え、意味を持たない診断情報なら削除または伏せ字化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "Git 管理下の成果物を directory 列挙で限定せずに確認し、workspace 内を指す作業機の絶対パスは repo-relative に、workspace 外の一時領域・host 固有 path は意味を保つ必要がある場合だけ汎用表記に置き換え、不要な診断情報は削除または伏せ字化する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "5e3d02adc6bc42f3de1a25829151fc335f8a08e5c5add18a39d75951fc242baa",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Git 管理下の成果物に残る作業機の絶対パスは、公開前に全件書き換える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "作業機情報を含まない absolute path（例: /dev/null、/bin/false、container 内 path、一般例示 path）は D5 の書き換え対象にせず、absolute path の分類または waiver 制度を導入しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "349278543571a68d63a508cc93579d62f6f4794ab967385215557ea0eb5eca70",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同時に、今後の成果物を書き込む処理は repo-relative path を保存するように修正する。既存成果物の一括書き換えだけで終えると、次の review / track 実行で絶対パスが再混入するためである。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "今後の成果物を書き込む経路は repo-relative path を保存し、既存成果物の一括書き換え後に同じ作業機の絶対パスを再混入させない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "a5e1050527ee0af864999ffbbe3cb33d012978ee2cb0718945ca598e92242c0a",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "公開元リポジトリ側: Git 管理下の全 file に作業機の絶対パスが含まれていないことを検査する verify ゲートを追加し、CI に接続する。対象は directory 列挙で絞り込まない。検出の最低対象は home directory 配下を指す絶対パスとする。ゲートは fail-closed とし、D5 の一括書き換え完了後に有効化する。2 つの検査面が用いる作業機の home directory は composition root が解決し、adapter / verifier の構築時または引数として明示的に渡す。adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まない。作業機の home directory を解決できない場合は検査を fail-closed する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-12",
+          "text_label": "公開元リポジトリの verify ゲートは Git 管理下の全 file を走査し、home directory 配下を指す作業機の絶対パスを最低検出対象として CI で fail-closed にする。verifier が用いる home directory は composition root が解決して構築時または引数として明示的に渡し、verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。対象を directory 列挙で絞り込まず、この最低対象を超える検出範囲を必須要件にしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "9cf63c23daa8dcc022cdc0ce0dc7c3554131818ce8e049458ef824a80e33fab5",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "2 つの検査面が用いる作業機の home directory は composition root が解決し、adapter / verifier の構築時または引数として明示的に渡す。adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-13",
+          "text_label": "template export smoke は export 出力を走査し、作業機の絶対パスを検出した場合に fail-closed で失敗する。出力走査に用いる home directory は composition root が解決して adapter / verifier の構築時または引数として明示的に渡し、adapter / verifier は `HOME` や `USERPROFILE` などの環境変数を暗黙に読まず、home directory を解決できない場合も fail-closed にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "272a89a2b6954a4d6f536687120c8d084a8bd960a2f41b3fe4e3f160a383ef50",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "補助の型は home directory を入力に取らず、repo-relative でない値をすべて構築時に拒否するため、環境依存を持たない。agent が自由記述で書く markdown への混入もこの走査で検出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-14",
+          "text_label": "path を保存する構造化成果物の codec 境界は home directory を入力に取らず、repo-relative でない値をすべて構築時に拒否するため、環境依存を持たない。自由記述に対しては AC-12 および AC-13 の走査が同じ再混入を検出する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "1162403d602a3b04ec8805cefeac36065bea91e0fdf151cb13d101335276d81c",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の一括整理後に、同じ出荷対象集合へ存在しない具体参照が再混入することを防ぐ fail-closed の verify ゲートを有効化し、CI に接続する。検査対象は独自の directory 列挙を持たず、境界 manifest の分類から D3 の出荷対象集合を導出する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-15",
+          "text_label": "具体参照の名前キー検査は、境界 manifest の include / overlay 分類から導出した D3 の出荷対象集合だけを走査し、独自の directory 列挙を持たず、違反時は CI で fail-closed にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "b5e6a3657b4d60ad6d94fb4f4ab027d0893a8e1e651b1d64ccd6e14c3fb03f65",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "必須の検出対象は、`knowledge/adr/` 配下の日付時刻型 file 名を伴う具体 ADR 参照と、`track/items/` 配下の日付 suffix 付き track id を伴う具体 track 参照とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-16",
+          "text_label": "名前キー検査は、knowledge/adr/ 前置および .md 後置の有無にかかわらず、`\\d{4}-\\d{2}-\\d{2}-\\d{4}-[a-z0-9][a-z0-9-]*` に一致する token を具体 ADR 参照として違反にする。日付時刻だけで slug を伴わない token は違反にしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "3e4e8e510274551105a1e03d9f0d1829800d611e65bc22ba3154b45f179f0983",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "必須の検出対象は、`knowledge/adr/` 配下の日付時刻型 file 名を伴う具体 ADR 参照と、`track/items/` 配下の日付 suffix 付き track id を伴う具体 track 参照とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "名前キー検査は、track/items/ 直後の最初の path segment が `[a-z0-9][a-z0-9-]*-\\d{4}-\\d{2}-\\d{2}` で終わる具体 track id を違反にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "a285286a47c48a253fe6a6cabfcac10909fa1c5ac79a761ebb2805b8326abf07",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "必須の検出対象は、`knowledge/adr/` 配下の日付時刻型 file 名を伴う具体 ADR 参照と、`track/items/` 配下の日付 suffix 付き track id を伴う具体 track 参照とする。`knowledge/adr/` directory および `knowledge/adr/README.md` への汎用参照と、`<id>` など角括弧形式の placeholder は許容する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "名前キー検査は knowledge/adr/ directory 参照、knowledge/adr/README.md、角括弧の placeholder segment（track/items/<id>/ 等）、単なる日付、日付 suffix を持たない slug を許容する。code fence、comment、prose の文脈は区別せず、裸の CN- 数字型符号は将来の拡張候補として検出対象に含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "4a4ba5c1a0c358d37ea849658a41cdc2afa77918384a29a5eb3e9ea427925c01",
+      "evidence_hash": "70b4038f96538b24dde08cb2a731c53999ea361220e33bb2424a9311d8d83ac3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "必須の検出対象は、`knowledge/adr/` 配下の日付時刻型 file 名を伴う具体 ADR 参照と、`track/items/` 配下の日付 suffix 付き track id を伴う具体 track 参照とする。`knowledge/adr/` directory および `knowledge/adr/README.md` への汎用参照と、`<id>` など角括弧形式の placeholder は許容する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-19",
+          "text_label": "名前キー検査には、実 ADR file 名は違反、knowledge/adr/README.md は許容、track/items/<id>/ は許容、日付単独は許容、日付 suffix 付き track id は違反、の 5 fixture を含める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "4a060f944a000debfc96d118f5668a45ccbf67bcf1fdae7a4d3b80722b1c3a12",
+      "evidence_hash": "6c2c6b5cd7e355f27e04524423e0a15a16648649b554e95e6f37a2d2865281a4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "全コピーを削除し、`TrackId::try_new`（domain）への委譲に置き換える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-20",
+          "text_label": "`catalogue-spec-refs --track-id` を含む track ID を受け取る境界は、domain の `TrackId::try_new` に検証を委譲し、検証済みの TrackId だけを下流へ渡す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-19-0924-existing-dry-violation-cleanup.md",
+          "decision_id": "D1"
+        }
+      }
+    }
+  ]
+}

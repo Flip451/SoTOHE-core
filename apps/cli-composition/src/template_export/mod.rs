@@ -10,12 +10,25 @@
 //! `handle` accepts the driver input DTO already assembled by the `cli` layer.
 //! See IN-01, AC-01, and ADR 2026-07-08-0541 D1.
 
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use cli_driver::CommandOutcome;
 use cli_driver::template_export::{TemplateDriver, TemplateInput};
 
 use crate::error::CompositionError;
+
+/// Resolves the work machine's home directory for export-output scanning.
+///
+/// The composition root owns ambient environment access. It resolves
+/// `SOTP_MACHINE_HOME`, then `HOME`, then `USERPROFILE`; empty values are
+/// skipped. Containerized runs forward the host home through
+/// `SOTP_MACHINE_HOME`, avoiding the container-local fallback.
+fn machine_home_directory() -> Option<PathBuf> {
+    ["SOTP_MACHINE_HOME", "HOME", "USERPROFILE"].into_iter().find_map(|variable| {
+        std::env::var_os(variable).filter(|value| !value.is_empty()).map(PathBuf::from)
+    })
+}
 
 /// Composition root for the `template` command family.
 ///
@@ -49,7 +62,8 @@ impl TemplateCompositionRoot {
 
         let manifest_port: Arc<dyn TemplateBoundaryManifestPort> =
             Arc::new(FsTemplateBoundaryManifestAdapter::new());
-        let export_port: Arc<dyn TemplateExportPort> = Arc::new(FsTemplateExportAdapter::new());
+        let export_port: Arc<dyn TemplateExportPort> =
+            Arc::new(FsTemplateExportAdapter::new(machine_home_directory()));
         let transplant_port: Arc<dyn SelfBinaryTransplantPort> =
             Arc::new(FsSelfBinaryTransplantAdapter::new());
         let service: Arc<dyn TemplateExportService> =
@@ -77,7 +91,59 @@ mod tests {
     use cli_driver::template_export::{TemplateExportInput, TemplateInput};
     use tempfile::TempDir;
 
-    use super::TemplateCompositionRoot;
+    use super::{TemplateCompositionRoot, machine_home_directory};
+
+    #[test]
+    fn test_machine_home_directory_home_set_returns_home() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let _machine_home = crate::review_v2::process_guards::EnvGuard::remove("SOTP_MACHINE_HOME");
+        let _home = crate::review_v2::process_guards::EnvGuard::set("HOME", "/work-machine/home");
+        let _userprofile = crate::review_v2::process_guards::EnvGuard::set(
+            "USERPROFILE",
+            "/work-machine/userprofile",
+        );
+
+        assert_eq!(machine_home_directory(), Some(PathBuf::from("/work-machine/home")));
+    }
+
+    #[test]
+    fn test_machine_home_directory_home_empty_returns_userprofile() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let _machine_home = crate::review_v2::process_guards::EnvGuard::remove("SOTP_MACHINE_HOME");
+        let _home = crate::review_v2::process_guards::EnvGuard::set("HOME", "");
+        let _userprofile = crate::review_v2::process_guards::EnvGuard::set(
+            "USERPROFILE",
+            "/work-machine/userprofile",
+        );
+
+        assert_eq!(machine_home_directory(), Some(PathBuf::from("/work-machine/userprofile")));
+    }
+
+    #[test]
+    fn test_machine_home_directory_variables_unset_returns_none() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let _machine_home = crate::review_v2::process_guards::EnvGuard::remove("SOTP_MACHINE_HOME");
+        let _home = crate::review_v2::process_guards::EnvGuard::remove("HOME");
+        let _userprofile = crate::review_v2::process_guards::EnvGuard::remove("USERPROFILE");
+
+        assert_eq!(machine_home_directory(), None);
+    }
+
+    #[test]
+    fn test_machine_home_directory_override_takes_precedence() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let _machine_home = crate::review_v2::process_guards::EnvGuard::set(
+            "SOTP_MACHINE_HOME",
+            "/work-machine/override",
+        );
+        let _home = crate::review_v2::process_guards::EnvGuard::set("HOME", "/work-machine/home");
+        let _userprofile = crate::review_v2::process_guards::EnvGuard::set(
+            "USERPROFILE",
+            "/work-machine/userprofile",
+        );
+
+        assert_eq!(machine_home_directory(), Some(PathBuf::from("/work-machine/override")));
+    }
 
     /// Composition-root smoke test: the wired stack routes an `Export` input all
     /// the way through `FsTemplateBoundaryManifestAdapter` → interactor →

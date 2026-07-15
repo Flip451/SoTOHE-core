@@ -123,7 +123,7 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
         //     We reject any `..` component before any I/O.
         //
         // (2) Symlink walk: checking only the leaf component is insufficient because a
-        //     symlink in an ancestor (e.g. `/home/user/proj` where `user` is a symlink)
+        //     symlink in an ancestor (e.g. `/home/<user>/proj` where `user` is a symlink)
         //     would redirect all I/O.  We walk every ancestor from the filesystem root
         //     and reject any that is a symlink via the injected `SymlinkGuardPort`.
         for component in workspace_root.components() {

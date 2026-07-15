@@ -33,7 +33,7 @@ SoTOHE はテンプレート（framework）であり、その CI ゲート / ver
 - Good: `verify-view-freshness`（生成ビューが JSON SSoT と一致するか）、`adr-signals`（decision が grounding されているか）、`check-layers`（層依存方向）、`cargo make ci` の fmt/clippy/test。いずれも SoTOHE 自身の整合性。
 - Good: `.codex/config.toml` や `.claude/settings.json` を**デフォルトとして同梱**し、`.claude/rules/10-guardrails.md` 等で意図・危険例を説明する（提供 + docs）。
 - Good: `.harness/config/signal-gates.json` を**推奨デフォルトとして同梱**し、`responsibility-boundary.md` で `interim` の理由（TDDD 構造的必然 vs ワークフロー選択）を説明する（提供 + docs）。
-- Bad: `verify-orchestra` のように `.claude/settings.json` の allow/deny エントリや `.codex/*` の設定値・ファイル存在・rules の allow リストを「期待リスト」と照合して CI で hard-fail させる（利用者設定の enforcement ＝越権。2026-06-13 に全廃。ADR `2026-06-13-0002-codex-orchestrator-settings-addition` 参照）。
+- Bad: `verify-orchestra` のように `.claude/settings.json` の allow/deny エントリや `.codex/*` の設定値・ファイル存在・rules の allow リストを「期待リスト」と照合して CI で hard-fail させる（利用者設定の enforcement ＝越権である）。
 - Bad: 人間向け doc に特定の散文スニペットが在る/無いを CI で照合する（言い換えで壊れ、偽安心）。
 
 ## Exceptions
@@ -51,5 +51,5 @@ SoTOHE はテンプレート（framework）であり、その CI ゲート / ver
 
 - `knowledge/conventions/enforce-by-mechanism.md` — 機構で強制する原則（その「機構」が enforce してよい対象が本 convention の前段）。
 - `knowledge/conventions/workflow-ceremony-minimization.md` — 形骸化する人工状態フィールドを作らない原則。
-- `knowledge/adr/2026-06-13-0002-codex-orchestrator-settings-addition.md` — `verify-orchestra` 全廃と provide-not-enforce の決定。
+- `knowledge/adr/README.md` — 設計判断の索引（履歴を確認する必要がある場合）。
 - `.claude/rules/10-guardrails.md` — 危険な permission の**説明**（警告であって CI 強制ではない）。

@@ -31,14 +31,11 @@ workspace の lifecycle 整合性を保ち、暫定 compatibility layer の長�
 ## Examples
 
 - Good (rename, no alias): `TypeDefinitionKind::TraitPort` → `SecondaryPort` のリネーム。alias は
-  作らず、active track の catalogue 宣言を一括書き換え
-  (ADR `2026-04-11-0002-tddd-multilayer-extension` Phase 1)
+  作らず、active track の catalogue 宣言を一括書き換える
 - Good (schema version bump, reject old): `metadata.json` v4 → v5 で `status` field を削除、v4 は
-  decode 拒否、legacy track は verify gate が skip することで共存
-  (ADR `2026-04-19-1242-plan-artifact-workflow-restructure` Follow-up §D1.4)
+  decode 拒否、legacy track は verify gate が skip することで共存する
 - Good (adopter-scoped opt-in flag): `catalogue_spec_signal.enabled` は暫定 migration toggle ではなく、
   template 採用者が恒久的に選択する opt-in flag
-  (ADR `2026-04-23-0344-catalogue-spec-signal-activation` §D5)
 - Bad: 旧 schema の opt-in flag を permanent に保ち、新旧 2 つの code path が永続的に並存する
   (codec 保守 / test surface / documentation の負担が増え続ける)
 - Bad: completed track の metadata を一律書き換えて新 schema に migrate する (non-active track
@@ -48,7 +45,7 @@ workspace の lifecycle 整合性を保ち、暫定 compatibility layer の長�
 
 - **template 採用者向けの恒久的 opt-in flag** (`tddd.enabled`, `catalogue_spec_signal.enabled` 等) は
   migration 用の暫定 toggle ではなく「利用者が恒久的に選択する設計自由度」として残す。これは本
-  convention の撤去対象外 (ADR 2026-04-11-0002 §D1 / 2026-04-23-0344 §D5)
+  convention の撤去対象外。
 - **security-critical な fix** (既存脆弱性の修正、認証境界の修正) は本 convention より優先し、必要なら
   非 active track にも遡及適用する。ただし遡及適用を行う際は、全 write guard 層 (filesystem / codec /
   CLI / active-track guard) を協調してバイパスする経路を別 ADR で定義してから実施する。バイパス機構は
