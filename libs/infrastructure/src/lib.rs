@@ -21,6 +21,7 @@ pub mod impl_catalog_signal_reader;
 pub mod impl_plan_codec;
 pub mod impl_plan_reader;
 pub mod pr_review;
+pub mod provider_session;
 pub mod ref_verify;
 pub mod review_v2;
 pub mod schema_export;

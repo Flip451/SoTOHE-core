@@ -1,12 +1,8 @@
 {
-  "schema_version": 2,
-  "generated_at": "2026-07-14T11:19:58Z",
-  "declaration_hash": "223bc680689ab9551f4644ca4378fd27ec54541432908e4eeb408c7a501c38e8",
-  "implementation_input_hash": "70a2dcb0a80363e21cf2613db275e991ed6ad390c313c7475f3ddbc474b2cf9f",
-  "baseline_hash": "0e9baa5253a20dd6138c6b9a0d7ddd02a89177b91fd28bdb582c2eb9bf0da8a6",
-  "live_rustdoc_snapshot_hash": "90d61882857d118f0e3fa86fb28fd43063372d722341c465bdcb961d8ffddc2e",
-  "evaluator_contract_hash": "2a777bad7254e62184a5879b04c88e397ef9d415c4ffa8474e0cf34c3b27ba8d",
-  "rustdoc_extraction_contract_hash": "12a00d7d8c09783a43c5d7057da95042a359d2ba6fc0112dcb00806300694be0",
+  "schema_version": 3,
+  "generated_at": "2026-07-15T03:53:21Z",
+  "declaration_hash": "be064953983418afc36f5dd8d04b648b6a151970945bd19cfc35083fa9500b0a",
+  "implementation_input_hash": "0bed5b4e6c3e415db7908f891479c1fb5c57090f247a34301e6c6dfa05a2ee11",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -32,15 +28,9 @@
       ]
     },
     {
-      "type_name": "CapabilityExecutionContractFingerprintPort",
-      "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
-    },
-    {
       "type_name": "CapabilityInputValidationError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Debug",
@@ -73,23 +63,11 @@
       ]
     },
     {
-      "type_name": "ExecutionContractFingerprint",
-      "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
       "type_name": "ProviderSessionCacheEntry",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -99,9 +77,9 @@
     {
       "type_name": "ProviderSessionCacheError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -110,9 +88,9 @@
     {
       "type_name": "ProviderSessionCacheKey",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -123,15 +101,15 @@
     {
       "type_name": "ProviderSessionCachePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ProviderSessionId",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -152,17 +130,11 @@
       ]
     },
     {
-      "type_name": "ReviewerExecutionContractFingerprintPort",
-      "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
-    },
-    {
       "type_name": "ReviewerPrompt",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -172,9 +144,9 @@
     {
       "type_name": "TargetArtifactPath",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -187,9 +159,9 @@
     {
       "type_name": "TargetArtifactSet",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -295,6 +267,12 @@
     },
     {
       "type_name": "Reviewer",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SchemaExporterPort",
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true

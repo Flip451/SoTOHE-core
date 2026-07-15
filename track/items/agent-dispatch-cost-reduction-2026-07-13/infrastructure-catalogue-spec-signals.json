@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "57cc07e187db75bce8a7c5bfaaee5fd3d2d4e266e080dbef22c630975e156e8d",
+  "catalogue_declaration_hash": "3b6ea1523113bf6c750c516bb953e1cd9542481807a8b976ab9154629f1d09bf",
   "signals": [
     {
       "type_name": "AgentProfiles",
@@ -25,22 +25,22 @@
     {
       "type_name": "ClaudeCapabilityAdapter",
       "signal": "blue",
-      "entry_hash": "2f2f3aa95a070d57253c51b87ac615d72decec47481fcea35a282accb4fe1f3d"
+      "entry_hash": "3c0260dc84d25dcf32047d9d2ffe4060010df4d0861ef6055234acfb9a268adf"
     },
     {
       "type_name": "ClaudeReviewer",
       "signal": "blue",
-      "entry_hash": "962328f2dd335e72566e8a637b4b375f90dbe5ff04b22f6287184cf8295774c9"
+      "entry_hash": "494489d2376187e87a690ebc707642ed2ca79150387dfd635b34f59fa0eb3275"
     },
     {
       "type_name": "CodexCapabilityAdapter",
       "signal": "blue",
-      "entry_hash": "2cf6593970e47ec083a42adae3b5ee94aa8a1f5e78e3a445bc679bed18c5e86b"
+      "entry_hash": "e9d0ab6c3bf1492ce2607c5f3a4b72db6d8c22abcbe60c7380f2905e0d4d09ba"
     },
     {
       "type_name": "CodexReviewer",
       "signal": "blue",
-      "entry_hash": "cada0c5243f475187a396beb9f3997acd2b02b345bb7550fda29e5e64a365361"
+      "entry_hash": "47bb694dd27d30d01b57656fb895d3d7b7c1eb18a0f991b5e7f0bf4abc7f03f8"
     },
     {
       "type_name": "EvaluateSignalsError",
@@ -55,7 +55,7 @@
     {
       "type_name": "FsProviderSessionCacheAdapter",
       "signal": "blue",
-      "entry_hash": "30a3f36fd68ca59433fa2617cf31898af3308b1521cab4cdd84229369f83bc48"
+      "entry_hash": "ae4c08014a5c79bc9be3e00fbab1659f8460458b8db076d9dccbd0920564557c"
     },
     {
       "type_name": "LoadCatalogueSpecSignalsForViewError",
@@ -91,11 +91,6 @@
       "type_name": "RustdocSchemaExporter",
       "signal": "blue",
       "entry_hash": "de9f162b71e1a3d5231205ba5a52a8097bb331e44395e5bfd63bad3e8094b07d"
-    },
-    {
-      "type_name": "Sha256ExecutionContractFingerprintAdapter",
-      "signal": "blue",
-      "entry_hash": "634a1f050bb5a840fef97129400ad7318918ccc21f00be4e94845012f8aaade5"
     },
     {
       "type_name": "TypeSignalsCodecError",
@@ -140,7 +135,7 @@
     {
       "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
       "signal": "blue",
-      "entry_hash": "5dbbc911f7ff1d9e727810ff7569872bd1115d2d338ed50883625fcc7d48bcc1"
+      "entry_hash": "086f3277d69a13c57b5d6419eeb55977c0af70dd0476b62b93b3535b4899eeb5"
     },
     {
       "type_name": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash",

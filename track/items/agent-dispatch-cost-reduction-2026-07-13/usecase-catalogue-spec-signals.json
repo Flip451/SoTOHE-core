@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "223bc680689ab9551f4644ca4378fd27ec54541432908e4eeb408c7a501c38e8",
+  "catalogue_declaration_hash": "be064953983418afc36f5dd8d04b648b6a151970945bd19cfc35083fa9500b0a",
   "signals": [
     {
       "type_name": "CapabilityDispatchOutcome",
@@ -55,12 +55,7 @@
     {
       "type_name": "DiagnosticText",
       "signal": "blue",
-      "entry_hash": "9dfcf9d7f52c4b8f4209faf3faab966521cd25f3a30811086608335bc317d4df"
-    },
-    {
-      "type_name": "ExecutionContractFingerprint",
-      "signal": "blue",
-      "entry_hash": "ee55b34ac35b40c57c2f893980c75c5fce924799902b09971a2cc2e667ee718c"
+      "entry_hash": "ed2d5e310ff08104a950f997b685aa9cc3a24d29487c15e8dfdb5e31dc90c884"
     },
     {
       "type_name": "ModelName",
@@ -75,17 +70,17 @@
     {
       "type_name": "ProviderSessionCacheEntry",
       "signal": "blue",
-      "entry_hash": "eea29fe9c256813bb037db73cb48fc232e89bebd8ba852f436514ef8e94784c3"
+      "entry_hash": "2a5f3ac9570258fdb5fcd7ce3331c21c1b77cc3e688c47b64150cdbca8b2d0cc"
     },
     {
       "type_name": "ProviderSessionCacheError",
       "signal": "blue",
-      "entry_hash": "ec3e72a0623d2d2483b6ccd3f0cbe72352e9ed7240f9ed6be3c2c5e3a172d649"
+      "entry_hash": "842f6215da15d656d485d757856b9578e5ea2cb23fe1775865b9b52360254e6a"
     },
     {
       "type_name": "ProviderSessionCacheKey",
       "signal": "blue",
-      "entry_hash": "bffa3fb980f65a0df7a301553026573bab23e6f1e0614450e74d2915bf3d42bb"
+      "entry_hash": "71114c09ebdbd9f1ed9e46f6b00eadc4843b053b51fa16dade686f9321dbb65b"
     },
     {
       "type_name": "ProviderSessionId",
@@ -100,7 +95,7 @@
     {
       "type_name": "ReviewerPrompt",
       "signal": "blue",
-      "entry_hash": "8650cb50c7be6ec601ead3f58583b745fd4c64ae4b772026429da42727cb35e3"
+      "entry_hash": "ed33de96e7ebe88cbf07385665b97a4db4c7008726e9d6b118057f50189d5e50"
     },
     {
       "type_name": "TargetArtifactPath",
@@ -138,11 +133,6 @@
       "entry_hash": "dbe62ccc268f6223af588d0081ff226239cb94d6e78c296b9536e211141ec0d5"
     },
     {
-      "type_name": "CapabilityExecutionContractFingerprintPort",
-      "signal": "blue",
-      "entry_hash": "c4a2d388922599dfa4c6ceb063f65674e76e890e6899cffce2c0940d49a125d6"
-    },
-    {
       "type_name": "CapabilityProfilePort",
       "signal": "blue",
       "entry_hash": "1ab2b0df54b71a9797579b3e423bf185817f18986cad6691d997fe04a783c3ef"
@@ -155,7 +145,7 @@
     {
       "type_name": "ProviderSessionCachePort",
       "signal": "blue",
-      "entry_hash": "5fa7ca0d2c5d68c26d3bdbdb6beae06efe00b4994b11fbf8d71aad576246f9e9"
+      "entry_hash": "90edf4710b6ed8945fffd9c5044020a2104f88c38a2fb97295ba4bb4ca856ad1"
     },
     {
       "type_name": "Reviewer",
@@ -163,9 +153,9 @@
       "entry_hash": "f3178e0184a5589f89dae97a21f29add6faa53d158c1098e3e9fdb68895b090a"
     },
     {
-      "type_name": "ReviewerExecutionContractFingerprintPort",
+      "type_name": "SchemaExporterPort",
       "signal": "blue",
-      "entry_hash": "4c533b4f681139a8ec953e6c711213c50706cb5ef6a736bddff43b6e21c61fbd"
+      "entry_hash": "b89e5c64d73a588b4f067733652bd1de9568e0b07fa1530dbd386ec8401bb7e8"
     },
     {
       "type_name": "TypeSignalsExecutorPort",

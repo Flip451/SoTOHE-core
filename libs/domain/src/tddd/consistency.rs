@@ -131,9 +131,7 @@ mod tests {
     use crate::Timestamp;
     use crate::tddd::catalogue::TypeSignal;
     use crate::tddd::type_signals_doc::{
-        BaselineHash, CatalogueDeclarationHash, EvaluatorContractHash, ImplementationInputHash,
-        LiveRustdocSnapshotHash, RustdocExtractionContractHash, Sha256Digest, TypeSignalsDocument,
-        TypeSignalsFreshness,
+        CatalogueDeclarationHash, ImplementationInputHash, Sha256Digest, TypeSignalsDocument,
     };
 
     fn ts() -> Timestamp {
@@ -151,14 +149,8 @@ mod tests {
         .unwrap();
         TypeSignalsDocument::new(
             ts(),
-            TypeSignalsFreshness::new(
-                CatalogueDeclarationHash::new(digest.clone()),
-                ImplementationInputHash::new(digest.clone()),
-                BaselineHash::new(digest.clone()),
-                LiveRustdocSnapshotHash::new(digest.clone()),
-                EvaluatorContractHash::new(digest.clone()),
-                RustdocExtractionContractHash::new(digest),
-            ),
+            CatalogueDeclarationHash::new(digest.clone()),
+            ImplementationInputHash::new(digest),
             signals,
         )
     }

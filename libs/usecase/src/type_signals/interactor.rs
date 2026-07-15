@@ -140,5 +140,4 @@ impl TypeSignalsService for TypeSignalsInteractor {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[path = "interactor_tests.rs"]
 mod tests;

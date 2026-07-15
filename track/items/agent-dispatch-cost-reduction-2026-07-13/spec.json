@@ -29,7 +29,7 @@
     },
     {
       "id": "GO-03",
-      "text": "reviewer 起動前の signal 前段処理で、検証済みの同一実装入力と rustdoc-extraction contract に限って rustdoc 抽出を再利用し、判定材料が変わる評価を省略しないまま不要な再計算コストを削減する。",
+      "text": "reviewer 起動前の signal 前段処理で、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を per-layer artifact の記録値と比較し、判定材料が変わる評価を省略しないまま不要な rustdoc 抽出の再計算コストを削減する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -90,7 +90,7 @@
       },
       {
         "id": "IN-04",
-        "text": "reviewer session cache を provider、model、および capability SSoT・scope-specific severity policy・review-scope 設定・固定 execution-contract briefing 部から得る安定 fingerprint に束縛する。profile 解決結果または fingerprint の不一致、読出し・hash 化不能、resume 失敗、または期限切れでは cache を使わず新規 session を開始する。",
+        "text": "reviewer session cache を provider と model に束縛する。現在の profile 解決結果の provider または model が記録値と不一致、resume 失敗、または session 期限切れなら、cache を使わず新規 session を開始する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -100,7 +100,7 @@
       },
       {
         "id": "IN-05",
-        "text": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。",
+        "text": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -110,7 +110,7 @@
       },
       {
         "id": "IN-06",
-        "text": "catalogue または baseline の変更時は、現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。rustdoc-extraction contract の変更・不明、実装側 input の不一致・不明、または snapshot 検証不能では rustdoc 抽出から再計算する。",
+        "text": "catalogue または spec の変更時は signal を再評価するが、実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -120,7 +120,7 @@
       },
       {
         "id": "IN-07",
-        "text": "per-layer type-signals artifact を schema version bump し、既存 declaration hash と対称に implementation-side input、baseline、live rustdoc snapshot、evaluator contract、および rustdoc-extraction contract の freshness 情報を保持する。completed track の旧 artifact を migration せず、旧値または必要値が使えない場合は保守的に再計算する。",
+        "text": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -130,7 +130,7 @@
       },
       {
         "id": "IN-08",
-        "text": "`sotp capability exec` に orchestrator が選ぶ resume option を追加する。同一 track・同一 capability の同一対象成果物への追補、修正再入、中断からの続行だけを対象とし、初回 dispatch と関心事または対象成果物を切り替える dispatch は新規 session とする。",
+        "text": "`sotp capability exec` に orchestrator が選ぶ resume option を追加する。同一 track・同一 capability の継続作業（同じ成果物への追補・修正の再入、中断からの続行）を対象とし、初回 dispatch と関心事を切り替える dispatch は orchestrator の判断で新規 session とする。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -140,11 +140,29 @@
       },
       {
         "id": "IN-09",
-        "text": "capability resume cache を、track 内では track・capability・対象 artifact の repo-relative path（複数は正規化済み順序付き集合）、track 外では workspace transient 配下の capability・対象 artifact path で分離する。対象 path が未確定の dispatch は cache を使わず記録もしない。",
+        "text": "capability resume cache を、track 内では track・capability、track 外では workspace transient 配下の capability・対象 artifact の repo-relative path で分離する。対象 path が未確定の track 外 dispatch は cache を使わず記録もしない。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
             "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "obligation gate の check と evaluate の判定対称性を修理する。edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+            "anchor": "D9"
           }
         ]
       }
@@ -186,15 +204,11 @@
       },
       {
         "id": "OS-03",
-        "text": "session id や freshness state を committed SoT file、review record、track identity に保存すること、または新しい top-level transient path を作ることは含めない。",
+        "text": "session id を committed SoT file、review record、track identity に保存すること、または新しい top-level transient path を作ることは含めない。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
             "anchor": "D2"
-          },
-          {
-            "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-            "anchor": "D3"
           },
           {
             "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -204,7 +218,7 @@
       },
       {
         "id": "OS-04",
-        "text": "completed track の type-signals artifact を新 schema へ遡及 migration することは含めない。",
+        "text": "D3 の freshness 状態を per-layer type-signals artifact と別の cache file に保存することは含めない。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -227,7 +241,7 @@
     },
     {
       "id": "CN-06",
-      "text": "reviewer session の profile または execution-contract fingerprint が不一致、読出し不能、hash 化不能、resume 失敗、または期限切れなら、stale な reuse をせず新規 session で round を実行する。",
+      "text": "reviewer session の記録済み provider または model が現在の profile 解決結果と不一致、resume 失敗、または期限切れなら、stale な reuse をせず新規 session で round を実行する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -237,7 +251,7 @@
     },
     {
       "id": "CN-07",
-      "text": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。",
+      "text": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -246,8 +260,18 @@
       ]
     },
     {
+      "id": "CN-11",
+      "text": "type-signals 評価の書込み対象は、現在 branch と照合済みの track identity に束縛し、不一致は拒否する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
       "id": "CN-08",
-      "text": "capability resume cache は、provider・model を含む現在の profile 解決結果、および現在の capability SSoT、dispatcher が常時注入する discipline、capability profile または SSoT が静的 contract input として宣言する policy / contract file の path と内容から得る安定 execution-contract fingerprint に束縛する。profile 解決結果または fingerprint が不一致、読出し不能、hash 化不能、resume 失敗、または期限切れなら、stale な reuse をせず新規 session で dispatch を実行する。",
+      "text": "capability resume cache は provider と model に束縛する。現在の profile 解決結果の provider または model が記録値と不一致、resume 失敗、または期限切れなら、stale な reuse をせず新規 session で dispatch を実行する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -315,7 +339,7 @@
     },
     {
       "id": "CN-05",
-      "text": "D3 の reuse 判定は手選別の file list ではなく、対象 rustdoc invocation の完全に解決・正規化された build-input closure と content hash に基づく。判定粒度は layer（crate）単位とし、影響がある layer だけを再計算する。",
+      "text": "D3 の reuse 判定は、対象 crate の source 内容、依存解決（lockfile）、toolchain 識別子から得る content hash に基づく。判定粒度は layer（crate）単位とし、変更がある layer だけを再計算する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -347,7 +371,7 @@
     },
     {
       "id": "AC-03",
-      "text": "同一 track・scope・round 種別で fixer 後に再実行した reviewer round は、現在の profile 解決結果と安定 fingerprint が一致する有効な prior session を resume し、reviewer は現在の file list と diff から scope 全件を再判定する。resume は文脈だけを再利用し、その round の judgment と review record は新規 session の round と同じ単位・意味で記録される。",
+      "text": "同一 track・scope・round 種別で fixer 後に再実行した reviewer round は、現在の profile 解決結果の provider と model が一致する有効な prior session を resume し、全実行 flag を明示的に再指定したうえで reviewer は現在の file list と diff から scope 全件を再判定する。resume は文脈だけを再利用し、その round の judgment と review record は新規 session の round と同じ単位・意味で記録される。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -357,7 +381,7 @@
     },
     {
       "id": "AC-04",
-      "text": "reviewer の初回 round、fast から final への escalation、profile または fingerprint 不一致、contract 読出し・hash 化不能、resume 失敗、または session 期限切れでは、新規 session で round を実行する。resume・新規のどちらでも model・sandbox・effort の全 flag は明示指定される。",
+      "text": "reviewer の初回 round、fast から final への escalation、profile 解決結果の provider または model の不一致、resume 失敗、または session 期限切れでは、新規 session で round を実行する。resume・新規のどちらでも model・sandbox・effort の全 flag は明示指定される。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -367,7 +391,7 @@
     },
     {
       "id": "AC-05",
-      "text": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し、解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。いずれかの評価入力または snapshot 検証が不一致または不明なら、AC-06/AC-07 の条件に従って signal 評価または rustdoc 抽出からの再計算を実行する。",
+      "text": "rustdoc 抽出の要否は、layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。一致時は rustdoc 抽出を skip し、不一致または判定不能時は AC-07 の条件に従って rustdoc 抽出から再計算する。declaration_hash または spec の差分は signal 再評価の要否だけを決め、両方が一致するときは評価ごと skip し、declaration_hash のみが不一致で implementation-side input hash が一致するときは AC-06 の条件に従って rustdoc を起動せず signal を再評価する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -377,7 +401,7 @@
     },
     {
       "id": "AC-06",
-      "text": "catalogue、baseline、または catalogue↔spec 評価に使う spec だけが変わった layer は、implementation-side input と rustdoc-extraction contract が一致し、解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。evaluator contract の変化は評価を強制するが、この snapshot 条件を満たす限り rustdoc 抽出だけは再利用できる。",
+      "text": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -387,7 +411,7 @@
     },
     {
       "id": "AC-07",
-      "text": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。",
+      "text": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -397,7 +421,7 @@
     },
     {
       "id": "AC-08",
-      "text": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。completed track の artifact は migration しない。",
+      "text": "per-layer type-signals artifact は、D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -407,7 +431,7 @@
     },
     {
       "id": "AC-09",
-      "text": "orchestrator が同一成果物への継続作業と判断して resume option を指定した provider CLI subprocess dispatch の `sotp capability exec` は、同一 track・capability・正規化済み対象 artifact identity の有効 cache entry だけを再開する。track 解決時は track-local cache、track 解決不能時は workspace-local cache を選び、初回 dispatch、関心事を切り替えた dispatch、対象 path 未確定、contract/profile 不一致、または cache・contract/profile の読出し・hash 化不能な dispatch は、同じ対象 artifact でも新規 session で実行して不適切な cache entry を記録しない。",
+      "text": "orchestrator が継続作業と判断して resume option を指定した provider CLI subprocess dispatch の `sotp capability exec` は、track 内では同一 track・capability の有効 cache entry を再開する。track 解決時は track-local cache、track 解決不能時は capability・対象 artifact の repo-relative path による workspace-local cache を選び、初回 dispatch、関心事を切り替えた dispatch、対象 path 未確定の track 外 dispatch、または provider・model 不一致では新規 session で実行する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
@@ -417,11 +441,29 @@
     },
     {
       "id": "AC-10",
-      "text": "capability resume の再開失敗または session 期限切れは dispatch を中断させず、新規 session に fallback する。resume capability は現在の briefing と上流 artifact を確認し、全実行 flag を再注入したうえで作業する。",
+      "text": "capability resume の再開失敗または session 期限切れは dispatch を中断させず、新規 session に fallback する。resume capability は上流 artifact の変更有無を確認し、変更があれば再読し、全実行 flag を再注入したうえで作業する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
           "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。check と evaluate はこの規則から同一の帰結を得る。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "anchor": "D9"
         }
       ]
     }
@@ -458,10 +500,14 @@
     {
       "file": "knowledge/conventions/track-lifecycle.md",
       "anchor": "Generated Views"
+    },
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
     }
   ],
   "signals": {
-    "blue": 38,
+    "blue": 41,
     "yellow": 0,
     "red": 0
   }

@@ -645,14 +645,8 @@ mod tests {
         let digest = domain::Sha256Digest::try_new("a".repeat(64)).unwrap();
         TypeSignalsDocument::new(
             ts("2026-06-27T00:00:00Z"),
-            domain::TypeSignalsFreshness::new(
-                domain::CatalogueDeclarationHash::new(digest.clone()),
-                domain::ImplementationInputHash::new(digest.clone()),
-                domain::BaselineHash::new(digest.clone()),
-                domain::LiveRustdocSnapshotHash::new(digest.clone()),
-                domain::EvaluatorContractHash::new(digest.clone()),
-                domain::RustdocExtractionContractHash::new(digest),
-            ),
+            domain::CatalogueDeclarationHash::new(digest.clone()),
+            domain::ImplementationInputHash::new(digest),
             signals,
         )
     }

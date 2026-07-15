@@ -137,7 +137,7 @@ fn test_signal_check_catalog_spec_empty_bindings_passes() {
 }
 
 #[cfg(feature = "test-support")]
-const ARCH_RULES_ONE_TDDD_LAYER: &str = r#"{
+const ARCH_RULES_TWO_TDDD_LAYERS: &str = r#"{
   "version": 2,
   "module_limits": { "max_lines": 700, "warn_lines": 400, "exclude": [] },
   "canonical_modules": [],
@@ -145,13 +145,24 @@ const ARCH_RULES_ONE_TDDD_LAYER: &str = r#"{
   "layers": [
     {
       "crate": "domain",
-      "path": "crates/domain",
+      "path": "libs/domain",
       "may_depend_on": [],
       "deny_reason": "",
       "tddd": {
         "enabled": true,
         "catalogue_file": "domain-types.json",
         "schema_export": { "method": "rustdoc", "targets": ["domain"] }
+      }
+    },
+    {
+      "crate": "usecase",
+      "path": "libs/usecase",
+      "may_depend_on": ["domain"],
+      "deny_reason": "",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "usecase-types.json",
+        "schema_export": { "method": "rustdoc", "targets": ["usecase"] }
       }
     }
   ]
@@ -169,16 +180,18 @@ fn minimal_rustdoc_json() -> String {
 /// replaces only rustdoc process launch; all freshness and signal paths remain
 /// production code.
 #[cfg(feature = "test-support")]
-fn setup_type_signal_workspace() -> (tempfile::TempDir, TrackId, std::path::PathBuf) {
+fn setup_type_signal_workspace()
+-> (tempfile::TempDir, TrackId, std::collections::BTreeMap<String, std::path::PathBuf>) {
     let track_id = "freshness-composition";
-    let workspace = setup_workspace(track_id, ARCH_RULES_ONE_TDDD_LAYER, SIGNAL_GATES_ALL_STRICT);
+    let workspace = setup_workspace(track_id, ARCH_RULES_TWO_TDDD_LAYERS, SIGNAL_GATES_ALL_STRICT);
     let root = workspace.path();
     let track_dir = root.join("track/items").join(track_id);
-    std::fs::create_dir_all(root.join("crates/domain/src")).unwrap();
+    std::fs::create_dir_all(root.join("libs/domain/src")).unwrap();
+    std::fs::create_dir_all(root.join("libs/usecase/src")).unwrap();
     std::fs::create_dir_all(root.join("target/doc")).unwrap();
     std::fs::write(
         root.join("Cargo.toml"),
-        "[workspace]\nmembers = [\"crates/domain\"]\nresolver = \"2\"\n",
+        "[workspace]\nmembers = [\"libs/domain\", \"libs/usecase\"]\nresolver = \"2\"\n",
     )
     .unwrap();
     std::fs::write(
@@ -187,22 +200,40 @@ fn setup_type_signal_workspace() -> (tempfile::TempDir, TrackId, std::path::Path
     )
     .unwrap();
     std::fs::write(
-        root.join("crates/domain/Cargo.toml"),
+        root.join("libs/domain/Cargo.toml"),
         "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
     )
     .unwrap();
-    std::fs::write(root.join("crates/domain/src/lib.rs"), "pub struct Fixture;\n").unwrap();
+    std::fs::write(
+        root.join("libs/usecase/Cargo.toml"),
+        "[package]\nname = \"usecase\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
+    )
+    .unwrap();
+    std::fs::write(root.join("libs/domain/src/lib.rs"), "pub struct Fixture;\n").unwrap();
+    std::fs::write(root.join("libs/usecase/src/lib.rs"), "pub struct Fixture;\n").unwrap();
     std::fs::write(
         track_dir.join("domain-types.json"),
         "{\n  \"schema_version\": 5,\n  \"crate_name\": \"domain\",\n  \"layer\": \"domain\",\n  \"types\": {},\n  \"traits\": {},\n  \"functions\": {}\n}\n",
     )
     .unwrap();
-    let snapshot_path = root.join("target/doc/domain.json");
-    let snapshot = minimal_rustdoc_json();
-    std::fs::write(&snapshot_path, &snapshot).unwrap();
-    std::fs::write(track_dir.join("domain-types-baseline.json"), snapshot).unwrap();
+    std::fs::write(
+        track_dir.join("usecase-types.json"),
+        "{\n  \"schema_version\": 5,\n  \"crate_name\": \"usecase\",\n  \"layer\": \"usecase\",\n  \"types\": {},\n  \"traits\": {},\n  \"functions\": {}\n}\n",
+    )
+    .unwrap();
+    let domain_rustdoc_json_path = root.join("target/doc/domain.json");
+    let usecase_rustdoc_json_path = root.join("target/doc/usecase.json");
+    let rustdoc_json = minimal_rustdoc_json();
+    std::fs::write(&domain_rustdoc_json_path, &rustdoc_json).unwrap();
+    std::fs::write(&usecase_rustdoc_json_path, &rustdoc_json).unwrap();
+    std::fs::write(track_dir.join("domain-types-baseline.json"), &rustdoc_json).unwrap();
+    std::fs::write(track_dir.join("usecase-types-baseline.json"), rustdoc_json).unwrap();
 
-    (workspace, TrackId::try_new(track_id).unwrap(), snapshot_path)
+    let rustdoc_json_paths = std::collections::BTreeMap::from([
+        ("domain".to_owned(), domain_rustdoc_json_path),
+        ("usecase".to_owned(), usecase_rustdoc_json_path),
+    ]);
+    (workspace, TrackId::try_new(track_id).unwrap(), rustdoc_json_paths)
 }
 
 #[cfg(feature = "test-support")]
@@ -234,34 +265,131 @@ fn test_signal_composition_freshness_skip_and_conservative_reextract_use_real_ad
         return;
     }
 
-    let (workspace, track_id, snapshot_path) = setup_type_signal_workspace();
+    let (workspace, track_id, rustdoc_json_paths) = setup_type_signal_workspace();
     let root = workspace.path();
 
-    let initial_observer = RustdocLaunchObserver::using_snapshot(snapshot_path.clone());
+    let initial_observer = RustdocLaunchObserver::using_json_paths(rustdoc_json_paths.clone());
     let initial = calc_impl_catalog_with_observer(root, track_id.clone(), initial_observer.clone());
     assert_eq!(initial.exit_code, 0, "initial calculation must succeed: {initial:?}");
-    assert_eq!(initial_observer.launches(), 1, "initial calculation must export rustdoc");
+    assert_eq!(initial_observer.launches_for("domain"), 1, "domain must export rustdoc initially");
+    assert_eq!(
+        initial_observer.launches_for("usecase"),
+        1,
+        "usecase must export rustdoc initially"
+    );
 
-    let skip_observer = RustdocLaunchObserver::using_snapshot(snapshot_path.clone());
+    let signal_path = root.join("track/items/freshness-composition/domain-type-signals.json");
+    let initial_signals: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(&signal_path).unwrap()).unwrap();
+    let initial_declaration_hash = initial_signals.get("declaration_hash").cloned().unwrap();
+    assert!(initial_signals.get("implementation_input_hash").unwrap().is_string());
+
+    let skip_observer = RustdocLaunchObserver::using_json_paths(rustdoc_json_paths.clone());
     let skip = calc_impl_catalog_with_observer(root, track_id.clone(), skip_observer.clone());
     assert_eq!(skip.exit_code, 0, "verified inputs must skip cleanly: {skip:?}");
     assert_eq!(skip_observer.launches(), 0, "verified inputs must not launch rustdoc");
 
-    std::fs::write(
-        root.join("Cargo.lock"),
-        "# changed lockfile\nversion = 4\n\n[[package]]\nname = \"domain\"\nversion = \"0.1.0\"\n",
-    )
-    .unwrap();
-    let conservative_observer = RustdocLaunchObserver::using_snapshot(snapshot_path);
-    let conservative =
-        calc_impl_catalog_with_observer(root, track_id, conservative_observer.clone());
+    let catalogue_path = root.join("track/items/freshness-composition/domain-types.json");
+    let catalogue = std::fs::read_to_string(&catalogue_path).unwrap();
+    std::fs::write(&catalogue_path, format!("{catalogue}\n")).unwrap();
+    let catalogue_only_observer =
+        RustdocLaunchObserver::using_json_paths(rustdoc_json_paths.clone());
+    let catalogue_only =
+        calc_impl_catalog_with_observer(root, track_id.clone(), catalogue_only_observer.clone());
     assert_eq!(
-        conservative.exit_code, 0,
-        "changed implementation inputs must recalculate cleanly: {conservative:?}"
+        catalogue_only.exit_code, 0,
+        "catalogue-only changes must reevaluate cleanly: {catalogue_only:?}"
     );
     assert_eq!(
-        conservative_observer.launches(),
+        catalogue_only_observer.launches(),
+        0,
+        "catalogue-only changes must reevaluate without rustdoc extraction"
+    );
+    let reevaluated_signals: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(&signal_path).unwrap()).unwrap();
+    assert_ne!(
+        reevaluated_signals.get("declaration_hash").cloned().unwrap(),
+        initial_declaration_hash,
+        "the changed declaration must be recorded, proving signal evaluation reran"
+    );
+    assert!(reevaluated_signals.get("implementation_input_hash").unwrap().is_string());
+
+    let mut incomplete_signals = reevaluated_signals;
+    incomplete_signals.as_object_mut().unwrap().remove("implementation_input_hash");
+    std::fs::write(&signal_path, serde_json::to_vec(&incomplete_signals).unwrap()).unwrap();
+    let incomplete_observer = RustdocLaunchObserver::using_json_paths(rustdoc_json_paths.clone());
+    let incomplete =
+        calc_impl_catalog_with_observer(root, track_id.clone(), incomplete_observer.clone());
+    assert_eq!(incomplete.exit_code, 0, "incomplete artifacts must be regenerated: {incomplete:?}");
+    assert_eq!(
+        incomplete_observer.launches(),
         1,
-        "changed implementation inputs must re-extract through the real adapter"
+        "a recorded artifact without every required hash must not be reused"
+    );
+
+    std::fs::write(root.join("libs/domain/src/lib.rs"), "pub struct ChangedFixture;\n").unwrap();
+    let changed_source_observer =
+        RustdocLaunchObserver::using_json_paths(rustdoc_json_paths.clone());
+    let changed_source =
+        calc_impl_catalog_with_observer(root, track_id.clone(), changed_source_observer.clone());
+    assert_eq!(
+        changed_source.exit_code, 0,
+        "changed source contents must recalculate cleanly: {changed_source:?}"
+    );
+    assert_eq!(
+        changed_source_observer.launches_for("domain"),
+        1,
+        "the changed domain layer must re-extract through the real adapter"
+    );
+    assert_eq!(
+        changed_source_observer.launches_for("usecase"),
+        0,
+        "the unchanged usecase layer must skip rustdoc extraction"
+    );
+
+    let lockfile_path = root.join("Cargo.lock");
+    let changed_lockfile_content = [
+        std::fs::read_to_string(&lockfile_path).unwrap(),
+        "# changed lockfile fixture for freshness verification\n".to_owned(),
+    ]
+    .concat();
+    std::fs::write(&lockfile_path, &changed_lockfile_content).unwrap();
+    let changed_lockfile_observer =
+        RustdocLaunchObserver::using_json_paths(rustdoc_json_paths.clone());
+    let changed_lockfile =
+        calc_impl_catalog_with_observer(root, track_id.clone(), changed_lockfile_observer.clone());
+    assert_eq!(
+        changed_lockfile.exit_code, 0,
+        "changed lockfile contents must recalculate cleanly: {changed_lockfile:?}"
+    );
+    assert_eq!(
+        changed_lockfile_observer.launches_for("domain"),
+        1,
+        "a lockfile change must re-extract the domain layer"
+    );
+    assert_eq!(
+        changed_lockfile_observer.launches_for("usecase"),
+        1,
+        "a lockfile change must re-extract every affected layer"
+    );
+
+    std::fs::remove_file(&lockfile_path).unwrap();
+    let restored_lockfile_path = lockfile_path.clone();
+    let indeterminate_observer = RustdocLaunchObserver::using_json_path_with_before_export(
+        rustdoc_json_paths.get("domain").cloned().unwrap(),
+        std::sync::Arc::new(move || {
+            std::fs::write(&restored_lockfile_path, &changed_lockfile_content).unwrap();
+        }),
+    );
+    let indeterminate =
+        calc_impl_catalog_with_observer(root, track_id, indeterminate_observer.clone());
+    assert_eq!(
+        indeterminate.exit_code, 0,
+        "an indeterminate reuse hash must fall back to a successful fresh evaluation: {indeterminate:?}"
+    );
+    assert_eq!(
+        indeterminate_observer.launches(),
+        1,
+        "an indeterminate implementation hash must re-extract rather than skip"
     );
 }

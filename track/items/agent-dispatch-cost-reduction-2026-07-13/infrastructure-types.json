@@ -199,7 +199,7 @@
     },
     "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer": {
       "action": "modify",
-      "docs": "Executes conservative layer-granular signal reuse, snapshot validation, or rustdoc re-extraction.",
+      "docs": "Executes conservative layer-granular signal reuse or rustdoc re-extraction from implementation-side input-hash freshness.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -324,23 +324,6 @@
         }
       ],
       "type_name": "FsProviderSessionCacheAdapter"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "repo_root",
-              "ty": "std::path::PathBuf"
-            }
-          ],
-          "returns": "Self"
-        }
-      ],
-      "type_name": "Sha256ExecutionContractFingerprintAdapter"
     }
   ],
   "layer": "infrastructure",
@@ -508,14 +491,6 @@
     {
       "for_type": "FsProviderSessionCacheAdapter",
       "trait_ref": "usecase::provider_session::ProviderSessionCachePort"
-    },
-    {
-      "for_type": "Sha256ExecutionContractFingerprintAdapter",
-      "trait_ref": "usecase::provider_session::CapabilityExecutionContractFingerprintPort"
-    },
-    {
-      "for_type": "Sha256ExecutionContractFingerprintAdapter",
-      "trait_ref": "usecase::provider_session::ReviewerExecutionContractFingerprintPort"
     },
     {
       "action": "modify",
@@ -988,10 +963,6 @@
             {
               "name": "session_cache",
               "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
-            },
-            {
-              "name": "fingerprint",
-              "ty": "std::sync::Arc<dyn usecase::provider_session::CapabilityExecutionContractFingerprintPort>"
             }
           ],
           "returns": "Self"
@@ -1081,10 +1052,6 @@
             {
               "name": "session_cache",
               "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
-            },
-            {
-              "name": "fingerprint",
-              "ty": "std::sync::Arc<dyn usecase::provider_session::ReviewerExecutionContractFingerprintPort>"
             }
           ],
           "returns": "Self"
@@ -1158,10 +1125,6 @@
             {
               "name": "session_cache",
               "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
-            },
-            {
-              "name": "fingerprint",
-              "ty": "std::sync::Arc<dyn usecase::provider_session::CapabilityExecutionContractFingerprintPort>"
             }
           ],
           "returns": "Self"
@@ -1251,10 +1214,6 @@
             {
               "name": "session_cache",
               "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
-            },
-            {
-              "name": "fingerprint",
-              "ty": "std::sync::Arc<dyn usecase::provider_session::ReviewerExecutionContractFingerprintPort>"
             }
           ],
           "returns": "Self"
@@ -1373,7 +1332,7 @@
     },
     "FsProviderSessionCacheAdapter": {
       "action": "add",
-      "docs": "Persists symlink-safe machine-local provider sessions in track-local or workspace-local storage.",
+      "docs": "Secondary adapter for machine-local provider-session storage; maps filesystem I/O failures to ProviderSessionCacheError::StorageUnavailable, codec failures to ProviderSessionCacheError::EntryInvalid, and symlink or trusted-path violations to ProviderSessionCacheError::IdentityBoundaryViolation before crossing ProviderSessionCachePort.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1855,38 +1814,6 @@
         },
         {
           "anchor": "AC-06",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        }
-      ]
-    },
-    "Sha256ExecutionContractFingerprintAdapter": {
-      "action": "add",
-      "docs": "Hashes canonical capability and scope-specific reviewer contract inputs into stable fingerprints.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
-      "methods": [],
-      "module_path": "provider_session",
-      "role": {
-        "SecondaryAdapter": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-04",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "CN-06",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "CN-08",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ]

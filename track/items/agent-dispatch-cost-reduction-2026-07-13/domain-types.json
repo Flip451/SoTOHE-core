@@ -3,21 +3,25 @@
   "functions": {
     "domain::tddd::type_signals_doc::decide_type_signals_reuse": {
       "action": "add",
-      "docs": "Compares recorded freshness with current non-snapshot hashes and a snapshot status whose Verified variant alone carries the current snapshot hash.",
+      "docs": "Decides whether recorded type signals can be reused.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
         {
-          "name": "recorded",
-          "ty": "&TypeSignalsFreshness"
+          "name": "recorded_declaration_hash",
+          "ty": "&CatalogueDeclarationHash"
         },
         {
-          "name": "current",
-          "ty": "&TypeSignalsCurrentInputs"
+          "name": "recorded_implementation_input_hash",
+          "ty": "&ImplementationInputHash"
         },
         {
-          "name": "snapshot_status",
-          "ty": "LiveRustdocSnapshotStatus"
+          "name": "current_declaration_hash",
+          "ty": "&CatalogueDeclarationHash"
+        },
+        {
+          "name": "current_implementation_input_hash",
+          "ty": "Option<&ImplementationInputHash>"
         }
       ],
       "returns": "TypeSignalsReuseDecision",
@@ -162,264 +166,6 @@
         }
       ],
       "type_name": "ImplementationInputHash"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "digest",
-              "ty": "Sha256Digest"
-            }
-          ],
-          "returns": "Self"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "as_digest",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&Sha256Digest"
-        }
-      ],
-      "type_name": "BaselineHash"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "digest",
-              "ty": "Sha256Digest"
-            }
-          ],
-          "returns": "Self"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "as_digest",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&Sha256Digest"
-        }
-      ],
-      "type_name": "LiveRustdocSnapshotHash"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "digest",
-              "ty": "Sha256Digest"
-            }
-          ],
-          "returns": "Self"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "as_digest",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&Sha256Digest"
-        }
-      ],
-      "type_name": "EvaluatorContractHash"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "digest",
-              "ty": "Sha256Digest"
-            }
-          ],
-          "returns": "Self"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "as_digest",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&Sha256Digest"
-        }
-      ],
-      "type_name": "RustdocExtractionContractHash"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "declaration_hash",
-              "ty": "CatalogueDeclarationHash"
-            },
-            {
-              "name": "implementation_input_hash",
-              "ty": "ImplementationInputHash"
-            },
-            {
-              "name": "baseline_hash",
-              "ty": "BaselineHash"
-            },
-            {
-              "name": "live_rustdoc_snapshot_hash",
-              "ty": "LiveRustdocSnapshotHash"
-            },
-            {
-              "name": "evaluator_contract_hash",
-              "ty": "EvaluatorContractHash"
-            },
-            {
-              "name": "rustdoc_extraction_contract_hash",
-              "ty": "RustdocExtractionContractHash"
-            }
-          ],
-          "returns": "Self"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "declaration_hash",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&CatalogueDeclarationHash"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "implementation_input_hash",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&ImplementationInputHash"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "baseline_hash",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&BaselineHash"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "live_rustdoc_snapshot_hash",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&LiveRustdocSnapshotHash"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "evaluator_contract_hash",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&EvaluatorContractHash"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "rustdoc_extraction_contract_hash",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&RustdocExtractionContractHash"
-        }
-      ],
-      "type_name": "TypeSignalsFreshness"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "declaration_hash",
-              "ty": "CatalogueDeclarationHash"
-            },
-            {
-              "name": "implementation_input_hash",
-              "ty": "ImplementationInputHash"
-            },
-            {
-              "name": "baseline_hash",
-              "ty": "BaselineHash"
-            },
-            {
-              "name": "evaluator_contract_hash",
-              "ty": "EvaluatorContractHash"
-            },
-            {
-              "name": "rustdoc_extraction_contract_hash",
-              "ty": "RustdocExtractionContractHash"
-            }
-          ],
-          "returns": "Self"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "declaration_hash",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&CatalogueDeclarationHash"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "implementation_input_hash",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&ImplementationInputHash"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "baseline_hash",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&BaselineHash"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "evaluator_contract_hash",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&EvaluatorContractHash"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "rustdoc_extraction_contract_hash",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&RustdocExtractionContractHash"
-        }
-      ],
-      "type_name": "TypeSignalsCurrentInputs"
     }
   ],
   "layer": "domain",
@@ -446,22 +192,22 @@
       "trait_ref": "core::cmp::Eq"
     },
     {
-      "action": "modify",
+      "action": "reference",
       "for_type": "TypeSignalsLoadResult",
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "action": "modify",
+      "action": "reference",
       "for_type": "TypeSignalsLoadResult",
       "trait_ref": "core::clone::Clone"
     },
     {
-      "action": "modify",
+      "action": "reference",
       "for_type": "TypeSignalsLoadResult",
       "trait_ref": "core::cmp::PartialEq"
     },
     {
-      "action": "modify",
+      "action": "reference",
       "for_type": "TypeSignalsLoadResult",
       "trait_ref": "core::cmp::Eq"
     },
@@ -602,118 +348,6 @@
       "trait_ref": "core::hash::Hash"
     },
     {
-      "for_type": "BaselineHash",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "BaselineHash",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "BaselineHash",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "BaselineHash",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "BaselineHash",
-      "trait_ref": "core::hash::Hash"
-    },
-    {
-      "for_type": "LiveRustdocSnapshotHash",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "LiveRustdocSnapshotHash",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "LiveRustdocSnapshotHash",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "LiveRustdocSnapshotHash",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "LiveRustdocSnapshotHash",
-      "trait_ref": "core::hash::Hash"
-    },
-    {
-      "for_type": "EvaluatorContractHash",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "EvaluatorContractHash",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "EvaluatorContractHash",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "EvaluatorContractHash",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "EvaluatorContractHash",
-      "trait_ref": "core::hash::Hash"
-    },
-    {
-      "for_type": "RustdocExtractionContractHash",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "RustdocExtractionContractHash",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "RustdocExtractionContractHash",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "RustdocExtractionContractHash",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "RustdocExtractionContractHash",
-      "trait_ref": "core::hash::Hash"
-    },
-    {
-      "for_type": "TypeSignalsFreshness",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "TypeSignalsFreshness",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "TypeSignalsFreshness",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "TypeSignalsFreshness",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "LiveRustdocSnapshotStatus",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "LiveRustdocSnapshotStatus",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "LiveRustdocSnapshotStatus",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "LiveRustdocSnapshotStatus",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
       "for_type": "TypeSignalsReuseDecision",
       "trait_ref": "core::fmt::Debug"
     },
@@ -734,23 +368,125 @@
       "trait_ref": "core::cmp::Eq"
     },
     {
-      "for_type": "TypeSignalsCurrentInputs",
+      "action": "reference",
+      "for_type": "ObligationsDocument",
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "for_type": "TypeSignalsCurrentInputs",
+      "action": "reference",
+      "for_type": "ObligationsDocument",
       "trait_ref": "core::clone::Clone"
     },
     {
-      "for_type": "TypeSignalsCurrentInputs",
+      "action": "reference",
+      "for_type": "ObligationsDocument",
       "trait_ref": "core::cmp::PartialEq"
     },
     {
-      "for_type": "TypeSignalsCurrentInputs",
+      "action": "reference",
+      "for_type": "ObligationsDocument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestBindingsDocument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestBindingsDocument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestBindingsDocument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestBindingsDocument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligation",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "EdgeOwnership",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "EdgeOwnership",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "EdgeOwnership",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "EdgeOwnership",
       "trait_ref": "core::cmp::Eq"
     }
   ],
   "traits": {
+    "SchemaExporter": {
+      "action": "reference",
+      "docs": "Port trait for extracting a crate's public API schema. This rustdoc/process boundary is intentionally blocking and synchronous.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<SchemaExport, SchemaExportError>"
+        }
+      ],
+      "module_path": "schema",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
     "TypeSignalsExecutorPort": {
       "action": "delete",
       "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
@@ -783,37 +519,9 @@
     }
   },
   "types": {
-    "BaselineHash": {
-      "action": "add",
-      "docs": "Identifies the exact layer baseline used by a type-signal evaluation.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
-      "methods": [],
-      "module_path": "tddd::type_signals_doc",
-      "role": {
-        "ValueObject": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-05",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "AC-05",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        }
-      ]
-    },
     "CatalogueDeclarationHash": {
       "action": "add",
-      "docs": "Identifies the normalized catalogue declaration used by a type-signal evaluation.",
+      "docs": "Identifies the catalogue declaration input bytes recorded by a type-signal evaluation.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -839,37 +547,58 @@
         }
       ]
     },
-    "EvaluatorContractHash": {
+    "EdgeOwnership": {
       "action": "add",
-      "docs": "Identifies the evaluator contract used to interpret a layer snapshot.",
+      "docs": "Ownership result for one edge: no owner, one borrowed owner, or all borrowed owners; lifetime `'a` is represented in payload type refs because v5 generics encode type parameters only.",
       "informal_grounds": [],
       "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "None",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Unique",
+            "payload": {
+              "fields": [
+                "&'a TestObligation"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Multiple",
+            "payload": {
+              "fields": [
+                "Vec<&'a TestObligation>"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
       },
       "methods": [],
-      "module_path": "tddd::type_signals_doc",
+      "module_path": "tddd::test_obligation::obligations",
       "role": {
         "ValueObject": {}
       },
       "spec_refs": [
         {
-          "anchor": "IN-05",
+          "anchor": "IN-10",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         },
         {
-          "anchor": "AC-06",
+          "anchor": "AC-11",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ]
     },
     "ImplementationInputHash": {
       "action": "add",
-      "docs": "Identifies the fully resolved implementation-side build-input closure for one layer.",
+      "docs": "Implementation-side input hash value object.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -891,6 +620,34 @@
         },
         {
           "anchor": "CN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-08",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ]
@@ -932,9 +689,9 @@
         }
       ]
     },
-    "LiveRustdocSnapshotHash": {
-      "action": "add",
-      "docs": "Identifies the verified live rustdoc JSON snapshot for one layer.",
+    "ObligationsDocument": {
+      "action": "modify",
+      "docs": "Domain service that owns derived-obligation collection, edge-ownership, and staleness queries.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -944,84 +701,90 @@
           "kind": "plain"
         }
       },
-      "methods": [],
-      "module_path": "tddd::type_signals_doc",
-      "role": {
-        "ValueObject": {}
-      },
-      "spec_refs": [
+      "methods": [
         {
-          "anchor": "IN-06",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "TrackId"
+            },
+            {
+              "name": "obligations",
+              "ty": "Vec<TestObligation>"
+            }
+          ],
+          "returns": "Self"
         },
         {
-          "anchor": "CN-07",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "obligations",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TestObligation]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "edge_ownership",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "&TestObligationEdgeId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "EdgeOwnership<'_>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "owners_of_edge",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "&TestObligationEdgeId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Vec<&TestObligation>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "staleness_against",
+          "params": [
+            {
+              "name": "expected",
+              "ty": "&ObligationsDocument"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<DiagnosticMessage>"
         }
-      ]
-    },
-    "LiveRustdocSnapshotStatus": {
-      "action": "add",
-      "docs": "Classifies live rustdoc snapshot verification, carrying the current hash only when verification succeeded.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Verified",
-            "payload": {
-              "fields": [
-                "LiveRustdocSnapshotHash"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "Missing",
-            "payload": {
-              "kind": "unit"
-            }
-          },
-          {
-            "name": "ReadFailed",
-            "payload": {
-              "kind": "unit"
-            }
-          },
-          {
-            "name": "ParseFailed",
-            "payload": {
-              "kind": "unit"
-            }
-          },
-          {
-            "name": "HashMismatch",
-            "payload": {
-              "kind": "unit"
-            }
-          }
-        ]
-      },
-      "methods": [],
-      "module_path": "tddd::type_signals_doc",
+      ],
+      "module_path": "tddd::test_obligation::obligations",
       "role": {
-        "ValueObject": {}
+        "DomainService": {}
       },
       "spec_refs": [
         {
-          "anchor": "IN-06",
+          "anchor": "IN-10",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         },
         {
-          "anchor": "CN-07",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "AC-06",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "AC-07",
+          "anchor": "AC-11",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ]
@@ -1063,34 +826,6 @@
         },
         {
           "anchor": "CN-09",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        }
-      ]
-    },
-    "RustdocExtractionContractHash": {
-      "action": "add",
-      "docs": "Identifies the contract that extracts the live rustdoc snapshot.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
-      "methods": [],
-      "module_path": "tddd::type_signals_doc",
-      "role": {
-        "ValueObject": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-06",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "AC-07",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ]
@@ -1208,6 +943,210 @@
         }
       ]
     },
+    "TestBindingsDocument": {
+      "action": "modify",
+      "docs": "Domain service that owns test-binding records and waiver-resolution queries.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "TrackId"
+            },
+            {
+              "name": "records",
+              "ty": "Vec<TestBindingRecord>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "records",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TestBindingRecord]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "waived_edge_ids",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Vec<&TestObligationEdgeId>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_edge_waived",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "&TestObligationEdgeId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "module_path": "tddd::test_obligation::binding",
+      "role": {
+        "DomainService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TestObligation": {
+      "action": "modify",
+      "docs": "Domain service that owns a derived obligation and decides whether it owns an obligation edge.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "id",
+              "ty": "TestObligationId"
+            },
+            {
+              "name": "target_entry",
+              "ty": "CatalogueEntryRef"
+            },
+            {
+              "name": "target_role",
+              "ty": "TargetEntryRoleKind"
+            },
+            {
+              "name": "brief",
+              "ty": "TestObligationBrief"
+            },
+            {
+              "name": "declaration_hash",
+              "ty": "DeclarationHash"
+            },
+            {
+              "name": "spec_refs",
+              "ty": "Vec<TestObligationAnchorId>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "target_entry",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CatalogueEntryRef"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "target_role",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TargetEntryRoleKind"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "brief",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationBrief"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "declaration_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&DeclarationHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "spec_refs",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TestObligationAnchorId]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "owns_edge",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "&TestObligationEdgeId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "module_path": "tddd::test_obligation::obligations",
+      "role": {
+        "DomainService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
     "TrackBranch": {
       "action": "reference",
       "docs": "Validated active track branch paired with the signal request's TrackId.",
@@ -1240,7 +1179,7 @@
       },
       "spec_refs": [
         {
-          "anchor": "CN-07",
+          "anchor": "CN-11",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ]
@@ -1286,53 +1225,9 @@
         }
       ]
     },
-    "TypeSignalsCurrentInputs": {
-      "action": "add",
-      "docs": "Read-only record of the five current non-snapshot hashes used to decide type-signal reuse.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
-      "methods": [],
-      "module_path": "tddd::type_signals_doc",
-      "role": {
-        "ValueObject": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-05",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "IN-06",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "CN-07",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "AC-05",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "AC-06",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "AC-07",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        }
-      ]
-    },
     "TypeSignalsDocument": {
       "action": "modify",
-      "docs": "Persists type-signal results together with all semantic freshness identities needed for safe reuse.",
+      "docs": "Persists type-signal results with the declaration-side and implementation-side input hashes required for artifact self-described freshness checks.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1353,8 +1248,12 @@
               "ty": "Timestamp"
             },
             {
-              "name": "freshness",
-              "ty": "TypeSignalsFreshness"
+              "name": "declaration_hash",
+              "ty": "CatalogueDeclarationHash"
+            },
+            {
+              "name": "implementation_input_hash",
+              "ty": "ImplementationInputHash"
             },
             {
               "name": "signals",
@@ -1377,8 +1276,12 @@
               "ty": "Timestamp"
             },
             {
-              "name": "freshness",
-              "ty": "TypeSignalsFreshness"
+              "name": "declaration_hash",
+              "ty": "CatalogueDeclarationHash"
+            },
+            {
+              "name": "implementation_input_hash",
+              "ty": "ImplementationInputHash"
             },
             {
               "name": "signals",
@@ -1406,18 +1309,18 @@
         {
           "has_default_impl": false,
           "is_async": false,
-          "name": "freshness",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&TypeSignalsFreshness"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
           "name": "declaration_hash",
           "params": [],
           "receiver": "&self",
           "returns": "&CatalogueDeclarationHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "implementation_input_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ImplementationInputHash"
         },
         {
           "has_default_impl": false,
@@ -1474,62 +1377,6 @@
       "spec_refs": [
         {
           "anchor": "CN-07",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        }
-      ]
-    },
-    "TypeSignalsFreshness": {
-      "action": "add",
-      "docs": "Groups every semantic hash that governs type-signal evaluation and rustdoc snapshot reuse.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
-      "methods": [],
-      "module_path": "tddd::type_signals_doc",
-      "role": {
-        "ValueObject": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-05",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "IN-06",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "IN-07",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "CN-05",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "CN-07",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "AC-05",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "AC-06",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "AC-07",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "AC-08",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ]
@@ -1631,7 +1478,7 @@
             }
           },
           {
-            "name": "ReevaluateWithSnapshot",
+            "name": "ReevaluateWithoutExtraction",
             "payload": {
               "kind": "unit"
             }

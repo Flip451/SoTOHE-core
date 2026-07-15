@@ -83,31 +83,6 @@
     {
       "methods": [
         {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "digest",
-              "ty": "domain::tddd::type_signals_doc::Sha256Digest"
-            }
-          ],
-          "returns": "Self"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "as_digest",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&domain::tddd::type_signals_doc::Sha256Digest"
-        }
-      ],
-      "type_name": "ExecutionContractFingerprint"
-    },
-    {
-      "methods": [
-        {
           "docs": "Produces only CapabilityInputValidationError::EmptyContent; all other variants are unreachable for this constructor.",
           "has_default_impl": false,
           "is_async": false,
@@ -153,10 +128,6 @@
             {
               "name": "effort",
               "ty": "ReasoningEffort"
-            },
-            {
-              "name": "fingerprint",
-              "ty": "ExecutionContractFingerprint"
             }
           ],
           "returns": "Self"
@@ -192,14 +163,6 @@
           "params": [],
           "receiver": "&self",
           "returns": "ReasoningEffort"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "fingerprint",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&ExecutionContractFingerprint"
         }
       ],
       "type_name": "ProviderSessionCacheEntry"
@@ -424,22 +387,6 @@
       "trait_ref": "core::cmp::Eq"
     },
     {
-      "for_type": "ExecutionContractFingerprint",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "ExecutionContractFingerprint",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "ExecutionContractFingerprint",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "ExecutionContractFingerprint",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
       "for_type": "ReviewerPrompt",
       "trait_ref": "core::fmt::Debug"
     },
@@ -521,41 +468,6 @@
     }
   ],
   "traits": {
-    "CapabilityExecutionContractFingerprintPort": {
-      "action": "add",
-      "docs": "Synchronous capability execution-contract fingerprint port; adapters perform bounded blocking guarded-file reads on the already-synchronous capability dispatch path.",
-      "informal_grounds": [],
-      "methods": [
-        {
-          "docs": "Reads guarded capability-contract inputs; error subset: Io, Symlink, Path; never Codec.",
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "capability_fingerprint",
-          "params": [
-            {
-              "name": "capability",
-              "ty": "&CapabilityName"
-            }
-          ],
-          "receiver": "&self",
-          "returns": "Result<ExecutionContractFingerprint, ProviderSessionCacheError>"
-        }
-      ],
-      "module_path": "provider_session",
-      "role": {
-        "SecondaryPort": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "CN-08",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        }
-      ],
-      "supertrait_bounds": [
-        "Send",
-        "Sync"
-      ]
-    },
     "CapabilityProfilePort": {
       "action": "reference",
       "docs": "Resolves the typed dispatch profile for a capability.",
@@ -646,10 +558,11 @@
     },
     "ProviderSessionCachePort": {
       "action": "add",
-      "docs": "Synchronous machine-local cache port; adapters perform bounded blocking filesystem work on the already-synchronous dispatch path.",
+      "docs": "Synchronous machine-local provider-session cache boundary.",
       "informal_grounds": [],
       "methods": [
         {
+          "docs": "Failure surface: ProviderSessionCacheError::StorageUnavailable, ProviderSessionCacheError::EntryInvalid, or ProviderSessionCacheError::IdentityBoundaryViolation.",
           "has_default_impl": false,
           "is_async": false,
           "name": "load",
@@ -663,6 +576,7 @@
           "returns": "Result<Option<ProviderSessionCacheEntry>, ProviderSessionCacheError>"
         },
         {
+          "docs": "Failure surface: ProviderSessionCacheError::StorageUnavailable, ProviderSessionCacheError::EntryInvalid, or ProviderSessionCacheError::IdentityBoundaryViolation.",
           "has_default_impl": false,
           "is_async": false,
           "name": "save",
@@ -680,7 +594,7 @@
           "returns": "Result<(), ProviderSessionCacheError>"
         },
         {
-          "docs": "Removes the entry selected by the validated key without encoding or decoding cache contents; error subset: Io, Symlink, Path; never Codec.",
+          "docs": "Failure surface: ProviderSessionCacheError::StorageUnavailable or ProviderSessionCacheError::IdentityBoundaryViolation; ProviderSessionCacheError::EntryInvalid is not produced.",
           "has_default_impl": false,
           "is_async": false,
           "name": "remove",
@@ -792,37 +706,44 @@
         }
       ]
     },
-    "ReviewerExecutionContractFingerprintPort": {
-      "action": "add",
-      "docs": "Synchronous reviewer execution-contract fingerprint port; adapters perform bounded blocking guarded-file reads on the already-synchronous reviewer dispatch path.",
+    "SchemaExporterPort": {
+      "action": "reference",
+      "docs": "Secondary port for domain schema export. This rustdoc/process and filesystem I/O boundary is intentionally blocking and synchronous.",
       "informal_grounds": [],
       "methods": [
         {
-          "docs": "Reads guarded reviewer-contract inputs; error subset: Io, Symlink, Path; never Codec.",
           "has_default_impl": false,
           "is_async": false,
-          "name": "reviewer_fingerprint",
+          "name": "export_as_json",
           "params": [
             {
-              "name": "scope",
-              "ty": "&domain::review_v2::ScopeName"
+              "name": "crate_name",
+              "ty": "&str"
             }
           ],
           "receiver": "&self",
-          "returns": "Result<ExecutionContractFingerprint, ProviderSessionCacheError>"
+          "returns": "Result<String, SchemaExporterError>"
         }
       ],
-      "module_path": "provider_session",
+      "module_path": "export_schema",
       "role": {
         "SecondaryPort": {}
       },
       "spec_refs": [
         {
-          "anchor": "IN-04",
+          "anchor": "IN-05",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         },
         {
-          "anchor": "CN-06",
+          "anchor": "IN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-07",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ],
@@ -1608,38 +1529,6 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-05",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
-          "anchor": "IN-06",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        }
-      ]
-    },
-    "ExecutionContractFingerprint": {
-      "action": "add",
-      "docs": "Typed digest of the stable execution contract that gates provider-session reuse.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
-      "methods": [],
-      "module_path": "provider_session",
-      "role": {
-        "ValueObject": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-04",
-          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
-        },
-        {
           "anchor": "CN-06",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         },
@@ -1749,7 +1638,7 @@
     },
     "ProviderSessionCacheEntry": {
       "action": "add",
-      "docs": "Provider-session cache payload (IN-04, CN-02, CN-06, CN-08).",
+      "docs": "Stores reusable provider-session metadata.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1793,33 +1682,36 @@
     },
     "ProviderSessionCacheError": {
       "action": "add",
-      "docs": "Classifies cache failures without exposing machine-local paths or provider internals.",
+      "docs": "Use-case cache failure vocabulary with opaque diagnostic detail.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
         "variants": [
           {
-            "name": "Io",
+            "name": "StorageUnavailable",
             "payload": {
-              "kind": "unit"
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
             }
           },
           {
-            "name": "Codec",
+            "name": "EntryInvalid",
             "payload": {
-              "kind": "unit"
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
             }
           },
           {
-            "name": "Symlink",
+            "name": "IdentityBoundaryViolation",
             "payload": {
-              "kind": "unit"
-            }
-          },
-          {
-            "name": "Path",
-            "payload": {
-              "kind": "unit"
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
             }
           }
         ]
@@ -1854,7 +1746,7 @@
     },
     "ProviderSessionCacheKey": {
       "action": "add",
-      "docs": "Separates reviewer, track capability, and workspace capability sessions by validated identity.",
+      "docs": "Machine-local session cache entry key.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1890,10 +1782,6 @@
                 {
                   "name": "capability",
                   "ty": "CapabilityName"
-                },
-                {
-                  "name": "target_artifacts",
-                  "ty": "TargetArtifactSet"
                 }
               ],
               "kind": "struct"
@@ -2054,7 +1942,7 @@
     },
     "ReviewerPrompt": {
       "action": "add",
-      "docs": "Validated non-empty reviewer prompt used in the execution-contract fingerprint.",
+      "docs": "Validated non-empty reviewer prompt used to start or resume reviewer sessions.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",

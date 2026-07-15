@@ -24,6 +24,9 @@ pub enum CapabilityInputValidationError {
     /// The supplied file path was not a repository-relative, traversal-free path.
     #[error("file path must be repository-relative and traversal-free")]
     InvalidFilePath,
+    /// The supplied target-artifact collection was empty.
+    #[error("target artifact set must not be empty")]
+    EmptyTargetArtifactSet,
     /// The supplied technical text was empty or whitespace-only.
     #[error("content must not be empty")]
     EmptyContent,
@@ -132,6 +135,83 @@ impl CapabilityFilePath {
 impl std::fmt::Display for CapabilityFilePath {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(formatter, "{}", self.as_path().display())
+    }
+}
+
+/// Validated normalized repository-relative artifact path used in capability
+/// session identity.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct TargetArtifactPath {
+    path: PathBuf,
+}
+
+impl TargetArtifactPath {
+    /// Validates and normalizes a repository-relative artifact path.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`CapabilityInputValidationError::EmptyFilePath`] when `path`
+    /// has no path components, or [`CapabilityInputValidationError::InvalidFilePath`]
+    /// when it cannot identify a repository-relative artifact.
+    pub fn try_new(path: PathBuf) -> Result<Self, CapabilityInputValidationError> {
+        if path.as_os_str().is_empty() {
+            return Err(CapabilityInputValidationError::EmptyFilePath);
+        }
+        if path.is_absolute() {
+            return Err(CapabilityInputValidationError::InvalidFilePath);
+        }
+
+        let mut normalized = PathBuf::new();
+        for component in path.components() {
+            match component {
+                Component::Normal(value) => normalized.push(value),
+                Component::CurDir => {}
+                Component::ParentDir | Component::RootDir | Component::Prefix(_) => {
+                    return Err(CapabilityInputValidationError::InvalidFilePath);
+                }
+            }
+        }
+        if normalized.as_os_str().is_empty() {
+            return Err(CapabilityInputValidationError::InvalidFilePath);
+        }
+        Ok(Self { path: normalized })
+    }
+
+    /// Returns the normalized repository-relative path.
+    #[must_use]
+    pub fn as_path(&self) -> &Path {
+        &self.path
+    }
+}
+
+/// Non-empty sorted deduplicated target-artifact identity for capability resume.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TargetArtifactSet {
+    paths: Vec<TargetArtifactPath>,
+}
+
+impl TargetArtifactSet {
+    /// Builds a canonical artifact identity from one or more validated paths.
+    ///
+    /// # Errors
+    ///
+    /// Returns only [`CapabilityInputValidationError::EmptyTargetArtifactSet`]
+    /// when `paths` is empty.
+    pub fn try_new(
+        mut paths: Vec<TargetArtifactPath>,
+    ) -> Result<Self, CapabilityInputValidationError> {
+        if paths.is_empty() {
+            return Err(CapabilityInputValidationError::EmptyTargetArtifactSet);
+        }
+        paths.sort();
+        paths.dedup();
+        Ok(Self { paths })
+    }
+
+    /// Returns the canonical sorted artifact paths.
+    #[must_use]
+    pub fn as_slice(&self) -> &[TargetArtifactPath] {
+        &self.paths
     }
 }
 

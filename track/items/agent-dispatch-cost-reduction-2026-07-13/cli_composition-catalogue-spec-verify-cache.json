@@ -3,11 +3,11 @@
   "layer": "cli_composition",
   "entries": [
     {
-      "claim_hash": "74e8b9e8740f10fe3f8f7ced0f89f8fe0cd8583364da0b03f4e24210d2dc636b",
-      "evidence_hash": "63c589b64a63ee081735dcf7dbf38dee057677a09c23dc11c3ec0148e3e3da85",
+      "claim_hash": "300e04b013d62cde45b1bcb77b97f046aa02935380d4da6e7a8b2c774a691c73",
+      "evidence_hash": "74df0cf41b80fdb8461f2469f8807e5f1c56c5247083791d8ee3a415f4bd2d91",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp capability exec` に orchestrator が選ぶ resume option を追加する。同一 track・同一 capability の同一対象成果物への追補、修正再入、中断からの続行だけを対象とし、初回 dispatch と関心事または対象成果物を切り替える dispatch は新規 session とする。"
+        "citation": "`sotp capability exec` に orchestrator が選ぶ resume option を追加する。同一 track・同一 capability の継続作業（同じ成果物への追補・修正の再入、中断からの続行）を対象とし、初回 dispatch と関心事を切り替える dispatch は orchestrator の判断で新規 session とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -22,16 +22,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-08",
-          "text_label": "`sotp capability exec` に orchestrator が選ぶ resume option を追加する。同一 track・同一 capability の同一対象成果物への追補、修正再入、中断からの続行だけを対象とし、初回 dispatch と関心事または対象成果物を切り替える dispatch は新規 session とする。"
+          "text_label": "`sotp capability exec` に orchestrator が選ぶ resume option を追加する。同一 track・同一 capability の継続作業（同じ成果物への追補・修正の再入、中断からの続行）を対象とし、初回 dispatch と関心事を切り替える dispatch は orchestrator の判断で新規 session とする。"
         }
       }
     },
     {
-      "claim_hash": "74e8b9e8740f10fe3f8f7ced0f89f8fe0cd8583364da0b03f4e24210d2dc636b",
-      "evidence_hash": "34454a941205a277b2c984bc867d13e0e6ca67da6c296c2fc2a6b8c46af10326",
+      "claim_hash": "300e04b013d62cde45b1bcb77b97f046aa02935380d4da6e7a8b2c774a691c73",
+      "evidence_hash": "4cabd2650852dcafaf577955b9d2f99d99cb1597a3454dd512217be528610884",
       "verdict": {
         "kind": "pass",
-        "citation": "capability resume cache を、track 内では track・capability・対象 artifact の repo-relative path（複数は正規化済み順序付き集合）、track 外では workspace transient 配下の capability・対象 artifact path で分離する。対象 path が未確定の dispatch は cache を使わず記録もしない。"
+        "citation": "capability resume cache を、track 内では track・capability、track 外では workspace transient 配下の capability・対象 artifact の repo-relative path で分離する。対象 path が未確定の track 外 dispatch は cache を使わず記録もしない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -46,12 +46,12 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-09",
-          "text_label": "capability resume cache を、track 内では track・capability・対象 artifact の repo-relative path（複数は正規化済み順序付き集合）、track 外では workspace transient 配下の capability・対象 artifact path で分離する。対象 path が未確定の dispatch は cache を使わず記録もしない。"
+          "text_label": "capability resume cache を、track 内では track・capability、track 外では workspace transient 配下の capability・対象 artifact の repo-relative path で分離する。対象 path が未確定の track 外 dispatch は cache を使わず記録もしない。"
         }
       }
     },
     {
-      "claim_hash": "74e8b9e8740f10fe3f8f7ced0f89f8fe0cd8583364da0b03f4e24210d2dc636b",
+      "claim_hash": "300e04b013d62cde45b1bcb77b97f046aa02935380d4da6e7a8b2c774a691c73",
       "evidence_hash": "005ff75b15c8786749c37f17ad38945817c2f9faa8f552792bc41e814ed75c67",
       "verdict": {
         "kind": "pass",
@@ -75,11 +75,11 @@
       }
     },
     {
-      "claim_hash": "74e8b9e8740f10fe3f8f7ced0f89f8fe0cd8583364da0b03f4e24210d2dc636b",
-      "evidence_hash": "6ea0a6a57b008fc7e679ac8506f762447b57adeb644aaf49fbdb2a637642adcb",
+      "claim_hash": "300e04b013d62cde45b1bcb77b97f046aa02935380d4da6e7a8b2c774a691c73",
+      "evidence_hash": "044d71dcc35d9514510f77881c51b2083654a18517467a2749da14ed316a97c9",
       "verdict": {
         "kind": "pass",
-        "citation": "capability resume cache は、provider・model を含む現在の profile 解決結果、および現在の capability SSoT、dispatcher が常時注入する discipline、capability profile または SSoT が静的 contract input として宣言する policy / contract file の path と内容から得る安定 execution-contract fingerprint に束縛する。"
+        "citation": "capability resume cache は provider と model に束縛する。現在の profile 解決結果の provider または model が記録値と不一致、resume 失敗、または期限切れなら、stale な reuse をせず新規 session で dispatch を実行する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -94,16 +94,16 @@
         "data": {
           "section": "constraint",
           "element_id": "CN-08",
-          "text_label": "capability resume cache は、provider・model を含む現在の profile 解決結果、および現在の capability SSoT、dispatcher が常時注入する discipline、capability profile または SSoT が静的 contract input として宣言する policy / contract file の path と内容から得る安定 execution-contract fingerprint に束縛する。profile 解決結果または fingerprint が不一致、読出し不能、hash 化不能、resume 失敗、または期限切れなら、stale な reuse をせず新規 session で dispatch を実行する。"
+          "text_label": "capability resume cache は provider と model に束縛する。現在の profile 解決結果の provider または model が記録値と不一致、resume 失敗、または期限切れなら、stale な reuse をせず新規 session で dispatch を実行する。"
         }
       }
     },
     {
-      "claim_hash": "74e8b9e8740f10fe3f8f7ced0f89f8fe0cd8583364da0b03f4e24210d2dc636b",
-      "evidence_hash": "b2f850145e47d31c928c7bc422029b1dc79ddf0dfe7ab0022d02ebc3919f8fe3",
+      "claim_hash": "300e04b013d62cde45b1bcb77b97f046aa02935380d4da6e7a8b2c774a691c73",
+      "evidence_hash": "6a3047e6a3e70c18439ff82f51f1e54058d97c6aebf518347106d5303ae67dca",
       "verdict": {
         "kind": "pass",
-        "citation": "provider CLI subprocess dispatch の `sotp capability exec` は、同一 track・capability・正規化済み対象 artifact identity の有効 cache entry だけを再開する。"
+        "citation": "track 内では同一 track・capability の有効 cache entry を再開する。track 解決時は track-local cache、track 解決不能時は capability・対象 artifact の repo-relative path による workspace-local cache を選び、初回 dispatch、関心事を切り替えた dispatch、対象 path 未確定の track 外 dispatch、または provider・model 不一致では新規 session で実行する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -118,16 +118,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-09",
-          "text_label": "orchestrator が同一成果物への継続作業と判断して resume option を指定した provider CLI subprocess dispatch の `sotp capability exec` は、同一 track・capability・正規化済み対象 artifact identity の有効 cache entry だけを再開する。track 解決時は track-local cache、track 解決不能時は workspace-local cache を選び、初回 dispatch、関心事を切り替えた dispatch、対象 path 未確定、contract/profile 不一致、または cache・contract/profile の読出し・hash 化不能な dispatch は、同じ対象 artifact でも新規 session で実行して不適切な cache entry を記録しない。"
+          "text_label": "orchestrator が継続作業と判断して resume option を指定した provider CLI subprocess dispatch の `sotp capability exec` は、track 内では同一 track・capability の有効 cache entry を再開する。track 解決時は track-local cache、track 解決不能時は capability・対象 artifact の repo-relative path による workspace-local cache を選び、初回 dispatch、関心事を切り替えた dispatch、対象 path 未確定の track 外 dispatch、または provider・model 不一致では新規 session で実行する。"
         }
       }
     },
     {
-      "claim_hash": "74e8b9e8740f10fe3f8f7ced0f89f8fe0cd8583364da0b03f4e24210d2dc636b",
-      "evidence_hash": "875d295851aaad7f2b846ac29a17deac234c884130fceb70e1a74d652ad4e2b2",
+      "claim_hash": "300e04b013d62cde45b1bcb77b97f046aa02935380d4da6e7a8b2c774a691c73",
+      "evidence_hash": "937d966a0f20ec721cceef92656a12e2918a311e80fd05d24ef46576cc7036e6",
       "verdict": {
         "kind": "pass",
-        "citation": "capability resume の再開失敗または session 期限切れは dispatch を中断させず、新規 session に fallback する。resume capability は現在の briefing と上流 artifact を確認し、全実行 flag を再注入したうえで作業する。"
+        "citation": "capability resume の再開失敗または session 期限切れは dispatch を中断させず、新規 session に fallback する。resume capability は上流 artifact の変更有無を確認し、変更があれば再読し、全実行 flag を再注入したうえで作業する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -142,7 +142,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-10",
-          "text_label": "capability resume の再開失敗または session 期限切れは dispatch を中断させず、新規 session に fallback する。resume capability は現在の briefing と上流 artifact を確認し、全実行 flag を再注入したうえで作業する。"
+          "text_label": "capability resume の再開失敗または session 期限切れは dispatch を中断させず、新規 session に fallback する。resume capability は上流 artifact の変更有無を確認し、変更があれば再読し、全実行 flag を再注入したうえで作業する。"
         }
       }
     },
@@ -172,10 +172,10 @@
     },
     {
       "claim_hash": "4f8b545ac02422a87938e0c1dcf7ac1b079a88d9757e7f78228ede39d936a5e7",
-      "evidence_hash": "92afac0bbb659bd97337b4588d798a5c9a57100730c3f1e5997edeb485faca26",
+      "evidence_hash": "4a0192a8dce970468a6460197209eed1813e7cec9205b0fe5f587428a2e169d4",
       "verdict": {
         "kind": "pass",
-        "citation": "reviewer session cache を provider、model、および capability SSoT・scope-specific severity policy・review-scope 設定・固定 execution-contract briefing 部から得る安定 fingerprint に束縛する。profile 解決結果または fingerprint の不一致、読出し・hash 化不能、resume 失敗、または期限切れでは cache を使わず新規 session を開始する。"
+        "citation": "reviewer session cache を provider と model に束縛する。現在の profile 解決結果の provider または model が記録値と不一致、resume 失敗、または session 期限切れなら、cache を使わず新規 session を開始する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -190,7 +190,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-04",
-          "text_label": "reviewer session cache を provider、model、および capability SSoT・scope-specific severity policy・review-scope 設定・固定 execution-contract briefing 部から得る安定 fingerprint に束縛する。profile 解決結果または fingerprint の不一致、読出し・hash 化不能、resume 失敗、または期限切れでは cache を使わず新規 session を開始する。"
+          "text_label": "reviewer session cache を provider と model に束縛する。現在の profile 解決結果の provider または model が記録値と不一致、resume 失敗、または session 期限切れなら、cache を使わず新規 session を開始する。"
         }
       }
     },
@@ -244,10 +244,10 @@
     },
     {
       "claim_hash": "4f8b545ac02422a87938e0c1dcf7ac1b079a88d9757e7f78228ede39d936a5e7",
-      "evidence_hash": "fad7ea0ceda5130c370b3bb9102e4a58b9e72e39615a868975ee9b045777926e",
+      "evidence_hash": "abd98551eac1e2f5ff60063ab41438480d7b9f728bbbb69d8971125aed426862",
       "verdict": {
         "kind": "pass",
-        "citation": "reviewer session の profile または execution-contract fingerprint が不一致、読出し不能、hash 化不能、resume 失敗、または期限切れなら、stale な reuse をせず新規 session で round を実行する。"
+        "citation": "reviewer session の記録済み provider または model が現在の profile 解決結果と不一致、resume 失敗、または期限切れなら、stale な reuse をせず新規 session で round を実行する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -262,7 +262,7 @@
         "data": {
           "section": "constraint",
           "element_id": "CN-06",
-          "text_label": "reviewer session の profile または execution-contract fingerprint が不一致、読出し不能、hash 化不能、resume 失敗、または期限切れなら、stale な reuse をせず新規 session で round を実行する。"
+          "text_label": "reviewer session の記録済み provider または model が現在の profile 解決結果と不一致、resume 失敗、または期限切れなら、stale な reuse をせず新規 session で round を実行する。"
         }
       }
     },
@@ -292,10 +292,10 @@
     },
     {
       "claim_hash": "4f8b545ac02422a87938e0c1dcf7ac1b079a88d9757e7f78228ede39d936a5e7",
-      "evidence_hash": "79de3a84f3c444f7bdc3d817d4438c16f21fd9c1fb19f39a4d77da9a43bcdf0b",
+      "evidence_hash": "4366b1c9706f0833d253640513d73ad5eee6c781b408cbdf1e9964e2363a4728",
       "verdict": {
         "kind": "pass",
-        "citation": "同一 track・scope・round 種別で fixer 後に再実行した reviewer round は、現在の profile 解決結果と安定 fingerprint が一致する有効な prior session を resume し、reviewer は現在の file list と diff から scope 全件を再判定する。"
+        "citation": "同一 track・scope・round 種別で fixer 後に再実行した reviewer round は、現在の profile 解決結果の provider と model が一致する有効な prior session を resume し、全実行 flag を明示的に再指定したうえで reviewer は現在の file list と diff から scope 全件を再判定する。resume は文脈だけを再利用し、その round の judgment と review record は新規 session の round と同じ単位・意味で記録される。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -310,16 +310,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-03",
-          "text_label": "同一 track・scope・round 種別で fixer 後に再実行した reviewer round は、現在の profile 解決結果と安定 fingerprint が一致する有効な prior session を resume し、reviewer は現在の file list と diff から scope 全件を再判定する。resume は文脈だけを再利用し、その round の judgment と review record は新規 session の round と同じ単位・意味で記録される。"
+          "text_label": "同一 track・scope・round 種別で fixer 後に再実行した reviewer round は、現在の profile 解決結果の provider と model が一致する有効な prior session を resume し、全実行 flag を明示的に再指定したうえで reviewer は現在の file list と diff から scope 全件を再判定する。resume は文脈だけを再利用し、その round の judgment と review record は新規 session の round と同じ単位・意味で記録される。"
         }
       }
     },
     {
       "claim_hash": "4f8b545ac02422a87938e0c1dcf7ac1b079a88d9757e7f78228ede39d936a5e7",
-      "evidence_hash": "3f4ac830bfbd259c118b6b050210bc74d70e0ec212ca752fba4c05aaa258a6d0",
+      "evidence_hash": "8fab669df39131c60a84a964399837e9d35abd0be89f8e1f80b907e58f882ee1",
       "verdict": {
         "kind": "pass",
-        "citation": "reviewer の初回 round、fast から final への escalation、profile または fingerprint 不一致、contract 読出し・hash 化不能、resume 失敗、または session 期限切れでは、新規 session で round を実行する。resume・新規のどちらでも model・sandbox・effort の全 flag は明示指定される。"
+        "citation": "reviewer の初回 round、fast から final への escalation、profile 解決結果の provider または model の不一致、resume 失敗、または session 期限切れでは、新規 session で round を実行する。resume・新規のどちらでも model・sandbox・effort の全 flag は明示指定される。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -334,16 +334,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "reviewer の初回 round、fast から final への escalation、profile または fingerprint 不一致、contract 読出し・hash 化不能、resume 失敗、または session 期限切れでは、新規 session で round を実行する。resume・新規のどちらでも model・sandbox・effort の全 flag は明示指定される。"
+          "text_label": "reviewer の初回 round、fast から final への escalation、profile 解決結果の provider または model の不一致、resume 失敗、または session 期限切れでは、新規 session で round を実行する。resume・新規のどちらでも model・sandbox・effort の全 flag は明示指定される。"
         }
       }
     },
     {
-      "claim_hash": "e78401c52a041889c89a26cbee7ff3b19204c45b172fb64e89a27f09cee5581f",
-      "evidence_hash": "6c07a808c08de878a2b70f499456f3d07b57191518430f7c9ca07eb54124f353",
+      "claim_hash": "20ec78fb418cc2c4c76e58ed234c16cb2c1548a9509015bc2fae35833ca956a0",
+      "evidence_hash": "fe109946d1995c4c732bc8fb54bbffe76f5ac009147a01c150500c59b2706fa5",
       "verdict": {
         "kind": "pass",
-        "citation": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。"
+        "citation": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -358,16 +358,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-05",
-          "text_label": "reviewer 起動 wrapper は layer ごとに、実装側 build-input closure、catalogue declaration、baseline、evaluator contract、rustdoc-extraction contract、および検証済み live rustdoc snapshot の一致を機械的に判定する。すべての signal 評価入力が不変なときだけ評価を skip し、catalogue・baseline・evaluator 側の変化では必要な評価を実行する。"
+          "text_label": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
         }
       }
     },
     {
-      "claim_hash": "e78401c52a041889c89a26cbee7ff3b19204c45b172fb64e89a27f09cee5581f",
-      "evidence_hash": "c3b04f861ace9021ceb51a514dfbf39506260bc570806dd1506f0c15ceb20a7e",
+      "claim_hash": "20ec78fb418cc2c4c76e58ed234c16cb2c1548a9509015bc2fae35833ca956a0",
+      "evidence_hash": "4d96c7f24b5212b1d4d365bae36f9db185a0d0ae6acdf0baa816e2998dd2972f",
       "verdict": {
         "kind": "pass",
-        "citation": "現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。"
+        "citation": "catalogue または spec の変更時は signal を再評価するが、実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -382,16 +382,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-06",
-          "text_label": "catalogue または baseline の変更時は、現行実装側 input と rustdoc-extraction contract が artifact 記録値に一致し、解決済み target の live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ rustdoc 抽出を省略する。rustdoc-extraction contract の変更・不明、実装側 input の不一致・不明、または snapshot 検証不能では rustdoc 抽出から再計算する。"
+          "text_label": "catalogue または spec の変更時は signal を再評価するが、実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
         }
       }
     },
     {
-      "claim_hash": "e78401c52a041889c89a26cbee7ff3b19204c45b172fb64e89a27f09cee5581f",
-      "evidence_hash": "878e1860a6cdc6b72117348b0a177487dd1b97ca5d8e218b1844f3257f386a6d",
+      "claim_hash": "20ec78fb418cc2c4c76e58ed234c16cb2c1548a9509015bc2fae35833ca956a0",
+      "evidence_hash": "7f33153785739162ebf3918b9670f5bc636a95404859166e5f883cbffb5313e1",
       "verdict": {
         "kind": "pass",
-        "citation": "per-layer type-signals artifact を schema version bump し、既存 declaration hash と対称に implementation-side input、baseline、live rustdoc snapshot、evaluator contract、および rustdoc-extraction contract の freshness 情報を保持する。completed track の旧 artifact を migration せず、旧値または必要値が使えない場合は保守的に再計算する。"
+        "citation": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -406,16 +406,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-07",
-          "text_label": "per-layer type-signals artifact を schema version bump し、既存 declaration hash と対称に implementation-side input、baseline、live rustdoc snapshot、evaluator contract、および rustdoc-extraction contract の freshness 情報を保持する。completed track の旧 artifact を migration せず、旧値または必要値が使えない場合は保守的に再計算する。"
+          "text_label": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。"
         }
       }
     },
     {
-      "claim_hash": "e78401c52a041889c89a26cbee7ff3b19204c45b172fb64e89a27f09cee5581f",
-      "evidence_hash": "605ebac5f18135706f47d634fdf122b5fb7e14de1f01c3749b082f4dbdd45abf",
+      "claim_hash": "20ec78fb418cc2c4c76e58ed234c16cb2c1548a9509015bc2fae35833ca956a0",
+      "evidence_hash": "42e488012663edfbfda5cbf685eb05758026cbc08d403a3c9a8b7eabdeeb2299",
       "verdict": {
         "kind": "pass",
-        "citation": "D3 の reuse 判定は手選別の file list ではなく、対象 rustdoc invocation の完全に解決・正規化された build-input closure と content hash に基づく。判定粒度は layer（crate）単位とし、影響がある layer だけを再計算する。"
+        "citation": "判定粒度は layer（crate）単位とし、変更がある layer だけを再計算する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -430,16 +430,16 @@
         "data": {
           "section": "constraint",
           "element_id": "CN-05",
-          "text_label": "D3 の reuse 判定は手選別の file list ではなく、対象 rustdoc invocation の完全に解決・正規化された build-input closure と content hash に基づく。判定粒度は layer（crate）単位とし、影響がある layer だけを再計算する。"
+          "text_label": "D3 の reuse 判定は、対象 crate の source 内容、依存解決（lockfile）、toolchain 識別子から得る content hash に基づく。判定粒度は layer（crate）単位とし、変更がある layer だけを再計算する。"
         }
       }
     },
     {
-      "claim_hash": "e78401c52a041889c89a26cbee7ff3b19204c45b172fb64e89a27f09cee5581f",
-      "evidence_hash": "311e0eb218466efcff988ce152df338433e52d110ecd1ea9dc385a17853dfb62",
+      "claim_hash": "20ec78fb418cc2c4c76e58ed234c16cb2c1548a9509015bc2fae35833ca956a0",
+      "evidence_hash": "a9065a33eb4a304a8ad5cc05e91b16d06b12b63099e5dc95f1f4092e14690a30",
       "verdict": {
         "kind": "pass",
-        "citation": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+        "citation": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -454,16 +454,16 @@
         "data": {
           "section": "constraint",
           "element_id": "CN-07",
-          "text_label": "build-input closure を確定できない場合、または live rustdoc snapshot を検証できない場合は、誤った signal 評価 skip や snapshot reuse をせず、rustdoc 抽出から再計算する。"
+          "text_label": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
         }
       }
     },
     {
-      "claim_hash": "e78401c52a041889c89a26cbee7ff3b19204c45b172fb64e89a27f09cee5581f",
-      "evidence_hash": "3d8ca7a4e5f8437ee7166bf4218dfb6a5357d96d0f53a483c8b9fd64fe4d97d9",
+      "claim_hash": "20ec78fb418cc2c4c76e58ed234c16cb2c1548a9509015bc2fae35833ca956a0",
+      "evidence_hash": "ddc5c857319ee8bcff94b6ef60d1efbbdd345d5d03c95098a4e33710d77d2a07",
       "verdict": {
         "kind": "pass",
-        "citation": "解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。いずれかの評価入力または snapshot 検証が不一致または不明なら、AC-06/AC-07 の条件に従って signal 評価または rustdoc 抽出からの再計算を実行する。"
+        "citation": "declaration_hash または spec の差分は signal 再評価の要否だけを決め、両方が一致するときは評価ごと skip し、declaration_hash のみが不一致で implementation-side input hash が一致するときは AC-06 の条件に従って rustdoc を起動せず signal を再評価する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -478,16 +478,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "layer の implementation-side input、rustdoc-extraction contract、catalogue declaration、baseline、evaluator contract、および catalogue↔spec 評価に使う spec が対応する記録値とすべて一致し、解決済み live rustdoc JSON を安全に読出し・parse でき、その内容 hash が記録済み snapshot hash と一致するときだけ、reviewer prelude はその signal 評価を skip する。いずれかの評価入力または snapshot 検証が不一致または不明なら、AC-06/AC-07 の条件に従って signal 評価または rustdoc 抽出からの再計算を実行する。"
+          "text_label": "rustdoc 抽出の要否は、layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。一致時は rustdoc 抽出を skip し、不一致または判定不能時は AC-07 の条件に従って rustdoc 抽出から再計算する。declaration_hash または spec の差分は signal 再評価の要否だけを決め、両方が一致するときは評価ごと skip し、declaration_hash のみが不一致で implementation-side input hash が一致するときは AC-06 の条件に従って rustdoc を起動せず signal を再評価する。"
         }
       }
     },
     {
-      "claim_hash": "e78401c52a041889c89a26cbee7ff3b19204c45b172fb64e89a27f09cee5581f",
-      "evidence_hash": "4ddbdf94614315742b8e7fd77f2c188e79f6b91af95ef1f88f2d03ea4241a952",
+      "claim_hash": "20ec78fb418cc2c4c76e58ed234c16cb2c1548a9509015bc2fae35833ca956a0",
+      "evidence_hash": "f4297f58a9fc5f4c1d1dcc4be1283815b456de3dd577387a3559727daadf4f52",
       "verdict": {
         "kind": "pass",
-        "citation": "catalogue、baseline、または catalogue↔spec 評価に使う spec だけが変わった layer は、implementation-side input と rustdoc-extraction contract が一致し、解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。"
+        "citation": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -502,16 +502,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "catalogue、baseline、または catalogue↔spec 評価に使う spec だけが変わった layer は、implementation-side input と rustdoc-extraction contract が一致し、解決済み live rustdoc JSON の安全な読出し・parse と snapshot hash 検証に成功するとき、rustdoc を起動せずに signal 評価を再実行する。evaluator contract の変化は評価を強制するが、この snapshot 条件を満たす限り rustdoc 抽出だけは再利用できる。"
+          "text_label": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。"
         }
       }
     },
     {
-      "claim_hash": "e78401c52a041889c89a26cbee7ff3b19204c45b172fb64e89a27f09cee5581f",
-      "evidence_hash": "68e17c1ccece0c75f8f50889fd05215d9b9658a163d791002e3ce1d4dc1876f9",
+      "claim_hash": "20ec78fb418cc2c4c76e58ed234c16cb2c1548a9509015bc2fae35833ca956a0",
+      "evidence_hash": "ec707111f47c24a28d5c6c1e8921016b80f9f1df9c57f042f873d4658a71b468",
       "verdict": {
         "kind": "pass",
-        "citation": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+        "citation": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -526,16 +526,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-07",
-          "text_label": "implementation-side input または rustdoc-extraction contract の不一致・不明、target JSON の不在・読出し・parse 失敗、または snapshot hash 不一致では、snapshot を再利用せず rustdoc 抽出から再計算する。build-input closure を取得または正規化できない場合も同じ経路になる。"
+          "text_label": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
         }
       }
     },
     {
-      "claim_hash": "e78401c52a041889c89a26cbee7ff3b19204c45b172fb64e89a27f09cee5581f",
-      "evidence_hash": "3586a0eb53a01ed37c5ee5d487f84bf5e48e640aca8812c7e26e22efa3f17a69",
+      "claim_hash": "20ec78fb418cc2c4c76e58ed234c16cb2c1548a9509015bc2fae35833ca956a0",
+      "evidence_hash": "12a6dd207b9fc471c6baee3fbfc9973493acb2a524b5679be39bd041c29730dd",
       "verdict": {
         "kind": "pass",
-        "citation": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。completed track の artifact は migration しない。"
+        "citation": "per-layer type-signals artifact は、D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -550,7 +550,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "per-layer type-signals artifact の新 schema は D3 の freshness 情報を計算結果と同じ artifact に記録し、旧 artifact または必要 hash が欠ける artifact を reuse 可能と誤認しない。completed track の artifact は migration しない。"
+          "text_label": "per-layer type-signals artifact は、D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。"
         }
       }
     }

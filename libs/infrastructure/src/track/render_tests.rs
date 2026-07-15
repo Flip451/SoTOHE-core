@@ -1618,14 +1618,10 @@ fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
         .as_str()
         .to_owned();
     let signal_file = serde_json::json!({
-        "schema_version": 2,
+        "schema_version": 3,
         "generated_at": "2026-04-19T00:00:00Z",
         "declaration_hash": hash,
         "implementation_input_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        "baseline_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-        "live_rustdoc_snapshot_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-        "evaluator_contract_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
-        "rustdoc_extraction_contract_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
         "signals": [
             {
                 "type_name": "TrackId",

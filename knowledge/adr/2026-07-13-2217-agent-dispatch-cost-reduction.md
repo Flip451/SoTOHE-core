@@ -1,5 +1,5 @@
 ---
-adr_id: 2026-07-13-2217-agent-dispatch-cost-reduction
+adr_id: agent-dispatch-cost-reduction
 decisions:
   - id: D1
     user_decision_ref: "chat_segment:session-01DNXZbHA36W7ziMHyccmyvt:2026-07-13 fast/final 二段構成を維持し、capability と fast/final 毎に effort を指定可能にして fast を low にする提案 + 同日追補: final は各 provider の最大段階を規定し effort 未指定は fail-closed、pr-reviewer を例外とし ref-verifier-chain1/chain2 を対象に含める"
@@ -45,25 +45,23 @@ effort 指定の無い dispatch は fail-closed とする — 対象 capability�
 
 fixer の修正後に同じ scope・同じ round 種別で再判定する場合、前回 reviewer session を provider の session 再開機構（codex exec resume / claude -p の resume）で継続する。再開 prompt は再判定の依頼のみを伝え、変更内容の列挙はしない — 差分は reviewer 自身が scope の file list と diff から確認する（runner 側で差分を要約して渡すことは、判定材料の選別という判断の混入経路になるため行わない）。再入 round でも scope 全件を再判定する権限・義務を持つことは、reviewer 系 capability の運用契約（capability SSoT 文書）に常設の規定として記載し、prompt ごとの注入に依存させない。初回 round と fast→final の escalation は従来どおり新規 session とする（判定の独立性を保ち、また model が変わる escalation は再開不能なため）。
 
-session id は reviewer 実行基盤が track × scope × round 種別のキーで保存する。保存先は track 単位の機械 local transient として track 成果物 directory 配下に gitignore 管理で置き、committed な SoT file には入れない（新設の top-level transient path は template export の境界 manifest 分類に抵触するため作らない）。cache entry は provider と model に加え、**安定した execution contract だけ**から計算した fingerprint を束縛する。入力は、現在の reviewer capability SSoT、scope-specific severity policy、scope identity と file-selection 規則を定める review-scope 設定、及び生成済み review briefing のうちこれらの固定 template / 設定から機械的に切り出せる execution-contract 部分であり、いずれも path と内容を hash 化する。briefing の Design Intent・再判定依頼等の可変 task payload、解決済み scope file list の内容、及びその diff は fingerprint に含めない。これらは fixer 修正のたびに変わる**現在の判定材料**であり、再開の可否ではなく再開後に reviewer 自身が読み直して全件再判定する対象である。読み出し時に現在の profile 解決結果又は安定 contract fingerprint と不一致なら失効として新規 session に落とす。安定 contract のいずれかを読出し又は hash 化できない場合も再開を許さず新規 session にする。再開の失敗・session 期限切れも同様に新規 session へ fallback する（resume という最適化は諦めるが、round の実行自体は止めない）。
+session id は reviewer 実行基盤が track × scope × round 種別のキーで保存する。保存先は track 単位の機械 local transient として track 成果物 directory 配下に gitignore 管理で置き、committed な SoT file には入れない（新設の top-level transient path は template export の境界 manifest 分類に抵触するため作らない）。cache entry は provider と model を束縛し、現在の profile 解決結果と不一致なら失効として新規 session に落とす。再開の失敗・session 期限切れも同様に新規 session へ fallback する（resume という最適化は諦めるが、round の実行自体は止めない）。
 
 **再開時は model・sandbox・effort の全実行 flag を、引き継ぎ挙動に依存せず毎回明示的に再指定する。** 実機検証で provider 間の挙動差を確認している — codex の再開は元 session の設定を引き継がず、無指定では project 既定（別 model・書き込み可 sandbox・高 effort）に落ちる。claude の再開は model を引き継ぐことを確認したが、effort 等の引き継ぎ有無は出力から観測できない。引き継ぎに依存した素の再開は、provider や version によって sandbox 逸脱を含む欠陥となり得るため、明示再指定を両 provider 共通の必須規則とする。
 
 ### D3: reviewer 起動 wrapper の signal 再計算は対象コードの差分がないとき skip する
 
-reviewer 起動前の gate 前段では、**rustdoc 抽出だけを**前回計算時点から実装側入力と rustdoc-extraction contract が不変な layer で skip する。signal 評価そのものを省略できるのは、その評価に使う全入力 — 実装側 input、catalogue declaration、baseline、及び evaluator contract — が不変である場合に限る。catalogue 又は baseline の変更時は、検証済みの live rustdoc snapshot を用いて implementation↔catalogue signal を再評価する。evaluator contract の変更又は判定不能時も signal 評価を必須にするが、**rustdoc-extraction contract が一致して検証済み snapshot の条件を満たす場合に限り**、それだけで rustdoc 抽出までは要求しない。rustdoc-extraction contract の変更又は判定不能時は snapshot を無効として rustdoc 抽出から再計算する。spec の変更時は catalogue↔spec 側の評価を再実行するが、これも rustdoc 抽出の再実行理由にはしない。いずれの reuse 判定も内容 hash の機械的比較で行い、signal 評価 skip の判定不能時は signal 評価を、snapshot 再利用の判定不能時は rustdoc 抽出からの再計算を必須にする（skip という省略に対して fail-closed）。
+reviewer 起動前の gate 前段（rustdoc 抽出を伴う implementation↔catalogue signal の再計算）は、前回計算時点から対象 Rust コードに変更がない場合に skip する。判定は内容 hash の機械的比較で行い、判定不能な場合は skip を許さず再計算に倒す（skip という省略に対して fail-closed）。catalogue や spec の変更は signal の再評価対象だが rustdoc 抽出の再実行を要しないため、再計算の要否は入力ごとに分離して判定する。
 
-skip 判定の状態は別の cache file を新設せず、計算産物である per-layer type-signals artifact 自体に実装側入力 hash、baseline hash、live rustdoc snapshot hash、evaluator-contract hash、及び rustdoc-extraction-contract hash として記録する。既存 artifact は catalogue 側入力の hash（declaration_hash）を既に保持しており、これらを対称に加えることで、鮮度判定は「artifact に記録された入力 hash と現在の入力 hash の一致」という artifact 自己記述の検証になる（鮮度情報とそれが記述する計算結果が同一 file に閉じ、別 file 間の対応管理が発生しない）。evaluator contract は、signal 出力の意味に影響する evaluator 実装の解決済み code / build identity、rule・設定 file の内容、schema version、及び有効 feature / 設定値の完全な正規化済み closure とする。rustdoc-extraction contract は、Cargo target と rustdoc root の解決、rustdoc invocation の引数・出力形式、及び snapshot の読出し・検証に影響する実装 code / build identity と設定値の完全な正規化済み closure とする。ある実装又は設定が両方へ影響する場合は両方の contract に含める。実装は両 contract を機械的に解決して hash 化する。現在の evaluator-contract hash が artifact 記録値と不一致、又は旧 artifact を含めいずれかの値を読出し・hash 化できない場合は signal 評価を必須にする。現在の rustdoc-extraction-contract hash が不一致、又は読出し・hash 化できない場合は snapshot を無効として rustdoc 抽出から再計算する。snapshot 本体の正本は、当該 rustdoc invocation が解決した Cargo target directory の `doc/<resolved-rustdoc-root>.json`（通常は workspace の `target/doc/`）とする。再利用経路は同一の target / rustdoc-root 解決規則でこの既存 JSON の path を求め、通常の symlink guard と JSON parser を通して**直接読出す**。この経路は Cargo / rustdoc を起動しないため、新しい transient cache は作らない。catalogue / baseline 変更時にこれを再利用できるのは、現在の**実装側 input hash**と rustdoc-extraction-contract hash が artifact 記録値に一致し、当該 JSON が存在して読出し・parse に成功し、その内容 hash が記録済み snapshot hash と一致する場合だけである。baseline hash の不一致又は evaluator-contract hash の不一致は signal 評価を必須にするが、snapshot 再利用を拒否する条件にはしない。実装側 input hash、rustdoc-extraction-contract hash、又は snapshot 検証のいずれかが欠ける又は不一致なら、snapshot を信用せず rustdoc 抽出から再計算する。
-
-実装側 input hash は手選別の file list ではなく、対象 rustdoc invocation の**完全な解決済み build-input closure**を正規化して hash 化する。これは対象 crate の source / manifest だけでなく、workspace 内又は path dependency の source・manifest、build script と proc-macro の source、依存 package の解決済み source identity / checksum、lockfile、workspace と crate の Cargo manifest、Cargo config、toolchain 識別子、target triple、有効 feature 集合、及び rustdoc / rustc 又は build script に到達する設定値（`RUSTFLAGS`、`RUSTDOCFLAGS`、Cargo config と許可された環境値を含む）を含む。実装が closure を取得・正規化できない場合、又は build script / 環境 / 設定の入力で影響有無を機械的に確定できないものを検出した場合は hash を確定させず、snapshot / signal の reuse を許さず rustdoc 抽出から再計算に倒す。判定と skip の粒度は layer（crate）単位とし、変更のあった layer のみ再計算する。
+skip 判定の状態は別の cache file を新設せず、計算産物である per-layer type-signals artifact 自体に実装側入力の hash として記録する。既存 artifact は catalogue 側入力の hash（declaration_hash）を既に保持しており、実装側入力の hash を対称に加えることで、鮮度判定は「artifact に記録された入力 hash と現在の入力 hash の一致」という artifact 自己記述の検証になる（鮮度情報とそれが記述する計算結果が同一 file に閉じ、別 file 間の対応管理が発生しない）。hash の入力は対象 crate の source 内容に加え、rustdoc 出力に影響する依存解決（lockfile）と toolchain の識別子を含める。判定と skip の粒度は layer（crate）単位とし、変更のあった layer のみ再計算する。
 
 ### D4: capability dispatch も `capability exec` の resume オプションで session を再開できるようにする
 
 `sotp capability exec` に session 再開の option を追加する。orchestrator は、同一 track × 同一 capability の**継続作業**（同じ成果物への追補・修正の再入、中断からの続行）と判断した dispatch でこの option を使い、初回 dispatch と関心事の切り替わる dispatch は従来どおり新規 session とする（opt-in — 再開するかの判断は呼び出し側が持つ）。
 
-session id は capability 実行基盤が **track × capability × 対象成果物 identity** のキーで保存する。対象成果物 identity は対象 artifact の repo-relative path（複数を対象とする dispatch は path の正規化済み順序付き集合）とし、読み出し時にも同じ identity の一致を必須とする。対象 path が未確定の dispatch は track cache の対象外とする（新規 session で実行し、session id も記録しない）。保存先は D2 と共通の規則に従う: **track 単位の機械 local transient として track 成果物 directory 配下に gitignore 管理で置き、committed な SoT file（review 記録・track identity 等）には入れない**。track の削除・archive と lifecycle を共にし、並行 track 間または同一 track 内の別成果物間で混線しない。cache entry は session id に加えて **provider と model、及び安定した execution contract の path と内容から計算した fingerprint**を束縛する。安定 contract は現在の capability SSoT、dispatcher が常時注入する discipline、及び capability profile / SSoT が静的 contract input として宣言した policy / contract file から成り、dispatch briefing の本文そのものは含めない。briefing の task 指示・追補 / 修正依頼、対象成果物の現在内容、及び diff は継続作業ごとに変わり得る可変 payload であるため、同じ対象成果物への opt-in 再入を失効させる理由にはしない。再開時は現在渡された briefing を読み、対象成果物と必要な上流入力の変更を capability 自身が確認してから作業する。読み出し時に現在の profile 解決結果又は fingerprint と不一致なら失効（新規 session）として扱い、安定 contract のいずれかを読出し又は hash 化できない場合も resume しない — provider 間に session 互換はなく、model 跨ぎ又は古い作業契約での再開は品質劣化を伴うためである。
+session id は capability 実行基盤が track × capability のキーで保存する。保存先は D2 と共通の規則に従う: **track 単位の機械 local transient として track 成果物 directory 配下に gitignore 管理で置き、committed な SoT file（review 記録・track identity 等）には入れない**。track の削除・archive と lifecycle を共にし、並行 track 間で混線しない。cache entry は session id に加えて **provider と model を束縛**し、読み出し時に現在の profile 解決結果と不一致なら失効（新規 session）として扱う — provider 間に session 互換はなく、model 跨ぎの再開は品質劣化を伴うためである。
 
-track 外の dispatch でも resume を使えるようにする（pre-track ADR 起草の adr-editor のように、branch-bound の track 解決が失敗する base branch 上の文脈）。この場合の session id は、workspace の機械 local transient 領域（briefing file 置き場と同じ gitignore 済みの既存 runtime path 配下 — 新設の top-level path は作らない）に **capability × 対象 artifact（repo-relative path）** のキーで保存する。capability 単独のキーは別対象への切り替え時に無関係な session を掴むため、対象 artifact のキー成分で機械的に失効させる。対象 path が未確定の dispatch は cache の対象外とする（新規 session で実行し、session id も記録しない）。path が確定した dispatch から session id を記録し、以後の再入で resume を使えるようにする。track cache と workspace cache のどちらを使うかは dispatch 時の track 解決結果で機械的に分岐し（解決成功 → track cache、解決失敗 → workspace cache）、新たな判定機構は設けない。provider / model と execution-contract fingerprint の束縛、読出し / hash 化不能時を含む失効、期限切れ時の新規 session への fallback は track cache と同一規則とする。
+track 外の dispatch でも resume を使えるようにする（pre-track ADR 起草の adr-editor のように、branch-bound の track 解決が失敗する base branch 上の文脈）。この場合の session id は、workspace の機械 local transient 領域（briefing file 置き場と同じ gitignore 済みの既存 runtime path 配下 — 新設の top-level path は作らない）に **capability × 対象 artifact（repo-relative path）** のキーで保存する。capability 単独のキーは別対象への切り替え時に無関係な session を掴むため、対象 artifact のキー成分で機械的に失効させる。対象 path が未確定の dispatch は cache の対象外とする（新規 session で実行し、session id も記録しない）。path が確定した dispatch から session id を記録し、以後の再入で resume を使えるようにする。track cache と workspace cache のどちらを使うかは dispatch 時の track 解決結果で機械的に分岐し（解決成功 → track cache、解決失敗 → workspace cache）、新たな判定機構は設けない。provider / model の束縛と、失効・期限切れ時の新規 session への fallback は track cache と同一規則とする。
 
 再開時も dispatcher は通常の dispatch と同一の解決（profile からの model / effort、provider-native 定義からの sandbox）を行い、**解決した全実行 flag を明示的に再注入する**（D2 と同一の規則。provider の引き継ぎ挙動に依存しない）。再開の失敗・session 期限切れは新規 session に fallback し、dispatch 自体は止めない。
 
@@ -73,9 +71,9 @@ writer 特有の注意として、再入の間に他 writer が上流 artifact �
 
 ## Rejected Alternatives
 
-### A. fast/final の二段構成又は effort tier を統合する
+### A. fast/final の二段構成を統合して 1 round にする
 
-round 数を半減して二段構成を統合すると、前置フィルタ（安価な model での早期発見）と full-model 最終判定という役割分離が失われる。二段構成を保ったまま `merge-fast-final-tiers` で fast / final の effort tier を共通化しても、fast だけを低 effort にして単価を下げる D1 の目的を達成できない。二段構成と tier 別 effort をともに維持するため却下。
+round 数は半減するが、前置フィルタ（安価な model での早期発見）と full-model 最終判定という役割分離が失われる。二段構成は維持し、fast の単価を effort で下げる方針を採るため却下。
 
 ### B. provider CLI の project 全体設定で effort を一律に下げる
 
@@ -89,9 +87,9 @@ escalation は model が変わるため技術的に再開できず、また fina
 
 実機検証で provider 間の挙動差を確認した。codex は再開時に model・sandbox・effort を引き継がず project 既定に落ちる（軽量 model・読み取り専用で記録した session が別 model・書き込み可 sandbox で再開され失敗した）。claude は model を引き継ぐが、effort 等の引き継ぎ有無は観測できない。挙動が provider 依存かつ一部観測不能である以上、引き継ぎ前提の素の再開は sandbox 逸脱を含む欠陥となり得るため、全 flag の明示再指定を必須とする。
 
-### E. D2 の reviewer を毎 round 新規 session のままにし、provider 側の prompt cache に頼る
+### E. 毎 round 新規 session のまま provider 側の prompt cache に頼る
 
-`fresh-every-round` は server 側の cache により入力 token 費用を下げられるが、reviewer がローカルで行う file 読み・diff 取得・探索の実時間は削減されない。round 単価の実測支配項は後者であり、同一 scope × 同一 round 種別の再判定では D2 の session 再開で削減できるため却下。
+server 側の cache は入力 token 費用を下げるが、reviewer がローカルで行う file 読み・diff 取得・探索の実時間は削減されない。round 単価の実測支配項は後者であるため却下。
 
 ### F. gate 前段の signal 再計算を毎 round 維持する
 

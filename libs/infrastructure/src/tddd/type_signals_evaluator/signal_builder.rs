@@ -1,6 +1,10 @@
 //! Conversion of three-way evaluator output into persisted type signals.
 
-use super::*;
+use std::collections::{BTreeMap, HashMap};
+
+use domain::{ConfidenceSignal, TypeSignal};
+
+use crate::tddd::{ThreeWaySignal, ThreeWaySignalKind};
 
 /// Intermediate accumulator entry for a single top-level item.
 ///

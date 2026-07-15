@@ -260,6 +260,51 @@ mod tests {
     }
 
     #[test]
+    fn test_evaluate_layer_rejects_items_dir_outside_workspace() {
+        let workspace = tempfile::tempdir().unwrap();
+        let external = tempfile::tempdir().unwrap();
+        let items_dir = external.path().join("track/items");
+        std::fs::create_dir_all(items_dir.join("my-track")).unwrap();
+
+        let result = TypeSignalsExecutorAdapter::new().evaluate_layer(
+            &items_dir,
+            &track_id(),
+            workspace.path(),
+            &domain_binding("domain"),
+        );
+
+        assert!(
+            matches!(&result, Err(error) if error.0.contains("resolves outside workspace_root")),
+            "items_dir outside the workspace must be rejected before reads: {result:?}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_evaluate_layer_rejects_symlinked_catalogue_before_read() {
+        let workspace = tempfile::tempdir().unwrap();
+        let items_dir = workspace.path().join("track/items");
+        let track_dir = items_dir.join("my-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let outside_catalogue = workspace.path().join("outside-types.json");
+        std::fs::write(&outside_catalogue, "{}").unwrap();
+        std::os::unix::fs::symlink(&outside_catalogue, track_dir.join("domain-types.json"))
+            .unwrap();
+
+        let result = TypeSignalsExecutorAdapter::new().evaluate_layer(
+            &items_dir,
+            &track_id(),
+            workspace.path(),
+            &domain_binding("domain"),
+        );
+
+        assert!(
+            matches!(&result, Err(error) if error.0.contains("symlink guard rejected catalogue")),
+            "a symlinked catalogue must be rejected before read: {result:?}"
+        );
+    }
+
+    #[test]
     fn test_evaluate_layer_multi_target_absent_catalogue_returns_error() {
         // Multi-target evaluation is unsupported even if the catalogue is absent.
         let dir = tempfile::tempdir().unwrap();
@@ -327,7 +372,7 @@ mod tests {
         );
         let msg = result.unwrap_err().to_string();
         assert!(
-            msg.contains("failed to read catalogue"),
+            msg.contains("cannot read catalogue"),
             "error must identify the missing input, got: {msg}"
         );
     }

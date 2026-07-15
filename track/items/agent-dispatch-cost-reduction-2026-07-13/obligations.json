@@ -3,6 +3,538 @@
   "obligations": [
     {
       "id": {
+        "entry_key": "ObligationsDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:new"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ObligationsDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:new' of ObligationsDocument",
+      "declaration_hash": "331effb448fbf4c20176c6eb2201a576d20ef47979fda91b6a359123ac325040",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ObligationsDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:track_id"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ObligationsDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:track_id' of ObligationsDocument",
+      "declaration_hash": "331effb448fbf4c20176c6eb2201a576d20ef47979fda91b6a359123ac325040",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ObligationsDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:obligations"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ObligationsDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:obligations' of ObligationsDocument",
+      "declaration_hash": "331effb448fbf4c20176c6eb2201a576d20ef47979fda91b6a359123ac325040",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ObligationsDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:edge_ownership"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ObligationsDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:edge_ownership' of ObligationsDocument",
+      "declaration_hash": "331effb448fbf4c20176c6eb2201a576d20ef47979fda91b6a359123ac325040",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ObligationsDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:owners_of_edge"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ObligationsDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:owners_of_edge' of ObligationsDocument",
+      "declaration_hash": "331effb448fbf4c20176c6eb2201a576d20ef47979fda91b6a359123ac325040",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ObligationsDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:staleness_against"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "ObligationsDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:staleness_against' of ObligationsDocument",
+      "declaration_hash": "331effb448fbf4c20176c6eb2201a576d20ef47979fda91b6a359123ac325040",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestBindingsDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:new"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "TestBindingsDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:new' of TestBindingsDocument",
+      "declaration_hash": "1637e09f59d1de3026e583d6a64a822997f70bdc973e63d9a4cb3d621382181f",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestBindingsDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:track_id"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "TestBindingsDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:track_id' of TestBindingsDocument",
+      "declaration_hash": "1637e09f59d1de3026e583d6a64a822997f70bdc973e63d9a4cb3d621382181f",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestBindingsDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:records"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "TestBindingsDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:records' of TestBindingsDocument",
+      "declaration_hash": "1637e09f59d1de3026e583d6a64a822997f70bdc973e63d9a4cb3d621382181f",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestBindingsDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:waived_edge_ids"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "TestBindingsDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:waived_edge_ids' of TestBindingsDocument",
+      "declaration_hash": "1637e09f59d1de3026e583d6a64a822997f70bdc973e63d9a4cb3d621382181f",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestBindingsDocument",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:is_edge_waived"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "TestBindingsDocument"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:is_edge_waived' of TestBindingsDocument",
+      "declaration_hash": "1637e09f59d1de3026e583d6a64a822997f70bdc973e63d9a4cb3d621382181f",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestObligation",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:new"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "TestObligation"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:new' of TestObligation",
+      "declaration_hash": "df58d855b8fa43d51dcd0464b54d0875cd5640b8c23ad47a52a69487d01d7c95",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestObligation",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:id"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "TestObligation"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:id' of TestObligation",
+      "declaration_hash": "df58d855b8fa43d51dcd0464b54d0875cd5640b8c23ad47a52a69487d01d7c95",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestObligation",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:target_entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "TestObligation"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:target_entry' of TestObligation",
+      "declaration_hash": "df58d855b8fa43d51dcd0464b54d0875cd5640b8c23ad47a52a69487d01d7c95",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestObligation",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:target_role"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "TestObligation"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:target_role' of TestObligation",
+      "declaration_hash": "df58d855b8fa43d51dcd0464b54d0875cd5640b8c23ad47a52a69487d01d7c95",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestObligation",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:brief"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "TestObligation"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:brief' of TestObligation",
+      "declaration_hash": "df58d855b8fa43d51dcd0464b54d0875cd5640b8c23ad47a52a69487d01d7c95",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestObligation",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:declaration_hash"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "TestObligation"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:declaration_hash' of TestObligation",
+      "declaration_hash": "df58d855b8fa43d51dcd0464b54d0875cd5640b8c23ad47a52a69487d01d7c95",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestObligation",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:spec_refs"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "TestObligation"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:spec_refs' of TestObligation",
+      "declaration_hash": "df58d855b8fa43d51dcd0464b54d0875cd5640b8c23ad47a52a69487d01d7c95",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestObligation",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:owns_edge"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+        "section_key": "types",
+        "entry_key": "TestObligation"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:owns_edge' of TestObligation",
+      "declaration_hash": "df58d855b8fa43d51dcd0464b54d0875cd5640b8c23ad47a52a69487d01d7c95",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
         "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
         "obligation_kind": "logic",
         "item_identifier": "entry"
@@ -17,7 +549,7 @@
         "role": "FreeFunction"
       },
       "brief": "Author a logic test covering 'entry' of domain::tddd::type_signals_doc::decide_type_signals_reuse",
-      "declaration_hash": "84f68c5f5ed94b92d7abed1947cb2a540ae958277bbd64596419c250fd36a6a8",
+      "declaration_hash": "9cad9d098d1d621308aaedd8220d39aa99b5a87662788dfd86272432bc6a4f6a",
       "spec_refs": [
         {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
@@ -87,30 +619,6 @@
     },
     {
       "id": {
-        "entry_key": "CapabilityExecutionContractFingerprintPort",
-        "obligation_kind": "contract",
-        "item_identifier": "trait_method:capability_fingerprint"
-      },
-      "target_entry": {
-        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-        "section_key": "traits",
-        "entry_key": "CapabilityExecutionContractFingerprintPort"
-      },
-      "target_role": {
-        "kind": "contract_role",
-        "role": "SecondaryPort"
-      },
-      "brief": "Author a contract test covering 'trait_method:capability_fingerprint' of CapabilityExecutionContractFingerprintPort",
-      "declaration_hash": "0219ce26ba79d78942399e11e6ca1e29ea394df4da6bf3b8b620ee93730ade83",
-      "spec_refs": [
-        {
-          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-          "element_id": "CN-08"
-        }
-      ]
-    },
-    {
-      "id": {
         "entry_key": "ProviderSessionCachePort",
         "obligation_kind": "contract",
         "item_identifier": "trait_method:load"
@@ -125,7 +633,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:load' of ProviderSessionCachePort",
-      "declaration_hash": "da74120dcfe6690be568b150a785e5a7ef8b469f1cedf24cf23237a833b03f08",
+      "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
       "spec_refs": [
         {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
@@ -181,7 +689,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:save' of ProviderSessionCachePort",
-      "declaration_hash": "da74120dcfe6690be568b150a785e5a7ef8b469f1cedf24cf23237a833b03f08",
+      "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
       "spec_refs": [
         {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
@@ -237,7 +745,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:remove' of ProviderSessionCachePort",
-      "declaration_hash": "da74120dcfe6690be568b150a785e5a7ef8b469f1cedf24cf23237a833b03f08",
+      "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
       "spec_refs": [
         {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
@@ -274,34 +782,6 @@
         {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "AC-09"
-        }
-      ]
-    },
-    {
-      "id": {
-        "entry_key": "ReviewerExecutionContractFingerprintPort",
-        "obligation_kind": "contract",
-        "item_identifier": "trait_method:reviewer_fingerprint"
-      },
-      "target_entry": {
-        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-        "section_key": "traits",
-        "entry_key": "ReviewerExecutionContractFingerprintPort"
-      },
-      "target_role": {
-        "kind": "contract_role",
-        "role": "SecondaryPort"
-      },
-      "brief": "Author a contract test covering 'trait_method:reviewer_fingerprint' of ReviewerExecutionContractFingerprintPort",
-      "declaration_hash": "7d60498e880e069e98fceb4a8b901f56759098381b8735e78acaf1b00f097913",
-      "spec_refs": [
-        {
-          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-          "element_id": "IN-04"
-        },
-        {
-          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-          "element_id": "CN-06"
         }
       ]
     },
@@ -497,7 +977,7 @@
         "role": "FreeFunction"
       },
       "brief": "Author a logic test covering 'entry' of infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-      "declaration_hash": "3a8cc164b69ab629f4fd8fe50a1f1a3a6e5437b2d42494e302d74a2552677719",
+      "declaration_hash": "ffc8d24bbcd228c3c0c7ef7168c13126e0ab42dd00c9d9476279a9ef9a32e9cf",
       "spec_refs": [
         {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
@@ -794,58 +1274,6 @@
         {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "AC-09"
-        }
-      ]
-    },
-    {
-      "id": {
-        "entry_key": "Sha256ExecutionContractFingerprintAdapter",
-        "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::provider_session::CapabilityExecutionContractFingerprintPort"
-      },
-      "target_entry": {
-        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
-        "section_key": "traits",
-        "entry_key": "Sha256ExecutionContractFingerprintAdapter"
-      },
-      "target_role": {
-        "kind": "trait_impl",
-        "role": "SecondaryPort"
-      },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::provider_session::CapabilityExecutionContractFingerprintPort' of Sha256ExecutionContractFingerprintAdapter",
-      "declaration_hash": "73f0b08ec3ded02833d4b0771df4c2e95bb416290c8a79162adbb8c80b399181",
-      "spec_refs": [
-        {
-          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-          "element_id": "CN-08"
-        }
-      ]
-    },
-    {
-      "id": {
-        "entry_key": "Sha256ExecutionContractFingerprintAdapter",
-        "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::provider_session::ReviewerExecutionContractFingerprintPort"
-      },
-      "target_entry": {
-        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
-        "section_key": "traits",
-        "entry_key": "Sha256ExecutionContractFingerprintAdapter"
-      },
-      "target_role": {
-        "kind": "trait_impl",
-        "role": "SecondaryPort"
-      },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::provider_session::ReviewerExecutionContractFingerprintPort' of Sha256ExecutionContractFingerprintAdapter",
-      "declaration_hash": "fc3158fe49bbcca58c535c3c7c1fd2ea1eac0465e9d39ca8e336491f001d2de1",
-      "spec_refs": [
-        {
-          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-          "element_id": "IN-04"
-        },
-        {
-          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-          "element_id": "CN-06"
         }
       ]
     }

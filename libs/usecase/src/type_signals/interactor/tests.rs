@@ -3,7 +3,7 @@
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
 use std::path::Path;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use domain::tddd::catalogue_v2::{TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort};
 use domain::{TrackBranch, TrackId};
@@ -80,6 +80,23 @@ impl TypeSignalsExecutorPort for FailingExecutor {
     }
 }
 
+struct TrackIdSpyExecutor {
+    seen_track_ids: Arc<Mutex<Vec<TrackId>>>,
+}
+
+impl TypeSignalsExecutorPort for TrackIdSpyExecutor {
+    fn evaluate_layer(
+        &self,
+        _items_dir: &Path,
+        track_id: &TrackId,
+        _workspace_root: &Path,
+        _binding: &TdddLayerBinding,
+    ) -> Result<(), TypeSignalsExecutionError> {
+        self.seen_track_ids.lock().unwrap().push(track_id.clone());
+        Ok(())
+    }
+}
+
 fn stub_binding(layer_id: &str) -> TdddLayerBinding {
     TdddLayerBinding {
         layer_id: layer_id.to_owned(),
@@ -109,6 +126,19 @@ fn valid_request(tmp: &std::path::Path) -> TypeSignalsRequest {
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
+
+#[test]
+fn test_new_with_injected_ports_runs_the_requested_layer() {
+    let interactor = TypeSignalsInteractor::new(
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
+        Arc::new(SuccessExecutor),
+    );
+    let tmp = tempfile::tempdir().unwrap();
+
+    let result = interactor.run(valid_request(tmp.path()));
+
+    assert!(result.is_ok(), "injected ports must be used by the constructed interactor");
+}
 
 /// The interactor derives `items_dir` from `workspace_root` internally, so
 /// the `items_dir` field of the request is ignored.  This test exercises the
@@ -162,6 +192,42 @@ fn test_run_rejects_branch_track_id_mismatch() {
                 if branch.as_ref() == "track/other-track" && track_id.as_ref() == "test-track-2026-01-01"
         ),
         "branch/track-id mismatch must return BranchTrackMismatch, got: {err:?}"
+    );
+}
+
+#[test]
+fn test_run_propagates_track_id_to_every_layer_and_rejects_mismatched_active_track() {
+    let seen_track_ids = Arc::new(Mutex::new(Vec::new()));
+    let interactor = build_interactor(
+        Arc::new(StubLayerBindings {
+            bindings: vec![stub_binding("domain"), stub_binding("usecase")],
+        }),
+        Arc::new(TrackIdSpyExecutor { seen_track_ids: Arc::clone(&seen_track_ids) }),
+    );
+    let tmp = tempfile::tempdir().unwrap();
+
+    let mismatched_request = TypeSignalsRequest {
+        items_dir: tmp.path().join("track/items"),
+        track_id: TrackId::try_new("test-track-2026-01-01").unwrap(),
+        branch: TrackBranch::try_new("track/other-track").unwrap(),
+        workspace_root: tmp.path().to_path_buf(),
+        layer: None,
+    };
+    let mismatch = interactor.run(mismatched_request).unwrap_err();
+    assert!(matches!(mismatch, TypeSignalsError::BranchTrackMismatch { .. }));
+    assert!(
+        seen_track_ids.lock().unwrap().is_empty(),
+        "the active-track guard must reject a mismatch before any layer evaluation"
+    );
+
+    let request = valid_request(tmp.path());
+    let expected_track_id = request.track_id.clone();
+    interactor.run(request).unwrap();
+
+    assert_eq!(
+        seen_track_ids.lock().unwrap().as_slice(),
+        [expected_track_id.clone(), expected_track_id].as_slice(),
+        "every layer evaluation must receive the request track id"
     );
 }
 

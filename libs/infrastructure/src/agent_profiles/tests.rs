@@ -71,6 +71,30 @@ fn test_resolve_execution_missing_fast_effort_returns_error() {
 }
 
 #[test]
+fn test_resolve_execution_missing_final_effort_returns_error() {
+    let profiles = load_profiles(
+        r#"{
+            "schema_version": 1,
+            "providers": { "codex": { "label": "Codex CLI" } },
+            "capabilities": {
+                "reviewer": {
+                    "provider": "codex",
+                    "model": "gpt-5.6-sol",
+                    "fast_model": "gpt-5.6-luna",
+                    "fast_reasoning_effort": "low",
+                    "execution_mode": "typed-pipeline"
+                }
+            }
+        }"#,
+    );
+
+    assert!(matches!(
+        profiles.resolve_execution(&capability("reviewer"), RoundType::Final),
+        Err(AgentProfilesError::EffortMissing(name, RoundType::Final)) if name.as_str() == "reviewer"
+    ));
+}
+
+#[test]
 fn test_resolve_execution_unsupported_provider_effort_returns_error() {
     let profiles = load_profiles(
         r#"{

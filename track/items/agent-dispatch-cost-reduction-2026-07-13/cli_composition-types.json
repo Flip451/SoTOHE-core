@@ -19,7 +19,7 @@
   "types": {
     "CapabilityCompositionRoot": {
       "action": "reference",
-      "docs": "Wires typed profile, fingerprint, session-cache, provider, use-case, and CLI-driver dependencies.",
+      "docs": "Wires typed profile, session-cache, provider, use-case, and CLI-driver dependencies.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -377,7 +377,7 @@
     },
     "SignalCompositionRoot": {
       "action": "modify",
-      "docs": "Wires semantic freshness collection, snapshot validation, and layer-granular type-signal execution.",
+      "docs": "Wires implementation-input hashing, artifact freshness comparison, and layer-granular type-signal execution.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",

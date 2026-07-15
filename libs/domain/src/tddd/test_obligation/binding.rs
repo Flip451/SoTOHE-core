@@ -160,6 +160,29 @@ impl TestBindingsDocument {
     pub fn records(&self) -> &[TestBindingRecord] {
         &self.records
     }
+
+    /// Returns the edges carrying a waiver record.
+    ///
+    /// Waiver records win per edge: a waived edge is resolved through its
+    /// waiver, so fulfillment and voluntary bindings must not compete with it.
+    #[must_use]
+    pub fn waived_edge_ids(&self) -> Vec<&TestObligationEdgeId> {
+        self.records
+            .iter()
+            .filter_map(|record| match record {
+                TestBindingRecord::Waiver { edge_id, .. } => Some(edge_id),
+                _ => None,
+            })
+            .collect()
+    }
+
+    /// Returns whether `edge_id` is resolved by a waiver record.
+    #[must_use]
+    pub fn is_edge_waived(&self, edge_id: &TestObligationEdgeId) -> bool {
+        self.records.iter().any(|record| {
+            matches!(record, TestBindingRecord::Waiver { edge_id: waived, .. } if waived == edge_id)
+        })
+    }
 }
 
 #[cfg(test)]
@@ -278,5 +301,41 @@ mod tests {
         );
         assert_eq!(doc.track_id(), &track_id);
         assert_eq!(doc.records().len(), 1);
+    }
+
+    #[test]
+    fn test_waived_edge_ids_reports_exactly_the_waiver_records() {
+        let waived = sample_edge_id();
+        let doc = TestBindingsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![
+                TestBindingRecord::Fulfillment {
+                    obligation_id: sample_obligation_id(),
+                    tests: NonEmptyTestLocations::try_new(vec![sample_location()]).unwrap(),
+                },
+                TestBindingRecord::VoluntaryBinding {
+                    edge_id: other_edge_id(),
+                    tests: NonEmptyTestLocations::try_new(vec![sample_location()]).unwrap(),
+                },
+                TestBindingRecord::Waiver {
+                    edge_id: waived.clone(),
+                    reason: WaivedReason::try_new("covered elsewhere".to_owned()).unwrap(),
+                },
+            ],
+        );
+
+        assert_eq!(doc.waived_edge_ids(), vec![&waived]);
+        assert!(doc.is_edge_waived(&waived), "the waiver record owns its edge");
+        assert!(
+            !doc.is_edge_waived(&other_edge_id()),
+            "fulfillment and voluntary records never mark an edge waived"
+        );
+    }
+
+    fn other_edge_id() -> TestObligationEdgeId {
+        TestObligationEdgeId::new(
+            CatalogueEntryKey::try_new("domain::User".to_owned()).unwrap(),
+            TestObligationAnchorId::try_new("spec.json".to_owned(), "IN-07".to_owned()).unwrap(),
+        )
     }
 }

@@ -570,14 +570,14 @@ mod tests {
         (dir, path)
     }
 
-    // Helper: write a `<layer>-type-signals.json` (schema_version 2) whose
+    // Helper: write a `<layer>-type-signals.json` (schema_version 3) whose
     // `declaration_hash` matches the on-disk bytes of the companion
     // `<layer>-types.json` file. The `signals` field is copied verbatim from
     // the declaration file's legacy `signals` array (raw JSON) so that fixture
     // declaration files with inline signals still exercise the intended
     // Blue/Yellow/Red paths in `check_type_signals` via the signal file.
-    // The freshness hashes reuse the declaration hash: these fixtures only
-    // need a decodable schema-v2 document with a matching declaration hash.
+    // The implementation hash reuses the declaration hash because these
+    // fixtures only need a decodable current-schema document.
     fn write_matching_signal_file(track_dir: &Path, catalogue_name: &str, signal_name: &str) {
         let decl_bytes = std::fs::read(track_dir.join(catalogue_name)).unwrap();
         let value: serde_json::Value = serde_json::from_slice(&decl_bytes).unwrap();
@@ -588,14 +588,10 @@ mod tests {
             .as_str()
             .to_owned();
         let signal_file = serde_json::json!({
-            "schema_version": 2,
+            "schema_version": 3,
             "generated_at": "2026-04-18T12:00:00Z",
             "declaration_hash": hash,
             "implementation_input_hash": hash,
-            "baseline_hash": hash,
-            "live_rustdoc_snapshot_hash": hash,
-            "evaluator_contract_hash": hash,
-            "rustdoc_extraction_contract_hash": hash,
             "signals": signals_array,
         });
         let encoded = serde_json::to_string_pretty(&signal_file).unwrap();
@@ -1423,14 +1419,10 @@ mod tests {
     }
 
     const DOMAIN_TYPE_SIGNALS_STALE_HASH: &str = r#"{
-  "schema_version": 2,
+  "schema_version": 3,
   "generated_at": "2026-04-18T12:00:00Z",
   "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
   "implementation_input_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-  "baseline_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-  "live_rustdoc_snapshot_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-  "evaluator_contract_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-  "rustdoc_extraction_contract_hash": "0000000000000000000000000000000000000000000000000000000000000000",
   "signals": [
     { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
   ]
@@ -1580,14 +1572,10 @@ mod tests {
         let digest = hash.as_digest().as_str().to_owned();
         let blue_signal_file = format!(
             r#"{{
-              "schema_version": 2,
+              "schema_version": 3,
               "generated_at": "2026-04-18T12:00:00Z",
               "declaration_hash": "{digest}",
               "implementation_input_hash": "{digest}",
-              "baseline_hash": "{digest}",
-              "live_rustdoc_snapshot_hash": "{digest}",
-              "evaluator_contract_hash": "{digest}",
-              "rustdoc_extraction_contract_hash": "{digest}",
               "signals": [
                 {{
                   "type_name": "TrackId",
@@ -1706,7 +1694,7 @@ mod tests {
         // `TypeSignalDto` requires `kind_tag`, `signal`, and `found_type` fields
         // (deny_unknown_fields; missing fields fail decoding).
         format!(
-            r#"{{"schema_version":2,"generated_at":"2026-01-01T00:00:00Z","declaration_hash":"{hash}","implementation_input_hash":"{hash}","baseline_hash":"{hash}","live_rustdoc_snapshot_hash":"{hash}","evaluator_contract_hash":"{hash}","rustdoc_extraction_contract_hash":"{hash}","signals":[{{"type_name":"Foo","kind_tag":"value_object","signal":"{signal}","found_type":true}}]}}"#,
+            r#"{{"schema_version":3,"generated_at":"2026-01-01T00:00:00Z","declaration_hash":"{hash}","implementation_input_hash":"{hash}","signals":[{{"type_name":"Foo","kind_tag":"value_object","signal":"{signal}","found_type":true}}]}}"#,
         )
     }
 

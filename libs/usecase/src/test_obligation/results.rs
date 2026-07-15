@@ -512,9 +512,14 @@ fn waiver_record(
     bindings: Option<&TestBindingsDocument>,
     obligations: Option<&ObligationsDocument>,
 ) -> EdgeVerdictRecord {
-    let obligation_id = obligations
-        .and_then(|document| document.owning_obligation(edge_id))
-        .map(|obligation| obligation.id().clone());
+    // Provenance names an obligation only when ownership is unambiguous; a
+    // multi-owner edge stays anonymous rather than crediting one owner.
+    let obligation_id = obligations.and_then(|document| match document.edge_ownership(edge_id) {
+        domain::tddd::test_obligation::obligations::EdgeOwnership::Unique(obligation) => {
+            Some(obligation.id().clone())
+        }
+        _ => None,
+    });
     let (claim_source, evidence_source) = waiver_binding_sources(edge_id, bindings);
     EdgeVerdictRecord::new(
         obligation_id,

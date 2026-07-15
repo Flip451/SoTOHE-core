@@ -36,9 +36,8 @@
 | ClaudeReviewer | secondary_adapter | modify | impl Reviewer | 🟡 | 🔵 |
 | CodexCapabilityAdapter | secondary_adapter | modify | impl CapabilityProviderPort | 🟡 | 🔵 |
 | CodexReviewer | secondary_adapter | modify | impl Reviewer | 🟡 | 🔵 |
-| FsProviderSessionCacheAdapter | secondary_adapter | add | impl ProviderSessionCachePort | 🟡 | 🔵 |
+| FsProviderSessionCacheAdapter | secondary_adapter | add | impl ProviderSessionCachePort | 🔵 | 🔵 |
 | RustdocSchemaExporter | secondary_adapter | modify | impl SchemaExporter, impl SchemaExporterPort | 🔵 | 🔵 |
-| Sha256ExecutionContractFingerprintAdapter | secondary_adapter | add | impl CapabilityExecutionContractFingerprintPort, impl ReviewerExecutionContractFingerprintPort | 🟡 | 🔵 |
 | TypeSignalsExecutorAdapter | secondary_adapter | modify | impl TypeSignalsExecutorPort, impl TypeSignalsExecutorPort, impl Debug, impl Default | 🔵 | 🔵 |
 
 ## Free Functions

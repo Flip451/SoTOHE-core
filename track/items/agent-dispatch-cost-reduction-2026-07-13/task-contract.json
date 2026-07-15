@@ -30,9 +30,6 @@
       {"layer": "domain", "entry_key": "RoundType"},
       {"layer": "domain", "entry_key": "ScopeName"},
       {"layer": "domain", "entry_key": "TrackId"},
-      {"layer": "usecase", "entry_key": "ExecutionContractFingerprint"},
-      {"layer": "usecase", "entry_key": "CapabilityExecutionContractFingerprintPort"},
-      {"layer": "usecase", "entry_key": "ReviewerExecutionContractFingerprintPort"},
       {"layer": "usecase", "entry_key": "ProviderSessionCacheEntry"},
       {"layer": "usecase", "entry_key": "ProviderSessionCacheError"},
       {"layer": "usecase", "entry_key": "ProviderSessionCacheKey"},
@@ -41,8 +38,7 @@
       {"layer": "usecase", "entry_key": "ReviewerPrompt"},
       {"layer": "usecase", "entry_key": "TargetArtifactPath"},
       {"layer": "usecase", "entry_key": "TargetArtifactSet"},
-      {"layer": "infrastructure", "entry_key": "FsProviderSessionCacheAdapter"},
-      {"layer": "infrastructure", "entry_key": "Sha256ExecutionContractFingerprintAdapter"}
+      {"layer": "infrastructure", "entry_key": "FsProviderSessionCacheAdapter"}
     ],
     "T004": [
       {"layer": "usecase", "entry_key": "Reviewer"},
@@ -53,20 +49,13 @@
       {"layer": "cli_composition", "entry_key": "ReviewCompositionRoot"}
     ],
     "T005": [
-      {"layer": "domain", "entry_key": "BaselineHash"},
       {"layer": "domain", "entry_key": "CatalogueDeclarationHash"},
-      {"layer": "domain", "entry_key": "EvaluatorContractHash"},
       {"layer": "domain", "entry_key": "ImplementationInputHash"},
       {"layer": "domain", "entry_key": "LayerId"},
-      {"layer": "domain", "entry_key": "LiveRustdocSnapshotHash"},
-      {"layer": "domain", "entry_key": "LiveRustdocSnapshotStatus"},
-      {"layer": "domain", "entry_key": "RustdocExtractionContractHash"},
       {"layer": "domain", "entry_key": "Sha256Digest"},
       {"layer": "domain", "entry_key": "Sha256DigestError"},
       {"layer": "domain", "entry_key": "TrackBranch"},
       {"layer": "domain", "entry_key": "TypeSignalsDocument"},
-      {"layer": "domain", "entry_key": "TypeSignalsCurrentInputs"},
-      {"layer": "domain", "entry_key": "TypeSignalsFreshness"},
       {"layer": "domain", "entry_key": "TypeSignalsLoadResult"},
       {"layer": "domain", "entry_key": "TypeSignalsReuseDecision"},
       {"layer": "domain", "entry_key": "TypeSignalsSchemaVersion"},
@@ -97,6 +86,8 @@
       {"layer": "cli_composition", "entry_key": "SignalCompositionRoot"}
     ],
     "T014": [
+      {"layer": "domain", "entry_key": "SchemaExporter"},
+      {"layer": "usecase", "entry_key": "SchemaExporterPort"},
       {"layer": "infrastructure", "entry_key": "RustdocSchemaExporter"}
     ],
     "T015": [
@@ -126,6 +117,24 @@
       {"layer": "cli", "entry_key": "cli::commands::capability::execute"},
       {"layer": "cli_composition", "entry_key": "CapabilityCompositionRoot"}
     ],
-    "T009": []
+    "T009": [],
+    "T019": [
+      {
+        "layer": "domain",
+        "entry_key": "EdgeOwnership"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "TestObligation"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "ObligationsDocument"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "TestBindingsDocument"
+      }
+    ]
   }
 }

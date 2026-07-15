@@ -1,26 +1,21 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "6bfa6d7cbc541da545697deee34e90ecefc705717e6642bbd414a554863fda13",
+  "catalogue_declaration_hash": "95c34034301ff3d0ee47255c445eb0af9bf019680c9f1068cc270b3002887284",
   "signals": [
-    {
-      "type_name": "BaselineHash",
-      "signal": "blue",
-      "entry_hash": "625c6edc3f17fa012dbdd4853726a5b0823252dd0511a7b4bb70526c170118e7"
-    },
     {
       "type_name": "CatalogueDeclarationHash",
       "signal": "blue",
-      "entry_hash": "5ce8e208e04fab4c42b87b65819f2c8aba05a26c77259db2d8a877910a98a0af"
+      "entry_hash": "a46698e554afbb94f48d91e0bbb3dcc8dc476db0cf34f92258a5a05011c39261"
     },
     {
-      "type_name": "EvaluatorContractHash",
+      "type_name": "EdgeOwnership",
       "signal": "blue",
-      "entry_hash": "37661261591a8cc2ee13754ecbb511abf47de5c0a31df00f972670f31f81f139"
+      "entry_hash": "c5e04e058f1ceab51f3de8aa97688e79e45b0d563954d60c2b2239d522c1af97"
     },
     {
       "type_name": "ImplementationInputHash",
       "signal": "blue",
-      "entry_hash": "9c2b995953dc9dba59cac8185dcdf36a4830a26866977575d3bb3fe565a6bc52"
+      "entry_hash": "de4fd2927b4914b0d72ded622f0216e9243d260e847b42b3d4a876dffaab3afa"
     },
     {
       "type_name": "LayerId",
@@ -28,24 +23,14 @@
       "entry_hash": "292384787dd184cf4e4455f6cc033776cfd67be5eaf848a25471851cb2c644bc"
     },
     {
-      "type_name": "LiveRustdocSnapshotHash",
+      "type_name": "ObligationsDocument",
       "signal": "blue",
-      "entry_hash": "fb33c6acedbddb0732016b4d5b23f4bbd9982a4ea71fae92be6036c90935e2fa"
-    },
-    {
-      "type_name": "LiveRustdocSnapshotStatus",
-      "signal": "blue",
-      "entry_hash": "f0a13d56e5d2c42f51d0fd07de88b47165808d6196dbf3d5b4c50e6043200507"
+      "entry_hash": "5dc3d81388732fd8ec9ab6788152a65b6dc831e0c3dc3029fb91c13cf185b9e9"
     },
     {
       "type_name": "RoundType",
       "signal": "blue",
       "entry_hash": "cb40b930c444e9521a03f71712d9b4a1e85b0db508e5081dd8ae4905cdb41587"
-    },
-    {
-      "type_name": "RustdocExtractionContractHash",
-      "signal": "blue",
-      "entry_hash": "32e9ad4927a6591c24337b64230c92be5a0b91f15babfb8fcc7baee16c62b070"
     },
     {
       "type_name": "ScopeName",
@@ -63,9 +48,19 @@
       "entry_hash": "613847554768974e08d8ebff80755dc7b14c46bd3949d0f2f1f74e7dc6c945e1"
     },
     {
+      "type_name": "TestBindingsDocument",
+      "signal": "blue",
+      "entry_hash": "7f51f900b481487022f283e9c8cbc5b63ecbe6ac4e660af9df91797ecec85bf7"
+    },
+    {
+      "type_name": "TestObligation",
+      "signal": "blue",
+      "entry_hash": "acd525b7a1d3b3df1f1c66f294aec1ca4f1a44075f4eaff023d59f89fa059680"
+    },
+    {
       "type_name": "TrackBranch",
       "signal": "blue",
-      "entry_hash": "f81100fbb1fde70f15741f064ce2507477ee3f76c2820cefcaeb046588e2f1ef"
+      "entry_hash": "ae4e34a05bab27a3ecadbf2f967f0f1f24b889b2b312bdc761ae9dde77b605c4"
     },
     {
       "type_name": "TrackId",
@@ -73,19 +68,9 @@
       "entry_hash": "211af6f72e52315d4a2c411e0d030ace13afd2d742867bc9396be54c0c5f4072"
     },
     {
-      "type_name": "TypeSignalsCurrentInputs",
-      "signal": "blue",
-      "entry_hash": "044a83c63990cb62f42ee19c4193763a7ecb4b50222c6c03b77ed62ef3837f17"
-    },
-    {
       "type_name": "TypeSignalsDocument",
       "signal": "blue",
-      "entry_hash": "46eab11d5a3b86f44dd70aa128bbbad1b349fef4db80c27ee8cd29f5eadf4baa"
-    },
-    {
-      "type_name": "TypeSignalsFreshness",
-      "signal": "blue",
-      "entry_hash": "e12daca675fa1242e6a1b65549dffbbadc47cdae1c99b336e330275d439977e3"
+      "entry_hash": "b8fa715deeced660a8e0266b9bd5c15e6fa40e01551be25bb5545311e2ee1739"
     },
     {
       "type_name": "TypeSignalsLoadResult",
@@ -95,7 +80,7 @@
     {
       "type_name": "TypeSignalsReuseDecision",
       "signal": "blue",
-      "entry_hash": "cf3f8f678b334575a34aa7cb236cf49cdc13bb73e62dea25b1b25009a5dc7c0d"
+      "entry_hash": "0fe08d11dad3a2277e38b84e1851f0cd72fd1f81ea287d50c682e6cbc10a8217"
     },
     {
       "type_name": "TypeSignalsSchemaVersion",
@@ -108,9 +93,14 @@
       "entry_hash": "2efbbd40bf63c22b95ce5ef52fbd3e2bc59981072c858146d1c72fc64a1235be"
     },
     {
+      "type_name": "SchemaExporter",
+      "signal": "blue",
+      "entry_hash": "71d63f5ef37e6f40347bdd9148eac2148b94d6a4b52ee6f0810d924175105a62"
+    },
+    {
       "type_name": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
       "signal": "blue",
-      "entry_hash": "121d205ed81c2ced1b61a4df4ae086793e1f3bfaab8582591f893c6b54c66605"
+      "entry_hash": "d0272be83866b55f0cca12e1c95ded5af1b802814955c5f56ba3ed2a22cac2c8"
     },
     {
       "type_name": "TypeSignalsExecutionError",
