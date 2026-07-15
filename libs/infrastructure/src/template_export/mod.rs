@@ -235,7 +235,7 @@ impl TemplateExportPort for FsTemplateExportAdapter {
         filesystem::ensure_output_dir_outside_source_roots(command)?;
 
         let counts = export_walk::export_worktree(command, manifest)?;
-        // CN-03: a home below the workspace is a shipped container path, not machine identity.
+        // A workspace-local home is container-local and must fail closed rather than skip a scan.
         if machine_path_scan::exported_output_scan_is_required(
             &command.output_dir,
             self.machine_home_dir.as_deref(),

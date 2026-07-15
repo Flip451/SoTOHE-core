@@ -10,6 +10,9 @@ use usecase::template_export::TemplateExportPortError;
 
 use super::filesystem::{io_error, non_symlink_metadata};
 
+/// Actionable diagnostic for a workspace-local machine-home configuration.
+pub(crate) const WORKSPACE_LOCAL_MACHINE_HOME_MESSAGE: &str = "machine home directory resolves inside the project root (a container-local home); supply the real work-machine home explicitly (e.g. via SOTP_MACHINE_HOME) for machine-path verification";
+
 /// Rejects output containing the current work machine's home directory.
 pub(super) fn ensure_exported_output_has_no_machine_paths(
     output_dir: &Path,
@@ -28,9 +31,10 @@ pub(super) fn ensure_exported_output_has_no_machine_paths(
 
 /// Returns whether output scanning is required for the injected machine home.
 ///
-/// A machine home below the workspace denotes a shipped container path, not
-/// work-machine identity (CN-03). Validate the path before making that
-/// exception so a lexical `..` component cannot bypass the export scan.
+/// A machine home below the workspace is a container-local home, so export
+/// fails closed and directs callers to supply the real work-machine home.
+/// Validate the path before this containment check so a lexical `..` component
+/// cannot bypass the failure.
 pub(super) fn exported_output_scan_is_required(
     output_dir: &Path,
     machine_home_dir: Option<&Path>,
@@ -41,7 +45,10 @@ pub(super) fn exported_output_scan_is_required(
     };
 
     match machine_home_workspace_containment(output_dir, machine_home_dir, workspace_root)? {
-        MachineHomeWorkspaceContainment::WithinWorkspace => Ok(false),
+        MachineHomeWorkspaceContainment::WithinWorkspace => {
+            let error = std::io::Error::other(WORKSPACE_LOCAL_MACHINE_HOME_MESSAGE);
+            Err(io_error(output_dir, &error))
+        }
         MachineHomeWorkspaceContainment::OutsideWorkspace
         | MachineHomeWorkspaceContainment::Unresolved => Ok(true),
     }
@@ -52,7 +59,7 @@ pub(super) fn exported_output_scan_is_required(
 /// `Unresolved` is deliberately distinct from `OutsideWorkspace`: callers
 /// decide whether their gate must reject a failed containment check or retain
 /// a conservative scan.  In either case, an unresolved path never receives
-/// the workspace-local exception.
+/// the workspace-local containment classification.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum MachineHomeWorkspaceContainment {
     /// The canonical machine-home path is inside the canonical workspace root.
@@ -66,8 +73,17 @@ pub(crate) enum MachineHomeWorkspaceContainment {
 /// Classifies an injected machine home against a workspace root.
 ///
 /// The home spelling is first validated with the same rules used by the byte
-/// scanner, so a lexical `..` component cannot obtain the workspace-local
-/// exception.  Both paths are then canonicalized before containment is tested.
+/// scanner, so a lexical `..` component cannot bypass workspace-local-home
+/// rejection. The workspace root is canonicalized before containment is
+/// tested. For a nonexistent home, the deepest existing ancestor is
+/// canonicalized before its missing suffix is retained. This resolves a
+/// symlinked workspace spelling before it is compared with the canonical root.
+/// A lexically inside home remains `WithinWorkspace` and fails closed upstream;
+/// every other resolution failure remains `Unresolved` and also fails closed.
+/// Therefore the fallback cannot create a scan bypass: only an absolute,
+/// parent-directory-free home outside the workspace is classified as
+/// `OutsideWorkspace`, and that spelling is exactly what the byte scanner
+/// needs.
 ///
 /// # Errors
 ///
@@ -80,16 +96,52 @@ pub(crate) fn machine_home_workspace_containment(
 ) -> Result<MachineHomeWorkspaceContainment, TemplateExportPortError> {
     normalized_machine_home_path_bytes(error_path, machine_home_dir)?;
 
-    match (std::fs::canonicalize(workspace_root), std::fs::canonicalize(machine_home_dir)) {
-        (Ok(workspace_root), Ok(machine_home_dir)) => {
-            if machine_home_dir.starts_with(workspace_root) {
-                Ok(MachineHomeWorkspaceContainment::WithinWorkspace)
-            } else {
-                Ok(MachineHomeWorkspaceContainment::OutsideWorkspace)
+    let workspace_root = match std::fs::canonicalize(workspace_root) {
+        Ok(workspace_root) => workspace_root,
+        Err(_) => return Ok(MachineHomeWorkspaceContainment::Unresolved),
+    };
+    let machine_home_dir = match std::fs::canonicalize(machine_home_dir) {
+        Ok(machine_home_dir) => machine_home_dir,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            match canonicalize_deepest_existing_ancestor(machine_home_dir) {
+                Some(machine_home_dir) => machine_home_dir,
+                None => return Ok(MachineHomeWorkspaceContainment::Unresolved),
             }
         }
-        _ => Ok(MachineHomeWorkspaceContainment::Unresolved),
+        Err(_) => return Ok(MachineHomeWorkspaceContainment::Unresolved),
+    };
+
+    if machine_home_dir.starts_with(workspace_root) {
+        Ok(MachineHomeWorkspaceContainment::WithinWorkspace)
+    } else {
+        Ok(MachineHomeWorkspaceContainment::OutsideWorkspace)
     }
+}
+
+/// Canonicalizes a path's deepest existing ancestor while preserving its missing suffix.
+///
+/// A dangling symlink is unresolved rather than treated as a missing path: continuing past it
+/// would discard a symlink component whose target is needed to classify containment safely.
+fn canonicalize_deepest_existing_ancestor(path: &Path) -> Option<PathBuf> {
+    for ancestor in path.ancestors() {
+        match std::fs::canonicalize(ancestor) {
+            Ok(canonical_ancestor) => {
+                let missing_suffix = path.strip_prefix(ancestor).ok()?;
+                return Some(canonical_ancestor.join(missing_suffix));
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                match std::fs::symlink_metadata(ancestor) {
+                    Ok(metadata) if metadata.file_type().is_symlink() => return None,
+                    Ok(_) => return None,
+                    Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+                    Err(_) => return None,
+                }
+            }
+            Err(_) => return None,
+        }
+    }
+
+    None
 }
 
 /// Returns the normalized, lossless representation used to scan machine paths.

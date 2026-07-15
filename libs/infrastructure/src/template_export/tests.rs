@@ -641,7 +641,7 @@ fn test_export_rejects_machine_path_in_exported_output() {
 }
 
 #[test]
-fn test_export_workspace_home_path_in_exported_output_succeeds() {
+fn test_export_workspace_home_path_fails_closed() {
     let dir = TempDir::new().unwrap();
     let command = export_fixture(&dir);
     let home = command.workspace_root.join("libs/domain/.cache/home");
@@ -649,15 +649,18 @@ fn test_export_workspace_home_path_in_exported_output_succeeds() {
     let content = format!("container home: {}\n", home.display());
     write_file(dir.path(), "workspace/libs/domain/src/lib.rs", &content);
 
-    let report =
-        FsTemplateExportAdapter::new(Some(home)).export(&command, &full_manifest()).unwrap();
+    let err =
+        FsTemplateExportAdapter::new(Some(home)).export(&command, &full_manifest()).unwrap_err();
 
-    assert_eq!(report.included_count, 1);
-    assert_eq!(read_file(&command.output_dir, "libs/domain/src/lib.rs"), content);
+    assert!(
+        matches!(err, TemplateExportPortError::Io { ref path, ref reason }
+            if path == &command.output_dir && reason.as_str().contains("container-local home")),
+        "unexpected error: {err}"
+    );
 }
 
 #[test]
-fn test_export_uncanonicalizable_workspace_machine_home_requires_scan() {
+fn test_export_nonexistent_workspace_home_fails_closed() {
     let dir = TempDir::new().unwrap();
     let command = export_fixture(&dir);
     let home = command.workspace_root.join("libs/domain/.cache/missing-home");
@@ -671,17 +674,14 @@ fn test_export_uncanonicalizable_workspace_machine_home_requires_scan() {
         FsTemplateExportAdapter::new(Some(home)).export(&command, &full_manifest()).unwrap_err();
 
     assert!(
-        matches!(
-            err,
-            TemplateExportPortError::MachinePathDetected { ref path }
-                if path.as_str() == "libs/domain/src/lib.rs"
-        ),
+        matches!(err, TemplateExportPortError::Io { ref path, ref reason }
+            if path == &command.output_dir && reason.as_str().contains("container-local home")),
         "unexpected error: {err}"
     );
 }
 
 #[test]
-fn test_export_relative_workspace_root_with_existing_machine_home_succeeds() {
+fn test_export_relative_workspace_root_with_existing_machine_home_fails_closed() {
     let dir = TempDir::new().unwrap();
     let mut command = export_fixture(&dir);
     let home = command.workspace_root.join("libs/domain/.cache/home");
@@ -698,11 +698,14 @@ fn test_export_relative_workspace_root_with_existing_machine_home_succeeds() {
     );
     command.workspace_root = workspace_root;
 
-    let report =
-        FsTemplateExportAdapter::new(Some(home)).export(&command, &full_manifest()).unwrap();
+    let err =
+        FsTemplateExportAdapter::new(Some(home)).export(&command, &full_manifest()).unwrap_err();
 
-    assert_eq!(report.included_count, 1);
-    assert_eq!(read_file(&command.output_dir, "libs/domain/src/lib.rs"), content);
+    assert!(
+        matches!(err, TemplateExportPortError::Io { ref path, ref reason }
+            if path == &command.output_dir && reason.as_str().contains("container-local home")),
+        "unexpected error: {err}"
+    );
 }
 
 #[test]

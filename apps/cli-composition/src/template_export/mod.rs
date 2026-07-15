@@ -20,11 +20,12 @@ use crate::error::CompositionError;
 
 /// Resolves the work machine's home directory for export-output scanning.
 ///
-/// The composition root owns ambient environment access. `HOME` takes
-/// precedence over `USERPROFILE`, and empty values are treated as unresolved
-/// so the adapter can fail closed.
+/// The composition root owns ambient environment access. It resolves
+/// `SOTP_MACHINE_HOME`, then `HOME`, then `USERPROFILE`; empty values are
+/// skipped. Containerized runs forward the host home through
+/// `SOTP_MACHINE_HOME`, avoiding the container-local fallback.
 fn machine_home_directory() -> Option<PathBuf> {
-    ["HOME", "USERPROFILE"].into_iter().find_map(|variable| {
+    ["SOTP_MACHINE_HOME", "HOME", "USERPROFILE"].into_iter().find_map(|variable| {
         std::env::var_os(variable).filter(|value| !value.is_empty()).map(PathBuf::from)
     })
 }
@@ -95,6 +96,7 @@ mod tests {
     #[test]
     fn test_machine_home_directory_home_set_returns_home() {
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let _machine_home = crate::review_v2::process_guards::EnvGuard::remove("SOTP_MACHINE_HOME");
         let _home = crate::review_v2::process_guards::EnvGuard::set("HOME", "/work-machine/home");
         let _userprofile = crate::review_v2::process_guards::EnvGuard::set(
             "USERPROFILE",
@@ -107,6 +109,7 @@ mod tests {
     #[test]
     fn test_machine_home_directory_home_empty_returns_userprofile() {
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let _machine_home = crate::review_v2::process_guards::EnvGuard::remove("SOTP_MACHINE_HOME");
         let _home = crate::review_v2::process_guards::EnvGuard::set("HOME", "");
         let _userprofile = crate::review_v2::process_guards::EnvGuard::set(
             "USERPROFILE",
@@ -119,10 +122,27 @@ mod tests {
     #[test]
     fn test_machine_home_directory_variables_unset_returns_none() {
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let _machine_home = crate::review_v2::process_guards::EnvGuard::remove("SOTP_MACHINE_HOME");
         let _home = crate::review_v2::process_guards::EnvGuard::remove("HOME");
         let _userprofile = crate::review_v2::process_guards::EnvGuard::remove("USERPROFILE");
 
         assert_eq!(machine_home_directory(), None);
+    }
+
+    #[test]
+    fn test_machine_home_directory_override_takes_precedence() {
+        let _lock = crate::test_support::process_env_lock().lock().unwrap();
+        let _machine_home = crate::review_v2::process_guards::EnvGuard::set(
+            "SOTP_MACHINE_HOME",
+            "/work-machine/override",
+        );
+        let _home = crate::review_v2::process_guards::EnvGuard::set("HOME", "/work-machine/home");
+        let _userprofile = crate::review_v2::process_guards::EnvGuard::set(
+            "USERPROFILE",
+            "/work-machine/userprofile",
+        );
+
+        assert_eq!(machine_home_directory(), Some(PathBuf::from("/work-machine/override")));
     }
 
     /// Composition-root smoke test: the wired stack routes an `Export` input all
