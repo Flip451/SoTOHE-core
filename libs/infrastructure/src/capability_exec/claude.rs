@@ -5,12 +5,15 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
 
+use domain::TrackId;
 use usecase::capability_exec::{
     CLAUDE_PROVIDER_NAME, CapabilityDispatchOutcome, CapabilityDispatchRequest,
     CapabilityExecError, CapabilityProviderPort, ProviderName, ReasoningEffort,
 };
+use usecase::provider_session::ProviderSessionCachePort;
 
 use super::path_guard::capability_name_path_segment;
+use super::session::CapabilitySession;
 use super::{
     ProviderProcessRunner, adapter_preflight_error, capability_prompt,
     parse_provider_definition_front_matter, read_front_matter, read_utf8_file,
@@ -23,17 +26,26 @@ pub struct ClaudeCapabilityAdapter {
     runtime_dir: PathBuf,
     provider: ProviderName,
     process_runner: Arc<dyn ProviderProcessRunner>,
+    session_cache: Arc<dyn ProviderSessionCachePort>,
+    track_id: Option<TrackId>,
 }
 
 impl ClaudeCapabilityAdapter {
     /// Creates a Claude adapter rooted at `repo_root` with logs under `runtime_dir`.
     #[must_use]
-    pub fn new(repo_root: PathBuf, runtime_dir: PathBuf) -> Self {
+    pub fn new(
+        repo_root: PathBuf,
+        runtime_dir: PathBuf,
+        session_cache: Arc<dyn ProviderSessionCachePort>,
+        track_id: Option<TrackId>,
+    ) -> Self {
         Self {
             repo_root,
             runtime_dir,
             provider: CLAUDE_PROVIDER_NAME.clone(),
             process_runner: system_process_runner(),
+            session_cache,
+            track_id,
         }
     }
 
@@ -43,23 +55,34 @@ impl ClaudeCapabilityAdapter {
         runtime_dir: PathBuf,
         process_runner: Arc<dyn ProviderProcessRunner>,
     ) -> Self {
-        Self { repo_root, runtime_dir, provider: CLAUDE_PROVIDER_NAME.clone(), process_runner }
+        let session_cache = Arc::new(crate::provider_session::FsProviderSessionCacheAdapter::new(
+            repo_root.clone(),
+            runtime_dir.clone(),
+        ));
+        Self {
+            repo_root,
+            runtime_dir,
+            provider: CLAUDE_PROVIDER_NAME.clone(),
+            process_runner,
+            session_cache,
+            track_id: None,
+        }
     }
 
     fn agent_path(&self, capability: &str) -> PathBuf {
         self.repo_root.join(".claude").join("agents").join(format!("{capability}.md"))
     }
 
-    fn validate_agent(
+    fn agent_tools(
         &self,
         request: &CapabilityDispatchRequest,
-    ) -> Result<(), CapabilityExecError> {
+    ) -> Result<Vec<String>, CapabilityExecError> {
         let capability = capability_name_path_segment(request.request.capability.as_str())
             .map_err(|detail| adapter_preflight_error(request, &self.provider, detail))?;
         let path = self.agent_path(capability);
         let definition = read_utf8_file(&path, &self.repo_root)
             .map_err(|detail| adapter_preflight_error(request, &self.provider, detail))?;
-        validate_agent_definition(&definition, capability, request.profile.model.as_str())
+        agent_tools_from_definition(&definition, capability, request.profile.model.as_str())
             .map_err(|detail| adapter_preflight_error(request, &self.provider, detail))
     }
 }
@@ -73,7 +96,7 @@ impl CapabilityProviderPort for ClaudeCapabilityAdapter {
         &self,
         request: &CapabilityDispatchRequest,
     ) -> Result<CapabilityDispatchOutcome, CapabilityExecError> {
-        self.validate_agent(request)?;
+        let allowed_tools = self.agent_tools(request)?;
         if request.request.host == self.provider {
             return Ok(CapabilityDispatchOutcome::DelegateInHost {
                 capability: request.request.capability.clone(),
@@ -83,37 +106,79 @@ impl CapabilityProviderPort for ClaudeCapabilityAdapter {
         }
 
         let prompt = capability_prompt(request);
-        let args = build_claude_args(
+        let session =
+            CapabilitySession::new(request, self.track_id.as_ref(), self.session_cache.clone());
+        let resume_id = session.resumable_id(&request.request.resume);
+        let args = build_claude_args_with_resume(
             request.request.capability.as_str(),
             request.profile.model.as_str(),
             request.profile.effort,
+            &allowed_tools,
+            resume_id.as_deref(),
             &prompt,
         );
         let timeout = request.request.timeout.map(|timeout| Duration::from_secs(timeout.as_secs()));
-        let exit_code = self.process_runner.run(
+        let result = self.process_runner.run(
             "claude",
             &args,
             &self.repo_root,
             &self.runtime_dir,
             &self.provider,
             timeout,
-        )?;
-        Ok(CapabilityDispatchOutcome::Executed { provider: self.provider.clone(), exit_code })
+        );
+        let output = match (resume_id, result) {
+            (Some(_), Ok(output)) if output.exit_code != 0 => self.process_runner.run(
+                "claude",
+                &build_claude_args(
+                    request.request.capability.as_str(),
+                    request.profile.model.as_str(),
+                    request.profile.effort,
+                    &allowed_tools,
+                    &prompt,
+                ),
+                &self.repo_root,
+                &self.runtime_dir,
+                &self.provider,
+                timeout,
+            )?,
+            (Some(_), Err(_)) => self.process_runner.run(
+                "claude",
+                &build_claude_args(
+                    request.request.capability.as_str(),
+                    request.profile.model.as_str(),
+                    request.profile.effort,
+                    &allowed_tools,
+                    &prompt,
+                ),
+                &self.repo_root,
+                &self.runtime_dir,
+                &self.provider,
+                timeout,
+            )?,
+            (_, result) => result?,
+        };
+        if output.exit_code == 0 {
+            session.save(output.session_id);
+        }
+        Ok(CapabilityDispatchOutcome::Executed {
+            provider: self.provider.clone(),
+            exit_code: output.exit_code,
+        })
     }
 }
 
-fn validate_agent_definition(
+fn agent_tools_from_definition(
     definition: &str,
     expected_capability: &str,
     profile_model: &str,
-) -> Result<(), String> {
+) -> Result<Vec<String>, String> {
     let front_matter = read_front_matter(definition)?
         .ok_or_else(|| "Claude agent definition has no YAML front matter".to_owned())?;
     let front_matter = parse_provider_definition_front_matter(front_matter)?;
     front_matter.validate_identity(expected_capability, "Claude agent definition")?;
-    if !front_matter.has_tools() {
-        return Err("Claude agent definition must declare a non-empty tools field".to_owned());
-    }
+    let tools = front_matter
+        .tools()
+        .ok_or_else(|| "Claude agent definition must declare a non-empty tools field".to_owned())?;
     let model = front_matter
         .model()
         .ok_or_else(|| "Claude agent definition must declare a model field".to_owned())?;
@@ -122,25 +187,47 @@ fn validate_agent_definition(
             "Claude agent model '{model}' does not match profile model '{profile_model}'"
         ));
     }
-    Ok(())
+    Ok(tools.into_iter().map(str::to_owned).collect())
 }
 
 fn build_claude_args(
     capability: &str,
     model: &str,
     effort: ReasoningEffort,
+    allowed_tools: &[String],
     prompt: &str,
 ) -> Vec<OsString> {
-    vec![
-        OsString::from("-p"),
-        OsString::from("--agent"),
-        OsString::from(capability),
-        OsString::from("--model"),
-        OsString::from(model),
-        OsString::from("--effort"),
-        OsString::from(reasoning_effort_value(effort)),
-        OsString::from(prompt),
-    ]
+    build_claude_args_with_resume(capability, model, effort, allowed_tools, None, prompt)
+}
+
+fn build_claude_args_with_resume(
+    capability: &str,
+    model: &str,
+    effort: ReasoningEffort,
+    allowed_tools: &[String],
+    resume_id: Option<&str>,
+    prompt: &str,
+) -> Vec<OsString> {
+    vec![OsString::from("-p")]
+        .into_iter()
+        .chain(
+            resume_id.into_iter().flat_map(|id| [OsString::from("--resume"), OsString::from(id)]),
+        )
+        .chain([OsString::from("--permission-mode"), OsString::from("dontAsk")])
+        .chain([OsString::from("--allowedTools")])
+        .chain(allowed_tools.iter().map(OsString::from))
+        .chain([
+            OsString::from("--output-format"),
+            OsString::from("stream-json"),
+            OsString::from("--agent"),
+            OsString::from(capability),
+            OsString::from("--model"),
+            OsString::from(model),
+            OsString::from("--effort"),
+            OsString::from(reasoning_effort_value(effort)),
+            OsString::from(prompt),
+        ])
+        .collect()
 }
 
 fn reasoning_effort_value(effort: ReasoningEffort) -> &'static str {
@@ -162,14 +249,21 @@ mod tests {
     use std::sync::{Arc, Mutex};
     use std::time::Duration;
 
+    use super::super::process::ProviderProcessOutput;
     use super::super::{MAX_CAPABILITY_EXEC_TEXT_BYTES, ProviderProcessRunner};
-    use super::{ClaudeCapabilityAdapter, build_claude_args, validate_agent_definition};
+    use super::{ClaudeCapabilityAdapter, agent_tools_from_definition, build_claude_args};
+    use crate::provider_session::FsProviderSessionCacheAdapter;
     use usecase::capability_exec::{
         BriefingText, CapabilityDispatchOutcome, CapabilityDispatchRequest, CapabilityExecError,
         CapabilityExecRequest, CapabilityFilePath, CapabilityProfile, CapabilityProviderPort,
-        DisciplineText, ExecutionMode, ModelName, ProviderName, ReasoningEffort, TimeoutSeconds,
+        CapabilityResumeRequest, DisciplineText, ExecutionMode, ModelName, ProviderName,
+        ReasoningEffort, TargetArtifactPath, TargetArtifactSet, TimeoutSeconds,
     };
     use usecase::dry_write_driver::CapabilityName;
+    use usecase::provider_session::{
+        ProviderSessionCacheEntry, ProviderSessionCacheKey, ProviderSessionCachePort,
+        ProviderSessionId,
+    };
 
     type RecordedInvocation = (String, Vec<OsString>, Option<Duration>);
 
@@ -177,6 +271,7 @@ mod tests {
     struct RecordingProcessRunner {
         invocations: Mutex<Vec<RecordedInvocation>>,
         exit_code: u8,
+        exit_codes: Mutex<Vec<u8>>,
     }
 
     impl ProviderProcessRunner for RecordingProcessRunner {
@@ -188,13 +283,19 @@ mod tests {
             _runtime_dir: &Path,
             _provider: &ProviderName,
             timeout: Option<Duration>,
-        ) -> Result<u8, CapabilityExecError> {
+        ) -> Result<ProviderProcessOutput, CapabilityExecError> {
             self.invocations.lock().expect("test process recorder lock").push((
                 binary.to_owned(),
                 args.to_vec(),
                 timeout,
             ));
-            Ok(self.exit_code)
+            let exit_code = self
+                .exit_codes
+                .lock()
+                .expect("test process exit-code lock")
+                .pop()
+                .unwrap_or(self.exit_code);
+            Ok(ProviderProcessOutput { exit_code, session_id: None })
         }
     }
 
@@ -208,6 +309,7 @@ mod tests {
                 host: ProviderName::try_new(host)?,
                 briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
                 timeout: None,
+                resume: usecase::capability_exec::CapabilityResumeRequest::Fresh,
             },
             profile: CapabilityProfile {
                 provider: ProviderName::try_new("claude")?,
@@ -237,35 +339,38 @@ mod tests {
     fn test_claude_agent_matching_model_and_tools_is_valid() {
         let definition = "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools:\n  - Read\n---\nbody\n";
 
-        assert_eq!(validate_agent_definition(definition, "implementer", "claude-opus"), Ok(()));
+        assert_eq!(
+            agent_tools_from_definition(definition, "implementer", "claude-opus"),
+            Ok(vec!["Read".to_owned()])
+        );
     }
 
     #[test]
     fn test_claude_agent_missing_tools_is_rejected() {
         let definition = "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\n---\nbody\n";
 
-        assert!(validate_agent_definition(definition, "implementer", "claude-opus").is_err());
+        assert!(agent_tools_from_definition(definition, "implementer", "claude-opus").is_err());
     }
 
     #[test]
     fn test_claude_agent_model_mismatch_is_rejected() {
         let definition = "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-haiku\ntools: Read\n---\nbody\n";
 
-        assert!(validate_agent_definition(definition, "implementer", "claude-opus").is_err());
+        assert!(agent_tools_from_definition(definition, "implementer", "claude-opus").is_err());
     }
 
     #[test]
     fn test_claude_agent_nested_model_and_tools_are_rejected() {
         let definition = "---\nname: implementer\ndescription: Implements assigned tasks.\nmetadata:\n  model: claude-opus\n  tools: Read\n---\nbody\n";
 
-        assert!(validate_agent_definition(definition, "implementer", "claude-opus").is_err());
+        assert!(agent_tools_from_definition(definition, "implementer", "claude-opus").is_err());
     }
 
     #[test]
     fn test_claude_agent_malformed_front_matter_is_rejected() {
         let definition = "---\nmodel: [claude-opus\ntools: Read\n---\nbody\n";
 
-        assert!(validate_agent_definition(definition, "implementer", "claude-opus").is_err());
+        assert!(agent_tools_from_definition(definition, "implementer", "claude-opus").is_err());
     }
 
     #[test]
@@ -274,6 +379,7 @@ mod tests {
             "implementer",
             "claude-opus",
             ReasoningEffort::Max,
+            &["Read".to_owned()],
             "Read tmp/briefing.md and perform the task.",
         );
         let values: Vec<_> = args.iter().map(|value| value.to_string_lossy()).collect();
@@ -282,6 +388,12 @@ mod tests {
             values,
             [
                 "-p",
+                "--permission-mode",
+                "dontAsk",
+                "--allowedTools",
+                "Read",
+                "--output-format",
+                "stream-json",
                 "--agent",
                 "implementer",
                 "--model",
@@ -356,6 +468,12 @@ mod tests {
             args,
             [
                 "-p",
+                "--permission-mode",
+                "dontAsk",
+                "--allowedTools",
+                "Read",
+                "--output-format",
+                "stream-json",
                 "--agent",
                 "implementer",
                 "--model",
@@ -366,6 +484,237 @@ mod tests {
             ]
         );
         assert_eq!(invocation.2, None, "an omitted timeout runs the provider without a limit");
+        Ok(())
+    }
+
+    #[test]
+    fn test_claude_capability_adapter_resumes_workspace_session_with_explicit_flags()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_agent(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let mut adapter = ClaudeCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+        let mut request = request_from_host("codex")?;
+        let targets = TargetArtifactSet::try_new(vec![TargetArtifactPath::try_new(
+            PathBuf::from("track/items/a/spec.json"),
+        )?])?;
+        request.request.resume = CapabilityResumeRequest::Resume(targets.clone());
+        let cache = Arc::new(FsProviderSessionCacheAdapter::new(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+        ));
+        let key = ProviderSessionCacheKey::WorkspaceCapability {
+            capability: request.request.capability.clone(),
+            target_artifacts: targets,
+        };
+        cache.save(
+            &key,
+            &ProviderSessionCacheEntry::new(
+                ProviderSessionId::try_new("prior-session".to_owned())?,
+                request.profile.provider.clone(),
+                request.profile.model.clone(),
+                request.profile.effort,
+            ),
+        )?;
+        adapter.session_cache = cache;
+
+        adapter.dispatch(&request)?;
+
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        let first = invocations.first().expect("one invocation recorded");
+        let args: Vec<_> =
+            first.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();
+        assert!(args.windows(2).any(|pair| pair == ["--resume", "prior-session"]));
+        assert!(args.windows(2).any(|pair| pair == ["--model", "claude-opus"]));
+        assert!(args.windows(2).any(|pair| pair == ["--effort", "high"]));
+        assert!(args.windows(2).any(|pair| pair == ["--permission-mode", "dontAsk"]));
+        assert!(args.windows(2).any(|pair| pair == ["--allowedTools", "Read"]));
+        Ok(())
+    }
+
+    #[test]
+    fn test_claude_capability_adapter_provider_mismatch_starts_fresh_with_explicit_flags()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_agent(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let mut adapter = ClaudeCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+        let mut request = request_from_host("codex")?;
+        let targets = TargetArtifactSet::try_new(vec![TargetArtifactPath::try_new(
+            PathBuf::from("track/items/a/spec.json"),
+        )?])?;
+        request.request.resume = CapabilityResumeRequest::Resume(targets.clone());
+        let cache = Arc::new(FsProviderSessionCacheAdapter::new(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+        ));
+        let key = ProviderSessionCacheKey::WorkspaceCapability {
+            capability: request.request.capability.clone(),
+            target_artifacts: targets,
+        };
+        let current_provider = request.profile.provider.clone();
+        let recorded_provider = ProviderName::try_new("codex")?;
+        assert_ne!(current_provider, recorded_provider);
+        cache.save(
+            &key,
+            &ProviderSessionCacheEntry::new(
+                ProviderSessionId::try_new("stale-codex-session".to_owned())?,
+                recorded_provider,
+                request.profile.model.clone(),
+                request.profile.effort,
+            ),
+        )?;
+        adapter.session_cache = cache;
+
+        adapter.dispatch(&request)?;
+
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        let args: Vec<_> = invocations
+            .first()
+            .expect("one fresh invocation recorded")
+            .1
+            .iter()
+            .map(|value| value.to_string_lossy().into_owned())
+            .collect();
+        assert!(!args.contains(&"--resume".to_owned()));
+        assert!(args.windows(2).any(|pair| pair == ["--model", "claude-opus"]));
+        assert!(args.windows(2).any(|pair| pair == ["--effort", "high"]));
+        assert!(args.windows(2).any(|pair| pair == ["--permission-mode", "dontAsk"]));
+        assert!(args.windows(2).any(|pair| pair == ["--allowedTools", "Read"]));
+        Ok(())
+    }
+
+    #[test]
+    fn test_claude_capability_adapter_model_mismatch_starts_fresh_with_explicit_flags()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_agent(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let mut adapter = ClaudeCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+        let mut request = request_from_host("codex")?;
+        let targets = TargetArtifactSet::try_new(vec![TargetArtifactPath::try_new(
+            PathBuf::from("track/items/a/spec.json"),
+        )?])?;
+        request.request.resume = CapabilityResumeRequest::Resume(targets.clone());
+        let cache = Arc::new(FsProviderSessionCacheAdapter::new(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+        ));
+        let key = ProviderSessionCacheKey::WorkspaceCapability {
+            capability: request.request.capability.clone(),
+            target_artifacts: targets,
+        };
+        let recorded_model = ModelName::try_new("claude-haiku")?;
+        assert_ne!(request.profile.model, recorded_model);
+        cache.save(
+            &key,
+            &ProviderSessionCacheEntry::new(
+                ProviderSessionId::try_new("stale-model-session".to_owned())?,
+                request.profile.provider.clone(),
+                recorded_model,
+                request.profile.effort,
+            ),
+        )?;
+        adapter.session_cache = cache;
+
+        adapter.dispatch(&request)?;
+
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        assert_eq!(invocations.len(), 1);
+        let args: Vec<_> = invocations
+            .first()
+            .expect("one fresh invocation recorded")
+            .1
+            .iter()
+            .map(|value| value.to_string_lossy().into_owned())
+            .collect();
+        assert!(!args.contains(&"--resume".to_owned()));
+        assert!(args.windows(2).any(|pair| pair == ["--model", "claude-opus"]));
+        assert!(args.windows(2).any(|pair| pair == ["--effort", "high"]));
+        assert!(args.windows(2).any(|pair| pair == ["--permission-mode", "dontAsk"]));
+        assert!(args.windows(2).any(|pair| pair == ["--allowedTools", "Read"]));
+        Ok(())
+    }
+
+    #[test]
+    fn test_claude_capability_adapter_resume_nonzero_retries_fresh_with_explicit_flags()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_agent(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner {
+            exit_codes: Mutex::new(vec![0, 7]),
+            ..Default::default()
+        });
+        let mut adapter = ClaudeCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+        let mut request = request_from_host("codex")?;
+        let targets = TargetArtifactSet::try_new(vec![TargetArtifactPath::try_new(
+            PathBuf::from("track/items/a/spec.json"),
+        )?])?;
+        request.request.resume = CapabilityResumeRequest::Resume(targets.clone());
+        let cache = Arc::new(FsProviderSessionCacheAdapter::new(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+        ));
+        let key = ProviderSessionCacheKey::WorkspaceCapability {
+            capability: request.request.capability.clone(),
+            target_artifacts: targets,
+        };
+        cache.save(
+            &key,
+            &ProviderSessionCacheEntry::new(
+                ProviderSessionId::try_new("prior-session".to_owned())?,
+                request.profile.provider.clone(),
+                request.profile.model.clone(),
+                request.profile.effort,
+            ),
+        )?;
+        adapter.session_cache = cache;
+
+        let outcome = adapter.dispatch(&request)?;
+
+        assert!(matches!(outcome, CapabilityDispatchOutcome::Executed { exit_code: 0, .. }));
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        assert_eq!(invocations.len(), 2);
+        for (index, invocation) in invocations.iter().enumerate() {
+            let args: Vec<_> =
+                invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();
+            assert_eq!(args.contains(&"--resume".to_owned()), index == 0);
+            assert!(args.windows(2).any(|pair| pair == ["--model", "claude-opus"]));
+            assert!(args.windows(2).any(|pair| pair == ["--effort", "high"]));
+            assert!(args.windows(2).any(|pair| pair == ["--permission-mode", "dontAsk"]));
+            assert!(args.windows(2).any(|pair| pair == ["--allowedTools", "Read"]));
+            assert!(args.last().is_some_and(|prompt| prompt.contains(
+                "check whether upstream artifacts changed; if they did, reread them before working"
+            )));
+        }
         Ok(())
     }
 

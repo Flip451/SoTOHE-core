@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "5a9634afc398d21929c20916ddc447c6167bcab1564f8b4a031c10dbf3dfd149",
+  "catalogue_declaration_hash": "8c66dd0a8bb779f0682efc30ab541a51657250cbe065734ec2d2240cef89c48c",
   "signals": [
     {
       "type_name": "CapabilityDriver",
@@ -20,7 +20,7 @@
     {
       "type_name": "TargetArtifactPathArg",
       "signal": "blue",
-      "entry_hash": "8da5b7a76bd6c8a32a4833c1e17faa81ff1e18fa5426b29b9cac9ec2acdc3e7a"
+      "entry_hash": "f2487472a348ab8528bbaaa3634947f92b01faaadd19b3eba450ed67b0602d45"
     }
   ]
 }

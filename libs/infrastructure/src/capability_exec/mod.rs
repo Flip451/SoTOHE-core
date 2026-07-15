@@ -8,6 +8,7 @@ pub(crate) mod path_guard;
 pub(crate) mod process;
 pub(crate) mod prompt;
 pub(crate) mod read;
+pub(crate) mod session;
 pub mod source;
 
 use usecase::capability_exec::{
@@ -187,7 +188,7 @@ mod tests {
         let provider = ProviderName::try_new("codex")?;
         let args = [OsString::from("-c"), OsString::from("sleep 0.2; exit 7")];
 
-        let exit_code = run_provider_process_with_timeout(
+        let output = run_provider_process_with_timeout(
             "sh",
             &args,
             repository.path(),
@@ -196,7 +197,7 @@ mod tests {
             None,
         )?;
 
-        assert_eq!(exit_code, 7);
+        assert_eq!(output.exit_code, 7);
         Ok(())
     }
 
@@ -261,7 +262,7 @@ mod tests {
         let parsed = parse_provider_definition_front_matter(front_matter)
             .expect("top-level tools list parses");
 
-        assert!(parsed.has_tools());
+        assert_eq!(parsed.tools(), Some(vec!["Read", "Edit"]));
         assert_eq!(parsed.validate_identity("implementer", "provider definition"), Ok(()));
     }
 

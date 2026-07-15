@@ -8,7 +8,7 @@ GO-02 → T003, T004, T007, T008, T009.
 GO-03 → T005, T011, T012, T013, T014, T015, T016, T017, T018.
 GO-04 → T001, T002, T003, T004, T005, T007, T008, T009, T011, T012, T013, T014, T015, T016, T017, T018, T019.
 
-## Tasks (13/17 resolved)
+## Tasks (15/17 resolved)
 
 ### S1 — Explicit dispatch profile resolution
 
@@ -47,8 +47,8 @@ GO-04 → T001, T002, T003, T004, T005, T007, T008, T009, T011, T012, T013, T014
 > Run T007 after T001, T002, and T003.
 > Run T008 after T007.
 
-- [ ] **T007**: Modify `libs/usecase/src/capability_exec.rs` (`CapabilityDispatchOutcome`, `CapabilityDispatchRequest`, `CapabilityExecRequest`, `CapabilityProviderPort`, `CapabilityFailureDetail`, `CapabilityFilePath`, `CapabilityInputValidationError`, `CapabilityResumeRequest`, and `TimeoutSeconds`) and `libs/infrastructure/src/capability_exec/{claude,codex}.rs` (`ClaudeCapabilityAdapter` and `CodexCapabilityAdapter`); add usecase and process-boundary tests plus `track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json` entries. IN-01, IN-02, IN-08, IN-09, CN-01, CN-02, CN-04, CN-08, CN-10, AC-01, AC-02, AC-09, AC-10.
-- [ ] **T008**: Modify `apps/cli-driver/src/capability.rs` (`CapabilityDriver`, `CapabilityExecDriverInput`, `CapabilityResumeArg`, and `TargetArtifactPathArg`), `apps/cli/src/commands/capability.rs` (`CapabilityCommand`, `CapabilityExecArgs`, and `cli::commands::capability::execute`), and `apps/cli-composition/src/capability.rs` (`CapabilityCompositionRoot`); add CLI fixtures and `track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json` entries. IN-08, IN-09, CN-04, CN-10, AC-09, AC-10.
+- [x] **T007**: Modify `libs/usecase/src/capability_exec.rs` (`CapabilityDispatchOutcome`, `CapabilityDispatchRequest`, `CapabilityExecRequest`, `CapabilityProviderPort`, `CapabilityFailureDetail`, `CapabilityFilePath`, `CapabilityInputValidationError`, `CapabilityResumeRequest`, and `TimeoutSeconds`) and `libs/infrastructure/src/capability_exec/{claude,codex}.rs` (`ClaudeCapabilityAdapter` and `CodexCapabilityAdapter`); add usecase and process-boundary tests plus `track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json` entries. IN-01, IN-02, IN-08, IN-09, CN-01, CN-02, CN-04, CN-08, CN-10, AC-01, AC-02, AC-09, AC-10.
+- [x] **T008**: Modify `apps/cli-driver/src/capability.rs` (`CapabilityDriver`, `CapabilityExecDriverInput`, `CapabilityResumeArg`, and `TargetArtifactPathArg`), `apps/cli/src/commands/capability.rs` (`CapabilityCommand`, `CapabilityExecArgs`, `cli::commands::capability::execute`, and `cli::commands::capability::into_driver_input`), and `apps/cli-composition/src/capability.rs` (`CapabilityCompositionRoot`); add CLI fixtures and `track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json` entries. IN-08, IN-09, CN-04, CN-10, AC-09, AC-10.
 
 ### S5 — Operational contract cutover
 

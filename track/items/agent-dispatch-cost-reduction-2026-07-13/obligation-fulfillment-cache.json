@@ -867,6 +867,30 @@
     },
     {
       "edge_id": {
+        "entry_key": "cli::commands::capability::into_driver_input",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::capability::into_driver_input",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "5cccca7cd67df8f19c03401f02e4f2c8223ac120910a9cf9878812f40e7e624e",
+        "declaration_hash": "0aa24d54fbcdd45d06d84ae23ef62757179fc911501499f17bb4faa8021dc851",
+        "anchor_text_hash": "cb1121edfe3e7d42504d7f4a07514cb6b78742ed5f048b8f98ea64e1f8684c3b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(into_driver_input(fresh).resume, CapabilityResumeArg::Fresh);\n        assert!(targetless.target_artifacts.is_empty());\n        assert_eq!(into_driver_input(targetless).resume, CapabilityResumeArg::ResumeWithoutTarget);\n        assert_eq!(\n            into_driver_input(targeted).resume,\n            CapabilityResumeArg::Resume(vec![\n                \"track/items/a/spec.json\"\n                    .parse::<TargetArtifactPathArg>()\n                    .expect(\"normalized target\")\n            ])\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
         "entry_key": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args",
         "anchor_id": {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
@@ -2007,13 +2031,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "30ec01934ba407f49d436c871bcf20cff349e500fc4b9c63eaab89738eaa56a1",
+        "bound_tests_set_hash": "50e836da69a869b27461aee20adbc1fcd32b1f6bd7559d36584d20a83bc56b54",
         "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
         "anchor_text_hash": "d83bf653d5d0148b2c13a4caf5f7a6173f7eb775ca9d95ae17c4509eadd9d4e9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")), \"workspace capability sessions must stay under the workspace transient path\"); assert!(track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")), \"track capability sessions must stay inside that track's artifact directory\"); assert_ne!(track_path.parent(), first_path.parent()); assert_eq!(track_identity, \"track-capability:track-a:implementer\");"
+        "citation": "assert!(first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")), \"workspace capability sessions must stay under the workspace transient path\"); assert!(track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")), \"track capability sessions must stay inside that track's artifact directory\"); assert_ne!(track_path.parent(), first_path.parent()); assert_eq!(track_identity, \"track-capability:track-a:implementer\"); assert!(first_path.is_file()); assert!(second_path.is_file()); assert!(track_path.is_file());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2031,13 +2055,13 @@
         "item_identifier": "trait_method:save"
       },
       "key": {
-        "bound_tests_set_hash": "30ec01934ba407f49d436c871bcf20cff349e500fc4b9c63eaab89738eaa56a1",
+        "bound_tests_set_hash": "50e836da69a869b27461aee20adbc1fcd32b1f6bd7559d36584d20a83bc56b54",
         "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
         "anchor_text_hash": "d83bf653d5d0148b2c13a4caf5f7a6173f7eb775ca9d95ae17c4509eadd9d4e9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(\n            first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")),\n            \"workspace capability sessions must stay under the workspace transient path\"\n        );\n        assert!(\n            track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")),\n            \"track capability sessions must stay inside that track's artifact directory\"\n        );\n        assert_ne!(track_path.parent(), first_path.parent());"
+        "citation": "assert!(\n            track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")),\n            \"track capability sessions must stay inside that track's artifact directory\"\n        );\n        assert_ne!(track_path.parent(), first_path.parent());\n        assert_eq!(track_identity, \"track-capability:track-a:implementer\");\n        assert!(first_identity.contains(\"workspace-capability:implementer:\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2055,13 +2079,13 @@
         "item_identifier": "trait_method:remove"
       },
       "key": {
-        "bound_tests_set_hash": "30ec01934ba407f49d436c871bcf20cff349e500fc4b9c63eaab89738eaa56a1",
+        "bound_tests_set_hash": "50e836da69a869b27461aee20adbc1fcd32b1f6bd7559d36584d20a83bc56b54",
         "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
         "anchor_text_hash": "d83bf653d5d0148b2c13a4caf5f7a6173f7eb775ca9d95ae17c4509eadd9d4e9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")), \"workspace capability sessions must stay under the workspace transient path\"); assert!(track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")), \"track capability sessions must stay inside that track's artifact directory\"); assert_ne!(track_path.parent(), first_path.parent()); assert_ne!(first_path, second_path, \"workspace artifact identities need distinct files\"); assert_ne!(first_identity, second_identity);"
+        "citation": "assert_ne!(first_path, second_path, \"workspace artifact identities need distinct files\");\n        assert_ne!(first_identity, second_identity);\n        assert!(\n            first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")),\n            \"workspace capability sessions must stay under the workspace transient path\"\n        );\n        assert!(\n            track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")),\n            \"track capability sessions must stay inside that track's artifact directory\"\n        );\n        assert_ne!(track_path.parent(), first_path.parent());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2151,13 +2175,13 @@
         "item_identifier": "trait_impl:usecase::provider_session::ProviderSessionCachePort"
       },
       "key": {
-        "bound_tests_set_hash": "30ec01934ba407f49d436c871bcf20cff349e500fc4b9c63eaab89738eaa56a1",
+        "bound_tests_set_hash": "50e836da69a869b27461aee20adbc1fcd32b1f6bd7559d36584d20a83bc56b54",
         "declaration_hash": "d67fa7b401c0a20783618c4c0c285ce13681cc1ffe622e92b47d0f79d4176d38",
         "anchor_text_hash": "d83bf653d5d0148b2c13a4caf5f7a6173f7eb775ca9d95ae17c4509eadd9d4e9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")), \"workspace capability sessions must stay under the workspace transient path\"); assert!(track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")), \"track capability sessions must stay inside that track's artifact directory\"); assert_ne!(track_path.parent(), first_path.parent()); assert_eq!(track_identity, \"track-capability:track-a:implementer\"); assert!(first_identity.contains(\"workspace-capability:implementer:\"));"
+        "citation": "assert!(\n            first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")),\n            \"workspace capability sessions must stay under the workspace transient path\"\n        );\n        assert!(\n            track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")),\n            \"track capability sessions must stay inside that track's artifact directory\"\n        );\n        assert_ne!(track_path.parent(), first_path.parent());\n        assert_eq!(track_identity, \"track-capability:track-a:implementer\");\n        assert!(first_identity.contains(\"workspace-capability:implementer:\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5254,6 +5278,942 @@
       "verdict": {
         "kind": "fulfilled",
         "citation": "assert!(arguments.contains(\"resume prior-session\"), \"expected resume argv: {arguments}\");\n        assert!(arguments.contains(\"--model codex-review-model\"), \"missing model argv: {arguments}\");\n        assert!(arguments.contains(\"--sandbox read-only\"), \"missing sandbox argv: {arguments}\");\n        assert!(arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"), \"missing effort argv: {arguments}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "fde374cad3d0db1c1b5b9219767fc2f91ea5be94c66137bd439132be5e81e4ec",
+        "declaration_hash": "6b1b39446fdbc2e10992246043098766cd1602bd809e4827add12361cb67c467",
+        "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(args.windows(2).any(|pair| pair == [\"--model\", \"claude-opus\"]));\n        assert!(args.windows(2).any(|pair| pair == [\"--effort\", \"high\"]));\n        assert!(args.windows(2).any(|pair| pair == [\"--permission-mode\", \"dontAsk\"]));\n        assert!(args.windows(2).any(|pair| pair == [\"--allowedTools\", \"Read\"]));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "fde374cad3d0db1c1b5b9219767fc2f91ea5be94c66137bd439132be5e81e4ec",
+        "declaration_hash": "6b1b39446fdbc2e10992246043098766cd1602bd809e4827add12361cb67c467",
+        "anchor_text_hash": "042865d7c2f3ee57558d16bbda502891955644407e647ab52193b9aa10aa9c88"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!args.contains(&\"--resume\".to_owned()));\nassert!(args.windows(2).any(|pair| pair == [\"--model\", \"claude-opus\"]));\nassert!(args.windows(2).any(|pair| pair == [\"--effort\", \"high\"]));\nassert!(args.windows(2).any(|pair| pair == [\"--permission-mode\", \"dontAsk\"]));\nassert!(args.windows(2).any(|pair| pair == [\"--allowedTools\", \"Read\"]));\nassert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "fde374cad3d0db1c1b5b9219767fc2f91ea5be94c66137bd439132be5e81e4ec",
+        "declaration_hash": "6b1b39446fdbc2e10992246043098766cd1602bd809e4827add12361cb67c467",
+        "anchor_text_hash": "352679c83a776ed39e6ab98c82bac69f8455389fad22f2fa56704a6573584b5e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\"); ... assert!(args.last().is_some_and(|prompt| prompt.contains(\n                \"check whether upstream artifacts changed; if they did, reread them before working\"\n            )));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "fccc0dde81d336d8d31d6b359ee1d2d357d87ab7e92906190b06112f23cb809b",
+        "declaration_hash": "d7c1fb987e30e8ab87dac8a90ebc75a7064d6d65aec6e8e1b3dcb5ebb18dbefc",
+        "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(args.windows(2).any(|pair| pair == [\"-m\", \"gpt-5\"]));\n        assert!(args.contains(&\"model_reasoning_effort=\\\"high\\\"\".to_owned()));\n        assert!(args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace-write\"]));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "fccc0dde81d336d8d31d6b359ee1d2d357d87ab7e92906190b06112f23cb809b",
+        "declaration_hash": "d7c1fb987e30e8ab87dac8a90ebc75a7064d6d65aec6e8e1b3dcb5ebb18dbefc",
+        "anchor_text_hash": "042865d7c2f3ee57558d16bbda502891955644407e647ab52193b9aa10aa9c88"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(resumed.0, Verdict::ZeroFindings)); ... assert!(matches!(model_mismatch.0, Verdict::ZeroFindings)); ... assert!(matches!(provider_mismatch.0, Verdict::ZeroFindings)); ... assert!(matches!(first_round.0, Verdict::ZeroFindings)); ... assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\"); ... assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\"); ... assert!(matches!(run(RoundType::Final, matched_key.clone(), \"fast-keyed-final-codex.sh\", false).0, Verdict::ZeroFindings)); ... assert!(args.windows(2).any(|pair| pair == [\"-m\", \"gpt-5\"])); assert!(args.contains(&\"model_reasoning_effort=\\\"high\\\"\".to_owned())); assert!(args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace-write\"]));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "fccc0dde81d336d8d31d6b359ee1d2d357d87ab7e92906190b06112f23cb809b",
+        "declaration_hash": "d7c1fb987e30e8ab87dac8a90ebc75a7064d6d65aec6e8e1b3dcb5ebb18dbefc",
+        "anchor_text_hash": "352679c83a776ed39e6ab98c82bac69f8455389fad22f2fa56704a6573584b5e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(outcome, CapabilityDispatchOutcome::Executed { exit_code: 0, .. }));\nassert_eq!(invocations.len(), 2);\nassert_eq!(args.contains(&\"resume\".to_owned()), index == 0);\nassert!(args.windows(2).any(|pair| pair == [\"-m\", \"gpt-5\"]));\nassert!(args.contains(&\"model_reasoning_effort=\\\"high\\\"\".to_owned()));\nassert!(args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace-write\"]));\nassert!(args.last().is_some_and(|prompt| prompt.contains(\n    \"check whether upstream artifacts changed; if they did, reread them before working\"\n)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecRequest",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "41fe703c8ace20fd73e60e327e53ef3f973aaa1f03d912f12fd712b10b5b0707",
+        "declaration_hash": "7273f0aafc9daae7f8f3df7eaca3eaaa42646019cff06089666403f36bbdabd1",
+        "anchor_text_hash": "cb1121edfe3e7d42504d7f4a07514cb6b78742ed5f048b8f98ea64e1f8684c3b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(same_track.resumable_id(&request.request.resume),\n    Some(\"same-track-session\".to_owned())\n);\nassert_eq!(other_track.resumable_id(&request.request.resume), None);\nassert_eq!(other_capability.resumable_id(&other_capability_request.request.resume), None);\nassert_eq!(same_track.resumable_id(&CapabilityResumeRequest::Fresh), None);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecRequest",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "347aca752f8e0a845a740cea748a29d8de5454f051503d87b5f4b949bcf49d77",
+        "declaration_hash": "7273f0aafc9daae7f8f3df7eaca3eaaa42646019cff06089666403f36bbdabd1",
+        "anchor_text_hash": "875aeaabc70f7773ea6a5c22c3ffd8eca0526bac8fc0275fe201d43f790c4f6d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"assert_ne!(cache_key(&first, None), cache_key(&second, None));\" ... \"assert_eq!(cache_key(&targetless, None), None);\" ... \"first_path.starts_with(directory.path().join(\\\"tmp/runtime/provider-sessions\\\"))\" ... \"track_path.starts_with(directory.path().join(\\\"track/items/track-a/.provider-sessions\\\"))\" ... \"assert_eq!(track_identity, \\\"track-capability:track-a:implementer\\\");\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecRequest",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "5d687866f59b685500330b33588e209039f21011a643c570d64b7fae1bdfe460",
+        "declaration_hash": "7273f0aafc9daae7f8f3df7eaca3eaaa42646019cff06089666403f36bbdabd1",
+        "anchor_text_hash": "d83bf653d5d0148b2c13a4caf5f7a6173f7eb775ca9d95ae17c4509eadd9d4e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(cache_key(&first, None), cache_key(&second, None));\nassert_eq!(cache_key(&targetless, None), None);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecRequest",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "22635484b9a36a11c7e88c9422e32b8b87dabf1b679079790a9c66967a625210",
+        "declaration_hash": "7273f0aafc9daae7f8f3df7eaca3eaaa42646019cff06089666403f36bbdabd1",
+        "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(same_track.resumable_id(&request.request.resume), Some(\"same-track-session\".to_owned()));\nassert_eq!(other_track.resumable_id(&request.request.resume), None);\nassert_eq!(other_capability.resumable_id(&other_capability_request.request.resume), None);\nassert_eq!(same_track.resumable_id(&CapabilityResumeRequest::Fresh), None);\nassert_ne!(cache_key(&first, None), cache_key(&second, None));\nassert_eq!(cache_key(&targetless, None), None);\nassert!(!args.contains(&\"--resume\".to_owned()));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecRequest",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "4042ba52b3a76bf65ca008f328132e49e580a4f0858582fbfc24b480ac3c0dce",
+        "declaration_hash": "7273f0aafc9daae7f8f3df7eaca3eaaa42646019cff06089666403f36bbdabd1",
+        "anchor_text_hash": "352679c83a776ed39e6ab98c82bac69f8455389fad22f2fa56704a6573584b5e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(outcome, CapabilityDispatchOutcome::Executed { exit_code: 0, .. }));\nlet invocations = runner.invocations.lock().expect(\"test process recorder lock\");\nassert_eq!(invocations.len(), 2);\nfor (index, invocation) in invocations.iter().enumerate() {\n    let args: Vec<_> =\n        invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();\n    assert_eq!(args.contains(&\"resume\".to_owned()), index == 0);\n    assert!(args.windows(2).any(|pair| pair == [\"-m\", \"gpt-5\"]));\n    assert!(args.contains(&\"model_reasoning_effort=\\\"high\\\"\".to_owned()));\n    assert!(args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace-write\"]));\n    assert!(args.last().is_some_and(|prompt| prompt.contains(\n        \"check whether upstream artifacts changed; if they did, reread them before working\"\n    )));\n}"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityInputValidationError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityInputValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "64cfb46a44e498d81b3e7bb5cd8487e9dc87d4fe30594d68a0024e621aef53be",
+        "declaration_hash": "48c62bb6409e7cebb7b89ee88395ab49fc322ae53b65390b8052fbf2f2650b98",
+        "anchor_text_hash": "cb1121edfe3e7d42504d7f4a07514cb6b78742ed5f048b8f98ea64e1f8684c3b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n    TargetArtifactPath::try_new(PathBuf::from(\"../outside/spec.json\")),\n    Err(CapabilityInputValidationError::InvalidFilePath)\n));\nassert!(matches!(\n    TargetArtifactPath::try_new(PathBuf::from(\"/absolute/spec.json\")),\n    Err(CapabilityInputValidationError::InvalidFilePath)\n));\nassert!(matches!(\n    TargetArtifactPath::try_new(PathBuf::new()),\n    Err(CapabilityInputValidationError::EmptyFilePath)\n));\nassert!(matches!(\n    TargetArtifactSet::try_new(vec![]),\n    Err(CapabilityInputValidationError::EmptyTargetArtifactSet)\n));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityInputValidationError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityInputValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "afcfa997601900937a55a9aabb2b4dea49b1c6eff63d7fc33c2fb1ec0c5c5607",
+        "declaration_hash": "48c62bb6409e7cebb7b89ee88395ab49fc322ae53b65390b8052fbf2f2650b98",
+        "anchor_text_hash": "875aeaabc70f7773ea6a5c22c3ffd8eca0526bac8fc0275fe201d43f790c4f6d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n    CapabilityFilePath::try_new(path),\n    Err(CapabilityInputValidationError::InvalidFilePath)\n));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityInputValidationError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityInputValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "97b2c71a96bca61143e7572dbde47b30da482c29a6f7c9d717b586c25ea529a2",
+        "declaration_hash": "48c62bb6409e7cebb7b89ee88395ab49fc322ae53b65390b8052fbf2f2650b98",
+        "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_matches!(\n            CapabilityFilePathArg::from_str(\"../briefing.md\"),\n            Err(CapabilityInputValidationError::InvalidFilePath)\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityResumeRequest",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityResumeRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "8e7c6078052b82db029f84432827c6b43a810bef1e3d1daf793f97ff77635a40",
+        "declaration_hash": "0a1b3775d1b84d4057489050f127920f2201f42754261cef7badfd1af3206f75",
+        "anchor_text_hash": "cb1121edfe3e7d42504d7f4a07514cb6b78742ed5f048b8f98ea64e1f8684c3b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(same_track.resumable_id(&request.request.resume), Some(\"same-track-session\".to_owned()));\nassert_eq!(other_track.resumable_id(&request.request.resume), None);\nassert_eq!(other_capability.resumable_id(&other_capability_request.request.resume), None);\nassert_eq!(same_track.resumable_id(&CapabilityResumeRequest::Fresh), None);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityResumeRequest",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityResumeRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "edaa9880665517a3f372f1cf8e37c195ba54187d01762e0446c1570dcdc6c2fc",
+        "declaration_hash": "0a1b3775d1b84d4057489050f127920f2201f42754261cef7badfd1af3206f75",
+        "anchor_text_hash": "875aeaabc70f7773ea6a5c22c3ffd8eca0526bac8fc0275fe201d43f790c4f6d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(cache_key(&first, None), cache_key(&second, None));\n        assert_eq!(cache_key(&targetless, None), None);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityResumeRequest",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityResumeRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "ea2660811e8405a588bb3d3e668108606167d5a6dd7052996e70f623c97b1cc3",
+        "declaration_hash": "0a1b3775d1b84d4057489050f127920f2201f42754261cef7badfd1af3206f75",
+        "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(cache_key(&first, None), cache_key(&second, None));\nassert_eq!(cache_key(&targetless, None), None);\nassert_eq!(same_track.resumable_id(&CapabilityResumeRequest::Fresh), None);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "a48619478f19387cd891b5c4255411771cedd0943828f20c098b8f056d19edf3",
+        "declaration_hash": "3819300d375ba2d16180d16e1368177b7a8417159d5685c7abc5655d107860ff",
+        "anchor_text_hash": "cb1121edfe3e7d42504d7f4a07514cb6b78742ed5f048b8f98ea64e1f8684c3b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(args.windows(2).any(|pair| pair == [\"--resume\", \"prior-session\"]));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "35516fb647f254c42265d4a073817055549f24c0d75c1aee1a9865dd9aca297e",
+        "declaration_hash": "3819300d375ba2d16180d16e1368177b7a8417159d5685c7abc5655d107860ff",
+        "anchor_text_hash": "875aeaabc70f7773ea6a5c22c3ffd8eca0526bac8fc0275fe201d43f790c4f6d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(cache_key(&first, None), cache_key(&second, None));\nassert_eq!(cache_key(&targetless, None), None);\nassert!(cache.entries.lock().expect(\"test cache lock\").is_empty());\n\"workspace capability sessions must stay under the workspace transient path\"\n\"track capability sessions must stay inside that track's artifact directory\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "a4414347710b3509ada26070ef688323c968990e283af0496cf9b796e2f8087c",
+        "declaration_hash": "3819300d375ba2d16180d16e1368177b7a8417159d5685c7abc5655d107860ff",
+        "anchor_text_hash": "d83bf653d5d0148b2c13a4caf5f7a6173f7eb775ca9d95ae17c4509eadd9d4e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"the existing runtime directory must stay gitignored\"; \"track-local provider sessions must stay gitignored\"; \"workspace sessions must live under the existing runtime directory\"; \"track sessions must live under the gitignored track-local cache directory\"; \"track_path.starts_with(directory.path().join(\\\"track/items/track-b/.provider-sessions\\\"))\"; \"workspace capability sessions must stay under the workspace transient path\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "629903b9fae3d68601a8d290c491b9061ed96a20b2041a20555e2a3200af1e77",
+        "declaration_hash": "3819300d375ba2d16180d16e1368177b7a8417159d5685c7abc5655d107860ff",
+        "anchor_text_hash": "3d6ce5da0d1d309b25d54c5bc7541563b7c71385a68fd95f99ebc8ecc25a4a13"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(current_provider, recorded_provider);\n...\nadapter.dispatch(&request)?;\n...\nassert!(!args.contains(&\"--resume\".to_owned()));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "5a504f098d5e656d9eb79188b2e8716c3df352fddd7d45b2b77731b165c0fb5a",
+        "declaration_hash": "3819300d375ba2d16180d16e1368177b7a8417159d5685c7abc5655d107860ff",
+        "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(args.windows(2).any(|pair| pair == [\"--resume\", \"prior-session\"]));\nassert_eq!(same_track.resumable_id(&request.request.resume), Some(\"same-track-session\".to_owned()));\nassert_eq!(other_track.resumable_id(&request.request.resume), None);\nassert_eq!(other_capability.resumable_id(&other_capability_request.request.resume), None);\nassert!(!args.contains(&\"--resume\".to_owned()));\nassert_ne!(cache_key(&first, None), cache_key(&second, None));\nassert_eq!(cache_key(&targetless, None), None);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "a7145b6ab7c7ce165e13f3b1790c71b0ce2d97237ec4c19caf3c4c40940cbaed",
+        "declaration_hash": "c146460dd88681f01ec71eaa9a90b45d13d5955135e1f05a2a8cd7c4494120a2",
+        "anchor_text_hash": "cb1121edfe3e7d42504d7f4a07514cb6b78742ed5f048b8f98ea64e1f8684c3b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "request.request.resume = CapabilityResumeRequest::Resume(targets.clone());\n...\nassert!(args.windows(2).any(|pair| pair == [\"resume\", \"prior-session\"]));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "8f159aaf00b8ae6d41a8f8066a6b25a380298d5fedd6ae191e99d3b0e86f9836",
+        "declaration_hash": "c146460dd88681f01ec71eaa9a90b45d13d5955135e1f05a2a8cd7c4494120a2",
+        "anchor_text_hash": "875aeaabc70f7773ea6a5c22c3ffd8eca0526bac8fc0275fe201d43f790c4f6d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(cache_key(&first, None), cache_key(&second, None));\n        assert_eq!(cache_key(&targetless, None), None);\n        assert!(matches!(\n            cache_key(&first, None),\n            Some(ProviderSessionCacheKey::WorkspaceCapability {\n                ref capability,\n                ref target_artifacts,\n            }) if capability.as_str() == \"implementer\"\n                && target_artifacts.as_slice().first().map(|path| path.as_path())\n                    == Some(std::path::Path::new(\"track/items/a/spec.json\"))\n        ));\n\n        let cache = Arc::new(FakeCache::default());\n        let targetless_session = CapabilitySession::new(&targetless, None, cache.clone());\n        targetless_session.save(Some(\"unrecorded-session\".to_owned()));\n        assert!(cache.entries.lock().expect(\"test cache lock\").is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "8e6f532c37b1a5275d1c7878e6ff52b3ead66a0960d71ccfbd8d2566df1af130",
+        "declaration_hash": "c146460dd88681f01ec71eaa9a90b45d13d5955135e1f05a2a8cd7c4494120a2",
+        "anchor_text_hash": "d83bf653d5d0148b2c13a4caf5f7a6173f7eb775ca9d95ae17c4509eadd9d4e9"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"assert!(other_track_path.starts_with(directory.path().join(\\\"track/items/track-b\\\")),\\n            \\\"each track's entries live under that track's own artifact directory\\\"\\n        );\"; \"assert!(\\n            first_path.starts_with(directory.path().join(\\\"tmp/runtime/provider-sessions\\\")),\\n            \\\"workspace capability sessions must stay under the workspace transient path\\\"\\n        );\"; \"assert!(\\n            committed_gitignore.lines().any(|line| line == \\\"tmp/\\\"),\\n            \\\"the existing runtime directory must stay gitignored\\\"\\n        );\\n        assert!(\\n            committed_gitignore.lines().any(|line| line == \\\"track/items/**/.provider-sessions/\\\"),\\n            \\\"track-local provider sessions must stay gitignored\\\"\\n        );\"; \"assert_ne!(track_path, other_track_path, \\\"distinct track ids need distinct storage\\\");\\nassert_ne!(\\n    track_path, other_capability_path,\\n    \\\"distinct capabilities need distinct storage within one track\\\"\\n);\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "4bcacff031dd40ed7495ab742c740cfe42e8134b91a36a8445878868290686bc",
+        "declaration_hash": "c146460dd88681f01ec71eaa9a90b45d13d5955135e1f05a2a8cd7c4494120a2",
+        "anchor_text_hash": "3d6ce5da0d1d309b25d54c5bc7541563b7c71385a68fd95f99ebc8ecc25a4a13"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!args.contains(&\"resume\".to_owned()));\nassert_eq!(invocations.len(), 2);\nassert_eq!(args.contains(&\"resume\".to_owned()), index == 0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "8742b61feb09bd423a9c23daa343ab71d0dd0ed53cd66d3672839a2e56fb3200",
+        "declaration_hash": "c146460dd88681f01ec71eaa9a90b45d13d5955135e1f05a2a8cd7c4494120a2",
+        "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(same_track.resumable_id(&request.request.resume), Some(\"same-track-session\".to_owned()));\nassert_eq!(other_track.resumable_id(&request.request.resume), None);\nassert_eq!(other_capability.resumable_id(&other_capability_request.request.resume), None);\nassert_eq!(same_track.resumable_id(&CapabilityResumeRequest::Fresh), None);\nassert!(matches!(\n    cache_key(&first, None),\n    Some(ProviderSessionCacheKey::WorkspaceCapability {\n        ref capability,\n        ref target_artifacts,\n    }) if capability.as_str() == \"implementer\"\n        && target_artifacts.as_slice().first().map(|path| path.as_path())\n            == Some(std::path::Path::new(\"track/items/a/spec.json\"))\n));\nassert_eq!(cache_key(&targetless, None), None);\nassert!(!args.contains(&\"resume\".to_owned()));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "59f6675fabfcd2d6f1a5fdfe0690eef55b229f458a0910041e6f5177b8eb768d",
+        "declaration_hash": "2c51e7077989caa4c79b0ff7e70b190ee6af84bea8e890062be10357c89d2b9d",
+        "anchor_text_hash": "cb1121edfe3e7d42504d7f4a07514cb6b78742ed5f048b8f98ea64e1f8684c3b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(into_driver_input(fresh).resume, CapabilityResumeArg::Fresh); ... assert_eq!(into_driver_input(targetless).resume, CapabilityResumeArg::ResumeWithoutTarget); ... assert_eq!(into_driver_input(targeted).resume, CapabilityResumeArg::Resume(vec![\n                \"track/items/a/spec.json\"\n                    .parse::<TargetArtifactPathArg>()\n                    .expect(\"normalized target\")\n            ]))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "1d205104c5f3a6248d843509122cb3c4f159eb1d849524d7491fa09fb46fe8b4",
+        "declaration_hash": "2c51e7077989caa4c79b0ff7e70b190ee6af84bea8e890062be10357c89d2b9d",
+        "anchor_text_hash": "875aeaabc70f7773ea6a5c22c3ffd8eca0526bac8fc0275fe201d43f790c4f6d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(cache_key(&first, None), cache_key(&second, None));\nassert_eq!(cache_key(&targetless, None), None);\n...\ntargetless_session.save(Some(\"unrecorded-session\".to_owned()));\nassert!(cache.entries.lock().expect(\"test cache lock\").is_empty());\n...\nassert!(first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")));\nassert!(track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")));\nassert_ne!(track_path.parent(), first_path.parent());\nassert_eq!(track_identity, \"track-capability:track-a:implementer\");\nassert!(first_identity.contains(\"workspace-capability:implementer:\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecDriverInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "7f297c29e8a6486f82adae62c9c3cc10b710ba0791499e1fb9f58994ce36d266",
+        "declaration_hash": "2c51e7077989caa4c79b0ff7e70b190ee6af84bea8e890062be10357c89d2b9d",
+        "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(into_driver_input(fresh).resume, CapabilityResumeArg::Fresh); ... assert_eq!(into_driver_input(targetless).resume, CapabilityResumeArg::ResumeWithoutTarget); ... assert_eq!(into_driver_input(targeted).resume, CapabilityResumeArg::Resume(vec![ vec![ \"track/items/a/spec.json\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityResumeArg",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityResumeArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "c9b97895957a9fdbd0dba7a2dfe6570e119ac8c2be4696aa5eb51cea87871ada",
+        "declaration_hash": "de99cf4b8d98a3b73763d23c0d31b9a9af5346e0a842fff0f4a3bd23d895196c",
+        "anchor_text_hash": "cb1121edfe3e7d42504d7f4a07514cb6b78742ed5f048b8f98ea64e1f8684c3b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(into_driver_input(fresh).resume, CapabilityResumeArg::Fresh); ... assert_eq!(into_driver_input(targetless).resume, CapabilityResumeArg::ResumeWithoutTarget); ... assert_eq!(into_driver_input(targeted).resume, CapabilityResumeArg::Resume(vec![\n                \"track/items/a/spec.json\"\n                    .parse::<TargetArtifactPathArg>()\n                    .expect(\"normalized target\")\n            ]))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityResumeArg",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityResumeArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "e782b4d736519b2d4180388a54c60d61f8edf27ac47d33039e0c9ba42ac05587",
+        "declaration_hash": "de99cf4b8d98a3b73763d23c0d31b9a9af5346e0a842fff0f4a3bd23d895196c",
+        "anchor_text_hash": "875aeaabc70f7773ea6a5c22c3ffd8eca0526bac8fc0275fe201d43f790c4f6d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(cache_key(&first, None), cache_key(&second, None));\n        assert_eq!(cache_key(&targetless, None), None);\n        ...\n        targetless_session.save(Some(\"unrecorded-session\".to_owned()));\n        assert!(cache.entries.lock().expect(\"test cache lock\").is_empty());\n...\n        assert!(\n            first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")),\n            \"workspace capability sessions must stay under the workspace transient path\"\n        );\n        assert!(\n            track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")),\n            \"track capability sessions must stay inside that track's artifact directory\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityResumeArg",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityResumeArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "c9b97895957a9fdbd0dba7a2dfe6570e119ac8c2be4696aa5eb51cea87871ada",
+        "declaration_hash": "de99cf4b8d98a3b73763d23c0d31b9a9af5346e0a842fff0f4a3bd23d895196c",
+        "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(into_driver_input(fresh).resume, CapabilityResumeArg::Fresh);\nassert_eq!(into_driver_input(targetless).resume, CapabilityResumeArg::ResumeWithoutTarget);\nassert_eq!(\n    into_driver_input(targeted).resume,\n    CapabilityResumeArg::Resume(vec!["
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TargetArtifactPathArg",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TargetArtifactPathArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "4ba2faf49355396941b32c8be5dad5ea9c4ff91bb97b0cfea64b8acd75f118c9",
+        "declaration_hash": "8d4399e9e437a0eafe52075c3657e89505c25595cef0b1c44cee4e6f69142921",
+        "anchor_text_hash": "cb1121edfe3e7d42504d7f4a07514cb6b78742ed5f048b8f98ea64e1f8684c3b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "CapabilityFilePathArg::from_str(\"../briefing.md\"),\n            Err(CapabilityInputValidationError::InvalidFilePath)"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TargetArtifactPathArg",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TargetArtifactPathArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "69b5d85ab3fd4ca6fddfb330ce4de4c2848d67ca0dcef2c3413dd1a8151042b6",
+        "declaration_hash": "8d4399e9e437a0eafe52075c3657e89505c25595cef0b1c44cee4e6f69142921",
+        "anchor_text_hash": "875aeaabc70f7773ea6a5c22c3ffd8eca0526bac8fc0275fe201d43f790c4f6d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_matches!(\n            CapabilityFilePathArg::from_str(\"../briefing.md\"),\n            Err(CapabilityInputValidationError::InvalidFilePath)\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TargetArtifactPathArg",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TargetArtifactPathArg",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "4ba2faf49355396941b32c8be5dad5ea9c4ff91bb97b0cfea64b8acd75f118c9",
+        "declaration_hash": "8d4399e9e437a0eafe52075c3657e89505c25595cef0b1c44cee4e6f69142921",
+        "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "CapabilityResumeRequest::Resume(ref targets)\n                if targets.as_slice().first().map(|target| target.as_path().to_path_buf())\n                    == Some(PathBuf::from(\"track/items/a/spec.json\"))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecArgs",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "c9b97895957a9fdbd0dba7a2dfe6570e119ac8c2be4696aa5eb51cea87871ada",
+        "declaration_hash": "848bc8f9fc94fd3594b2666d97f1f8b9a2b0344861a3e109cd204ba7acc47293",
+        "anchor_text_hash": "cb1121edfe3e7d42504d7f4a07514cb6b78742ed5f048b8f98ea64e1f8684c3b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(into_driver_input(fresh).resume, CapabilityResumeArg::Fresh);\nassert!(targetless.target_artifacts.is_empty());\nassert_eq!(into_driver_input(targetless).resume, CapabilityResumeArg::ResumeWithoutTarget);\nassert_eq!(into_driver_input(targeted).resume, CapabilityResumeArg::Resume(vec![\n    \"track/items/a/spec.json\"\n        .parse::<TargetArtifactPathArg>()\n        .expect(\"normalized target\")\n]));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecArgs",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "c9b97895957a9fdbd0dba7a2dfe6570e119ac8c2be4696aa5eb51cea87871ada",
+        "declaration_hash": "848bc8f9fc94fd3594b2666d97f1f8b9a2b0344861a3e109cd204ba7acc47293",
+        "anchor_text_hash": "875aeaabc70f7773ea6a5c22c3ffd8eca0526bac8fc0275fe201d43f790c4f6d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(into_driver_input(targetless).resume, CapabilityResumeArg::ResumeWithoutTarget);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecArgs",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "c9b97895957a9fdbd0dba7a2dfe6570e119ac8c2be4696aa5eb51cea87871ada",
+        "declaration_hash": "848bc8f9fc94fd3594b2666d97f1f8b9a2b0344861a3e109cd204ba7acc47293",
+        "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(into_driver_input(fresh).resume, CapabilityResumeArg::Fresh);\n        assert!(targetless.target_artifacts.is_empty());\n        assert_eq!(into_driver_input(targetless).resume, CapabilityResumeArg::ResumeWithoutTarget);\n        assert_eq!(\n            into_driver_input(targeted).resume,\n            CapabilityResumeArg::Resume(vec![\n                \"track/items/a/spec.json\"\n                    .parse::<TargetArtifactPathArg>()\n                    .expect(\"normalized target\")\n            ])\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     }

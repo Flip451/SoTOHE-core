@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-15T03:53:21Z",
+  "generated_at": "2026-07-15T11:48:51Z",
   "declaration_hash": "be064953983418afc36f5dd8d04b648b6a151970945bd19cfc35083fa9500b0a",
-  "implementation_input_hash": "0bed5b4e6c3e415db7908f891479c1fb5c57090f247a34301e6c6dfa05a2ee11",
+  "implementation_input_hash": "65b9336bafa8bcf67801d30d82a2fe6a73debd99274e17e96338628e5724d4dc",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -18,7 +18,7 @@
     {
       "type_name": "CapabilityExecRequest",
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Clone",
@@ -53,9 +53,9 @@
     {
       "type_name": "CapabilityResumeRequest",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",

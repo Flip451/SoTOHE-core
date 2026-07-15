@@ -5,8 +5,8 @@ use std::process::ExitCode;
 use clap::{Args, Subcommand};
 use cli_composition::CapabilityCompositionRoot;
 use cli_driver::capability::{
-    CapabilityExecDriverInput, CapabilityFilePathArg, CapabilityNameArg, ProviderNameArg,
-    TimeoutSecondsArg,
+    CapabilityExecDriverInput, CapabilityFilePathArg, CapabilityNameArg, CapabilityResumeArg,
+    ProviderNameArg, TargetArtifactPathArg, TimeoutSecondsArg,
 };
 
 use crate::commands::driver_outcome_to_exit;
@@ -33,6 +33,13 @@ pub struct CapabilityExecArgs {
     /// runs without a time limit.
     #[arg(long)]
     pub timeout_seconds: Option<TimeoutSecondsArg>,
+    /// Resume the matching prior provider session.  With no target artifacts,
+    /// track resolution is required; otherwise dispatch falls back fresh.
+    #[arg(long)]
+    pub resume: bool,
+    /// Repository-relative artifact identity for a workspace resume.
+    #[arg(long = "target-artifact", requires = "resume")]
+    pub target_artifacts: Vec<TargetArtifactPathArg>,
 }
 
 /// Executes a generic capability command.
@@ -58,12 +65,23 @@ fn execute_exec(args: CapabilityExecArgs) -> ExitCode {
         }
     };
     let driver = root.capability_driver();
-    driver_outcome_to_exit(driver.handle(CapabilityExecDriverInput {
+    driver_outcome_to_exit(driver.handle(into_driver_input(args)))
+}
+
+fn into_driver_input(args: CapabilityExecArgs) -> CapabilityExecDriverInput {
+    CapabilityExecDriverInput {
         capability: args.capability,
         host: args.host,
         briefing_file: args.briefing_file,
         timeout_seconds: args.timeout_seconds,
-    }))
+        resume: if !args.resume {
+            CapabilityResumeArg::Fresh
+        } else if args.target_artifacts.is_empty() {
+            CapabilityResumeArg::ResumeWithoutTarget
+        } else {
+            CapabilityResumeArg::Resume(args.target_artifacts)
+        },
+    }
 }
 
 #[cfg(test)]
@@ -73,7 +91,8 @@ mod tests {
 
     use super::{
         CapabilityCommand, CapabilityExecArgs, CapabilityFilePathArg, CapabilityNameArg,
-        ProviderNameArg, TimeoutSecondsArg, execute, execute_with,
+        CapabilityResumeArg, ProviderNameArg, TargetArtifactPathArg, TimeoutSecondsArg, execute,
+        execute_with, into_driver_input,
     };
 
     #[derive(Parser)]
@@ -101,6 +120,8 @@ mod tests {
                 host,
                 briefing_file,
                 timeout_seconds,
+                resume: _,
+                target_artifacts: _,
             }) => {
                 assert_eq!(
                     capability,
@@ -116,6 +137,83 @@ mod tests {
                 assert_eq!(timeout_seconds, None, "omitted timeout parses as no limit");
             }
         }
+    }
+
+    #[test]
+    fn test_capability_exec_parses_targeted_resume_input() {
+        let cli = TestCli::try_parse_from([
+            "sotp",
+            "exec",
+            "implementer",
+            "--host",
+            "codex",
+            "--briefing-file",
+            "tmp/briefing.md",
+            "--resume",
+            "--target-artifact",
+            "track/items/a/spec.json",
+        ])
+        .expect("valid resume command parses");
+
+        match cli.command {
+            CapabilityCommand::Exec(args) => {
+                assert!(args.resume);
+                assert_eq!(args.target_artifacts.len(), 1);
+            }
+        }
+    }
+
+    #[test]
+    fn test_capability_exec_maps_fresh_targetless_and_targeted_resume_to_distinct_driver_states() {
+        let fresh = TestCli::try_parse_from([
+            "sotp",
+            "exec",
+            "implementer",
+            "--host",
+            "codex",
+            "--briefing-file",
+            "tmp/briefing.md",
+        ])
+        .expect("fresh command parses");
+        let targetless = TestCli::try_parse_from([
+            "sotp",
+            "exec",
+            "implementer",
+            "--host",
+            "codex",
+            "--briefing-file",
+            "tmp/briefing.md",
+            "--resume",
+        ])
+        .expect("targetless resume command parses");
+        let targeted = TestCli::try_parse_from([
+            "sotp",
+            "exec",
+            "implementer",
+            "--host",
+            "codex",
+            "--briefing-file",
+            "tmp/briefing.md",
+            "--resume",
+            "--target-artifact",
+            "track/items/a/./spec.json",
+        ])
+        .expect("targeted resume command parses");
+
+        let CapabilityCommand::Exec(fresh) = fresh.command;
+        let CapabilityCommand::Exec(targetless) = targetless.command;
+        let CapabilityCommand::Exec(targeted) = targeted.command;
+        assert_eq!(into_driver_input(fresh).resume, CapabilityResumeArg::Fresh);
+        assert!(targetless.target_artifacts.is_empty());
+        assert_eq!(into_driver_input(targetless).resume, CapabilityResumeArg::ResumeWithoutTarget);
+        assert_eq!(
+            into_driver_input(targeted).resume,
+            CapabilityResumeArg::Resume(vec![
+                "track/items/a/spec.json"
+                    .parse::<TargetArtifactPathArg>()
+                    .expect("normalized target")
+            ])
+        );
     }
 
     #[test]
@@ -216,6 +314,8 @@ mod tests {
             host: "codex".parse().expect("valid test provider"),
             briefing_file: "tmp/briefing.md".parse().expect("valid test briefing path"),
             timeout_seconds: None,
+            resume: false,
+            target_artifacts: Vec::new(),
         });
         let mut forwarded = None;
 

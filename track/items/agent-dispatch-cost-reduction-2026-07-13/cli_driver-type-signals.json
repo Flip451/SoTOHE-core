@@ -1,13 +1,13 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-14T20:49:23Z",
-  "declaration_hash": "5a9634afc398d21929c20916ddc447c6167bcab1564f8b4a031c10dbf3dfd149",
-  "implementation_input_hash": "5aabea35469ce769614f4553d62a3a628cee263b27ad3ee28ecc2e7b7f727abf",
+  "generated_at": "2026-07-15T13:21:29Z",
+  "declaration_hash": "8c66dd0a8bb779f0682efc30ab541a51657250cbe065734ec2d2240cef89c48c",
+  "implementation_input_hash": "da75cf13ef081fdd010c939b59e79ff1da82fde8c62ea2abdd6d12468850a01e",
   "signals": [
     {
       "type_name": "CapabilityExecDriverInput",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Clone",
@@ -19,9 +19,9 @@
     {
       "type_name": "CapabilityResumeArg",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -31,9 +31,9 @@
     {
       "type_name": "TargetArtifactPathArg",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",

@@ -2,7 +2,7 @@
 
 use std::ffi::OsString;
 use std::fs::{File, OpenOptions};
-use std::io::{Error, ErrorKind, Read, Write};
+use std::io::{BufRead, BufReader, Error, ErrorKind, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, ExitStatus, Stdio};
 use std::sync::Arc;
@@ -20,6 +20,7 @@ const PROVIDER_LOG_DRAIN_TIMEOUT: Duration = Duration::from_secs(1);
 const BOUNDED_COMMAND_POLL_INTERVAL: Duration = Duration::from_millis(50);
 const BOUNDED_COMMAND_DRAIN_TIMEOUT: Duration = Duration::from_secs(1);
 const LOG_TRUNCATION_NOTICE: &[u8] = b"\n[provider stderr truncated]\n";
+const MAX_PROVIDER_SESSION_EVENT_BYTES: usize = 64 * 1024;
 
 static PROVIDER_LOG_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
@@ -187,7 +188,14 @@ pub(crate) trait ProviderProcessRunner: Send + Sync {
         runtime_dir: &Path,
         provider: &ProviderName,
         timeout: Option<Duration>,
-    ) -> Result<u8, CapabilityExecError>;
+    ) -> Result<ProviderProcessOutput, CapabilityExecError>;
+}
+
+/// Observable, bounded result of a provider subprocess.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct ProviderProcessOutput {
+    pub(crate) exit_code: u8,
+    pub(crate) session_id: Option<String>,
 }
 
 pub(crate) struct SystemProviderProcessRunner;
@@ -201,7 +209,7 @@ impl ProviderProcessRunner for SystemProviderProcessRunner {
         runtime_dir: &Path,
         provider: &ProviderName,
         timeout: Option<Duration>,
-    ) -> Result<u8, CapabilityExecError> {
+    ) -> Result<ProviderProcessOutput, CapabilityExecError> {
         run_provider_process_with_timeout(binary, args, repo_root, runtime_dir, provider, timeout)
     }
 }
@@ -217,7 +225,7 @@ pub(crate) fn run_provider_process_with_timeout(
     runtime_dir: &Path,
     provider: &ProviderName,
     timeout: Option<Duration>,
-) -> Result<u8, CapabilityExecError> {
+) -> Result<ProviderProcessOutput, CapabilityExecError> {
     let runtime_dir = prepare_runtime_dir(repo_root, runtime_dir, provider)?;
     let timestamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -244,7 +252,7 @@ pub(crate) fn run_provider_process_with_timeout(
         .args(args)
         .current_dir(repo_root)
         .stdin(Stdio::null())
-        .stdout(Stdio::inherit())
+        .stdout(Stdio::piped())
         .stderr(Stdio::piped());
     configure_process_group(&mut command);
     let mut child = command
@@ -254,10 +262,104 @@ pub(crate) fn run_provider_process_with_timeout(
     let stderr = child.stderr.take().ok_or_else(|| {
         dispatch_error(provider, format!("cannot capture stderr for {binary} provider subprocess"))
     })?;
+    let stdout = child.stdout.take().ok_or_else(|| {
+        dispatch_error(provider, format!("cannot capture stdout for {binary} provider subprocess"))
+    })?;
     let log_writer = spawn_bounded_log_writer(stderr, log_file);
+    let session_collector = spawn_provider_session_collector(stdout);
     let status = wait_for_provider_process(&mut child, provider, binary, timeout)?;
     wait_for_bounded_log_writer(log_writer, process_id, provider, binary, &log_path)?;
-    Ok(status.code().and_then(|code| u8::try_from(code).ok()).unwrap_or(1))
+    let session_id = receive_provider_session_id(session_collector, process_id, provider, binary)?;
+    Ok(ProviderProcessOutput {
+        exit_code: status.code().and_then(|code| u8::try_from(code).ok()).unwrap_or(1),
+        session_id,
+    })
+}
+
+fn spawn_provider_session_collector(
+    stdout: impl Read + Send + 'static,
+) -> Receiver<Option<String>> {
+    let (sender, receiver) = mpsc::sync_channel(1);
+    thread::spawn(move || {
+        let _ = sender.send(collect_provider_session_id(stdout));
+    });
+    receiver
+}
+
+fn receive_provider_session_id(
+    collector: Receiver<Option<String>>,
+    process_id: u32,
+    provider: &ProviderName,
+    binary: &str,
+) -> Result<Option<String>, CapabilityExecError> {
+    match collector.recv_timeout(PROVIDER_LOG_DRAIN_TIMEOUT) {
+        Ok(session_id) => Ok(session_id),
+        Err(RecvTimeoutError::Timeout) => {
+            let _ = terminate_provider_process_group(process_id, provider, binary);
+            Err(dispatch_error(
+                provider,
+                format!(
+                    "stdout drain did not close within {} seconds after {binary} exited",
+                    PROVIDER_LOG_DRAIN_TIMEOUT.as_secs(),
+                ),
+            ))
+        }
+        Err(RecvTimeoutError::Disconnected) => {
+            Err(dispatch_error(provider, format!("stdout collector disconnected for {binary}")))
+        }
+    }
+}
+
+/// Drains provider output while retaining only the first bounded JSON session/thread ID event.
+fn collect_provider_session_id<R: Read>(pipe: R) -> Option<String> {
+    let mut reader = BufReader::new(pipe);
+    let mut event = Vec::with_capacity(MAX_PROVIDER_SESSION_EVENT_BYTES);
+    let mut discarding_event = false;
+    let mut session_id = None;
+
+    while let Ok(buffer) = reader.fill_buf() {
+        if buffer.is_empty() {
+            break;
+        }
+        if session_id.is_some() {
+            let consumed = buffer.len();
+            reader.consume(consumed);
+            continue;
+        }
+        let newline = buffer.iter().position(|byte| *byte == b'\n');
+        let event_bytes = newline.unwrap_or(buffer.len());
+        if !discarding_event {
+            let remaining = MAX_PROVIDER_SESSION_EVENT_BYTES.saturating_sub(event.len());
+            if event_bytes <= remaining {
+                if let Some(part) = buffer.get(..event_bytes) {
+                    event.extend_from_slice(part);
+                }
+            } else {
+                discarding_event = true;
+            }
+        }
+        let consumed = newline.map_or(buffer.len(), |index| index.saturating_add(1));
+        reader.consume(consumed);
+        if newline.is_some() {
+            if !discarding_event {
+                session_id = extract_provider_session_id(&event);
+            }
+            event.clear();
+            discarding_event = false;
+        }
+    }
+    session_id
+}
+
+fn extract_provider_session_id(event: &[u8]) -> Option<String> {
+    let event = std::str::from_utf8(event).ok()?;
+    let value = serde_json::from_str::<serde_json::Value>(event.trim()).ok()?;
+    value
+        .get("session_id")
+        .or_else(|| value.get("thread_id"))?
+        .as_str()
+        .filter(|id| !id.trim().is_empty())
+        .map(str::to_owned)
 }
 
 fn wait_for_bounded_log_writer(
@@ -557,7 +659,9 @@ use termination::{
 mod tests {
     use std::io::Cursor;
 
-    use super::collect_bounded_pipe;
+    use super::{
+        MAX_PROVIDER_SESSION_EVENT_BYTES, collect_bounded_pipe, collect_provider_session_id,
+    };
 
     #[test]
     fn test_collect_bounded_pipe_discards_excess_after_limit() -> Result<(), std::io::Error> {
@@ -566,5 +670,18 @@ mod tests {
         assert_eq!(collected.bytes, b"abc");
         assert!(collected.exceeded_limit);
         Ok(())
+    }
+
+    #[test]
+    fn test_provider_session_capture_discards_oversized_event_and_keeps_draining() {
+        let mut stdout = vec![b'x'; MAX_PROVIDER_SESSION_EVENT_BYTES.saturating_add(1)];
+        stdout.push(b'\n');
+        stdout.extend_from_slice(br#"{"thread_id":"captured-session"}"#);
+        stdout.push(b'\n');
+
+        assert_eq!(
+            collect_provider_session_id(Cursor::new(stdout)),
+            Some("captured-session".to_owned())
+        );
     }
 }

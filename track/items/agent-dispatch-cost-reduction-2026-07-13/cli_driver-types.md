@@ -4,14 +4,14 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityResumeArg | enum | add | Fresh, ResumeWithoutTarget, Resume | 🟡 | 🔵 |
+| CapabilityResumeArg | enum | add | Fresh, ResumeWithoutTarget, Resume | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityExecDriverInput | dto | modify | — | 🟡 | 🔵 |
-| TargetArtifactPathArg | dto | add | — | 🟡 | 🔵 |
+| CapabilityExecDriverInput | dto | modify | — | 🔵 | 🔵 |
+| TargetArtifactPathArg | dto | add | — | 🔵 | 🔵 |
 
 ## Primary Adapters
 

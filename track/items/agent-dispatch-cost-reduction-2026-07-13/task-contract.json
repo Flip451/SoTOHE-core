@@ -115,6 +115,7 @@
       {"layer": "cli", "entry_key": "CapabilityCommand"},
       {"layer": "cli", "entry_key": "CapabilityExecArgs"},
       {"layer": "cli", "entry_key": "cli::commands::capability::execute"},
+      {"layer": "cli", "entry_key": "cli::commands::capability::into_driver_input"},
       {"layer": "cli_composition", "entry_key": "CapabilityCompositionRoot"}
     ],
     "T009": [],

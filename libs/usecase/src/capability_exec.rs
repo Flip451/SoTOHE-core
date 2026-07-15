@@ -384,6 +384,17 @@ pub struct CapabilityExecRequest {
     pub briefing_file: CapabilityFilePath,
     /// Provider-process timeout; `None` waits without a time limit.
     pub timeout: Option<TimeoutSeconds>,
+    /// The orchestrator-selected session policy for this dispatch.
+    pub resume: CapabilityResumeRequest,
+}
+
+/// Explicit capability-session selection.  A fresh dispatch never consults a
+/// cache; targetless resume is deliberately fail-closed outside a track.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CapabilityResumeRequest {
+    Fresh,
+    ResumeWithoutTarget,
+    Resume(TargetArtifactSet),
 }
 
 /// Typed routing data resolved from the capability profile.
@@ -622,8 +633,9 @@ mod tests {
         BriefingText, CapabilityDispatchOutcome, CapabilityDispatchRequest, CapabilityExecError,
         CapabilityExecInteractor, CapabilityExecRequest, CapabilityExecService,
         CapabilityFailureDetail, CapabilityFilePath, CapabilityInputValidationError,
-        CapabilityProfile, CapabilityProfilePort, CapabilityProviderPort, CapabilitySourcePort,
-        DisciplineText, ExecutionMode, ModelName, ProviderName, ReasoningEffort, TimeoutSeconds,
+        CapabilityProfile, CapabilityProfilePort, CapabilityProviderPort, CapabilityResumeRequest,
+        CapabilitySourcePort, DisciplineText, ExecutionMode, ModelName, ProviderName,
+        ReasoningEffort, TargetArtifactPath, TargetArtifactSet, TimeoutSeconds,
     };
     use crate::dry_write_driver::CapabilityName;
 
@@ -721,6 +733,7 @@ mod tests {
             host: ProviderName::try_new("codex")?,
             briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
             timeout: None,
+            resume: CapabilityResumeRequest::Fresh,
         })
     }
 
@@ -793,6 +806,29 @@ mod tests {
     }
 
     #[test]
+    fn test_resume_target_inputs_rejected_with_typed_variants_before_dispatch() {
+        // Resume-option targets are validated by this error type before any
+        // dispatch or cache-key derivation: an invalid target can never name a
+        // continuation session outside the requested track/capability scope.
+        assert!(matches!(
+            TargetArtifactPath::try_new(PathBuf::from("../outside/spec.json")),
+            Err(CapabilityInputValidationError::InvalidFilePath)
+        ));
+        assert!(matches!(
+            TargetArtifactPath::try_new(PathBuf::from("/absolute/spec.json")),
+            Err(CapabilityInputValidationError::InvalidFilePath)
+        ));
+        assert!(matches!(
+            TargetArtifactPath::try_new(PathBuf::new()),
+            Err(CapabilityInputValidationError::EmptyFilePath)
+        ));
+        assert!(matches!(
+            TargetArtifactSet::try_new(vec![]),
+            Err(CapabilityInputValidationError::EmptyTargetArtifactSet)
+        ));
+    }
+
+    #[test]
     fn test_briefing_text_whitespace_rejected() {
         assert!(matches!(
             BriefingText::try_new("\n  \t".to_owned()),
@@ -848,6 +884,7 @@ mod tests {
             host: ProviderName::try_new("codex")?,
             briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
             timeout: Some(TimeoutSeconds::try_new(1800)?),
+            resume: CapabilityResumeRequest::Fresh,
         };
 
         assert_eq!(request.capability.as_str(), "implementer");

@@ -5,7 +5,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CapabilityDispatchOutcome | enum | reference | Executed, DelegateInHost | 🔵 | 🔵 |
-| CapabilityResumeRequest | enum | add | Fresh, ResumeWithoutTarget, Resume | 🟡 | 🔵 |
+| CapabilityResumeRequest | enum | add | Fresh, ResumeWithoutTarget, Resume | 🔵 | 🔵 |
 | ProviderSessionCacheKey | enum | add | Review, TrackCapability, WorkspaceCapability | 🔵 | 🔵 |
 | ReasoningEffort | enum | add | Low, Medium, High, XHigh, Max | 🔵 | 🔵 |
 
@@ -70,6 +70,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityExecRequest | command | modify | — | 🟡 | 🔵 |
+| CapabilityExecRequest | command | modify | — | 🔵 | 🔵 |
 | TypeSignalsRequest | command | modify | — | 🔵 | 🔵 |
 

@@ -411,7 +411,7 @@
       }
     },
     {
-      "claim_hash": "3c0260dc84d25dcf32047d9d2ffe4060010df4d0861ef6055234acfb9a268adf",
+      "claim_hash": "b2f34061c411573dc8b73b9dab0fb37db73b4da322b5d9c716cd7b26206aba21",
       "evidence_hash": "74df0cf41b80fdb8461f2469f8807e5f1c56c5247083791d8ee3a415f4bd2d91",
       "verdict": {
         "kind": "pass",
@@ -435,7 +435,7 @@
       }
     },
     {
-      "claim_hash": "3c0260dc84d25dcf32047d9d2ffe4060010df4d0861ef6055234acfb9a268adf",
+      "claim_hash": "b2f34061c411573dc8b73b9dab0fb37db73b4da322b5d9c716cd7b26206aba21",
       "evidence_hash": "4cabd2650852dcafaf577955b9d2f99d99cb1597a3454dd512217be528610884",
       "verdict": {
         "kind": "pass",
@@ -459,7 +459,7 @@
       }
     },
     {
-      "claim_hash": "3c0260dc84d25dcf32047d9d2ffe4060010df4d0861ef6055234acfb9a268adf",
+      "claim_hash": "b2f34061c411573dc8b73b9dab0fb37db73b4da322b5d9c716cd7b26206aba21",
       "evidence_hash": "2b1bcd4b2f654058eb4920ab6f0133fb52b34975a32989e5d0a083a51d6300a2",
       "verdict": {
         "kind": "pass",
@@ -483,7 +483,7 @@
       }
     },
     {
-      "claim_hash": "3c0260dc84d25dcf32047d9d2ffe4060010df4d0861ef6055234acfb9a268adf",
+      "claim_hash": "b2f34061c411573dc8b73b9dab0fb37db73b4da322b5d9c716cd7b26206aba21",
       "evidence_hash": "005ff75b15c8786749c37f17ad38945817c2f9faa8f552792bc41e814ed75c67",
       "verdict": {
         "kind": "pass",
@@ -507,7 +507,7 @@
       }
     },
     {
-      "claim_hash": "3c0260dc84d25dcf32047d9d2ffe4060010df4d0861ef6055234acfb9a268adf",
+      "claim_hash": "b2f34061c411573dc8b73b9dab0fb37db73b4da322b5d9c716cd7b26206aba21",
       "evidence_hash": "044d71dcc35d9514510f77881c51b2083654a18517467a2749da14ed316a97c9",
       "verdict": {
         "kind": "pass",
@@ -531,11 +531,11 @@
       }
     },
     {
-      "claim_hash": "3c0260dc84d25dcf32047d9d2ffe4060010df4d0861ef6055234acfb9a268adf",
+      "claim_hash": "b2f34061c411573dc8b73b9dab0fb37db73b4da322b5d9c716cd7b26206aba21",
       "evidence_hash": "6a3047e6a3e70c18439ff82f51f1e54058d97c6aebf518347106d5303ae67dca",
       "verdict": {
         "kind": "pass",
-        "citation": "track 内では同一 track・capability の有効 cache entry を再開する。track 解決時は track-local cache、track 解決不能時は capability・対象 artifact の repo-relative path による workspace-local cache を選び、初回 dispatch、関心事を切り替えた dispatch、対象 path 未確定の track 外 dispatch、または provider・model 不一致では新規 session で実行する。"
+        "citation": "orchestrator が継続作業と判断して resume option を指定した provider CLI subprocess dispatch の `sotp capability exec` は、track 内では同一 track・capability の有効 cache entry を再開する。track 解決時は track-local cache、track 解決不能時は capability・対象 artifact の repo-relative path による workspace-local cache を選び、初回 dispatch、関心事を切り替えた dispatch、対象 path 未確定の track 外 dispatch、または provider・model 不一致では新規 session で実行する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -555,7 +555,7 @@
       }
     },
     {
-      "claim_hash": "3c0260dc84d25dcf32047d9d2ffe4060010df4d0861ef6055234acfb9a268adf",
+      "claim_hash": "b2f34061c411573dc8b73b9dab0fb37db73b4da322b5d9c716cd7b26206aba21",
       "evidence_hash": "937d966a0f20ec721cceef92656a12e2918a311e80fd05d24ef46576cc7036e6",
       "verdict": {
         "kind": "pass",
@@ -771,7 +771,7 @@
       }
     },
     {
-      "claim_hash": "e9d0ab6c3bf1492ce2607c5f3a4b72db6d8c22abcbe60c7380f2905e0d4d09ba",
+      "claim_hash": "19a05c231ed0a95a608b31d424bead744e60aaf2e3d6615567120239ce64e4b6",
       "evidence_hash": "74df0cf41b80fdb8461f2469f8807e5f1c56c5247083791d8ee3a415f4bd2d91",
       "verdict": {
         "kind": "pass",
@@ -795,7 +795,7 @@
       }
     },
     {
-      "claim_hash": "e9d0ab6c3bf1492ce2607c5f3a4b72db6d8c22abcbe60c7380f2905e0d4d09ba",
+      "claim_hash": "19a05c231ed0a95a608b31d424bead744e60aaf2e3d6615567120239ce64e4b6",
       "evidence_hash": "4cabd2650852dcafaf577955b9d2f99d99cb1597a3454dd512217be528610884",
       "verdict": {
         "kind": "pass",
@@ -819,7 +819,7 @@
       }
     },
     {
-      "claim_hash": "e9d0ab6c3bf1492ce2607c5f3a4b72db6d8c22abcbe60c7380f2905e0d4d09ba",
+      "claim_hash": "19a05c231ed0a95a608b31d424bead744e60aaf2e3d6615567120239ce64e4b6",
       "evidence_hash": "2b1bcd4b2f654058eb4920ab6f0133fb52b34975a32989e5d0a083a51d6300a2",
       "verdict": {
         "kind": "pass",
@@ -843,7 +843,7 @@
       }
     },
     {
-      "claim_hash": "e9d0ab6c3bf1492ce2607c5f3a4b72db6d8c22abcbe60c7380f2905e0d4d09ba",
+      "claim_hash": "19a05c231ed0a95a608b31d424bead744e60aaf2e3d6615567120239ce64e4b6",
       "evidence_hash": "005ff75b15c8786749c37f17ad38945817c2f9faa8f552792bc41e814ed75c67",
       "verdict": {
         "kind": "pass",
@@ -867,7 +867,7 @@
       }
     },
     {
-      "claim_hash": "e9d0ab6c3bf1492ce2607c5f3a4b72db6d8c22abcbe60c7380f2905e0d4d09ba",
+      "claim_hash": "19a05c231ed0a95a608b31d424bead744e60aaf2e3d6615567120239ce64e4b6",
       "evidence_hash": "044d71dcc35d9514510f77881c51b2083654a18517467a2749da14ed316a97c9",
       "verdict": {
         "kind": "pass",
@@ -891,11 +891,11 @@
       }
     },
     {
-      "claim_hash": "e9d0ab6c3bf1492ce2607c5f3a4b72db6d8c22abcbe60c7380f2905e0d4d09ba",
+      "claim_hash": "19a05c231ed0a95a608b31d424bead744e60aaf2e3d6615567120239ce64e4b6",
       "evidence_hash": "6a3047e6a3e70c18439ff82f51f1e54058d97c6aebf518347106d5303ae67dca",
       "verdict": {
         "kind": "pass",
-        "citation": "track 内では同一 track・capability の有効 cache entry を再開する。track 解決時は track-local cache、track 解決不能時は capability・対象 artifact の repo-relative path による workspace-local cache を選び、初回 dispatch、関心事を切り替えた dispatch、対象 path 未確定の track 外 dispatch、または provider・model 不一致では新規 session で実行する。"
+        "citation": "track 解決時は track-local cache、track 解決不能時は capability・対象 artifact の repo-relative path による workspace-local cache を選び、初回 dispatch、関心事を切り替えた dispatch、対象 path 未確定の track 外 dispatch、または provider・model 不一致では新規 session で実行する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -915,7 +915,7 @@
       }
     },
     {
-      "claim_hash": "e9d0ab6c3bf1492ce2607c5f3a4b72db6d8c22abcbe60c7380f2905e0d4d09ba",
+      "claim_hash": "19a05c231ed0a95a608b31d424bead744e60aaf2e3d6615567120239ce64e4b6",
       "evidence_hash": "937d966a0f20ec721cceef92656a12e2918a311e80fd05d24ef46576cc7036e6",
       "verdict": {
         "kind": "pass",

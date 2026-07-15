@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "de7e45a72e2d5f24cb08fd8f35a3a422626e668167547395f971c1e24133254d",
+  "catalogue_declaration_hash": "8a3c046c5966b17655367bd39ccc56e24cc536f0000c55e972dff11960df9a8a",
   "signals": [
     {
       "type_name": "AgentProfiles",
@@ -25,7 +25,7 @@
     {
       "type_name": "ClaudeCapabilityAdapter",
       "signal": "blue",
-      "entry_hash": "3c0260dc84d25dcf32047d9d2ffe4060010df4d0861ef6055234acfb9a268adf"
+      "entry_hash": "b2f34061c411573dc8b73b9dab0fb37db73b4da322b5d9c716cd7b26206aba21"
     },
     {
       "type_name": "ClaudeReviewer",
@@ -35,7 +35,7 @@
     {
       "type_name": "CodexCapabilityAdapter",
       "signal": "blue",
-      "entry_hash": "e9d0ab6c3bf1492ce2607c5f3a4b72db6d8c22abcbe60c7380f2905e0d4d09ba"
+      "entry_hash": "19a05c231ed0a95a608b31d424bead744e60aaf2e3d6615567120239ce64e4b6"
     },
     {
       "type_name": "CodexReviewer",

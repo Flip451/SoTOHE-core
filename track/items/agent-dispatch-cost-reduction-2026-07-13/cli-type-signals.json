@@ -1,19 +1,25 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-14T20:49:30Z",
-  "declaration_hash": "63e08410653b36dfecfd309013c5a28458ad5d405ac25a16ff64ac50ee43af3d",
-  "implementation_input_hash": "5c261cbd0e98369fb316ae5168a7fdc8d10c7ffba0ac4e5a0f606329b0b13c11",
+  "generated_at": "2026-07-15T13:11:34Z",
+  "declaration_hash": "d2145bb66d2d87bdadb6079b343560e132a34d5a44a58a2d48db152213f56b5b",
+  "implementation_input_hash": "b16146f9d565fc5bac4f1b26f16dbe7e4c0cd8b2df567d1a922643fa846ae443",
   "signals": [
     {
       "type_name": "CapabilityExecArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Args",
         "Debug",
         "FromArgMatches"
       ]
+    },
+    {
+      "type_name": "cli::commands::capability::into_driver_input",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CapabilityCommand",

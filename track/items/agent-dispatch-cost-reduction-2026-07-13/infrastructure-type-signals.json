@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-15T08:58:07Z",
-  "declaration_hash": "de7e45a72e2d5f24cb08fd8f35a3a422626e668167547395f971c1e24133254d",
-  "implementation_input_hash": "bcc389e0234eb0dd748bbc2d2db563b9ca00b4b2a2f8a504a03341e0ee7f31ac",
+  "generated_at": "2026-07-15T12:29:52Z",
+  "declaration_hash": "8a3c046c5966b17655367bd39ccc56e24cc536f0000c55e972dff11960df9a8a",
+  "implementation_input_hash": "6705c76a74dba9bf35c5bb32570b15083df4f37a422018438f29198923bfc0fb",
   "signals": [
     {
       "type_name": "AgentProfiles",
@@ -39,7 +39,7 @@
     {
       "type_name": "ClaudeCapabilityAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "CapabilityProviderPort"
@@ -57,7 +57,7 @@
     {
       "type_name": "CodexCapabilityAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "CapabilityProviderPort"

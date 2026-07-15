@@ -1,35 +1,6 @@
 {
   "crate_name": "cli_driver",
   "functions": {},
-  "inherent_impls": [
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-        "name": "into_domain",
-          "params": [],
-          "receiver": "self",
-          "returns": "usecase::capability_exec::TargetArtifactPath"
-        }
-      ],
-      "type_name": "TargetArtifactPathArg"
-    },
-    {
-      "methods": [
-        {
-          "docs": "Produces only usecase::capability_exec::CapabilityInputValidationError::EmptyTargetArtifactSet when a Resume path list is empty; Fresh, ResumeWithoutTarget, and non-empty Resume inputs are infallible.",
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "into_domain",
-          "params": [],
-          "receiver": "self",
-        "returns": "Result<usecase::capability_exec::CapabilityResumeRequest, usecase::capability_exec::CapabilityInputValidationError>"
-        }
-      ],
-      "type_name": "CapabilityResumeArg"
-    }
-  ],
   "layer": "cli_driver",
   "schema_version": 5,
   "trait_impls": [
@@ -262,7 +233,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],

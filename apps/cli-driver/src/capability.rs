@@ -6,7 +6,8 @@ use std::sync::Arc;
 
 use usecase::capability_exec::{
     CapabilityDispatchOutcome, CapabilityExecRequest, CapabilityExecService, CapabilityFilePath,
-    ProviderName, TimeoutSeconds,
+    CapabilityInputValidationError, CapabilityResumeRequest, ProviderName, TargetArtifactPath,
+    TargetArtifactSet, TimeoutSeconds,
 };
 use usecase::dry_write_driver::CapabilityName;
 
@@ -17,10 +18,10 @@ use crate::render::CommandOutcome;
 pub struct CapabilityNameArg(CapabilityName);
 
 impl core::str::FromStr for CapabilityNameArg {
-    type Err = String;
+    type Err = usecase::ValidationError;
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
-        CapabilityName::try_new(value.to_owned()).map(Self).map_err(|error| error.to_string())
+        CapabilityName::try_new(value.to_owned()).map(Self)
     }
 }
 
@@ -41,12 +42,10 @@ impl core::str::FromStr for ProviderNameArg {
 pub struct CapabilityFilePathArg(CapabilityFilePath);
 
 impl core::str::FromStr for CapabilityFilePathArg {
-    type Err = String;
+    type Err = CapabilityInputValidationError;
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
-        CapabilityFilePath::try_new(PathBuf::from(value))
-            .map(Self)
-            .map_err(|error| error.to_string())
+        CapabilityFilePath::try_new(PathBuf::from(value)).map(Self)
     }
 }
 
@@ -60,6 +59,26 @@ impl Clone for TimeoutSecondsArg {
     fn clone(&self) -> Self {
         *self
     }
+}
+
+/// CLI parser wrapper for a repository-relative target artifact.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TargetArtifactPathArg(TargetArtifactPath);
+
+impl FromStr for TargetArtifactPathArg {
+    type Err = CapabilityInputValidationError;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        TargetArtifactPath::try_new(PathBuf::from(value)).map(Self)
+    }
+}
+
+/// The orchestrator-selected resume policy at the CLI boundary.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CapabilityResumeArg {
+    Fresh,
+    ResumeWithoutTarget,
+    Resume(Vec<TargetArtifactPathArg>),
 }
 
 impl FromStr for TimeoutSecondsArg {
@@ -83,6 +102,8 @@ pub struct CapabilityExecDriverInput {
     pub briefing_file: CapabilityFilePathArg,
     /// Provider-process timeout; `None` waits without a time limit.
     pub timeout_seconds: Option<TimeoutSecondsArg>,
+    /// Explicit resume selection and, when required, its target identity.
+    pub resume: CapabilityResumeArg,
 }
 
 /// Primary adapter driver for generic capability dispatch.
@@ -100,7 +121,10 @@ impl CapabilityDriver {
     /// Builds a prevalidated request, runs dispatch, and renders a discriminated outcome.
     #[must_use]
     pub fn handle(&self, input: CapabilityExecDriverInput) -> CommandOutcome {
-        let request = into_request(input);
+        let request = match into_request(input) {
+            Ok(request) => request,
+            Err(error) => return CommandOutcome::failure(Some(error.to_string())),
+        };
         match self.service.execute(request) {
             Ok(outcome) => render_outcome(outcome),
             Err(error) => CommandOutcome::failure(Some(error.to_string())),
@@ -108,13 +132,28 @@ impl CapabilityDriver {
     }
 }
 
-fn into_request(input: CapabilityExecDriverInput) -> CapabilityExecRequest {
-    CapabilityExecRequest {
+fn into_request(
+    input: CapabilityExecDriverInput,
+) -> Result<CapabilityExecRequest, CapabilityInputValidationError> {
+    let resume = match input.resume {
+        CapabilityResumeArg::Fresh => CapabilityResumeRequest::Fresh,
+        CapabilityResumeArg::ResumeWithoutTarget => CapabilityResumeRequest::ResumeWithoutTarget,
+        // An empty targeted resume must NOT degrade to a targetless resume: that
+        // would silently select a track/capability-scoped session the caller never
+        // named. Propagate the typed validation error instead (types review verdict).
+        CapabilityResumeArg::Resume(paths) => {
+            TargetArtifactSet::try_new(paths.into_iter().map(|path| path.0).collect())
+                .map(CapabilityResumeRequest::Resume)?
+        }
+    };
+
+    Ok(CapabilityExecRequest {
         capability: input.capability.0,
         host: input.host.0,
         briefing_file: input.briefing_file.0,
         timeout: input.timeout_seconds.map(|timeout| timeout.0),
-    }
+        resume,
+    })
 }
 
 fn render_outcome(outcome: CapabilityDispatchOutcome) -> CommandOutcome {
@@ -144,13 +183,22 @@ mod tests {
 
     use super::{
         CapabilityDriver, CapabilityExecDriverInput, CapabilityFilePathArg, CapabilityNameArg,
-        ProviderNameArg, TimeoutSecondsArg,
+        CapabilityResumeArg, ProviderNameArg, TargetArtifactPathArg, TimeoutSecondsArg,
+        into_request,
     };
+    use usecase::ValidationError;
     use usecase::capability_exec::{
         CapabilityDispatchOutcome, CapabilityExecError, CapabilityExecRequest,
-        CapabilityExecService, DisciplineText, ProviderName,
+        CapabilityExecService, CapabilityInputValidationError, CapabilityResumeRequest,
+        DisciplineText, ProviderName,
     };
     use usecase::dry_write_driver::CapabilityName;
+
+    macro_rules! assert_matches {
+        ($expression:expr, $pattern:pat $(,)?) => {
+            assert!(matches!($expression, $pattern));
+        };
+    }
 
     struct StaticService {
         outcome: CapabilityDispatchOutcome,
@@ -187,6 +235,7 @@ mod tests {
             briefing_file: CapabilityFilePathArg::from_str("tmp/briefing.md")
                 .expect("valid test briefing path"),
             timeout_seconds: None,
+            resume: CapabilityResumeArg::Fresh,
         }
     }
 
@@ -285,12 +334,95 @@ mod tests {
     }
 
     #[test]
+    fn test_capability_driver_maps_normalized_targeted_resume_to_typed_request() {
+        let requests = Arc::new(Mutex::new(Vec::new()));
+        let driver = CapabilityDriver::new(Arc::new(RecordingService {
+            outcome: CapabilityDispatchOutcome::Executed {
+                provider: ProviderName::try_new("codex").expect("valid test provider"),
+                exit_code: 0,
+            },
+            requests: requests.clone(),
+        }));
+        let mut input = input();
+        input.resume = CapabilityResumeArg::Resume(vec![
+            TargetArtifactPathArg::from_str("track/items/a/./spec.json")
+                .expect("valid normalized target"),
+        ]);
+
+        let _ = driver.handle(input);
+
+        let recorded = requests.lock().expect("test request recorder lock");
+        let first = recorded.first().expect("one request recorded");
+        assert!(matches!(
+            first.resume,
+            CapabilityResumeRequest::Resume(ref targets)
+                if targets.as_slice().first().map(|target| target.as_path().to_path_buf())
+                    == Some(PathBuf::from("track/items/a/spec.json"))
+        ));
+    }
+
+    #[test]
+    fn test_into_request_maps_fresh_and_untargeted_resume_to_typed_variants() {
+        assert_matches!(
+            into_request(input()).expect("fresh input is valid").resume,
+            CapabilityResumeRequest::Fresh
+        );
+
+        let mut untargeted_input = input();
+        untargeted_input.resume = CapabilityResumeArg::ResumeWithoutTarget;
+        assert_matches!(
+            into_request(untargeted_input).expect("untargeted input is valid").resume,
+            CapabilityResumeRequest::ResumeWithoutTarget
+        );
+    }
+
+    #[test]
+    fn test_capability_driver_rejects_empty_targeted_resume_with_typed_error() {
+        let requests = Arc::new(Mutex::new(Vec::new()));
+        let driver = CapabilityDriver::new(Arc::new(RecordingService {
+            outcome: CapabilityDispatchOutcome::Executed {
+                provider: ProviderName::try_new("codex").expect("valid test provider"),
+                exit_code: 0,
+            },
+            requests: requests.clone(),
+        }));
+        let mut invalid_input = input();
+        invalid_input.resume = CapabilityResumeArg::Resume(Vec::new());
+
+        assert_matches!(
+            into_request(invalid_input.clone()),
+            Err(CapabilityInputValidationError::EmptyTargetArtifactSet)
+        );
+
+        let outcome = driver.handle(invalid_input);
+
+        assert_ne!(outcome.exit_code, 0);
+        let recorded = requests.lock().expect("test request recorder lock");
+        assert!(recorded.is_empty(), "rejected input must never reach dispatch");
+    }
+
+    #[test]
     fn test_capability_name_arg_blank_value_rejected() {
-        assert!(CapabilityNameArg::from_str(" ").is_err());
+        assert_matches!(CapabilityNameArg::from_str(" "), Err(ValidationError::EmptyString));
+    }
+
+    #[test]
+    fn test_capability_driver_input_validation_returns_concrete_error_variants() {
+        assert_matches!(
+            CapabilityFilePathArg::from_str("../briefing.md"),
+            Err(CapabilityInputValidationError::InvalidFilePath)
+        );
+        assert_matches!(
+            TargetArtifactPathArg::from_str("track/items/a/../../other/spec.json"),
+            Err(CapabilityInputValidationError::InvalidFilePath)
+        );
     }
 
     #[test]
     fn test_capability_file_path_arg_parent_directory_rejected() {
-        assert!(CapabilityFilePathArg::from_str("../briefing.md").is_err());
+        assert_matches!(
+            CapabilityFilePathArg::from_str("../briefing.md"),
+            Err(CapabilityInputValidationError::InvalidFilePath)
+        );
     }
 }

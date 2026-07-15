@@ -32,9 +32,9 @@
 |------|------|--------|---------|--------|----------|
 | AgentProfiles | secondary_adapter | modify | impl Debug | 🔵 | 🔵 |
 | AgentProfilesCapabilityAdapter | secondary_adapter | reference | impl CapabilityProfilePort | 🔵 | 🔵 |
-| ClaudeCapabilityAdapter | secondary_adapter | modify | impl CapabilityProviderPort | 🟡 | 🔵 |
+| ClaudeCapabilityAdapter | secondary_adapter | modify | impl CapabilityProviderPort | 🔵 | 🔵 |
 | ClaudeReviewer | secondary_adapter | modify | impl Reviewer | 🔵 | 🔵 |
-| CodexCapabilityAdapter | secondary_adapter | modify | impl CapabilityProviderPort | 🟡 | 🔵 |
+| CodexCapabilityAdapter | secondary_adapter | modify | impl CapabilityProviderPort | 🔵 | 🔵 |
 | CodexReviewer | secondary_adapter | modify | impl Reviewer | 🔵 | 🔵 |
 | FsProviderSessionCacheAdapter | secondary_adapter | add | impl ProviderSessionCachePort | 🔵 | 🔵 |
 | RustdocSchemaExporter | secondary_adapter | modify | impl SchemaExporter, impl SchemaExporterPort | 🔵 | 🔵 |

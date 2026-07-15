@@ -963,6 +963,10 @@
             {
               "name": "session_cache",
               "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<domain::ids::TrackId>"
             }
           ],
           "returns": "Self"
@@ -1146,6 +1150,10 @@
             {
               "name": "session_cache",
               "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<domain::ids::TrackId>"
             }
           ],
           "returns": "Self"

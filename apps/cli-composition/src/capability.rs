@@ -3,12 +3,14 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use domain::TrackId;
 use infrastructure::agent_profiles::AGENT_PROFILES_PATH;
 use infrastructure::capability_exec::{
     agent_profiles::AgentProfilesCapabilityAdapter, claude::ClaudeCapabilityAdapter,
     codex::CodexCapabilityAdapter, source::FsCapabilitySourceAdapter,
 };
 use infrastructure::git_cli::SystemGitRepo;
+use infrastructure::provider_session::FsProviderSessionCacheAdapter;
 use usecase::capability_exec::{
     CapabilityExecInteractor, CapabilityProfilePort, CapabilityProviderPort, CapabilitySourcePort,
 };
@@ -52,16 +54,34 @@ impl CapabilityCompositionRoot {
             ));
         let source: Arc<dyn CapabilitySourcePort> =
             Arc::new(FsCapabilitySourceAdapter::new(self.repo_root.clone()));
+        let session_cache = Arc::new(FsProviderSessionCacheAdapter::new(
+            self.repo_root.clone(),
+            self.runtime_dir.clone(),
+        ));
+        let track_id = self.current_track_id();
         let providers: Vec<Arc<dyn CapabilityProviderPort>> = vec![
             Arc::new(ClaudeCapabilityAdapter::new(
                 self.repo_root.clone(),
                 self.runtime_dir.clone(),
+                session_cache.clone(),
+                track_id.clone(),
             )),
-            Arc::new(CodexCapabilityAdapter::new(self.repo_root.clone(), self.runtime_dir.clone())),
+            Arc::new(CodexCapabilityAdapter::new(
+                self.repo_root.clone(),
+                self.runtime_dir.clone(),
+                session_cache,
+                track_id,
+            )),
         ];
         let service = Arc::new(CapabilityExecInteractor::new(profile, source, providers));
 
         cli_driver::capability::CapabilityDriver::new(service)
+    }
+
+    fn current_track_id(&self) -> Option<TrackId> {
+        let branch =
+            SystemGitRepo::discover_from(&self.repo_root).ok()?.current_branch().ok()??;
+        TrackId::try_new(branch.strip_prefix("track/")?.to_owned()).ok()
     }
 }
 
@@ -175,6 +195,7 @@ mod tests {
             briefing_file: CapabilityFilePathArg::from_str("tmp/briefing.md")
                 .expect("valid test briefing path"),
             timeout_seconds: None,
+            resume: cli_driver::capability::CapabilityResumeArg::Fresh,
         }
     }
 

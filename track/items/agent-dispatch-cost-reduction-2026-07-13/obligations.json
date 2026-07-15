@@ -1276,6 +1276,30 @@
           "element_id": "AC-09"
         }
       ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::capability::into_driver_input",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::capability::into_driver_input"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::capability::into_driver_input",
+      "declaration_hash": "0aa24d54fbcdd45d06d84ae23ef62757179fc911501499f17bb4faa8021dc851",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        }
+      ]
     }
   ]
 }

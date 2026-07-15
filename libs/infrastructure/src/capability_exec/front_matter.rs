@@ -137,13 +137,18 @@ impl ProviderDefinitionFrontMatter {
         self.model.as_deref().filter(|value| !value.trim().is_empty())
     }
 
-    pub(crate) fn has_tools(&self) -> bool {
+    /// Returns the explicitly declared Claude tool surface.
+    pub(crate) fn tools(&self) -> Option<Vec<&str>> {
         match self.tools.as_ref() {
-            Some(ToolsDeclaration::Scalar(value)) => !value.trim().is_empty(),
-            Some(ToolsDeclaration::List(values)) => {
-                !values.is_empty() && values.iter().all(|value| !value.trim().is_empty())
+            Some(ToolsDeclaration::Scalar(value)) if !value.trim().is_empty() => {
+                Some(vec![value.as_str()])
             }
-            None => false,
+            Some(ToolsDeclaration::List(values))
+                if !values.is_empty() && values.iter().all(|value| !value.trim().is_empty()) =>
+            {
+                Some(values.iter().map(String::as_str).collect())
+            }
+            Some(ToolsDeclaration::Scalar(_)) | Some(ToolsDeclaration::List(_)) | None => None,
         }
     }
 }

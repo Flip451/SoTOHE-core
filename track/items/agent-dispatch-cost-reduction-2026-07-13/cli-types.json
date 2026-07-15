@@ -25,6 +25,26 @@
         }
       ]
     },
+    "cli::commands::capability::into_driver_input": {
+      "action": "add",
+      "docs": "Private helper that converts capability CLI arguments into typed driver input, including resume intent.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "CapabilityExecArgs"
+        }
+      ],
+      "returns": "cli_driver::capability::CapabilityExecDriverInput",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
     "cli::commands::review::execute": {
       "action": "reference",
       "docs": "Builds review composition with track, scope, and round identities required for safe session reuse.",
@@ -103,7 +123,7 @@
     },
     "CapabilityExecArgs": {
       "action": "modify",
-      "docs": "Parses capability dispatch arguments into the mirrored typed driver input, including resume intent and target artifacts.",
+      "docs": "Parses capability dispatch arguments into typed driver input. The raw resume boolean is only the clap flag-presence token; conversion immediately combines it with validated target artifact paths into CapabilityResumeArg.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -127,7 +147,11 @@
             },
             {
               "name": "resume",
-              "ty": "cli_driver::capability::CapabilityResumeArg"
+              "ty": "bool"
+            },
+            {
+              "name": "target_artifacts",
+              "ty": "Vec<cli_driver::capability::TargetArtifactPathArg>"
             }
           ],
           "has_stripped_fields": false,

@@ -285,7 +285,7 @@ fn map_symlink_or_io(error: std::io::Error) -> ProviderSessionCacheError {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use std::path::PathBuf;
+    use std::path::{Path, PathBuf};
 
     use super::FsProviderSessionCacheAdapter;
     use domain::TrackId;
@@ -428,6 +428,47 @@ mod tests {
         assert!(first_path.is_file());
         assert!(second_path.is_file());
         assert!(track_path.is_file());
+    }
+
+    #[test]
+    fn test_provider_session_cache_paths_are_gitignored_machine_local_transients() {
+        let directory = tempfile::tempdir().unwrap();
+        let cache = FsProviderSessionCacheAdapter::new(
+            directory.path().to_path_buf(),
+            PathBuf::from("tmp/runtime"),
+        );
+        let workspace_key = workspace_key();
+        let track_key = track_key_for_target_set(
+            TargetArtifactSet::try_new(vec![
+                TargetArtifactPath::try_new(PathBuf::from("tmp/briefing.md")).unwrap(),
+            ])
+            .unwrap(),
+        );
+
+        cache.save(&workspace_key, &entry()).unwrap();
+        cache.save(&track_key, &entry()).unwrap();
+        let (workspace_path, _) = cache.cache_path(&workspace_key).unwrap();
+        let (track_path, _) = cache.cache_path(&track_key).unwrap();
+        let workspace_relative = workspace_path.strip_prefix(directory.path()).unwrap();
+        let track_relative = track_path.strip_prefix(directory.path()).unwrap();
+        let committed_gitignore = include_str!("../../../.gitignore");
+
+        assert!(
+            committed_gitignore.lines().any(|line| line == "tmp/"),
+            "the existing runtime directory must stay gitignored"
+        );
+        assert!(
+            committed_gitignore.lines().any(|line| line == "track/items/**/.provider-sessions/"),
+            "track-local provider sessions must stay gitignored"
+        );
+        assert!(
+            workspace_relative.starts_with(Path::new("tmp")),
+            "workspace sessions must live under the existing runtime directory"
+        );
+        assert!(
+            track_relative.starts_with(Path::new("track/items/track-a/.provider-sessions")),
+            "track sessions must live under the gitignored track-local cache directory"
+        );
     }
 
     #[test]

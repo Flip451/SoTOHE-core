@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "63e08410653b36dfecfd309013c5a28458ad5d405ac25a16ff64ac50ee43af3d",
+  "catalogue_declaration_hash": "d2145bb66d2d87bdadb6079b343560e132a34d5a44a58a2d48db152213f56b5b",
   "signals": [
     {
       "type_name": "CapabilityCommand",
@@ -10,7 +10,7 @@
     {
       "type_name": "CapabilityExecArgs",
       "signal": "blue",
-      "entry_hash": "dcadc0ecfd795f6f274a29a194ba866e04f66889276a3f72acc4f0dd49ff64f3"
+      "entry_hash": "d7df5d12c5599c685453ff209c529d2568bc58202286cfb7472a8351b3be9edb"
     },
     {
       "type_name": "ReviewCommand",
@@ -21,6 +21,11 @@
       "type_name": "cli::commands::capability::execute",
       "signal": "blue",
       "entry_hash": "48a67d73841c047057f8a23fe7189b1236203cb6cad983ed2da9adaae0cf8e62"
+    },
+    {
+      "type_name": "cli::commands::capability::into_driver_input",
+      "signal": "blue",
+      "entry_hash": "bad99907dab0de736f22deac97366cdd3c85dc4c925285daf7e6e6ca1562ffd3"
     },
     {
       "type_name": "cli::commands::review::execute",

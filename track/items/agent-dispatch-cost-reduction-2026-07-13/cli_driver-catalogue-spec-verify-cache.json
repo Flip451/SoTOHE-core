@@ -219,11 +219,11 @@
       }
     },
     {
-      "claim_hash": "8da5b7a76bd6c8a32a4833c1e17faa81ff1e18fa5426b29b9cac9ec2acdc3e7a",
+      "claim_hash": "f2487472a348ab8528bbaaa3634947f92b01faaadd19b3eba450ed67b0602d45",
       "evidence_hash": "74df0cf41b80fdb8461f2469f8807e5f1c56c5247083791d8ee3a415f4bd2d91",
       "verdict": {
         "kind": "pass",
-        "citation": "同一 track・同一 capability の継続作業（同じ成果物への追補・修正の再入、中断からの続行）を対象とし"
+        "citation": "`sotp capability exec` に orchestrator が選ぶ resume option を追加する。同一 track・同一 capability の継続作業（同じ成果物への追補・修正の再入、中断からの続行）を対象とし、初回 dispatch と関心事を切り替える dispatch は orchestrator の判断で新規 session とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -243,7 +243,7 @@
       }
     },
     {
-      "claim_hash": "8da5b7a76bd6c8a32a4833c1e17faa81ff1e18fa5426b29b9cac9ec2acdc3e7a",
+      "claim_hash": "f2487472a348ab8528bbaaa3634947f92b01faaadd19b3eba450ed67b0602d45",
       "evidence_hash": "4cabd2650852dcafaf577955b9d2f99d99cb1597a3454dd512217be528610884",
       "verdict": {
         "kind": "pass",
@@ -267,11 +267,11 @@
       }
     },
     {
-      "claim_hash": "8da5b7a76bd6c8a32a4833c1e17faa81ff1e18fa5426b29b9cac9ec2acdc3e7a",
+      "claim_hash": "f2487472a348ab8528bbaaa3634947f92b01faaadd19b3eba450ed67b0602d45",
       "evidence_hash": "6a3047e6a3e70c18439ff82f51f1e54058d97c6aebf518347106d5303ae67dca",
       "verdict": {
         "kind": "pass",
-        "citation": "track 解決不能時は capability・対象 artifact の repo-relative path による workspace-local cache を選び"
+        "citation": "track 解決時は track-local cache、track 解決不能時は capability・対象 artifact の repo-relative path による workspace-local cache を選び"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
