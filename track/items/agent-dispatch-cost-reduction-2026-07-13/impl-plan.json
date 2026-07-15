@@ -16,7 +16,7 @@
     {
       "id": "T003",
       "description": "Extend `libs/usecase/src/capability_exec.rs` with `TargetArtifactPath` and `TargetArtifactSet`; create `libs/usecase/src/provider_session.rs` (`ProviderSessionCacheEntry`, `ProviderSessionCacheError`, `ProviderSessionCacheKey`, `ProviderSessionCachePort`, `ProviderSessionId`, and `ReviewerPrompt`) and `libs/infrastructure/src/provider_session.rs` (`FsProviderSessionCacheAdapter`); export both modules from their `lib.rs` files, consume existing `TrackId`, `ScopeName`, and `RoundType` identity values, and add focused tests plus `track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json` entries. IN-03, IN-04, IN-08, IN-09, CN-04, CN-06, CN-08, AC-03, AC-04, AC-09, AC-10.",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "id": "T004",

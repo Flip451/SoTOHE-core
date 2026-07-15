@@ -8,7 +8,7 @@ GO-02 → T003, T004, T007, T008, T009.
 GO-03 → T005, T011, T012, T013, T014, T015, T016, T017, T018.
 GO-04 → T001, T002, T003, T004, T005, T007, T008, T009, T011, T012, T013, T014, T015, T016, T017, T018, T019.
 
-## Tasks (16/17 resolved)
+## Tasks (17/17 resolved)
 
 ### S1 — Explicit dispatch profile resolution
 
@@ -23,7 +23,7 @@ GO-04 → T001, T002, T003, T004, T005, T007, T008, T009, T011, T012, T013, T014
 > Run T003 after T001 and T002.
 > Run T004 after T003.
 
-- [~] **T003**: Extend `libs/usecase/src/capability_exec.rs` with `TargetArtifactPath` and `TargetArtifactSet`; create `libs/usecase/src/provider_session.rs` (`ProviderSessionCacheEntry`, `ProviderSessionCacheError`, `ProviderSessionCacheKey`, `ProviderSessionCachePort`, `ProviderSessionId`, and `ReviewerPrompt`) and `libs/infrastructure/src/provider_session.rs` (`FsProviderSessionCacheAdapter`); export both modules from their `lib.rs` files, consume existing `TrackId`, `ScopeName`, and `RoundType` identity values, and add focused tests plus `track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json` entries. IN-03, IN-04, IN-08, IN-09, CN-04, CN-06, CN-08, AC-03, AC-04, AC-09, AC-10.
+- [x] **T003**: Extend `libs/usecase/src/capability_exec.rs` with `TargetArtifactPath` and `TargetArtifactSet`; create `libs/usecase/src/provider_session.rs` (`ProviderSessionCacheEntry`, `ProviderSessionCacheError`, `ProviderSessionCacheKey`, `ProviderSessionCachePort`, `ProviderSessionId`, and `ReviewerPrompt`) and `libs/infrastructure/src/provider_session.rs` (`FsProviderSessionCacheAdapter`); export both modules from their `lib.rs` files, consume existing `TrackId`, `ScopeName`, and `RoundType` identity values, and add focused tests plus `track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json` entries. IN-03, IN-04, IN-08, IN-09, CN-04, CN-06, CN-08, AC-03, AC-04, AC-09, AC-10.
 - [x] **T004**: Modify `libs/usecase/src/review_v2/ports.rs` (`Reviewer`), `libs/infrastructure/src/review_v2/{claude_reviewer,codex_reviewer}.rs` (`ClaudeReviewer` and `CodexReviewer`), `apps/cli/src/commands/review/{mod,local,claude_local,codex_local}.rs` (`ReviewCommand` and `cli::commands::review::execute`), and `apps/cli-composition/src/review_v2/{mod,run,shared,shim}.rs` (`ReviewCompositionRoot`); add boundary tests and `track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json` entries. IN-01, IN-03, IN-04, CN-02, CN-03, CN-06, CN-09, AC-01, AC-03, AC-04.
 
 ### S3 — Conservative type-signal freshness
