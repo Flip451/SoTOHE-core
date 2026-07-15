@@ -1289,6 +1289,31 @@ fn test_voluntary_binding_adjudicates_every_obligation_owning_the_edge() {
     );
 }
 
+/// A waiver on an edge owned by SEVERAL obligations must be adjudicated once
+/// per owner. Each declaration can make a different claim about the same edge,
+/// so taking the first owner would leave the other claim unverified.
+#[test]
+fn test_waiver_adjudicates_every_obligation_owning_the_edge() {
+    let h = harness(
+        Some(ObligationsDocument::new(track(), vec![obligation(), trait_impl_obligation()])),
+        Some(waiver_bindings()),
+        fulfilled(),
+        fulfillment_fail(),
+        WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("multi-owner waiver".to_owned()).unwrap(),
+        },
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 2, "each owning obligation must be adjudicated");
+    assert_eq!(*h.waiver_driver.calls.lock().unwrap(), 2);
+    assert_eq!(h.waiver_cache.saved.lock().unwrap().as_ref().unwrap().entries().len(), 2);
+    let declarations = h.waiver_driver.declarations.lock().unwrap();
+    assert!(declarations.iter().any(|declaration| declaration.contains("kind")));
+    assert!(declarations.iter().any(|declaration| declaration.contains("trait_ref")));
+}
+
 /// A voluntary binding on an edge that also carries a waiver record must not
 /// plan any fulfillment adjudication: the waiver owns the edge at the check
 /// gate, mirroring the fulfillment-record precedence.
@@ -1342,6 +1367,12 @@ fn test_production_pair_count_scales_voluntary_bindings_by_owner_count() {
     );
     assert_eq!(super::production_pair_count(&obligations, &bindings), 2);
 
+    let waiver = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::Waiver { edge_id: edge(), reason: waiver_reason() }],
+    );
+    assert_eq!(super::production_pair_count(&obligations, &waiver), 2);
+
     let unowned_edge = TestObligationEdgeId::new(
         CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
         TestObligationAnchorId::try_new("spec.json".to_owned(), "IN-06".to_owned()).unwrap(),
@@ -1349,7 +1380,7 @@ fn test_production_pair_count_scales_voluntary_bindings_by_owner_count() {
     let unowned = TestBindingsDocument::new(
         track(),
         vec![TestBindingRecord::VoluntaryBinding {
-            edge_id: unowned_edge,
+            edge_id: unowned_edge.clone(),
             tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
         }],
     );
@@ -1357,6 +1388,16 @@ fn test_production_pair_count_scales_voluntary_bindings_by_owner_count() {
         super::production_pair_count(&obligations, &unowned),
         1,
         "catalogue-only voluntary edges keep the minimum budget of one"
+    );
+
+    let unowned_waiver = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::Waiver { edge_id: unowned_edge, reason: waiver_reason() }],
+    );
+    assert_eq!(
+        super::production_pair_count(&obligations, &unowned_waiver),
+        1,
+        "catalogue-only waiver edges keep the minimum budget of one"
     );
 }
 

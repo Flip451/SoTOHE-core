@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-15T12:29:52Z",
+  "generated_at": "2026-07-15T15:53:46Z",
   "declaration_hash": "8a3c046c5966b17655367bd39ccc56e24cc536f0000c55e972dff11960df9a8a",
-  "implementation_input_hash": "6705c76a74dba9bf35c5bb32570b15083df4f37a422018438f29198923bfc0fb",
+  "implementation_input_hash": "234b4f67be5ee2130307cffa71173ddddd310ff46eabb9ba24b97bd062d4eeee",
   "signals": [
     {
       "type_name": "AgentProfiles",

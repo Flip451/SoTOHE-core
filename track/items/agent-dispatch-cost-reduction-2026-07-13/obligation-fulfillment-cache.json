@@ -159,13 +159,13 @@
         "item_identifier": "method:owners_of_edge"
       },
       "key": {
-        "bound_tests_set_hash": "a2f28a94eca644595b289f14442d1c183bdb50b843f1f7e56a06c5ba41c9d66e",
+        "bound_tests_set_hash": "d53f6ddbc91e36160ae0bfa2c2b121c41a93bc1041be9efb3d03c27311c9b3f0",
         "declaration_hash": "331effb448fbf4c20176c6eb2201a576d20ef47979fda91b6a359123ac325040",
         "anchor_text_hash": "72ae17b4ae30c6993d271cb5ce29d45c7af57e84ce9be805034a9520054dea9e"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let owners = doc.owners_of_edge(&edge(\"domain::User\", \"IN-05\"));\nassert_eq!(\n    owners.iter().map(|o| o.id().clone()).collect::<Vec<_>>(),\n    vec![first.id().clone(), second.id().clone()],\n    \"every obligation sharing the entry key and anchor owns the edge\"\n);"
+        "citation": "let owners = doc.owners_of_edge(&edge(\"domain::User\", \"IN-05\"));\nassert_eq!(\n    owners.iter().map(|o| o.id().clone()).collect::<Vec<_>>(),\n    vec![first.id().clone(), second.id().clone()],\n    \"every obligation sharing the entry key and anchor owns the edge\"\n);\nassert!(doc.owners_of_edge(&edge(\"domain::User\", \"IN-06\")).is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -183,13 +183,13 @@
         "item_identifier": "method:owners_of_edge"
       },
       "key": {
-        "bound_tests_set_hash": "a2f28a94eca644595b289f14442d1c183bdb50b843f1f7e56a06c5ba41c9d66e",
+        "bound_tests_set_hash": "d53f6ddbc91e36160ae0bfa2c2b121c41a93bc1041be9efb3d03c27311c9b3f0",
         "declaration_hash": "331effb448fbf4c20176c6eb2201a576d20ef47979fda91b6a359123ac325040",
         "anchor_text_hash": "70f344616e7fa7b739110f1fae619e676845800d43e24e64f8ff980f7a3dfdd1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"assert_eq!(outcome.pass_count(), 2, \\\"each owning obligation must be adjudicated\\\");\" \"assert_eq!(fulfillment_cache.saved.lock().unwrap().as_ref().unwrap().entries().len(), 2, \\\"one frozen verdict per (edge × obligation) pair\\\");\" \"assert_eq!(real_fulfillment_tracker.peak(), 0, \\\"a waived edge's voluntary binding must not be adjudicated\\\");\""
+        "citation": "assert_eq!(\n            owners.iter().map(|o| o.id().clone()).collect::<Vec<_>>(),\n            vec![first.id().clone(), second.id().clone()],\n            \"every obligation sharing the entry key and anchor owns the edge\"\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4791,13 +4791,13 @@
         "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
       },
       "key": {
-        "bound_tests_set_hash": "5c871aed39653d9e8761a4821cb5a412b9e127d66015113ca39da3ab10d13f08",
+        "bound_tests_set_hash": "4525c61bc7ea5974c298f264cb1f9486c38d416d6ae1ce5535a14e938a029384",
         "declaration_hash": "316f52253430d2303c9e18f36fcd6bdcd2ec45806866cb925b2a413f2508d1b4",
         "anchor_text_hash": "ada0a8c57a9d8d40910dc95985d3a9260b7c885da13431c2cd9613cbd79e7805"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;\n  *) exit 10 ;;\nesac\n\nassert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");\n\nassert!(matches!(\n    run(RoundType::Final, matched_key.clone(), \"fast-keyed-final-codex.sh\", false).0,\n    Verdict::ZeroFindings\n));\nassert!(matches!(\n    run(RoundType::Fast, matched_key, \"matching-key-codex.sh\", true).0,\n    Verdict::ZeroFindings\n));"
+        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;\n  *) exit 10 ;;\nesac"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4815,7 +4815,7 @@
         "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
       },
       "key": {
-        "bound_tests_set_hash": "5c871aed39653d9e8761a4821cb5a412b9e127d66015113ca39da3ab10d13f08",
+        "bound_tests_set_hash": "4525c61bc7ea5974c298f264cb1f9486c38d416d6ae1ce5535a14e938a029384",
         "declaration_hash": "316f52253430d2303c9e18f36fcd6bdcd2ec45806866cb925b2a413f2508d1b4",
         "anchor_text_hash": "0dee02c08949c142a3ea7edfea8ac737088ad23dd54aa0e7d24bb564776b23e6"
       },
@@ -4839,13 +4839,13 @@
         "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
       },
       "key": {
-        "bound_tests_set_hash": "5c871aed39653d9e8761a4821cb5a412b9e127d66015113ca39da3ab10d13f08",
+        "bound_tests_set_hash": "4525c61bc7ea5974c298f264cb1f9486c38d416d6ae1ce5535a14e938a029384",
         "declaration_hash": "316f52253430d2303c9e18f36fcd6bdcd2ec45806866cb925b2a413f2508d1b4",
         "anchor_text_hash": "544150922e44eb510e899f687c37184a771bf9fca61d89487b5353bd44f16517"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(resumed.0, model_mismatch.0);\n        assert_eq!(resumed.0, provider_mismatch.0);\n        assert_eq!(resumed.0, first_round.0);"
+        "citation": "assert_eq!(resumed.0, model_mismatch.0);\n        assert_eq!(resumed.0, provider_mismatch.0);\n        assert_eq!(resumed.0, first_round.0);\n        assert!(matches!(resumed.0, Verdict::ZeroFindings));\n        assert!(!resumed.1.as_str().is_empty());\n        assert!(!model_mismatch.1.as_str().is_empty());\n        assert!(!provider_mismatch.1.as_str().is_empty());\n        assert!(!first_round.1.as_str().is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4983,7 +4983,7 @@
         "item_identifier": "voluntary:IN-04"
       },
       "key": {
-        "bound_tests_set_hash": "1bd758aa7dc15c56f5212bbec139300bb36b7e907a9615dfdfd5b758ce0dd478",
+        "bound_tests_set_hash": "8995fc710d5b957010317b0f4d29c6c7d5b2b81f8859639758b437629e5f5a4a",
         "declaration_hash": "7c188774e58888e0dc9136fdb9150e33f7cb7c10949a1aa0c44f76cc76867696",
         "anchor_text_hash": "12b1350e138cc06f3478183cd939907fcd5552cc6e22d2179adef96ff00b8b11"
       },
@@ -5031,13 +5031,13 @@
         "item_identifier": "voluntary:CN-06"
       },
       "key": {
-        "bound_tests_set_hash": "1bd758aa7dc15c56f5212bbec139300bb36b7e907a9615dfdfd5b758ce0dd478",
+        "bound_tests_set_hash": "8995fc710d5b957010317b0f4d29c6c7d5b2b81f8859639758b437629e5f5a4a",
         "declaration_hash": "7c188774e58888e0dc9136fdb9150e33f7cb7c10949a1aa0c44f76cc76867696",
         "anchor_text_hash": "07cdc5852c99211b87502f07153d16da0d9e13f03f511f0ec36d0e90ca5ce018"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "`with_bin(write_bin(\"model-mismatch-codex.sh\", false))`、`with_bin(write_bin(\"provider-mismatch-codex.sh\", false))`、`assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");`"
+        "citation": "assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5079,13 +5079,13 @@
         "item_identifier": "voluntary:AC-04"
       },
       "key": {
-        "bound_tests_set_hash": "d4c70c9a3d592229708207f153a4b72407ade74a3cfef1ab5208a675bb49ac10",
+        "bound_tests_set_hash": "85e68d833b1ed8115e61e9c2e5c71f6b3092d522cc6c30a3d9646634066edd2a",
         "declaration_hash": "7c188774e58888e0dc9136fdb9150e33f7cb7c10949a1aa0c44f76cc76867696",
         "anchor_text_hash": "042865d7c2f3ee57558d16bbda502891955644407e647ab52193b9aa10aa9c88"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"[ \\\"$has_model\\\" -eq 1 ] && [ \\\"$has_sandbox\\\" -eq 1 ] && [ \\\"$has_effort\\\" -eq 1 ] && [ -n \\\"$output\\\" ] && {resume_check} || exit 9\"; \"assert_eq!(std::fs::read_to_string(attempts).unwrap(), \\\"resume\\\\nfresh\\\\n\\\")\"; \"run(RoundType::Final, matched_key.clone(), \\\"fast-keyed-final-codex.sh\\\", false)\""
+        "citation": "assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");\n\n[ \"$has_model\" -eq 1 ] && [ \"$has_sandbox\" -eq 1 ] && [ \"$has_effort\" -eq 1 ] || exit 9"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },

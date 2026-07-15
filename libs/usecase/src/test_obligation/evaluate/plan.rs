@@ -298,12 +298,63 @@ impl EvaluateTestObligationsInteractor {
         existing_waiver_cache: Option<&WaiverCacheDocument>,
         plan: &mut Vec<PlannedAction>,
     ) -> Result<(), ObligationEvaluateError> {
+        // Each derived owner represents a distinct edge × obligation claim,
+        // just as voluntary bindings do. A waiver therefore needs one
+        // adjudication per owner, using that owner's declaration as evidence.
+        let owners = obligations.owners_of_edge(edge_id);
+        if !owners.is_empty() {
+            let Some(anchor_text) = resolve_anchor_text(spec, edge_id.anchor_id().element_id())
+            else {
+                plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(edge_id.clone())));
+                return Ok(());
+            };
+            for obligation in owners {
+                let Some(declaration) =
+                    obligation_declaration_text_from_loaded(catalogues, obligation)
+                else {
+                    plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(
+                        edge_id.clone(),
+                    )));
+                    continue;
+                };
+                self.emit_waiver_action(
+                    edge_id,
+                    reason,
+                    declaration,
+                    &anchor_text,
+                    existing_waiver_cache,
+                    plan,
+                );
+            }
+            return Ok(());
+        }
+
         let Some((declaration, anchor_text, _declaration_hash)) =
-            self.resolve_waiver_edge(edge_id, obligations, catalogues, spec)
+            self.resolve_edge(edge_id, catalogues, spec)
         else {
             plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(edge_id.clone())));
             return Ok(());
         };
+        self.emit_waiver_action(
+            edge_id,
+            reason,
+            declaration,
+            &anchor_text,
+            existing_waiver_cache,
+            plan,
+        );
+        Ok(())
+    }
+
+    fn emit_waiver_action(
+        &self,
+        edge_id: &TestObligationEdgeId,
+        reason: &WaivedReason,
+        declaration: String,
+        anchor_text: &str,
+        existing_waiver_cache: Option<&WaiverCacheDocument>,
+        plan: &mut Vec<PlannedAction>,
+    ) {
         let reason_hash = WaivedReasonHash::new(self.hasher.sha256(reason.as_str().as_bytes()));
         let declaration_hash_actual =
             DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
@@ -320,16 +371,15 @@ impl EvaluateTestObligationsInteractor {
                 key,
                 verdict,
             }));
-            return Ok(());
+            return;
         }
         plan.push(PlannedAction::Waiver(WaiverLlmTask {
             edge_id: edge_id.clone(),
             key,
             reason: reason.clone(),
             declaration,
-            anchor_text,
+            anchor_text: anchor_text.to_owned(),
         }));
-        Ok(())
     }
 
     /// Emits either a cache-hit `Immediate` or a `Fulfillment` LLM task.
@@ -535,24 +585,6 @@ impl EvaluateTestObligationsInteractor {
         }
         let hash = BoundTestsSetHash::new(self.hasher.sha256(source.as_bytes()));
         Ok((source, hash))
-    }
-
-    /// Resolves the verification triple for a waiver edge; kept here so
-    /// waiver planning can reuse the fulfillment-first precedence.
-    fn resolve_waiver_edge(
-        &self,
-        edge_id: &TestObligationEdgeId,
-        obligations: &ObligationsDocument,
-        catalogues: &[LoadedCatalogueDocument],
-        spec: &SpecDocument,
-    ) -> Option<(String, String, DeclarationHash)> {
-        if let Some(obligation) = obligations.owners_of_edge(edge_id).into_iter().next() {
-            let declaration = obligation_declaration_text_from_loaded(catalogues, obligation)?;
-            let anchor_text = resolve_anchor_text(spec, edge_id.anchor_id().element_id())?;
-            let declaration_hash = DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
-            return Some((declaration, anchor_text, declaration_hash));
-        }
-        self.resolve_edge(edge_id, catalogues, spec)
     }
 
     /// Catalogue-only edge resolution — used when no derived obligation owns

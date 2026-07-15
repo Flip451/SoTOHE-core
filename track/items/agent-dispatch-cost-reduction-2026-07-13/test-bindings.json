@@ -138,6 +138,11 @@
           "layer": "usecase",
           "module_path": "usecase::test_obligation::evaluate::tests",
           "test_name": "test_waiver_edge_suppresses_voluntary_binding_adjudication"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_waiver_adjudicates_every_obligation_owning_the_edge"
         }
       ]
     },
@@ -3836,6 +3841,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::review_v2::codex_reviewer::tests",
           "test_name": "test_codex_reviewer_resumes_only_matching_track_scope_and_round_key_unit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_fresh_retry_does_not_adopt_failed_resume_verdict"
         }
       ]
     },
@@ -3886,6 +3896,7 @@
       "tests": [
         { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
         { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_failure_retries_fresh_invocation" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_fresh_retry_does_not_adopt_failed_resume_verdict" },
         { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_expired_session_starts_fresh_with_explicit_flags" }
       ]
     },
@@ -3900,6 +3911,7 @@
       "tests": [
         { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
         { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_failure_retries_fresh_invocation" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_fresh_retry_does_not_adopt_failed_resume_verdict" },
         { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_expired_session_starts_fresh_with_explicit_flags" }
       ]
     },
@@ -3917,6 +3929,7 @@
       "tests": [
         { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
         { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_failure_retries_fresh_invocation" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_fresh_retry_does_not_adopt_failed_resume_verdict" },
         { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_expired_session_starts_fresh_with_explicit_flags" },
         { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resumes_only_matching_track_scope_and_round_key_unit" }
       ]

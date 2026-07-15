@@ -501,15 +501,14 @@ fn production_pair_count(
                     .unwrap_or(1);
                 count = count.saturating_add(edge_count.max(1));
             }
-            TestBindingRecord::VoluntaryBinding { edge_id, .. } => {
-                // A voluntary binding is adjudicated once per owning
-                // obligation, so the calibration budget must scale with the
-                // owner count (minimum one for catalogue-only edges).
+            TestBindingRecord::VoluntaryBinding { edge_id, .. }
+            | TestBindingRecord::Waiver { edge_id, .. } => {
+                // Voluntary bindings and waivers are both adjudicated once
+                // per owning obligation, so the calibration budget must
+                // scale with the owner count (minimum one for catalogue-only
+                // edges).
                 let owner_count = obligations.owners_of_edge(edge_id).len();
                 count = count.saturating_add(owner_count.max(1));
-            }
-            TestBindingRecord::Waiver { .. } => {
-                count = count.saturating_add(1);
             }
         }
     }

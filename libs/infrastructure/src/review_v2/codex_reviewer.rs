@@ -1,11 +1,15 @@
 //! Codex-backed implementation of the `Reviewer` usecase port.
 
+use std::fs::OpenOptions;
 use std::io::{BufRead, BufReader, Read};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
+
+#[cfg(unix)]
+use std::os::unix::fs::OpenOptionsExt;
 
 use domain::TrackId;
 use domain::review_v2::{
@@ -25,6 +29,7 @@ use super::session::{ReviewerSession, effort_value};
 use crate::codex_common::{
     POLL_INTERVAL, REVIEW_RUNTIME_DIR, codex_bin, runtime_path, tee_stderr_to_file,
 };
+use crate::track::symlink_guard::reject_symlinks_up_to_root;
 
 type SpawnCodexReviewerResult =
     Result<(Child, thread::JoinHandle<()>, thread::JoinHandle<Option<String>>), String>;
@@ -143,11 +148,6 @@ impl CodexReviewer {
         // Session log is NOT auto-managed — it persists for post-run debugging.
         let _cleanup = AutoManagedArtifacts::new([&output_last_message, &output_schema]);
 
-        // Reset output-last-message to empty so stale content cannot be mistaken for a verdict.
-        std::fs::write(&output_last_message, "").map_err(|e| {
-            ReviewerError::Unexpected(format!("failed to initialize output-last-message: {e}"))
-        })?;
-
         // Write output schema file.
         std::fs::write(&output_schema, REVIEW_OUTPUT_SCHEMA_JSON).map_err(|e| {
             ReviewerError::Unexpected(format!("failed to write output-schema: {e}"))
@@ -160,6 +160,12 @@ impl CodexReviewer {
 
         let resume_id = self.session.resumable_id();
         let run = |resume_id: Option<&str>| {
+            // Both resumed and fresh attempts share this path. Reset the
+            // authoritative output before every child so a failed resume
+            // cannot donate its verdict to the fresh retry.
+            initialize_output_last_message(&output_last_message).map_err(|e| {
+                ReviewerError::Unexpected(format!("failed to initialize output-last-message: {e}"))
+            })?;
             let invocation = build_codex_reviewer_invocation(
                 self.model.as_str(),
                 effort_value(self.session.effort()),
@@ -456,6 +462,51 @@ fn read_bounded_output_last_message(path: &Path, max_bytes: u64) -> std::io::Res
             format!("output-last-message is not valid UTF-8: {error}"),
         )
     })
+}
+
+/// Empties the authoritative Codex final-message file without following symlinks.
+///
+/// The file is reset before every invocation so a failed resumed attempt cannot
+/// donate a stale verdict to its fresh retry. On Unix, `O_NOFOLLOW` closes the
+/// check-to-open race; truncation occurs only after the opened handle is verified
+/// to be a regular file.
+fn initialize_output_last_message(path: &Path) -> std::io::Result<()> {
+    match std::fs::symlink_metadata(path) {
+        Ok(metadata) if metadata.file_type().is_symlink() => {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!("refusing to initialize symlinked output-last-message: {}", path.display()),
+            ));
+        }
+        Ok(metadata) if !metadata.file_type().is_file() => {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!("output-last-message is not a regular file: {}", path.display()),
+            ));
+        }
+        Ok(_) => {}
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+        Err(error) => return Err(error),
+    }
+
+    // The runtime path is relative to the workspace. Check every existing
+    // ancestor before opening the leaf so a symlinked `tmp/` or
+    // `reviewer-runtime/` cannot redirect the authoritative verdict outside
+    // the runtime tree.
+    reject_symlinks_up_to_root(path)?;
+
+    let mut options = OpenOptions::new();
+    options.write(true).create(true);
+    #[cfg(unix)]
+    options.custom_flags(libc::O_NOFOLLOW);
+    let file = options.open(path)?;
+    if !file.metadata()?.file_type().is_file() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("output-last-message is not a regular file: {}", path.display()),
+        ));
+    }
+    file.set_len(0)
 }
 
 fn build_codex_reviewer_invocation(
@@ -903,6 +954,57 @@ printf '{{"thread_id":"new-session"}}\n'
 
     #[cfg(unix)]
     #[test]
+    fn test_codex_reviewer_fresh_retry_does_not_adopt_failed_resume_verdict() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = tempfile::tempdir().unwrap();
+        let attempts = dir.path().join("attempts.log");
+        let script = dir.path().join("stale-resume-verdict-codex.sh");
+        std::fs::write(
+            &script,
+            format!(
+                r#"#!/bin/sh
+has_resume=0
+output=""
+previous=""
+for argument in "$@"; do
+  [ "$argument" = "resume" ] && has_resume=1
+  [ "$previous" = "--output-last-message" ] && output="$argument"
+  previous="$argument"
+done
+if [ "$has_resume" -eq 1 ]; then
+  printf 'resume\n' >> '{}'
+  printf '{{"verdict":"zero_findings","findings":[]}}\n' > "$output"
+  exit 7
+fi
+printf 'fresh\n' >> '{}'
+exit 0
+"#,
+                attempts.display(),
+                attempts.display()
+            ),
+        )
+        .unwrap();
+        let mut permissions = std::fs::metadata(&script).unwrap().permissions();
+        permissions.set_mode(0o755);
+        std::fs::set_permissions(&script, permissions).unwrap();
+
+        let target =
+            ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
+        let result = test_reviewer_with_cache(
+            Duration::from_secs(10),
+            "Review this code.",
+            Arc::new(StaticSessionCache { entry: Some(session_entry("codex")) }),
+        )
+        .with_bin(script)
+        .review(&target);
+
+        assert!(matches!(result, Err(ReviewerError::IllegalVerdict)));
+        assert_eq!(std::fs::read_to_string(attempts).unwrap(), "resume\nfresh\n");
+    }
+
+    #[cfg(unix)]
+    #[test]
     fn test_codex_reviewer_expired_session_starts_fresh_with_explicit_flags() {
         use std::os::unix::fs::PermissionsExt;
 
@@ -1125,6 +1227,44 @@ printf '{{"thread_id":"new-session"}}\n'
 
         assert_eq!(error.kind(), std::io::ErrorKind::InvalidInput);
         assert!(error.to_string().contains("symlinked output-last-message"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_initialize_output_last_message_symlink_returns_error_without_truncating_target() {
+        let dir = tempfile::tempdir().unwrap();
+        let target = dir.path().join("verdict.json");
+        let link = dir.path().join("last-message.json");
+        std::fs::write(&target, b"preserve this verdict").unwrap();
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+
+        let error = initialize_output_last_message(&link).unwrap_err();
+
+        assert_eq!(error.kind(), std::io::ErrorKind::InvalidInput);
+        assert!(error.to_string().contains("symlinked output-last-message"));
+        assert_eq!(std::fs::read(&target).unwrap(), b"preserve this verdict");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_initialize_output_last_message_symlinked_parent_preserves_target() {
+        let dir = tempfile::tempdir().unwrap();
+        let redirected_parent = dir.path().join("redirected");
+        let link_parent = dir.path().join("runtime");
+        std::fs::create_dir_all(&redirected_parent).unwrap();
+        std::fs::write(redirected_parent.join("last-message.json"), b"preserve this verdict")
+            .unwrap();
+        std::os::unix::fs::symlink(&redirected_parent, &link_parent).unwrap();
+
+        let error =
+            initialize_output_last_message(&link_parent.join("last-message.json")).unwrap_err();
+
+        assert_eq!(error.kind(), std::io::ErrorKind::InvalidInput);
+        assert!(error.to_string().contains("refusing to follow symlink"));
+        assert_eq!(
+            std::fs::read(redirected_parent.join("last-message.json")).unwrap(),
+            b"preserve this verdict"
+        );
     }
 
     #[test]
