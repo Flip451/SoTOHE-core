@@ -808,7 +808,7 @@ mod tests {
     fn test_read_returns_invalid_data_for_absolute_persisted_paths() {
         for field in ["low_path", "high_path", "changed_path"] {
             let mut record = valid_v1_record_json();
-            record[field] = serde_json::json!("/home/workstation/src/a.rs");
+            record[field] = serde_json::json!("/srv/workstation/src/a.rs");
 
             assert_v1_record_returns_invalid_data(record, field);
         }

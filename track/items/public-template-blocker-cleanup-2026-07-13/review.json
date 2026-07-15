@@ -1,6 +1,52 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71431006623b6e258c538d01ec76a96fb1030c2fe07c9156f2f20b9b35b58933",
+          "at": "2026-07-14T05:38:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71431006623b6e258c538d01ec76a96fb1030c2fe07c9156f2f20b9b35b58933",
+          "at": "2026-07-14T05:48:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39ac2cd856978fefa73bbc5895d12a81f02cbf4a80b0565e60f5c91609c0abd0",
+          "at": "2026-07-14T11:56:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39ac2cd856978fefa73bbc5895d12a81f02cbf4a80b0565e60f5c91609c0abd0",
+          "at": "2026-07-14T12:02:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3241ffa7b17ae8a89bbccd7bacbb32c63743e03f0d736ad13525db2eec283b29",
+          "at": "2026-07-15T00:05:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3241ffa7b17ae8a89bbccd7bacbb32c63743e03f0d736ad13525db2eec283b29",
+          "at": "2026-07-15T00:10:25Z"
+        }
+      ]
+    },
     "cli_driver": {
       "rounds": [
         {
@@ -515,42 +561,6 @@
         }
       ]
     },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4f1c4233ce871f086440b983a735def7b900ca7778f62bb735048a3a4af7c4dc",
-          "at": "2026-07-14T03:59:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4f1c4233ce871f086440b983a735def7b900ca7778f62bb735048a3a4af7c4dc",
-          "at": "2026-07-14T04:03:06Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5de5dbcb6611e56ff3a13e43453f91e56575544ed5aa7a1011477566fc073d86",
-          "at": "2026-07-14T14:39:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5de5dbcb6611e56ff3a13e43453f91e56575544ed5aa7a1011477566fc073d86",
-          "at": "2026-07-14T14:45:44Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -937,153 +947,224 @@
           "findings": [],
           "hash": "rvw1:sha256:49b9fead2b4c2883995739876925b6355c2f4d7c38209de5c2677a2792819d7e",
           "at": "2026-07-14T14:46:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ac8411cd78f0ece2f46327a1dc8ea655ba1e96a49da0e1e18f63b5497f2d327",
+          "at": "2026-07-15T00:05:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7ac8411cd78f0ece2f46327a1dc8ea655ba1e96a49da0e1e18f63b5497f2d327",
+          "at": "2026-07-15T00:10:06Z"
         }
       ]
     },
-    "spec": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bdf57539cebb9aa527b4edbbd59ca6e55525e8b1cceb6b01d5dbb408420d451a",
-          "at": "2026-07-14T01:31:50Z"
+          "hash": "rvw1:sha256:5de5dbcb6611e56ff3a13e43453f91e56575544ed5aa7a1011477566fc073d86",
+          "at": "2026-07-14T14:39:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5de5dbcb6611e56ff3a13e43453f91e56575544ed5aa7a1011477566fc073d86",
+          "at": "2026-07-14T14:45:44Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D7 defers the exact detection pattern and implementation to implementation time. Terms such as “date-time-shaped ADR filename” and “track ID with a date suffix” do not define the accepted grammar, path boundaries, or placeholder/false-positive handling, so downstream spec and implementations can produce materially different gates. Define observable matching rules and required cases before implementation.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
+              "line": 109,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
+          "at": "2026-07-13T23:40:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
+          "at": "2026-07-14T00:28:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
+          "at": "2026-07-14T00:29:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
+          "at": "2026-07-14T05:40:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
+          "at": "2026-07-14T05:41:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
+          "at": "2026-07-14T05:47:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a34fb21f352d8159c83a37052bc4c902fa11d2b8faa39a079783b52161d55b0",
+          "at": "2026-07-14T07:03:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a34fb21f352d8159c83a37052bc4c902fa11d2b8faa39a079783b52161d55b0",
+          "at": "2026-07-14T07:07:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eeefd0f749c0e421329ce01db1ccb26e43e46a216d3f2198ef3943de1ec6b05a",
+          "at": "2026-07-14T15:25:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eeefd0f749c0e421329ce01db1ccb26e43e46a216d3f2198ef3943de1ec6b05a",
+          "at": "2026-07-14T15:28:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:980a36b64fea86389c2c6251cc1fa0878bbcf3235b9861f42752a32856abb42b",
+          "at": "2026-07-14T23:02:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:980a36b64fea86389c2c6251cc1fa0878bbcf3235b9861f42752a32856abb42b",
+          "at": "2026-07-14T23:05:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82f8578327a968dc92e60b15ccb673d342e2aefe4f81537bab68f8838f48c2ab",
+          "at": "2026-07-15T00:05:16Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "GO-03 and IN-03 require the entire manifest-derived shipment to be self-contained, and ADR D3 explicitly includes unresolvable decision/constraint symbols in the prohibited references. AC-05 covers only concrete paths, while AC-06 checks those symbols only in shipped conventions. Other shipped files (commands, harness documents, README/configuration, etc.) can therefore retain unresolvable symbols while every AC still passes, leaving GO-03 without complete acceptance coverage.",
+              "message": "`echo /home/<user>` は有効な `$HOME` 展開後コマンドではありません。未引用の `<` と `>` は Bash でリダイレクト演算子として解釈され、この文字列は構文エラーになります。また `$HOME` がプレースホルダー文字列へ展開されることもありません。そのため、変更後の例は「同じコマンドの展開前と展開後」という脅威モデルの根拠を示せていません。machine-paths に一致しない、有効な展開後コマンド例へ置き換えてください。",
               "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json",
-              "line": 346,
-              "category": "missing AC coverage for a stated goal"
+              "file": "knowledge/research/2026-04-07-0016-ast-expansion-policy-design.md",
+              "line": 213,
+              "category": "research grounding mismatch"
             }
           ],
-          "hash": "rvw1:sha256:bdf57539cebb9aa527b4edbbd59ca6e55525e8b1cceb6b01d5dbb408420d451a",
-          "at": "2026-07-14T01:35:56Z"
+          "hash": "rvw1:sha256:82f8578327a968dc92e60b15ccb673d342e2aefe4f81537bab68f8838f48c2ab",
+          "at": "2026-07-15T00:11:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47014cdcb6fa835e4cdc8f60cab04c9ed37016ebc270141d8ff7672ceb2bb2b0",
+          "at": "2026-07-15T00:14:35Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:703a5a045def573cd005db997451f0fc07c8d29fbe8cf0fdc3abaea343d05075",
+          "at": "2026-07-14T11:56:21Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "GO-04 の「archive 業務ロジックを CLI / workflow に集約する」部分を検証する acceptance criterion がありません。AC-07 は command 文書が workflow を参照し、手動手順を含まないことだけを要求し、AC-08 は directory 由来の状態・表示だけを扱っています。そのため workflow が CLI に委譲せず archive 操作を再実装していても全 AC を満たせてしまい、GO-04 / IN-04 / D4 の単一業務ロジック化を完了条件として証明できません。",
+              "message": "`CatalogueSpecRefs` の dispatch arm が `TrackId::try_new` によるドメイン検証、成否分岐、エラー用 `CommandOutcome` の生成まで bin 内で行っています。これは parse → `driver.handle(input)` → emit に限定する thin-bin 境界を越えます（ADR `2026-06-21-1328-cli-composition-split-presentation-layer.md` D5、`2026-05-27-0110-composition-root-dedicated-crate.md` D3）。Clap のパース段階で型付き値にするか、raw input を driver に渡して検証とエラー整形を driver 境界内へ移してください。",
               "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json",
-              "line": 356,
-              "category": "missing AC coverage for a stated goal"
+              "file": "apps/cli/src/commands/verify.rs",
+              "line": 248,
+              "category": "business logic in bin"
             }
           ],
-          "hash": "rvw1:sha256:04af3b8a3ddf343a2733bd41b2e211c7953d0c2eb28d216a3717287502aa16d1",
-          "at": "2026-07-14T01:39:24Z"
+          "hash": "rvw1:sha256:703a5a045def573cd005db997451f0fc07c8d29fbe8cf0fdc3abaea343d05075",
+          "at": "2026-07-14T12:03:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ce86068f4cfa6b84ec43032d723f08fd6337a2daa6c2e4d57de758594e6fcd5c",
-          "at": "2026-07-14T01:42:30Z"
+          "hash": "rvw1:sha256:385e98478fbc67ccdab0a0949c9e9afcf588c8c987bb1c496e77c06abd74aabf",
+          "at": "2026-07-14T12:52:57Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1932c865c75a56a3902086addda07052d2d8717364d6c1470eb10aeca54f09ac",
-          "at": "2026-07-14T03:32:59Z"
+          "hash": "rvw1:sha256:138fccf77940c68fed5b48f5fc29a2e184df1e4262ee5cc4d4d4b109f3a888ac",
+          "at": "2026-07-14T14:39:56Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1932c865c75a56a3902086addda07052d2d8717364d6c1470eb10aeca54f09ac",
-          "at": "2026-07-14T03:35:58Z"
+          "hash": "rvw1:sha256:138fccf77940c68fed5b48f5fc29a2e184df1e4262ee5cc4d4d4b109f3a888ac",
+          "at": "2026-07-14T14:46:11Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e47814e90adc16b99442ac597490a08157fbd11b9a7e7e1d1d47af717911e1bd",
-          "at": "2026-07-14T05:38:07Z"
+          "hash": "rvw1:sha256:c1b28b0711ccba0fe2f7b2f0bf52cac9b70905bf8a6c9fa0888a886f0a25f078",
+          "at": "2026-07-15T00:05:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e47814e90adc16b99442ac597490a08157fbd11b9a7e7e1d1d47af717911e1bd",
-          "at": "2026-07-14T05:46:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ae2f2cbdd01c84dc0563acad02771b755f68bfcf222c5714d8461fe61a95af83",
-          "at": "2026-07-14T07:03:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ae2f2cbdd01c84dc0563acad02771b755f68bfcf222c5714d8461fe61a95af83",
-          "at": "2026-07-14T07:07:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7a887bdc8afd443a5ef9c4f6c5d541b1630a6c88e2fd964149607fcef5a4356",
-          "at": "2026-07-14T13:24:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-20 requires track-ID validation boundaries to delegate to `TrackId::try_new`, but none of IN-01..07 includes track-ID/slug validation or remediation of its duplicated implementations. Although the cited ADR D1 supports the behavior, this acceptance criterion mandates behavior outside this spec's declared in-scope set.",
-              "severity": "P1",
-              "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json",
-              "line": 482,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f7a887bdc8afd443a5ef9c4f6c5d541b1630a6c88e2fd964149607fcef5a4356",
-          "at": "2026-07-14T13:28:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98f48e163249f21b2874e968853bd53e3e97cc3f3d90f0b5b75b969e5ca1e14f",
-          "at": "2026-07-14T13:37:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98f48e163249f21b2874e968853bd53e3e97cc3f3d90f0b5b75b969e5ca1e14f",
-          "at": "2026-07-14T13:40:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7d037ca7d38ebed9ba3635052dcfa86a1087d77e110be6479944c90323b8ec24",
-          "at": "2026-07-14T13:53:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7d037ca7d38ebed9ba3635052dcfa86a1087d77e110be6479944c90323b8ec24",
-          "at": "2026-07-14T13:53:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7d037ca7d38ebed9ba3635052dcfa86a1087d77e110be6479944c90323b8ec24",
-          "at": "2026-07-14T13:56:18Z"
+          "hash": "rvw1:sha256:c1b28b0711ccba0fe2f7b2f0bf52cac9b70905bf8a6c9fa0888a886f0a25f078",
+          "at": "2026-07-15T00:10:37Z"
         }
       ]
     },
@@ -1293,6 +1374,171 @@
           "findings": [],
           "hash": "rvw1:sha256:656bc7e2a2648b3c41bc255e4a74864c5c5c0fc2c9490da203857db1bb666a33",
           "at": "2026-07-14T23:13:06Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f1c4233ce871f086440b983a735def7b900ca7778f62bb735048a3a4af7c4dc",
+          "at": "2026-07-14T03:59:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f1c4233ce871f086440b983a735def7b900ca7778f62bb735048a3a4af7c4dc",
+          "at": "2026-07-14T04:03:06Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdf57539cebb9aa527b4edbbd59ca6e55525e8b1cceb6b01d5dbb408420d451a",
+          "at": "2026-07-14T01:31:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-03 and IN-03 require the entire manifest-derived shipment to be self-contained, and ADR D3 explicitly includes unresolvable decision/constraint symbols in the prohibited references. AC-05 covers only concrete paths, while AC-06 checks those symbols only in shipped conventions. Other shipped files (commands, harness documents, README/configuration, etc.) can therefore retain unresolvable symbols while every AC still passes, leaving GO-03 without complete acceptance coverage.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json",
+              "line": 346,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:bdf57539cebb9aa527b4edbbd59ca6e55525e8b1cceb6b01d5dbb408420d451a",
+          "at": "2026-07-14T01:35:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-04 の「archive 業務ロジックを CLI / workflow に集約する」部分を検証する acceptance criterion がありません。AC-07 は command 文書が workflow を参照し、手動手順を含まないことだけを要求し、AC-08 は directory 由来の状態・表示だけを扱っています。そのため workflow が CLI に委譲せず archive 操作を再実装していても全 AC を満たせてしまい、GO-04 / IN-04 / D4 の単一業務ロジック化を完了条件として証明できません。",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json",
+              "line": 356,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:04af3b8a3ddf343a2733bd41b2e211c7953d0c2eb28d216a3717287502aa16d1",
+          "at": "2026-07-14T01:39:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce86068f4cfa6b84ec43032d723f08fd6337a2daa6c2e4d57de758594e6fcd5c",
+          "at": "2026-07-14T01:42:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1932c865c75a56a3902086addda07052d2d8717364d6c1470eb10aeca54f09ac",
+          "at": "2026-07-14T03:32:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1932c865c75a56a3902086addda07052d2d8717364d6c1470eb10aeca54f09ac",
+          "at": "2026-07-14T03:35:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e47814e90adc16b99442ac597490a08157fbd11b9a7e7e1d1d47af717911e1bd",
+          "at": "2026-07-14T05:38:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e47814e90adc16b99442ac597490a08157fbd11b9a7e7e1d1d47af717911e1bd",
+          "at": "2026-07-14T05:46:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae2f2cbdd01c84dc0563acad02771b755f68bfcf222c5714d8461fe61a95af83",
+          "at": "2026-07-14T07:03:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae2f2cbdd01c84dc0563acad02771b755f68bfcf222c5714d8461fe61a95af83",
+          "at": "2026-07-14T07:07:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7a887bdc8afd443a5ef9c4f6c5d541b1630a6c88e2fd964149607fcef5a4356",
+          "at": "2026-07-14T13:24:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-20 requires track-ID validation boundaries to delegate to `TrackId::try_new`, but none of IN-01..07 includes track-ID/slug validation or remediation of its duplicated implementations. Although the cited ADR D1 supports the behavior, this acceptance criterion mandates behavior outside this spec's declared in-scope set.",
+              "severity": "P1",
+              "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json",
+              "line": 482,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f7a887bdc8afd443a5ef9c4f6c5d541b1630a6c88e2fd964149607fcef5a4356",
+          "at": "2026-07-14T13:28:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98f48e163249f21b2874e968853bd53e3e97cc3f3d90f0b5b75b969e5ca1e14f",
+          "at": "2026-07-14T13:37:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98f48e163249f21b2874e968853bd53e3e97cc3f3d90f0b5b75b969e5ca1e14f",
+          "at": "2026-07-14T13:40:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d037ca7d38ebed9ba3635052dcfa86a1087d77e110be6479944c90323b8ec24",
+          "at": "2026-07-14T13:53:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d037ca7d38ebed9ba3635052dcfa86a1087d77e110be6479944c90323b8ec24",
+          "at": "2026-07-14T13:53:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d037ca7d38ebed9ba3635052dcfa86a1087d77e110be6479944c90323b8ec24",
+          "at": "2026-07-14T13:56:18Z"
         }
       ]
     },
@@ -1605,181 +1851,20 @@
           "findings": [],
           "hash": "rvw1:sha256:7c8e6bd661a508c91e8ab089e7a20e58fcc2c1bbfb02d269927dd20006dac8e6",
           "at": "2026-07-14T12:02:19Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:703a5a045def573cd005db997451f0fc07c8d29fbe8cf0fdc3abaea343d05075",
-          "at": "2026-07-14T11:56:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueSpecRefs` の dispatch arm が `TrackId::try_new` によるドメイン検証、成否分岐、エラー用 `CommandOutcome` の生成まで bin 内で行っています。これは parse → `driver.handle(input)` → emit に限定する thin-bin 境界を越えます（ADR `2026-06-21-1328-cli-composition-split-presentation-layer.md` D5、`2026-05-27-0110-composition-root-dedicated-crate.md` D3）。Clap のパース段階で型付き値にするか、raw input を driver に渡して検証とエラー整形を driver 境界内へ移してください。",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/verify.rs",
-              "line": 248,
-              "category": "business logic in bin"
-            }
-          ],
-          "hash": "rvw1:sha256:703a5a045def573cd005db997451f0fc07c8d29fbe8cf0fdc3abaea343d05075",
-          "at": "2026-07-14T12:03:06Z"
+          "hash": "rvw1:sha256:db5814040950257c6a3af4249cd49520647c9adfd835b2aa73fa6cfaff84afe4",
+          "at": "2026-07-15T00:05:38Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:385e98478fbc67ccdab0a0949c9e9afcf588c8c987bb1c496e77c06abd74aabf",
-          "at": "2026-07-14T12:52:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:138fccf77940c68fed5b48f5fc29a2e184df1e4262ee5cc4d4d4b109f3a888ac",
-          "at": "2026-07-14T14:39:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:138fccf77940c68fed5b48f5fc29a2e184df1e4262ee5cc4d4d4b109f3a888ac",
-          "at": "2026-07-14T14:46:11Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D7 defers the exact detection pattern and implementation to implementation time. Terms such as “date-time-shaped ADR filename” and “track ID with a date suffix” do not define the accepted grammar, path boundaries, or placeholder/false-positive handling, so downstream spec and implementations can produce materially different gates. Define observable matching rules and required cases before implementation.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-0818-public-template-blocker-cleanup.md",
-              "line": 109,
-              "category": "decision underspecified for downstream consumption"
-            }
-          ],
-          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
-          "at": "2026-07-13T23:40:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
-          "at": "2026-07-14T00:28:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a7ae9008681089ec0659df1825af7df1c23d68209511fe88988ef6eb6d439a3",
-          "at": "2026-07-14T00:29:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
-          "at": "2026-07-14T05:40:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
-          "at": "2026-07-14T05:41:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4fd9614c099f80fc1ba4b0438312a1b83012f0daaca801d01d0b2f57f7f0f144",
-          "at": "2026-07-14T05:47:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a34fb21f352d8159c83a37052bc4c902fa11d2b8faa39a079783b52161d55b0",
-          "at": "2026-07-14T07:03:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a34fb21f352d8159c83a37052bc4c902fa11d2b8faa39a079783b52161d55b0",
-          "at": "2026-07-14T07:07:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eeefd0f749c0e421329ce01db1ccb26e43e46a216d3f2198ef3943de1ec6b05a",
-          "at": "2026-07-14T15:25:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eeefd0f749c0e421329ce01db1ccb26e43e46a216d3f2198ef3943de1ec6b05a",
-          "at": "2026-07-14T15:28:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:980a36b64fea86389c2c6251cc1fa0878bbcf3235b9861f42752a32856abb42b",
-          "at": "2026-07-14T23:02:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:980a36b64fea86389c2c6251cc1fa0878bbcf3235b9861f42752a32856abb42b",
-          "at": "2026-07-14T23:05:07Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71431006623b6e258c538d01ec76a96fb1030c2fe07c9156f2f20b9b35b58933",
-          "at": "2026-07-14T05:38:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71431006623b6e258c538d01ec76a96fb1030c2fe07c9156f2f20b9b35b58933",
-          "at": "2026-07-14T05:48:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:39ac2cd856978fefa73bbc5895d12a81f02cbf4a80b0565e60f5c91609c0abd0",
-          "at": "2026-07-14T11:56:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:39ac2cd856978fefa73bbc5895d12a81f02cbf4a80b0565e60f5c91609c0abd0",
-          "at": "2026-07-14T12:02:29Z"
+          "hash": "rvw1:sha256:db5814040950257c6a3af4249cd49520647c9adfd835b2aa73fa6cfaff84afe4",
+          "at": "2026-07-15T00:11:04Z"
         }
       ]
     }

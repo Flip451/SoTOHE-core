@@ -1081,7 +1081,7 @@ mod tests {
         let interactor = TrackGitInteractor::new(git.clone(), fs);
 
         interactor
-            .create_track_branch(Path::new("/root"), &track_id("feature-2026-07-04"), "main")
+            .create_track_branch(Path::new("/repo"), &track_id("feature-2026-07-04"), "main")
             .unwrap();
 
         assert_eq!(
@@ -1098,7 +1098,7 @@ mod tests {
         let interactor = TrackGitInteractor::new(git, fs);
 
         let err = interactor
-            .create_track_branch(Path::new("/root"), &track_id("feature-2026-07-04"), "main")
+            .create_track_branch(Path::new("/repo"), &track_id("feature-2026-07-04"), "main")
             .unwrap_err();
 
         assert!(err.to_string().contains("branch create must start from 'main'"));
@@ -1113,7 +1113,7 @@ mod tests {
         let interactor = TrackGitInteractor::new(git, fs);
 
         let err = interactor
-            .create_track_branch(Path::new("/root"), &track_id("feature-2026-07-04"), "main")
+            .create_track_branch(Path::new("/repo"), &track_id("feature-2026-07-04"), "main")
             .unwrap_err();
 
         assert!(err.to_string().contains("already exists"));
@@ -1127,7 +1127,7 @@ mod tests {
         let interactor = TrackGitInteractor::new(git.clone(), fs);
 
         let msg = interactor
-            .switch_to_track_branch(Path::new("/root"), &track_id("feature-2026-07-04"))
+            .switch_to_track_branch(Path::new("/repo"), &track_id("feature-2026-07-04"))
             .unwrap();
 
         assert!(msg.contains("track/feature-2026-07-04"));
@@ -1144,7 +1144,7 @@ mod tests {
         let interactor = TrackGitInteractor::new(git, fs);
 
         let err = interactor
-            .switch_to_track_branch(Path::new("/root"), &track_id("feature-2026-07-04"))
+            .switch_to_track_branch(Path::new("/repo"), &track_id("feature-2026-07-04"))
             .unwrap_err();
 
         assert!(err.to_string().contains("does not exist"));
@@ -1156,7 +1156,7 @@ mod tests {
         let fs = Arc::new(MockFsPort::default());
         let interactor = TrackGitInteractor::new(git.clone(), fs);
 
-        let msg = interactor.switch_to_base(Path::new("/root"), "main").unwrap();
+        let msg = interactor.switch_to_base(Path::new("/repo"), "main").unwrap();
 
         assert!(msg.contains("[OK] On main"));
         assert_eq!(git.switched_branches.lock().unwrap().as_slice(), &["main".to_owned()]);
@@ -1169,7 +1169,7 @@ mod tests {
         *git.sync_result.lock().unwrap() = Some(GitWorkflowError::SyncUpstreamNotSet);
         let interactor = TrackGitInteractor::new(git, fs);
 
-        let msg = interactor.switch_to_base(Path::new("/root"), "main").unwrap();
+        let msg = interactor.switch_to_base(Path::new("/repo"), "main").unwrap();
 
         assert!(msg.contains("[WARN] Pull failed"));
     }
@@ -1183,7 +1183,7 @@ mod tests {
         });
         let interactor = TrackGitInteractor::new(git, fs);
 
-        let msg = interactor.switch_to_base(Path::new("/root"), "main").unwrap();
+        let msg = interactor.switch_to_base(Path::new("/repo"), "main").unwrap();
 
         assert!(msg.contains("[WARN] Pull failed"));
     }
@@ -1203,7 +1203,7 @@ mod tests {
             Some(GitWorkflowError::Unavailable(DiagnosticText::new("git process spawn failed")));
         let interactor = TrackGitInteractor::new(git, fs);
 
-        let msg = interactor.switch_to_base(Path::new("/root"), "main").unwrap();
+        let msg = interactor.switch_to_base(Path::new("/repo"), "main").unwrap();
 
         assert!(msg.contains("[WARN] Pull failed"), "expected WARN fold, got: {msg}");
     }
@@ -1212,7 +1212,7 @@ mod tests {
     fn track_git_archive_track_happy_moves_track_directory() {
         let git = Arc::new(MockGitPrimitive::default());
         let fs = Arc::new(MockFsPort::default());
-        let project_root = Path::new("/root");
+        let project_root = Path::new("/repo");
         fs.add_dir(&project_root.join("track/items/feature-2026-07-04"));
         let interactor = TrackGitInteractor::new(git.clone(), fs);
 
@@ -1233,7 +1233,7 @@ mod tests {
         let interactor = TrackGitInteractor::new(git, fs);
 
         let err = interactor
-            .archive_track(Path::new("/root"), &track_id("feature-2026-07-04"))
+            .archive_track(Path::new("/repo"), &track_id("feature-2026-07-04"))
             .unwrap_err();
 
         assert!(err.to_string().contains("track directory not found"));
@@ -1243,7 +1243,7 @@ mod tests {
     fn track_git_archive_track_fails_when_destination_exists() {
         let git = Arc::new(MockGitPrimitive::default());
         let fs = Arc::new(MockFsPort::default());
-        let project_root = Path::new("/root");
+        let project_root = Path::new("/repo");
         fs.add_dir(&project_root.join("track/items/feature-2026-07-04"));
         fs.add_dir(&project_root.join("track/archive/feature-2026-07-04"));
         let interactor = TrackGitInteractor::new(git, fs);
@@ -1258,7 +1258,7 @@ mod tests {
     fn track_git_archive_track_reports_rollback_failure_after_logs_rename_failure() {
         let git = Arc::new(MockGitPrimitive::default());
         let fs = Arc::new(MockFsPort::default());
-        let project_root = Path::new("/root");
+        let project_root = Path::new("/repo");
         let src_dir = project_root.join("track/items/feature-2026-07-04");
         let dst_dir = project_root.join("track/archive/feature-2026-07-04");
         fs.add_dir(&src_dir);
@@ -1294,7 +1294,7 @@ mod tests {
     fn track_git_archive_track_rolls_back_when_logs_disappear_after_git_move() {
         let git = Arc::new(MockGitPrimitive::default());
         let fs = Arc::new(MockFsPort::default());
-        let project_root = Path::new("/root");
+        let project_root = Path::new("/repo");
         let src_dir = project_root.join("track/items/feature-2026-07-04");
         let dst_dir = project_root.join("track/archive/feature-2026-07-04");
         let src_logs = src_dir.join("logs");

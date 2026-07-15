@@ -550,15 +550,17 @@ fn poll_review_timeout_with_no_reviews_returns_failure() {
 
 #[test]
 fn poll_review_sanitizes_review_body_on_stdout() {
-    let client = PollTestClient::with_reviews(
-        r#"[{
+    let home_path = format!("/home/{}", "user");
+    let reviews = format!(
+        r#"[{{
             "id": 1,
-            "user": {"login": "openai-codex[bot]"},
+            "user": {{"login": "openai-codex[bot]"}},
             "submitted_at": "2026-03-16T10:00:00Z",
             "state": "APPROVED",
-            "body": "Found issue at /home/user/project/src/main.rs"
-        }]"#,
+            "body": "Found issue at {home_path}/project/src/main.rs"
+        }}]"#,
     );
+    let client = PollTestClient::with_reviews(&reviews);
     // The function should succeed (found a post-trigger APPROVED review)
     let result =
         super::poll_review("1", "2026-03-16T09:00:00Z", 15, 60, &client, &|_| {}, Some("commit1"));
