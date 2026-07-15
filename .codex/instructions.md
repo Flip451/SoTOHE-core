@@ -100,6 +100,15 @@ Policy belongs in SoTOHE hook dispatch, not in the shell adapter.
 - Preserve hexagonal layer dependencies from `architecture-rules.json`.
 - Add focused tests for public behavior and failure cases.
 
+## Session resume
+
+Session resume is orchestrator opt-in (`sotp capability exec --resume`; reviewer rounds resume
+automatically for same-scope same-round re-entries). On both resumed and fresh dispatches every
+execution flag (model, sandbox, effort) is explicitly re-specified; a failed or expired resume
+falls back to a fresh session. When you run as a resumed session, check whether the upstream
+artifacts of your assignment changed since the prior session and re-read any that did before
+working (see `.harness/prompts/capability-exec-discipline.md`).
+
 ## Output
 
 For user-facing replies, be concise and direct. For task work, report:

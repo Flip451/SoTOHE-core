@@ -16,3 +16,9 @@ provider-agnostic contract for this capability. Do not duplicate it here.
 - The final line of your output MUST be exactly one of:
   `REVIEW_FIX_STATUS: completed` / `REVIEW_FIX_STATUS: blocked_cross_scope` /
   `REVIEW_FIX_STATUS: failed`.
+
+## Session resume conformance
+
+- If your dispatch is a resumed session (orchestrator opt-in continuation), follow the
+  "Session resume" section of the capability SSoT: check whether your upstream artifacts
+  changed since the prior session and re-read any that did before continuing.

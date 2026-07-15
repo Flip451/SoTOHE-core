@@ -12,3 +12,9 @@ contract for this capability. Do not duplicate it here.
 ## Codex-skill notes
 
 - Invoked when Codex is assigned the `impl-planner` capability (`.codex/agents/impl-planner.toml`).
+
+## Session resume conformance
+
+- If your dispatch is a resumed session (orchestrator opt-in continuation), follow the
+  "Session resume" section of the capability SSoT: check whether your upstream artifacts
+  changed since the prior session and re-read any that did before continuing.

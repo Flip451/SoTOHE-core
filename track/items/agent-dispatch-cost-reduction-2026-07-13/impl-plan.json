@@ -90,7 +90,7 @@
     {
       "id": "T009",
       "description": "Modify `.harness/prompts/capability-exec-discipline.md`, `.harness/workflows/track/review.md`, `.harness/capabilities/{review-fix-lead,adr-editor,spec-designer,type-designer,impl-planner,implementer}.md`, `.claude/agents/{adr-editor,spec-designer,type-designer,impl-planner,implementer,review-fix-lead}.md`, `.agents/skills/{adr-editor,spec-designer,type-designer,impl-planner,implementer,review-fix-lead}/SKILL.md`, `.codex/agents/{adr-editor,spec-designer,type-designer,impl-planner,review-fix-lead}.toml`, and `.codex/instructions.md`; add the resume explicit-flag re-specification and upstream re-read conformance check (IN-03, IN-08, CN-03, CN-10, AC-03, AC-10).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T019",

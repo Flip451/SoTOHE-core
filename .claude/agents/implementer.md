@@ -26,3 +26,9 @@ internal pipeline, output contract, rules). Do not duplicate it here.
 - Use `Read` / `Grep` / `Glob` for file inspection, not `Bash(cat/grep/head)`.
 - Do not run `git add`, `git commit`, `git push`, or PR commands.
 - Report the final status in your final message as one of: `completed` / `blocked` / `failed`.
+
+## Session resume conformance
+
+- If your dispatch is a resumed session (orchestrator opt-in continuation), follow the
+  "Session resume" section of the capability SSoT: check whether your upstream artifacts
+  changed since the prior session and re-read any that did before continuing.

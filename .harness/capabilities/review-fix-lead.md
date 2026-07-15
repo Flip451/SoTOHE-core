@@ -188,3 +188,12 @@ If the briefing asks for:
 - Do not edit `<layer>-types.json` directly — the `type-designer` capability owns catalogue files.
 - Use `bin/sotp` (not `./bin/sotp` and not absolute paths) in all command references.
 - Use `cargo make` wrappers (e.g. `cargo make ci-rust`), not `*-local` tasks directly.
+
+## Session resume
+
+When dispatched as a resumed session (orchestrator opt-in continuation of the same track and
+capability), do not trust context carried over from the prior session: first check whether the
+upstream artifacts of this assignment (ADR, `spec.json`, type catalogues, `impl-plan.json`, the
+review briefing — as applicable) changed since that session, and re-read any that did before
+continuing. All execution flags are explicitly re-specified by the dispatcher on resume; a
+failed or expired resume falls back to a fresh session.

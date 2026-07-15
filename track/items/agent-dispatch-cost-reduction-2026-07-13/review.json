@@ -1,6 +1,1217 @@
 {
   "schema_version": 2,
   "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 の入力 hash は source 内容・Cargo.lock・toolchain 識別子 בלבדで、Cargo.toml の feature/target 設定、rustflags/RUSTDOCFLAGS、その他 rustdoc 出力を変える設定を捕捉することが明示されていません。この変更後も hash が一致して signal 再計算を skip すると、古い type-signals を新しい実装条件に対して再利用できます。実装が hash に含める入力集合と、未モデル化入力時の fail-closed 動作を決定として明記してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 56,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D4 は継続作業を「同じ成果物」への再入に限定していますが、track cache のキーは track × capability だけで対象 artifact を含みません。同一 track 内で同じ capability が別 artifact を扱うと、orchestrator が resume を opt-in した際に前の artifact の session を再利用し、stale context を引き継げます。track cache も artifact/work-unit identity をキーまたは検証条件に含める必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 62,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:e28b1deafd32dbdedacc5da5839fb082192a37692907d9a436c2fa942ea52fec",
+          "at": "2026-07-13T13:37:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 simultaneously requires skipping signal recalculation when implementation inputs are unchanged and re-evaluating when the catalogue/spec changes, but it does not define a retained and validated rustdoc snapshot for that re-evaluation. The downstream implementation cannot safely evaluate a changed catalogue without rerunning rustdoc or specifying a cache, so this can consume absent/stale data.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 54,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "The D3 freshness hash does not explicitly cover all inputs that affect the stored signals: the evaluator also consumes the baseline rustdoc artifact, and rustdoc/evaluation can vary with path-dependency, build-script, or proc-macro source changes not captured by the listed target-crate source and lockfile inputs. Without an explicit complete input closure or fail-closed detection for these cases, an unchanged hash can incorrectly skip recalculation and leave stale signals.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 56,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:8a1936a638f682ff57609a28bc3a52b36cff5ca03ae7efa0a0c54281e1e76ce4",
+          "at": "2026-07-13T13:44:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 is internally inconsistent: it says baseline changes may reuse the live rustdoc snapshot without extraction (lines 54–56), but then requires the current baseline hash to equal the artifact’s recorded baseline hash. Any actual baseline change makes that condition false and forces rustdoc recomputation, so downstream implementation cannot derive the stated skip behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 56,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:905d06f2de81067badcdc312fa215e94cd7949ff9017a2914597fd1e9e3c6aec",
+          "at": "2026-07-13T13:48:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 lists `fresh-every-round` as a rejected candidate, but no Rejected Alternatives entry actually rejects fresh reviewer sessions. H concerns capability dispatches under D4, while C only rejects cross-tier resume, leaving D2's reviewer-session choice without a corresponding rationale.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 10,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:8ea7d58df436321bbdb35e53480a57c0221701d7b5a3c238150ef2153fb0ef4b",
+          "at": "2026-07-13T13:51:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 requires skipping rustdoc extraction and later reusing a verified live snapshot, but it only specifies storing the snapshot hash in the type-signals artifact while explicitly rejecting a separate transient cache. It does not define where the snapshot body is persisted or how it is loaded; regenerating it with Cargo would perform the extraction that D3 intends to skip, while omitting it makes signal recomputation impossible. Downstream implementation/spec cannot derive a working acceptance criterion for this reuse path.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 56,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:c2e7ed3cd7c8d0bee017ad2694fbfd41d43d6708579eecf3828e4be8ad9d6d61",
+          "at": "2026-07-13T13:54:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2/D4 の session cache は provider/model だけで再利用可否を決め、review briefing・severity policy・capability contract の世代変更を無効化または再注入する規則がありません。再起動後や規約更新後に同じ track/scope/artifact で resume すると、古い判断規則・作業契約のまま review/編集を続け得るため、observable な fail-closed 条件を追加してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 48,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D1 の candidate_selection にある `merge-fast-final-tiers` は、Rejected Alternatives A-L または採択 decision に対応する説明がありません。fast/final の effort tier を統合する案を却下したのか、採択方針に含めるのかが decision trace から判定できず、ADR の選択理由と downstream acceptance criteria の根拠が不完全です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 6,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:3e333d9af262e53f830748c286c014c3151f6bbbf735450b4068d2df6a57a0f2",
+          "at": "2026-07-13T13:58:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bfb67537af7ea8afea42eee4449d98aa405cb5f58950cff36073956125483f76",
+          "at": "2026-07-13T14:03:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 fingerprints the contents of the resolved scope files and generated briefing, then invalidates the session on any mismatch. A fixer re-round necessarily changes at least a scoped file—and the briefing may also be regenerated—so the cache always falls back to a new session instead of resuming as D2 requires. Separate stable execution-contract inputs from mutable review inputs.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 48,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "D4 includes the dispatch briefing's contents in the fingerprint and invalidates the session when they change. Since `capability exec` receives each task through that briefing, follow-up or repair work normally requires changing it; the intended continuation therefore becomes a fresh session. The decision must specify which stable contract portion is fingerprinted independently of the changing task payload.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 64,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:bfb67537af7ea8afea42eee4449d98aa405cb5f58950cff36073956125483f76",
+          "at": "2026-07-13T14:06:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 permits skipping signal evaluation when “all inputs” are unchanged, but the defined freshness state covers only the target rustdoc build-input closure, catalogue declaration, baseline, and snapshot. Signal results also depend on the evaluator implementation and its configuration, which can change without changing any of those hashes; downstream spec.json therefore cannot derive an observable invalidation rule, and previously generated signals may remain stale after evaluation semantics change. Specify how the evaluation contract participates in freshness or when reevaluation is mandatory.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 54,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:f8363ba8866e61492d1566bce3aa0d5f5f5ba0dd845b86b3d70393c3504a8307",
+          "at": "2026-07-13T14:11:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は evaluator-contract の変更時にも既存 rustdoc snapshot の再利用を許可していますが、その contract 自体に evaluator 実装の code/build identity を含めています。抽出用の引数・root 解決・JSON 生成方法を担う実装が変わっても、実装側 input hash と旧 snapshot の自己 hash が一致すれば旧 snapshot を再利用できるため、「判定不能なら rustdoc 抽出から再計算する」という fail-closed 方針に反して stale signal を生成し得ます。下流 spec が安全な再利用条件を導出できるよう、抽出結果へ影響する contract の変更を snapshot 無効化条件として明確にしてください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+              "line": 54,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:2134ab5c76dd93544397956b0f3f593ee1cd539f8bb6c113ad548bebc8937aa3",
+          "at": "2026-07-13T14:15:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e02a12ecad05852e529f05be0bc2b4998b3f6e1f4fee0c2c1eff928d1f24a4df",
+          "at": "2026-07-13T14:19:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a391fac85b6d96a431bb15f019edada7f1b3e0ebcff916ff79320dbfad33886",
+          "at": "2026-07-14T18:32:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a391fac85b6d96a431bb15f019edada7f1b3e0ebcff916ff79320dbfad33886",
+          "at": "2026-07-14T19:54:17Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eed5226c767fa495148a2a4468a327ec40ac1035e6a35334d6ea0b7a5a5870a5",
+          "at": "2026-07-14T06:23:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eed5226c767fa495148a2a4468a327ec40ac1035e6a35334d6ea0b7a5a5870a5",
+          "at": "2026-07-14T06:27:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd668edf234c37a4c569aaab36f14562420d2653dad956fd3370148679e87d42",
+          "at": "2026-07-14T07:12:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23dd453c35b4585a0d281339948769f6c3b2867df0ce2ddcad9e01f7c5bd3b74",
+          "at": "2026-07-14T18:32:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23dd453c35b4585a0d281339948769f6c3b2867df0ce2ddcad9e01f7c5bd3b74",
+          "at": "2026-07-14T19:54:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ab88b864455d9c25e6652cd25301a080d240216e264b807f3a776b996ec34b7",
+          "at": "2026-07-15T00:04:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ab88b864455d9c25e6652cd25301a080d240216e264b807f3a776b996ec34b7",
+          "at": "2026-07-15T00:05:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:942b7c45d06d2c340b84b7b45912376337e74401eb964477db18e2b2bdab9fa0",
+          "at": "2026-07-15T02:12:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:942b7c45d06d2c340b84b7b45912376337e74401eb964477db18e2b2bdab9fa0",
+          "at": "2026-07-15T02:14:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a93c9104245742d2ce749facd64e9283c59b02c6c5c5f4afd094439b38608a2",
+          "at": "2026-07-15T02:50:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a93c9104245742d2ce749facd64e9283c59b02c6c5c5f4afd094439b38608a2",
+          "at": "2026-07-15T02:53:11Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The dry-checker final/default effort is set to `high`, but D1 requires reviewer-like final lanes on Codex to use the provider maximum, `xhigh`. The final DRY-check lane therefore runs below the required effort level; set `reasoning_effort` to `xhigh`.",
+              "severity": "P0",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 81,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:38493a7a5e525dd585c55f0aac489e462d7e87d6b58fc11dc7c10f321a082eac",
+          "at": "2026-07-13T21:20:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry-checker` の fast/final 用キーが契約と異なります。`reasoning_effort` ではなく `final_reasoning_effort: \"xhigh\"` が必要で、現在の `fast_reasoning_effort: \"medium\"` も D1 の fast=low に違反します。このままでは final dispatch が必須 effort を解決できず fail-closed で失敗します。",
+              "severity": "P0",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 81,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:56cef24bd4ad1204fc52f69b0366c24a6f7ce7fc00292bb3e385cd1f50ccabb2",
+          "at": "2026-07-13T21:25:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94558f51cde94d5697892908fc3135e71a440eab683d03a8e4718095e93bc3f1",
+          "at": "2026-07-13T21:29:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94558f51cde94d5697892908fc3135e71a440eab683d03a8e4718095e93bc3f1",
+          "at": "2026-07-13T22:28:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39de4b61175f8eae85d637acc63f231904a65f78d4e677d60f7585dd5cdf6d4c",
+          "at": "2026-07-15T08:15:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39de4b61175f8eae85d637acc63f231904a65f78d4e677d60f7585dd5cdf6d4c",
+          "at": "2026-07-15T08:17:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d4bd5d68e5b3e70c2441ba5c1c48bfaa3501c5a3b32e0c547bfdd11b4d1db53",
+          "at": "2026-07-15T09:24:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review_operational` excludes only the fulfillment half of the test-obligation verdict-cache pair. `bin/sotp test-obligation evaluate` persists both `obligation-fulfillment-cache.json` and `waiver-cache.json`, and the workflow explicitly treats both as generated frozen-verdict outputs. Because `waiver-cache.json` still classifies as `other`, any evaluation that refreshes a waiver verdict changes the reviewed `other` hash and recreates the evaluate → stale → re-review loop this change is intended to eliminate. Add `track/items/<track-id>/waiver-cache.json` to `review_operational` as well.",
+              "severity": "P1",
+              "file": ".harness/config/review-scope.json",
+              "line": 90,
+              "category": "review-scope or briefing wiring inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:7d4bd5d68e5b3e70c2441ba5c1c48bfaa3501c5a3b32e0c547bfdd11b4d1db53",
+          "at": "2026-07-15T09:27:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b569660c79bb29bbb7ed6dc39be4ddfcb2ca4fe7a62de8bbdabab215886ea65d",
+          "at": "2026-07-15T09:29:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aae9342da9eedebd987c16d4d4d7b9d287efbb8fa4c744ca5fbd192fd5fa26df",
+          "at": "2026-07-15T13:42:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow promises that a scope's first round and every fast→final escalation always start fresh, but the implemented reviewer cache has only a persistent track×scope×round-type key and no production invalidation at a review-cycle or batch boundary. After one completed cycle, the next batch's initial fast round can resume the old fast session and its final escalation can resume the old final session. This SSoT therefore documents behavior `bin/sotp review local` cannot enforce; add a cycle boundary/invalidation or describe the broader reuse accurately.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 46,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The orchestrator opt-in rule is placed in the discipline text delivered to a capability only after `capability exec` has already resolved the request as fresh or resumed, so it cannot drive the caller's `--resume` decision. Codex gets a separate root-facing instruction, but the Claude root caller still invokes `bin/sotp capability exec` without `--resume` on back-and-forth re-entry. Consequently the documented capability-resume behavior is not wired for both hosts. Put the continuation/fresh decision in the shared caller workflow and its Claude invocation adapter before dispatch.",
+              "severity": "P1",
+              "file": ".harness/prompts/capability-exec-discipline.md",
+              "line": 22,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:aae9342da9eedebd987c16d4d4d7b9d287efbb8fa4c744ca5fbd192fd5fa26df",
+          "at": "2026-07-15T13:53:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8e02fc1d7041151d3a36509e3f43c14081d16c5ffeba3e2beccf22360c801bf",
+          "at": "2026-07-15T13:56:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rule says resume handling applies identically on Claude and Codex roots, but when both host and capability provider are Claude, `ClaudeCapabilityAdapter::dispatch` returns `DelegateInHost` before consulting the resume cache; the governing ADR also explicitly excludes in-host delegation from session resume. Thus `--resume` is silently ineffective for Claude-routed capabilities. Qualify this guidance as subprocess-only and state that Claude in-host delegation remains fresh, or add native in-host resume wiring.",
+              "severity": "P1",
+              "file": ".claude/rules/08-orchestration.md",
+              "line": 65,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:c8e02fc1d7041151d3a36509e3f43c14081d16c5ffeba3e2beccf22360c801bf",
+          "at": "2026-07-15T14:02:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2da228fd2a6908de53c3c7f5a217a06cfd9537f76847461d177b00a16efeaffd",
+          "at": "2026-07-15T14:05:55Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01’s requirement for a low-effort fast round, provider-maximum final effort, and preservation of the two-stage review is not deterministically covered. AC-01 only verifies that distinct fast/final effort values resolve, so an implementation using arbitrary values or not preserving the two-stage behavior could pass all ACs.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 330,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "CN-08 requires a new-session fallback when the capability resume cache cannot be read or hashed, but no AC covers those cases. AC-09 covers valid entries and profile/contract mismatch, while AC-10 covers resume failure and expiry; an implementation could omit read/hash-failure fallback and still satisfy every AC.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 250,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "GO-04 promises preservation of review judgment and review-record semantics, but no acceptance criterion deterministically verifies that session resume leaves the judgment/record unit unchanged. AC-03 verifies full-scope rejudgment only, and AC-04 verifies session selection and flag injection; both could pass while resumed rounds alter record semantics.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 42,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:ef0973d9289a0f7ef6da6420df173797ca945a426216056f958ed7aad2c5253e",
+          "at": "2026-07-13T16:40:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22f57e52e8eda72c842a70ee3f0529f018cae653e6a35315453739232c03161c",
+          "at": "2026-07-13T16:45:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 permits signal-evaluation skip whenever the implementation, catalogue, baseline, and evaluator hashes match, even when the rustdoc-extraction contract changed or the live snapshot cannot be verified. CN-07 and AC-07 require rustdoc extraction and recalculation in those same cases, so the contract simultaneously permits skipping and requires recomputation, risking stale signals. The skip condition must also account for the extraction contract and snapshot-validity requirements.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 370,
+              "category": "scope / acceptance_criteria contradiction"
+            },
+            {
+              "message": "AC-09 applies its resume requirement to any `sotp capability exec` invocation carrying the resume option, but that command also has an in-host delegation outcome. This requires cache-backed resume for the in-host branch that OS-05 explicitly excludes. Restrict this criterion to provider-subprocess dispatches or explicitly specify that in-host dispatch rejects/ignores resume.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 410,
+              "category": "out_of_scope leakage"
+            }
+          ],
+          "hash": "rvw1:sha256:22f57e52e8eda72c842a70ee3f0529f018cae653e6a35315453739232c03161c",
+          "at": "2026-07-13T16:49:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-03 requires every evaluation whose decision inputs changed to run, but AC-05's complete-skip predicate omits the spec/catalogue↔spec input, and AC-06/AC-07 provide no spec-change path. A spec-only change could therefore satisfy the stated skip conditions and leave catalogue↔spec signals stale, contrary to D3. GO-03 lacks deterministic acceptance coverage for this case.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 370,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "CN-08 and AC-09 require invalidation on a capability execution-contract fingerprint mismatch, but the spec never defines that fingerprint's inputs for generic capability resume; IN-04 defines only the reviewer-specific fingerprint. D4 identifies capability SSoT, always-injected discipline, and declared policy/contract files as inputs. Without an equivalent contract here, downstream phases must invent which changes invalidate the cache, making stale-reuse prevention untestable.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 250,
+              "category": "constraint vague or untestable"
+            }
+          ],
+          "hash": "rvw1:sha256:108da43a56156852b9bd84a34fdafa56d8576cf5c188766aebda83000a916b9d",
+          "at": "2026-07-13T16:54:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-08 requires a fresh session when the concern changes, even if the target artifact remains the same. However, AC-09 only checks the resume option and track/capability/artifact identity, so all acceptance criteria can pass while a same-artifact concern switch incorrectly resumes stale context. This leaves GO-02/GO-04 without deterministic coverage for a prohibited reuse path.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 410,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:d46257338e0adf1ff89460ffa3a3b546f012a8687dfd402f1a78e49915cc5b4a",
+          "at": "2026-07-13T16:58:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b0673238fe06b26b1bfe37b71c4c5e5a44f3e572d61f83156a1e8c5e7c9191b",
+          "at": "2026-07-13T17:02:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f8e5981a7be92172bfa4dd064dfe92c1bed7668a0ce317b2f4f1290eddeb91e6",
+          "at": "2026-07-14T18:34:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 の第1文は declaration_hash の一致も rustdoc 抽出を skip する必要条件にしていますが、同じ AC の第3文と AC-06 は、implementation-side input hash が一致して declaration_hash だけが不一致の場合にも rustdoc を起動しないと定めています。同一状態に対して相反する routing となるため、rustdoc 抽出の要否は implementation-side input hash のみに基づき、declaration/spec の差分は signal 再評価の要否だけを決める契約に統一する必要があります。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 366,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f8e5981a7be92172bfa4dd064dfe92c1bed7668a0ce317b2f4f1290eddeb91e6",
+          "at": "2026-07-14T19:55:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9c085bd4ba08195fabcfa858e002be63b3ae1bdc0b035b435cb83ae30088999",
+          "at": "2026-07-14T19:58:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9c085bd4ba08195fabcfa858e002be63b3ae1bdc0b035b435cb83ae30088999",
+          "at": "2026-07-14T19:59:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7ea3576ae23b7baa74f3acf9d55bf7f5f52347f549dc1fa9fee25a26f409b45",
+          "at": "2026-07-15T01:51:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7ea3576ae23b7baa74f3acf9d55bf7f5f52347f549dc1fa9fee25a26f409b45",
+          "at": "2026-07-15T01:53:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a343392f8f0ca60ab5996df09d0fab5afeda437fdd26dc7e69d29c1d72628b2",
+          "at": "2026-07-15T04:33:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a343392f8f0ca60ab5996df09d0fab5afeda437fdd26dc7e69d29c1d72628b2",
+          "at": "2026-07-15T04:37:09Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Sha256Digest`, `TypeSignalsFreshness`, and `TypeSignalsSchemaVersion` are private-field value objects with no declared constructor or accessors, so the infrastructure codec/evaluator cannot create or inspect the freshness data required by `TypeSignalsDocument`.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+              "line": 1074,
+              "category": "api_shape"
+            },
+            {
+              "message": "`ProviderSessionCacheEntry` is opaque (`has_stripped_fields: true`) but declares no constructor, accessors, or serialization boundary. The cache port returns and accepts this type, leaving adapters and provider callers unable to persist or validate its session/profile/fingerprint fields.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 1516,
+              "category": "api_shape"
+            },
+            {
+              "message": "`TargetArtifactPath` and `TargetArtifactSet` are private-field value objects with no construction or read API, while `CapabilityResumeArg` crosses from CLI-driver into these types. The declared boundary has no way to convert validated CLI paths into the usecase resume identity.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 1849,
+              "category": "cross_layer_contract"
+            },
+            {
+              "message": "`FsProviderSessionCacheAdapter` and `Sha256ExecutionContractFingerprintAdapter` both have private state and empty method declarations, including no `new`/factory method or `Default` impl. The composition root therefore cannot construct either adapter for the dependencies it claims to wire.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 1168,
+              "category": "api_shape"
+            },
+            {
+              "message": "`ExecutionContractFingerprintPort::reviewer_fingerprint` and `capability_fingerprint` return `ProviderSessionCacheError`, whose `Io`, `Symlink`, and `Path` variants are structurally unrelated to the declared pure fingerprint operations. The entry does not document a justified subset; callers must handle unreachable cache-storage failures.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 552,
+              "category": "per_method_error_imprecision"
+            },
+            {
+              "message": "`ProviderSessionCachePort` is explicitly a machine-local persistence port, but all `load`/`save`/`remove` methods are synchronous and the entry does not acknowledge the blocking-I/O choice. This fixes the adapter contract to blocking filesystem operations without documenting the color decision.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 607,
+              "category": "sync_async_color_mismatch"
+            },
+            {
+              "message": "`TypeSignalsExecutorPort::evaluate_layer` takes filesystem roots and a layer binding and delegates semantic evaluation/rustdoc execution, yet is declared synchronous with no documented sync-I/O decision. The port contract leaves the adapter's external-process/filesystem execution model underspecified.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+              "line": 657,
+              "category": "sync_async_color_mismatch"
+            },
+            {
+              "message": "The `CapabilityDispatchOutcome` docs restate the upstream resume-boundary contract and the `Executed` payload semantics (including why raw `u8` is opaque) instead of only citing the `IN-08`/`OS-05` anchors.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 796,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "The `ProviderSessionCacheEntry` docs restate profile/fingerprint compatibility and expiry fallback behavior from the upstream contract; this behavior must remain in the cited spec anchors rather than being duplicated in the type catalogue.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 1518,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "The `AgentProfiles` docs restate the upstream routing invariant that `provider_label` is display-only and must not be used as identity, rather than referring to the `IN-01`/`IN-02`/`CN-01` anchors.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 362,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "The `AgentProfilesError` docs restate the upstream diagnostic-data policy for `UnsupportedSchemaVersion` instead of limiting the catalogue entry to the type change plus its anchors.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 524,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:b5a456c7c632e4fd0b56739ed45792d55748de1b482de42b00d3bdfd336c19f0",
+          "at": "2026-07-13T16:45:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::CapabilityExecArgs` declares only capability, host, briefing_file, and timeout_seconds, while `cli_driver::CapabilityExecDriverInput` requires `resume: CapabilityResumeArg`. The resume selector and target artifacts are therefore unreachable from the CLI, so the IN-08/AC-09 resume flow cannot be invoked.",
+              "severity": "P0",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+              "line": 111,
+              "category": "mirror_chain_divergence"
+            }
+          ],
+          "hash": "rvw1:sha256:77c7cbab5269c9fca2b1e703014621863f015467ac158ac10d1083880669e645",
+          "at": "2026-07-13T17:13:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc5d0930702a6721dc0ab30752ba09b98300adac4ce60c7b97cff958d58fb748",
+          "at": "2026-07-13T17:31:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TypeSignalsExecutorPort` abstracts blocking rustdoc/filesystem work and is consumed by `TypeSignalsInteractor`, so it is an application-service port rather than a domain concept. Declaring it as a `SecondaryPort` in the domain catalogue violates the Port Placement Rules; move this contract (and its executor error surface) to the usecase layer and have the infrastructure adapter implement that port.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+              "line": 657,
+              "category": "architecture violation"
+            },
+            {
+              "message": "`TypeSignalsInteractor` is marked `action: modify`, but its declared public shape and constructor are identical to the rustdoc baseline; only its implementation behavior is planned to change. This makes Chain ③ blue before the implementation lands and contradicts the catalogue's modify semantics. Mark it `reference` or omit it if no type-level edge requires it.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 1969,
+              "category": "SoT integrity/action incoherence"
+            },
+            {
+              "message": "Several baseline-identical entries are incorrectly marked `modify`: `AgentProfilesCapabilityAdapter`, `TypeSignalsExecutorAdapter`, `infrastructure::tddd::type_signals_codec::decode`, and `...::encode`. Their declared constructors/signatures contain no post-track structural delta, so they already evaluate blue before implementation. Use `reference` or omit body-only changes from the type catalogue.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 37,
+              "category": "SoT integrity/action incoherence"
+            },
+            {
+              "message": "`CapabilityDriver` is marked `action: modify`, but its declared public methods match the baseline exactly; the planned resume validation is a method-body change. Representing it as `modify` falsely claims a post-track structural change and allows Chain ③ to be blue before that behavior exists. Use `reference` or omit the entry.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_driver-types.json",
+              "line": 95,
+              "category": "SoT integrity/action incoherence"
+            },
+            {
+              "message": "`CapabilityCompositionRoot` is marked `action: modify`, although its declared public constructor and accessor signatures match the baseline. Changes to stripped private wiring do not constitute a catalogue-visible shape delta, so this should be `reference` rather than an already-blue `modify`.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_composition-types.json",
+              "line": 21,
+              "category": "SoT integrity/action incoherence"
+            },
+            {
+              "message": "Both `cli::commands::capability::execute` and `cli::commands::review::execute` are marked `action: modify`, but their parameter and return signatures are baseline-identical; only their bodies will change. Mark these entries `reference` or omit them so the catalogue does not claim unenforceable structural modifications.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
+              "line": 5,
+              "category": "SoT integrity/action incoherence"
+            }
+          ],
+          "hash": "rvw1:sha256:bc5d0930702a6721dc0ab30752ba09b98300adac4ce60c7b97cff958d58fb748",
+          "at": "2026-07-13T17:39:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::tddd::type_signals_doc::decide_type_signals_reuse` requires a complete `current: &TypeSignalsFreshness`, including `LiveRustdocSnapshotHash`, even when `snapshot_status` is `Missing` or `ReadFailed`, where no current snapshot hash exists. Callers must fabricate a hash, and the separate parameters also admit contradictory states such as `Verified` paired with an unrelated hash. Carry the verified hash in the status enum or separate current input hashes from recorded freshness.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+              "line": 4,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "The new `TargetArtifactPath::try_new`, `TargetArtifactSet::try_new`, `ProviderSessionId::try_new`, and `ReviewerPrompt::try_new` methods all return the seven-variant `CapabilityInputValidationError`, although each can produce only a small, disjoint subset. Their declarations neither document those subsets nor justify the broad error surface, forcing callers to handle structurally impossible variants.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 17,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`CapabilityResumeArg::into_domain` returns the full `CapabilityInputValidationError`, but only conversion of `Resume(Vec<TargetArtifactPathArg>)` can fail, specifically while constructing `TargetArtifactSet`; provider, model, file-path, content, and timeout variants are structurally unreachable. Declare or document the producible subset.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_driver-types.json",
+              "line": 26,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`AgentProfiles::resolve_execution` operates on an already-loaded profile yet returns `AgentProfilesError`, exposing loader-only variants such as `Io`, `Symlink`, `PathOutsideTrustedRoot`, `Parse`, and `UnsupportedSchemaVersion`. Its declaration does not document a producible subset or justify requiring resolution callers to handle these impossible failures.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 410,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`infrastructure::tddd::type_signals_codec::encode` accepts an already validated `TypeSignalsDocument` but returns the shared `TypeSignalsCodecError`, including decode-only validation failures such as `InvalidSchemaVersion`, `InvalidTimestamp`, and `InvalidDigest`. The method does not identify its producible subset or justify this broad surface.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 60,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:4a177add70e8d337cfc2cb7853097ed8d28d42c607c1e2822f7694a8d0d1ab75",
+          "at": "2026-07-13T18:18:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ExecutionContractFingerprintPort` は reviewer 専用の `reviewer_fingerprint` と capability 専用の `capability_fingerprint` を単一 interface に束ねています。`CodexReviewer` / `ClaudeReviewer` と capability adapter 群の利用系統は分離しており、各 mock・代替実装に無関係なメソッドの実装を強制します。reviewer 用と capability 用の SecondaryPort に分割してください。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 572,
+              "category": "Interface Segregation violation"
+            },
+            {
+              "message": "`ExecutionContractFingerprintPort` の両メソッドは guarded contract file を読み取る外部 I/O 境界ですが、いずれも同期メソッドであり、docs は blocking I/O を同期 dispatch path で行う設計判断を説明していません。同期を意図するなら bounded blocking の選択を明記し、そうでなければ async 境界にしてください。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 574,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "`ProviderSessionCachePort::remove` は共有 `ProviderSessionCacheError` を返すため `Codec` まで公開しますが、key による削除処理は entry の encode/decode を行わず、この variant を構造的に生成できません。`ExecutionContractFingerprintPort` と同様に生成可能な subset を method docs で限定するか、より精密な error type を使用してください。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 675,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:53f35f952f8d43bdf7046930f09ab6adebcc6d482ac50dfcb92117fe354b728a",
+          "at": "2026-07-13T18:51:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3a6801779eb100ab8dced3a2e2ed2fb1a58aff2652d86466244e883131ed448a",
+          "at": "2026-07-13T19:16:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ff4ea6638a929bc929b50bd4557b8327ec116e52a173a07d0b4dafef139d004",
+          "at": "2026-07-13T21:20:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args` returns the six-variant `usecase::ref_verify::RefVerifyError`, although this function can only construct `VerifierPort`. Its docs neither declare that producible subset nor justify the broad error surface, forcing callers to account for structurally impossible variants.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 86,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "The `build_gemini_ref_verifier_args` docs restate the upstream fail-closed behavior and its rationale (“because Gemini cannot accept invocation-scoped typed effort”) instead of limiting the catalogue description to the symbol’s purpose plus the existing IN-01/IN-02/CN-01 anchor citations, contrary to `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 86,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:5aa43e13e20412751093a987d0f43cc18d6f4522a35f5c19f62613d2b997a584",
+          "at": "2026-07-13T22:22:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:462668e88796e961dc59653d42c59c92999a76c12d5a22b2cf592407aaa729e0",
+          "at": "2026-07-13T22:39:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`LoadCatalogueSpecSignalsForViewError::Hash` is dead vocabulary. Both sources of `Sha256DigestError` are already canonical: `declaration_hash` formats a SHA-256 value as exactly 64 lowercase hexadecimal characters, while the loader revalidates `ContentHash::to_hex()`, which has the same guarantee. Consequently neither `InvalidLength` nor `InvalidHex` can occur. The fallible contracts on `infrastructure::tddd::type_signals_codec::declaration_hash` and `infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash` propagate an impossible failure and create this unconstructible variant. Provide an infallible conversion for computed digest bytes and reserve fallible parsing for external strings.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 1443,
+              "category": "unconstructible error variant / per-method error imprecision"
+            },
+            {
+              "message": "`RustdocSchemaExporter::existing_rustdoc_json_path` returns the broad `domain::schema::SchemaExportError`, but this method neither checks nightly, launches rustdoc, nor parses rustdoc JSON. Its implementation maps its resolution and path-safety failures exclusively to `RustdocFailed`, leaving `NightlyNotFound`, `ParseFailed`, and `CrateNotFound` structurally unreachable. The catalogue docs neither list that producible subset nor justify the broad error. Declare a method-specific error or explicitly narrow the contract.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 1857,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "The `infrastructure::RustdocSchemaExporter` docs restate AC-06's behavioral contract by promising verified snapshot resolution without launching rustdoc. Under `knowledge/conventions/no-upstream-restatement.md`, catalogue docs should identify the changed symbol and cite the upstream anchors rather than duplicate their behavior; replace this clause with an anchor-only change description such as adding `existing_rustdoc_json_path` for IN-06/AC-06.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 1810,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:a5ea198d613065ae81aa6c2a07523475fc73facc37614e99954f9fe225d3bf11",
+          "at": "2026-07-14T06:25:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:955b4dc040a4c7f3ffb86375dfd15ccfa668636ac0e5f983c84d5ec33d576ac3",
+          "at": "2026-07-14T07:15:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:109d4520bf5e010ba62ce50d893be7ea0e3cad154e7980a9d900daf9f03bb663",
+          "at": "2026-07-14T11:19:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `decide_type_signals_reuse` docs restate the CN-07/AC-07 fail-closed behavior (“an unavailable implementation input hash forces re-extraction”) instead of limiting the entry to the symbol and anchor references.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `ProviderSessionCacheEntry` docs restate the upstream provider/model compatibility and resume flag-injection contract. Keep that behavior in the cited spec anchors and describe only the type change here.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 1639,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:08e4f0362eaaa51974686677c7cdb310e233be9a277b08f1ebbec359253166d2",
+          "at": "2026-07-14T18:39:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ImplementationInputHash` の docs は CN-05 の source/lockfile/toolchain 入力契約を散文で再記述しています。上流アンカー参照と型の変更対象だけに絞ってください。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+              "line": 476,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`domain::SchemaExporter` と `usecase::SchemaExporterPort` は rustdoc/process・filesystem I/O を行う同期ポートですが、docs が blocking synchronous design を明記していません。同期境界を意図するならその選択を契約に記載してください。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 707,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "`TypeSignalsInteractor` は rustdoc baseline と同じ公開 shape・constructor なのに `action: modify` です。変更は実装本体のみで、catalogue-visible な型変更を宣言していないため `reference` にしてください。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 2205,
+              "category": "action incoherence"
+            },
+            {
+              "message": "`SignalCompositionRoot` の公開メソッド signatures は rustdoc baseline と同一なのに `action: modify` です。実装 wiring の変更だけでは modify として宣言できないため、`reference` にするか型エントリを除去してください。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_composition-types.json",
+              "line": 379,
+              "category": "action incoherence"
+            }
+          ],
+          "hash": "rvw1:sha256:5c3ca4a189ad64a0ca0f54dff8cb167aaf568b89224ee3ecf5636947793fdae0",
+          "at": "2026-07-14T18:59:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SignalCompositionRoot` is marked `action: modify`, but its declared public methods and signatures are identical to the rustdoc baseline; the change is implementation wiring only. Mark it `reference` or omit the entry.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_composition-types.json",
+              "line": 379,
+              "category": "action_incoherent_with_diff"
+            }
+          ],
+          "hash": "rvw1:sha256:33b2ed8951141692e30226e0ae5a5a943af84baf439bbab94847d5ffaff2b24f",
+          "at": "2026-07-14T19:15:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33b2ed8951141692e30226e0ae5a5a943af84baf439bbab94847d5ffaff2b24f",
+          "at": "2026-07-14T19:28:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SignalCompositionRoot` is marked `action: modify`, but its public methods and signatures are unchanged; only implementation wiring/docs changed. Mark it `reference` or omit the entry.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_composition-types.json",
+              "line": 379,
+              "category": "action_incoherent_with_diff"
+            }
+          ],
+          "hash": "rvw1:sha256:08f4b5065ff21e19b80c2ecdde837d9f5cfe182fbcd952364385ce73b831adda",
+          "at": "2026-07-14T20:44:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:08f4b5065ff21e19b80c2ecdde837d9f5cfe182fbcd952364385ce73b831adda",
+          "at": "2026-07-14T20:57:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TypeSignalsInteractor` is marked `action: reference`, but its public `new` signature changed: the baseline executor parameter is `Arc<dyn domain::...::TypeSignalsExecutorPort>`, while the catalogue now uses the newly declared usecase `TypeSignalsExecutorPort`. This is a public API mutation and requires `action: modify`.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 2210,
+              "category": "missing companion modify"
+            }
+          ],
+          "hash": "rvw1:sha256:08f4b5065ff21e19b80c2ecdde837d9f5cfe182fbcd952364385ce73b831adda",
+          "at": "2026-07-14T21:02:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4882b5ae7827cad6704202c6a39523db5662fecf96e3c3993445f6007da16ad8",
+          "at": "2026-07-14T23:01:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::ProviderSessionCacheKey::TrackCapability` still includes `target_artifacts`, but IN-09/AC-09 and restored ADR D4 define the track-local key as track × capability; target-artifact identity applies only to workspace-local caching. This retains the rejected mechanical invalidation behavior, so changing the target set within the same track/capability incorrectly selects another cache entry and prevents the intended resume. Remove `target_artifacts` from `TrackCapability` while retaining it on `WorkspaceCapability`.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 1787,
+              "category": "SoT integrity / spec_refs mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:4882b5ae7827cad6704202c6a39523db5662fecf96e3c3993445f6007da16ad8",
+          "at": "2026-07-14T23:08:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:793ed66eb96229430582cf9817948d2d68b773ca709cffd42516cc09928deb5f",
+          "at": "2026-07-14T23:33:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:793ed66eb96229430582cf9817948d2d68b773ca709cffd42516cc09928deb5f",
+          "at": "2026-07-14T23:41:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec88e1c10482ba5d459e3c377b91d2d5e6270290a504580f33d3aa3d9002e85a",
+          "at": "2026-07-15T01:54:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::ProviderSessionCacheKey` restates the complete session-keying behavior from IN-03/IN-09/CN-04/AC-03/AC-09 in `docs`. Replace this behavioral restatement with a short type-purpose phrase and anchor citations, as required by `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 1749,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:ec88e1c10482ba5d459e3c377b91d2d5e6270290a504580f33d3aa3d9002e85a",
+          "at": "2026-07-15T01:59:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efa3338ceda422772d51594ba3a1793239bd2a38f81aea9aa87c6ed6f79ebdf7",
+          "at": "2026-07-15T02:11:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::ObligationsDocument::owning_obligation` returns `Option<&TestObligation>`, while the same contract introduces `owners_of_edge` and AC-11 permits multiple obligations to own one edge. `None` therefore conflates “no owner” with “multiple owners,” allowing consumers to silently skip required per-(edge × obligation) handling. Remove the singular API or return a type that distinguishes no, unique, and multiple owners.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+              "line": 675,
+              "category": "state-shape smell"
+            }
+          ],
+          "hash": "rvw1:sha256:efa3338ceda422772d51594ba3a1793239bd2a38f81aea9aa87c6ed6f79ebdf7",
+          "at": "2026-07-15T02:17:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cebb3d7331c521530799b9c84ecda0f3ffe281244c9ec6bfc82a984011e1a40",
+          "at": "2026-07-15T02:54:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0cebb3d7331c521530799b9c84ecda0f3ffe281244c9ec6bfc82a984011e1a40",
+          "at": "2026-07-15T03:05:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eedb619f1299733a52485fb238105a209f080e2eeafbdcdf91f6f027dfba1d2b",
+          "at": "2026-07-15T04:35:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eedb619f1299733a52485fb238105a209f080e2eeafbdcdf91f6f027dfba1d2b",
+          "at": "2026-07-15T04:39:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c0b6bacf0aaceb20e965a90901a744fedf4b4f12b41c8df8215b72329e28598",
+          "at": "2026-07-15T09:03:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c0b6bacf0aaceb20e965a90901a744fedf4b4f12b41c8df8215b72329e28598",
+          "at": "2026-07-15T09:13:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c63a435bb3943dd37b244a52c9304dc01d25f78083f0ba72f0ff18348c67227",
+          "at": "2026-07-15T12:50:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_driver::CapabilityResumeArg::Resume` carries a plain `Vec<TargetArtifactPathArg>`, so the public driver API admits `Resume(vec![])` alongside the separate `ResumeWithoutTarget` state. This bypasses the usecase mirror’s non-empty `TargetArtifactSet` invariant and allows an empty targeted resume to be treated as targetless rather than rejected, potentially selecting a track-scoped cached session. Use a non-empty validated payload or fallible construction so this overlapping state is unrepresentable.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_driver-types.json",
+              "line": 197,
+              "category": "state-shape smell"
+            }
+          ],
+          "hash": "rvw1:sha256:3c63a435bb3943dd37b244a52c9304dc01d25f78083f0ba72f0ff18348c67227",
+          "at": "2026-07-15T12:55:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c63a435bb3943dd37b244a52c9304dc01d25f78083f0ba72f0ff18348c67227",
+          "at": "2026-07-15T13:12:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_driver::CapabilityResumeArg::Resume` still carries a plain `Vec<TargetArtifactPathArg>`, admitting `Resume(vec![])` alongside `ResumeWithoutTarget`. The briefing’s claimed fallible conversion is not present in the current implementation: `into_request` still converts the empty case to `ResumeWithoutTarget` and dispatches it. Thus malformed targeted resume can still select targetless/track-scoped session behavior. Carry a non-empty validated payload or propagate `EmptyTargetArtifactSet` before dispatch.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_driver-types.json",
+              "line": 197,
+              "category": "state-shape smell"
+            }
+          ],
+          "hash": "rvw1:sha256:3c63a435bb3943dd37b244a52c9304dc01d25f78083f0ba72f0ff18348c67227",
+          "at": "2026-07-15T13:14:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c63a435bb3943dd37b244a52c9304dc01d25f78083f0ba72f0ff18348c67227",
+          "at": "2026-07-15T13:22:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c63a435bb3943dd37b244a52c9304dc01d25f78083f0ba72f0ff18348c67227",
+          "at": "2026-07-15T13:24:41Z"
+        }
+      ]
+    },
     "cli_composition": {
       "rounds": [
         {
@@ -1030,454 +2241,20 @@
           "findings": [],
           "hash": "rvw1:sha256:bc2c314b1c7f3ce4f792a80fb835a5a1e8f43d811af6d33d5ce2e879add51125",
           "at": "2026-07-15T12:54:46Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01’s requirement for a low-effort fast round, provider-maximum final effort, and preservation of the two-stage review is not deterministically covered. AC-01 only verifies that distinct fast/final effort values resolve, so an implementation using arbitrary values or not preserving the two-stage behavior could pass all ACs.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 330,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "CN-08 requires a new-session fallback when the capability resume cache cannot be read or hashed, but no AC covers those cases. AC-09 covers valid entries and profile/contract mismatch, while AC-10 covers resume failure and expiry; an implementation could omit read/hash-failure fallback and still satisfy every AC.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 250,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "GO-04 promises preservation of review judgment and review-record semantics, but no acceptance criterion deterministically verifies that session resume leaves the judgment/record unit unchanged. AC-03 verifies full-scope rejudgment only, and AC-04 verifies session selection and flag injection; both could pass while resumed rounds alter record semantics.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 42,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:ef0973d9289a0f7ef6da6420df173797ca945a426216056f958ed7aad2c5253e",
-          "at": "2026-07-13T16:40:39Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:22f57e52e8eda72c842a70ee3f0529f018cae653e6a35315453739232c03161c",
-          "at": "2026-07-13T16:45:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-05 permits signal-evaluation skip whenever the implementation, catalogue, baseline, and evaluator hashes match, even when the rustdoc-extraction contract changed or the live snapshot cannot be verified. CN-07 and AC-07 require rustdoc extraction and recalculation in those same cases, so the contract simultaneously permits skipping and requires recomputation, risking stale signals. The skip condition must also account for the extraction contract and snapshot-validity requirements.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 370,
-              "category": "scope / acceptance_criteria contradiction"
-            },
-            {
-              "message": "AC-09 applies its resume requirement to any `sotp capability exec` invocation carrying the resume option, but that command also has an in-host delegation outcome. This requires cache-backed resume for the in-host branch that OS-05 explicitly excludes. Restrict this criterion to provider-subprocess dispatches or explicitly specify that in-host dispatch rejects/ignores resume.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 410,
-              "category": "out_of_scope leakage"
-            }
-          ],
-          "hash": "rvw1:sha256:22f57e52e8eda72c842a70ee3f0529f018cae653e6a35315453739232c03161c",
-          "at": "2026-07-13T16:49:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-03 requires every evaluation whose decision inputs changed to run, but AC-05's complete-skip predicate omits the spec/catalogue↔spec input, and AC-06/AC-07 provide no spec-change path. A spec-only change could therefore satisfy the stated skip conditions and leave catalogue↔spec signals stale, contrary to D3. GO-03 lacks deterministic acceptance coverage for this case.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 370,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "CN-08 and AC-09 require invalidation on a capability execution-contract fingerprint mismatch, but the spec never defines that fingerprint's inputs for generic capability resume; IN-04 defines only the reviewer-specific fingerprint. D4 identifies capability SSoT, always-injected discipline, and declared policy/contract files as inputs. Without an equivalent contract here, downstream phases must invent which changes invalidate the cache, making stale-reuse prevention untestable.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 250,
-              "category": "constraint vague or untestable"
-            }
-          ],
-          "hash": "rvw1:sha256:108da43a56156852b9bd84a34fdafa56d8576cf5c188766aebda83000a916b9d",
-          "at": "2026-07-13T16:54:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-08 requires a fresh session when the concern changes, even if the target artifact remains the same. However, AC-09 only checks the resume option and track/capability/artifact identity, so all acceptance criteria can pass while a same-artifact concern switch incorrectly resumes stale context. This leaves GO-02/GO-04 without deterministic coverage for a prohibited reuse path.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 410,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:d46257338e0adf1ff89460ffa3a3b546f012a8687dfd402f1a78e49915cc5b4a",
-          "at": "2026-07-13T16:58:44Z"
+          "hash": "rvw1:sha256:c4c166e00053574c952d4fff5744222af84d030c358e7e005cd69d1a81c9408c",
+          "at": "2026-07-15T13:42:20Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0b0673238fe06b26b1bfe37b71c4c5e5a44f3e572d61f83156a1e8c5e7c9191b",
-          "at": "2026-07-13T17:02:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f8e5981a7be92172bfa4dd064dfe92c1bed7668a0ce317b2f4f1290eddeb91e6",
-          "at": "2026-07-14T18:34:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-05 の第1文は declaration_hash の一致も rustdoc 抽出を skip する必要条件にしていますが、同じ AC の第3文と AC-06 は、implementation-side input hash が一致して declaration_hash だけが不一致の場合にも rustdoc を起動しないと定めています。同一状態に対して相反する routing となるため、rustdoc 抽出の要否は implementation-side input hash のみに基づき、declaration/spec の差分は signal 再評価の要否だけを決める契約に統一する必要があります。",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 366,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f8e5981a7be92172bfa4dd064dfe92c1bed7668a0ce317b2f4f1290eddeb91e6",
-          "at": "2026-07-14T19:55:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b9c085bd4ba08195fabcfa858e002be63b3ae1bdc0b035b435cb83ae30088999",
-          "at": "2026-07-14T19:58:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b9c085bd4ba08195fabcfa858e002be63b3ae1bdc0b035b435cb83ae30088999",
-          "at": "2026-07-14T19:59:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d7ea3576ae23b7baa74f3acf9d55bf7f5f52347f549dc1fa9fee25a26f409b45",
-          "at": "2026-07-15T01:51:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d7ea3576ae23b7baa74f3acf9d55bf7f5f52347f549dc1fa9fee25a26f409b45",
-          "at": "2026-07-15T01:53:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a343392f8f0ca60ab5996df09d0fab5afeda437fdd26dc7e69d29c1d72628b2",
-          "at": "2026-07-15T04:33:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a343392f8f0ca60ab5996df09d0fab5afeda437fdd26dc7e69d29c1d72628b2",
-          "at": "2026-07-15T04:37:09Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c576a936b9b6507fada977cc6eb7efded1d6a73a2c9785ddbdbeefc829ed272",
-          "at": "2026-07-13T21:28:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c576a936b9b6507fada977cc6eb7efded1d6a73a2c9785ddbdbeefc829ed272",
-          "at": "2026-07-13T21:34:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The ReasoningEffort waiver is justified by Batch A scheduling and future tasks (T003/T007), not by an entry-local reason why this type cannot cover CN-02. This leaves the waiver dependent on implementation sequencing; replace it with an entry-surface argument, as done for CapabilityProfile, or bind the behavior to a real test.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 16,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:21a589da3491af2f83c9071d99dd9dd85fd9d128402e43e06aaac4053eda6d36",
-          "at": "2026-07-13T22:22:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b78fe666ca9abf35ce4243b3a6b350be26411b813f511db106f7b319fb2d75ef",
-          "at": "2026-07-13T22:28:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:528254b6e817585913367db1da724f5ad2adb69d04c55d473e05115daf4969ee",
-          "at": "2026-07-13T23:10:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2172f1f05f8cd47f0b2be88e3ffeadce96cb3c49ab78dec175523db8511993aa",
-          "at": "2026-07-14T07:19:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb40827d2b2e6317e5522f58c2e385840200b5d8b4e3f3e0ffa102d437417c55",
-          "at": "2026-07-14T08:52:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This waiver cites the plan task `T007` and a specific test to justify the waiver. The briefing requires waiver reasons to argue only from the entry's declared surface, with no task IDs or scheduling language. Rewrite the rationale solely in terms of `FsProviderSessionCacheAdapter`'s observable API and limitations.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 699,
-              "category": "test_obligation_waiver"
-            },
-            {
-              "message": "This waiver assigns the behavior to plan task `T007`, directly violating the requirement that waiver reasons contain no task IDs and rely only on the entry's declared surface. Explain only why `ProviderSessionCacheEntry` cannot represent or perform the AC-10 behavior.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 2845,
-              "category": "test_obligation_waiver"
-            }
-          ],
-          "hash": "rvw1:sha256:c6e0dab0b4af61ef4b1f70b2201b00b803850614056eb5259772ab0e4444395a",
-          "at": "2026-07-15T00:31:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:01173c3a7019127403b345fc0fa9c6558cebe49d15bd63bd540a7496df798b4e",
-          "at": "2026-07-15T00:36:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The regenerated obligations add 19 enforced `logic_result` obligations for `ObligationsDocument`, `TestBindingsDocument`, and `TestObligation`, but none has a fulfillment or waiver in `test-bindings.json`. Consequently, `bin/sotp test-obligation check --track-id agent-dispatch-cost-reduction-2026-07-13` fails with `Missing` drifts. Add bindings and regenerate the caches before committing these obligations.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/obligations.json",
-              "line": 4,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:1123dafe3aad472a41cf8070d95fd65397434b551362fa0897d4d8b4e8536e26",
-          "at": "2026-07-15T01:51:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `method:staleness_against` fulfillment is bound only to edge-ownership and evaluation-fan-out tests; none invokes `ObligationsDocument::staleness_against`. Consequently the generated cache marks both associated edges fulfilled using unrelated assertions, so the obligation gate can remain green without evidence for this method. Bind the existing staleness tests instead and regenerate the cache.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 158,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:9b0c8ede22450cebd8468f41e3ffd50258bda00b516c4c4950deccdfffc9f8bb",
-          "at": "2026-07-15T02:18:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Eleven voluntary-binding records contain duplicate TestLocation entries. SignalCompositionRoot repeats the same test seven times for IN-06, IN-07, CN-07, and AC-05 through AC-08; TypeSignalsDocument/IN-05 and both RustdocSchemaExporter edges repeat it twice; TypeSignalsReuseDecision/IN-05 repeats it three times. The evaluator concatenates every listed test body without deduplication, so these records inject 47 redundant test-body copies into verifier prompts, overweight a single test, and produce duplicate-sensitive `bound_tests_set_hash` values. Deduplicate each record and regenerate the fulfillment cache.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 2109,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f412a908920fb07d36cd1cadd80cf89b3e6750e7e214346714a78129ef9641ed",
-          "at": "2026-07-15T02:53:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The fulfillment for `ObligationsDocument::track_id` binds only edge-ownership and evaluator tests; none calls `track_id()`. The existing `test_obligations_document_round_trips` test does exercise this accessor but is not bound, so the obligation is incorrectly reported as fulfilled.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 38,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The fulfillment for `TestBindingsDocument::track_id` binds waiver/evaluator tests that never call `track_id()`. Bind `test_bindings_document_round_trips`, which actually verifies this accessor, so the gate cannot pass on unrelated evidence.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 203,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The fulfillments for `TestObligation::{target_entry,target_role,brief,declaration_hash}` all cite the same ownership/evaluator tests, none of which invokes these accessors. `test_obligation_exposes_all_components` exercises all four but is absent, causing four public-API obligations to be marked fulfilled without relevant evidence.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 353,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:b8f224ffaf621b4d0da73dfb2aa3d795a4b0882ab7adb23b534437e5076a3b90",
-          "at": "2026-07-15T03:14:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82f2f5809fb058a2365c3f73cd0a03f16a6fd405d0cae01e3ea7598e54ba309c",
-          "at": "2026-07-15T03:24:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5fb5e5400122362ba4cba66a0dac8c10f1eb83ec0b3864c6822d5d1fad16d910",
-          "at": "2026-07-15T08:03:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0c31a029ae142071a29ba460b2bd60753eb0b18e42de99c08e9ed32965bf6bc7",
-          "at": "2026-07-15T08:14:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `ClaudeReviewer` contract-conformance fulfillment still does not bind `test_claude_reviewer_resumes_only_matching_track_scope_and_round_key_unit`. The bound static-cache tests do not prove IN-03's track/scope/round isolation or fast-to-final fresh-session behavior; binding that test only to AC-03/AC-04 cannot support the separate IN-03 verdict. Add it to this fulfillment and regenerate the cache.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 3753,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The `ReviewCompositionRoot` bindings for CN-02, CN-03, and CN-09 still contain only infrastructure reviewer unit tests. None execute `ReviewCompositionRoot`, so regressions in its flag/profile wiring, current-scope propagation, or review-record persistence would leave these entry-specific edges fulfilled. Bind composition-level evidence for each edge and regenerate the cache.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 3917,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:0c31a029ae142071a29ba460b2bd60753eb0b18e42de99c08e9ed32965bf6bc7",
-          "at": "2026-07-15T08:16:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`test-bindings.json` has changed again beyond the previously reviewed T004 append (the new diff adds evidence tests for ReviewCompositionRoot IN-04/CN-02/CN-03/CN-09), but `obligation-fulfillment-cache.json` is unchanged for those records. Because each cache entry stores `bound_tests_set_hash`, the cached frozen verdicts are stale relative to the current bindings and the machine artifacts are internally inconsistent; regenerate the cache after the binding update.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/obligation-fulfillment-cache.json",
-              "line": null,
-              "category": "artifact-consistency"
-            }
-          ],
-          "hash": "rvw1:sha256:33744cdcb62bf8a64ffb165bd7274de54fe0e529cd6f292a1ca7593310f6d5ee",
-          "at": "2026-07-15T08:22:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:33744cdcb62bf8a64ffb165bd7274de54fe0e529cd6f292a1ca7593310f6d5ee",
-          "at": "2026-07-15T08:26:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:33744cdcb62bf8a64ffb165bd7274de54fe0e529cd6f292a1ca7593310f6d5ee",
-          "at": "2026-07-15T08:27:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d2d7d2d6715731c4f8c730ac39afedbdd78218e3b06ae66b6862b6644c4d5f9",
-          "at": "2026-07-15T09:23:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0d2d7d2d6715731c4f8c730ac39afedbdd78218e3b06ae66b6862b6644c4d5f9",
-          "at": "2026-07-15T09:27:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e94a9146442259eb7d5e2a9fce2443a0039a8272ff44b13a752852144957bfbb",
-          "at": "2026-07-15T12:50:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e94a9146442259eb7d5e2a9fce2443a0039a8272ff44b13a752852144957bfbb",
-          "at": "2026-07-15T12:55:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6c489347422355e97c643c3413bd12b7a32b5940a7b3e7723cfb6e714fe5f918",
-          "at": "2026-07-15T13:12:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6c489347422355e97c643c3413bd12b7a32b5940a7b3e7723cfb6e714fe5f918",
-          "at": "2026-07-15T13:16:50Z"
+          "hash": "rvw1:sha256:c4c166e00053574c952d4fff5744222af84d030c358e7e005cd69d1a81c9408c",
+          "at": "2026-07-15T13:43:28Z"
         }
       ]
     },
@@ -2283,292 +3060,6 @@
         }
       ]
     },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 の入力 hash は source 内容・Cargo.lock・toolchain 識別子 בלבדで、Cargo.toml の feature/target 設定、rustflags/RUSTDOCFLAGS、その他 rustdoc 出力を変える設定を捕捉することが明示されていません。この変更後も hash が一致して signal 再計算を skip すると、古い type-signals を新しい実装条件に対して再利用できます。実装が hash に含める入力集合と、未モデル化入力時の fail-closed 動作を決定として明記してください。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 56,
-              "category": "decision underspecified for downstream consumption"
-            },
-            {
-              "message": "D4 は継続作業を「同じ成果物」への再入に限定していますが、track cache のキーは track × capability だけで対象 artifact を含みません。同一 track 内で同じ capability が別 artifact を扱うと、orchestrator が resume を opt-in した際に前の artifact の session を再利用し、stale context を引き継げます。track cache も artifact/work-unit identity をキーまたは検証条件に含める必要があります。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 62,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:e28b1deafd32dbdedacc5da5839fb082192a37692907d9a436c2fa942ea52fec",
-          "at": "2026-07-13T13:37:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 simultaneously requires skipping signal recalculation when implementation inputs are unchanged and re-evaluating when the catalogue/spec changes, but it does not define a retained and validated rustdoc snapshot for that re-evaluation. The downstream implementation cannot safely evaluate a changed catalogue without rerunning rustdoc or specifying a cache, so this can consume absent/stale data.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 54,
-              "category": "decision underspecified for downstream consumption"
-            },
-            {
-              "message": "The D3 freshness hash does not explicitly cover all inputs that affect the stored signals: the evaluator also consumes the baseline rustdoc artifact, and rustdoc/evaluation can vary with path-dependency, build-script, or proc-macro source changes not captured by the listed target-crate source and lockfile inputs. Without an explicit complete input closure or fail-closed detection for these cases, an unchanged hash can incorrectly skip recalculation and leave stale signals.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 56,
-              "category": "decision underspecified for downstream consumption"
-            }
-          ],
-          "hash": "rvw1:sha256:8a1936a638f682ff57609a28bc3a52b36cff5ca03ae7efa0a0c54281e1e76ce4",
-          "at": "2026-07-13T13:44:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 is internally inconsistent: it says baseline changes may reuse the live rustdoc snapshot without extraction (lines 54–56), but then requires the current baseline hash to equal the artifact’s recorded baseline hash. Any actual baseline change makes that condition false and forces rustdoc recomputation, so downstream implementation cannot derive the stated skip behavior.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 56,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:905d06f2de81067badcdc312fa215e94cd7949ff9017a2914597fd1e9e3c6aec",
-          "at": "2026-07-13T13:48:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2 lists `fresh-every-round` as a rejected candidate, but no Rejected Alternatives entry actually rejects fresh reviewer sessions. H concerns capability dispatches under D4, while C only rejects cross-tier resume, leaving D2's reviewer-session choice without a corresponding rationale.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 10,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:8ea7d58df436321bbdb35e53480a57c0221701d7b5a3c238150ef2153fb0ef4b",
-          "at": "2026-07-13T13:51:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 requires skipping rustdoc extraction and later reusing a verified live snapshot, but it only specifies storing the snapshot hash in the type-signals artifact while explicitly rejecting a separate transient cache. It does not define where the snapshot body is persisted or how it is loaded; regenerating it with Cargo would perform the extraction that D3 intends to skip, while omitting it makes signal recomputation impossible. Downstream implementation/spec cannot derive a working acceptance criterion for this reuse path.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 56,
-              "category": "decision underspecified for downstream consumption"
-            }
-          ],
-          "hash": "rvw1:sha256:c2e7ed3cd7c8d0bee017ad2694fbfd41d43d6708579eecf3828e4be8ad9d6d61",
-          "at": "2026-07-13T13:54:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2/D4 の session cache は provider/model だけで再利用可否を決め、review briefing・severity policy・capability contract の世代変更を無効化または再注入する規則がありません。再起動後や規約更新後に同じ track/scope/artifact で resume すると、古い判断規則・作業契約のまま review/編集を続け得るため、observable な fail-closed 条件を追加してください。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 48,
-              "category": "decision underspecified for downstream consumption"
-            },
-            {
-              "message": "D1 の candidate_selection にある `merge-fast-final-tiers` は、Rejected Alternatives A-L または採択 decision に対応する説明がありません。fast/final の effort tier を統合する案を却下したのか、採択方針に含めるのかが decision trace から判定できず、ADR の選択理由と downstream acceptance criteria の根拠が不完全です。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 6,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:3e333d9af262e53f830748c286c014c3151f6bbbf735450b4068d2df6a57a0f2",
-          "at": "2026-07-13T13:58:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bfb67537af7ea8afea42eee4449d98aa405cb5f58950cff36073956125483f76",
-          "at": "2026-07-13T14:03:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2 fingerprints the contents of the resolved scope files and generated briefing, then invalidates the session on any mismatch. A fixer re-round necessarily changes at least a scoped file—and the briefing may also be regenerated—so the cache always falls back to a new session instead of resuming as D2 requires. Separate stable execution-contract inputs from mutable review inputs.",
-              "severity": "P0",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 48,
-              "category": "inconsistent decisions within the same ADR"
-            },
-            {
-              "message": "D4 includes the dispatch briefing's contents in the fingerprint and invalidates the session when they change. Since `capability exec` receives each task through that briefing, follow-up or repair work normally requires changing it; the intended continuation therefore becomes a fresh session. The decision must specify which stable contract portion is fingerprinted independently of the changing task payload.",
-              "severity": "P0",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 64,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:bfb67537af7ea8afea42eee4449d98aa405cb5f58950cff36073956125483f76",
-          "at": "2026-07-13T14:06:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 permits skipping signal evaluation when “all inputs” are unchanged, but the defined freshness state covers only the target rustdoc build-input closure, catalogue declaration, baseline, and snapshot. Signal results also depend on the evaluator implementation and its configuration, which can change without changing any of those hashes; downstream spec.json therefore cannot derive an observable invalidation rule, and previously generated signals may remain stale after evaluation semantics change. Specify how the evaluation contract participates in freshness or when reevaluation is mandatory.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 54,
-              "category": "decision underspecified for downstream consumption"
-            }
-          ],
-          "hash": "rvw1:sha256:f8363ba8866e61492d1566bce3aa0d5f5f5ba0dd845b86b3d70393c3504a8307",
-          "at": "2026-07-13T14:11:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 は evaluator-contract の変更時にも既存 rustdoc snapshot の再利用を許可していますが、その contract 自体に evaluator 実装の code/build identity を含めています。抽出用の引数・root 解決・JSON 生成方法を担う実装が変わっても、実装側 input hash と旧 snapshot の自己 hash が一致すれば旧 snapshot を再利用できるため、「判定不能なら rustdoc 抽出から再計算する」という fail-closed 方針に反して stale signal を生成し得ます。下流 spec が安全な再利用条件を導出できるよう、抽出結果へ影響する contract の変更を snapshot 無効化条件として明確にしてください。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
-              "line": 54,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:2134ab5c76dd93544397956b0f3f593ee1cd539f8bb6c113ad548bebc8937aa3",
-          "at": "2026-07-13T14:15:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e02a12ecad05852e529f05be0bc2b4998b3f6e1f4fee0c2c1eff928d1f24a4df",
-          "at": "2026-07-13T14:19:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a391fac85b6d96a431bb15f019edada7f1b3e0ebcff916ff79320dbfad33886",
-          "at": "2026-07-14T18:32:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a391fac85b6d96a431bb15f019edada7f1b3e0ebcff916ff79320dbfad33886",
-          "at": "2026-07-14T19:54:17Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The dry-checker final/default effort is set to `high`, but D1 requires reviewer-like final lanes on Codex to use the provider maximum, `xhigh`. The final DRY-check lane therefore runs below the required effort level; set `reasoning_effort` to `xhigh`.",
-              "severity": "P0",
-              "file": ".harness/config/agent-profiles.json",
-              "line": 81,
-              "category": "capability routing mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:38493a7a5e525dd585c55f0aac489e462d7e87d6b58fc11dc7c10f321a082eac",
-          "at": "2026-07-13T21:20:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry-checker` の fast/final 用キーが契約と異なります。`reasoning_effort` ではなく `final_reasoning_effort: \"xhigh\"` が必要で、現在の `fast_reasoning_effort: \"medium\"` も D1 の fast=low に違反します。このままでは final dispatch が必須 effort を解決できず fail-closed で失敗します。",
-              "severity": "P0",
-              "file": ".harness/config/agent-profiles.json",
-              "line": 81,
-              "category": "capability routing mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:56cef24bd4ad1204fc52f69b0366c24a6f7ce7fc00292bb3e385cd1f50ccabb2",
-          "at": "2026-07-13T21:25:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94558f51cde94d5697892908fc3135e71a440eab683d03a8e4718095e93bc3f1",
-          "at": "2026-07-13T21:29:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:94558f51cde94d5697892908fc3135e71a440eab683d03a8e4718095e93bc3f1",
-          "at": "2026-07-13T22:28:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:39de4b61175f8eae85d637acc63f231904a65f78d4e677d60f7585dd5cdf6d4c",
-          "at": "2026-07-15T08:15:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:39de4b61175f8eae85d637acc63f231904a65f78d4e677d60f7585dd5cdf6d4c",
-          "at": "2026-07-15T08:17:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7d4bd5d68e5b3e70c2441ba5c1c48bfaa3501c5a3b32e0c547bfdd11b4d1db53",
-          "at": "2026-07-15T09:24:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`review_operational` excludes only the fulfillment half of the test-obligation verdict-cache pair. `bin/sotp test-obligation evaluate` persists both `obligation-fulfillment-cache.json` and `waiver-cache.json`, and the workflow explicitly treats both as generated frozen-verdict outputs. Because `waiver-cache.json` still classifies as `other`, any evaluation that refreshes a waiver verdict changes the reviewed `other` hash and recreates the evaluate → stale → re-review loop this change is intended to eliminate. Add `track/items/<track-id>/waiver-cache.json` to `review_operational` as well.",
-              "severity": "P1",
-              "file": ".harness/config/review-scope.json",
-              "line": 90,
-              "category": "review-scope or briefing wiring inconsistency"
-            }
-          ],
-          "hash": "rvw1:sha256:7d4bd5d68e5b3e70c2441ba5c1c48bfaa3501c5a3b32e0c547bfdd11b4d1db53",
-          "at": "2026-07-15T09:27:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b569660c79bb29bbb7ed6dc39be4ddfcb2ca4fe7a62de8bbdabab215886ea65d",
-          "at": "2026-07-15T09:29:59Z"
-        }
-      ]
-    },
     "cli_driver": {
       "rounds": [
         {
@@ -2630,700 +3121,281 @@
         }
       ]
     },
-    "types": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Sha256Digest`, `TypeSignalsFreshness`, and `TypeSignalsSchemaVersion` are private-field value objects with no declared constructor or accessors, so the infrastructure codec/evaluator cannot create or inspect the freshness data required by `TypeSignalsDocument`.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
-              "line": 1074,
-              "category": "api_shape"
-            },
-            {
-              "message": "`ProviderSessionCacheEntry` is opaque (`has_stripped_fields: true`) but declares no constructor, accessors, or serialization boundary. The cache port returns and accepts this type, leaving adapters and provider callers unable to persist or validate its session/profile/fingerprint fields.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 1516,
-              "category": "api_shape"
-            },
-            {
-              "message": "`TargetArtifactPath` and `TargetArtifactSet` are private-field value objects with no construction or read API, while `CapabilityResumeArg` crosses from CLI-driver into these types. The declared boundary has no way to convert validated CLI paths into the usecase resume identity.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 1849,
-              "category": "cross_layer_contract"
-            },
-            {
-              "message": "`FsProviderSessionCacheAdapter` and `Sha256ExecutionContractFingerprintAdapter` both have private state and empty method declarations, including no `new`/factory method or `Default` impl. The composition root therefore cannot construct either adapter for the dependencies it claims to wire.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
-              "line": 1168,
-              "category": "api_shape"
-            },
-            {
-              "message": "`ExecutionContractFingerprintPort::reviewer_fingerprint` and `capability_fingerprint` return `ProviderSessionCacheError`, whose `Io`, `Symlink`, and `Path` variants are structurally unrelated to the declared pure fingerprint operations. The entry does not document a justified subset; callers must handle unreachable cache-storage failures.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 552,
-              "category": "per_method_error_imprecision"
-            },
-            {
-              "message": "`ProviderSessionCachePort` is explicitly a machine-local persistence port, but all `load`/`save`/`remove` methods are synchronous and the entry does not acknowledge the blocking-I/O choice. This fixes the adapter contract to blocking filesystem operations without documenting the color decision.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 607,
-              "category": "sync_async_color_mismatch"
-            },
-            {
-              "message": "`TypeSignalsExecutorPort::evaluate_layer` takes filesystem roots and a layer binding and delegates semantic evaluation/rustdoc execution, yet is declared synchronous with no documented sync-I/O decision. The port contract leaves the adapter's external-process/filesystem execution model underspecified.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
-              "line": 657,
-              "category": "sync_async_color_mismatch"
-            },
-            {
-              "message": "The `CapabilityDispatchOutcome` docs restate the upstream resume-boundary contract and the `Executed` payload semantics (including why raw `u8` is opaque) instead of only citing the `IN-08`/`OS-05` anchors.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 796,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "The `ProviderSessionCacheEntry` docs restate profile/fingerprint compatibility and expiry fallback behavior from the upstream contract; this behavior must remain in the cited spec anchors rather than being duplicated in the type catalogue.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 1518,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "The `AgentProfiles` docs restate the upstream routing invariant that `provider_label` is display-only and must not be used as identity, rather than referring to the `IN-01`/`IN-02`/`CN-01` anchors.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
-              "line": 362,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "The `AgentProfilesError` docs restate the upstream diagnostic-data policy for `UnsupportedSchemaVersion` instead of limiting the catalogue entry to the type change plus its anchors.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
-              "line": 524,
-              "category": "upstream_restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:b5a456c7c632e4fd0b56739ed45792d55748de1b482de42b00d3bdfd336c19f0",
-          "at": "2026-07-13T16:45:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cli::CapabilityExecArgs` declares only capability, host, briefing_file, and timeout_seconds, while `cli_driver::CapabilityExecDriverInput` requires `resume: CapabilityResumeArg`. The resume selector and target artifacts are therefore unreachable from the CLI, so the IN-08/AC-09 resume flow cannot be invoked.",
-              "severity": "P0",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
-              "line": 111,
-              "category": "mirror_chain_divergence"
-            }
-          ],
-          "hash": "rvw1:sha256:77c7cbab5269c9fca2b1e703014621863f015467ac158ac10d1083880669e645",
-          "at": "2026-07-13T17:13:04Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bc5d0930702a6721dc0ab30752ba09b98300adac4ce60c7b97cff958d58fb748",
-          "at": "2026-07-13T17:31:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`TypeSignalsExecutorPort` abstracts blocking rustdoc/filesystem work and is consumed by `TypeSignalsInteractor`, so it is an application-service port rather than a domain concept. Declaring it as a `SecondaryPort` in the domain catalogue violates the Port Placement Rules; move this contract (and its executor error surface) to the usecase layer and have the infrastructure adapter implement that port.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
-              "line": 657,
-              "category": "architecture violation"
-            },
-            {
-              "message": "`TypeSignalsInteractor` is marked `action: modify`, but its declared public shape and constructor are identical to the rustdoc baseline; only its implementation behavior is planned to change. This makes Chain ③ blue before the implementation lands and contradicts the catalogue's modify semantics. Mark it `reference` or omit it if no type-level edge requires it.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 1969,
-              "category": "SoT integrity/action incoherence"
-            },
-            {
-              "message": "Several baseline-identical entries are incorrectly marked `modify`: `AgentProfilesCapabilityAdapter`, `TypeSignalsExecutorAdapter`, `infrastructure::tddd::type_signals_codec::decode`, and `...::encode`. Their declared constructors/signatures contain no post-track structural delta, so they already evaluate blue before implementation. Use `reference` or omit body-only changes from the type catalogue.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
-              "line": 37,
-              "category": "SoT integrity/action incoherence"
-            },
-            {
-              "message": "`CapabilityDriver` is marked `action: modify`, but its declared public methods match the baseline exactly; the planned resume validation is a method-body change. Representing it as `modify` falsely claims a post-track structural change and allows Chain ③ to be blue before that behavior exists. Use `reference` or omit the entry.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_driver-types.json",
-              "line": 95,
-              "category": "SoT integrity/action incoherence"
-            },
-            {
-              "message": "`CapabilityCompositionRoot` is marked `action: modify`, although its declared public constructor and accessor signatures match the baseline. Changes to stripped private wiring do not constitute a catalogue-visible shape delta, so this should be `reference` rather than an already-blue `modify`.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_composition-types.json",
-              "line": 21,
-              "category": "SoT integrity/action incoherence"
-            },
-            {
-              "message": "Both `cli::commands::capability::execute` and `cli::commands::review::execute` are marked `action: modify`, but their parameter and return signatures are baseline-identical; only their bodies will change. Mark these entries `reference` or omit them so the catalogue does not claim unenforceable structural modifications.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli-types.json",
-              "line": 5,
-              "category": "SoT integrity/action incoherence"
-            }
-          ],
-          "hash": "rvw1:sha256:bc5d0930702a6721dc0ab30752ba09b98300adac4ce60c7b97cff958d58fb748",
-          "at": "2026-07-13T17:39:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`domain::tddd::type_signals_doc::decide_type_signals_reuse` requires a complete `current: &TypeSignalsFreshness`, including `LiveRustdocSnapshotHash`, even when `snapshot_status` is `Missing` or `ReadFailed`, where no current snapshot hash exists. Callers must fabricate a hash, and the separate parameters also admit contradictory states such as `Verified` paired with an unrelated hash. Carry the verified hash in the status enum or separate current input hashes from recorded freshness.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
-              "line": 4,
-              "category": "state-shape smell"
-            },
-            {
-              "message": "The new `TargetArtifactPath::try_new`, `TargetArtifactSet::try_new`, `ProviderSessionId::try_new`, and `ReviewerPrompt::try_new` methods all return the seven-variant `CapabilityInputValidationError`, although each can produce only a small, disjoint subset. Their declarations neither document those subsets nor justify the broad error surface, forcing callers to handle structurally impossible variants.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 17,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "`CapabilityResumeArg::into_domain` returns the full `CapabilityInputValidationError`, but only conversion of `Resume(Vec<TargetArtifactPathArg>)` can fail, specifically while constructing `TargetArtifactSet`; provider, model, file-path, content, and timeout variants are structurally unreachable. Declare or document the producible subset.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_driver-types.json",
-              "line": 26,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "`AgentProfiles::resolve_execution` operates on an already-loaded profile yet returns `AgentProfilesError`, exposing loader-only variants such as `Io`, `Symlink`, `PathOutsideTrustedRoot`, `Parse`, and `UnsupportedSchemaVersion`. Its declaration does not document a producible subset or justify requiring resolution callers to handle these impossible failures.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
-              "line": 410,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "`infrastructure::tddd::type_signals_codec::encode` accepts an already validated `TypeSignalsDocument` but returns the shared `TypeSignalsCodecError`, including decode-only validation failures such as `InvalidSchemaVersion`, `InvalidTimestamp`, and `InvalidDigest`. The method does not identify its producible subset or justify this broad surface.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
-              "line": 60,
-              "category": "per-method error imprecision"
-            }
-          ],
-          "hash": "rvw1:sha256:4a177add70e8d337cfc2cb7853097ed8d28d42c607c1e2822f7694a8d0d1ab75",
-          "at": "2026-07-13T18:18:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ExecutionContractFingerprintPort` は reviewer 専用の `reviewer_fingerprint` と capability 専用の `capability_fingerprint` を単一 interface に束ねています。`CodexReviewer` / `ClaudeReviewer` と capability adapter 群の利用系統は分離しており、各 mock・代替実装に無関係なメソッドの実装を強制します。reviewer 用と capability 用の SecondaryPort に分割してください。",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 572,
-              "category": "Interface Segregation violation"
-            },
-            {
-              "message": "`ExecutionContractFingerprintPort` の両メソッドは guarded contract file を読み取る外部 I/O 境界ですが、いずれも同期メソッドであり、docs は blocking I/O を同期 dispatch path で行う設計判断を説明していません。同期を意図するなら bounded blocking の選択を明記し、そうでなければ async 境界にしてください。",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 574,
-              "category": "sync/async color mismatch"
-            },
-            {
-              "message": "`ProviderSessionCachePort::remove` は共有 `ProviderSessionCacheError` を返すため `Codec` まで公開しますが、key による削除処理は entry の encode/decode を行わず、この variant を構造的に生成できません。`ExecutionContractFingerprintPort` と同様に生成可能な subset を method docs で限定するか、より精密な error type を使用してください。",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 675,
-              "category": "per-method error imprecision"
-            }
-          ],
-          "hash": "rvw1:sha256:53f35f952f8d43bdf7046930f09ab6adebcc6d482ac50dfcb92117fe354b728a",
-          "at": "2026-07-13T18:51:04Z"
+          "hash": "rvw1:sha256:4c576a936b9b6507fada977cc6eb7efded1d6a73a2c9785ddbdbeefc829ed272",
+          "at": "2026-07-13T21:28:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3a6801779eb100ab8dced3a2e2ed2fb1a58aff2652d86466244e883131ed448a",
-          "at": "2026-07-13T19:16:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1ff4ea6638a929bc929b50bd4557b8327ec116e52a173a07d0b4dafef139d004",
-          "at": "2026-07-13T21:20:57Z"
+          "hash": "rvw1:sha256:4c576a936b9b6507fada977cc6eb7efded1d6a73a2c9785ddbdbeefc829ed272",
+          "at": "2026-07-13T21:34:49Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args` returns the six-variant `usecase::ref_verify::RefVerifyError`, although this function can only construct `VerifierPort`. Its docs neither declare that producible subset nor justify the broad error surface, forcing callers to account for structurally impossible variants.",
+              "message": "The ReasoningEffort waiver is justified by Batch A scheduling and future tasks (T003/T007), not by an entry-local reason why this type cannot cover CN-02. This leaves the waiver dependent on implementation sequencing; replace it with an entry-surface argument, as done for CapabilityProfile, or bind the behavior to a real test.",
               "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
-              "line": 86,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "The `build_gemini_ref_verifier_args` docs restate the upstream fail-closed behavior and its rationale (“because Gemini cannot accept invocation-scoped typed effort”) instead of limiting the catalogue description to the symbol’s purpose plus the existing IN-01/IN-02/CN-01 anchor citations, contrary to `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
-              "line": 86,
-              "category": "upstream restatement"
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 16,
+              "category": "test_coverage"
             }
           ],
-          "hash": "rvw1:sha256:5aa43e13e20412751093a987d0f43cc18d6f4522a35f5c19f62613d2b997a584",
+          "hash": "rvw1:sha256:21a589da3491af2f83c9071d99dd9dd85fd9d128402e43e06aaac4053eda6d36",
           "at": "2026-07-13T22:22:51Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:462668e88796e961dc59653d42c59c92999a76c12d5a22b2cf592407aaa729e0",
-          "at": "2026-07-13T22:39:07Z"
+          "hash": "rvw1:sha256:b78fe666ca9abf35ce4243b3a6b350be26411b813f511db106f7b319fb2d75ef",
+          "at": "2026-07-13T22:28:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:528254b6e817585913367db1da724f5ad2adb69d04c55d473e05115daf4969ee",
+          "at": "2026-07-13T23:10:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2172f1f05f8cd47f0b2be88e3ffeadce96cb3c49ab78dec175523db8511993aa",
+          "at": "2026-07-14T07:19:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb40827d2b2e6317e5522f58c2e385840200b5d8b4e3f3e0ffa102d437417c55",
+          "at": "2026-07-14T08:52:23Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`LoadCatalogueSpecSignalsForViewError::Hash` is dead vocabulary. Both sources of `Sha256DigestError` are already canonical: `declaration_hash` formats a SHA-256 value as exactly 64 lowercase hexadecimal characters, while the loader revalidates `ContentHash::to_hex()`, which has the same guarantee. Consequently neither `InvalidLength` nor `InvalidHex` can occur. The fallible contracts on `infrastructure::tddd::type_signals_codec::declaration_hash` and `infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash` propagate an impossible failure and create this unconstructible variant. Provide an infallible conversion for computed digest bytes and reserve fallible parsing for external strings.",
+              "message": "This waiver cites the plan task `T007` and a specific test to justify the waiver. The briefing requires waiver reasons to argue only from the entry's declared surface, with no task IDs or scheduling language. Rewrite the rationale solely in terms of `FsProviderSessionCacheAdapter`'s observable API and limitations.",
               "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
-              "line": 1443,
-              "category": "unconstructible error variant / per-method error imprecision"
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 699,
+              "category": "test_obligation_waiver"
             },
             {
-              "message": "`RustdocSchemaExporter::existing_rustdoc_json_path` returns the broad `domain::schema::SchemaExportError`, but this method neither checks nightly, launches rustdoc, nor parses rustdoc JSON. Its implementation maps its resolution and path-safety failures exclusively to `RustdocFailed`, leaving `NightlyNotFound`, `ParseFailed`, and `CrateNotFound` structurally unreachable. The catalogue docs neither list that producible subset nor justify the broad error. Declare a method-specific error or explicitly narrow the contract.",
+              "message": "This waiver assigns the behavior to plan task `T007`, directly violating the requirement that waiver reasons contain no task IDs and rely only on the entry's declared surface. Explain only why `ProviderSessionCacheEntry` cannot represent or perform the AC-10 behavior.",
               "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
-              "line": 1857,
-              "category": "per-method error imprecision"
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 2845,
+              "category": "test_obligation_waiver"
+            }
+          ],
+          "hash": "rvw1:sha256:c6e0dab0b4af61ef4b1f70b2201b00b803850614056eb5259772ab0e4444395a",
+          "at": "2026-07-15T00:31:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01173c3a7019127403b345fc0fa9c6558cebe49d15bd63bd540a7496df798b4e",
+          "at": "2026-07-15T00:36:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regenerated obligations add 19 enforced `logic_result` obligations for `ObligationsDocument`, `TestBindingsDocument`, and `TestObligation`, but none has a fulfillment or waiver in `test-bindings.json`. Consequently, `bin/sotp test-obligation check --track-id agent-dispatch-cost-reduction-2026-07-13` fails with `Missing` drifts. Add bindings and regenerate the caches before committing these obligations.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/obligations.json",
+              "line": 4,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1123dafe3aad472a41cf8070d95fd65397434b551362fa0897d4d8b4e8536e26",
+          "at": "2026-07-15T01:51:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `method:staleness_against` fulfillment is bound only to edge-ownership and evaluation-fan-out tests; none invokes `ObligationsDocument::staleness_against`. Consequently the generated cache marks both associated edges fulfilled using unrelated assertions, so the obligation gate can remain green without evidence for this method. Bind the existing staleness tests instead and regenerate the cache.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 158,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:9b0c8ede22450cebd8468f41e3ffd50258bda00b516c4c4950deccdfffc9f8bb",
+          "at": "2026-07-15T02:18:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Eleven voluntary-binding records contain duplicate TestLocation entries. SignalCompositionRoot repeats the same test seven times for IN-06, IN-07, CN-07, and AC-05 through AC-08; TypeSignalsDocument/IN-05 and both RustdocSchemaExporter edges repeat it twice; TypeSignalsReuseDecision/IN-05 repeats it three times. The evaluator concatenates every listed test body without deduplication, so these records inject 47 redundant test-body copies into verifier prompts, overweight a single test, and produce duplicate-sensitive `bound_tests_set_hash` values. Deduplicate each record and regenerate the fulfillment cache.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 2109,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f412a908920fb07d36cd1cadd80cf89b3e6750e7e214346714a78129ef9641ed",
+          "at": "2026-07-15T02:53:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The fulfillment for `ObligationsDocument::track_id` binds only edge-ownership and evaluator tests; none calls `track_id()`. The existing `test_obligations_document_round_trips` test does exercise this accessor but is not bound, so the obligation is incorrectly reported as fulfilled.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 38,
+              "category": "test_coverage"
             },
             {
-              "message": "The `infrastructure::RustdocSchemaExporter` docs restate AC-06's behavioral contract by promising verified snapshot resolution without launching rustdoc. Under `knowledge/conventions/no-upstream-restatement.md`, catalogue docs should identify the changed symbol and cite the upstream anchors rather than duplicate their behavior; replace this clause with an anchor-only change description such as adding `existing_rustdoc_json_path` for IN-06/AC-06.",
+              "message": "The fulfillment for `TestBindingsDocument::track_id` binds waiver/evaluator tests that never call `track_id()`. Bind `test_bindings_document_round_trips`, which actually verifies this accessor, so the gate cannot pass on unrelated evidence.",
               "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
-              "line": 1810,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:a5ea198d613065ae81aa6c2a07523475fc73facc37614e99954f9fe225d3bf11",
-          "at": "2026-07-14T06:25:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:955b4dc040a4c7f3ffb86375dfd15ccfa668636ac0e5f983c84d5ec33d576ac3",
-          "at": "2026-07-14T07:15:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:109d4520bf5e010ba62ce50d893be7ea0e3cad154e7980a9d900daf9f03bb663",
-          "at": "2026-07-14T11:19:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `decide_type_signals_reuse` docs restate the CN-07/AC-07 fail-closed behavior (“an unavailable implementation input hash forces re-extraction”) instead of limiting the entry to the symbol and anchor references.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
-              "line": 6,
-              "category": "upstream restatement"
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 203,
+              "category": "test_coverage"
             },
             {
-              "message": "The `ProviderSessionCacheEntry` docs restate the upstream provider/model compatibility and resume flag-injection contract. Keep that behavior in the cited spec anchors and describe only the type change here.",
+              "message": "The fulfillments for `TestObligation::{target_entry,target_role,brief,declaration_hash}` all cite the same ownership/evaluator tests, none of which invokes these accessors. `test_obligation_exposes_all_components` exercises all four but is absent, causing four public-API obligations to be marked fulfilled without relevant evidence.",
               "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 1639,
-              "category": "upstream restatement"
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 353,
+              "category": "test_coverage"
             }
           ],
-          "hash": "rvw1:sha256:08e4f0362eaaa51974686677c7cdb310e233be9a277b08f1ebbec359253166d2",
-          "at": "2026-07-14T18:39:16Z"
+          "hash": "rvw1:sha256:b8f224ffaf621b4d0da73dfb2aa3d795a4b0882ab7adb23b534437e5076a3b90",
+          "at": "2026-07-15T03:14:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82f2f5809fb058a2365c3f73cd0a03f16a6fd405d0cae01e3ea7598e54ba309c",
+          "at": "2026-07-15T03:24:50Z"
         },
         {
           "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fb5e5400122362ba4cba66a0dac8c10f1eb83ec0b3864c6822d5d1fad16d910",
+          "at": "2026-07-15T08:03:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c31a029ae142071a29ba460b2bd60753eb0b18e42de99c08e9ed32965bf6bc7",
+          "at": "2026-07-15T08:14:56Z"
+        },
+        {
+          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`ImplementationInputHash` の docs は CN-05 の source/lockfile/toolchain 入力契約を散文で再記述しています。上流アンカー参照と型の変更対象だけに絞ってください。",
+              "message": "The `ClaudeReviewer` contract-conformance fulfillment still does not bind `test_claude_reviewer_resumes_only_matching_track_scope_and_round_key_unit`. The bound static-cache tests do not prove IN-03's track/scope/round isolation or fast-to-final fresh-session behavior; binding that test only to AC-03/AC-04 cannot support the separate IN-03 verdict. Add it to this fulfillment and regenerate the cache.",
               "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
-              "line": 476,
-              "category": "upstream restatement"
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 3753,
+              "category": "test_coverage"
             },
             {
-              "message": "`domain::SchemaExporter` と `usecase::SchemaExporterPort` は rustdoc/process・filesystem I/O を行う同期ポートですが、docs が blocking synchronous design を明記していません。同期境界を意図するならその選択を契約に記載してください。",
+              "message": "The `ReviewCompositionRoot` bindings for CN-02, CN-03, and CN-09 still contain only infrastructure reviewer unit tests. None execute `ReviewCompositionRoot`, so regressions in its flag/profile wiring, current-scope propagation, or review-record persistence would leave these entry-specific edges fulfilled. Bind composition-level evidence for each edge and regenerate the cache.",
               "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 707,
-              "category": "sync/async color mismatch"
-            },
-            {
-              "message": "`TypeSignalsInteractor` は rustdoc baseline と同じ公開 shape・constructor なのに `action: modify` です。変更は実装本体のみで、catalogue-visible な型変更を宣言していないため `reference` にしてください。",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 2205,
-              "category": "action incoherence"
-            },
-            {
-              "message": "`SignalCompositionRoot` の公開メソッド signatures は rustdoc baseline と同一なのに `action: modify` です。実装 wiring の変更だけでは modify として宣言できないため、`reference` にするか型エントリを除去してください。",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_composition-types.json",
-              "line": 379,
-              "category": "action incoherence"
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 3917,
+              "category": "test_coverage"
             }
           ],
-          "hash": "rvw1:sha256:5c3ca4a189ad64a0ca0f54dff8cb167aaf568b89224ee3ecf5636947793fdae0",
-          "at": "2026-07-14T18:59:00Z"
+          "hash": "rvw1:sha256:0c31a029ae142071a29ba460b2bd60753eb0b18e42de99c08e9ed32965bf6bc7",
+          "at": "2026-07-15T08:16:38Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`SignalCompositionRoot` is marked `action: modify`, but its declared public methods and signatures are identical to the rustdoc baseline; the change is implementation wiring only. Mark it `reference` or omit the entry.",
+              "message": "`test-bindings.json` has changed again beyond the previously reviewed T004 append (the new diff adds evidence tests for ReviewCompositionRoot IN-04/CN-02/CN-03/CN-09), but `obligation-fulfillment-cache.json` is unchanged for those records. Because each cache entry stores `bound_tests_set_hash`, the cached frozen verdicts are stale relative to the current bindings and the machine artifacts are internally inconsistent; regenerate the cache after the binding update.",
               "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_composition-types.json",
-              "line": 379,
-              "category": "action_incoherent_with_diff"
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/obligation-fulfillment-cache.json",
+              "line": null,
+              "category": "artifact-consistency"
             }
           ],
-          "hash": "rvw1:sha256:33b2ed8951141692e30226e0ae5a5a943af84baf439bbab94847d5ffaff2b24f",
-          "at": "2026-07-14T19:15:41Z"
+          "hash": "rvw1:sha256:33744cdcb62bf8a64ffb165bd7274de54fe0e529cd6f292a1ca7593310f6d5ee",
+          "at": "2026-07-15T08:22:21Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:33b2ed8951141692e30226e0ae5a5a943af84baf439bbab94847d5ffaff2b24f",
-          "at": "2026-07-14T19:28:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SignalCompositionRoot` is marked `action: modify`, but its public methods and signatures are unchanged; only implementation wiring/docs changed. Mark it `reference` or omit the entry.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_composition-types.json",
-              "line": 379,
-              "category": "action_incoherent_with_diff"
-            }
-          ],
-          "hash": "rvw1:sha256:08f4b5065ff21e19b80c2ecdde837d9f5cfe182fbcd952364385ce73b831adda",
-          "at": "2026-07-14T20:44:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:08f4b5065ff21e19b80c2ecdde837d9f5cfe182fbcd952364385ce73b831adda",
-          "at": "2026-07-14T20:57:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::TypeSignalsInteractor` is marked `action: reference`, but its public `new` signature changed: the baseline executor parameter is `Arc<dyn domain::...::TypeSignalsExecutorPort>`, while the catalogue now uses the newly declared usecase `TypeSignalsExecutorPort`. This is a public API mutation and requires `action: modify`.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 2210,
-              "category": "missing companion modify"
-            }
-          ],
-          "hash": "rvw1:sha256:08f4b5065ff21e19b80c2ecdde837d9f5cfe182fbcd952364385ce73b831adda",
-          "at": "2026-07-14T21:02:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4882b5ae7827cad6704202c6a39523db5662fecf96e3c3993445f6007da16ad8",
-          "at": "2026-07-14T23:01:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::ProviderSessionCacheKey::TrackCapability` still includes `target_artifacts`, but IN-09/AC-09 and restored ADR D4 define the track-local key as track × capability; target-artifact identity applies only to workspace-local caching. This retains the rejected mechanical invalidation behavior, so changing the target set within the same track/capability incorrectly selects another cache entry and prevents the intended resume. Remove `target_artifacts` from `TrackCapability` while retaining it on `WorkspaceCapability`.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 1787,
-              "category": "SoT integrity / spec_refs mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:4882b5ae7827cad6704202c6a39523db5662fecf96e3c3993445f6007da16ad8",
-          "at": "2026-07-14T23:08:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:793ed66eb96229430582cf9817948d2d68b773ca709cffd42516cc09928deb5f",
-          "at": "2026-07-14T23:33:33Z"
+          "hash": "rvw1:sha256:33744cdcb62bf8a64ffb165bd7274de54fe0e529cd6f292a1ca7593310f6d5ee",
+          "at": "2026-07-15T08:26:02Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:793ed66eb96229430582cf9817948d2d68b773ca709cffd42516cc09928deb5f",
-          "at": "2026-07-14T23:41:31Z"
+          "hash": "rvw1:sha256:33744cdcb62bf8a64ffb165bd7274de54fe0e529cd6f292a1ca7593310f6d5ee",
+          "at": "2026-07-15T08:27:38Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ec88e1c10482ba5d459e3c377b91d2d5e6270290a504580f33d3aa3d9002e85a",
-          "at": "2026-07-15T01:54:58Z"
+          "hash": "rvw1:sha256:0d2d7d2d6715731c4f8c730ac39afedbdd78218e3b06ae66b6862b6644c4d5f9",
+          "at": "2026-07-15T09:23:07Z"
         },
         {
           "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::ProviderSessionCacheKey` restates the complete session-keying behavior from IN-03/IN-09/CN-04/AC-03/AC-09 in `docs`. Replace this behavioral restatement with a short type-purpose phrase and anchor citations, as required by `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
-              "line": 1749,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:ec88e1c10482ba5d459e3c377b91d2d5e6270290a504580f33d3aa3d9002e85a",
-          "at": "2026-07-15T01:59:49Z"
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d2d7d2d6715731c4f8c730ac39afedbdd78218e3b06ae66b6862b6644c4d5f9",
+          "at": "2026-07-15T09:27:03Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:efa3338ceda422772d51594ba3a1793239bd2a38f81aea9aa87c6ed6f79ebdf7",
-          "at": "2026-07-15T02:11:22Z"
+          "hash": "rvw1:sha256:e94a9146442259eb7d5e2a9fce2443a0039a8272ff44b13a752852144957bfbb",
+          "at": "2026-07-15T12:50:08Z"
         },
         {
           "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`domain::ObligationsDocument::owning_obligation` returns `Option<&TestObligation>`, while the same contract introduces `owners_of_edge` and AC-11 permits multiple obligations to own one edge. `None` therefore conflates “no owner” with “multiple owners,” allowing consumers to silently skip required per-(edge × obligation) handling. Remove the singular API or return a type that distinguishes no, unique, and multiple owners.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
-              "line": 675,
-              "category": "state-shape smell"
-            }
-          ],
-          "hash": "rvw1:sha256:efa3338ceda422772d51594ba3a1793239bd2a38f81aea9aa87c6ed6f79ebdf7",
-          "at": "2026-07-15T02:17:31Z"
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e94a9146442259eb7d5e2a9fce2443a0039a8272ff44b13a752852144957bfbb",
+          "at": "2026-07-15T12:55:19Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0cebb3d7331c521530799b9c84ecda0f3ffe281244c9ec6bfc82a984011e1a40",
-          "at": "2026-07-15T02:54:53Z"
+          "hash": "rvw1:sha256:6c489347422355e97c643c3413bd12b7a32b5940a7b3e7723cfb6e714fe5f918",
+          "at": "2026-07-15T13:12:17Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0cebb3d7331c521530799b9c84ecda0f3ffe281244c9ec6bfc82a984011e1a40",
-          "at": "2026-07-15T03:05:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eedb619f1299733a52485fb238105a209f080e2eeafbdcdf91f6f027dfba1d2b",
-          "at": "2026-07-15T04:35:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eedb619f1299733a52485fb238105a209f080e2eeafbdcdf91f6f027dfba1d2b",
-          "at": "2026-07-15T04:39:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c0b6bacf0aaceb20e965a90901a744fedf4b4f12b41c8df8215b72329e28598",
-          "at": "2026-07-15T09:03:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c0b6bacf0aaceb20e965a90901a744fedf4b4f12b41c8df8215b72329e28598",
-          "at": "2026-07-15T09:13:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c63a435bb3943dd37b244a52c9304dc01d25f78083f0ba72f0ff18348c67227",
-          "at": "2026-07-15T12:50:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cli_driver::CapabilityResumeArg::Resume` carries a plain `Vec<TargetArtifactPathArg>`, so the public driver API admits `Resume(vec![])` alongside the separate `ResumeWithoutTarget` state. This bypasses the usecase mirror’s non-empty `TargetArtifactSet` invariant and allows an empty targeted resume to be treated as targetless rather than rejected, potentially selecting a track-scoped cached session. Use a non-empty validated payload or fallible construction so this overlapping state is unrepresentable.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_driver-types.json",
-              "line": 197,
-              "category": "state-shape smell"
-            }
-          ],
-          "hash": "rvw1:sha256:3c63a435bb3943dd37b244a52c9304dc01d25f78083f0ba72f0ff18348c67227",
-          "at": "2026-07-15T12:55:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c63a435bb3943dd37b244a52c9304dc01d25f78083f0ba72f0ff18348c67227",
-          "at": "2026-07-15T13:12:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cli_driver::CapabilityResumeArg::Resume` still carries a plain `Vec<TargetArtifactPathArg>`, admitting `Resume(vec![])` alongside `ResumeWithoutTarget`. The briefing’s claimed fallible conversion is not present in the current implementation: `into_request` still converts the empty case to `ResumeWithoutTarget` and dispatches it. Thus malformed targeted resume can still select targetless/track-scoped session behavior. Carry a non-empty validated payload or propagate `EmptyTargetArtifactSet` before dispatch.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_driver-types.json",
-              "line": 197,
-              "category": "state-shape smell"
-            }
-          ],
-          "hash": "rvw1:sha256:3c63a435bb3943dd37b244a52c9304dc01d25f78083f0ba72f0ff18348c67227",
-          "at": "2026-07-15T13:14:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c63a435bb3943dd37b244a52c9304dc01d25f78083f0ba72f0ff18348c67227",
-          "at": "2026-07-15T13:22:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c63a435bb3943dd37b244a52c9304dc01d25f78083f0ba72f0ff18348c67227",
-          "at": "2026-07-15T13:24:41Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eed5226c767fa495148a2a4468a327ec40ac1035e6a35334d6ea0b7a5a5870a5",
-          "at": "2026-07-14T06:23:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eed5226c767fa495148a2a4468a327ec40ac1035e6a35334d6ea0b7a5a5870a5",
-          "at": "2026-07-14T06:27:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fd668edf234c37a4c569aaab36f14562420d2653dad956fd3370148679e87d42",
-          "at": "2026-07-14T07:12:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:23dd453c35b4585a0d281339948769f6c3b2867df0ce2ddcad9e01f7c5bd3b74",
-          "at": "2026-07-14T18:32:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:23dd453c35b4585a0d281339948769f6c3b2867df0ce2ddcad9e01f7c5bd3b74",
-          "at": "2026-07-14T19:54:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3ab88b864455d9c25e6652cd25301a080d240216e264b807f3a776b996ec34b7",
-          "at": "2026-07-15T00:04:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3ab88b864455d9c25e6652cd25301a080d240216e264b807f3a776b996ec34b7",
-          "at": "2026-07-15T00:05:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:942b7c45d06d2c340b84b7b45912376337e74401eb964477db18e2b2bdab9fa0",
-          "at": "2026-07-15T02:12:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:942b7c45d06d2c340b84b7b45912376337e74401eb964477db18e2b2bdab9fa0",
-          "at": "2026-07-15T02:14:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a93c9104245742d2ce749facd64e9283c59b02c6c5c5f4afd094439b38608a2",
-          "at": "2026-07-15T02:50:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a93c9104245742d2ce749facd64e9283c59b02c6c5c5f4afd094439b38608a2",
-          "at": "2026-07-15T02:53:11Z"
+          "hash": "rvw1:sha256:6c489347422355e97c643c3413bd12b7a32b5940a7b3e7723cfb6e714fe5f918",
+          "at": "2026-07-15T13:16:50Z"
         }
       ]
     }

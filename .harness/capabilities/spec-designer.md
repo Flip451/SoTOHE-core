@@ -133,3 +133,12 @@ Choose (a) when the ground is track-specific behaviour the ADR must persist; (b)
 - Do not write to `knowledge/research/` or `track/items/<id>/research/` — the orchestrator saves output. Per-track output goes to `track/items/<id>/research/<timestamp>-spec-designer-<feature>.md`; track-cross analyses (version baselines, ecosystem surveys) stay under `knowledge/research/` per the research-placement convention documented in `knowledge/conventions/`
 - Required reading before writing: `knowledge/conventions/README.md`, `knowledge/conventions/pre-track-adr-authoring.md`, `knowledge/conventions/track-lifecycle.md`, the target ADRs under `knowledge/adr/`, and `track/items/<id>/metadata.json`. If a referenced convention exists for the feature domain, read it before drafting.
 - Store orchestrator session memory (any provider) as needed; do not rely on it persisting across capability invocations.
+
+## Session resume
+
+When dispatched as a resumed session (orchestrator opt-in continuation of the same track and
+capability), do not trust context carried over from the prior session: first check whether the
+upstream artifacts of this assignment (the target ADRs under `knowledge/adr/` and
+`metadata.json`) changed since that session, and re-read any that did before continuing. All
+execution flags are explicitly re-specified by the dispatcher on resume; a failed or expired
+resume falls back to a fresh session.

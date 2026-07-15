@@ -8,7 +8,7 @@ GO-02 → T003, T004, T007, T008, T009.
 GO-03 → T005, T011, T012, T013, T014, T015, T016, T017, T018.
 GO-04 → T001, T002, T003, T004, T005, T007, T008, T009, T011, T012, T013, T014, T015, T016, T017, T018, T019.
 
-## Tasks (15/17 resolved)
+## Tasks (16/17 resolved)
 
 ### S1 — Explicit dispatch profile resolution
 
@@ -54,7 +54,7 @@ GO-04 → T001, T002, T003, T004, T005, T007, T008, T009, T011, T012, T013, T014
 
 > Run T009 after the reviewer and capability resume paths in T004 and T008 are available.
 
-- [ ] **T009**: Modify `.harness/prompts/capability-exec-discipline.md`, `.harness/workflows/track/review.md`, `.harness/capabilities/{review-fix-lead,adr-editor,spec-designer,type-designer,impl-planner,implementer}.md`, `.claude/agents/{adr-editor,spec-designer,type-designer,impl-planner,implementer,review-fix-lead}.md`, `.agents/skills/{adr-editor,spec-designer,type-designer,impl-planner,implementer,review-fix-lead}/SKILL.md`, `.codex/agents/{adr-editor,spec-designer,type-designer,impl-planner,review-fix-lead}.toml`, and `.codex/instructions.md`; add the resume explicit-flag re-specification and upstream re-read conformance check (IN-03, IN-08, CN-03, CN-10, AC-03, AC-10).
+- [x] **T009**: Modify `.harness/prompts/capability-exec-discipline.md`, `.harness/workflows/track/review.md`, `.harness/capabilities/{review-fix-lead,adr-editor,spec-designer,type-designer,impl-planner,implementer}.md`, `.claude/agents/{adr-editor,spec-designer,type-designer,impl-planner,implementer,review-fix-lead}.md`, `.agents/skills/{adr-editor,spec-designer,type-designer,impl-planner,implementer,review-fix-lead}/SKILL.md`, `.codex/agents/{adr-editor,spec-designer,type-designer,impl-planner,review-fix-lead}.toml`, and `.codex/instructions.md`; add the resume explicit-flag re-specification and upstream re-read conformance check (IN-03, IN-08, CN-03, CN-10, AC-03, AC-10).
 
 ### S6 — Test-obligation machinery repair
 
