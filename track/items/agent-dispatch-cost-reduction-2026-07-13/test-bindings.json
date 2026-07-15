@@ -2405,6 +2405,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::build_inputs::tests",
           "test_name": "test_hash_implementation_inputs_uses_rustup_toolchain_identity_and_rejects_unavailable_rustup"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::build_inputs::tests",
+          "test_name": "test_hash_implementation_inputs_includes_workspace_and_target_manifests_and_optional_build_script_only"
         }
       ]
     },
@@ -2422,6 +2427,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::build_inputs::tests",
           "test_name": "test_hash_implementation_inputs_includes_source_lockfile_and_toolchain_and_rejects_missing_required_input"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::build_inputs::tests",
+          "test_name": "test_hash_implementation_inputs_includes_workspace_and_target_manifests_and_optional_build_script_only"
         }
       ]
     },
@@ -3567,6 +3577,11 @@
           "layer": "cli_composition",
           "module_path": "cli_composition::signal::tests",
           "test_name": "test_signal_composition_freshness_skip_and_conservative_reextract_use_real_adapter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::build_inputs::tests",
+          "test_name": "test_hash_implementation_inputs_includes_workspace_and_target_manifests_and_optional_build_script_only"
         }
       ]
     },

@@ -3423,13 +3423,13 @@
         "item_identifier": "voluntary:IN-05"
       },
       "key": {
-        "bound_tests_set_hash": "54ce55b4a1e21b5ef715f599063058bbe7a34575a158aea44805c57e39ed59e0",
+        "bound_tests_set_hash": "17b60eed662eb53cbd23dfb18606400f97d67103737ccdfdf3c50f00f552ecbb",
         "declaration_hash": "23d1cc4a1403e6aecc50a6a5495af5fe0e67215cb936b4fc7c546766bea2058d",
         "anchor_text_hash": "959c4b3a290c72f12013a431e329323e0f66ee7bff578df90db696793494c8d8"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(skip_observer.launches(), 0, \"verified inputs must not launch rustdoc\");\n...\nassert_eq!(catalogue_only_observer.launches(), 0,\n        \"catalogue-only changes must reevaluate without rustdoc extraction\"\n    );\n...\nassert_ne!(first, second, \"the rustup-reported toolchain identity must affect the hash\");"
+        "citation": "assert_eq!(skip_observer.launches(), 0, \"verified inputs must not launch rustdoc\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -3447,13 +3447,13 @@
         "item_identifier": "voluntary:CN-05"
       },
       "key": {
-        "bound_tests_set_hash": "db56b6b5445108216bbbf6949cc5e4b23c003857fe6f0cfbaaf277958196cb82",
+        "bound_tests_set_hash": "ed6198cae835cf6887687b74ee23e67fb4cb21d85e40d9e3d6b620a3a4b8242c",
         "declaration_hash": "23d1cc4a1403e6aecc50a6a5495af5fe0e67215cb936b4fc7c546766bea2058d",
         "anchor_text_hash": "af95b62f5b63cd6a3382998e0e549d2b50723e293948ce0798e7014632cab448"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_ne!(initial, changed_source, \"source content must participate in the hash\");\n\nassert_ne!(changed_source, changed_lockfile, \"Cargo.lock must participate in the hash\");\n\nassert_ne!(changed_lockfile, changed_toolchain, \"toolchain identity must participate\");"
+        "citation": "assert_ne!(initial, changed_source, \"source content must participate in the hash\");\n\nassert_ne!(changed_source, changed_lockfile, \"Cargo.lock must participate in the hash\");\n\nassert_ne!(changed_lockfile, changed_toolchain, \"toolchain identity must participate\");\n\nassert_eq!(\n            initial, unchanged_by_sibling_crate,\n            \"sibling crate manifests and sources must stay outside the target crate boundary\"\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4479,13 +4479,13 @@
         "item_identifier": "voluntary:AC-05"
       },
       "key": {
-        "bound_tests_set_hash": "24ecd84d5cb5805e6269234d45d34fc92c067b005ace98b1ed202e53664d5399",
+        "bound_tests_set_hash": "648e951f681fd1b9636f2b5f42a48a948fc1892adc8dc563624c3ecebed1da6f",
         "declaration_hash": "23d1cc4a1403e6aecc50a6a5495af5fe0e67215cb936b4fc7c546766bea2058d",
         "anchor_text_hash": "8ae1e29d3c8d6c007de81060cf4b9f84f156691de93aca0490dfda5707f85dd7"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(skip_observer.launches(), 0, \"verified inputs must not launch rustdoc\"); ... assert_eq!(catalogue_only_observer.launches(), 0, \"catalogue-only changes must reevaluate without rustdoc extraction\"); ... assert_eq!(incomplete_observer.launches(), 1, \"a recorded artifact without every required hash must not be reused\"); ... assert_eq!(changed_source_observer.launches_for(\"domain\"), 1, \"the changed domain layer must re-extract through the real adapter\"); ... assert_eq!(indeterminate_observer.launches(), 1, \"an indeterminate implementation hash must re-extract rather than skip\");"
+        "citation": "assert_eq!(skip_observer.launches(), 0, \"verified inputs must not launch rustdoc\");\n...\nassert_eq!(indeterminate_observer.launches(), 1, \"an indeterminate implementation hash must re-extract rather than skip\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },

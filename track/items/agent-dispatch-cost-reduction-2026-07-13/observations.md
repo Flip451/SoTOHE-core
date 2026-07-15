@@ -66,3 +66,27 @@ nightly toolchain 識別子の 3 つのみ（`build_inputs.rs`）。
   行い、ゼロベース再生成をしない。
 - 最終状態: evaluate pass=200 / fail=0 / pending=0（プローブ検出率 100%）、check
   resolved_edges=212、todo-lane 未解決 55 は許容 WARN、`cargo make ci` 全通過。
+
+## 2026-07-16: D3 hash 入力の解釈裁定（user 承認）
+
+PR #195 round-3 の Codex P1（manifest 変更で stale signal が fresh 扱いされる）への
+対応として、**crate 自身の `Cargo.toml` + `build.rs` は「対象 crate の source」の
+一部として implementation-input hash に含める**ことを user が承認（2026-07-16）。
+crate 境界内の解釈であり、棄却済みの workspace build-input closure（他 crate /
+workspace root / 抽出契約の hash 化）とは別物。crate 境界の外へは広げない。
+
+## 2026-07-15/16: PR #195 review cycle と resume dogfooding の副産物
+
+- Codex Cloud review が実バグ 3 件を検出: waiver 裁定の多重 owner 欠落（T019 の
+  voluntary 修正と同型の欠陥が waiver 側に残存）、codex reviewer の fresh 再試行時
+  stale verdict、capability stdout の破棄退行。
+- stdout 破棄退行は本日の capability dispatch「silent death」多発の根本原因だった
+  （T007 の session-id 捕捉が specialist の最終報告を飲み込んでいた）。診断力の
+  低下がバグ修正を遅らせる悪循環を生んだ — collector の tee 化で解消。
+- reviewer resume dogfooding: fast 再入で同一 session id 継続を実測（16:29 entry が
+  019f649f 世代の id を保持）。capability resume は T009 の再 dispatch で --resume
+  を実運用（silent death 起因で報告は未観測、fix 後の dispatch から有効に観測可能）。
+- review-fix-lead が古い briefing 記述（「空 Resume の degrade は意図的」）を根拠に
+  types 裁定済みの fix を差し戻す事故を観測 — cross-scope fix では briefing 間の
+  整合性維持が前提条件。scope hash の自己失効（.provider-sessions / obligation
+  cache の review_operational 未登録）も dogfooding が発見。

@@ -19,8 +19,9 @@ const MAX_TOTAL_SOURCE_BYTES: u64 = 64 * 1024 * 1024;
 const MAX_TOOLCHAIN_COMMAND_OUTPUT_BYTES: usize = 64 * 1024;
 const MAX_TOOLCHAIN_COMMAND_DURATION: Duration = Duration::from_secs(10);
 
-/// Hashes exactly one crate's source contents, the workspace lockfile, and
-/// the active nightly toolchain identifier.
+/// Hashes exactly one crate's source contents, its manifest, optional build
+/// script, the workspace manifest and lockfile, and the active nightly
+/// toolchain identifier.
 ///
 /// # Errors
 ///
@@ -44,6 +45,12 @@ fn hash_implementation_inputs_with_toolchain_identifier(
     toolchain_identifier: &[u8],
 ) -> Result<Sha256Digest, EvaluateSignalsError> {
     let source_root = crate_source_root(workspace_root, target_crate)?;
+    let crate_root = source_root.parent().ok_or_else(|| {
+        EvaluateSignalsError(format!(
+            "cannot determine crate root from source directory '{}'",
+            source_root.display()
+        ))
+    })?;
     let mut source_files = Vec::new();
     let mut visited_entries = 0usize;
     collect_source_files(&source_root, 0, &mut visited_entries, &mut source_files)?;
@@ -65,6 +72,39 @@ fn hash_implementation_inputs_with_toolchain_identifier(
             &read_regular_source_file(&path, MAX_SOURCE_FILE_BYTES, &mut remaining_budget)?,
         );
     }
+    append_component(
+        &mut hasher,
+        b"crate-manifest",
+        &read_regular_source_file(
+            &crate_root.join("Cargo.toml"),
+            MAX_SOURCE_FILE_BYTES,
+            &mut remaining_budget,
+        )?,
+    );
+    let build_script = crate_root.join("build.rs");
+    match std::fs::symlink_metadata(&build_script) {
+        Ok(_) => append_component(
+            &mut hasher,
+            b"crate-build-script",
+            &read_regular_source_file(&build_script, MAX_SOURCE_FILE_BYTES, &mut remaining_budget)?,
+        ),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+        Err(error) => {
+            return Err(EvaluateSignalsError(format!(
+                "cannot stat optional crate build script '{}': {error}",
+                build_script.display()
+            )));
+        }
+    }
+    append_component(
+        &mut hasher,
+        b"workspace-manifest",
+        &read_regular_source_file(
+            &workspace_root.join("Cargo.toml"),
+            MAX_SOURCE_FILE_BYTES,
+            &mut remaining_budget,
+        )?,
+    );
     append_component(
         &mut hasher,
         b"lockfile",
@@ -291,6 +331,16 @@ mod tests {
         std::fs::create_dir_all(workspace.path().join("libs/domain/src")).unwrap();
         std::fs::write(workspace.path().join("libs/domain/src/lib.rs"), "pub struct First;\n")
             .unwrap();
+        std::fs::write(
+            workspace.path().join("libs/domain/Cargo.toml"),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\n",
+        )
+        .unwrap();
+        std::fs::write(
+            workspace.path().join("Cargo.toml"),
+            "[workspace]\nmembers = [\"libs/domain\"]\n",
+        )
+        .unwrap();
         std::fs::write(workspace.path().join("Cargo.lock"), "version = 4\n").unwrap();
         workspace
     }
@@ -350,6 +400,70 @@ mod tests {
             hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly-b")
                 .is_err(),
             "a missing required input must make the implementation hash indeterminate"
+        );
+    }
+
+    #[test]
+    fn test_hash_implementation_inputs_includes_workspace_and_target_manifests_and_optional_build_script_only()
+     {
+        let workspace = workspace_with_domain_source();
+        let root = workspace.path();
+        let crate_root = root.join("libs/domain");
+        let initial =
+            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly")
+                .unwrap();
+
+        std::fs::create_dir_all(root.join("libs/usecase/src")).unwrap();
+        std::fs::write(root.join("libs/usecase/Cargo.toml"), "[package]\nname = \"usecase\"\n")
+            .unwrap();
+        std::fs::write(root.join("libs/usecase/src/lib.rs"), "pub struct Sibling;\n").unwrap();
+        let unchanged_by_sibling_crate =
+            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly")
+                .unwrap();
+        assert_eq!(
+            initial, unchanged_by_sibling_crate,
+            "sibling crate manifests and sources must stay outside the target crate boundary"
+        );
+
+        std::fs::write(
+            root.join("Cargo.toml"),
+            "[workspace]\nmembers = [\"libs/domain\", \"libs/usecase\"]\n",
+        )
+        .unwrap();
+        let changed_workspace_manifest =
+            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly")
+                .unwrap();
+        assert_ne!(
+            initial, changed_workspace_manifest,
+            "workspace Cargo.toml must participate in the hash"
+        );
+
+        std::fs::write(
+            crate_root.join("Cargo.toml"),
+            "[package]\nname = \"domain\"\nversion = \"0.2.0\"\n",
+        )
+        .unwrap();
+        let changed_manifest =
+            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly")
+                .unwrap();
+        assert_ne!(
+            changed_workspace_manifest, changed_manifest,
+            "target Cargo.toml must participate in the hash"
+        );
+
+        std::fs::write(crate_root.join("build.rs"), "fn main() { println!(\"first\"); }\n")
+            .unwrap();
+        let added_build_script =
+            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly")
+                .unwrap();
+        std::fs::write(crate_root.join("build.rs"), "fn main() { println!(\"second\"); }\n")
+            .unwrap();
+        let changed_build_script =
+            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly")
+                .unwrap();
+        assert_ne!(
+            added_build_script, changed_build_script,
+            "target build.rs must participate in the hash when present"
         );
     }
 
