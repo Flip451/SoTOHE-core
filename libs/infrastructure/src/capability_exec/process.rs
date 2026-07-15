@@ -226,6 +226,26 @@ pub(crate) fn run_provider_process_with_timeout(
     provider: &ProviderName,
     timeout: Option<Duration>,
 ) -> Result<ProviderProcessOutput, CapabilityExecError> {
+    run_provider_process_with_timeout_and_stdout(
+        binary,
+        args,
+        repo_root,
+        runtime_dir,
+        provider,
+        timeout,
+        std::io::stdout(),
+    )
+}
+
+fn run_provider_process_with_timeout_and_stdout<W: Write + Send + 'static>(
+    binary: &str,
+    args: &[OsString],
+    repo_root: &Path,
+    runtime_dir: &Path,
+    provider: &ProviderName,
+    timeout: Option<Duration>,
+    passthrough: W,
+) -> Result<ProviderProcessOutput, CapabilityExecError> {
     let runtime_dir = prepare_runtime_dir(repo_root, runtime_dir, provider)?;
     let timestamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -266,7 +286,7 @@ pub(crate) fn run_provider_process_with_timeout(
         dispatch_error(provider, format!("cannot capture stdout for {binary} provider subprocess"))
     })?;
     let log_writer = spawn_bounded_log_writer(stderr, log_file);
-    let session_collector = spawn_provider_session_collector(stdout);
+    let session_collector = spawn_provider_session_collector(stdout, passthrough);
     let status = wait_for_provider_process(&mut child, provider, binary, timeout)?;
     wait_for_bounded_log_writer(log_writer, process_id, provider, binary, &log_path)?;
     let session_id = receive_provider_session_id(session_collector, process_id, provider, binary)?;
@@ -278,22 +298,27 @@ pub(crate) fn run_provider_process_with_timeout(
 
 fn spawn_provider_session_collector(
     stdout: impl Read + Send + 'static,
-) -> Receiver<Option<String>> {
+    passthrough: impl Write + Send + 'static,
+) -> Receiver<Result<Option<String>, std::io::Error>> {
     let (sender, receiver) = mpsc::sync_channel(1);
     thread::spawn(move || {
-        let _ = sender.send(collect_provider_session_id(stdout));
+        let _ = sender.send(collect_provider_session_id(stdout, passthrough));
     });
     receiver
 }
 
 fn receive_provider_session_id(
-    collector: Receiver<Option<String>>,
+    collector: Receiver<Result<Option<String>, std::io::Error>>,
     process_id: u32,
     provider: &ProviderName,
     binary: &str,
 ) -> Result<Option<String>, CapabilityExecError> {
     match collector.recv_timeout(PROVIDER_LOG_DRAIN_TIMEOUT) {
-        Ok(session_id) => Ok(session_id),
+        Ok(Ok(session_id)) => Ok(session_id),
+        Ok(Err(error)) => Err(dispatch_error(
+            provider,
+            format!("cannot pass through stdout from {binary} provider subprocess: {error}"),
+        )),
         Err(RecvTimeoutError::Timeout) => {
             let _ = terminate_provider_process_group(process_id, provider, binary);
             Err(dispatch_error(
@@ -310,24 +335,37 @@ fn receive_provider_session_id(
     }
 }
 
-/// Drains provider output while retaining only the first bounded JSON session/thread ID event.
-fn collect_provider_session_id<R: Read>(pipe: R) -> Option<String> {
+/// Passes through provider output while retaining only the first bounded JSON session/thread ID event.
+fn collect_provider_session_id<R: Read, W: Write>(
+    pipe: R,
+    mut passthrough: W,
+) -> Result<Option<String>, std::io::Error> {
     let mut reader = BufReader::new(pipe);
     let mut event = Vec::with_capacity(MAX_PROVIDER_SESSION_EVENT_BYTES);
     let mut discarding_event = false;
     let mut session_id = None;
 
-    while let Ok(buffer) = reader.fill_buf() {
+    loop {
+        let buffer = reader.fill_buf()?;
         if buffer.is_empty() {
             break;
         }
         if session_id.is_some() {
             let consumed = buffer.len();
+            passthrough.write_all(buffer)?;
             reader.consume(consumed);
             continue;
         }
         let newline = buffer.iter().position(|byte| *byte == b'\n');
         let event_bytes = newline.unwrap_or(buffer.len());
+        let consumed = newline.map_or(buffer.len(), |index| index.saturating_add(1));
+        let passthrough_bytes = buffer.get(..consumed).ok_or_else(|| {
+            Error::new(
+                ErrorKind::InvalidData,
+                "provider stdout collector returned an invalid byte count",
+            )
+        })?;
+        passthrough.write_all(passthrough_bytes)?;
         if !discarding_event {
             let remaining = MAX_PROVIDER_SESSION_EVENT_BYTES.saturating_sub(event.len());
             if event_bytes <= remaining {
@@ -338,7 +376,6 @@ fn collect_provider_session_id<R: Read>(pipe: R) -> Option<String> {
                 discarding_event = true;
             }
         }
-        let consumed = newline.map_or(buffer.len(), |index| index.saturating_add(1));
         reader.consume(consumed);
         if newline.is_some() {
             if !discarding_event {
@@ -348,7 +385,8 @@ fn collect_provider_session_id<R: Read>(pipe: R) -> Option<String> {
             discarding_event = false;
         }
     }
-    session_id
+    passthrough.flush()?;
+    Ok(session_id)
 }
 
 fn extract_provider_session_id(event: &[u8]) -> Option<String> {
@@ -657,11 +695,32 @@ use termination::{
 
 #[cfg(test)]
 mod tests {
-    use std::io::Cursor;
+    use std::ffi::OsString;
+    use std::io::{Cursor, Error, Write};
+    use std::sync::{Arc, Mutex};
 
     use super::{
         MAX_PROVIDER_SESSION_EVENT_BYTES, collect_bounded_pipe, collect_provider_session_id,
+        run_provider_process_with_timeout_and_stdout,
     };
+    use usecase::capability_exec::ProviderName;
+
+    #[derive(Clone)]
+    struct SharedWriter(Arc<Mutex<Vec<u8>>>);
+
+    impl Write for SharedWriter {
+        fn write(&mut self, bytes: &[u8]) -> Result<usize, Error> {
+            self.0
+                .lock()
+                .map_err(|_| Error::other("test passthrough lock poisoned"))?
+                .extend_from_slice(bytes);
+            Ok(bytes.len())
+        }
+
+        fn flush(&mut self) -> Result<(), Error> {
+            Ok(())
+        }
+    }
 
     #[test]
     fn test_collect_bounded_pipe_discards_excess_after_limit() -> Result<(), std::io::Error> {
@@ -673,15 +732,50 @@ mod tests {
     }
 
     #[test]
-    fn test_provider_session_capture_discards_oversized_event_and_keeps_draining() {
+    fn test_provider_session_capture_discards_oversized_event_and_keeps_draining()
+    -> Result<(), Error> {
         let mut stdout = vec![b'x'; MAX_PROVIDER_SESSION_EVENT_BYTES.saturating_add(1)];
         stdout.push(b'\n');
         stdout.extend_from_slice(br#"{"thread_id":"captured-session"}"#);
         stdout.push(b'\n');
 
         assert_eq!(
-            collect_provider_session_id(Cursor::new(stdout)),
+            collect_provider_session_id(Cursor::new(stdout), Vec::new())?,
             Some("captured-session".to_owned())
         );
+        Ok(())
+    }
+
+    #[test]
+    fn test_provider_process_passthroughs_fake_provider_report_while_capturing_session_id()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let output = Arc::new(Mutex::new(Vec::new()));
+        let provider = ProviderName::try_new("codex".to_owned())?;
+        let args = vec![
+            OsString::from("-c"),
+            OsString::from(
+                "printf 'specialist final report\\n{\"session_id\":\"captured-session\"}\\n'",
+            ),
+        ];
+
+        let result = run_provider_process_with_timeout_and_stdout(
+            "sh",
+            &args,
+            directory.path(),
+            &directory.path().join("tmp/runtime"),
+            &provider,
+            None,
+            SharedWriter(output.clone()),
+        )?;
+
+        assert_eq!(result.exit_code, 0);
+        assert_eq!(result.session_id.as_deref(), Some("captured-session"));
+        let output = output.lock().map_err(|_| Error::other("test passthrough lock poisoned"))?;
+        assert_eq!(
+            output.as_slice(),
+            b"specialist final report\n{\"session_id\":\"captured-session\"}\n"
+        );
+        Ok(())
     }
 }

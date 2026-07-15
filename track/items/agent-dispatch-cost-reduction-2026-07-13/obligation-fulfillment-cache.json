@@ -5799,13 +5799,13 @@
         "item_identifier": "voluntary:AC-09"
       },
       "key": {
-        "bound_tests_set_hash": "5a504f098d5e656d9eb79188b2e8716c3df352fddd7d45b2b77731b165c0fb5a",
+        "bound_tests_set_hash": "8eaa1736f1958f2ed4a7c18e42eef97c10e83da2541363760cc1829da2975ca5",
         "declaration_hash": "3819300d375ba2d16180d16e1368177b7a8417159d5685c7abc5655d107860ff",
         "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(args.windows(2).any(|pair| pair == [\"--resume\", \"prior-session\"]));\nassert_eq!(same_track.resumable_id(&request.request.resume), Some(\"same-track-session\".to_owned()));\nassert_eq!(other_track.resumable_id(&request.request.resume), None);\nassert_eq!(other_capability.resumable_id(&other_capability_request.request.resume), None);\nassert!(!args.contains(&\"--resume\".to_owned()));\nassert_ne!(cache_key(&first, None), cache_key(&second, None));\nassert_eq!(cache_key(&targetless, None), None);"
+        "citation": "assert_eq!(same_track.resumable_id(&request.request.resume), Some(\"same-track-session\".to_owned()));\nassert_eq!(other_track.resumable_id(&request.request.resume), None);\nassert_eq!(other_capability.resumable_id(&other_capability_request.request.resume), None);\nassert!(args.windows(2).any(|pair| pair == [\"--resume\", \"prior-session\"]));\nassert!(!args.contains(&\"--resume\".to_owned()));\nassert_eq!(targetless_session.resumable_id(&CapabilityResumeRequest::Fresh), None);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5919,13 +5919,13 @@
         "item_identifier": "voluntary:AC-09"
       },
       "key": {
-        "bound_tests_set_hash": "8742b61feb09bd423a9c23daa343ab71d0dd0ed53cd66d3672839a2e56fb3200",
+        "bound_tests_set_hash": "06e4d44d6fc24e74cf473ff2969786af2a9d57b7e8efe25476d02c01fea5ee7c",
         "declaration_hash": "c146460dd88681f01ec71eaa9a90b45d13d5955135e1f05a2a8cd7c4494120a2",
         "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(same_track.resumable_id(&request.request.resume), Some(\"same-track-session\".to_owned()));\nassert_eq!(other_track.resumable_id(&request.request.resume), None);\nassert_eq!(other_capability.resumable_id(&other_capability_request.request.resume), None);\nassert_eq!(same_track.resumable_id(&CapabilityResumeRequest::Fresh), None);\nassert!(matches!(\n    cache_key(&first, None),\n    Some(ProviderSessionCacheKey::WorkspaceCapability {\n        ref capability,\n        ref target_artifacts,\n    }) if capability.as_str() == \"implementer\"\n        && target_artifacts.as_slice().first().map(|path| path.as_path())\n            == Some(std::path::Path::new(\"track/items/a/spec.json\"))\n));\nassert_eq!(cache_key(&targetless, None), None);\nassert!(!args.contains(&\"resume\".to_owned()));"
+        "citation": "assert!(args.windows(2).any(|pair| pair == [\"resume\", \"prior-session\"])); ... assert_eq!(other_track.resumable_id(&request.request.resume), None); ... assert_eq!(other_capability.resumable_id(&other_capability_request.request.resume), None); ... assert_eq!(cache_key(&targetless, None), None); ... assert!(!args.contains(&\"resume\".to_owned()));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
