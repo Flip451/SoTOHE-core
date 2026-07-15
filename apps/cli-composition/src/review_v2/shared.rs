@@ -258,7 +258,15 @@ fn discover_repo_from_items_dir(items_dir: &Path) -> Result<SystemGitRepo, Revie
 }
 
 pub(super) fn repo_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, ReviewSharedError> {
-    Ok(discover_repo_from_items_dir(items_dir)?.root().to_path_buf())
+    // `items_dir` is an explicit composition input. Derive the repository root
+    // from it rather than falling back to ambient process CWD, which is shared
+    // by concurrent callers and can select an unrelated repository.
+    let project_root = crate::track::resolve_project_root(items_dir)
+        .map_err(|error| ReviewSharedError::Path(error.to_string()))?;
+    Ok(SystemGitRepo::discover_from(&project_root)
+        .map_err(|error| ReviewSharedError::Git(format!("git discover: {error}")))?
+        .root()
+        .to_path_buf())
 }
 
 struct RepoCwdGuard {

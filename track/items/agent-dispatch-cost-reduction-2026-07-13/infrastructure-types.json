@@ -1005,7 +1005,7 @@
     },
     "ClaudeReviewer": {
       "action": "modify",
-      "docs": "Runs complete Claude review rounds with typed effort and scope-bound session continuation.",
+      "docs": "Runs complete Claude review rounds with typed effort and scope-bound session continuation. The scope-label override is presentation-only free text and carries no domain invariant.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1054,6 +1054,27 @@
               "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
             }
           ],
+          "returns": "Self"
+        },
+        {
+          "generics": [
+            {
+              "bounds": [
+                "Into<String>"
+              ],
+              "name": "S"
+            }
+          ],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_scope_label",
+          "params": [
+            {
+              "name": "label",
+              "ty": "S"
+            }
+          ],
+          "receiver": "self",
           "returns": "Self"
         }
       ],
@@ -1167,7 +1188,7 @@
     },
     "CodexReviewer": {
       "action": "modify",
-      "docs": "Runs complete Codex review rounds with typed effort and scope-bound session continuation.",
+      "docs": "Runs complete Codex review rounds with typed effort and scope-bound session continuation. The scope-label override is presentation-only free text and carries no domain invariant.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1216,6 +1237,19 @@
               "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
             }
           ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_scope_label",
+          "params": [
+            {
+              "name": "label",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "receiver": "self",
           "returns": "Self"
         }
       ],

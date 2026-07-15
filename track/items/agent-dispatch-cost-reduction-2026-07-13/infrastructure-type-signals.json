@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-15T01:12:31Z",
-  "declaration_hash": "3b6ea1523113bf6c750c516bb953e1cd9542481807a8b976ab9154629f1d09bf",
-  "implementation_input_hash": "bf65c987e9195c8790470488ee4b75af5aecde0592a744c036f5b74dbaf85d2b",
+  "generated_at": "2026-07-15T08:58:07Z",
+  "declaration_hash": "de7e45a72e2d5f24cb08fd8f35a3a422626e668167547395f971c1e24133254d",
+  "implementation_input_hash": "bcc389e0234eb0dd748bbc2d2db563b9ca00b4b2a2f8a504a03341e0ee7f31ac",
   "signals": [
     {
       "type_name": "AgentProfiles",
@@ -48,7 +48,7 @@
     {
       "type_name": "ClaudeReviewer",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Reviewer"
@@ -66,7 +66,7 @@
     {
       "type_name": "CodexReviewer",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Reviewer"

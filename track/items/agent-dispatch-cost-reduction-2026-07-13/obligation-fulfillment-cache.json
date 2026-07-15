@@ -4680,6 +4680,582 @@
         "citation": "owners.iter().map(|o| o.id().clone()).collect::<Vec<_>>(),\n                vec![first.id().clone(), second.id().clone()],\n                \"multiple owners are reported distinctly, never conflated with no-owner\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeReviewer",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
+      },
+      "key": {
+        "bound_tests_set_hash": "8adc4a11aa9ee4ad57e6963c6651225bbfb3d6de56e8ae0104fb1626dd44d5c8",
+        "declaration_hash": "1ec7b9f5493d1fdfb799c402d091767243e8b8e1ffa9f0d3612106d2a7f9bb9e",
+        "anchor_text_hash": "ada0a8c57a9d8d40910dc95985d3a9260b7c885da13431c2cd9613cbd79e7805"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;\n  *) exit 10 ;;\nesac\n\nassert!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeReviewer",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
+      },
+      "key": {
+        "bound_tests_set_hash": "8adc4a11aa9ee4ad57e6963c6651225bbfb3d6de56e8ae0104fb1626dd44d5c8",
+        "declaration_hash": "1ec7b9f5493d1fdfb799c402d091767243e8b8e1ffa9f0d3612106d2a7f9bb9e",
+        "anchor_text_hash": "0dee02c08949c142a3ea7edfea8ac737088ad23dd54aa0e7d24bb564776b23e6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeReviewer",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
+      },
+      "key": {
+        "bound_tests_set_hash": "8adc4a11aa9ee4ad57e6963c6651225bbfb3d6de56e8ae0104fb1626dd44d5c8",
+        "declaration_hash": "1ec7b9f5493d1fdfb799c402d091767243e8b8e1ffa9f0d3612106d2a7f9bb9e",
+        "anchor_text_hash": "544150922e44eb510e899f687c37184a771bf9fca61d89487b5353bd44f16517"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(resumed.0, model_mismatch.0);\n        assert_eq!(resumed.0, provider_mismatch.0);\n        assert_eq!(resumed.0, first_round.0);\n        assert!(matches!(resumed.0, Verdict::ZeroFindings));\n        // A resume changes only provider context. Every invocation still returns\n        // the same single-round review record shape: verdict plus log info.\n        assert_eq!(resumed.1, model_mismatch.1);\n        assert_eq!(resumed.1, provider_mismatch.1);\n        assert_eq!(resumed.1, first_round.1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexReviewer",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
+      },
+      "key": {
+        "bound_tests_set_hash": "5c871aed39653d9e8761a4821cb5a412b9e127d66015113ca39da3ab10d13f08",
+        "declaration_hash": "316f52253430d2303c9e18f36fcd6bdcd2ec45806866cb925b2a413f2508d1b4",
+        "anchor_text_hash": "ada0a8c57a9d8d40910dc95985d3a9260b7c885da13431c2cd9613cbd79e7805"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;\n  *) exit 10 ;;\nesac\n\nassert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");\n\nassert!(matches!(\n    run(RoundType::Final, matched_key.clone(), \"fast-keyed-final-codex.sh\", false).0,\n    Verdict::ZeroFindings\n));\nassert!(matches!(\n    run(RoundType::Fast, matched_key, \"matching-key-codex.sh\", true).0,\n    Verdict::ZeroFindings\n));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexReviewer",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
+      },
+      "key": {
+        "bound_tests_set_hash": "5c871aed39653d9e8761a4821cb5a412b9e127d66015113ca39da3ab10d13f08",
+        "declaration_hash": "316f52253430d2303c9e18f36fcd6bdcd2ec45806866cb925b2a413f2508d1b4",
+        "anchor_text_hash": "0dee02c08949c142a3ea7edfea8ac737088ad23dd54aa0e7d24bb564776b23e6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexReviewer",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
+      },
+      "key": {
+        "bound_tests_set_hash": "5c871aed39653d9e8761a4821cb5a412b9e127d66015113ca39da3ab10d13f08",
+        "declaration_hash": "316f52253430d2303c9e18f36fcd6bdcd2ec45806866cb925b2a413f2508d1b4",
+        "anchor_text_hash": "544150922e44eb510e899f687c37184a771bf9fca61d89487b5353bd44f16517"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(resumed.0, model_mismatch.0);\n        assert_eq!(resumed.0, provider_mismatch.0);\n        assert_eq!(resumed.0, first_round.0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeReviewer",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "f3e485cf8cb23eb6e2c5a0f604914a12948adf42ef0d61b996871f40e468c98f",
+        "declaration_hash": "581728aa50d1e6db1c0c6548623190820247dd17fa37dff1b52386dbd218cd6c",
+        "anchor_text_hash": "12b1350e138cc06f3478183cd939907fcd5552cc6e22d2179adef96ff00b8b11"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let model_mismatch = test_reviewer_with_cache(\n            Duration::from_secs(10),\n            \"Review this code.\",\n            Arc::new(StaticSessionCache {\n                entry: Some(session_entry_with_model(\"claude\", \"previous-model\")),\n            }),\n        )\n        .with_bin(write_bin(\"model-mismatch-claude.sh\", false))\n        .review(&target)\n        .unwrap();\n        let provider_mismatch = test_reviewer_with_cache(\n            Duration::from_secs(10),\n            \"Review this code.\",\n            Arc::new(StaticSessionCache { entry: Some(session_entry(\"codex\")) }),\n        )\n        .with_bin(write_bin(\"provider-mismatch-claude.sh\", false))\n        .review(&target)\n        .unwrap();"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeReviewer",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "72cdbe123fd86689af9c4f3343af6be5a9b97c9c2591ac202c13d3f240a7e58d",
+        "declaration_hash": "581728aa50d1e6db1c0c6548623190820247dd17fa37dff1b52386dbd218cd6c",
+        "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "[ \"$has_model\" -eq 1 ] && [ \"$has_effort\" -eq 1 ] && [ \"$has_permission\" -eq 1 ] && {resume_check} || exit 9"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeReviewer",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "f3e485cf8cb23eb6e2c5a0f604914a12948adf42ef0d61b996871f40e468c98f",
+        "declaration_hash": "581728aa50d1e6db1c0c6548623190820247dd17fa37dff1b52386dbd218cd6c",
+        "anchor_text_hash": "07cdc5852c99211b87502f07153d16da0d9e13f03f511f0ec36d0e90ca5ce018"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"let model_mismatch = test_reviewer_with_cache(\\n            Duration::from_secs(10),\\n            \\\"Review this code.\\\",\\n            Arc::new(StaticSessionCache {\\n                entry: Some(session_entry_with_model(\\\"claude\\\", \\\"previous-model\\\")),\\n            }),\\n        )\\n        .with_bin(write_bin(\\\"model-mismatch-claude.sh\\\", false))\"; \"let provider_mismatch = test_reviewer_with_cache(\\n            Duration::from_secs(10),\\n            \\\"Review this code.\\\",\\n            Arc::new(StaticSessionCache { entry: Some(session_entry(\\\"codex\\\")) }),\\n        )\\n        .with_bin(write_bin(\\\"provider-mismatch-claude.sh\\\", false))\"; \"assert_eq!(std::fs::read_to_string(attempts).unwrap(), \\\"resume\\\\nfresh\\\\n\\\");\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeReviewer",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "5b15e691e6e1ee746d639bd7a7d445e6e1fbb233a6b66b95ebdac21e3bc4a053",
+        "declaration_hash": "581728aa50d1e6db1c0c6548623190820247dd17fa37dff1b52386dbd218cd6c",
+        "anchor_text_hash": "6c61fa978e67690504105be79dd73f2649add14f0026cd302f7565c126cc61d7"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "[ \"$has_model\" -eq 1 ] && [ \"$has_effort\" -eq 1 ] && [ \"$has_permission\" -eq 1 ] && {resume_check} || exit 9\ncase \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;\nassert_eq!(resumed.1, model_mismatch.1);\nassert_eq!(resumed.1, provider_mismatch.1);\nassert_eq!(resumed.1, first_round.1);\nassert!(matches!(\n            run(RoundType::Fast, matched_key, \"matching-key-claude.sh\", true).0,\n            Verdict::ZeroFindings\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClaudeReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeReviewer",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "8adc4a11aa9ee4ad57e6963c6651225bbfb3d6de56e8ae0104fb1626dd44d5c8",
+        "declaration_hash": "581728aa50d1e6db1c0c6548623190820247dd17fa37dff1b52386dbd218cd6c",
+        "anchor_text_hash": "042865d7c2f3ee57558d16bbda502891955644407e647ab52193b9aa10aa9c88"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"[ \\\"$has_model\\\" -eq 1 ] && [ \\\"$has_effort\\\" -eq 1 ] && [ \\\"$has_permission\\\" -eq 1 ] && {resume_check} || exit 9\"; \"assert_eq!(std::fs::read_to_string(attempts).unwrap(), \\\"resume\\\\nfresh\\\\n\\\");\"; \"run(RoundType::Final, matched_key.clone(), \\\"fast-keyed-final-claude.sh\\\", false)\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexReviewer",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "1bd758aa7dc15c56f5212bbec139300bb36b7e907a9615dfdfd5b758ce0dd478",
+        "declaration_hash": "7c188774e58888e0dc9136fdb9150e33f7cb7c10949a1aa0c44f76cc76867696",
+        "anchor_text_hash": "12b1350e138cc06f3478183cd939907fcd5552cc6e22d2179adef96ff00b8b11"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexReviewer",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "7ff97a43ccfd1f0cf069f529590513d25e35f378b671effc4d45f58fe259295b",
+        "declaration_hash": "7c188774e58888e0dc9136fdb9150e33f7cb7c10949a1aa0c44f76cc76867696",
+        "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "[ \"$has_model\" -eq 1 ] && [ \"$has_sandbox\" -eq 1 ] && [ \"$has_effort\" -eq 1 ] && [ -n \"$output\" ] && {resume_check} || exit 9"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexReviewer",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "1bd758aa7dc15c56f5212bbec139300bb36b7e907a9615dfdfd5b758ce0dd478",
+        "declaration_hash": "7c188774e58888e0dc9136fdb9150e33f7cb7c10949a1aa0c44f76cc76867696",
+        "anchor_text_hash": "07cdc5852c99211b87502f07153d16da0d9e13f03f511f0ec36d0e90ca5ce018"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "`with_bin(write_bin(\"model-mismatch-codex.sh\", false))`、`with_bin(write_bin(\"provider-mismatch-codex.sh\", false))`、`assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");`"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexReviewer",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "def3395189ba17c22fc23791b860ff5bf4972dbcca02a79e821f8a4b7559e3e6",
+        "declaration_hash": "7c188774e58888e0dc9136fdb9150e33f7cb7c10949a1aa0c44f76cc76867696",
+        "anchor_text_hash": "6c61fa978e67690504105be79dd73f2649add14f0026cd302f7565c126cc61d7"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "[ \"$has_model\" -eq 1 ] && [ \"$has_sandbox\" -eq 1 ] && [ \"$has_effort\" -eq 1 ] && [ -n \"$output\" ] && {resume_check} || exit 9\ncase \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexReviewer",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexReviewer",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "d4c70c9a3d592229708207f153a4b72407ade74a3cfef1ab5208a675bb49ac10",
+        "declaration_hash": "7c188774e58888e0dc9136fdb9150e33f7cb7c10949a1aa0c44f76cc76867696",
+        "anchor_text_hash": "042865d7c2f3ee57558d16bbda502891955644407e647ab52193b9aa10aa9c88"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"[ \\\"$has_model\\\" -eq 1 ] && [ \\\"$has_sandbox\\\" -eq 1 ] && [ \\\"$has_effort\\\" -eq 1 ] && [ -n \\\"$output\\\" ] && {resume_check} || exit 9\"; \"assert_eq!(std::fs::read_to_string(attempts).unwrap(), \\\"resume\\\\nfresh\\\\n\\\")\"; \"run(RoundType::Final, matched_key.clone(), \\\"fast-keyed-final-codex.sh\\\", false)\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "dc0102a28b9a1343cc2e148eff2798327bd6b2e3ab82016835c99b808117fced",
+        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "anchor_text_hash": "ada0a8c57a9d8d40910dc95985d3a9260b7c885da13431c2cd9613cbd79e7805"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(arguments.contains(\"resume prior-session\"), \"expected resume argv: {arguments}\");\nassert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "2151656b41f2bed7ad4d5b408dbd260e29ddfe552c3a7f669382b84c844dacb4",
+        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "anchor_text_hash": "12b1350e138cc06f3478183cd939907fcd5552cc6e22d2179adef96ff00b8b11"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\");\nassert!(arguments.contains(\"--model codex-review-model\"), \"{name}: {arguments}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "6ceaf00908367a98830b1da138ee5a2af0563d3ecf5f68a2072e4a0bd047e1ff",
+        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(arguments.contains(\"--model codex-review-model\"), \"missing model argv: {arguments}\");\nassert!(arguments.contains(\"--sandbox read-only\"), \"missing sandbox argv: {arguments}\");\nassert!(arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"), \"missing effort argv: {arguments}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "f78ee46fcefc8e24fa67eb1af9fb4fb15d4798964d52bf8b4c77453861687cc8",
+        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "anchor_text_hash": "0dee02c08949c142a3ea7edfea8ac737088ad23dd54aa0e7d24bb564776b23e6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "*\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "e0b79d14d004714edb6a89cd01f0651b10488499ed77a3fcc072394a1845ace6",
+        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "anchor_text_hash": "07cdc5852c99211b87502f07153d16da0d9e13f03f511f0ec36d0e90ca5ce018"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\");\n            assert!(attempts.len(), 2, \"resume failure must retry fresh: {attempts:?}\");\n        assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "f78ee46fcefc8e24fa67eb1af9fb4fb15d4798964d52bf8b4c77453861687cc8",
+        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "anchor_text_hash": "544150922e44eb510e899f687c37184a771bf9fca61d89487b5353bd44f16517"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(resumed.0, model_mismatch.0);\n        assert_eq!(resumed.0, provider_mismatch.0);\n        assert_eq!(resumed.0, first_round.0);\n        assert!(matches!(resumed.0, Verdict::ZeroFindings));\n        // A resume changes only provider context. Every invocation still returns\n        // the same single-round review record shape: verdict plus log info.\n        assert_eq!(resumed.1, model_mismatch.1);\n        assert_eq!(resumed.1, provider_mismatch.1);\n        assert_eq!(resumed.1, first_round.1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "22de352a2bb28f197e48d79e6fad2561c5a2a071ac7e7b28d465750b6f9ccb8f",
+        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "anchor_text_hash": "6c61fa978e67690504105be79dd73f2649add14f0026cd302f7565c126cc61d7"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(arguments.contains(\"resume prior-session\"), \"expected resume argv: {arguments}\");\nassert!(\n    arguments.contains(\"--model codex-review-model\"),\n    \"missing model argv: {arguments}\"\n);\nassert!(arguments.contains(\"--sandbox read-only\"), \"missing sandbox argv: {arguments}\");\nassert!(\n    arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"),\n    \"missing effort argv: {arguments}\"\n);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "2151656b41f2bed7ad4d5b408dbd260e29ddfe552c3a7f669382b84c844dacb4",
+        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "anchor_text_hash": "042865d7c2f3ee57558d16bbda502891955644407e647ab52193b9aa10aa9c88"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(arguments.contains(\"resume prior-session\"), \"expected resume argv: {arguments}\");\n        assert!(arguments.contains(\"--model codex-review-model\"), \"missing model argv: {arguments}\");\n        assert!(arguments.contains(\"--sandbox read-only\"), \"missing sandbox argv: {arguments}\");\n        assert!(arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"), \"missing effort argv: {arguments}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     }
   ]
 }

@@ -85,6 +85,9 @@ track/items/**/*-graph-d*/
 track/items/**/.commit_hash
 track/items/**/.commit_hash.tmp
 
+# --- Provider session resume cache (runtime session state, not version-controlled) ---
+track/items/**/.provider-sessions/
+
 # --- Track workflow telemetry logs (runtime diagnostics, not version-controlled) ---
 track/items/**/logs/
 track/archive/**/logs/

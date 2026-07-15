@@ -95,7 +95,7 @@
     },
     "ReviewCompositionRoot": {
       "action": "modify",
-      "docs": "Wires scope-bound reviewer sessions while preserving existing review judgment and record boundaries.",
+      "docs": "Wires scope-bound reviewer sessions while preserving existing review judgment and record boundaries. String façade parameters are unvalidated CLI-boundary text; this composition layer validates and converts them to domain value objects before use.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -161,25 +161,25 @@
           "is_async": false,
           "name": "review_run_fix_local_resolve",
           "params": [
-            {
-              "name": "track_id_opt",
-              "ty": "Option<domain::ids::TrackId>"
-            },
-            {
-              "name": "scope",
-              "ty": "domain::review_v2::ScopeName"
+          {
+            "name": "track_id_opt",
+            "ty": "Option<String>"
+          },
+          {
+            "name": "scope",
+            "ty": "String"
             },
             {
               "name": "briefing_file",
               "ty": "std::path::PathBuf"
             },
-            {
-              "name": "round_type",
-              "ty": "domain::review_v2::RoundType"
-            },
-            {
-              "name": "model",
-              "ty": "Option<usecase::capability_exec::ModelName>"
+          {
+            "name": "round_type",
+            "ty": "String"
+          },
+          {
+            "name": "model",
+            "ty": "Option<String>"
             },
             {
               "name": "items_dir",
@@ -194,9 +194,9 @@
           "is_async": false,
           "name": "review_check_approved",
           "params": [
-            {
-              "name": "track_id",
-              "ty": "Option<domain::ids::TrackId>"
+          {
+            "name": "track_id",
+            "ty": "Option<String>"
             },
             {
               "name": "items_dir",
@@ -224,13 +224,13 @@
           "is_async": false,
           "name": "review_classify",
           "params": [
-            {
-              "name": "paths",
-              "ty": "Vec<domain::review_v2::FilePath>"
-            },
-            {
-              "name": "track_id",
-              "ty": "Option<domain::ids::TrackId>"
+          {
+            "name": "paths",
+            "ty": "Vec<String>"
+          },
+          {
+            "name": "track_id",
+            "ty": "Option<String>"
             },
             {
               "name": "items_dir",
@@ -245,13 +245,13 @@
           "is_async": false,
           "name": "review_files",
           "params": [
-            {
-              "name": "scope",
-              "ty": "domain::review_v2::ScopeName"
-            },
-            {
-              "name": "track_id",
-              "ty": "Option<domain::ids::TrackId>"
+          {
+            "name": "scope",
+            "ty": "String"
+          },
+          {
+            "name": "track_id",
+            "ty": "Option<String>"
             },
             {
               "name": "items_dir",
@@ -266,13 +266,13 @@
           "is_async": false,
           "name": "review_validate_scope",
           "params": [
-            {
-              "name": "scope",
-              "ty": "domain::review_v2::ScopeName"
-            },
-            {
-              "name": "track_id",
-              "ty": "Option<domain::ids::TrackId>"
+          {
+            "name": "scope",
+            "ty": "String"
+          },
+          {
+            "name": "track_id",
+            "ty": "Option<String>"
             },
             {
               "name": "items_dir",
@@ -287,13 +287,13 @@
           "is_async": false,
           "name": "review_get_briefing",
           "params": [
-            {
-              "name": "scope",
-              "ty": "domain::review_v2::ScopeName"
-            },
-            {
-              "name": "track_id",
-              "ty": "Option<domain::ids::TrackId>"
+          {
+            "name": "scope",
+            "ty": "String"
+          },
+          {
+            "name": "track_id",
+            "ty": "Option<String>"
             },
             {
               "name": "items_dir",
@@ -308,9 +308,9 @@
           "is_async": false,
           "name": "review_persist_commit_hash",
           "params": [
-            {
-              "name": "track_id",
-              "ty": "Option<domain::ids::TrackId>"
+          {
+            "name": "track_id",
+            "ty": "Option<String>"
             },
             {
               "name": "items_dir",

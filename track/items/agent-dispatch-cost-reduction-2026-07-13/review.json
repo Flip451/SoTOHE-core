@@ -1,174 +1,279 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4c576a936b9b6507fada977cc6eb7efded1d6a73a2c9785ddbdbeefc829ed272",
-          "at": "2026-07-13T21:28:58Z"
+          "hash": "rvw1:sha256:87e87b14d4c8e91a357d128fcbb8e4196031695a6f19a91c0d4ed4e0dbcffc41",
+          "at": "2026-07-13T21:25:49Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4c576a936b9b6507fada977cc6eb7efded1d6a73a2c9785ddbdbeefc829ed272",
-          "at": "2026-07-13T21:34:49Z"
+          "hash": "rvw1:sha256:87e87b14d4c8e91a357d128fcbb8e4196031695a6f19a91c0d4ed4e0dbcffc41",
+          "at": "2026-07-13T21:29:25Z"
         },
         {
           "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5faabd6f4992094ae491ab34e77daacd508ac27bed236a5129174d35dbff45a7",
+          "at": "2026-07-14T06:27:12Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The ReasoningEffort waiver is justified by Batch A scheduling and future tasks (T003/T007), not by an entry-local reason why this type cannot cover CN-02. This leaves the waiver dependent on implementation sequencing; replace it with an entry-surface argument, as done for CapabilityProfile, or bind the behavior to a real test.",
+              "message": "GO-01’s requirement for a low-effort fast round, provider-maximum final effort, and preservation of the two-stage review is not deterministically covered. AC-01 only verifies that distinct fast/final effort values resolve, so an implementation using arbitrary values or not preserving the two-stage behavior could pass all ACs.",
               "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 16,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:21a589da3491af2f83c9071d99dd9dd85fd9d128402e43e06aaac4053eda6d36",
-          "at": "2026-07-13T22:22:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b78fe666ca9abf35ce4243b3a6b350be26411b813f511db106f7b319fb2d75ef",
-          "at": "2026-07-13T22:28:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:528254b6e817585913367db1da724f5ad2adb69d04c55d473e05115daf4969ee",
-          "at": "2026-07-13T23:10:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2172f1f05f8cd47f0b2be88e3ffeadce96cb3c49ab78dec175523db8511993aa",
-          "at": "2026-07-14T07:19:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb40827d2b2e6317e5522f58c2e385840200b5d8b4e3f3e0ffa102d437417c55",
-          "at": "2026-07-14T08:52:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This waiver cites the plan task `T007` and a specific test to justify the waiver. The briefing requires waiver reasons to argue only from the entry's declared surface, with no task IDs or scheduling language. Rewrite the rationale solely in terms of `FsProviderSessionCacheAdapter`'s observable API and limitations.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 699,
-              "category": "test_obligation_waiver"
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 330,
+              "category": "missing AC coverage for a stated goal"
             },
             {
-              "message": "This waiver assigns the behavior to plan task `T007`, directly violating the requirement that waiver reasons contain no task IDs and rely only on the entry's declared surface. Explain only why `ProviderSessionCacheEntry` cannot represent or perform the AC-10 behavior.",
+              "message": "CN-08 requires a new-session fallback when the capability resume cache cannot be read or hashed, but no AC covers those cases. AC-09 covers valid entries and profile/contract mismatch, while AC-10 covers resume failure and expiry; an implementation could omit read/hash-failure fallback and still satisfy every AC.",
               "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 2845,
-              "category": "test_obligation_waiver"
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 250,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "GO-04 promises preservation of review judgment and review-record semantics, but no acceptance criterion deterministically verifies that session resume leaves the judgment/record unit unchanged. AC-03 verifies full-scope rejudgment only, and AC-04 verifies session selection and flag injection; both could pass while resumed rounds alter record semantics.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 42,
+              "category": "missing AC coverage for a stated goal"
             }
           ],
-          "hash": "rvw1:sha256:c6e0dab0b4af61ef4b1f70b2201b00b803850614056eb5259772ab0e4444395a",
-          "at": "2026-07-15T00:31:32Z"
+          "hash": "rvw1:sha256:ef0973d9289a0f7ef6da6420df173797ca945a426216056f958ed7aad2c5253e",
+          "at": "2026-07-13T16:40:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22f57e52e8eda72c842a70ee3f0529f018cae653e6a35315453739232c03161c",
+          "at": "2026-07-13T16:45:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 permits signal-evaluation skip whenever the implementation, catalogue, baseline, and evaluator hashes match, even when the rustdoc-extraction contract changed or the live snapshot cannot be verified. CN-07 and AC-07 require rustdoc extraction and recalculation in those same cases, so the contract simultaneously permits skipping and requires recomputation, risking stale signals. The skip condition must also account for the extraction contract and snapshot-validity requirements.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 370,
+              "category": "scope / acceptance_criteria contradiction"
+            },
+            {
+              "message": "AC-09 applies its resume requirement to any `sotp capability exec` invocation carrying the resume option, but that command also has an in-host delegation outcome. This requires cache-backed resume for the in-host branch that OS-05 explicitly excludes. Restrict this criterion to provider-subprocess dispatches or explicitly specify that in-host dispatch rejects/ignores resume.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 410,
+              "category": "out_of_scope leakage"
+            }
+          ],
+          "hash": "rvw1:sha256:22f57e52e8eda72c842a70ee3f0529f018cae653e6a35315453739232c03161c",
+          "at": "2026-07-13T16:49:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-03 requires every evaluation whose decision inputs changed to run, but AC-05's complete-skip predicate omits the spec/catalogue↔spec input, and AC-06/AC-07 provide no spec-change path. A spec-only change could therefore satisfy the stated skip conditions and leave catalogue↔spec signals stale, contrary to D3. GO-03 lacks deterministic acceptance coverage for this case.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 370,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "CN-08 and AC-09 require invalidation on a capability execution-contract fingerprint mismatch, but the spec never defines that fingerprint's inputs for generic capability resume; IN-04 defines only the reviewer-specific fingerprint. D4 identifies capability SSoT, always-injected discipline, and declared policy/contract files as inputs. Without an equivalent contract here, downstream phases must invent which changes invalidate the cache, making stale-reuse prevention untestable.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 250,
+              "category": "constraint vague or untestable"
+            }
+          ],
+          "hash": "rvw1:sha256:108da43a56156852b9bd84a34fdafa56d8576cf5c188766aebda83000a916b9d",
+          "at": "2026-07-13T16:54:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-08 requires a fresh session when the concern changes, even if the target artifact remains the same. However, AC-09 only checks the resume option and track/capability/artifact identity, so all acceptance criteria can pass while a same-artifact concern switch incorrectly resumes stale context. This leaves GO-02/GO-04 without deterministic coverage for a prohibited reuse path.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 410,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:d46257338e0adf1ff89460ffa3a3b546f012a8687dfd402f1a78e49915cc5b4a",
+          "at": "2026-07-13T16:58:44Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:01173c3a7019127403b345fc0fa9c6558cebe49d15bd63bd540a7496df798b4e",
-          "at": "2026-07-15T00:36:11Z"
+          "hash": "rvw1:sha256:0b0673238fe06b26b1bfe37b71c4c5e5a44f3e572d61f83156a1e8c5e7c9191b",
+          "at": "2026-07-13T17:02:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f8e5981a7be92172bfa4dd064dfe92c1bed7668a0ce317b2f4f1290eddeb91e6",
+          "at": "2026-07-14T18:34:18Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The regenerated obligations add 19 enforced `logic_result` obligations for `ObligationsDocument`, `TestBindingsDocument`, and `TestObligation`, but none has a fulfillment or waiver in `test-bindings.json`. Consequently, `bin/sotp test-obligation check --track-id agent-dispatch-cost-reduction-2026-07-13` fails with `Missing` drifts. Add bindings and regenerate the caches before committing these obligations.",
+              "message": "AC-05 の第1文は declaration_hash の一致も rustdoc 抽出を skip する必要条件にしていますが、同じ AC の第3文と AC-06 は、implementation-side input hash が一致して declaration_hash だけが不一致の場合にも rustdoc を起動しないと定めています。同一状態に対して相反する routing となるため、rustdoc 抽出の要否は implementation-side input hash のみに基づき、declaration/spec の差分は signal 再評価の要否だけを決める契約に統一する必要があります。",
               "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/obligations.json",
-              "line": 4,
-              "category": "testing"
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 366,
+              "category": "scope / acceptance_criteria contradiction"
             }
           ],
-          "hash": "rvw1:sha256:1123dafe3aad472a41cf8070d95fd65397434b551362fa0897d4d8b4e8536e26",
-          "at": "2026-07-15T01:51:44Z"
+          "hash": "rvw1:sha256:f8e5981a7be92172bfa4dd064dfe92c1bed7668a0ce317b2f4f1290eddeb91e6",
+          "at": "2026-07-14T19:55:31Z"
         },
         {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `method:staleness_against` fulfillment is bound only to edge-ownership and evaluation-fan-out tests; none invokes `ObligationsDocument::staleness_against`. Consequently the generated cache marks both associated edges fulfilled using unrelated assertions, so the obligation gate can remain green without evidence for this method. Bind the existing staleness tests instead and regenerate the cache.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 158,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:9b0c8ede22450cebd8468f41e3ffd50258bda00b516c4c4950deccdfffc9f8bb",
-          "at": "2026-07-15T02:18:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Eleven voluntary-binding records contain duplicate TestLocation entries. SignalCompositionRoot repeats the same test seven times for IN-06, IN-07, CN-07, and AC-05 through AC-08; TypeSignalsDocument/IN-05 and both RustdocSchemaExporter edges repeat it twice; TypeSignalsReuseDecision/IN-05 repeats it three times. The evaluator concatenates every listed test body without deduplication, so these records inject 47 redundant test-body copies into verifier prompts, overweight a single test, and produce duplicate-sensitive `bound_tests_set_hash` values. Deduplicate each record and regenerate the fulfillment cache.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 2109,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:f412a908920fb07d36cd1cadd80cf89b3e6750e7e214346714a78129ef9641ed",
-          "at": "2026-07-15T02:53:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The fulfillment for `ObligationsDocument::track_id` binds only edge-ownership and evaluator tests; none calls `track_id()`. The existing `test_obligations_document_round_trips` test does exercise this accessor but is not bound, so the obligation is incorrectly reported as fulfilled.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 38,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The fulfillment for `TestBindingsDocument::track_id` binds waiver/evaluator tests that never call `track_id()`. Bind `test_bindings_document_round_trips`, which actually verifies this accessor, so the gate cannot pass on unrelated evidence.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 203,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The fulfillments for `TestObligation::{target_entry,target_role,brief,declaration_hash}` all cite the same ownership/evaluator tests, none of which invokes these accessors. `test_obligation_exposes_all_components` exercises all four but is absent, causing four public-API obligations to be marked fulfilled without relevant evidence.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
-              "line": 353,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:b8f224ffaf621b4d0da73dfb2aa3d795a4b0882ab7adb23b534437e5076a3b90",
-          "at": "2026-07-15T03:14:41Z"
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9c085bd4ba08195fabcfa858e002be63b3ae1bdc0b035b435cb83ae30088999",
+          "at": "2026-07-14T19:58:39Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:82f2f5809fb058a2365c3f73cd0a03f16a6fd405d0cae01e3ea7598e54ba309c",
-          "at": "2026-07-15T03:24:50Z"
+          "hash": "rvw1:sha256:b9c085bd4ba08195fabcfa858e002be63b3ae1bdc0b035b435cb83ae30088999",
+          "at": "2026-07-14T19:59:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7ea3576ae23b7baa74f3acf9d55bf7f5f52347f549dc1fa9fee25a26f409b45",
+          "at": "2026-07-15T01:51:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7ea3576ae23b7baa74f3acf9d55bf7f5f52347f549dc1fa9fee25a26f409b45",
+          "at": "2026-07-15T01:53:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a343392f8f0ca60ab5996df09d0fab5afeda437fdd26dc7e69d29c1d72628b2",
+          "at": "2026-07-15T04:33:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a343392f8f0ca60ab5996df09d0fab5afeda437fdd26dc7e69d29c1d72628b2",
+          "at": "2026-07-15T04:37:09Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eed5226c767fa495148a2a4468a327ec40ac1035e6a35334d6ea0b7a5a5870a5",
+          "at": "2026-07-14T06:23:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eed5226c767fa495148a2a4468a327ec40ac1035e6a35334d6ea0b7a5a5870a5",
+          "at": "2026-07-14T06:27:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd668edf234c37a4c569aaab36f14562420d2653dad956fd3370148679e87d42",
+          "at": "2026-07-14T07:12:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23dd453c35b4585a0d281339948769f6c3b2867df0ce2ddcad9e01f7c5bd3b74",
+          "at": "2026-07-14T18:32:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23dd453c35b4585a0d281339948769f6c3b2867df0ce2ddcad9e01f7c5bd3b74",
+          "at": "2026-07-14T19:54:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ab88b864455d9c25e6652cd25301a080d240216e264b807f3a776b996ec34b7",
+          "at": "2026-07-15T00:04:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ab88b864455d9c25e6652cd25301a080d240216e264b807f3a776b996ec34b7",
+          "at": "2026-07-15T00:05:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:942b7c45d06d2c340b84b7b45912376337e74401eb964477db18e2b2bdab9fa0",
+          "at": "2026-07-15T02:12:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:942b7c45d06d2c340b84b7b45912376337e74401eb964477db18e2b2bdab9fa0",
+          "at": "2026-07-15T02:14:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a93c9104245742d2ce749facd64e9283c59b02c6c5c5f4afd094439b38608a2",
+          "at": "2026-07-15T02:50:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a93c9104245742d2ce749facd64e9283c59b02c6c5c5f4afd094439b38608a2",
+          "at": "2026-07-15T02:53:11Z"
         }
       ]
     },
@@ -364,1109 +469,6 @@
           "findings": [],
           "hash": "rvw1:sha256:7a391fac85b6d96a431bb15f019edada7f1b3e0ebcff916ff79320dbfad33886",
           "at": "2026-07-14T19:54:17Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f823dbe2f4d57aa7514f3bee9dd3e60725bc9194d47e63ded184ebefccd042fc",
-          "at": "2026-07-13T21:19:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f823dbe2f4d57aa7514f3bee9dd3e60725bc9194d47e63ded184ebefccd042fc",
-          "at": "2026-07-13T21:25:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:24b5c380b1839ad24c958d3695386c78ef662c5f0bca2e0a881e615b88eafe80",
-          "at": "2026-07-14T06:23:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`waived_edges` は `plan_fulfillment_record` にしか適用されません。Waiver と同じ edge の `VoluntaryBinding` はこの owner ループで Fulfillment action を生成し続けるため、check gate の waiver precedence と不一致になり、不要な二重 adjudication と誤った tally/cache を生じます。",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
-              "line": 241,
-              "category": "orchestration correctness"
-            },
-            {
-              "message": "この変更で 1 件の voluntary binding が複数 owner 分の Fulfillment action を生成する一方、calibration の production-pair 数は voluntary binding を 1 件として数えます。そのため複数 owner のケースでは実際の adjudication 数より少ない calibration probe しか発行されず、検出率ゲートが過少評価されます。",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
-              "line": 248,
-              "category": "orchestration correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6b6a98fc2331e19453ade77317f50a4a5648166317cc5b825aba29526d079a9c",
-          "at": "2026-07-14T18:36:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77b39e740d38b8c312b79f4d65f284144539b4a20d0ed0614bf2eaa9987ed39f",
-          "at": "2026-07-14T18:41:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ProviderSessionCacheError` exposes filesystem/codec mechanics (`Io`, `Symlink`, `Path`, `Codec`) through the usecase port. This makes callers aware of adapter implementation details and allows infrastructure errors to leak across the abstraction boundary. Replace these with usecase-level cache failure concepts and map filesystem-specific causes inside the infrastructure adapter.",
-              "severity": "P1",
-              "file": "libs/usecase/src/provider_session.rs",
-              "line": 155,
-              "category": "error type confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:77b39e740d38b8c312b79f4d65f284144539b4a20d0ed0614bf2eaa9987ed39f",
-          "at": "2026-07-14T19:56:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbe2efc47790d96ebec9fd456250b18d44e7bafd732646ce5de448ce087421f0",
-          "at": "2026-07-14T20:37:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbe2efc47790d96ebec9fd456250b18d44e7bafd732646ce5de448ce087421f0",
-          "at": "2026-07-14T20:40:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3428042737be1093ef766fefd09810ce32140240cb273a364f51bd9de7018551",
-          "at": "2026-07-14T23:43:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`plan_binding_records` decides the domain-level precedence rule that a waiver suppresses fulfillment and voluntary bindings. This duplicates the same rule from the check gate, allowing evaluators to diverge when the rule changes. Move precedence/mutual-exclusivity resolution onto the domain binding model and let the usecase orchestrate the resolved outcome, per `hexagonal-architecture.md` §CLI as Composition Root.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
-              "line": 121,
-              "category": "business logic leak"
-            },
-            {
-              "message": "The usecase defines edge ownership by comparing an obligation's entry key and spec references. That relationship is a domain predicate, and duplicating it here (including the existing single-owner variant) risks inconsistent ownership semantics across check/evaluate flows. Expose this through `TestObligation` or `ObligationsDocument` in domain and consume it from the orchestrator, per `hexagonal-architecture.md` §CLI as Composition Root.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/edges.rs",
-              "line": 41,
-              "category": "business logic leak"
-            }
-          ],
-          "hash": "rvw1:sha256:3428042737be1093ef766fefd09810ce32140240cb273a364f51bd9de7018551",
-          "at": "2026-07-14T23:45:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bba94a081460da6b47f3077c640556b4eadb7fe5b772f2e417c4b9579db279d4",
-          "at": "2026-07-15T00:00:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bba94a081460da6b47f3077c640556b4eadb7fe5b772f2e417c4b9579db279d4",
-          "at": "2026-07-15T00:02:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f59a5f81fe369af64ec0b69a9cc7be4908e4698d9fd0a00bf06b8972360a637",
-          "at": "2026-07-15T01:56:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f59a5f81fe369af64ec0b69a9cc7be4908e4698d9fd0a00bf06b8972360a637",
-          "at": "2026-07-15T01:58:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0b4a1a4603984292f0a680187437b174a8167798e231327f6044dc8a43aa85c",
-          "at": "2026-07-15T02:52:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0b4a1a4603984292f0a680187437b174a8167798e231327f6044dc8a43aa85c",
-          "at": "2026-07-15T02:54:44Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eed5226c767fa495148a2a4468a327ec40ac1035e6a35334d6ea0b7a5a5870a5",
-          "at": "2026-07-14T06:23:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eed5226c767fa495148a2a4468a327ec40ac1035e6a35334d6ea0b7a5a5870a5",
-          "at": "2026-07-14T06:27:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fd668edf234c37a4c569aaab36f14562420d2653dad956fd3370148679e87d42",
-          "at": "2026-07-14T07:12:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:23dd453c35b4585a0d281339948769f6c3b2867df0ce2ddcad9e01f7c5bd3b74",
-          "at": "2026-07-14T18:32:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:23dd453c35b4585a0d281339948769f6c3b2867df0ce2ddcad9e01f7c5bd3b74",
-          "at": "2026-07-14T19:54:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3ab88b864455d9c25e6652cd25301a080d240216e264b807f3a776b996ec34b7",
-          "at": "2026-07-15T00:04:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3ab88b864455d9c25e6652cd25301a080d240216e264b807f3a776b996ec34b7",
-          "at": "2026-07-15T00:05:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:942b7c45d06d2c340b84b7b45912376337e74401eb964477db18e2b2bdab9fa0",
-          "at": "2026-07-15T02:12:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:942b7c45d06d2c340b84b7b45912376337e74401eb964477db18e2b2bdab9fa0",
-          "at": "2026-07-15T02:14:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a93c9104245742d2ce749facd64e9283c59b02c6c5c5f4afd094439b38608a2",
-          "at": "2026-07-15T02:50:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a93c9104245742d2ce749facd64e9283c59b02c6c5c5f4afd094439b38608a2",
-          "at": "2026-07-15T02:53:11Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54109f1fe1308de7696fd7f46c8a0965d2773cc418181a293d1e1dc48a30815e",
-          "at": "2026-07-13T21:30:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54109f1fe1308de7696fd7f46c8a0965d2773cc418181a293d1e1dc48a30815e",
-          "at": "2026-07-13T22:27:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab3669fc27032c1fb5d689af213ea7e3f55436714e4b3a272470d89d9baaf100",
-          "at": "2026-07-14T07:13:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:46f2d5e0321ddbbf632186fbd3a0c11e022bacccbaa62c884e9a6874a158447f",
-          "at": "2026-07-14T19:01:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:46f2d5e0321ddbbf632186fbd3a0c11e022bacccbaa62c884e9a6874a158447f",
-          "at": "2026-07-15T00:30:07Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87e87b14d4c8e91a357d128fcbb8e4196031695a6f19a91c0d4ed4e0dbcffc41",
-          "at": "2026-07-13T21:25:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87e87b14d4c8e91a357d128fcbb8e4196031695a6f19a91c0d4ed4e0dbcffc41",
-          "at": "2026-07-13T21:29:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5faabd6f4992094ae491ab34e77daacd508ac27bed236a5129174d35dbff45a7",
-          "at": "2026-07-14T06:27:12Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fdddf6274c939ce5cdc37f6c2c1129e63d89d5f6eb34801e190573617c81544c",
-          "at": "2026-07-13T21:22:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The resolved `effort` is discarded here, and `run_dry_fix_codex` consequently launches Codex without `model_reasoning_effort`. Even though missing effort now fails during profile resolution, every successful `dry-fix-lead` dispatch still falls back to Codex's implicit default, violating the explicit/fail-closed effort contract. Capture the effort and pass it into the Codex invocation.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/dry_check/dry_fix_local/mod.rs",
-              "line": 101,
-              "category": "non-fail-closed config"
-            },
-            {
-              "message": "The shared ref/obligation verifier runner discards the resolved `effort`. The Codex branch continues to hardcode `high`, so configured fast=`low` and final=`xhigh` executions both run at the wrong level; Claude/Gemini likewise receive no resolved effort. Thread the typed effort into each provider's argument builder instead of using a hardcoded or provider-default value.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/ref_verify/process_runner.rs",
-              "line": 150,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:fdddf6274c939ce5cdc37f6c2c1129e63d89d5f6eb34801e190573617c81544c",
-          "at": "2026-07-13T21:28:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2e59c03d6ef6415eb3268146a08c3f11e9e5e98e785bc4b48272f42aa074afeb",
-          "at": "2026-07-13T22:23:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "For out-of-host Claude dispatches, the resolved `request.profile.effort` is dropped: `build_claude_args` receives only capability, model, and prompt, so no `--effort` flag reaches the subprocess. An explicitly configured effort therefore silently falls back to Claude's provider default, violating D1's fail-closed execution contract.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/capability_exec/claude.rs",
-              "line": 86,
-              "category": "non-fail-closed config"
-            },
-            {
-              "message": "Codex generic dispatch similarly ignores `request.profile.effort`; the generated arguments contain model and sandbox but no `model_reasoning_effort` override. Capabilities resolved through `AgentProfilesCapabilityAdapter` consequently run with Codex's implicit default despite having a validated explicit effort.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/capability_exec/codex.rs",
-              "line": 106,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:169809b5acf9f4dab608ec9434e354c65d79aa2e66fd6f7b6de09cccb96cd60b",
-          "at": "2026-07-13T23:12:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:03b87380b15ff20b933e349c1d18deff5cc996ea7d77c54a345e78282b5213dc",
-          "at": "2026-07-13T23:23:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The baseline is hashed before its symlink guard runs. Because `SkipEvaluation` returns before the later guard, a symlinked baseline outside `canonical_items` can participate in a successful freshness match. Run `reject_symlinks_below(&baseline_path, &canonical_items)` before `hash_identity`.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 384,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "The persisted signal artifact is read without checking the leaf or its ancestors for symlinks. A valid schema-v2 document reached through a symlink can supply the recorded hashes and trigger `SkipEvaluation`. Apply the established `reject_symlinks_below` guard before reading it.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 404,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "Both contract fingerprints hash only `type_signals_evaluator.rs`. Evaluator behavior also depends on `signal_evaluator_v2`, `signal_tags`, codecs and rules, while extraction behavior depends on `schema_export`, target/root resolution, invocation arguments, features, and configuration. Changes to those inputs leave these hashes unchanged and can incorrectly reuse stale signals or snapshots. Hash the complete resolved closures required by ADR D3.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 385,
-              "category": "fingerprint or hash drift"
-            },
-            {
-              "message": "The build-input fingerprint treats every local package closure as fully resolved after hashing its package tree, but it neither discovers build-script inputs outside that tree nor rejects custom-build packages whose inputs cannot be determined. For example, changing a workspace-level schema named by `cargo:rerun-if-changed` can alter generated public API while this hash remains unchanged, allowing a stale snapshot reuse. Detect unresolved build-script inputs and fail closed, or include their resolved files/tools in the hash.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 45,
-              "category": "fingerprint or hash drift"
-            },
-            {
-              "message": "The new reuse path loads both existing rustdoc snapshots and persisted signal artifacts with unbounded `read_to_string` calls. A malformed large file can exhaust memory before parsing; the existing signal reader already establishes a 16 MiB bounded-read pattern. Enforce explicit size limits before these reads.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 125,
-              "category": "unbounded I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:f78259925398ee05a8c1a269624ac4cc81d6f45d83dfc95642f8f923b81f6f9b",
-          "at": "2026-07-14T06:25:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The evaluator/extraction fingerprints hash files from the runtime source checkout identified by the compile-time `CARGO_MANIFEST_DIR`, rather than the code embedded in the running `bin/sotp`. If source B is evaluated with an older binary A, that binary writes results produced by A while recording B's hash; after installing binary B, the hashes match and evaluation can be skipped, leaving stale signals. Exported/transplanted binaries can also reference a nonexistent build-host path. Embed a build-time contract digest in the binary instead of reading mutable source files at runtime.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 103,
-              "category": "fingerprint or hash drift"
-            },
-            {
-              "message": "`encode` serializes the document's arbitrary schema version even though this codec only supports the current version. Because `TypeSignalsDocument::with_schema_version` is public, callers can emit a schema-v3 file with the schema-v2 shape which this codec immediately rejects on read. Validate the version before serialization or always emit `TYPE_SIGNALS_SCHEMA_VERSION`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
-              "line": 175,
-              "category": "serde codec break"
-            },
-            {
-              "message": "Cargo configuration files are detected with `is_file()` and loaded with `std::fs::read`, both of which follow symlinks. This bypasses the repository's real-file config convention and can read configuration outside the intended config root. Use `symlink_metadata()` and reject symlinks before loading, following the `scope_config_loader.rs` pattern.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 343,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "The common build-input reader follows symlinks for workspace/package manifests and `Cargo.lock`; unlike the source traversal, it performs no `symlink_metadata().file_type().is_symlink()` rejection. A symlinked freshness input can therefore escape the trusted workspace boundary. Reject symlinks before every `append_file` read.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 496,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "The build-input closure recursively enumerates every regular file under each local package and then reads each file fully into memory without any file-count, depth, per-file-size, or aggregate-byte bound. A large generated file or sufficiently large tree can exhaust memory or make the mandatory review prelude effectively unbounded. Apply explicit traversal and byte limits and fail closed when exceeded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 446,
-              "category": "unbounded I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:c8afca2938289c68dc6ead57b858c194ccfcb7dd989880c5b769e8f6786b9bdc",
-          "at": "2026-07-14T07:16:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The workspace-root symlink check occurs only later in the evaluation, after this call has already executed `cargo metadata` and traversed manifests and source files beneath `workspace_root`. Because leaf `symlink_metadata` checks follow symlinked ancestors, a symlinked workspace root reaches external I/O before rejection. Validate the workspace anchor before any freshness hashing or snapshot resolution.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 452,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "Build scripts are rejected only for local/path packages. Registry or git dependencies with `custom-build` targets remain reusable even though their outputs can depend on untracked system files; changing such an input can alter rustdoc output without changing this digest. Reject unresolved build scripts across the complete dependency closure or hash their resolved inputs/outputs.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 69,
-              "category": "fingerprint or hash drift"
-            },
-            {
-              "message": "The source collector unconditionally excludes package-root `tmp` and every directory named `target`, without proving they are build outputs. Cargo permits declared sources such as `[lib] path = \"tmp/lib.rs\"`, so changing that source produces the same implementation-input hash and can incorrectly reuse stale signals. Derive the source closure from Cargo inputs or fail closed when an excluded directory is referenced.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 403,
-              "category": "fingerprint or hash drift"
-            },
-            {
-              "message": "The snapshot-reuse method uses `resolve_target_dir`, whose metadata failure or malformed output silently falls back to `<workspace>/target`. A transient resolution failure can therefore select and verify an old snapshot at the default path instead of forcing rustdoc extraction, contrary to the conservative freshness contract. Use a strict target-directory resolver for reuse that propagates any metadata/parse failure.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/schema_export.rs",
-              "line": 101,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:97dcfc69a1a243b5a184d4652bac69a43cd654319c99aa9558f992e77f24c755",
-          "at": "2026-07-14T07:49:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The freshness hash records environment-variable strings and the fixed `rustup run nightly rustc -Vv` output, but not the identity/content of the actual compiler or documentation executable selected by Cargo (`RUSTDOC`, `CARGO_BUILD_RUSTDOC`/`build.rustdoc`, `RUSTC`, or wrappers). If a custom rustdoc binary changes in place at the same path, the implementation-input hash remains unchanged and `SkipEvaluation` can reuse stale output. Hash the resolved executable identity/content or treat such overrides as indeterminate and re-extract.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 150,
-              "category": "fingerprint or hash drift"
-            },
-            {
-              "message": "`collect_contract_files` recursively traverses contract-source directories and accumulates paths without any depth, file-count, or aggregate-byte bound. The per-file limit is applied only afterward, so a sufficiently deep or large source tree can exhaust stack, memory, or build time. Add fail-closed traversal budgets like those in `build_inputs::collect_package_files`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/build.rs",
-              "line": 97,
-              "category": "unbounded I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:558026a26268af4dc685424096270e2aad704d553675cae278b862f68ff19fa8",
-          "at": "2026-07-14T08:02:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8731cab0eea0e73f011dd79f471915256b7d1a39d115ac6cb0ac9d325ae6b817",
-          "at": "2026-07-14T08:15:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`implementation_input_hash` には target 名または path 文字列だけが入り、custom target JSON の内容が含まれません。同じ path の target specification を変更しても hash が変わらず、古い rustdoc snapshot に対して `SkipEvaluation` が選ばれ得ます。custom target の内容も hash 化するか、解決不能として再利用を拒否してください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 60,
-              "category": "fingerprint or hash drift"
-            },
-            {
-              "message": "評価後に baseline と workspace inputs を再読込して freshness hash を作っていますが、評価前の値との一致を確認していません。長い rustdoc 実行中に source、lockfile、baseline が変更されると、旧入力で生成した signals/snapshot と新入力の hash が同じ artifact に保存され、次回は誤って `SkipEvaluation` できます。評価に使用した同一 bytes の hash を保持するか、前後の hash が一致しなければ再試行または失敗させてください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 585,
-              "category": "fingerprint or hash drift"
-            }
-          ],
-          "hash": "rvw1:sha256:3771fb9e65a19f2ddb7f47666499d8a087719c1469a58a7c3179328fe1788b3b",
-          "at": "2026-07-14T08:56:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The traversal budget counts only regular files. Directories consume no budget, so a package tree containing arbitrarily many empty directories (within the depth limit) causes unbounded `read_dir` recursion during signal freshness calculation. Count every visited directory entry or add a global directory/entry limit.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 481,
-              "category": "unbounded_io"
-            },
-            {
-              "message": "The build-script traversal has the same unbounded-directory gap: `ContractSourceBudget.files` increases only for files, allowing arbitrarily many empty directories to bypass all count and byte limits and exhaust build time/resources. Apply a bounded total-entry or directory count before recursing.",
-              "severity": "P1",
-              "file": "libs/infrastructure/build.rs",
-              "line": 143,
-              "category": "unbounded_io"
-            }
-          ],
-          "hash": "rvw1:sha256:2ab80ccb98381159cdfff16be4b255af3e093dab3c92907344362e890f3b6e3e",
-          "at": "2026-07-14T09:11:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "An absolute `CARGO_TARGET_DIR` with a symlinked ancestor is accepted. For example, with `/tmp/link -> /outside`, `CARGO_TARGET_DIR=/tmp/link/target` causes `symlink_metadata()` to follow `link` and inspect only the real leaf directory. Later checks treat that lexical target as the trusted root and inspect only descendants, so snapshot reuse can read `/outside/target/doc/*.json`. Reject every target-directory component with the existing ancestor-walking symlink guard before trusting it.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/schema_export/path_resolution.rs",
-              "line": 157,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`reject_symlinked_type_signals_anchor` checks only the final path component. A `workspace_root` or `items_dir` reached through a symlinked parent passes this check; subsequent canonicalization resolves both paths through the link, so containment also passes. The freshness pipeline can consequently read build inputs and write signals outside the intended lexical workspace. Use the existing `reject_symlinks_up_to_root` pattern, consistent with the repository's symlink-parent rejection tests.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 82,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:d434e1c39456a2ae052916222537528d2c0441c7c162a391f0554b8b0465be24",
-          "at": "2026-07-14T09:21:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`append_local_package_sources` only hashes files beneath each package directory. Rust inputs can legally escape that directory through `include!`, `include_str!`, `include_bytes!`, or `#[path]`; changing such a shared file leaves `implementation_input_hash` unchanged and can incorrectly select `SkipEvaluation`, accepting stale type signals. Hash compiler-reported external inputs or fail closed when the complete closure cannot be established.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 457,
-              "category": "fingerprint or hash drift"
-            },
-            {
-              "message": "The new freshness commands use `Command::output()`, which buffers unbounded stdout and stderr before any source-closure byte budget applies. `cargo metadata` can contain arbitrarily large manifest metadata/dependency output, so this path can exhaust memory before failing closed; the rustup commands have the same issue. Stream subprocess output through explicit size limits.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 153,
-              "category": "unbounded I/O"
-            },
-            {
-              "message": "Strict snapshot target resolution buffers the complete `cargo metadata --no-deps` stdout/stderr via `Command::output()` without a bound. Large workspace/package metadata can therefore exhaust memory during snapshot lookup. Read the subprocess pipes with a fixed cap and reject over-limit output.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/schema_export/path_resolution.rs",
-              "line": 75,
-              "category": "unbounded I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:29605bf14948ae43ad74f867bd39d05509614c8a5ef350fed3a815b9ee2970e7",
-          "at": "2026-07-14T09:32:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The evaluator and extraction contract digests are built from hand-picked infrastructure paths. Semantics from local path dependencies and helpers outside these lists can change without changing Cargo.lock or the hashed manifests, leaving the contract hash unchanged and permitting stale reuse. Hash the complete resolved code/build closure required by D3/CN-05.",
-              "severity": "P1",
-              "file": "libs/infrastructure/build.rs",
-              "line": 30,
-              "category": "fingerprint or hash drift"
-            },
-            {
-              "message": "Local package hashing walks only the manifest's parent directory and ignores Cargo metadata's `targets[].src_path`. A valid target path outside that directory can therefore change without affecting `implementation_input_hash`, allowing stale rustdoc snapshots to be reused. Hash every resolved target source root or reject targets escaping the package root.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 89,
-              "category": "fingerprint or hash drift"
-            },
-            {
-              "message": "The bounded-output helper limits retained bytes but has no wall-clock timeout: `child.wait()` and the pipe readers can block forever if cargo, rustup, or a descendant never exits or retains a pipe. These calls run in the reviewer prelude, so one stuck subprocess can hang the review indefinitely. Add bounded waiting and process-tree termination.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/capability_exec/process.rs",
-              "line": 56,
-              "category": "unbounded I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:8f2826c6e1d4e7301acd9d99ee3df44a8acb6fcd44686cd3ceb59946fc3e7cee",
-          "at": "2026-07-14T09:49:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cargo metadata`-derived `manifest_path` values are read and recursively traversed without proving that each package root remains under `workspace_root` or another explicitly trusted root. A repository-controlled external path dependency can therefore make freshness calculation enumerate and hash files outside the repository. Apply an `is_safe_briefing_path`-style validation, canonical containment check, and ancestor-symlink rejection; per CN-04, roots that cannot be authorized must fail closed into re-extraction.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 88,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "The new snapshot lookup calls `resolve_rustdoc_root_name`, whose `cargo metadata` subprocess uses unbounded `.output()`. This puts the freshness path at risk of an indefinite subprocess or unbounded stdout/stderr allocation before the bounded metadata lookup runs. Use the bounded command runner with an output cap and timeout.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/schema_export.rs",
-              "line": 99,
-              "category": "unbounded I/O"
-            },
-            {
-              "message": "`core_source_roots` enumerates `libs_root` and grows `roots` without applying the declared entry budget. The later recursive scan is bounded, but a workspace with many direct library entries can consume unbounded time and memory before that budget is created. Apply an entry limit during this top-level scan as well.",
-              "severity": "P1",
-              "file": "libs/infrastructure/build.rs",
-              "line": 40,
-              "category": "unbounded I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:21840407717a26f9b8d64ebddd301ad1853f8325522ff18b713a674e240c6702",
-          "at": "2026-07-14T10:03:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d24e59010e4e1ea74e09258d6434a0a463d7f36a22bc05fc97854a8585343934",
-          "at": "2026-07-14T10:15:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The freshness closure rejects unresolved `custom-build` targets but accepts `proc-macro` targets. Procedural macros can perform arbitrary filesystem I/O while generating the rustdoc-visible API; changing such an external file would not change any currently hashed field, allowing stale `SkipEvaluation`. Reject unresolved proc-macro targets or include a verified hermetic input identity.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 181,
-              "category": "fingerprint or hash drift"
-            },
-            {
-              "message": "The byte scanner can miss valid external-input syntax such as `include /* comment */ !(\"../../shared.rs\")` and `#[cfg_attr(feature = \"x\", path = \"../../shared.rs\")]`. Those referenced files lie outside the walked package tree, so their contents can change without changing `implementation_input_hash`, permitting stale snapshot reuse. Use syntax-aware detection or otherwise fail closed for unresolved source inputs.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 424,
-              "category": "fingerprint or hash drift"
-            }
-          ],
-          "hash": "rvw1:sha256:13f54f7776a8b9681d91d2e1c4dcf97ccc63c716d7ab0de8658dc713086ed38e",
-          "at": "2026-07-14T10:45:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ea48f5a8e6d4de67fcfda698e2d7e8bdd9adfed9b03349056650f822656ff220",
-          "at": "2026-07-14T10:56:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`items_dir` is no longer canonicalized and checked beneath `workspace_root`; the subsequent `join` reads and writes arbitrary paths outside the trusted workspace.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 102,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "Catalogue, baseline, signal, and track paths are read without `reject_symlinks_below`; symlinked files can redirect I/O outside `items_dir`. Restore the existing boundary checks.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 103,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "Source traversal uses `is_dir`/`is_file` and `fs::read`, which follow symlinks. A source symlink can hash external content or recurse through a directory loop, violating the exact-input and fail-closed requirements.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 114,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`canonicalize()` resolves `repo_root` before the symlink check, so a symlinked repository root is accepted and cache writes can target the resolved location instead of the configured trusted root.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/provider_session.rs",
-              "line": 68,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "Existing rustdoc JSON is only checked for bounded UTF-8 text; malformed JSON is passed to evaluation and returns an error instead of taking the required re-extraction path.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
-              "line": 22,
-              "category": null
-            },
-            {
-              "message": "Implementation-input hashing performs unbounded recursive directory traversal and `fs::read` calls after the previous file/count/depth budgets were removed, allowing resource exhaustion instead of fail-closed rejection.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 105,
-              "category": null
-            },
-            {
-              "message": "The rustup identity subprocess uses raw `Command::output()` without an output limit or timeout, so a hung or excessively verbose toolchain command can block or exhaust memory.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 124,
-              "category": null
-            }
-          ],
-          "hash": "rvw1:sha256:9369e443401c3d588b665b348dc3c4c2997b79c0e648ba4691a3c3295bbbcb15",
-          "at": "2026-07-14T18:45:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d32d913f95f27bb2fb1b97ab7200c9d3579648317f20c3d893e89ada929c86ea",
-          "at": "2026-07-14T18:58:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`symlink_metadata(&source_root)` checks only the final `src` component. A symlinked `libs` or crate directory is followed by `read_dir`, allowing source files outside the trusted workspace to be hashed.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 87,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "The implementation hash includes `target_crate` as an extra semantic input, although the contract specifies exactly source contents, `Cargo.lock`, and nightly toolchain identity. This causes hash drift when only the target label changes.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 48,
-              "category": "fingerprint or hash drift"
-            }
-          ],
-          "hash": "rvw1:sha256:c85a8e6ed714dbb8848ec2a126ea0d86109ef5a49f6254c1adc6450203172e57",
-          "at": "2026-07-14T20:39:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a9f7ee6f043cfb07426d268ca1425cb565a9afd89e8b2b425c59dd5ac99e76d0",
-          "at": "2026-07-14T20:49:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_regular_source_file` now passes every source file and `Cargo.lock` directly to `std::fs::read` without a per-file or cumulative byte limit. The file-count/depth caps do not prevent a single large or sparse input from causing an arbitrarily large allocation and resource exhaustion during review. Restore pre-read size checks, a cumulative byte budget, and a post-read race check; exceeding them should make the hash indeterminate and fail closed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 190,
-              "category": "unbounded read"
-            }
-          ],
-          "hash": "rvw1:sha256:a9f7ee6f043cfb07426d268ca1425cb565a9afd89e8b2b425c59dd5ac99e76d0",
-          "at": "2026-07-14T20:54:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`canonical_repo_root` checks only the final path component before canonicalization. If an ancestor is a symlink, canonicalization can redirect the cache root outside the supplied repository, allowing reads/writes there. Reject symlinks through all ancestors before canonicalizing.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/provider_session.rs",
-              "line": 69,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:1c3e956ff0c4c0210b4dd7c34e7ce5b7331ee87bcf736c88ef86f2988bd2dac5",
-          "at": "2026-07-14T21:07:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`fs::read` は事前のサイズ確認後にファイルが拡大すると、上限を超えて無制限に割り当てる可能性があります。bounded reader と post-read 上限検証を使用してください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/provider_session.rs",
-              "line": 223,
-              "category": "unbounded read"
-            }
-          ],
-          "hash": "rvw1:sha256:50def3da520bf62cba83a5342151091dc773bbd218dc89ecf6c864d9c790b0d8",
-          "at": "2026-07-15T00:10:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d157789b247084b0c88bdcdf12528460b41e946dead9903dedb950eba0a17ccd",
-          "at": "2026-07-15T00:20:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute_with_dependencies` reads the catalogue with unbounded `std::fs::read`, and `verify_evaluation_inputs_unchanged` repeats the same unbounded read. An oversized track catalogue can therefore cause arbitrary allocation before decoding. Use a bounded regular-file reader such as `File::take(limit + 1)` for both reads.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 131,
-              "category": "unbounded I/O"
-            },
-            {
-              "message": "`save` does not enforce `MAX_CACHE_ENTRY_BYTES`, although `load` rejects entries above that limit. Because session IDs, provider/model names, and workspace artifact identities have no size bound, the adapter can write a cache entry it cannot subsequently load while also allocating and writing without a bound. Reject oversized encoded entries before opening the file and add a boundary test.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/provider_session.rs",
-              "line": 138,
-              "category": "unbounded I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:d157789b247084b0c88bdcdf12528460b41e946dead9903dedb950eba0a17ccd",
-          "at": "2026-07-15T00:25:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a98bd2ef39bf5b406fcf5ec22ee66bd980abfe7c161363700da84816502a15e",
-          "at": "2026-07-15T00:37:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`MAX_SOURCE_FILES` only counts regular files, while every directory is recursively traversed without any total directory/entry budget. A `src/` tree containing arbitrarily many empty directories can therefore make implementation-input hashing perform unbounded filesystem work despite the advertised traversal cap. Count every visited entry (or add a separate directory budget) and fail closed when the bound is exceeded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
-              "line": 127,
-              "category": "unbounded I/O path"
-            }
-          ],
-          "hash": "rvw1:sha256:5a98bd2ef39bf5b406fcf5ec22ee66bd980abfe7c161363700da84816502a15e",
-          "at": "2026-07-15T00:41:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ad569bf70867ed98b17d47aa26914545c96d0614324387bca87e4cd5c2455e8f",
-          "at": "2026-07-15T00:49:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The re-extraction path discards the pre-launch implementation hash and replaces it only after rustdoc finishes. If source files, Cargo.lock, or the nightly toolchain change during extraction, the resulting rustdoc JSON can represent the old or mixed inputs while the persisted document records the new post-extraction hash. The later unchanged-input check only brackets evaluation, so a subsequent run can incorrectly skip evaluation. When the initial hash was available, compare it with the post-extraction hash and fail or retry on mismatch while retaining the explicit transient-unavailable recovery path.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
-              "line": 185,
-              "category": "fingerprint or hash drift"
-            }
-          ],
-          "hash": "rvw1:sha256:ad569bf70867ed98b17d47aa26914545c96d0614324387bca87e4cd5c2455e8f",
-          "at": "2026-07-15T00:54:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6399fbe9b85730e42be5d1578873bffc2b495114d993dacc1b7d01fff4ef7b8a",
-          "at": "2026-07-15T01:07:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6399fbe9b85730e42be5d1578873bffc2b495114d993dacc1b7d01fff4ef7b8a",
-          "at": "2026-07-15T01:10:59Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01’s requirement for a low-effort fast round, provider-maximum final effort, and preservation of the two-stage review is not deterministically covered. AC-01 only verifies that distinct fast/final effort values resolve, so an implementation using arbitrary values or not preserving the two-stage behavior could pass all ACs.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 330,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "CN-08 requires a new-session fallback when the capability resume cache cannot be read or hashed, but no AC covers those cases. AC-09 covers valid entries and profile/contract mismatch, while AC-10 covers resume failure and expiry; an implementation could omit read/hash-failure fallback and still satisfy every AC.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 250,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "GO-04 promises preservation of review judgment and review-record semantics, but no acceptance criterion deterministically verifies that session resume leaves the judgment/record unit unchanged. AC-03 verifies full-scope rejudgment only, and AC-04 verifies session selection and flag injection; both could pass while resumed rounds alter record semantics.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 42,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:ef0973d9289a0f7ef6da6420df173797ca945a426216056f958ed7aad2c5253e",
-          "at": "2026-07-13T16:40:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22f57e52e8eda72c842a70ee3f0529f018cae653e6a35315453739232c03161c",
-          "at": "2026-07-13T16:45:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-05 permits signal-evaluation skip whenever the implementation, catalogue, baseline, and evaluator hashes match, even when the rustdoc-extraction contract changed or the live snapshot cannot be verified. CN-07 and AC-07 require rustdoc extraction and recalculation in those same cases, so the contract simultaneously permits skipping and requires recomputation, risking stale signals. The skip condition must also account for the extraction contract and snapshot-validity requirements.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 370,
-              "category": "scope / acceptance_criteria contradiction"
-            },
-            {
-              "message": "AC-09 applies its resume requirement to any `sotp capability exec` invocation carrying the resume option, but that command also has an in-host delegation outcome. This requires cache-backed resume for the in-host branch that OS-05 explicitly excludes. Restrict this criterion to provider-subprocess dispatches or explicitly specify that in-host dispatch rejects/ignores resume.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 410,
-              "category": "out_of_scope leakage"
-            }
-          ],
-          "hash": "rvw1:sha256:22f57e52e8eda72c842a70ee3f0529f018cae653e6a35315453739232c03161c",
-          "at": "2026-07-13T16:49:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-03 requires every evaluation whose decision inputs changed to run, but AC-05's complete-skip predicate omits the spec/catalogue↔spec input, and AC-06/AC-07 provide no spec-change path. A spec-only change could therefore satisfy the stated skip conditions and leave catalogue↔spec signals stale, contrary to D3. GO-03 lacks deterministic acceptance coverage for this case.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 370,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "CN-08 and AC-09 require invalidation on a capability execution-contract fingerprint mismatch, but the spec never defines that fingerprint's inputs for generic capability resume; IN-04 defines only the reviewer-specific fingerprint. D4 identifies capability SSoT, always-injected discipline, and declared policy/contract files as inputs. Without an equivalent contract here, downstream phases must invent which changes invalidate the cache, making stale-reuse prevention untestable.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 250,
-              "category": "constraint vague or untestable"
-            }
-          ],
-          "hash": "rvw1:sha256:108da43a56156852b9bd84a34fdafa56d8576cf5c188766aebda83000a916b9d",
-          "at": "2026-07-13T16:54:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-08 requires a fresh session when the concern changes, even if the target artifact remains the same. However, AC-09 only checks the resume option and track/capability/artifact identity, so all acceptance criteria can pass while a same-artifact concern switch incorrectly resumes stale context. This leaves GO-02/GO-04 without deterministic coverage for a prohibited reuse path.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 410,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:d46257338e0adf1ff89460ffa3a3b546f012a8687dfd402f1a78e49915cc5b4a",
-          "at": "2026-07-13T16:58:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0b0673238fe06b26b1bfe37b71c4c5e5a44f3e572d61f83156a1e8c5e7c9191b",
-          "at": "2026-07-13T17:02:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f8e5981a7be92172bfa4dd064dfe92c1bed7668a0ce317b2f4f1290eddeb91e6",
-          "at": "2026-07-14T18:34:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-05 の第1文は declaration_hash の一致も rustdoc 抽出を skip する必要条件にしていますが、同じ AC の第3文と AC-06 は、implementation-side input hash が一致して declaration_hash だけが不一致の場合にも rustdoc を起動しないと定めています。同一状態に対して相反する routing となるため、rustdoc 抽出の要否は implementation-side input hash のみに基づき、declaration/spec の差分は signal 再評価の要否だけを決める契約に統一する必要があります。",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 366,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f8e5981a7be92172bfa4dd064dfe92c1bed7668a0ce317b2f4f1290eddeb91e6",
-          "at": "2026-07-14T19:55:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b9c085bd4ba08195fabcfa858e002be63b3ae1bdc0b035b435cb83ae30088999",
-          "at": "2026-07-14T19:58:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b9c085bd4ba08195fabcfa858e002be63b3ae1bdc0b035b435cb83ae30088999",
-          "at": "2026-07-14T19:59:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d7ea3576ae23b7baa74f3acf9d55bf7f5f52347f549dc1fa9fee25a26f409b45",
-          "at": "2026-07-15T01:51:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d7ea3576ae23b7baa74f3acf9d55bf7f5f52347f549dc1fa9fee25a26f409b45",
-          "at": "2026-07-15T01:53:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a343392f8f0ca60ab5996df09d0fab5afeda437fdd26dc7e69d29c1d72628b2",
-          "at": "2026-07-15T04:33:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a343392f8f0ca60ab5996df09d0fab5afeda437fdd26dc7e69d29c1d72628b2",
-          "at": "2026-07-15T04:37:09Z"
         }
       ]
     },
@@ -2011,6 +1013,87 @@
           "findings": [],
           "hash": "rvw1:sha256:eedb619f1299733a52485fb238105a209f080e2eeafbdcdf91f6f027dfba1d2b",
           "at": "2026-07-15T04:39:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c0b6bacf0aaceb20e965a90901a744fedf4b4f12b41c8df8215b72329e28598",
+          "at": "2026-07-15T09:03:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c0b6bacf0aaceb20e965a90901a744fedf4b4f12b41c8df8215b72329e28598",
+          "at": "2026-07-15T09:13:10Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54109f1fe1308de7696fd7f46c8a0965d2773cc418181a293d1e1dc48a30815e",
+          "at": "2026-07-13T21:30:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54109f1fe1308de7696fd7f46c8a0965d2773cc418181a293d1e1dc48a30815e",
+          "at": "2026-07-13T22:27:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab3669fc27032c1fb5d689af213ea7e3f55436714e4b3a272470d89d9baaf100",
+          "at": "2026-07-14T07:13:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46f2d5e0321ddbbf632186fbd3a0c11e022bacccbaa62c884e9a6874a158447f",
+          "at": "2026-07-14T19:01:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46f2d5e0321ddbbf632186fbd3a0c11e022bacccbaa62c884e9a6874a158447f",
+          "at": "2026-07-15T00:30:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:627d86d50a439095bd58ec77a1dcf5878abb1f51d609205c43c045469c7727a7",
+          "at": "2026-07-15T07:14:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:627d86d50a439095bd58ec77a1dcf5878abb1f51d609205c43c045469c7727a7",
+          "at": "2026-07-15T07:19:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6a9b0c3f101fed82f6cb2f76a1d6e5f10c50fd83872a27b421ddc758b0e7e58",
+          "at": "2026-07-15T09:03:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6a9b0c3f101fed82f6cb2f76a1d6e5f10c50fd83872a27b421ddc758b0e7e58",
+          "at": "2026-07-15T09:07:37Z"
         }
       ]
     },
@@ -2751,6 +1834,1005 @@
           "findings": [],
           "hash": "rvw1:sha256:5a53d3acf2023b66ca59ef7991809cabdd693e79f57b87157ec506f2c575c81f",
           "at": "2026-07-15T04:35:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e891467ff93d26284430666a5fac984f0527b9e7bef538382c7899b271b67a3",
+          "at": "2026-07-15T07:13:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e891467ff93d26284430666a5fac984f0527b9e7bef538382c7899b271b67a3",
+          "at": "2026-07-15T07:16:09Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdddf6274c939ce5cdc37f6c2c1129e63d89d5f6eb34801e190573617c81544c",
+          "at": "2026-07-13T21:22:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The resolved `effort` is discarded here, and `run_dry_fix_codex` consequently launches Codex without `model_reasoning_effort`. Even though missing effort now fails during profile resolution, every successful `dry-fix-lead` dispatch still falls back to Codex's implicit default, violating the explicit/fail-closed effort contract. Capture the effort and pass it into the Codex invocation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/mod.rs",
+              "line": 101,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "The shared ref/obligation verifier runner discards the resolved `effort`. The Codex branch continues to hardcode `high`, so configured fast=`low` and final=`xhigh` executions both run at the wrong level; Claude/Gemini likewise receive no resolved effort. Thread the typed effort into each provider's argument builder instead of using a hardcoded or provider-default value.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/process_runner.rs",
+              "line": 150,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:fdddf6274c939ce5cdc37f6c2c1129e63d89d5f6eb34801e190573617c81544c",
+          "at": "2026-07-13T21:28:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e59c03d6ef6415eb3268146a08c3f11e9e5e98e785bc4b48272f42aa074afeb",
+          "at": "2026-07-13T22:23:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "For out-of-host Claude dispatches, the resolved `request.profile.effort` is dropped: `build_claude_args` receives only capability, model, and prompt, so no `--effort` flag reaches the subprocess. An explicitly configured effort therefore silently falls back to Claude's provider default, violating D1's fail-closed execution contract.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/claude.rs",
+              "line": 86,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "Codex generic dispatch similarly ignores `request.profile.effort`; the generated arguments contain model and sandbox but no `model_reasoning_effort` override. Capabilities resolved through `AgentProfilesCapabilityAdapter` consequently run with Codex's implicit default despite having a validated explicit effort.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/codex.rs",
+              "line": 106,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:169809b5acf9f4dab608ec9434e354c65d79aa2e66fd6f7b6de09cccb96cd60b",
+          "at": "2026-07-13T23:12:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03b87380b15ff20b933e349c1d18deff5cc996ea7d77c54a345e78282b5213dc",
+          "at": "2026-07-13T23:23:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The baseline is hashed before its symlink guard runs. Because `SkipEvaluation` returns before the later guard, a symlinked baseline outside `canonical_items` can participate in a successful freshness match. Run `reject_symlinks_below(&baseline_path, &canonical_items)` before `hash_identity`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 384,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The persisted signal artifact is read without checking the leaf or its ancestors for symlinks. A valid schema-v2 document reached through a symlink can supply the recorded hashes and trigger `SkipEvaluation`. Apply the established `reject_symlinks_below` guard before reading it.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 404,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "Both contract fingerprints hash only `type_signals_evaluator.rs`. Evaluator behavior also depends on `signal_evaluator_v2`, `signal_tags`, codecs and rules, while extraction behavior depends on `schema_export`, target/root resolution, invocation arguments, features, and configuration. Changes to those inputs leave these hashes unchanged and can incorrectly reuse stale signals or snapshots. Hash the complete resolved closures required by ADR D3.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 385,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "The build-input fingerprint treats every local package closure as fully resolved after hashing its package tree, but it neither discovers build-script inputs outside that tree nor rejects custom-build packages whose inputs cannot be determined. For example, changing a workspace-level schema named by `cargo:rerun-if-changed` can alter generated public API while this hash remains unchanged, allowing a stale snapshot reuse. Detect unresolved build-script inputs and fail closed, or include their resolved files/tools in the hash.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 45,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "The new reuse path loads both existing rustdoc snapshots and persisted signal artifacts with unbounded `read_to_string` calls. A malformed large file can exhaust memory before parsing; the existing signal reader already establishes a 16 MiB bounded-read pattern. Enforce explicit size limits before these reads.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 125,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:f78259925398ee05a8c1a269624ac4cc81d6f45d83dfc95642f8f923b81f6f9b",
+          "at": "2026-07-14T06:25:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The evaluator/extraction fingerprints hash files from the runtime source checkout identified by the compile-time `CARGO_MANIFEST_DIR`, rather than the code embedded in the running `bin/sotp`. If source B is evaluated with an older binary A, that binary writes results produced by A while recording B's hash; after installing binary B, the hashes match and evaluation can be skipped, leaving stale signals. Exported/transplanted binaries can also reference a nonexistent build-host path. Embed a build-time contract digest in the binary instead of reading mutable source files at runtime.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 103,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "`encode` serializes the document's arbitrary schema version even though this codec only supports the current version. Because `TypeSignalsDocument::with_schema_version` is public, callers can emit a schema-v3 file with the schema-v2 shape which this codec immediately rejects on read. Validate the version before serialization or always emit `TYPE_SIGNALS_SCHEMA_VERSION`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_codec.rs",
+              "line": 175,
+              "category": "serde codec break"
+            },
+            {
+              "message": "Cargo configuration files are detected with `is_file()` and loaded with `std::fs::read`, both of which follow symlinks. This bypasses the repository's real-file config convention and can read configuration outside the intended config root. Use `symlink_metadata()` and reject symlinks before loading, following the `scope_config_loader.rs` pattern.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 343,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The common build-input reader follows symlinks for workspace/package manifests and `Cargo.lock`; unlike the source traversal, it performs no `symlink_metadata().file_type().is_symlink()` rejection. A symlinked freshness input can therefore escape the trusted workspace boundary. Reject symlinks before every `append_file` read.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 496,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The build-input closure recursively enumerates every regular file under each local package and then reads each file fully into memory without any file-count, depth, per-file-size, or aggregate-byte bound. A large generated file or sufficiently large tree can exhaust memory or make the mandatory review prelude effectively unbounded. Apply explicit traversal and byte limits and fail closed when exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 446,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:c8afca2938289c68dc6ead57b858c194ccfcb7dd989880c5b769e8f6786b9bdc",
+          "at": "2026-07-14T07:16:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workspace-root symlink check occurs only later in the evaluation, after this call has already executed `cargo metadata` and traversed manifests and source files beneath `workspace_root`. Because leaf `symlink_metadata` checks follow symlinked ancestors, a symlinked workspace root reaches external I/O before rejection. Validate the workspace anchor before any freshness hashing or snapshot resolution.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 452,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "Build scripts are rejected only for local/path packages. Registry or git dependencies with `custom-build` targets remain reusable even though their outputs can depend on untracked system files; changing such an input can alter rustdoc output without changing this digest. Reject unresolved build scripts across the complete dependency closure or hash their resolved inputs/outputs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 69,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "The source collector unconditionally excludes package-root `tmp` and every directory named `target`, without proving they are build outputs. Cargo permits declared sources such as `[lib] path = \"tmp/lib.rs\"`, so changing that source produces the same implementation-input hash and can incorrectly reuse stale signals. Derive the source closure from Cargo inputs or fail closed when an excluded directory is referenced.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 403,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "The snapshot-reuse method uses `resolve_target_dir`, whose metadata failure or malformed output silently falls back to `<workspace>/target`. A transient resolution failure can therefore select and verify an old snapshot at the default path instead of forcing rustdoc extraction, contrary to the conservative freshness contract. Use a strict target-directory resolver for reuse that propagates any metadata/parse failure.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 101,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:97dcfc69a1a243b5a184d4652bac69a43cd654319c99aa9558f992e77f24c755",
+          "at": "2026-07-14T07:49:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The freshness hash records environment-variable strings and the fixed `rustup run nightly rustc -Vv` output, but not the identity/content of the actual compiler or documentation executable selected by Cargo (`RUSTDOC`, `CARGO_BUILD_RUSTDOC`/`build.rustdoc`, `RUSTC`, or wrappers). If a custom rustdoc binary changes in place at the same path, the implementation-input hash remains unchanged and `SkipEvaluation` can reuse stale output. Hash the resolved executable identity/content or treat such overrides as indeterminate and re-extract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 150,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "`collect_contract_files` recursively traverses contract-source directories and accumulates paths without any depth, file-count, or aggregate-byte bound. The per-file limit is applied only afterward, so a sufficiently deep or large source tree can exhaust stack, memory, or build time. Add fail-closed traversal budgets like those in `build_inputs::collect_package_files`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/build.rs",
+              "line": 97,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:558026a26268af4dc685424096270e2aad704d553675cae278b862f68ff19fa8",
+          "at": "2026-07-14T08:02:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8731cab0eea0e73f011dd79f471915256b7d1a39d115ac6cb0ac9d325ae6b817",
+          "at": "2026-07-14T08:15:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`implementation_input_hash` には target 名または path 文字列だけが入り、custom target JSON の内容が含まれません。同じ path の target specification を変更しても hash が変わらず、古い rustdoc snapshot に対して `SkipEvaluation` が選ばれ得ます。custom target の内容も hash 化するか、解決不能として再利用を拒否してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 60,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "評価後に baseline と workspace inputs を再読込して freshness hash を作っていますが、評価前の値との一致を確認していません。長い rustdoc 実行中に source、lockfile、baseline が変更されると、旧入力で生成した signals/snapshot と新入力の hash が同じ artifact に保存され、次回は誤って `SkipEvaluation` できます。評価に使用した同一 bytes の hash を保持するか、前後の hash が一致しなければ再試行または失敗させてください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 585,
+              "category": "fingerprint or hash drift"
+            }
+          ],
+          "hash": "rvw1:sha256:3771fb9e65a19f2ddb7f47666499d8a087719c1469a58a7c3179328fe1788b3b",
+          "at": "2026-07-14T08:56:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The traversal budget counts only regular files. Directories consume no budget, so a package tree containing arbitrarily many empty directories (within the depth limit) causes unbounded `read_dir` recursion during signal freshness calculation. Count every visited directory entry or add a global directory/entry limit.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 481,
+              "category": "unbounded_io"
+            },
+            {
+              "message": "The build-script traversal has the same unbounded-directory gap: `ContractSourceBudget.files` increases only for files, allowing arbitrarily many empty directories to bypass all count and byte limits and exhaust build time/resources. Apply a bounded total-entry or directory count before recursing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/build.rs",
+              "line": 143,
+              "category": "unbounded_io"
+            }
+          ],
+          "hash": "rvw1:sha256:2ab80ccb98381159cdfff16be4b255af3e093dab3c92907344362e890f3b6e3e",
+          "at": "2026-07-14T09:11:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "An absolute `CARGO_TARGET_DIR` with a symlinked ancestor is accepted. For example, with `/tmp/link -> /outside`, `CARGO_TARGET_DIR=/tmp/link/target` causes `symlink_metadata()` to follow `link` and inspect only the real leaf directory. Later checks treat that lexical target as the trusted root and inspect only descendants, so snapshot reuse can read `/outside/target/doc/*.json`. Reject every target-directory component with the existing ancestor-walking symlink guard before trusting it.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/schema_export/path_resolution.rs",
+              "line": 157,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`reject_symlinked_type_signals_anchor` checks only the final path component. A `workspace_root` or `items_dir` reached through a symlinked parent passes this check; subsequent canonicalization resolves both paths through the link, so containment also passes. The freshness pipeline can consequently read build inputs and write signals outside the intended lexical workspace. Use the existing `reject_symlinks_up_to_root` pattern, consistent with the repository's symlink-parent rejection tests.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 82,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:d434e1c39456a2ae052916222537528d2c0441c7c162a391f0554b8b0465be24",
+          "at": "2026-07-14T09:21:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`append_local_package_sources` only hashes files beneath each package directory. Rust inputs can legally escape that directory through `include!`, `include_str!`, `include_bytes!`, or `#[path]`; changing such a shared file leaves `implementation_input_hash` unchanged and can incorrectly select `SkipEvaluation`, accepting stale type signals. Hash compiler-reported external inputs or fail closed when the complete closure cannot be established.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 457,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "The new freshness commands use `Command::output()`, which buffers unbounded stdout and stderr before any source-closure byte budget applies. `cargo metadata` can contain arbitrarily large manifest metadata/dependency output, so this path can exhaust memory before failing closed; the rustup commands have the same issue. Stream subprocess output through explicit size limits.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 153,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "Strict snapshot target resolution buffers the complete `cargo metadata --no-deps` stdout/stderr via `Command::output()` without a bound. Large workspace/package metadata can therefore exhaust memory during snapshot lookup. Read the subprocess pipes with a fixed cap and reject over-limit output.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export/path_resolution.rs",
+              "line": 75,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:29605bf14948ae43ad74f867bd39d05509614c8a5ef350fed3a815b9ee2970e7",
+          "at": "2026-07-14T09:32:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The evaluator and extraction contract digests are built from hand-picked infrastructure paths. Semantics from local path dependencies and helpers outside these lists can change without changing Cargo.lock or the hashed manifests, leaving the contract hash unchanged and permitting stale reuse. Hash the complete resolved code/build closure required by D3/CN-05.",
+              "severity": "P1",
+              "file": "libs/infrastructure/build.rs",
+              "line": 30,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "Local package hashing walks only the manifest's parent directory and ignores Cargo metadata's `targets[].src_path`. A valid target path outside that directory can therefore change without affecting `implementation_input_hash`, allowing stale rustdoc snapshots to be reused. Hash every resolved target source root or reject targets escaping the package root.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 89,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "The bounded-output helper limits retained bytes but has no wall-clock timeout: `child.wait()` and the pipe readers can block forever if cargo, rustup, or a descendant never exits or retains a pipe. These calls run in the reviewer prelude, so one stuck subprocess can hang the review indefinitely. Add bounded waiting and process-tree termination.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/process.rs",
+              "line": 56,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:8f2826c6e1d4e7301acd9d99ee3df44a8acb6fcd44686cd3ceb59946fc3e7cee",
+          "at": "2026-07-14T09:49:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cargo metadata`-derived `manifest_path` values are read and recursively traversed without proving that each package root remains under `workspace_root` or another explicitly trusted root. A repository-controlled external path dependency can therefore make freshness calculation enumerate and hash files outside the repository. Apply an `is_safe_briefing_path`-style validation, canonical containment check, and ancestor-symlink rejection; per CN-04, roots that cannot be authorized must fail closed into re-extraction.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 88,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The new snapshot lookup calls `resolve_rustdoc_root_name`, whose `cargo metadata` subprocess uses unbounded `.output()`. This puts the freshness path at risk of an indefinite subprocess or unbounded stdout/stderr allocation before the bounded metadata lookup runs. Use the bounded command runner with an output cap and timeout.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export.rs",
+              "line": 99,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "`core_source_roots` enumerates `libs_root` and grows `roots` without applying the declared entry budget. The later recursive scan is bounded, but a workspace with many direct library entries can consume unbounded time and memory before that budget is created. Apply an entry limit during this top-level scan as well.",
+              "severity": "P1",
+              "file": "libs/infrastructure/build.rs",
+              "line": 40,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:21840407717a26f9b8d64ebddd301ad1853f8325522ff18b713a674e240c6702",
+          "at": "2026-07-14T10:03:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d24e59010e4e1ea74e09258d6434a0a463d7f36a22bc05fc97854a8585343934",
+          "at": "2026-07-14T10:15:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The freshness closure rejects unresolved `custom-build` targets but accepts `proc-macro` targets. Procedural macros can perform arbitrary filesystem I/O while generating the rustdoc-visible API; changing such an external file would not change any currently hashed field, allowing stale `SkipEvaluation`. Reject unresolved proc-macro targets or include a verified hermetic input identity.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 181,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "The byte scanner can miss valid external-input syntax such as `include /* comment */ !(\"../../shared.rs\")` and `#[cfg_attr(feature = \"x\", path = \"../../shared.rs\")]`. Those referenced files lie outside the walked package tree, so their contents can change without changing `implementation_input_hash`, permitting stale snapshot reuse. Use syntax-aware detection or otherwise fail closed for unresolved source inputs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 424,
+              "category": "fingerprint or hash drift"
+            }
+          ],
+          "hash": "rvw1:sha256:13f54f7776a8b9681d91d2e1c4dcf97ccc63c716d7ab0de8658dc713086ed38e",
+          "at": "2026-07-14T10:45:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea48f5a8e6d4de67fcfda698e2d7e8bdd9adfed9b03349056650f822656ff220",
+          "at": "2026-07-14T10:56:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`items_dir` is no longer canonicalized and checked beneath `workspace_root`; the subsequent `join` reads and writes arbitrary paths outside the trusted workspace.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 102,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "Catalogue, baseline, signal, and track paths are read without `reject_symlinks_below`; symlinked files can redirect I/O outside `items_dir`. Restore the existing boundary checks.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 103,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "Source traversal uses `is_dir`/`is_file` and `fs::read`, which follow symlinks. A source symlink can hash external content or recurse through a directory loop, violating the exact-input and fail-closed requirements.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 114,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`canonicalize()` resolves `repo_root` before the symlink check, so a symlinked repository root is accepted and cache writes can target the resolved location instead of the configured trusted root.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/provider_session.rs",
+              "line": 68,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "Existing rustdoc JSON is only checked for bounded UTF-8 text; malformed JSON is passed to evaluation and returns an error instead of taking the required re-extraction path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/freshness.rs",
+              "line": 22,
+              "category": null
+            },
+            {
+              "message": "Implementation-input hashing performs unbounded recursive directory traversal and `fs::read` calls after the previous file/count/depth budgets were removed, allowing resource exhaustion instead of fail-closed rejection.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 105,
+              "category": null
+            },
+            {
+              "message": "The rustup identity subprocess uses raw `Command::output()` without an output limit or timeout, so a hung or excessively verbose toolchain command can block or exhaust memory.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 124,
+              "category": null
+            }
+          ],
+          "hash": "rvw1:sha256:9369e443401c3d588b665b348dc3c4c2997b79c0e648ba4691a3c3295bbbcb15",
+          "at": "2026-07-14T18:45:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d32d913f95f27bb2fb1b97ab7200c9d3579648317f20c3d893e89ada929c86ea",
+          "at": "2026-07-14T18:58:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`symlink_metadata(&source_root)` checks only the final `src` component. A symlinked `libs` or crate directory is followed by `read_dir`, allowing source files outside the trusted workspace to be hashed.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 87,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The implementation hash includes `target_crate` as an extra semantic input, although the contract specifies exactly source contents, `Cargo.lock`, and nightly toolchain identity. This causes hash drift when only the target label changes.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 48,
+              "category": "fingerprint or hash drift"
+            }
+          ],
+          "hash": "rvw1:sha256:c85a8e6ed714dbb8848ec2a126ea0d86109ef5a49f6254c1adc6450203172e57",
+          "at": "2026-07-14T20:39:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9f7ee6f043cfb07426d268ca1425cb565a9afd89e8b2b425c59dd5ac99e76d0",
+          "at": "2026-07-14T20:49:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_regular_source_file` now passes every source file and `Cargo.lock` directly to `std::fs::read` without a per-file or cumulative byte limit. The file-count/depth caps do not prevent a single large or sparse input from causing an arbitrarily large allocation and resource exhaustion during review. Restore pre-read size checks, a cumulative byte budget, and a post-read race check; exceeding them should make the hash indeterminate and fail closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 190,
+              "category": "unbounded read"
+            }
+          ],
+          "hash": "rvw1:sha256:a9f7ee6f043cfb07426d268ca1425cb565a9afd89e8b2b425c59dd5ac99e76d0",
+          "at": "2026-07-14T20:54:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`canonical_repo_root` checks only the final path component before canonicalization. If an ancestor is a symlink, canonicalization can redirect the cache root outside the supplied repository, allowing reads/writes there. Reject symlinks through all ancestors before canonicalizing.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/provider_session.rs",
+              "line": 69,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:1c3e956ff0c4c0210b4dd7c34e7ce5b7331ee87bcf736c88ef86f2988bd2dac5",
+          "at": "2026-07-14T21:07:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`fs::read` は事前のサイズ確認後にファイルが拡大すると、上限を超えて無制限に割り当てる可能性があります。bounded reader と post-read 上限検証を使用してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/provider_session.rs",
+              "line": 223,
+              "category": "unbounded read"
+            }
+          ],
+          "hash": "rvw1:sha256:50def3da520bf62cba83a5342151091dc773bbd218dc89ecf6c864d9c790b0d8",
+          "at": "2026-07-15T00:10:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d157789b247084b0c88bdcdf12528460b41e946dead9903dedb950eba0a17ccd",
+          "at": "2026-07-15T00:20:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_with_dependencies` reads the catalogue with unbounded `std::fs::read`, and `verify_evaluation_inputs_unchanged` repeats the same unbounded read. An oversized track catalogue can therefore cause arbitrary allocation before decoding. Use a bounded regular-file reader such as `File::take(limit + 1)` for both reads.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 131,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "`save` does not enforce `MAX_CACHE_ENTRY_BYTES`, although `load` rejects entries above that limit. Because session IDs, provider/model names, and workspace artifact identities have no size bound, the adapter can write a cache entry it cannot subsequently load while also allocating and writing without a bound. Reject oversized encoded entries before opening the file and add a boundary test.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/provider_session.rs",
+              "line": 138,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:d157789b247084b0c88bdcdf12528460b41e946dead9903dedb950eba0a17ccd",
+          "at": "2026-07-15T00:25:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a98bd2ef39bf5b406fcf5ec22ee66bd980abfe7c161363700da84816502a15e",
+          "at": "2026-07-15T00:37:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MAX_SOURCE_FILES` only counts regular files, while every directory is recursively traversed without any total directory/entry budget. A `src/` tree containing arbitrarily many empty directories can therefore make implementation-input hashing perform unbounded filesystem work despite the advertised traversal cap. Count every visited entry (or add a separate directory budget) and fail closed when the bound is exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 127,
+              "category": "unbounded I/O path"
+            }
+          ],
+          "hash": "rvw1:sha256:5a98bd2ef39bf5b406fcf5ec22ee66bd980abfe7c161363700da84816502a15e",
+          "at": "2026-07-15T00:41:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad569bf70867ed98b17d47aa26914545c96d0614324387bca87e4cd5c2455e8f",
+          "at": "2026-07-15T00:49:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The re-extraction path discards the pre-launch implementation hash and replaces it only after rustdoc finishes. If source files, Cargo.lock, or the nightly toolchain change during extraction, the resulting rustdoc JSON can represent the old or mixed inputs while the persisted document records the new post-extraction hash. The later unchanged-input check only brackets evaluation, so a subsequent run can incorrectly skip evaluation. When the initial hash was available, compare it with the post-extraction hash and fail or retry on mismatch while retaining the explicit transient-unavailable recovery path.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 185,
+              "category": "fingerprint or hash drift"
+            }
+          ],
+          "hash": "rvw1:sha256:ad569bf70867ed98b17d47aa26914545c96d0614324387bca87e4cd5c2455e8f",
+          "at": "2026-07-15T00:54:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6399fbe9b85730e42be5d1578873bffc2b495114d993dacc1b7d01fff4ef7b8a",
+          "at": "2026-07-15T01:07:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6399fbe9b85730e42be5d1578873bffc2b495114d993dacc1b7d01fff4ef7b8a",
+          "at": "2026-07-15T01:10:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87773944f3736e71f5b012a3f08303db0d7a4cab6755774d5447b488a3c2cfc9",
+          "at": "2026-07-15T07:14:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new Codex stdout collector accumulates the entire `--json` event stream in one `String` for the duration of the reviewer subprocess. A verbose or malfunctioning child can therefore cause unbounded heap growth and OOM before the timeout; the previous implementation continuously drained and discarded this stream. Capture only a bounded `thread_id` event while continuing to drain subsequent output.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+              "line": 469,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:87773944f3736e71f5b012a3f08303db0d7a4cab6755774d5447b488a3c2cfc9",
+          "at": "2026-07-15T07:19:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e4e811e011f529f1f19cd4cc08dc817732e0d85d7964a388f7e39bc5d705f57d",
+          "at": "2026-07-15T07:29:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Claude stdout is now bounded, but stderr is still accumulated without limit in a `String`. A noisy or malfunctioning reviewer child can exhaust the parent process heap before the timeout; cap retained stderr bytes while continuing to drain the pipe.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "line": 445,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "The authoritative `--output-last-message` file is read with unbounded `read_to_string`. A malformed reviewer subprocess can create an arbitrarily large file and exhaust memory during verdict loading; enforce a maximum size and fail closed on overflow.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+              "line": 381,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "Codex stderr is streamed into a persistent session-log file without any byte limit. A verbose or malfunctioning child can exhaust workspace disk before the timeout; retain a bounded log while continuing to drain stderr.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+              "line": 464,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:e4e811e011f529f1f19cd4cc08dc817732e0d85d7964a388f7e39bc5d705f57d",
+          "at": "2026-07-15T07:34:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d849c558c8834f7700495d3bc2176fa6ee723c79c1b856dc323bdebf930d3872",
+          "at": "2026-07-15T07:47:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`drain_pipe` discards stdout via `BufRead::lines()`, which allocates until a newline is found. A malfunctioning child can emit an arbitrarily long newline-free record and exhaust heap memory even though the content is discarded. Drain fixed-size byte chunks instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/codex_common.rs",
+              "line": 185,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "The authoritative verdict file is opened without rejecting symlinks. The file can be replaced after initialization and before this read, redirecting verdict parsing to another file. Enforce real-file semantics with the same explicit `symlink_metadata().file_type().is_symlink()` rejection used by `scope_config_loader.rs` before opening the file.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+              "line": 428,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:d849c558c8834f7700495d3bc2176fa6ee723c79c1b856dc323bdebf930d3872",
+          "at": "2026-07-15T07:49:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bec4bd4731a6fa65ecf462402ecb3cb89d2b56fd1d7e415371aa6304c8421fd5",
+          "at": "2026-07-15T08:01:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bec4bd4731a6fa65ecf462402ecb3cb89d2b56fd1d7e415371aa6304c8421fd5",
+          "at": "2026-07-15T08:02:26Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c576a936b9b6507fada977cc6eb7efded1d6a73a2c9785ddbdbeefc829ed272",
+          "at": "2026-07-13T21:28:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c576a936b9b6507fada977cc6eb7efded1d6a73a2c9785ddbdbeefc829ed272",
+          "at": "2026-07-13T21:34:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ReasoningEffort waiver is justified by Batch A scheduling and future tasks (T003/T007), not by an entry-local reason why this type cannot cover CN-02. This leaves the waiver dependent on implementation sequencing; replace it with an entry-surface argument, as done for CapabilityProfile, or bind the behavior to a real test.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 16,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:21a589da3491af2f83c9071d99dd9dd85fd9d128402e43e06aaac4053eda6d36",
+          "at": "2026-07-13T22:22:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b78fe666ca9abf35ce4243b3a6b350be26411b813f511db106f7b319fb2d75ef",
+          "at": "2026-07-13T22:28:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:528254b6e817585913367db1da724f5ad2adb69d04c55d473e05115daf4969ee",
+          "at": "2026-07-13T23:10:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2172f1f05f8cd47f0b2be88e3ffeadce96cb3c49ab78dec175523db8511993aa",
+          "at": "2026-07-14T07:19:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb40827d2b2e6317e5522f58c2e385840200b5d8b4e3f3e0ffa102d437417c55",
+          "at": "2026-07-14T08:52:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This waiver cites the plan task `T007` and a specific test to justify the waiver. The briefing requires waiver reasons to argue only from the entry's declared surface, with no task IDs or scheduling language. Rewrite the rationale solely in terms of `FsProviderSessionCacheAdapter`'s observable API and limitations.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 699,
+              "category": "test_obligation_waiver"
+            },
+            {
+              "message": "This waiver assigns the behavior to plan task `T007`, directly violating the requirement that waiver reasons contain no task IDs and rely only on the entry's declared surface. Explain only why `ProviderSessionCacheEntry` cannot represent or perform the AC-10 behavior.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 2845,
+              "category": "test_obligation_waiver"
+            }
+          ],
+          "hash": "rvw1:sha256:c6e0dab0b4af61ef4b1f70b2201b00b803850614056eb5259772ab0e4444395a",
+          "at": "2026-07-15T00:31:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01173c3a7019127403b345fc0fa9c6558cebe49d15bd63bd540a7496df798b4e",
+          "at": "2026-07-15T00:36:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regenerated obligations add 19 enforced `logic_result` obligations for `ObligationsDocument`, `TestBindingsDocument`, and `TestObligation`, but none has a fulfillment or waiver in `test-bindings.json`. Consequently, `bin/sotp test-obligation check --track-id agent-dispatch-cost-reduction-2026-07-13` fails with `Missing` drifts. Add bindings and regenerate the caches before committing these obligations.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/obligations.json",
+              "line": 4,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1123dafe3aad472a41cf8070d95fd65397434b551362fa0897d4d8b4e8536e26",
+          "at": "2026-07-15T01:51:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `method:staleness_against` fulfillment is bound only to edge-ownership and evaluation-fan-out tests; none invokes `ObligationsDocument::staleness_against`. Consequently the generated cache marks both associated edges fulfilled using unrelated assertions, so the obligation gate can remain green without evidence for this method. Bind the existing staleness tests instead and regenerate the cache.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 158,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:9b0c8ede22450cebd8468f41e3ffd50258bda00b516c4c4950deccdfffc9f8bb",
+          "at": "2026-07-15T02:18:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Eleven voluntary-binding records contain duplicate TestLocation entries. SignalCompositionRoot repeats the same test seven times for IN-06, IN-07, CN-07, and AC-05 through AC-08; TypeSignalsDocument/IN-05 and both RustdocSchemaExporter edges repeat it twice; TypeSignalsReuseDecision/IN-05 repeats it three times. The evaluator concatenates every listed test body without deduplication, so these records inject 47 redundant test-body copies into verifier prompts, overweight a single test, and produce duplicate-sensitive `bound_tests_set_hash` values. Deduplicate each record and regenerate the fulfillment cache.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 2109,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f412a908920fb07d36cd1cadd80cf89b3e6750e7e214346714a78129ef9641ed",
+          "at": "2026-07-15T02:53:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The fulfillment for `ObligationsDocument::track_id` binds only edge-ownership and evaluator tests; none calls `track_id()`. The existing `test_obligations_document_round_trips` test does exercise this accessor but is not bound, so the obligation is incorrectly reported as fulfilled.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 38,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The fulfillment for `TestBindingsDocument::track_id` binds waiver/evaluator tests that never call `track_id()`. Bind `test_bindings_document_round_trips`, which actually verifies this accessor, so the gate cannot pass on unrelated evidence.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 203,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The fulfillments for `TestObligation::{target_entry,target_role,brief,declaration_hash}` all cite the same ownership/evaluator tests, none of which invokes these accessors. `test_obligation_exposes_all_components` exercises all four but is absent, causing four public-API obligations to be marked fulfilled without relevant evidence.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 353,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:b8f224ffaf621b4d0da73dfb2aa3d795a4b0882ab7adb23b534437e5076a3b90",
+          "at": "2026-07-15T03:14:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82f2f5809fb058a2365c3f73cd0a03f16a6fd405d0cae01e3ea7598e54ba309c",
+          "at": "2026-07-15T03:24:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5fb5e5400122362ba4cba66a0dac8c10f1eb83ec0b3864c6822d5d1fad16d910",
+          "at": "2026-07-15T08:03:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c31a029ae142071a29ba460b2bd60753eb0b18e42de99c08e9ed32965bf6bc7",
+          "at": "2026-07-15T08:14:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `ClaudeReviewer` contract-conformance fulfillment still does not bind `test_claude_reviewer_resumes_only_matching_track_scope_and_round_key_unit`. The bound static-cache tests do not prove IN-03's track/scope/round isolation or fast-to-final fresh-session behavior; binding that test only to AC-03/AC-04 cannot support the separate IN-03 verdict. Add it to this fulfillment and regenerate the cache.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 3753,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The `ReviewCompositionRoot` bindings for CN-02, CN-03, and CN-09 still contain only infrastructure reviewer unit tests. None execute `ReviewCompositionRoot`, so regressions in its flag/profile wiring, current-scope propagation, or review-record persistence would leave these entry-specific edges fulfilled. Bind composition-level evidence for each edge and regenerate the cache.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 3917,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:0c31a029ae142071a29ba460b2bd60753eb0b18e42de99c08e9ed32965bf6bc7",
+          "at": "2026-07-15T08:16:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test-bindings.json` has changed again beyond the previously reviewed T004 append (the new diff adds evidence tests for ReviewCompositionRoot IN-04/CN-02/CN-03/CN-09), but `obligation-fulfillment-cache.json` is unchanged for those records. Because each cache entry stores `bound_tests_set_hash`, the cached frozen verdicts are stale relative to the current bindings and the machine artifacts are internally inconsistent; regenerate the cache after the binding update.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/obligation-fulfillment-cache.json",
+              "line": null,
+              "category": "artifact-consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:33744cdcb62bf8a64ffb165bd7274de54fe0e529cd6f292a1ca7593310f6d5ee",
+          "at": "2026-07-15T08:22:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33744cdcb62bf8a64ffb165bd7274de54fe0e529cd6f292a1ca7593310f6d5ee",
+          "at": "2026-07-15T08:26:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33744cdcb62bf8a64ffb165bd7274de54fe0e529cd6f292a1ca7593310f6d5ee",
+          "at": "2026-07-15T08:27:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d2d7d2d6715731c4f8c730ac39afedbdd78218e3b06ae66b6862b6644c4d5f9",
+          "at": "2026-07-15T09:23:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d2d7d2d6715731c4f8c730ac39afedbdd78218e3b06ae66b6862b6644c4d5f9",
+          "at": "2026-07-15T09:27:03Z"
         }
       ]
     },
@@ -2799,6 +2881,203 @@
           "findings": [],
           "hash": "rvw1:sha256:94558f51cde94d5697892908fc3135e71a440eab683d03a8e4718095e93bc3f1",
           "at": "2026-07-13T22:28:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39de4b61175f8eae85d637acc63f231904a65f78d4e677d60f7585dd5cdf6d4c",
+          "at": "2026-07-15T08:15:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39de4b61175f8eae85d637acc63f231904a65f78d4e677d60f7585dd5cdf6d4c",
+          "at": "2026-07-15T08:17:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d4bd5d68e5b3e70c2441ba5c1c48bfaa3501c5a3b32e0c547bfdd11b4d1db53",
+          "at": "2026-07-15T09:24:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review_operational` excludes only the fulfillment half of the test-obligation verdict-cache pair. `bin/sotp test-obligation evaluate` persists both `obligation-fulfillment-cache.json` and `waiver-cache.json`, and the workflow explicitly treats both as generated frozen-verdict outputs. Because `waiver-cache.json` still classifies as `other`, any evaluation that refreshes a waiver verdict changes the reviewed `other` hash and recreates the evaluate → stale → re-review loop this change is intended to eliminate. Add `track/items/<track-id>/waiver-cache.json` to `review_operational` as well.",
+              "severity": "P1",
+              "file": ".harness/config/review-scope.json",
+              "line": 90,
+              "category": "review-scope or briefing wiring inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:7d4bd5d68e5b3e70c2441ba5c1c48bfaa3501c5a3b32e0c547bfdd11b4d1db53",
+          "at": "2026-07-15T09:27:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b569660c79bb29bbb7ed6dc39be4ddfcb2ca4fe7a62de8bbdabab215886ea65d",
+          "at": "2026-07-15T09:29:59Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f823dbe2f4d57aa7514f3bee9dd3e60725bc9194d47e63ded184ebefccd042fc",
+          "at": "2026-07-13T21:19:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f823dbe2f4d57aa7514f3bee9dd3e60725bc9194d47e63ded184ebefccd042fc",
+          "at": "2026-07-13T21:25:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24b5c380b1839ad24c958d3695386c78ef662c5f0bca2e0a881e615b88eafe80",
+          "at": "2026-07-14T06:23:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`waived_edges` は `plan_fulfillment_record` にしか適用されません。Waiver と同じ edge の `VoluntaryBinding` はこの owner ループで Fulfillment action を生成し続けるため、check gate の waiver precedence と不一致になり、不要な二重 adjudication と誤った tally/cache を生じます。",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 241,
+              "category": "orchestration correctness"
+            },
+            {
+              "message": "この変更で 1 件の voluntary binding が複数 owner 分の Fulfillment action を生成する一方、calibration の production-pair 数は voluntary binding を 1 件として数えます。そのため複数 owner のケースでは実際の adjudication 数より少ない calibration probe しか発行されず、検出率ゲートが過少評価されます。",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 248,
+              "category": "orchestration correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6b6a98fc2331e19453ade77317f50a4a5648166317cc5b825aba29526d079a9c",
+          "at": "2026-07-14T18:36:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77b39e740d38b8c312b79f4d65f284144539b4a20d0ed0614bf2eaa9987ed39f",
+          "at": "2026-07-14T18:41:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ProviderSessionCacheError` exposes filesystem/codec mechanics (`Io`, `Symlink`, `Path`, `Codec`) through the usecase port. This makes callers aware of adapter implementation details and allows infrastructure errors to leak across the abstraction boundary. Replace these with usecase-level cache failure concepts and map filesystem-specific causes inside the infrastructure adapter.",
+              "severity": "P1",
+              "file": "libs/usecase/src/provider_session.rs",
+              "line": 155,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:77b39e740d38b8c312b79f4d65f284144539b4a20d0ed0614bf2eaa9987ed39f",
+          "at": "2026-07-14T19:56:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbe2efc47790d96ebec9fd456250b18d44e7bafd732646ce5de448ce087421f0",
+          "at": "2026-07-14T20:37:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbe2efc47790d96ebec9fd456250b18d44e7bafd732646ce5de448ce087421f0",
+          "at": "2026-07-14T20:40:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3428042737be1093ef766fefd09810ce32140240cb273a364f51bd9de7018551",
+          "at": "2026-07-14T23:43:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan_binding_records` decides the domain-level precedence rule that a waiver suppresses fulfillment and voluntary bindings. This duplicates the same rule from the check gate, allowing evaluators to diverge when the rule changes. Move precedence/mutual-exclusivity resolution onto the domain binding model and let the usecase orchestrate the resolved outcome, per `hexagonal-architecture.md` §CLI as Composition Root.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 121,
+              "category": "business logic leak"
+            },
+            {
+              "message": "The usecase defines edge ownership by comparing an obligation's entry key and spec references. That relationship is a domain predicate, and duplicating it here (including the existing single-owner variant) risks inconsistent ownership semantics across check/evaluate flows. Expose this through `TestObligation` or `ObligationsDocument` in domain and consume it from the orchestrator, per `hexagonal-architecture.md` §CLI as Composition Root.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/edges.rs",
+              "line": 41,
+              "category": "business logic leak"
+            }
+          ],
+          "hash": "rvw1:sha256:3428042737be1093ef766fefd09810ce32140240cb273a364f51bd9de7018551",
+          "at": "2026-07-14T23:45:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bba94a081460da6b47f3077c640556b4eadb7fe5b772f2e417c4b9579db279d4",
+          "at": "2026-07-15T00:00:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bba94a081460da6b47f3077c640556b4eadb7fe5b772f2e417c4b9579db279d4",
+          "at": "2026-07-15T00:02:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f59a5f81fe369af64ec0b69a9cc7be4908e4698d9fd0a00bf06b8972360a637",
+          "at": "2026-07-15T01:56:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f59a5f81fe369af64ec0b69a9cc7be4908e4698d9fd0a00bf06b8972360a637",
+          "at": "2026-07-15T01:58:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b4a1a4603984292f0a680187437b174a8167798e231327f6044dc8a43aa85c",
+          "at": "2026-07-15T02:52:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b4a1a4603984292f0a680187437b174a8167798e231327f6044dc8a43aa85c",
+          "at": "2026-07-15T02:54:44Z"
         }
       ]
     }

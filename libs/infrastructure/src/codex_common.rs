@@ -13,7 +13,7 @@
 //! `runtime_path`.
 
 use std::ffi::OsString;
-use std::io::{BufRead, BufReader, Write};
+use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::thread;
@@ -32,6 +32,12 @@ pub(crate) const POLL_INTERVAL: Duration = Duration::from_millis(50);
 /// `apps/cli-composition` are coincidental constants and remain in their
 /// respective layers (CN-03 minimization; no cross-layer dep may be added).
 pub(crate) const REVIEW_RUNTIME_DIR: &str = "tmp/reviewer-runtime";
+
+/// Maximum stderr bytes retained in a persistent Codex session log.
+///
+/// Stderr is still drained and echoed after this limit, but no additional data
+/// is written to the workspace log file.
+pub(crate) const MAX_CODEX_SESSION_LOG_BYTES: u64 = 4 * 1024 * 1024;
 
 /// Build the argument vector for a `codex exec --sandbox read-only` invocation.
 ///
@@ -175,26 +181,106 @@ pub(crate) fn spawn_codex(
 /// Drains a pipe to prevent the child process from blocking on a full buffer.
 /// Content is intentionally discarded.
 pub(crate) fn drain_pipe(pipe: std::process::ChildStdout) {
-    let reader = BufReader::new(pipe);
-    for line in reader.lines() {
-        if line.is_err() {
-            break;
+    let mut buffer = [0_u8; 8 * 1024];
+    drain_reader(pipe, &mut buffer);
+}
+
+/// Drains a reader in fixed-size byte chunks, discarding all content.
+///
+/// This intentionally avoids line-oriented reads: a newline-free child stream
+/// must not cause the drain thread to allocate a buffer proportional to input.
+fn drain_reader<R: Read>(mut reader: R, buffer: &mut [u8]) {
+    loop {
+        match reader.read(buffer) {
+            Ok(0) | Err(_) => break,
+            Ok(_) => {}
         }
     }
 }
 
-/// Tees the child's stderr to a log file while also printing to the current
-/// process's stderr.
-pub fn tee_stderr_to_file(pipe: std::process::ChildStderr, mut log_file: std::fs::File) {
-    let reader = BufReader::new(pipe);
-    for line in reader.lines() {
-        match line {
-            Ok(line) => {
-                let _ = writeln!(log_file, "{line}");
-                eprintln!("{line}");
-            }
-            Err(_) => break,
+/// Tees the child's stderr to a bounded log file while also printing it to the
+/// current process's stderr.
+pub fn tee_stderr_to_file(pipe: std::process::ChildStderr, log_file: std::fs::File) {
+    tee_stderr_to_writer_with_limit(pipe, log_file, MAX_CODEX_SESSION_LOG_BYTES, true);
+}
+
+fn tee_stderr_to_writer_with_limit<R: Read, W: Write>(
+    mut pipe: R,
+    mut log_file: W,
+    max_log_bytes: u64,
+    echo_to_stderr: bool,
+) {
+    let mut retained = 0_u64;
+    let mut chunk = [0_u8; 8 * 1024];
+
+    loop {
+        let read = match pipe.read(&mut chunk) {
+            Ok(0) | Err(_) => break,
+            Ok(read) => read,
+        };
+        let Some(bytes) = chunk.get(..read) else {
+            break;
+        };
+        if echo_to_stderr {
+            let _ = std::io::stderr().write_all(bytes);
+        }
+
+        let write_len = max_log_bytes.saturating_sub(retained).min(read as u64) as usize;
+        if write_len > 0 {
+            let _ = log_file.write_all(bytes.get(..write_len).unwrap_or_default());
+            retained = retained.saturating_add(write_len as u64);
         }
     }
     let _ = log_file.flush();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    struct CountingReader {
+        inner: std::io::Cursor<Vec<u8>>,
+        read_calls: usize,
+        bytes_read: usize,
+    }
+
+    impl CountingReader {
+        fn new(bytes: Vec<u8>) -> Self {
+            Self { inner: std::io::Cursor::new(bytes), read_calls: 0, bytes_read: 0 }
+        }
+    }
+
+    impl Read for CountingReader {
+        fn read(&mut self, buffer: &mut [u8]) -> std::io::Result<usize> {
+            self.read_calls = self.read_calls.saturating_add(1);
+            let read = self.inner.read(buffer)?;
+            self.bytes_read = self.bytes_read.saturating_add(read);
+            Ok(read)
+        }
+    }
+
+    #[test]
+    fn test_drain_reader_newline_free_stream_uses_fixed_chunks() {
+        let mut reader = CountingReader::new(vec![b'x'; 10]);
+        let mut small_buffer = [0_u8; 3];
+
+        drain_reader(&mut reader, &mut small_buffer);
+
+        assert_eq!(reader.bytes_read, 10);
+        assert_eq!(reader.read_calls, 5);
+    }
+
+    #[test]
+    fn test_tee_stderr_to_writer_with_limit_over_cap_retains_prefix_and_drains() {
+        let mut session_log = Vec::new();
+
+        tee_stderr_to_writer_with_limit(
+            std::io::Cursor::new(b"0123456789"),
+            &mut session_log,
+            4,
+            false,
+        );
+
+        assert_eq!(session_log, b"0123");
+    }
 }

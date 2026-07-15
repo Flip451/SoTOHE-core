@@ -85,7 +85,10 @@
     "track/items/<track-id>/spec-adr-verify-cache.json",
     "track/items/<track-id>/spec-adr-verify-cache.json.lock",
     "track/items/<track-id>/*-catalogue-spec-verify-cache.json",
-    "track/items/<track-id>/*-catalogue-spec-verify-cache.json.lock"
+    "track/items/<track-id>/*-catalogue-spec-verify-cache.json.lock",
+    "track/items/<track-id>/.provider-sessions/**",
+    "track/items/<track-id>/obligation-fulfillment-cache.json",
+    "track/items/<track-id>/waiver-cache.json"
   ],
   "other_track": [
     "track/items/<other-track>/**",

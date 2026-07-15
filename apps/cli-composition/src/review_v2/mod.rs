@@ -13,8 +13,10 @@ pub(crate) mod results;
 pub(crate) mod run;
 pub mod run_fix;
 pub(crate) mod scope;
+mod session_context;
 pub(crate) mod shared;
 mod shim;
+mod telemetry_support;
 
 pub use inputs::{
     ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
@@ -42,73 +44,20 @@ use helpers::{
 use results::render_review_results_str;
 use run::{run_claude_review_str, run_codex_review_str};
 use scope::validate_scope_for_track_str;
+use session_context::reviewer_session_context;
 use shared::{build_scope_query_interactor_no_diff_str, build_scope_query_interactor_str};
+use telemetry_support::review_telemetry_for_outcome;
 
 use std::path::PathBuf;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use infrastructure::agent_profiles::ResolvedExecution;
 use infrastructure::review_v2::{ClaudeReviewer, CodexReviewer};
-use usecase::dry_write_driver::CapabilityName;
+use usecase::{capability_exec::ReasoningEffort, dry_write_driver::CapabilityName};
 
 use crate::{CommandOutcome, error::CompositionError};
 
 pub use shim::ReviewCompositionRoot;
-
-struct ReviewTelemetry<'a> {
-    findings_count: u32,
-    round_type: &'a str,
-    verdict_parse_failed: bool,
-    emit_subprocess: bool,
-    subprocess_started_at: Option<Instant>,
-}
-
-fn review_telemetry_for_outcome<'a, E>(
-    run_result: &'a Result<CodexReviewOutcome, E>,
-    requested_round_type: &'a str,
-) -> Option<ReviewTelemetry<'a>> {
-    match run_result {
-        Ok(CodexReviewOutcome::FinalCompleted {
-            findings_count, subprocess_started_at, ..
-        }) => Some(ReviewTelemetry {
-            findings_count: *findings_count,
-            round_type: "final",
-            verdict_parse_failed: false,
-            emit_subprocess: true,
-            subprocess_started_at: Some(*subprocess_started_at),
-        }),
-        Ok(CodexReviewOutcome::FastCompleted { findings_count, subprocess_started_at, .. }) => {
-            Some(ReviewTelemetry {
-                findings_count: *findings_count,
-                round_type: "fast",
-                verdict_parse_failed: false,
-                emit_subprocess: true,
-                subprocess_started_at: Some(*subprocess_started_at),
-            })
-        }
-        Ok(CodexReviewOutcome::Skipped { .. }) => Some(ReviewTelemetry {
-            findings_count: 0,
-            round_type: requested_round_type,
-            verdict_parse_failed: false,
-            emit_subprocess: false,
-            subprocess_started_at: None,
-        }),
-        Ok(CodexReviewOutcome::SubprocessFailed {
-            round_type,
-            verdict_parse_failed,
-            findings_count,
-            subprocess_started_at,
-            ..
-        }) => Some(ReviewTelemetry {
-            findings_count: *findings_count,
-            round_type,
-            verdict_parse_failed: *verdict_parse_failed,
-            emit_subprocess: true,
-            subprocess_started_at: Some(*subprocess_started_at),
-        }),
-        Err(_) => None,
-    }
-}
 
 impl ReviewCompositionRoot {
     /// Run the local Codex-backed reviewer and auto-record verdict to review.json.
@@ -155,8 +104,24 @@ impl ReviewCompositionRoot {
         .map_err(CompositionError::Infrastructure)?;
 
         let timeout = Duration::from_secs(input.timeout_seconds);
-        let reviewer =
-            CodexReviewer::new(&input.model, timeout, base_prompt).with_scope_label(&group);
+        let session = reviewer_session_context(
+            &track_id,
+            &group,
+            &input.round_type,
+            &input.model,
+            base_prompt,
+            &input.items_dir,
+        )?;
+        let reviewer = CodexReviewer::new(
+            session.track_id,
+            session.scope,
+            session.round_type,
+            session.model,
+            ReasoningEffort::High,
+            timeout,
+            session.prompt,
+            session.cache,
+        );
 
         let round_start = std::time::Instant::now();
         let run_result =
@@ -240,8 +205,24 @@ impl ReviewCompositionRoot {
         .map_err(CompositionError::Infrastructure)?;
 
         let timeout = Duration::from_secs(input.timeout_seconds);
-        let reviewer =
-            ClaudeReviewer::new(&input.model, timeout, base_prompt).with_scope_label(&group);
+        let session = reviewer_session_context(
+            &track_id,
+            &group,
+            &input.round_type,
+            &input.model,
+            base_prompt,
+            &input.items_dir,
+        )?;
+        let reviewer = ClaudeReviewer::new(
+            session.track_id,
+            session.scope,
+            session.round_type,
+            session.model,
+            ReasoningEffort::High,
+            timeout,
+            session.prompt,
+            session.cache,
+        );
 
         let round_start = std::time::Instant::now();
         let run_result =
@@ -301,7 +282,8 @@ impl ReviewCompositionRoot {
         let resolved = profiles
             .resolve_execution(&capability, infra_round_type)
             .map_err(|error| CompositionError::ConfigLoad(error.to_string()))?;
-        let ResolvedExecution::ProviderCli { provider, model: profile_model, .. } = resolved else {
+        let ResolvedExecution::ProviderCli { provider, model: profile_model, effort } = resolved
+        else {
             return Err(CompositionError::ConfigLoad(
                 "[ERROR] reviewer must resolve to a provider CLI execution".to_owned(),
             ));
@@ -344,8 +326,24 @@ impl ReviewCompositionRoot {
         let round_start = std::time::Instant::now();
         let (run_result, provider_name, effective_model) = match provider.as_str() {
             "codex" => {
-                let reviewer =
-                    CodexReviewer::new(&model, timeout, base_prompt).with_scope_label(&group);
+                let session = reviewer_session_context(
+                    &track_id,
+                    &group,
+                    &input.round_type,
+                    &model,
+                    base_prompt,
+                    &input.items_dir,
+                )?;
+                let reviewer = CodexReviewer::new(
+                    session.track_id,
+                    session.scope,
+                    session.round_type,
+                    session.model,
+                    effort,
+                    timeout,
+                    session.prompt,
+                    session.cache,
+                );
                 let result = run_codex_review_str(
                     &track_id,
                     &input.items_dir,
@@ -356,8 +354,24 @@ impl ReviewCompositionRoot {
                 (result, "codex".to_owned(), model)
             }
             "claude" => {
-                let reviewer =
-                    ClaudeReviewer::new(&model, timeout, base_prompt).with_scope_label(&group);
+                let session = reviewer_session_context(
+                    &track_id,
+                    &group,
+                    &input.round_type,
+                    &model,
+                    base_prompt,
+                    &input.items_dir,
+                )?;
+                let reviewer = ClaudeReviewer::new(
+                    session.track_id,
+                    session.scope,
+                    session.round_type,
+                    session.model,
+                    effort,
+                    timeout,
+                    session.prompt,
+                    session.cache,
+                );
                 let result = run_claude_review_str(
                     &track_id,
                     &input.items_dir,
@@ -689,6 +703,20 @@ mod tests {
     use std::path::PathBuf;
     use std::process::Command;
 
+    use super::{ReviewCompositionRoot, ReviewRunCodexInput};
+    use domain::{
+        TrackId,
+        review_v2::{MainScopeName, RoundType, ScopeName},
+    };
+    use infrastructure::provider_session::FsProviderSessionCacheAdapter;
+    use usecase::{
+        capability_exec::{ModelName, ProviderName, ReasoningEffort},
+        provider_session::{
+            ProviderSessionCacheEntry, ProviderSessionCacheKey, ProviderSessionCachePort,
+            ProviderSessionId,
+        },
+    };
+
     use crate::review_v2::process_guards::{CwdGuard, EnvGuard, GitRunner};
     #[cfg(unix)]
     use crate::test_support::make_executable;
@@ -844,7 +872,19 @@ case "$1" in
     exit 0
     ;;
 esac
-out="${{11}}"
+out=""
+args="$*"
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --output-last-message)
+      out="$2"
+      shift 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
 if [ -z "$out" ]; then
   echo "missing output-last-message" >&2
   exit 9
@@ -878,6 +918,70 @@ printf '{"verdict":"zero_findings","findings":[]}\n' > "$out"
 exit 0
 "#,
         );
+    }
+
+    #[cfg(unix)]
+    fn write_recording_codex_reviewer_bin(
+        bin_dir: &std::path::Path,
+        arguments_log: &std::path::Path,
+        fail_resume: bool,
+    ) {
+        let resume_failure =
+            if fail_resume { "case \"$args\" in *resume*) exit 7 ;; esac" } else { "" };
+        write_fake_codex_bin_with_body(
+            bin_dir,
+            &format!(
+                r#"
+printf '%s' "$args" | tr '\n' ' ' >> '{}'
+printf '\n' >> '{}'
+{resume_failure}
+printf '{{"verdict":"zero_findings","findings":[]}}\n' > "$out"
+printf '{{"thread_id":"new-session"}}\n'
+exit 0
+"#,
+                arguments_log.display(),
+                arguments_log.display()
+            ),
+        );
+    }
+
+    #[cfg(unix)]
+    fn seed_reviewer_session(
+        repo: &ReviewEntrypointRepo,
+        scope: ScopeName,
+        round_type: RoundType,
+        model: &str,
+    ) {
+        let cache = FsProviderSessionCacheAdapter::new(
+            repo._dir.path().to_path_buf(),
+            PathBuf::from("tmp/capability-runtime"),
+        );
+        let key = ProviderSessionCacheKey::Review {
+            track_id: TrackId::try_new(repo.track_id.clone()).unwrap(),
+            scope,
+            round_type,
+        };
+        let entry = ProviderSessionCacheEntry::new(
+            ProviderSessionId::try_new("prior-session".to_owned()).unwrap(),
+            ProviderName::try_new("codex".to_owned()).unwrap(),
+            ModelName::try_new(model.to_owned()).unwrap(),
+            ReasoningEffort::High,
+        );
+        cache.save(&key, &entry).unwrap();
+    }
+
+    #[cfg(unix)]
+    fn codex_review_input(repo: &ReviewEntrypointRepo, round_type: &str) -> ReviewRunCodexInput {
+        ReviewRunCodexInput {
+            model: "codex-review-model".to_owned(),
+            timeout_seconds: 10,
+            briefing_file: None,
+            prompt: Some("Review.".to_owned()),
+            track_id: Some(repo.track_id.clone()),
+            round_type: round_type.to_owned(),
+            group: "cli_composition".to_owned(),
+            items_dir: repo.items_dir.clone(),
+        }
     }
 
     #[cfg(unix)]
@@ -1010,6 +1114,114 @@ exit 0
         assert!(outcome.stdout.as_deref().unwrap_or("").contains("zero_findings"));
         assert!(repo.track_dir.join("review.json").exists());
         assert_review_telemetry(&repo.track_dir, "codex", "codex-review-model", "codex", "fast");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_composition_root_resumes_matching_scope_session_and_persists_review_record() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-session-resume-2026");
+        let bin_dir = repo.track_dir.join("fake-bin-session-resume");
+        let arguments_log = repo.track_dir.join("codex-arguments.log");
+        write_recording_codex_reviewer_bin(&bin_dir, &arguments_log, false);
+        seed_reviewer_session(
+            &repo,
+            ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+            RoundType::Fast,
+            "codex-review-model",
+        );
+        let _path_guard = prepend_path(&bin_dir);
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let outcome = ReviewCompositionRoot::new()
+            .review_run_codex(codex_review_input(&repo, "fast"))
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        let arguments = fs::read_to_string(arguments_log).unwrap();
+        assert!(arguments.contains("resume prior-session"), "expected resume argv: {arguments}");
+        assert!(
+            arguments.contains("--model codex-review-model"),
+            "missing model argv: {arguments}"
+        );
+        assert!(arguments.contains("--sandbox read-only"), "missing sandbox argv: {arguments}");
+        assert!(
+            arguments.contains("model_reasoning_effort=\"high\""),
+            "missing effort argv: {arguments}"
+        );
+        let review_record = fs::read_to_string(repo.track_dir.join("review.json")).unwrap();
+        assert!(review_record.contains("zero_findings"));
+        assert!(review_record.contains("fast"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_composition_root_starts_fresh_for_model_mismatch_first_round_and_fast_to_final()
+    {
+        let _lock = cwd_lock().lock().unwrap();
+        for (name, round_type, seeded) in [
+            ("model-mismatch", "fast", Some((RoundType::Fast, "previous-model"))),
+            ("first-round", "fast", None),
+            ("fast-to-final", "final", Some((RoundType::Fast, "codex-review-model"))),
+        ] {
+            let repo = setup_review_entrypoint_repo(&format!("review-session-{name}-2026"));
+            let bin_dir = repo.track_dir.join("fake-bin-session-fresh");
+            let arguments_log = repo.track_dir.join("codex-arguments.log");
+            write_recording_codex_reviewer_bin(&bin_dir, &arguments_log, false);
+            if let Some((seed_round, model)) = seeded {
+                seed_reviewer_session(
+                    &repo,
+                    ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+                    seed_round,
+                    model,
+                );
+            }
+            let _path_guard = prepend_path(&bin_dir);
+            let _cwd_guard = CwdGuard::save_current();
+            std::env::set_current_dir(repo._dir.path()).unwrap();
+
+            let outcome = ReviewCompositionRoot::new()
+                .review_run_codex(codex_review_input(&repo, round_type))
+                .unwrap();
+
+            assert_eq!(outcome.exit_code, 0, "{name}");
+            let arguments = fs::read_to_string(arguments_log).unwrap();
+            assert!(!arguments.contains("resume"), "{name} must start fresh: {arguments}");
+            assert!(arguments.contains("--model codex-review-model"), "{name}: {arguments}");
+            assert!(arguments.contains("--sandbox read-only"), "{name}: {arguments}");
+            assert!(arguments.contains("model_reasoning_effort=\"high\""), "{name}: {arguments}");
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_composition_root_resume_failure_falls_back_to_fresh_session() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-session-fallback-2026");
+        let bin_dir = repo.track_dir.join("fake-bin-session-fallback");
+        let arguments_log = repo.track_dir.join("codex-arguments.log");
+        write_recording_codex_reviewer_bin(&bin_dir, &arguments_log, true);
+        seed_reviewer_session(
+            &repo,
+            ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+            RoundType::Fast,
+            "codex-review-model",
+        );
+        let _path_guard = prepend_path(&bin_dir);
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let outcome = ReviewCompositionRoot::new()
+            .review_run_codex(codex_review_input(&repo, "fast"))
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        let arguments = fs::read_to_string(arguments_log).unwrap();
+        let attempts: Vec<&str> = arguments.lines().collect();
+        assert_eq!(attempts.len(), 2, "resume failure must retry fresh: {attempts:?}");
+        assert!(attempts.first().is_some_and(|attempt| attempt.contains("resume prior-session")));
+        assert!(attempts.get(1).is_some_and(|attempt| !attempt.contains("resume")));
     }
 
     #[cfg(unix)]

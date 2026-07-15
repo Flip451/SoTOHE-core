@@ -3748,6 +3748,237 @@
           "test_name": "test_edge_ownership_unmatched_entry_returns_none"
         }
       ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ClaudeReviewer",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resume_failure_retries_fresh_invocation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_expired_session_starts_fresh_with_explicit_flags"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resumes_only_matching_track_scope_and_round_key_unit"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "CodexReviewer",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resume_failure_retries_fresh_invocation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::session::tests",
+          "test_name": "test_reviewer_session_final_never_loads_fast_entry"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_expired_session_starts_fresh_with_explicit_flags"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resumes_only_matching_track_scope_and_round_key_unit"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "ClaudeReviewer", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "IN-04" } },
+      "tests": [
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resume_failure_retries_fresh_invocation" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_expired_session_starts_fresh_with_explicit_flags" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "ClaudeReviewer", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "CN-02" } },
+      "tests": [{ "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" }]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "ClaudeReviewer", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "CN-06" } },
+      "tests": [
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resume_failure_retries_fresh_invocation" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_expired_session_starts_fresh_with_explicit_flags" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "ClaudeReviewer", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "AC-03" } },
+      "tests": [
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resumes_only_matching_track_scope_and_round_key_unit" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "ClaudeReviewer", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "AC-04" } },
+      "tests": [
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resume_failure_retries_fresh_invocation" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_expired_session_starts_fresh_with_explicit_flags" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resumes_only_matching_track_scope_and_round_key_unit" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "CodexReviewer", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "IN-04" } },
+      "tests": [
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_failure_retries_fresh_invocation" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_expired_session_starts_fresh_with_explicit_flags" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "CodexReviewer", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "CN-02" } },
+      "tests": [{ "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" }]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "CodexReviewer", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "CN-06" } },
+      "tests": [
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_failure_retries_fresh_invocation" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_expired_session_starts_fresh_with_explicit_flags" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "CodexReviewer", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "AC-03" } },
+      "tests": [
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resumes_only_matching_track_scope_and_round_key_unit" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "CodexReviewer", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "AC-04" } },
+      "tests": [
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_failure_retries_fresh_invocation" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_expired_session_starts_fresh_with_explicit_flags" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resumes_only_matching_track_scope_and_round_key_unit" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "ReviewCompositionRoot", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "IN-03" } },
+      "tests": [
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_resumes_matching_scope_session_and_persists_review_record" },
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_starts_fresh_for_model_mismatch_first_round_and_fast_to_final" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resumes_only_matching_track_scope_and_round_key_unit" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "ReviewCompositionRoot", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "IN-04" } },
+      "tests": [
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_resumes_matching_scope_session_and_persists_review_record" },
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_starts_fresh_for_model_mismatch_first_round_and_fast_to_final" },
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_resume_failure_falls_back_to_fresh_session" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_expired_session_starts_fresh_with_explicit_flags" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_expired_session_starts_fresh_with_explicit_flags" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "ReviewCompositionRoot", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "CN-02" } },
+      "tests": [
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_resumes_matching_scope_session_and_persists_review_record" },
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_starts_fresh_for_model_mismatch_first_round_and_fast_to_final" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "ReviewCompositionRoot", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "CN-03" } },
+      "tests": [
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_resumes_matching_scope_session_and_persists_review_record" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "ReviewCompositionRoot", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "CN-06" } },
+      "tests": [
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_starts_fresh_for_model_mismatch_first_round_and_fast_to_final" },
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_resume_failure_falls_back_to_fresh_session" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_expired_session_starts_fresh_with_explicit_flags" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_expired_session_starts_fresh_with_explicit_flags" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "ReviewCompositionRoot", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "CN-09" } },
+      "tests": [
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_resumes_matching_scope_session_and_persists_review_record" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "ReviewCompositionRoot", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "AC-03" } },
+      "tests": [
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_resumes_matching_scope_session_and_persists_review_record" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resumes_only_matching_track_scope_and_round_key_unit" }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": { "entry_key": "ReviewCompositionRoot", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "AC-04" } },
+      "tests": [
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_resumes_matching_scope_session_and_persists_review_record" },
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_starts_fresh_for_model_mismatch_first_round_and_fast_to_final" },
+        { "layer": "cli_composition", "module_path": "cli_composition::review_v2::tests", "test_name": "test_review_composition_root_resume_failure_falls_back_to_fresh_session" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::claude_reviewer::tests", "test_name": "test_claude_reviewer_expired_session_starts_fresh_with_explicit_flags" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
+        { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_expired_session_starts_fresh_with_explicit_flags" }
+      ]
     }
   ]
 }

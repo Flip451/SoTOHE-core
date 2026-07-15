@@ -21,7 +21,7 @@
     {
       "id": "T004",
       "description": "Modify `libs/usecase/src/review_v2/ports.rs` (`Reviewer`), `libs/infrastructure/src/review_v2/{claude_reviewer,codex_reviewer}.rs` (`ClaudeReviewer` and `CodexReviewer`), `apps/cli/src/commands/review/{mod,local,claude_local,codex_local}.rs` (`ReviewCommand` and `cli::commands::review::execute`), and `apps/cli-composition/src/review_v2/{mod,run,shared,shim}.rs` (`ReviewCompositionRoot`); add boundary tests and `track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json` entries. IN-01, IN-03, IN-04, CN-02, CN-03, CN-06, CN-09, AC-01, AC-03, AC-04.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T005",

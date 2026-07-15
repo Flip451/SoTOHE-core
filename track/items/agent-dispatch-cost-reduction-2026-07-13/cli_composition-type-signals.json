@@ -1,13 +1,13 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-14T20:51:20Z",
-  "declaration_hash": "c4d13bf41a765c52f0aaec8626266ff7c70ff9ef7868d279c3ace2ca688f5327",
-  "implementation_input_hash": "9b3a944a42c411401c0633595f2c1c17d3ab2ef392af7077c2fcbfe89bf1d1d9",
+  "generated_at": "2026-07-15T08:58:07Z",
+  "declaration_hash": "d2bec862daba71852cd8f5aad2e6a3d46d439a216a19c95ac29aa3b741231302",
+  "implementation_input_hash": "f7f002580b10a6e0c42d2dc7dc58014b917c6796da31283cb2ace34bb31ca0fd",
   "signals": [
     {
       "type_name": "ReviewCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
