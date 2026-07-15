@@ -367,7 +367,7 @@ fn contains_machine_home_path(
             .copied()
             .or(preceding_buffered_byte);
         window == home_dir
-            && preceding_byte.is_none_or(is_machine_path_boundary)
+            && preceding_byte.is_none_or(is_machine_path_preceding_boundary)
             && match bytes.get(index + home_dir.len()) {
                 Some(following) => is_machine_path_boundary(*following),
                 None => at_end_of_file,
@@ -375,7 +375,19 @@ fn contains_machine_home_path(
     })
 }
 
+/// Returns whether a byte can immediately precede a machine-home path.
+///
+/// `../home/<user>` and `/./home/<user>` resolve into the home directory, so
+/// a preceding `.` must not shield the match. Over-matching an unusual spelling
+/// such as `foo../home/<user>` is acceptable for this fail-closed leak gate.
+fn is_machine_path_preceding_boundary(byte: u8) -> bool {
+    byte == b'.' || is_machine_path_boundary(byte)
+}
+
 /// Returns whether a byte separates a path token from surrounding text.
+///
+/// A following `.` is deliberately not a boundary: `/home/<user>.bak` is a
+/// sibling path rather than the machine home directory.
 fn is_machine_path_boundary(byte: u8) -> bool {
     matches!(
         byte,
@@ -423,6 +435,30 @@ mod tests {
             .unwrap();
 
         assert!(file_contains_machine_home_path(&file_path, b"/work-machine/home").is_err());
+    }
+
+    #[test]
+    fn test_file_contains_machine_home_path_parent_or_current_dir_spelling_returns_true() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("machine-path.txt");
+        let machine_home = b"/home/work-machine";
+
+        for content in
+            [b"/tmp/../home/work-machine/f".as_slice(), b"/x/./home/work-machine/f".as_slice()]
+        {
+            std::fs::write(&file_path, content).unwrap();
+
+            assert!(file_contains_machine_home_path(&file_path, machine_home).unwrap());
+        }
+    }
+
+    #[test]
+    fn test_file_contains_machine_home_path_sibling_suffix_returns_false() {
+        let temp_dir = TempDir::new().unwrap();
+        let file_path = temp_dir.path().join("machine-path.txt");
+        std::fs::write(&file_path, b"/home/work-machine.bak").unwrap();
+
+        assert!(!file_contains_machine_home_path(&file_path, b"/home/work-machine").unwrap());
     }
 
     #[test]
