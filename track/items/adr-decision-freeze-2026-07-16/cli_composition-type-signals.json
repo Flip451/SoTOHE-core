@@ -1,14 +1,28 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-16T15:01:16Z",
-  "declaration_hash": "72d514145d91fd8551d7957ecb3447c26f3767a2c4d4cb46e69034bcc0d98744",
-  "implementation_input_hash": "c9bf0f3ee9320e6ea83627a8c17d435b2e8bbf81f2839dfa6e3b31234c63ec47",
+  "generated_at": "2026-07-16T18:38:00Z",
+  "declaration_hash": "372522c52e697582bf91be66539cc817555a1eed3ebcc95bde1405dccd17872e",
+  "implementation_input_hash": "ba3135e6dacdd7fa35b18f96ab4fd5931149295aab94a3ed4125e9635b26a3c4",
   "signals": [
     {
       "type_name": "AdrBaselineCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Default"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineResolutionError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
     }
   ]
 }

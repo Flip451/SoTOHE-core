@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 //! Domain layer for the SoTOHE-core track state machine.
 
+pub mod adr_baseline;
 pub mod adr_decision;
 pub mod auto_phase;
 pub mod branch_strategy;
@@ -35,6 +36,12 @@ pub mod track_phase;
 pub use track_phase::{FixpointStep, ReviewScopeSet, ReviewScopeSetError};
 pub mod verify;
 
+pub use adr_baseline::{
+    AdrBaselineCheckOutcome, AdrBaselineCheckOutcomeError, AdrBaselineCheckViolation,
+    AdrBaselineCheckViolations, AdrBaselineKind, AdrBaselineLedgerEntry,
+    AdrBaselineRecordedCopyStatus, AdrBaselineSourceState, AdrSourceFileName,
+    AdrSourceFileNameError,
+};
 pub use adr_decision::{
     AcceptedDecision, AdrDecisionCommon, AdrDecisionCommonError, AdrDecisionEntry, AdrFilePort,
     AdrFilePortError, AdrFrontMatter, AdrFrontMatterError, AdrVerifyReport, DecisionGroundRef,

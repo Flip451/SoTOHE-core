@@ -1,6 +1,137 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrBaselineDriver::handle` duplicates the kind/reason semantic legality check (`requires_reason` versus `reason.is_some()`) in the primary adapter. This is business logic that the briefing states is owned by the use-case interactor; the driver should only map the typed input, invoke the single service, and render its result.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 228,
+              "category": "business logic in adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:ac9961cd6cce471be01fef90ce4675cbe38e25f342a0679b9614cef465c59917",
+          "at": "2026-07-16T17:32:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8dde79ab6cd51bf97f43d82102fad2deeafc1110ddd064a962ebb7e9c57bb22",
+          "at": "2026-07-16T17:34:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`handle` routes `Snapshot`/`Restore` to `command_service` and `CheckReview`/`CheckCommit` to the separate `query_service`, so this primary adapter branches between interactors based on the request variant. Inject one aggregate application service and delegate each request through that single boundary, as required by `hexagonal-architecture.md` §Usecase Layer Purity Rules.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 223,
+              "category": "handle not delegating to single use case"
+            }
+          ],
+          "hash": "rvw1:sha256:a8dde79ab6cd51bf97f43d82102fad2deeafc1110ddd064a962ebb7e9c57bb22",
+          "at": "2026-07-16T17:39:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c10242255161d6a4f4e8e0ae9868b43a277664103f677526dd29fabee13f8b8f",
+          "at": "2026-07-16T18:10:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The wildcard arm makes `handle` validate composition state instead of performing only input → invoke → render. It also misreports `Snapshot { track_id: Some(_), timestamp: None, .. }` as a missing track ID. Since composition owns resolving both optional fields, pass a resolved-only input to the driver so this state is unrepresentable, per `hexagonal-architecture.md` §Usecase Layer Purity Rules.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 284,
+              "category": "business logic in adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:c10242255161d6a4f4e8e0ae9868b43a277664103f677526dd29fabee13f8b8f",
+          "at": "2026-07-16T18:13:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4c3c60306a6708a149b467a97682a22be2b154fc22ec9f6505373bd59c8ebb1",
+          "at": "2026-07-16T18:40:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4c3c60306a6708a149b467a97682a22be2b154fc22ec9f6505373bd59c8ebb1",
+          "at": "2026-07-16T18:42:14Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a997565405b37111634003216facf15dcc1cd113fef5438b034f6159d863b8fc",
+          "at": "2026-07-16T17:32:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a997565405b37111634003216facf15dcc1cd113fef5438b034f6159d863b8fc",
+          "at": "2026-07-16T17:35:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:493ae95354f89d151f1e5abe5d7b9b903a530e21f8e403eda707b521e08934cc",
+          "at": "2026-07-16T18:10:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute` converts project-root and track-resolution failures directly into `CommandOutcome::failure` (here and at line 37), placing user-facing stderr rendering in the composition root. Keep these failures typed and let `cli_driver`/the CLI boundary map them to output.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/adr_baseline.rs",
+              "line": 33,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:493ae95354f89d151f1e5abe5d7b9b903a530e21f8e403eda707b521e08934cc",
+          "at": "2026-07-16T18:13:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:beae3c836bf890d609edd3f6864c26ec0b6351f802a4c2a202608c985c5e31ec",
+          "at": "2026-07-16T18:40:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:beae3c836bf890d609edd3f6864c26ec0b6351f802a4c2a202608c985c5e31ec",
+          "at": "2026-07-16T18:41:56Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -293,6 +424,402 @@
           "findings": [],
           "hash": "rvw1:sha256:363ad31ee5d03caf899d994b3c8fe25e642f599546094c455a75d93a19afc93a",
           "at": "2026-07-16T15:09:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0da7931193cd15c3791a7583db58d68af5db9cab46a343ad2b08b9f88da13aa",
+          "at": "2026-07-16T17:32:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0da7931193cd15c3791a7583db58d68af5db9cab46a343ad2b08b9f88da13aa",
+          "at": "2026-07-16T17:38:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d91ec6c5c45554e5755f4cfa272de704e4ca7380ee84c61b53b1e618c317813",
+          "at": "2026-07-16T18:10:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d91ec6c5c45554e5755f4cfa272de704e4ca7380ee84c61b53b1e618c317813",
+          "at": "2026-07-16T18:12:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:09eb9de7f9f7607bfee397a56c085e1715bb6cb9cf458876ebc946e15b4f7ec9",
+          "at": "2026-07-16T18:40:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is a split candidate: it combines the Git source adapter, filesystem store, ledger codec, and regression tests. Its current `libs/infrastructure/` implementation is about 1,459 lines—nearly 3× the configured 500-line ceiling—so it is not an individually committable within-ceiling task. Split the source-adapter work from the store/codec work and their tests.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 16,
+              "category": "batch-size infeasibility"
+            }
+          ],
+          "hash": "rvw1:sha256:09eb9de7f9f7607bfee397a56c085e1715bb6cb9cf458876ebc946e15b4f7ec9",
+          "at": "2026-07-16T18:42:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:09eb9de7f9f7607bfee397a56c085e1715bb6cb9cf458876ebc946e15b4f7ec9",
+          "at": "2026-07-16T18:45:04Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8c7706400707f5ff64485a112e7e772476c1a78d0dde221f72089abd3ba0f8f",
+          "at": "2026-07-16T17:33:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Snapshot/Restore では write 用、CheckReview/CheckCommit では read 用の track-id 解決を選択し、別の TrackCompositionRoot 呼び出しと再パースまで CLI 内で行っています。これは単一の typed Input を Driver に渡す範囲を超えた分岐・多段オーケストレーションです。`knowledge/conventions/hexagonal-architecture.md` §CLI as Composition Root の境界に従い、未解決の track-id と操作種別を driver/usecase 側へ渡してください。",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/adr_baseline.rs",
+              "line": 116,
+              "category": "business logic in bin"
+            },
+            {
+              "message": "`project_root_from_items_dir` が `items_dir` の構造を解釈・検証し、adapter 用 project root を算出しています。このアプリケーション固有のパス変換と分岐は thin-bin の責務外です。`items_dir` をそのまま composition/driver 境界へ渡し、`knowledge/conventions/hexagonal-architecture.md` §CLI as Composition Root に沿って request-scoped wiring 側で解決してください。",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/adr_baseline.rs",
+              "line": 184,
+              "category": "business logic in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:d8c7706400707f5ff64485a112e7e772476c1a78d0dde221f72089abd3ba0f8f",
+          "at": "2026-07-16T17:36:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d799aece9a1c84d90bda8c1263235111880b4196eb3debef6d787b123545e9c",
+          "at": "2026-07-16T18:10:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d799aece9a1c84d90bda8c1263235111880b4196eb3debef6d787b123545e9c",
+          "at": "2026-07-16T18:12:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b73eecbcc863b6b175e7b749101441b09654e232344a547e319926f218790078",
+          "at": "2026-07-16T18:40:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b73eecbcc863b6b175e7b749101441b09654e232344a547e319926f218790078",
+          "at": "2026-07-16T18:41:52Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR baseline adapter reads metadata/spec files with `fs::read_to_string` without first rejecting symlinks. A symlink under `track/items/<track_id>` can redirect the adapter outside the repository and is followed at the I/O boundary; enforce `symlink_metadata().file_type().is_symlink()` rejection as required by the infrastructure convention.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/source.rs",
+              "line": 41,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "Ledger and snapshot-copy reads do not reject symlinks before following them (`read_to_string`, `read_dir`/`read`, and `fs::read`). A malicious symlink in the baseline directory can redirect verification/restoration or ledger parsing to an unrelated file; perform explicit symlink checks at the boundary and fail closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/store.rs",
+              "line": 203,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`append_ledger_line` opens the ledger with `create(true).append(true)` without checking `symlink_metadata`. If `ledger.jsonl` is replaced by a symlink, the append follows it and writes outside the baseline directory, violating the required real-file semantics and append-only trust boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/store.rs",
+              "line": 223,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`atomic_overwrite` restores to `root/knowledge/adr/<source>` without rejecting a symlink at the target boundary. `fs::rename` can replace the symlink itself, but a symlinked parent directory can redirect the write outside the trusted repository root; validate the target path and every relevant parent component before restoring.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/store.rs",
+              "line": 170,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:66ca284fda7a96fbf17ab2bb6fc8a5148b865b5b8f6075aa6b32c32fcf8cb329",
+          "at": "2026-07-16T17:33:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Metadata and spec loads do not reject symlinks before `read_to_string`, allowing repository-controlled paths to redirect reads outside the intended workspace. Apply explicit `symlink_metadata().file_type().is_symlink()` rejection at this boundary.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/source.rs",
+              "line": 41,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "Baseline ledger and recorded-copy reads follow symlinks without boundary rejection. A symlinked ledger or snapshot can redirect parsing or verification to unrelated files; reject symlinks before `read_to_string`/`read`/directory traversal.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/store.rs",
+              "line": 203,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`append_ledger_line` opens an existing `ledger.jsonl` with append mode without checking whether it is a symlink, so a replaced ledger symlink can redirect writes outside the baseline directory.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/store.rs",
+              "line": 223,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:12b849528e1ca1e47d793dc7866ffa5415a0ebed8a0843210f9c4e58a32bc634",
+          "at": "2026-07-16T17:37:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56e55843129c4b19f73bfeaa2b2615ce70f2387f9fcaf62540d45ecb4976d828",
+          "at": "2026-07-16T18:10:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrSourceFileName` は `C:outside.md` のような Windows drive-relative prefix を許容するため、Windows ではこの `join` が `knowledge/adr` を捨てて trusted root 外を指し得ます。`reject_symlinks_below` は包含関係を検証しないため、working-tree 読み取り前に Windows prefix を拒否し、解決後のパスが root 配下であることを確認してください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/adr_baseline/source.rs",
+              "line": 44,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "snapshot copy 名と restore target の組み立ても、`C:outside.md` のような source により Windows 上で project root 外へ逸脱できます。symlink guard だけでは防げないため、scope-config loader のパターンと同様に prefix 拒否と trusted-root 包含検証が必要です。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/adr_baseline/store.rs",
+              "line": 80,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "versioned schema である `metadata.json` を、`schema_version` を持たず `deny_unknown_fields` もない部分 DTO に直接 deserialize しています。未知の将来版や legacy/余剰フィールドを黙って切り捨て、その `base_branch` で merge-base を計算してしまうため、既存の `track::codec::decode` のように version envelope を先に検証して strict DTO を使用してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/source.rs",
+              "line": 61,
+              "category": "serde codec break"
+            },
+            {
+              "message": "`user_decision_ref` の有無を YAML の行頭文字列で判定しているため、flow mapping や quoted key として記述された有効な field を見落とし、昇格済み ADR を draft と誤分類して刻印要求から除外できます。逆に block scalar 内の同名 prose は誤検出します。検証済みの parsed front-matter 構造から field presence を判定してください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/adr_baseline/source.rs",
+              "line": 197,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "ledger hash の prefix に一致する最初のファイルを返すため、仕様上サポートされる hash8 collision では、別 hash の短い名前も候補に一致します。`read_dir` 順序次第で verification が誤って mismatch になり、restore は別 snapshot の bytes を書き戻してデータを破壊できます。候補を full SHA-256 で照合してから選択してください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/adr_baseline/store.rs",
+              "line": 127,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "working-tree ADR は `fs::read`、fork-point ADR は `Command::output` で無制限にメモリへ読み込まれます。repository-controlled な巨大 ADR により snapshot/check がメモリ枯渇し得るため、両経路に同一の明示的な byte 上限と typed error を設けてください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/source.rs",
+              "line": 127,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "append-only で増え続ける ledger 全体を無制限に `String` と `Vec<AdrBaselineLedgerEntry>` へ読み込んでいます。通常運用による肥大化や細工された ledger で restore/check がメモリ枯渇し得るため、ledger bytes・line length・entry count を上限付きで読み、超過時は fail-closed にしてください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/store.rs",
+              "line": 225,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:56e55843129c4b19f73bfeaa2b2615ce70f2387f9fcaf62540d45ecb4976d828",
+          "at": "2026-07-16T18:20:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fec242783bb55b60612f1912c21c32e24e1040201997c0d0becfdccb81fb7f11",
+          "at": "2026-07-16T18:40:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`find_copy` は full hash が一致したファイルだけを返すため、改変された copy は `None` となり、ここでは `HashMismatch` ではなく `Missing` と報告されます。その結果 `HashMismatch` 分岐は到達不能です。候補ファイルの存在と内容照合を分離し、候補が存在して hash が異なる場合は実際の hash を返してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/store.rs",
+              "line": 233,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "`snapshot` は `MAX_SNAPSHOT_BYTES` を検査せず copy と ledger を正常記録できますが、同じ adapter の verify/restore はその copy を上限超過として拒否します。成功した書込みが直後から読めない状態を作るため、書込み前に snapshot bytes の上限を fail-closed で検証してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/store.rs",
+              "line": 178,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "読取り側には ledger 全体・行長・entry 数の上限がありますが、append 側はどの上限も検査しません。長大な reason、10,001 件目、または 8 MiB 超過の append が成功して ledger を以後読めない状態にするため、copy 作成前に現在量と追加 record を検証してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/store.rs",
+              "line": 188,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "baseline directory の `read_dir` を entry 数の上限なしで最後まで走査します。directory は workspace input であり、無関係な大量ファイルを置くだけで verify/restore の I/O と実行時間を無制限に増やせます。ledger 上限に対応する scan 上限を設け、超過時は typed error で fail-closed にしてください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/store.rs",
+              "line": 134,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:fec242783bb55b60612f1912c21c32e24e1040201997c0d0becfdccb81fb7f11",
+          "at": "2026-07-16T18:44:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "対応対象 hash と異なる全候補を mismatch として保持するため、正規の hash8 collision で長い prefix 側の copy だけが欠落した場合、短い prefix を所有する別 hash の正常な copy を `HashMismatch` と誤報します。その候補自身の full hash が filename label と整合するなら collision sibling として除外し、対象 copy は `Missing` と判定してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/store.rs",
+              "line": 172,
+              "category": "fingerprint or hash drift"
+            },
+            {
+              "message": "ledger 上限の検証と append が同一クリティカルセクションではありません。上限直前で複数の snapshot が並行すると、双方が検証を通過してから append し、entry 数または byte 上限を超えた読取り不能な ledger を生成できます。排他ロック下で再検証と append を一体化してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/adr_baseline/store.rs",
+              "line": 215,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:db81b1db78d14fd173e34316236f5c08d538b0015e55d9e9055f5bdea67a6b88",
+          "at": "2026-07-16T18:57:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2bd696e87052526efebda3773b5afd56adca1a709cf3c40a1674d1b8b834a4d4",
+          "at": "2026-07-16T19:03:13Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 の「可視化できる」という明示的な目標意図を、完了時に決定論的に証明する AC がありません。AC-02/AC-05 は累積記録と復元・briefing を定めていますが、init 版と最終版などの baseline 差分を review/PR で可視化できることを検証していないため、目標の一部が未カバーです。",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/spec.json",
+              "line": 6,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:4087c4ed8b1000824bf71fef0f5fdbeccf3c8cad07cdfac51e6866e281197de6",
+          "at": "2026-07-16T14:02:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cc606df76ca85a0d58701ab50d9180f52d183ccbb7ab216f71d3285a2456b92",
+          "at": "2026-07-16T14:03:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cc606df76ca85a0d58701ab50d9180f52d183ccbb7ab216f71d3285a2456b92",
+          "at": "2026-07-16T14:06:26Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:348a53c61162134bebd0e9bf69d384e36972bbea007ed0a268a65e4cc2a339cd",
+          "at": "2026-07-16T17:32:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Snapshot` 入力と `AdrBaselineStorePort::snapshot` に timestamp がなく、唯一の production adapter が内部で `timestamp_now()` → `chrono::Utc::now()` を呼んでいます。同一の usecase 入力が暗黙の時計に依存し、Usecase Layer Purity Rules の「時刻は entrypoint の引数として渡す」に違反します。`Timestamp` を command／port 引数へ追加し、composition root で取得してください。",
+              "severity": "P1",
+              "file": "libs/usecase/src/adr_baseline.rs",
+              "line": 20,
+              "category": "implicit time / env / process dependency"
+            }
+          ],
+          "hash": "rvw1:sha256:348a53c61162134bebd0e9bf69d384e36972bbea007ed0a268a65e4cc2a339cd",
+          "at": "2026-07-16T17:40:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9d157288de0812d5b81b09c9c589f4ecaa7c2c1ea3748d2ab39eca8ff5713fb",
+          "at": "2026-07-16T18:10:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9d157288de0812d5b81b09c9c589f4ecaa7c2c1ea3748d2ab39eca8ff5713fb",
+          "at": "2026-07-16T18:13:10Z"
         }
       ]
     },
@@ -509,39 +1036,81 @@
           "findings": [],
           "hash": "rvw1:sha256:0f79e5eb7184ef80a8356a9fa54d0c1bc922b276d77593b1815509f13638aa57",
           "at": "2026-07-16T15:20:18Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 の「可視化できる」という明示的な目標意図を、完了時に決定論的に証明する AC がありません。AC-02/AC-05 は累積記録と復元・briefing を定めていますが、init 版と最終版などの baseline 差分を review/PR で可視化できることを検証していないため、目標の一部が未カバーです。",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/spec.json",
-              "line": 6,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:4087c4ed8b1000824bf71fef0f5fdbeccf3c8cad07cdfac51e6866e281197de6",
-          "at": "2026-07-16T14:02:08Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4cc606df76ca85a0d58701ab50d9180f52d183ccbb7ab216f71d3285a2456b92",
-          "at": "2026-07-16T14:03:42Z"
+          "hash": "rvw1:sha256:29306981ee51677e7a2ec04c4b6d85a35c64ece56ce0e7d14a5c0be4dc7b1d7b",
+          "at": "2026-07-16T17:32:56Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4cc606df76ca85a0d58701ab50d9180f52d183ccbb7ab216f71d3285a2456b92",
-          "at": "2026-07-16T14:06:26Z"
+          "hash": "rvw1:sha256:29306981ee51677e7a2ec04c4b6d85a35c64ece56ce0e7d14a5c0be4dc7b1d7b",
+          "at": "2026-07-16T17:36:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e3e8d972bf28cf187555ea3878a1a1839d9095defaa5a4de24516bc492837b6",
+          "at": "2026-07-16T18:10:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::commands::adr_baseline::dispatch` declares `Result<cli_driver::CommandOutcome, CliError>`, but input construction is infallible and `AdrBaselineCompositionRoot::execute` already returns a plain `CommandOutcome`; consequently every `CliError` variant is structurally unreachable. Return `CommandOutcome` directly or add a genuine typed failure path.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli-types.json",
+              "line": 15,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`cli_driver::AdrBaselineInput` represents both pre-composition and post-composition states: every variant permits `track_id: None`, and `Snapshot` also permits `timestamp: None`, while `AdrBaselineDriver::handle` accepts this same type even though the use-case command requires resolved values. Thus unresolved requests are valid driver inputs and require runtime rejection. Split the unresolved composition request from a resolved driver input with required `TrackIdInput`/`Timestamp` fields.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+              "line": 272,
+              "category": "state-shape smell"
+            }
+          ],
+          "hash": "rvw1:sha256:4e3e8d972bf28cf187555ea3878a1a1839d9095defaa5a4de24516bc492837b6",
+          "at": "2026-07-16T18:18:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0c89fb121b4a0359974cf9fb53ef0ac57dae17979f9daa27becf747321cd6ee",
+          "at": "2026-07-16T18:40:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0c89fb121b4a0359974cf9fb53ef0ac57dae17979f9daa27becf747321cd6ee",
+          "at": "2026-07-16T18:44:33Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ff1cac9946731548246e11785f423ae9785c35590de0c40ce695a96ab86fe93",
+          "at": "2026-07-16T17:32:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ff1cac9946731548246e11785f423ae9785c35590de0c40ce695a96ab86fe93",
+          "at": "2026-07-16T17:37:12Z"
         }
       ]
     }

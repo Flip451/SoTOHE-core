@@ -457,7 +457,7 @@
     },
     "AdrBaselineStorePort": {
       "action": "add",
-      "docs": "Synchronous ADR baseline mutation port; snapshot bytes are opaque verbatim file content, and operations may produce read or write failures. Blocking is intentional for single-shot CLI execution.",
+      "docs": "Synchronous ADR baseline mutation port; snapshot bytes are opaque verbatim file content and snapshot time is caller-supplied. Operations may produce read or write failures; blocking is intentional for single-shot CLI execution.",
       "informal_grounds": [],
       "methods": [
         {
@@ -484,6 +484,10 @@
             {
               "name": "reason",
               "ty": "Option<domain::NonEmptyString>"
+            },
+            {
+              "name": "timestamp",
+              "ty": "domain::Timestamp"
             }
           ],
           "receiver": "&self",
@@ -621,7 +625,7 @@
   "types": {
     "AdrBaselineCommand": {
       "action": "add",
-      "docs": "ADR baseline write-command family.",
+      "docs": "ADR baseline write-command family with explicit snapshot time.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -645,6 +649,10 @@
                 {
                   "name": "reason",
                   "ty": "Option<domain::NonEmptyString>"
+                },
+                {
+                  "name": "timestamp",
+                  "ty": "domain::Timestamp"
                 }
               ],
               "kind": "struct"
@@ -762,7 +770,7 @@
     },
     "AdrBaselineInteractor": {
       "action": "add",
-      "docs": "ADR baseline write-command interactor and sole owner of snapshot kind/reason compatibility validation.",
+      "docs": "ADR baseline write-command interactor; owns kind/reason validation and forwards caller-supplied snapshot time.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",

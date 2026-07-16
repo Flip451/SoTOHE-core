@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "28ace489c16415627fd2b8b31d216c0877ea46e5672899a3e9dd85f13ef345e8",
+  "catalogue_declaration_hash": "4fbf180a4ecf22bfffc191ddfe12dee3c9d5855280c121b75d8df5cd2a1ae734",
   "signals": [
     {
       "type_name": "AdrBaselineCommand",
       "signal": "blue",
-      "entry_hash": "d8d826bfd5fc36a4e8330ea8521d8b6d67e58413eca5cb8d63e0678ae6b8d335"
+      "entry_hash": "3dfa65cd35ede8b248c4d422662e2f552f0b9c85e1ea1f36c91dcd40937e892c"
     },
     {
       "type_name": "AdrBaselineError",
@@ -15,7 +15,7 @@
     {
       "type_name": "AdrBaselineInteractor",
       "signal": "blue",
-      "entry_hash": "688a397a5bdc885bf1ce7adf2de29573147bd4453fafbc7e83cc8a5577dbd44a"
+      "entry_hash": "85a9c37fb6160c84cba0ca42f99a1976cd76aa5162f761562eeeba4fe991bfb1"
     },
     {
       "type_name": "AdrBaselineOutput",
@@ -80,7 +80,7 @@
     {
       "type_name": "AdrBaselineStorePort",
       "signal": "blue",
-      "entry_hash": "e153bfedef2746cc0e664cb43e4f3acceff79099d2222181a370ef4f5635ed37"
+      "entry_hash": "b59f645307769252bcc32adbe2e548bc120d6f4469eec96b4e31fe7f2ed1c730"
     },
     {
       "type_name": "AdrBaselineStoreReadPort",

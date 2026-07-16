@@ -9,6 +9,7 @@
 // Submodule declarations (grouped by command family)
 // ---------------------------------------------------------------------------
 
+mod adr_baseline;
 mod arch;
 mod capability;
 mod catalog;
@@ -69,6 +70,7 @@ pub use telemetry::TelemetryReportInput;
 // Per-context composition root re-exports (AC-04 / D2)
 // ---------------------------------------------------------------------------
 
+pub use adr_baseline::{AdrBaselineCompositionRoot, AdrBaselineResolutionError};
 pub use arch::ArchCompositionRoot;
 pub use capability::CapabilityCompositionRoot;
 pub use catalog::CatalogCompositionRoot;

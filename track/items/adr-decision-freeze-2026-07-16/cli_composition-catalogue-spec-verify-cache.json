@@ -3,7 +3,7 @@
   "layer": "cli_composition",
   "entries": [
     {
-      "claim_hash": "3482743c5093b80d96448c44692f6d5461690a5b6e0674f56429ed7a3ba73790",
+      "claim_hash": "8cc9142c40086ac29fdcf4cb87caa155d8464b83e765a4f04d740a8fdf2b5a10",
       "evidence_hash": "3bf02f04e316e2ee9cd9cf39607e9af9566d5e6b92eeac9f43b8affb306f4e03",
       "verdict": {
         "kind": "pass",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "3482743c5093b80d96448c44692f6d5461690a5b6e0674f56429ed7a3ba73790",
+      "claim_hash": "8cc9142c40086ac29fdcf4cb87caa155d8464b83e765a4f04d740a8fdf2b5a10",
       "evidence_hash": "50afe1ecde03037ed3153f3259e3081bdfbc8b24596b42b82e2e2d57f876df01",
       "verdict": {
         "kind": "pass",
@@ -51,7 +51,7 @@
       }
     },
     {
-      "claim_hash": "3482743c5093b80d96448c44692f6d5461690a5b6e0674f56429ed7a3ba73790",
+      "claim_hash": "8cc9142c40086ac29fdcf4cb87caa155d8464b83e765a4f04d740a8fdf2b5a10",
       "evidence_hash": "0efab8966d9b77c65f37f5191b4f1a487e99e2c41e282632169e15eae27c752c",
       "verdict": {
         "kind": "pass",
@@ -75,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "3482743c5093b80d96448c44692f6d5461690a5b6e0674f56429ed7a3ba73790",
+      "claim_hash": "8cc9142c40086ac29fdcf4cb87caa155d8464b83e765a4f04d740a8fdf2b5a10",
       "evidence_hash": "4ec13eccefa6f179b931a387969c2ce2deba0f6d60bff55755ab3ab147939bfa",
       "verdict": {
         "kind": "pass",
@@ -99,11 +99,11 @@
       }
     },
     {
-      "claim_hash": "3482743c5093b80d96448c44692f6d5461690a5b6e0674f56429ed7a3ba73790",
+      "claim_hash": "8cc9142c40086ac29fdcf4cb87caa155d8464b83e765a4f04d740a8fdf2b5a10",
       "evidence_hash": "743a0805d91fe4ffa7a4740c6c04b76abe413c8b3beeff1f3e0c5a007cabb415",
       "verdict": {
         "kind": "pass",
-        "citation": "初回刻印の対象 ADR は orchestrator が knowledge/adr/ 直下の file 名として明示し、cite 刻印は track 分岐点の committed 文面だけを複製元とする。"
+        "citation": "初回刻印の対象 ADR は orchestrator が knowledge/adr/ 直下の file 名として明示し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -123,11 +123,11 @@
       }
     },
     {
-      "claim_hash": "3482743c5093b80d96448c44692f6d5461690a5b6e0674f56429ed7a3ba73790",
+      "claim_hash": "8cc9142c40086ac29fdcf4cb87caa155d8464b83e765a4f04d740a8fdf2b5a10",
       "evidence_hash": "8c8398050fa68067a9da59e73150d743226106200da3bd3b16de321230246ea5",
       "verdict": {
         "kind": "pass",
-        "citation": "保護対象の刻印不足、照合不一致、required reason の欠落、または昇格済み新規 ADR の未刻印は fail-closed とする。"
+        "citation": "保護対象の刻印不足、照合不一致、required reason の欠落、または昇格済み新規 ADR の未刻印は fail-closed とする。一方、分岐点に存在せず user_decision_ref を持たない track 生まれの draft ADR は承認まで刻印要求から除外する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -147,7 +147,7 @@
       }
     },
     {
-      "claim_hash": "3482743c5093b80d96448c44692f6d5461690a5b6e0674f56429ed7a3ba73790",
+      "claim_hash": "8cc9142c40086ac29fdcf4cb87caa155d8464b83e765a4f04d740a8fdf2b5a10",
       "evidence_hash": "3e3105a9b4cbe12f4178d7fd85ddad0889006fe71c0ff1556234c325eb336a8b",
       "verdict": {
         "kind": "pass",
@@ -171,7 +171,7 @@
       }
     },
     {
-      "claim_hash": "3482743c5093b80d96448c44692f6d5461690a5b6e0674f56429ed7a3ba73790",
+      "claim_hash": "8cc9142c40086ac29fdcf4cb87caa155d8464b83e765a4f04d740a8fdf2b5a10",
       "evidence_hash": "b6f10e29095d85f97cda726ae8a0b8e53c6165face26e3d77b8c3ec6edd9380e",
       "verdict": {
         "kind": "pass",
@@ -195,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "3482743c5093b80d96448c44692f6d5461690a5b6e0674f56429ed7a3ba73790",
+      "claim_hash": "8cc9142c40086ac29fdcf4cb87caa155d8464b83e765a4f04d740a8fdf2b5a10",
       "evidence_hash": "f13e52e634d5b988d5e2adea0f43c44420c28f3387044a0848335bf142e4045a",
       "verdict": {
         "kind": "pass",
@@ -219,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "3482743c5093b80d96448c44692f6d5461690a5b6e0674f56429ed7a3ba73790",
+      "claim_hash": "8cc9142c40086ac29fdcf4cb87caa155d8464b83e765a4f04d740a8fdf2b5a10",
       "evidence_hash": "ab71ec867e21b9e363710b6530c84b74e0961e6f486170bafb98611040247371",
       "verdict": {
         "kind": "pass",
@@ -239,6 +239,78 @@
           "section": "acceptance_criteria",
           "element_id": "AC-05",
           "text_label": "On a detected mismatch, the orchestrator receives a diagnoser verdict: a non-semantic verdict permits a new snapshot and retry; a semantic or uncertain verdict restores the latest baseline and returns the originating work through a briefing that requests an amendment proposal instead of an in-place ADR edit."
+        }
+      }
+    },
+    {
+      "claim_hash": "d54a574466239488a66bc7a9b0881cb0fab68ceeaaccb256f99e145898b07fe2",
+      "evidence_hash": "3bf02f04e316e2ee9cd9cf39607e9af9566d5e6b92eeac9f43b8affb306f4e03",
+      "verdict": {
+        "kind": "pass",
+        "citation": "初回刻印、後続 cite、正規の再刻印および新規 ADR の凍結域への導入を、orchestrator が対象 ADR を明示して起動する専用 snapshot 経路で扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineResolutionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "初回刻印、後続 cite、正規の再刻印および新規 ADR の凍結域への導入を、orchestrator が対象 ADR を明示して起動する専用 snapshot 経路で扱う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d54a574466239488a66bc7a9b0881cb0fab68ceeaaccb256f99e145898b07fe2",
+      "evidence_hash": "50afe1ecde03037ed3153f3259e3081bdfbc8b24596b42b82e2e2d57f876df01",
+      "verdict": {
+        "kind": "pass",
+        "citation": "刻印済み ADR の現行バイト列を最新 baseline と照合し、不一致または保護対象の必要な刻印の欠落を fail-closed で block する binary check"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineResolutionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "刻印済み ADR の現行バイト列を最新 baseline と照合し、不一致または保護対象の必要な刻印の欠落を fail-closed で block する binary check を review 入口、commit gate、track-aware CI に配置する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d54a574466239488a66bc7a9b0881cb0fab68ceeaaccb256f99e145898b07fe2",
+      "evidence_hash": "f13e52e634d5b988d5e2adea0f43c44420c28f3387044a0848335bf142e4045a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"it blocks deterministically on a byte mismatch or on a missing required baseline\""
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineResolutionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "The binary check passes when each recorded ADR matches its latest baseline and all required baselines exist; it blocks deterministically on a byte mismatch or on a missing required baseline without parsing ADR prose or consulting an LLM."
         }
       }
     }

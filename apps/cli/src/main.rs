@@ -30,6 +30,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::arch::ArchCommand,
     },
+    /// ADR baseline snapshot, restore, and freeze-check operations.
+    AdrBaseline {
+        #[command(subcommand)]
+        cmd: commands::adr_baseline::AdrBaselineCommand,
+    },
     /// Convention document management tools.
     Conventions {
         #[command(subcommand)]
@@ -163,6 +168,7 @@ fn run_cli_with(
 ) -> ExitCode {
     match cli.command {
         Some(CliCommand::Arch { cmd }) => commands::arch::execute(cmd),
+        Some(CliCommand::AdrBaseline { cmd }) => commands::adr_baseline::execute(cmd),
         Some(CliCommand::Conventions { cmd }) => commands::conventions::execute(cmd),
         Some(CliCommand::Domain { cmd }) => commands::domain::execute(cmd),
         Some(CliCommand::Guard { cmd }) => commands::guard::execute(cmd),

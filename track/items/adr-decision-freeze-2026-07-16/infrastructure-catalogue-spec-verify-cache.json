@@ -219,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "349bff1792f764b426f95fd557ac9f26f6ec1c0513e67e7b8b88195f8fe7f1e1",
+      "claim_hash": "6837f8efe3fac3fbd857d4b104321e083f61d2a5b9bea083ccffcd3ce9bf357a",
       "evidence_hash": "c58399c681daf96644805e186beec1d9e6490eddfd301f961eb3900b2d9e202f",
       "verdict": {
         "kind": "pass",
@@ -243,7 +243,7 @@
       }
     },
     {
-      "claim_hash": "349bff1792f764b426f95fd557ac9f26f6ec1c0513e67e7b8b88195f8fe7f1e1",
+      "claim_hash": "6837f8efe3fac3fbd857d4b104321e083f61d2a5b9bea083ccffcd3ce9bf357a",
       "evidence_hash": "3bf02f04e316e2ee9cd9cf39607e9af9566d5e6b92eeac9f43b8affb306f4e03",
       "verdict": {
         "kind": "pass",
@@ -267,7 +267,7 @@
       }
     },
     {
-      "claim_hash": "349bff1792f764b426f95fd557ac9f26f6ec1c0513e67e7b8b88195f8fe7f1e1",
+      "claim_hash": "6837f8efe3fac3fbd857d4b104321e083f61d2a5b9bea083ccffcd3ce9bf357a",
       "evidence_hash": "3565c62e4cd76a5045824557e31715af30d4c05c4cc0dc54928e7fbba602eb7e",
       "verdict": {
         "kind": "pass",
@@ -291,7 +291,7 @@
       }
     },
     {
-      "claim_hash": "349bff1792f764b426f95fd557ac9f26f6ec1c0513e67e7b8b88195f8fe7f1e1",
+      "claim_hash": "6837f8efe3fac3fbd857d4b104321e083f61d2a5b9bea083ccffcd3ce9bf357a",
       "evidence_hash": "4ec13eccefa6f179b931a387969c2ce2deba0f6d60bff55755ab3ab147939bfa",
       "verdict": {
         "kind": "pass",
@@ -315,7 +315,7 @@
       }
     },
     {
-      "claim_hash": "349bff1792f764b426f95fd557ac9f26f6ec1c0513e67e7b8b88195f8fe7f1e1",
+      "claim_hash": "6837f8efe3fac3fbd857d4b104321e083f61d2a5b9bea083ccffcd3ce9bf357a",
       "evidence_hash": "743a0805d91fe4ffa7a4740c6c04b76abe413c8b3beeff1f3e0c5a007cabb415",
       "verdict": {
         "kind": "pass",
@@ -339,11 +339,11 @@
       }
     },
     {
-      "claim_hash": "349bff1792f764b426f95fd557ac9f26f6ec1c0513e67e7b8b88195f8fe7f1e1",
+      "claim_hash": "6837f8efe3fac3fbd857d4b104321e083f61d2a5b9bea083ccffcd3ce9bf357a",
       "evidence_hash": "3e3105a9b4cbe12f4178d7fd85ddad0889006fe71c0ff1556234c325eb336a8b",
       "verdict": {
         "kind": "pass",
-        "citation": "復元は最新 baseline のバイト列を機械コピーする。"
+        "citation": "diagnoser は read-only で verdict のみを返し、復元は最新 baseline のバイト列を機械コピーする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -363,7 +363,7 @@
       }
     },
     {
-      "claim_hash": "349bff1792f764b426f95fd557ac9f26f6ec1c0513e67e7b8b88195f8fe7f1e1",
+      "claim_hash": "6837f8efe3fac3fbd857d4b104321e083f61d2a5b9bea083ccffcd3ce9bf357a",
       "evidence_hash": "b6f10e29095d85f97cda726ae8a0b8e53c6165face26e3d77b8c3ec6edd9380e",
       "verdict": {
         "kind": "pass",
@@ -387,7 +387,7 @@
       }
     },
     {
-      "claim_hash": "349bff1792f764b426f95fd557ac9f26f6ec1c0513e67e7b8b88195f8fe7f1e1",
+      "claim_hash": "6837f8efe3fac3fbd857d4b104321e083f61d2a5b9bea083ccffcd3ce9bf357a",
       "evidence_hash": "13896d5a87bcce87e6e04621d1c065ec8724306855f037cd6db2ee51767cd036",
       "verdict": {
         "kind": "pass",
@@ -411,11 +411,11 @@
       }
     },
     {
-      "claim_hash": "349bff1792f764b426f95fd557ac9f26f6ec1c0513e67e7b8b88195f8fe7f1e1",
+      "claim_hash": "6837f8efe3fac3fbd857d4b104321e083f61d2a5b9bea083ccffcd3ce9bf357a",
       "evidence_hash": "ab71ec867e21b9e363710b6530c84b74e0961e6f486170bafb98611040247371",
       "verdict": {
         "kind": "pass",
-        "citation": "\"On a detected mismatch, the orchestrator receives a diagnoser verdict: a non-semantic verdict permits a new snapshot and retry; a semantic or uncertain verdict restores the latest baseline and returns the originating work through a briefing that requests an amendment proposal instead of an in-place ADR edit.\""
+        "citation": "On a detected mismatch, the orchestrator receives a diagnoser verdict: a non-semantic verdict permits a new snapshot and retry; a semantic or uncertain verdict restores the latest baseline and returns the originating work through a briefing that requests an amendment proposal instead of an in-place ADR edit."
       },
       "claim_origin": {
         "kind": "catalogue_entry",

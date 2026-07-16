@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "4b36fa6b0380efd4b6fbfe1cd3808d326f6d66ef2f64be27f8ade5cc0ff717f6",
+  "catalogue_declaration_hash": "12d6ab9fb1970d85a20eafefae7ebd3412da44f04b6d1f4944c04e15e71e5f63",
   "signals": [
     {
       "type_name": "AdrBaselineCodecError",
@@ -15,7 +15,7 @@
     {
       "type_name": "FsAdrBaselineStore",
       "signal": "blue",
-      "entry_hash": "349bff1792f764b426f95fd557ac9f26f6ec1c0513e67e7b8b88195f8fe7f1e1"
+      "entry_hash": "6837f8efe3fac3fbd857d4b104321e083f61d2a5b9bea083ccffcd3ce9bf357a"
     },
     {
       "type_name": "FsGitAdrBaselineSource",

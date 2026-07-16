@@ -1,15 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-16T15:03:38Z",
+  "generated_at": "2026-07-16T18:37:41Z",
   "declaration_hash": "a7fd7bc809ab341bef3d1a852274468159aa8062527c3c8d0101a03f2bd4daab",
-  "implementation_input_hash": "5d5b2ba4d3aa0cda0eb24cbf37a9c075f2034cf68df513f384f8918ff7537a7a",
+  "implementation_input_hash": "cbe6c650521113875b37ab745c35271888ea097fef5a4c914b00d1bdb453ad0c",
   "signals": [
     {
       "type_name": "AdrBaselineCheckOutcome",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -19,9 +19,9 @@
     {
       "type_name": "AdrBaselineCheckOutcomeError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Display",
@@ -33,9 +33,9 @@
     {
       "type_name": "AdrBaselineCheckViolation",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -45,9 +45,9 @@
     {
       "type_name": "AdrBaselineCheckViolations",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -57,9 +57,9 @@
     {
       "type_name": "AdrBaselineKind",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -70,9 +70,9 @@
     {
       "type_name": "AdrBaselineLedgerEntry",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -82,9 +82,9 @@
     {
       "type_name": "AdrBaselineRecordedCopyStatus",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -94,9 +94,9 @@
     {
       "type_name": "AdrBaselineSourceState",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -106,9 +106,9 @@
     {
       "type_name": "AdrSourceFileName",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Display",
@@ -122,9 +122,9 @@
     {
       "type_name": "AdrSourceFileNameError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Display",

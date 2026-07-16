@@ -8,12 +8,7 @@
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "std::path::PathBuf"
-            }
-          ],
+          "params": [],
           "returns": "Self"
         },
         {
@@ -22,12 +17,12 @@
           "name": "execute",
           "params": [
             {
-              "name": "input",
-              "ty": "cli_driver::adr_baseline::AdrBaselineInput"
+              "name": "request",
+              "ty": "cli_driver::adr_baseline::AdrBaselineRequest"
             }
           ],
           "receiver": "&self",
-          "returns": "cli_driver::CommandOutcome"
+          "returns": "Result<cli_driver::CommandOutcome, AdrBaselineResolutionError>"
         }
       ],
       "type_name": "AdrBaselineCompositionRoot"
@@ -35,17 +30,35 @@
   ],
   "layer": "cli_composition",
   "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "AdrBaselineCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "AdrBaselineResolutionError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineResolutionError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdrBaselineResolutionError",
+      "trait_ref": "core::error::Error"
+    }
+  ],
   "traits": {},
   "types": {
     "AdrBaselineCompositionRoot": {
       "action": "add",
-      "docs": "ADR baseline composition root; request items_dir selects request-scoped adapter wiring.",
+      "docs": "ADR baseline composition root; resolves request scope and injects snapshot time.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
         "shape": {
           "fields": [],
-          "has_stripped_fields": true,
+          "has_stripped_fields": false,
           "kind": "plain"
         }
       },
@@ -93,6 +106,71 @@
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineResolutionError": {
+      "action": "add",
+      "docs": "Typed failures produced while resolving an ADR baseline request for execution.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ProjectRoot",
+            "payload": {
+              "fields": [
+                "CompositionError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TrackResolution",
+            "payload": {
+              "fields": [
+                "CompositionError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ResolvedTrackInvalid",
+            "payload": {
+              "fields": [
+                "usecase::ValidationError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Timestamp",
+            "payload": {
+              "fields": [
+                "usecase::ValidationError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
           "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
         }
       ]

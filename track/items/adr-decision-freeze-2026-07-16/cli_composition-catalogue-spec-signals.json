@@ -1,11 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "72d514145d91fd8551d7957ecb3447c26f3767a2c4d4cb46e69034bcc0d98744",
+  "catalogue_declaration_hash": "372522c52e697582bf91be66539cc817555a1eed3ebcc95bde1405dccd17872e",
   "signals": [
     {
       "type_name": "AdrBaselineCompositionRoot",
       "signal": "blue",
-      "entry_hash": "3482743c5093b80d96448c44692f6d5461690a5b6e0674f56429ed7a3ba73790"
+      "entry_hash": "8cc9142c40086ac29fdcf4cb87caa155d8464b83e765a4f04d740a8fdf2b5a10"
+    },
+    {
+      "type_name": "AdrBaselineResolutionError",
+      "signal": "blue",
+      "entry_hash": "d54a574466239488a66bc7a9b0881cb0fab68ceeaaccb256f99e145898b07fe2"
     }
   ]
 }

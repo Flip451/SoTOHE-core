@@ -8,8 +8,9 @@
 pub use domain::tddd::LayerId;
 pub use domain::tddd::test_obligation::ids::DiagnosticMessage;
 pub use domain::tddd::test_obligation::verdict::DetectionRatePercent;
-pub use domain::{TrackId, ValidationError};
+pub use domain::{NonEmptyString, Timestamp, TrackId, ValidationError};
 
+pub mod adr_baseline;
 pub mod arch;
 pub mod baseline_capture;
 pub mod baseline_graph_workflow;

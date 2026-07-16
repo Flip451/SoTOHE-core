@@ -3,7 +3,7 @@
   "layer": "usecase",
   "entries": [
     {
-      "claim_hash": "d8d826bfd5fc36a4e8330ea8521d8b6d67e58413eca5cb8d63e0678ae6b8d335",
+      "claim_hash": "3dfa65cd35ede8b248c4d422662e2f552f0b9c85e1ea1f36c91dcd40937e892c",
       "evidence_hash": "3bf02f04e316e2ee9cd9cf39607e9af9566d5e6b92eeac9f43b8affb306f4e03",
       "verdict": {
         "kind": "pass",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "d8d826bfd5fc36a4e8330ea8521d8b6d67e58413eca5cb8d63e0678ae6b8d335",
+      "claim_hash": "3dfa65cd35ede8b248c4d422662e2f552f0b9c85e1ea1f36c91dcd40937e892c",
       "evidence_hash": "0efab8966d9b77c65f37f5191b4f1a487e99e2c41e282632169e15eae27c752c",
       "verdict": {
         "kind": "pass",
@@ -51,7 +51,7 @@
       }
     },
     {
-      "claim_hash": "d8d826bfd5fc36a4e8330ea8521d8b6d67e58413eca5cb8d63e0678ae6b8d335",
+      "claim_hash": "3dfa65cd35ede8b248c4d422662e2f552f0b9c85e1ea1f36c91dcd40937e892c",
       "evidence_hash": "4ec13eccefa6f179b931a387969c2ce2deba0f6d60bff55755ab3ab147939bfa",
       "verdict": {
         "kind": "pass",
@@ -75,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "d8d826bfd5fc36a4e8330ea8521d8b6d67e58413eca5cb8d63e0678ae6b8d335",
+      "claim_hash": "3dfa65cd35ede8b248c4d422662e2f552f0b9c85e1ea1f36c91dcd40937e892c",
       "evidence_hash": "743a0805d91fe4ffa7a4740c6c04b76abe413c8b3beeff1f3e0c5a007cabb415",
       "verdict": {
         "kind": "pass",
@@ -99,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "d8d826bfd5fc36a4e8330ea8521d8b6d67e58413eca5cb8d63e0678ae6b8d335",
+      "claim_hash": "3dfa65cd35ede8b248c4d422662e2f552f0b9c85e1ea1f36c91dcd40937e892c",
       "evidence_hash": "b6f10e29095d85f97cda726ae8a0b8e53c6165face26e3d77b8c3ec6edd9380e",
       "verdict": {
         "kind": "pass",
@@ -123,11 +123,11 @@
       }
     },
     {
-      "claim_hash": "d8d826bfd5fc36a4e8330ea8521d8b6d67e58413eca5cb8d63e0678ae6b8d335",
+      "claim_hash": "3dfa65cd35ede8b248c4d422662e2f552f0b9c85e1ea1f36c91dcd40937e892c",
       "evidence_hash": "ab71ec867e21b9e363710b6530c84b74e0961e6f486170bafb98611040247371",
       "verdict": {
         "kind": "pass",
-        "citation": "On a detected mismatch, the orchestrator receives a diagnoser verdict: a non-semantic verdict permits a new snapshot and retry; a semantic or uncertain verdict restores the latest baseline and returns the originating work through a briefing that requests an amendment proposal instead of an in-place ADR edit."
+        "citation": "\"a semantic or uncertain verdict restores the latest baseline and returns the originating work through a briefing that requests an amendment proposal instead of an in-place ADR edit\""
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -243,7 +243,7 @@
       }
     },
     {
-      "claim_hash": "688a397a5bdc885bf1ce7adf2de29573147bd4453fafbc7e83cc8a5577dbd44a",
+      "claim_hash": "85a9c37fb6160c84cba0ca42f99a1976cd76aa5162f761562eeeba4fe991bfb1",
       "evidence_hash": "3bf02f04e316e2ee9cd9cf39607e9af9566d5e6b92eeac9f43b8affb306f4e03",
       "verdict": {
         "kind": "pass",
@@ -267,7 +267,7 @@
       }
     },
     {
-      "claim_hash": "688a397a5bdc885bf1ce7adf2de29573147bd4453fafbc7e83cc8a5577dbd44a",
+      "claim_hash": "85a9c37fb6160c84cba0ca42f99a1976cd76aa5162f761562eeeba4fe991bfb1",
       "evidence_hash": "0efab8966d9b77c65f37f5191b4f1a487e99e2c41e282632169e15eae27c752c",
       "verdict": {
         "kind": "pass",
@@ -291,7 +291,7 @@
       }
     },
     {
-      "claim_hash": "688a397a5bdc885bf1ce7adf2de29573147bd4453fafbc7e83cc8a5577dbd44a",
+      "claim_hash": "85a9c37fb6160c84cba0ca42f99a1976cd76aa5162f761562eeeba4fe991bfb1",
       "evidence_hash": "3565c62e4cd76a5045824557e31715af30d4c05c4cc0dc54928e7fbba602eb7e",
       "verdict": {
         "kind": "pass",
@@ -315,11 +315,11 @@
       }
     },
     {
-      "claim_hash": "688a397a5bdc885bf1ce7adf2de29573147bd4453fafbc7e83cc8a5577dbd44a",
+      "claim_hash": "85a9c37fb6160c84cba0ca42f99a1976cd76aa5162f761562eeeba4fe991bfb1",
       "evidence_hash": "4ec13eccefa6f179b931a387969c2ce2deba0f6d60bff55755ab3ab147939bfa",
       "verdict": {
         "kind": "pass",
-        "citation": "baseline への書込は snapshot 機構だけに集約し、複製追加と ledger 追記を原子的に行う。書込を行う kind は init、cite、new-adr、non-semantic-fix、escalation の五種に限定し、escalation と new-adr では自己完結した reason を必須にする。"
+        "citation": "書込を行う kind は init、cite、new-adr、non-semantic-fix、escalation の五種に限定し、escalation と new-adr では自己完結した reason を必須にする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -339,11 +339,11 @@
       }
     },
     {
-      "claim_hash": "688a397a5bdc885bf1ce7adf2de29573147bd4453fafbc7e83cc8a5577dbd44a",
+      "claim_hash": "85a9c37fb6160c84cba0ca42f99a1976cd76aa5162f761562eeeba4fe991bfb1",
       "evidence_hash": "3e3105a9b4cbe12f4178d7fd85ddad0889006fe71c0ff1556234c325eb336a8b",
       "verdict": {
         "kind": "pass",
-        "citation": "不一致のトリアージでは非意味的編集のみ再刻印を許し、意味に触れる変更または判断不能な変更は逸脱として扱う。diagnoser は read-only で verdict のみを返し、復元は最新 baseline のバイト列を機械コピーする。"
+        "citation": "不一致のトリアージでは非意味的編集のみ再刻印を許し、意味に触れる変更または判断不能な変更は逸脱として扱う。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -363,7 +363,7 @@
       }
     },
     {
-      "claim_hash": "688a397a5bdc885bf1ce7adf2de29573147bd4453fafbc7e83cc8a5577dbd44a",
+      "claim_hash": "85a9c37fb6160c84cba0ca42f99a1976cd76aa5162f761562eeeba4fe991bfb1",
       "evidence_hash": "b6f10e29095d85f97cda726ae8a0b8e53c6165face26e3d77b8c3ec6edd9380e",
       "verdict": {
         "kind": "pass",
@@ -387,7 +387,7 @@
       }
     },
     {
-      "claim_hash": "688a397a5bdc885bf1ce7adf2de29573147bd4453fafbc7e83cc8a5577dbd44a",
+      "claim_hash": "85a9c37fb6160c84cba0ca42f99a1976cd76aa5162f761562eeeba4fe991bfb1",
       "evidence_hash": "13896d5a87bcce87e6e04621d1c065ec8724306855f037cd6db2ee51767cd036",
       "verdict": {
         "kind": "pass",
@@ -411,7 +411,7 @@
       }
     },
     {
-      "claim_hash": "688a397a5bdc885bf1ce7adf2de29573147bd4453fafbc7e83cc8a5577dbd44a",
+      "claim_hash": "85a9c37fb6160c84cba0ca42f99a1976cd76aa5162f761562eeeba4fe991bfb1",
       "evidence_hash": "ab71ec867e21b9e363710b6530c84b74e0961e6f486170bafb98611040247371",
       "verdict": {
         "kind": "pass",
@@ -1299,7 +1299,7 @@
       }
     },
     {
-      "claim_hash": "e153bfedef2746cc0e664cb43e4f3acceff79099d2222181a370ef4f5635ed37",
+      "claim_hash": "b59f645307769252bcc32adbe2e548bc120d6f4469eec96b4e31fe7f2ed1c730",
       "evidence_hash": "c58399c681daf96644805e186beec1d9e6490eddfd301f961eb3900b2d9e202f",
       "verdict": {
         "kind": "pass",
@@ -1323,7 +1323,7 @@
       }
     },
     {
-      "claim_hash": "e153bfedef2746cc0e664cb43e4f3acceff79099d2222181a370ef4f5635ed37",
+      "claim_hash": "b59f645307769252bcc32adbe2e548bc120d6f4469eec96b4e31fe7f2ed1c730",
       "evidence_hash": "3bf02f04e316e2ee9cd9cf39607e9af9566d5e6b92eeac9f43b8affb306f4e03",
       "verdict": {
         "kind": "pass",
@@ -1347,7 +1347,7 @@
       }
     },
     {
-      "claim_hash": "e153bfedef2746cc0e664cb43e4f3acceff79099d2222181a370ef4f5635ed37",
+      "claim_hash": "b59f645307769252bcc32adbe2e548bc120d6f4469eec96b4e31fe7f2ed1c730",
       "evidence_hash": "3565c62e4cd76a5045824557e31715af30d4c05c4cc0dc54928e7fbba602eb7e",
       "verdict": {
         "kind": "pass",
@@ -1371,7 +1371,7 @@
       }
     },
     {
-      "claim_hash": "e153bfedef2746cc0e664cb43e4f3acceff79099d2222181a370ef4f5635ed37",
+      "claim_hash": "b59f645307769252bcc32adbe2e548bc120d6f4469eec96b4e31fe7f2ed1c730",
       "evidence_hash": "4ec13eccefa6f179b931a387969c2ce2deba0f6d60bff55755ab3ab147939bfa",
       "verdict": {
         "kind": "pass",
@@ -1395,7 +1395,7 @@
       }
     },
     {
-      "claim_hash": "e153bfedef2746cc0e664cb43e4f3acceff79099d2222181a370ef4f5635ed37",
+      "claim_hash": "b59f645307769252bcc32adbe2e548bc120d6f4469eec96b4e31fe7f2ed1c730",
       "evidence_hash": "3e3105a9b4cbe12f4178d7fd85ddad0889006fe71c0ff1556234c325eb336a8b",
       "verdict": {
         "kind": "pass",
@@ -1419,7 +1419,7 @@
       }
     },
     {
-      "claim_hash": "e153bfedef2746cc0e664cb43e4f3acceff79099d2222181a370ef4f5635ed37",
+      "claim_hash": "b59f645307769252bcc32adbe2e548bc120d6f4469eec96b4e31fe7f2ed1c730",
       "evidence_hash": "b6f10e29095d85f97cda726ae8a0b8e53c6165face26e3d77b8c3ec6edd9380e",
       "verdict": {
         "kind": "pass",
@@ -1443,7 +1443,7 @@
       }
     },
     {
-      "claim_hash": "e153bfedef2746cc0e664cb43e4f3acceff79099d2222181a370ef4f5635ed37",
+      "claim_hash": "b59f645307769252bcc32adbe2e548bc120d6f4469eec96b4e31fe7f2ed1c730",
       "evidence_hash": "13896d5a87bcce87e6e04621d1c065ec8724306855f037cd6db2ee51767cd036",
       "verdict": {
         "kind": "pass",
@@ -1467,11 +1467,11 @@
       }
     },
     {
-      "claim_hash": "e153bfedef2746cc0e664cb43e4f3acceff79099d2222181a370ef4f5635ed37",
+      "claim_hash": "b59f645307769252bcc32adbe2e548bc120d6f4469eec96b4e31fe7f2ed1c730",
       "evidence_hash": "ab71ec867e21b9e363710b6530c84b74e0961e6f486170bafb98611040247371",
       "verdict": {
         "kind": "pass",
-        "citation": "\"a semantic or uncertain verdict restores the latest baseline\""
+        "citation": "\"On a detected mismatch, the orchestrator receives a diagnoser verdict: a non-semantic verdict permits a new snapshot and retry; a semantic or uncertain verdict restores the latest baseline\""
       },
       "claim_origin": {
         "kind": "catalogue_entry",

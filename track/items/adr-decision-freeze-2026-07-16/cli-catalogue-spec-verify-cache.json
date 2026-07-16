@@ -531,6 +531,102 @@
       }
     },
     {
+      "claim_hash": "14818e23d747fde53f8a48003d9a308afb79c3f0280bdcfe28f7ed350d7bc6f9",
+      "evidence_hash": "3bf02f04e316e2ee9cd9cf39607e9af9566d5e6b92eeac9f43b8affb306f4e03",
+      "verdict": {
+        "kind": "pass",
+        "citation": "orchestrator が対象 ADR を明示して起動する専用 snapshot 経路で扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CliCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "初回刻印、後続 cite、正規の再刻印および新規 ADR の凍結域への導入を、orchestrator が対象 ADR を明示して起動する専用 snapshot 経路で扱う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "14818e23d747fde53f8a48003d9a308afb79c3f0280bdcfe28f7ed350d7bc6f9",
+      "evidence_hash": "50afe1ecde03037ed3153f3259e3081bdfbc8b24596b42b82e2e2d57f876df01",
+      "verdict": {
+        "kind": "pass",
+        "citation": "刻印済み ADR の現行バイト列を最新 baseline と照合し、不一致または保護対象の必要な刻印の欠落を fail-closed で block する binary check を review 入口、commit gate、track-aware CI に配置する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CliCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "刻印済み ADR の現行バイト列を最新 baseline と照合し、不一致または保護対象の必要な刻印の欠落を fail-closed で block する binary check を review 入口、commit gate、track-aware CI に配置する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "64b5acddd5d120b83437f3e2f1115e60a155ed157bad59164abce2cff7897090",
+      "evidence_hash": "3bf02f04e316e2ee9cd9cf39607e9af9566d5e6b92eeac9f43b8affb306f4e03",
+      "verdict": {
+        "kind": "pass",
+        "citation": "初回刻印、後続 cite、正規の再刻印および新規 ADR の凍結域への導入を、orchestrator が対象 ADR を明示して起動する専用 snapshot 経路で扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::adr_baseline::dispatch"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "初回刻印、後続 cite、正規の再刻印および新規 ADR の凍結域への導入を、orchestrator が対象 ADR を明示して起動する専用 snapshot 経路で扱う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "64b5acddd5d120b83437f3e2f1115e60a155ed157bad59164abce2cff7897090",
+      "evidence_hash": "50afe1ecde03037ed3153f3259e3081bdfbc8b24596b42b82e2e2d57f876df01",
+      "verdict": {
+        "kind": "pass",
+        "citation": "刻印済み ADR の現行バイト列を最新 baseline と照合し、不一致または保護対象の必要な刻印の欠落を fail-closed で block する binary check"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::adr_baseline::dispatch"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "刻印済み ADR の現行バイト列を最新 baseline と照合し、不一致または保護対象の必要な刻印の欠落を fail-closed で block する binary check を review 入口、commit gate、track-aware CI に配置する。"
+        }
+      }
+    },
+    {
       "claim_hash": "b248bbae84bfbb8a83f9d55a42d14748ca3d70f2156dfa9e7dd16bf8f21759cb",
       "evidence_hash": "3bf02f04e316e2ee9cd9cf39607e9af9566d5e6b92eeac9f43b8affb306f4e03",
       "verdict": {

@@ -1,15 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-16T14:27:16Z",
-  "declaration_hash": "34da831cf3ca487e4fd8ccd559ce4b06efedb1ef42a9d7adfd1a6677c17fceb7",
-  "implementation_input_hash": "8b9d8e390e15d61947b63155aa60283ad895f1e9680a63012bb22516597ffee6",
+  "generated_at": "2026-07-16T18:37:58Z",
+  "declaration_hash": "b84a7849ced4d700800f387fdecd22f4655b83d5c233a3d373a11bfed1604177",
+  "implementation_input_hash": "ea809419d88bfdfa90df5681a424e6b7e28d77c71c53daaa4452c85070a99ced",
   "signals": [
     {
       "type_name": "AdrBaselineCheckCommitArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Args",
         "Clone",
         "Debug",
@@ -19,9 +19,9 @@
     {
       "type_name": "AdrBaselineCheckReviewArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Args",
         "Clone",
         "Debug",
@@ -31,9 +31,9 @@
     {
       "type_name": "AdrBaselineCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "FromArgMatches",
@@ -43,9 +43,9 @@
     {
       "type_name": "AdrBaselineRestoreArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Args",
         "Clone",
         "Debug",
@@ -55,9 +55,9 @@
     {
       "type_name": "AdrBaselineSnapshotArgs",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Args",
         "Clone",
         "Debug",
@@ -65,16 +65,28 @@
       ]
     },
     {
+      "type_name": "CliCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::adr_baseline::dispatch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "cli::commands::adr_baseline::execute",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "cli::commands::adr_baseline::execute_with_error_chain",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

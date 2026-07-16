@@ -4,20 +4,21 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdrBaselineInput | enum | add | Snapshot, Restore, CheckReview, CheckCommit | 🟡 | 🔵 |
-| AdrBaselineKindInput | enum | add | Init, Cite, NewAdr, NonSemanticFix, Escalation | 🟡 | 🔵 |
+| AdrBaselineInput | enum | add | Snapshot, Restore, CheckReview, CheckCommit | 🔵 | 🔵 |
+| AdrBaselineKindInput | enum | add | Init, Cite, NewAdr, NonSemanticFix, Escalation | 🔵 | 🔵 |
+| AdrBaselineRequest | enum | add | Snapshot, Restore, CheckReview, CheckCommit | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdrBaselineReasonInput | dto | add | — | 🟡 | 🔵 |
-| AdrSourceFileNameInput | dto | add | — | 🟡 | 🔵 |
-| TrackIdInput | dto | add | — | 🟡 | 🔵 |
+| AdrBaselineReasonInput | dto | add | — | 🔵 | 🔵 |
+| AdrSourceFileNameInput | dto | add | — | 🔵 | 🔵 |
+| TrackIdInput | dto | add | — | 🔵 | 🔵 |
 
 ## Primary Adapters
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdrBaselineDriver | primary_adapter | add | — | 🟡 | 🔵 |
+| AdrBaselineDriver | primary_adapter | add | — | 🔵 | 🔵 |
 

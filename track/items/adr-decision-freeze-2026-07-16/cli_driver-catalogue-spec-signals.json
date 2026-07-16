@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "46e4d0b9e13e4dd34d5e3f7cb8777bfcc540beb8df7c627252805674caaec267",
+  "catalogue_declaration_hash": "47cf2ad4a3e0c2938722b894b6f5ccf7b3846c490bd8eee56f16d6b6846b0f87",
   "signals": [
     {
       "type_name": "AdrBaselineDriver",
@@ -10,7 +10,7 @@
     {
       "type_name": "AdrBaselineInput",
       "signal": "blue",
-      "entry_hash": "74e08e95df7d7af5b4bb1087ba2d8d57fbf625320618cd6a5d9692b88a455682"
+      "entry_hash": "3d129941c472207b5baf162ba9133d816e70ef5faf8914f71db30e2b403d9d3f"
     },
     {
       "type_name": "AdrBaselineKindInput",
@@ -21,6 +21,11 @@
       "type_name": "AdrBaselineReasonInput",
       "signal": "blue",
       "entry_hash": "63f80b5f0d3ae011eabbd88d1c9b091471e52e6100da3a25f0dadd845fb6bf1e"
+    },
+    {
+      "type_name": "AdrBaselineRequest",
+      "signal": "blue",
+      "entry_hash": "bf9ac54957f26d33b74a313fd800ae3492916f4ea656f614c95f174f6b47177e"
     },
     {
       "type_name": "AdrSourceFileNameInput",

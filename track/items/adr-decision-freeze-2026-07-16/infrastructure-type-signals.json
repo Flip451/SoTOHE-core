@@ -1,15 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-16T15:03:40Z",
-  "declaration_hash": "4b36fa6b0380efd4b6fbfe1cd3808d326f6d66ef2f64be27f8ade5cc0ff717f6",
-  "implementation_input_hash": "b33307910e2da304955286aaf6834ff46ccd02b425dc3e502ccddb17a80aa4ac",
+  "generated_at": "2026-07-16T19:00:33Z",
+  "declaration_hash": "12d6ab9fb1970d85a20eafefae7ebd3412da44f04b6d1f4944c04e15e71e5f63",
+  "implementation_input_hash": "86b1ca9459e47357d3ea1d18cbccf12f0d6dc847590db7123d8889aba27901bc",
   "signals": [
     {
       "type_name": "AdrBaselineCodecError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -18,9 +18,9 @@
     {
       "type_name": "AdrBaselineLedgerRecordDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize",
@@ -32,9 +32,9 @@
     {
       "type_name": "FsAdrBaselineStore",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "AdrBaselineStorePort",
         "AdrBaselineStoreReadPort",
         "Clone",
@@ -45,9 +45,9 @@
     {
       "type_name": "FsGitAdrBaselineSource",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "AdrBaselineSourcePort",
         "Clone",
         "Debug",
@@ -57,14 +57,14 @@
     {
       "type_name": "infrastructure::adr_baseline::decode_ledger_line",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::adr_baseline::encode_ledger_entry",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

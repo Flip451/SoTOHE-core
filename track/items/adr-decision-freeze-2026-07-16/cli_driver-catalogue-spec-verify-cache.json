@@ -219,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "74e08e95df7d7af5b4bb1087ba2d8d57fbf625320618cd6a5d9692b88a455682",
+      "claim_hash": "3d129941c472207b5baf162ba9133d816e70ef5faf8914f71db30e2b403d9d3f",
       "evidence_hash": "3bf02f04e316e2ee9cd9cf39607e9af9566d5e6b92eeac9f43b8affb306f4e03",
       "verdict": {
         "kind": "pass",
@@ -243,7 +243,7 @@
       }
     },
     {
-      "claim_hash": "74e08e95df7d7af5b4bb1087ba2d8d57fbf625320618cd6a5d9692b88a455682",
+      "claim_hash": "3d129941c472207b5baf162ba9133d816e70ef5faf8914f71db30e2b403d9d3f",
       "evidence_hash": "50afe1ecde03037ed3153f3259e3081bdfbc8b24596b42b82e2e2d57f876df01",
       "verdict": {
         "kind": "pass",
@@ -267,7 +267,7 @@
       }
     },
     {
-      "claim_hash": "74e08e95df7d7af5b4bb1087ba2d8d57fbf625320618cd6a5d9692b88a455682",
+      "claim_hash": "3d129941c472207b5baf162ba9133d816e70ef5faf8914f71db30e2b403d9d3f",
       "evidence_hash": "0efab8966d9b77c65f37f5191b4f1a487e99e2c41e282632169e15eae27c752c",
       "verdict": {
         "kind": "pass",
@@ -291,7 +291,7 @@
       }
     },
     {
-      "claim_hash": "74e08e95df7d7af5b4bb1087ba2d8d57fbf625320618cd6a5d9692b88a455682",
+      "claim_hash": "3d129941c472207b5baf162ba9133d816e70ef5faf8914f71db30e2b403d9d3f",
       "evidence_hash": "4ec13eccefa6f179b931a387969c2ce2deba0f6d60bff55755ab3ab147939bfa",
       "verdict": {
         "kind": "pass",
@@ -315,7 +315,7 @@
       }
     },
     {
-      "claim_hash": "74e08e95df7d7af5b4bb1087ba2d8d57fbf625320618cd6a5d9692b88a455682",
+      "claim_hash": "3d129941c472207b5baf162ba9133d816e70ef5faf8914f71db30e2b403d9d3f",
       "evidence_hash": "743a0805d91fe4ffa7a4740c6c04b76abe413c8b3beeff1f3e0c5a007cabb415",
       "verdict": {
         "kind": "pass",
@@ -339,11 +339,11 @@
       }
     },
     {
-      "claim_hash": "74e08e95df7d7af5b4bb1087ba2d8d57fbf625320618cd6a5d9692b88a455682",
+      "claim_hash": "3d129941c472207b5baf162ba9133d816e70ef5faf8914f71db30e2b403d9d3f",
       "evidence_hash": "8c8398050fa68067a9da59e73150d743226106200da3bd3b16de321230246ea5",
       "verdict": {
         "kind": "pass",
-        "citation": "保護対象の刻印不足、照合不一致、required reason の欠落、または昇格済み新規 ADR の未刻印は fail-closed とする。"
+        "citation": "保護対象の刻印不足、照合不一致、required reason の欠落、または昇格済み新規 ADR の未刻印は fail-closed とする。一方、分岐点に存在せず user_decision_ref を持たない track 生まれの draft ADR は承認まで刻印要求から除外する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -363,7 +363,7 @@
       }
     },
     {
-      "claim_hash": "74e08e95df7d7af5b4bb1087ba2d8d57fbf625320618cd6a5d9692b88a455682",
+      "claim_hash": "3d129941c472207b5baf162ba9133d816e70ef5faf8914f71db30e2b403d9d3f",
       "evidence_hash": "b6f10e29095d85f97cda726ae8a0b8e53c6165face26e3d77b8c3ec6edd9380e",
       "verdict": {
         "kind": "pass",
@@ -387,11 +387,11 @@
       }
     },
     {
-      "claim_hash": "74e08e95df7d7af5b4bb1087ba2d8d57fbf625320618cd6a5d9692b88a455682",
+      "claim_hash": "3d129941c472207b5baf162ba9133d816e70ef5faf8914f71db30e2b403d9d3f",
       "evidence_hash": "f13e52e634d5b988d5e2adea0f43c44420c28f3387044a0848335bf142e4045a",
       "verdict": {
         "kind": "pass",
-        "citation": "The binary check passes when each recorded ADR matches its latest baseline and all required baselines exist"
+        "citation": "The binary check passes when each recorded ADR matches its latest baseline and all required baselines exist;"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -411,7 +411,7 @@
       }
     },
     {
-      "claim_hash": "74e08e95df7d7af5b4bb1087ba2d8d57fbf625320618cd6a5d9692b88a455682",
+      "claim_hash": "3d129941c472207b5baf162ba9133d816e70ef5faf8914f71db30e2b403d9d3f",
       "evidence_hash": "aba74679da76fd09213a8b43493e45548cd3ac6dab17150c69c1d03e518aebcd",
       "verdict": {
         "kind": "pass",
@@ -435,11 +435,11 @@
       }
     },
     {
-      "claim_hash": "74e08e95df7d7af5b4bb1087ba2d8d57fbf625320618cd6a5d9692b88a455682",
+      "claim_hash": "3d129941c472207b5baf162ba9133d816e70ef5faf8914f71db30e2b403d9d3f",
       "evidence_hash": "b72869e035604575bbeea782d3d7e2ac2084ecb4a3f6b42679e50e00fafd8099",
       "verdict": {
         "kind": "pass",
-        "citation": "When a later phase cites an existing ADR, its cited baseline is taken from the track merge-base and commit validation blocks if that cited ADR was not stamped. A track-created ADR remains exempt while it has no user_decision_ref, then blocks if it is promoted without its required new-adr snapshot."
+        "citation": "A track-created ADR remains exempt while it has no user_decision_ref, then blocks if it is promoted without its required new-adr snapshot."
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -575,6 +575,246 @@
           "section": "acceptance_criteria",
           "element_id": "AC-06",
           "text_label": "The snapshot operation rejects unsupported kinds, accepts reason only where its kind permits it, and blocks escalation or new-adr snapshots lacking the required self-contained reason. No capability manually writes a baseline copy or ledger record."
+        }
+      }
+    },
+    {
+      "claim_hash": "bf9ac54957f26d33b74a313fd800ae3492916f4ea656f614c95f174f6b47177e",
+      "evidence_hash": "3bf02f04e316e2ee9cd9cf39607e9af9566d5e6b92eeac9f43b8affb306f4e03",
+      "verdict": {
+        "kind": "pass",
+        "citation": "初回刻印、後続 cite、正規の再刻印および新規 ADR の凍結域への導入を、orchestrator が対象 ADR を明示して起動する専用 snapshot 経路で扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "初回刻印、後続 cite、正規の再刻印および新規 ADR の凍結域への導入を、orchestrator が対象 ADR を明示して起動する専用 snapshot 経路で扱う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bf9ac54957f26d33b74a313fd800ae3492916f4ea656f614c95f174f6b47177e",
+      "evidence_hash": "50afe1ecde03037ed3153f3259e3081bdfbc8b24596b42b82e2e2d57f876df01",
+      "verdict": {
+        "kind": "pass",
+        "citation": "刻印済み ADR の現行バイト列を最新 baseline と照合し、不一致または保護対象の必要な刻印の欠落を fail-closed で block する binary check を review 入口、commit gate、track-aware CI に配置する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "刻印済み ADR の現行バイト列を最新 baseline と照合し、不一致または保護対象の必要な刻印の欠落を fail-closed で block する binary check を review 入口、commit gate、track-aware CI に配置する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bf9ac54957f26d33b74a313fd800ae3492916f4ea656f614c95f174f6b47177e",
+      "evidence_hash": "0efab8966d9b77c65f37f5191b4f1a487e99e2c41e282632169e15eae27c752c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec が後続で cite する既存 ADR を track 分岐点の committed 文面から刻印し、track 中に生まれた ADR は user_decision_ref を得るまで draft として刻印要求から除外し、昇格後は刻印を必須にする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "spec が後続で cite する既存 ADR を track 分岐点の committed 文面から刻印し、track 中に生まれた ADR は user_decision_ref を得るまで draft として刻印要求から除外し、昇格後は刻印を必須にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bf9ac54957f26d33b74a313fd800ae3492916f4ea656f614c95f174f6b47177e",
+      "evidence_hash": "4ec13eccefa6f179b931a387969c2ce2deba0f6d60bff55755ab3ab147939bfa",
+      "verdict": {
+        "kind": "pass",
+        "citation": "baseline への書込は snapshot 機構だけに集約し、複製追加と ledger 追記を原子的に行う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "baseline への書込は snapshot 機構だけに集約し、複製追加と ledger 追記を原子的に行う。書込を行う kind は init、cite、new-adr、non-semantic-fix、escalation の五種に限定し、escalation と new-adr では自己完結した reason を必須にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bf9ac54957f26d33b74a313fd800ae3492916f4ea656f614c95f174f6b47177e",
+      "evidence_hash": "743a0805d91fe4ffa7a4740c6c04b76abe413c8b3beeff1f3e0c5a007cabb415",
+      "verdict": {
+        "kind": "pass",
+        "citation": "初回刻印の対象 ADR は orchestrator が knowledge/adr/ 直下の file 名として明示し、cite 刻印は track 分岐点の committed 文面だけを複製元とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "初回刻印の対象 ADR は orchestrator が knowledge/adr/ 直下の file 名として明示し、cite 刻印は track 分岐点の committed 文面だけを複製元とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bf9ac54957f26d33b74a313fd800ae3492916f4ea656f614c95f174f6b47177e",
+      "evidence_hash": "8c8398050fa68067a9da59e73150d743226106200da3bd3b16de321230246ea5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "保護対象の刻印不足、照合不一致、required reason の欠落、または昇格済み新規 ADR の未刻印は fail-closed とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "保護対象の刻印不足、照合不一致、required reason の欠落、または昇格済み新規 ADR の未刻印は fail-closed とする。一方、分岐点に存在せず user_decision_ref を持たない track 生まれの draft ADR は承認まで刻印要求から除外する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bf9ac54957f26d33b74a313fd800ae3492916f4ea656f614c95f174f6b47177e",
+      "evidence_hash": "b6f10e29095d85f97cda726ae8a0b8e53c6165face26e3d77b8c3ec6edd9380e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track init workflow completes the existing track initialization and then records a verbatim init baseline plus ledger entry for the orchestrator-specified primary ADR; the saved baseline is sufficient to byte-compare and restore that ADR later."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track init workflow completes the existing track initialization and then records a verbatim init baseline plus ledger entry for the orchestrator-specified primary ADR; the saved baseline is sufficient to byte-compare and restore that ADR later."
+        }
+      }
+    },
+    {
+      "claim_hash": "bf9ac54957f26d33b74a313fd800ae3492916f4ea656f614c95f174f6b47177e",
+      "evidence_hash": "f13e52e634d5b988d5e2adea0f43c44420c28f3387044a0848335bf142e4045a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "The binary check passes when each recorded ADR matches its latest baseline and all required baselines exist; it blocks deterministically on a byte mismatch or on a missing required baseline without parsing ADR prose or consulting an LLM."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "The binary check passes when each recorded ADR matches its latest baseline and all required baselines exist; it blocks deterministically on a byte mismatch or on a missing required baseline without parsing ADR prose or consulting an LLM."
+        }
+      }
+    },
+    {
+      "claim_hash": "bf9ac54957f26d33b74a313fd800ae3492916f4ea656f614c95f174f6b47177e",
+      "evidence_hash": "aba74679da76fd09213a8b43493e45548cd3ac6dab17150c69c1d03e518aebcd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "The snapshot operation rejects unsupported kinds, accepts reason only where its kind permits it, and blocks escalation or new-adr snapshots lacking the required self-contained reason."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "The snapshot operation rejects unsupported kinds, accepts reason only where its kind permits it, and blocks escalation or new-adr snapshots lacking the required self-contained reason. No capability manually writes a baseline copy or ledger record."
+        }
+      }
+    },
+    {
+      "claim_hash": "bf9ac54957f26d33b74a313fd800ae3492916f4ea656f614c95f174f6b47177e",
+      "evidence_hash": "b72869e035604575bbeea782d3d7e2ac2084ecb4a3f6b42679e50e00fafd8099",
+      "verdict": {
+        "kind": "pass",
+        "citation": "When a later phase cites an existing ADR, its cited baseline is taken from the track merge-base and commit validation blocks if that cited ADR was not stamped."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineRequest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "When a later phase cites an existing ADR, its cited baseline is taken from the track merge-base and commit validation blocks if that cited ADR was not stamped. A track-created ADR remains exempt while it has no user_decision_ref, then blocks if it is promoted without its required new-adr snapshot."
         }
       }
     },

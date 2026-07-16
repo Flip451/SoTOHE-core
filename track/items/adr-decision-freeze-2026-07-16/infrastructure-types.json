@@ -251,7 +251,7 @@
     },
     "FsAdrBaselineStore": {
       "action": "add",
-      "docs": "Filesystem ADR baseline persistence adapter.",
+      "docs": "Filesystem ADR baseline persistence adapter consuming caller-supplied snapshot time.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
