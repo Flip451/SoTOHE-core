@@ -44,4 +44,4 @@ Goal traceability: GO-01 -> T001/T003/T004/T005/T007; GO-02 -> T002/T003/T004/T0
 
 > Run T007 after T001 through T006 (IN-01, IN-02, IN-03, IN-04, IN-05, IN-06, IN-07, IN-08, IN-09, AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09).
 
-- [x] **T007**: apps/cli/tests/consumer_scaffold_host_first.rs — add focused exported-overlay validation cases for the planned scaffold changes, including direct bin/sotp workflow calls and absence of retired passthrough-wrapper references (IN-01, IN-02, IN-03, IN-04, IN-05, IN-06, IN-07, IN-08, IN-09, AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09).
+- [x] **T007**: apps/cli/tests/consumer_scaffold_host_first.rs — add focused exported-overlay validation cases for the planned scaffold changes, including direct bin/sotp workflow calls and absence of retired passthrough-wrapper references (IN-01, IN-02, IN-03, IN-04, IN-05, IN-06, IN-07, IN-08, IN-09, AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09). (`aee5447c7b18ece157dcc05414f11cbefd800016`)
