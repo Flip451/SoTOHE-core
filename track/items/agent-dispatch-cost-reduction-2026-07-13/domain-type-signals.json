@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-15T04:15:45Z",
-  "declaration_hash": "95c34034301ff3d0ee47255c445eb0af9bf019680c9f1068cc270b3002887284",
-  "implementation_input_hash": "fae9fa655f60e2e318f5a393db5a978b81e1b32a4a0ed92059812abadf4329a9",
+  "generated_at": "2026-07-16T02:13:53Z",
+  "declaration_hash": "7e38288ef967614b487bbcd9947e87db4878458dcd4a6398fe1dea09fec62665",
+  "implementation_input_hash": "435f8ef78ec3a1f1b793ca89a76bcecd2ae32bfa1380f12a34506949b4df0088",
   "signals": [
     {
       "type_name": "CatalogueDeclarationHash",
@@ -146,6 +146,12 @@
         "Error",
         "PartialEq"
       ]
+    },
+    {
+      "type_name": "WaiverCacheEntry",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "domain::tddd::type_signals_doc::decide_type_signals_reuse",

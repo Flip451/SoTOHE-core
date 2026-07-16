@@ -175,6 +175,22 @@ subgraph domain["domain"]
     T43_domain_domain_TypeSignalsSchemaVersionError__self[TypeSignalsSchemaVersionError]
     T43_domain_domain_TypeSignalsSchemaVersionError_Zero[Zero]
   end
+  subgraph T30_domain_domain_WaiverCacheEntry["tddd::test_obligation::verdict::WaiverCacheEntry"]
+    direction TB
+    T30_domain_domain_WaiverCacheEntry__self[WaiverCacheEntry]
+    T30_domain_domain_WaiverCacheEntry_new([new])
+    T30_domain_domain_WaiverCacheEntry_edge_id([edge_id])
+    T30_domain_domain_WaiverCacheEntry_obligation_id([obligation_id])
+    T30_domain_domain_WaiverCacheEntry_key([key])
+    T30_domain_domain_WaiverCacheEntry_verdict([verdict])
+    T30_domain_domain_WaiverCacheEntry_verifier_fingerprint([verifier_fingerprint])
+    T30_domain_domain_WaiverCacheEntry_new([new])
+    T30_domain_domain_WaiverCacheEntry_edge_id([edge_id])
+    T30_domain_domain_WaiverCacheEntry_obligation_id([obligation_id])
+    T30_domain_domain_WaiverCacheEntry_key([key])
+    T30_domain_domain_WaiverCacheEntry_verdict([verdict])
+    T30_domain_domain_WaiverCacheEntry_verifier_fingerprint([verifier_fingerprint])
+  end
   F71_domain_domain_domain__tddd__type_signals_doc__decide_type_signals_reuse[[decide_type_signals_reuse]]
   end
 end
@@ -740,6 +756,8 @@ T35_domain_domain_TypeSignalsLoadResult_Stale --o T38_domain_domain_CatalogueDec
 T35_domain_domain_TypeSignalsLoadResult_as_current --> T33_domain_domain_TypeSignalsDocument__self
 T38_domain_domain_TypeSignalsSchemaVersion_try_new --> T38_domain_domain_TypeSignalsSchemaVersion__self
 T38_domain_domain_TypeSignalsSchemaVersion_try_new --> T43_domain_domain_TypeSignalsSchemaVersionError__self
+T30_domain_domain_WaiverCacheEntry_new --> T30_domain_domain_WaiverCacheEntry__self
+T30_domain_domain_WaiverCacheEntry_new --> T30_domain_domain_WaiverCacheEntry__self
 F71_domain_domain_domain__tddd__type_signals_doc__decide_type_signals_reuse --o T38_domain_domain_CatalogueDeclarationHash__self
 F71_domain_domain_domain__tddd__type_signals_doc__decide_type_signals_reuse --o T37_domain_domain_ImplementationInputHash__self
 F71_domain_domain_domain__tddd__type_signals_doc__decide_type_signals_reuse --o T38_domain_domain_CatalogueDeclarationHash__self
@@ -1014,6 +1032,19 @@ class T38_domain_domain_TypeSignalsSchemaVersion_value method_node
 class T38_domain_domain_TypeSignalsSchemaVersion__self value_object
 class T43_domain_domain_TypeSignalsSchemaVersionError_Zero variant_node
 class T43_domain_domain_TypeSignalsSchemaVersionError__self error_type
+class T30_domain_domain_WaiverCacheEntry_new method_node
+class T30_domain_domain_WaiverCacheEntry_edge_id method_node
+class T30_domain_domain_WaiverCacheEntry_obligation_id method_node
+class T30_domain_domain_WaiverCacheEntry_key method_node
+class T30_domain_domain_WaiverCacheEntry_verdict method_node
+class T30_domain_domain_WaiverCacheEntry_verifier_fingerprint method_node
+class T30_domain_domain_WaiverCacheEntry_new method_node
+class T30_domain_domain_WaiverCacheEntry_edge_id method_node
+class T30_domain_domain_WaiverCacheEntry_obligation_id method_node
+class T30_domain_domain_WaiverCacheEntry_key method_node
+class T30_domain_domain_WaiverCacheEntry_verdict method_node
+class T30_domain_domain_WaiverCacheEntry_verifier_fingerprint method_node
+class T30_domain_domain_WaiverCacheEntry__self value_object
 class F71_domain_domain_domain__tddd__type_signals_doc__decide_type_signals_reuse free_function
 class F71_domain_domain_domain__tddd__type_signals_doc__decide_type_signals_reuse function_node
 class T41_usecase_usecase_CapabilityDispatchOutcome_Executed variant_node

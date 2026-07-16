@@ -1299,6 +1299,54 @@
       }
     },
     {
+      "claim_hash": "75bc5be31648e3e35d55f9ff3bd3956c08985018cb2d5d2de4725e52ab4e420a",
+      "evidence_hash": "3571cef764b264badeb99d012a01d1e9ddfacfe5f8de2c7fd985f804dede1a51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "WaiverCacheEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "obligation gate の check と evaluate の判定対称性を修理する。edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "75bc5be31648e3e35d55f9ff3bd3956c08985018cb2d5d2de4725e52ab4e420a",
+      "evidence_hash": "ae586810ff5e04f64f712f21c0bc592181dc64875bb22b2363d8521fa268f381",
+      "verdict": {
+        "kind": "pass",
+        "citation": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "WaiverCacheEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。check と evaluate はこの規則から同一の帰結を得る。"
+        }
+      }
+    },
+    {
       "claim_hash": "71d63f5ef37e6f40347bdd9148eac2148b94d6a4b52ee6f0810d924175105a62",
       "evidence_hash": "fe109946d1995c4c732bc8fb54bbffe76f5ac009147a01c150500c59b2706fa5",
       "verdict": {

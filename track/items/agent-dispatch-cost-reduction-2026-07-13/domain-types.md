@@ -22,6 +22,7 @@
 | TrackId | value_object | reference | — | 🔵 | 🔵 |
 | TypeSignalsDocument | value_object | modify | — | 🔵 | 🔵 |
 | TypeSignalsSchemaVersion | value_object | add | — | 🔵 | 🔵 |
+| WaiverCacheEntry | value_object | modify | — | 🔵 | 🔵 |
 
 ## Error Types
 

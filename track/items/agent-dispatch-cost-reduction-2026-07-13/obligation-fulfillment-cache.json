@@ -159,13 +159,13 @@
         "item_identifier": "method:owners_of_edge"
       },
       "key": {
-        "bound_tests_set_hash": "d53f6ddbc91e36160ae0bfa2c2b121c41a93bc1041be9efb3d03c27311c9b3f0",
+        "bound_tests_set_hash": "897bb8232502cd7b331529d8072c95aca5be09731ba471971441919f338a2d24",
         "declaration_hash": "331effb448fbf4c20176c6eb2201a576d20ef47979fda91b6a359123ac325040",
         "anchor_text_hash": "72ae17b4ae30c6993d271cb5ce29d45c7af57e84ce9be805034a9520054dea9e"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let owners = doc.owners_of_edge(&edge(\"domain::User\", \"IN-05\"));\nassert_eq!(\n    owners.iter().map(|o| o.id().clone()).collect::<Vec<_>>(),\n    vec![first.id().clone(), second.id().clone()],\n    \"every obligation sharing the entry key and anchor owns the edge\"\n);\nassert!(doc.owners_of_edge(&edge(\"domain::User\", \"IN-06\")).is_empty());"
+        "citation": "assert!(obligation.owns_edge(&edge(\"domain::User\", \"IN-05\")));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -183,7 +183,7 @@
         "item_identifier": "method:owners_of_edge"
       },
       "key": {
-        "bound_tests_set_hash": "d53f6ddbc91e36160ae0bfa2c2b121c41a93bc1041be9efb3d03c27311c9b3f0",
+        "bound_tests_set_hash": "897bb8232502cd7b331529d8072c95aca5be09731ba471971441919f338a2d24",
         "declaration_hash": "331effb448fbf4c20176c6eb2201a576d20ef47979fda91b6a359123ac325040",
         "anchor_text_hash": "70f344616e7fa7b739110f1fae619e676845800d43e24e64f8ff980f7a3dfdd1"
       },
@@ -4659,6 +4659,54 @@
     },
     {
       "edge_id": {
+        "entry_key": "WaiverCacheEntry",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "WaiverCacheEntry",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "bf207fda9e27f3dacf4ec30f8183771f027fe3808b91b84e954656e98a29449e",
+        "declaration_hash": "fbcf73029906382bfa7acf5050ad50fddfab46e7b3df8461f43a67b1ba843d61",
+        "anchor_text_hash": "72ae17b4ae30c6993d271cb5ce29d45c7af57e84ce9be805034a9520054dea9e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(entries.iter().any(|entry| entry.obligation_id() == Some(obligation().id())));\n    assert!(\n        entries.iter().any(|entry| entry.obligation_id() == Some(trait_impl_obligation().id()))\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverCacheEntry",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "WaiverCacheEntry",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "11b84c10ceabc277129b7a8b7677f043e3fa5d6e40e69442e99701e7c620a79c",
+        "declaration_hash": "fbcf73029906382bfa7acf5050ad50fddfab46e7b3df8461f43a67b1ba843d61",
+        "anchor_text_hash": "70f344616e7fa7b739110f1fae619e676845800d43e24e64f8ff980f7a3dfdd1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.pass_count(), 2, \"each owning obligation must be adjudicated\");\n    assert_eq!(*h.waiver_driver.calls.lock().unwrap(), 2);\n    let cache = h.waiver_cache.saved.lock().unwrap();\n    let entries = cache.as_ref().unwrap().entries();\n    assert_eq!(entries.len(), 2);\n    assert!(entries.iter().any(|entry| entry.obligation_id() == Some(obligation().id())));\n    assert!(\n        entries.iter().any(|entry| entry.obligation_id() == Some(trait_impl_obligation().id()))\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
         "entry_key": "EdgeOwnership",
         "anchor_id": {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
@@ -5295,7 +5343,7 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "fde374cad3d0db1c1b5b9219767fc2f91ea5be94c66137bd439132be5e81e4ec",
+        "bound_tests_set_hash": "a3ee0de734508a0b2435d01c171b8d8cce2c4644069eaa37c67fc146cf4034ed",
         "declaration_hash": "6b1b39446fdbc2e10992246043098766cd1602bd809e4827add12361cb67c467",
         "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
       },
@@ -5319,13 +5367,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "fde374cad3d0db1c1b5b9219767fc2f91ea5be94c66137bd439132be5e81e4ec",
+        "bound_tests_set_hash": "a3ee0de734508a0b2435d01c171b8d8cce2c4644069eaa37c67fc146cf4034ed",
         "declaration_hash": "6b1b39446fdbc2e10992246043098766cd1602bd809e4827add12361cb67c467",
         "anchor_text_hash": "042865d7c2f3ee57558d16bbda502891955644407e647ab52193b9aa10aa9c88"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(!args.contains(&\"--resume\".to_owned()));\nassert!(args.windows(2).any(|pair| pair == [\"--model\", \"claude-opus\"]));\nassert!(args.windows(2).any(|pair| pair == [\"--effort\", \"high\"]));\nassert!(args.windows(2).any(|pair| pair == [\"--permission-mode\", \"dontAsk\"]));\nassert!(args.windows(2).any(|pair| pair == [\"--allowedTools\", \"Read\"]));\nassert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
+        "citation": "assert!(args.windows(2).any(|pair| pair == [\"--model\", \"claude-opus-4-7\"])); assert!(args.windows(2).any(|pair| pair == [\"--effort\", \"high\"])); assert!(args.windows(2).any(|pair| pair == [\"--permission-mode\", \"dontAsk\"]));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5343,13 +5391,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "fde374cad3d0db1c1b5b9219767fc2f91ea5be94c66137bd439132be5e81e4ec",
+        "bound_tests_set_hash": "a3ee0de734508a0b2435d01c171b8d8cce2c4644069eaa37c67fc146cf4034ed",
         "declaration_hash": "6b1b39446fdbc2e10992246043098766cd1602bd809e4827add12361cb67c467",
         "anchor_text_hash": "352679c83a776ed39e6ab98c82bac69f8455389fad22f2fa56704a6573584b5e"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\"); ... assert!(args.last().is_some_and(|prompt| prompt.contains(\n                \"check whether upstream artifacts changed; if they did, reread them before working\"\n            )));"
+        "citation": "assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\"); ... assert!(args.windows(2).any(|pair| pair == [\"--model\", \"claude-opus\"])); assert!(args.windows(2).any(|pair| pair == [\"--effort\", \"high\"])); assert!(args.windows(2).any(|pair| pair == [\"--permission-mode\", \"dontAsk\"])); assert!(args.windows(2).any(|pair| pair == [\"--allowedTools\", \"Read\"])); assert!(args.last().is_some_and(|prompt| prompt.contains(\n                \"check whether upstream artifacts changed; if they did, reread them before working\"\n            )));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5703,7 +5751,7 @@
         "item_identifier": "voluntary:IN-08"
       },
       "key": {
-        "bound_tests_set_hash": "a48619478f19387cd891b5c4255411771cedd0943828f20c098b8f056d19edf3",
+        "bound_tests_set_hash": "0504e3a089e5c685970b43e056a6c2da6dbfdc6ae007bcd170dee2b434949e63",
         "declaration_hash": "3819300d375ba2d16180d16e1368177b7a8417159d5685c7abc5655d107860ff",
         "anchor_text_hash": "cb1121edfe3e7d42504d7f4a07514cb6b78742ed5f048b8f98ea64e1f8684c3b"
       },
@@ -5799,13 +5847,13 @@
         "item_identifier": "voluntary:AC-09"
       },
       "key": {
-        "bound_tests_set_hash": "8eaa1736f1958f2ed4a7c18e42eef97c10e83da2541363760cc1829da2975ca5",
+        "bound_tests_set_hash": "86feb3ae25d2a5ae4932c47dcc1afb463146a07fd4103703fedffb7759cb1422",
         "declaration_hash": "3819300d375ba2d16180d16e1368177b7a8417159d5685c7abc5655d107860ff",
         "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(same_track.resumable_id(&request.request.resume), Some(\"same-track-session\".to_owned()));\nassert_eq!(other_track.resumable_id(&request.request.resume), None);\nassert_eq!(other_capability.resumable_id(&other_capability_request.request.resume), None);\nassert!(args.windows(2).any(|pair| pair == [\"--resume\", \"prior-session\"]));\nassert!(!args.contains(&\"--resume\".to_owned()));\nassert_eq!(targetless_session.resumable_id(&CapabilityResumeRequest::Fresh), None);"
+        "citation": "assert_eq!(same_track.resumable_id(&request.request.resume), Some(\"same-track-session\".to_owned()));\n        assert_eq!(other_track.resumable_id(&request.request.resume), None);\n        assert_eq!(other_capability.resumable_id(&other_capability_request.request.resume), None);\n        assert_eq!(same_track.resumable_id(&CapabilityResumeRequest::Fresh), None);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5823,7 +5871,7 @@
         "item_identifier": "voluntary:IN-08"
       },
       "key": {
-        "bound_tests_set_hash": "a7145b6ab7c7ce165e13f3b1790c71b0ce2d97237ec4c19caf3c4c40940cbaed",
+        "bound_tests_set_hash": "07d68e6007ac610ef90befe0b7cb72e4935300d0b87c76f15d61056f3524ead8",
         "declaration_hash": "c146460dd88681f01ec71eaa9a90b45d13d5955135e1f05a2a8cd7c4494120a2",
         "anchor_text_hash": "cb1121edfe3e7d42504d7f4a07514cb6b78742ed5f048b8f98ea64e1f8684c3b"
       },
@@ -5919,13 +5967,13 @@
         "item_identifier": "voluntary:AC-09"
       },
       "key": {
-        "bound_tests_set_hash": "06e4d44d6fc24e74cf473ff2969786af2a9d57b7e8efe25476d02c01fea5ee7c",
+        "bound_tests_set_hash": "7edc250065621c80c12bf9739d77c32ce130a2384f9222f4a0ccf55f3b526dc1",
         "declaration_hash": "c146460dd88681f01ec71eaa9a90b45d13d5955135e1f05a2a8cd7c4494120a2",
         "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(args.windows(2).any(|pair| pair == [\"resume\", \"prior-session\"])); ... assert_eq!(other_track.resumable_id(&request.request.resume), None); ... assert_eq!(other_capability.resumable_id(&other_capability_request.request.resume), None); ... assert_eq!(cache_key(&targetless, None), None); ... assert!(!args.contains(&\"resume\".to_owned()));"
+        "citation": "let adapter = CodexCapabilityAdapter::with_process_runner_and_session_cache(\n            directory.path().to_owned(),\n            directory.path().join(\"tmp/runtime\"),\n            runner.clone(),\n            cache.clone(),\n            Some(track_id.clone()),\n        );\n...\nadapter.dispatch(&request)?;\n...\nadapter.dispatch(&request)?;\n...\nassert!(resumed_args.windows(2).any(|pair| pair == [\"resume\", \"persisted-codex-session\"]));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },

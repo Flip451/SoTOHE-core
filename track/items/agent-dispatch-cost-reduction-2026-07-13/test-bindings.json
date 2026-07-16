@@ -2974,7 +2974,7 @@
           "element_id": "CN-05"
         }
       },
-      "reason": "TypeSignalsRequest does not resolve or normalize Cargo build-input closures; that layer-granular responsibility belongs to the infrastructure build-input evaluator."
+      "reason": "TypeSignalsRequest is the command value object: it carries the validated branch identity and layer selection into the interactor and neither reads nor hashes any of CN-05's layer-granular inputs (crate source files, crate/workspace manifests, Cargo.lock, toolchain identifier). Computing that implementation-input hash is the infrastructure build-input evaluator's responsibility (hash_implementation_inputs), which is separately bound and tested."
     },
     {
       "kind": "waiver",
@@ -3733,6 +3733,85 @@
     {
       "kind": "voluntary_binding",
       "edge_id": {
+        "entry_key": "WaiverCacheEntry",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_waiver_adjudicates_every_obligation_owning_the_edge"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_waiver_cache_matches_each_owner_when_shared_edge_has_different_declarations"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_cache_codec::tests",
+          "test_name": "test_codec_save_then_load_round_trips"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::cache::tests",
+          "test_name": "test_cached_waiver_without_owner_is_not_replayed"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "WaiverCacheEntry",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_waiver_cache_matches_each_owner_when_shared_edge_has_different_declarations"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::waiver_cache_codec::tests",
+          "test_name": "test_codec_save_then_load_round_trips"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::cache::tests",
+          "test_name": "test_cached_waiver_without_owner_is_not_replayed"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_zero_obligation_cited_edge_waiver_resolves"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_waiver_adjudicates_every_obligation_owning_the_edge"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_waiver_edge_suppresses_fulfillment_adjudication_for_that_edge"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_waiver_edge_suppresses_voluntary_binding_adjudication"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
         "entry_key": "EdgeOwnership",
         "anchor_id": {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
@@ -4086,12 +4165,12 @@
     { "kind": "voluntary_binding", "edge_id": { "entry_key": "ClaudeCapabilityAdapter", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "IN-09" } }, "tests": [{ "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_track_key_is_selected_for_fresh_and_resume" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_workspace_keys_are_target_scoped_and_targetless_is_unrecorded" }, { "layer": "infrastructure", "module_path": "infrastructure::provider_session::tests", "test_name": "test_provider_session_cache_isolates_workspace_artifact_keys" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_resumes_workspace_session_with_explicit_flags" }] },
     { "kind": "voluntary_binding", "edge_id": { "entry_key": "ClaudeCapabilityAdapter", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "CN-04" } }, "tests": [{ "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_track_key_is_selected_for_fresh_and_resume" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_resume_reuses_only_the_same_track_and_capability" }, { "layer": "infrastructure", "module_path": "infrastructure::provider_session::tests", "test_name": "test_provider_session_cache_isolates_review_track_and_workspace_identities" }, { "layer": "infrastructure", "module_path": "infrastructure::provider_session::tests", "test_name": "test_provider_session_cache_isolates_workspace_artifact_keys" }, { "layer": "infrastructure", "module_path": "infrastructure::provider_session::tests", "test_name": "test_provider_session_cache_paths_are_gitignored_machine_local_transients" }] },
     { "kind": "voluntary_binding", "edge_id": { "entry_key": "ClaudeCapabilityAdapter", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "CN-08" } }, "tests": [{ "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_mismatch_starts_fresh_and_success_persists_matching_profile" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_provider_mismatch_starts_fresh_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_model_mismatch_starts_fresh_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_resume_nonzero_retries_fresh_with_explicit_flags" }] },
-    { "kind": "voluntary_binding", "edge_id": { "entry_key": "ClaudeCapabilityAdapter", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "AC-09" } }, "tests": [{ "layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_cross_provider_uses_native_agent_prompt" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_resumes_workspace_session_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_provider_mismatch_starts_fresh_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_model_mismatch_starts_fresh_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_resume_reuses_only_the_same_track_and_capability" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_workspace_keys_are_target_scoped_and_targetless_is_unrecorded" }, { "layer": "infrastructure", "module_path": "infrastructure::provider_session::tests", "test_name": "test_provider_session_cache_isolates_workspace_artifact_keys" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::process::tests", "test_name": "test_provider_process_passthroughs_fake_provider_report_while_capturing_session_id" }] },
+    { "kind": "voluntary_binding", "edge_id": { "entry_key": "ClaudeCapabilityAdapter", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "AC-09" } }, "tests": [{ "layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_cross_provider_uses_native_agent_prompt" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_resumes_workspace_session_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_provider_mismatch_starts_fresh_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_model_mismatch_starts_fresh_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_resume_reuses_only_the_same_track_and_capability" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_workspace_keys_are_target_scoped_and_targetless_is_unrecorded" }, { "layer": "infrastructure", "module_path": "infrastructure::provider_session::tests", "test_name": "test_provider_session_cache_isolates_workspace_artifact_keys" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::process::tests", "test_name": "test_claude_json_envelope_emits_only_result_and_captures_session_id" }] },
     { "kind": "voluntary_binding", "edge_id": { "entry_key": "CodexCapabilityAdapter", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "IN-08" } }, "tests": [{ "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_resumes_workspace_session_with_explicit_flags" }] },
     { "kind": "voluntary_binding", "edge_id": { "entry_key": "CodexCapabilityAdapter", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "IN-09" } }, "tests": [{ "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_track_key_is_selected_for_fresh_and_resume" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_workspace_keys_are_target_scoped_and_targetless_is_unrecorded" }, { "layer": "infrastructure", "module_path": "infrastructure::provider_session::tests", "test_name": "test_provider_session_cache_isolates_workspace_artifact_keys" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_resumes_workspace_session_with_explicit_flags" }] },
     { "kind": "voluntary_binding", "edge_id": { "entry_key": "CodexCapabilityAdapter", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "CN-04" } }, "tests": [{ "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_injected_cache_persists_and_resumes_track_session" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_track_key_is_selected_for_fresh_and_resume" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_resume_reuses_only_the_same_track_and_capability" }, { "layer": "infrastructure", "module_path": "infrastructure::provider_session::tests", "test_name": "test_provider_session_cache_isolates_review_track_and_workspace_identities" }, { "layer": "infrastructure", "module_path": "infrastructure::provider_session::tests", "test_name": "test_provider_session_cache_isolates_workspace_artifact_keys" }, { "layer": "infrastructure", "module_path": "infrastructure::provider_session::tests", "test_name": "test_provider_session_cache_paths_are_gitignored_machine_local_transients" }] },
     { "kind": "voluntary_binding", "edge_id": { "entry_key": "CodexCapabilityAdapter", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "CN-08" } }, "tests": [{ "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_mismatch_starts_fresh_and_success_persists_matching_profile" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_provider_mismatch_starts_fresh_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_model_mismatch_starts_fresh_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_resume_nonzero_retries_fresh_with_explicit_flags" }] },
-    { "kind": "voluntary_binding", "edge_id": { "entry_key": "CodexCapabilityAdapter", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "AC-09" } }, "tests": [{ "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_resumes_workspace_session_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_provider_mismatch_starts_fresh_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_model_mismatch_starts_fresh_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_injected_cache_persists_and_resumes_track_session" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_resume_reuses_only_the_same_track_and_capability" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_workspace_keys_are_target_scoped_and_targetless_is_unrecorded" }, { "layer": "infrastructure", "module_path": "infrastructure::provider_session::tests", "test_name": "test_provider_session_cache_isolates_workspace_artifact_keys" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::process::tests", "test_name": "test_provider_process_passthroughs_fake_provider_report_while_capturing_session_id" }] },
+    { "kind": "voluntary_binding", "edge_id": { "entry_key": "CodexCapabilityAdapter", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "AC-09" } }, "tests": [{ "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_resumes_workspace_session_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_provider_mismatch_starts_fresh_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_model_mismatch_starts_fresh_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_injected_cache_persists_and_resumes_track_session" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_resume_reuses_only_the_same_track_and_capability" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_workspace_keys_are_target_scoped_and_targetless_is_unrecorded" }, { "layer": "infrastructure", "module_path": "infrastructure::provider_session::tests", "test_name": "test_provider_session_cache_isolates_workspace_artifact_keys" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::process::tests", "test_name": "test_provider_process_emits_only_last_message_while_capturing_session_id" }] },
     { "kind": "voluntary_binding", "edge_id": { "entry_key": "CapabilityExecDriverInput", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "IN-08" } }, "tests": [{ "layer": "cli_driver", "module_path": "cli_driver::capability::tests", "test_name": "test_capability_driver_forwards_shared_exec_inputs_to_generic_service" }, { "layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_exec_maps_fresh_targetless_and_targeted_resume_to_distinct_driver_states" }] },
     { "kind": "voluntary_binding", "edge_id": { "entry_key": "CapabilityExecDriverInput", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "IN-09" } }, "tests": [{ "layer": "cli_driver", "module_path": "cli_driver::capability::tests", "test_name": "test_capability_driver_forwards_shared_exec_inputs_to_generic_service" }, { "layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_exec_maps_fresh_targetless_and_targeted_resume_to_distinct_driver_states" }, { "layer": "cli_driver", "module_path": "cli_driver::capability::tests", "test_name": "test_capability_driver_maps_normalized_targeted_resume_to_typed_request" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_workspace_keys_are_target_scoped_and_targetless_is_unrecorded" }, { "layer": "infrastructure", "module_path": "infrastructure::provider_session::tests", "test_name": "test_provider_session_cache_isolates_workspace_artifact_keys" }] },
     { "kind": "voluntary_binding", "edge_id": { "entry_key": "CapabilityExecDriverInput", "anchor_id": { "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json", "element_id": "AC-09" } }, "tests": [{ "layer": "cli_driver", "module_path": "cli_driver::capability::tests", "test_name": "test_capability_driver_forwards_shared_exec_inputs_to_generic_service" }, { "layer": "cli", "module_path": "cli::commands::capability::tests", "test_name": "test_capability_exec_maps_fresh_targetless_and_targeted_resume_to_distinct_driver_states" }, { "layer": "cli_driver", "module_path": "cli_driver::capability::tests", "test_name": "test_capability_driver_maps_normalized_targeted_resume_to_typed_request" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::session::tests", "test_name": "test_capability_session_workspace_keys_are_target_scoped_and_targetless_is_unrecorded" }, { "layer": "infrastructure", "module_path": "infrastructure::provider_session::tests", "test_name": "test_provider_session_cache_isolates_workspace_artifact_keys" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::claude::tests", "test_name": "test_claude_capability_adapter_model_mismatch_starts_fresh_with_explicit_flags" }, { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_model_mismatch_starts_fresh_with_explicit_flags" }] },

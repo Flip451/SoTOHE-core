@@ -125,6 +125,7 @@ impl CapabilityProviderPort for ClaudeCapabilityAdapter {
             &self.runtime_dir,
             &self.provider,
             timeout,
+            None,
         );
         let output = match (resume_id, result) {
             (Some(_), Ok(output)) if output.exit_code != 0 => self.process_runner.run(
@@ -140,6 +141,7 @@ impl CapabilityProviderPort for ClaudeCapabilityAdapter {
                 &self.runtime_dir,
                 &self.provider,
                 timeout,
+                None,
             )?,
             (Some(_), Err(_)) => self.process_runner.run(
                 "claude",
@@ -154,6 +156,7 @@ impl CapabilityProviderPort for ClaudeCapabilityAdapter {
                 &self.runtime_dir,
                 &self.provider,
                 timeout,
+                None,
             )?,
             (_, result) => result?,
         };
@@ -218,7 +221,7 @@ fn build_claude_args_with_resume(
         .chain(allowed_tools.iter().map(OsString::from))
         .chain([
             OsString::from("--output-format"),
-            OsString::from("stream-json"),
+            OsString::from("json"),
             OsString::from("--agent"),
             OsString::from(capability),
             OsString::from("--model"),
@@ -283,6 +286,7 @@ mod tests {
             _runtime_dir: &Path,
             _provider: &ProviderName,
             timeout: Option<Duration>,
+            _output_last_message: Option<&Path>,
         ) -> Result<ProviderProcessOutput, CapabilityExecError> {
             self.invocations.lock().expect("test process recorder lock").push((
                 binary.to_owned(),
@@ -393,7 +397,7 @@ mod tests {
                 "--allowedTools",
                 "Read",
                 "--output-format",
-                "stream-json",
+                "json",
                 "--agent",
                 "implementer",
                 "--model",
@@ -473,7 +477,7 @@ mod tests {
                 "--allowedTools",
                 "Read",
                 "--output-format",
-                "stream-json",
+                "json",
                 "--agent",
                 "implementer",
                 "--model",

@@ -32,12 +32,14 @@ pub(super) fn cached_fulfillment_verdict(
         .map(|entry| entry.verdict().clone())
 }
 
-/// Returns a frozen waiver verdict only when the edge and complete three-hash
-/// cache key and verifier fingerprint still match the current inputs. A cached
-/// `Pending` verdict is never replayed (same re-verify rule as fulfillment).
+/// Returns a frozen waiver verdict only when the edge, owner, complete
+/// three-hash cache key, and verifier fingerprint still match the current
+/// inputs. A cached `Pending` verdict is never replayed (same re-verify rule
+/// as fulfillment). Legacy entries without an owner miss deliberately.
 pub(super) fn cached_waiver_verdict(
     cache: Option<&WaiverCacheDocument>,
     edge_id: &TestObligationEdgeId,
+    obligation_id: &TestObligationId,
     key: &WaiverCacheKey,
     verifier_fingerprint: &VerifierPromptFingerprint,
 ) -> Option<WaiverVerdict> {
@@ -46,6 +48,7 @@ pub(super) fn cached_waiver_verdict(
         .iter()
         .find(|entry| {
             entry.edge_id() == edge_id
+                && entry.obligation_id() == Some(obligation_id)
                 && entry.key() == key
                 && entry.verifier_fingerprint() == Some(verifier_fingerprint)
                 && !matches!(entry.verdict(), WaiverVerdict::Pending)
@@ -168,12 +171,43 @@ mod tests {
             track(),
             vec![WaiverCacheEntry::new(
                 edge(),
+                Some(obligation()),
                 waiver_key(),
                 WaiverVerdict::Pending,
                 Some(fingerprint()),
             )],
         );
-        let found = cached_waiver_verdict(Some(&cache), &edge(), &waiver_key(), &fingerprint());
+        let found = cached_waiver_verdict(
+            Some(&cache),
+            &edge(),
+            &obligation(),
+            &waiver_key(),
+            &fingerprint(),
+        );
         assert!(found.is_none(), "cached Pending waiver must re-verify: {found:?}");
+    }
+
+    #[test]
+    fn test_cached_waiver_without_owner_is_not_replayed() -> Result<(), ValidationError> {
+        let verdict = WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("covers the waived behavior".to_owned())?,
+        };
+        let cache = WaiverCacheDocument::new(
+            track(),
+            vec![WaiverCacheEntry::new(edge(), None, waiver_key(), verdict, Some(fingerprint()))],
+        );
+
+        assert!(
+            cached_waiver_verdict(
+                Some(&cache),
+                &edge(),
+                &obligation(),
+                &waiver_key(),
+                &fingerprint(),
+            )
+            .is_none(),
+            "legacy cache entries without an owner must re-verify"
+        );
+        Ok(())
     }
 }

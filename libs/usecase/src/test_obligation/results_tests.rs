@@ -340,6 +340,7 @@ fn waiver_failure_cache(edge_id: TestObligationEdgeId) -> WaiverCacheDocument {
         track(),
         vec![WaiverCacheEntry::new(
             edge_id,
+            None,
             WaiverCacheKey::new(
                 domain::tddd::test_obligation::hashes::WaivedReasonHash::new(hash(5)),
                 DeclarationHash::new(hash(2)),
@@ -630,6 +631,7 @@ fn test_waiver_lane_counts() {
     let entries = vec![
         WaiverCacheEntry::new(
             edge("Money", "IN-05"),
+            None,
             WaiverCacheKey::new(
                 domain::tddd::test_obligation::hashes::WaivedReasonHash::new(hash(4)),
                 DeclarationHash::new(hash(2)),
@@ -640,6 +642,7 @@ fn test_waiver_lane_counts() {
         ),
         WaiverCacheEntry::new(
             waived_edge.clone(),
+            None,
             WaiverCacheKey::new(
                 domain::tddd::test_obligation::hashes::WaivedReasonHash::new(hash(5)),
                 DeclarationHash::new(hash(2)),

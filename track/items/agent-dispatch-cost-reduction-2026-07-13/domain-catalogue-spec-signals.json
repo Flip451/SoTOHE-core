@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "95c34034301ff3d0ee47255c445eb0af9bf019680c9f1068cc270b3002887284",
+  "catalogue_declaration_hash": "7e38288ef967614b487bbcd9947e87db4878458dcd4a6398fe1dea09fec62665",
   "signals": [
     {
       "type_name": "CatalogueDeclarationHash",
@@ -91,6 +91,11 @@
       "type_name": "TypeSignalsSchemaVersionError",
       "signal": "blue",
       "entry_hash": "2efbbd40bf63c22b95ce5ef52fbd3e2bc59981072c858146d1c72fc64a1235be"
+    },
+    {
+      "type_name": "WaiverCacheEntry",
+      "signal": "blue",
+      "entry_hash": "75bc5be31648e3e35d55f9ff3bd3956c08985018cb2d5d2de4725e52ab4e420a"
     },
     {
       "type_name": "SchemaExporter",

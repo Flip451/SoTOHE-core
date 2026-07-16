@@ -135,6 +135,10 @@
       {
         "layer": "domain",
         "entry_key": "TestBindingsDocument"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "WaiverCacheEntry"
       }
     ]
   }

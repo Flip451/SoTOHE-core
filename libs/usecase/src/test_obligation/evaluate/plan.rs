@@ -74,6 +74,7 @@ pub(super) enum ImmediateOutcome {
     },
     WaiverCached {
         edge_id: TestObligationEdgeId,
+        obligation_id: TestObligationId,
         key: WaiverCacheKey,
         verdict: WaiverVerdict,
     },
@@ -93,6 +94,7 @@ pub(super) struct FulfillmentLlmTask {
 /// LLM task for the waiver lane.
 pub(super) struct WaiverLlmTask {
     pub(super) edge_id: TestObligationEdgeId,
+    pub(super) obligation_id: TestObligationId,
     pub(super) key: WaiverCacheKey,
     pub(super) reason: WaivedReason,
     pub(super) declaration: String,
@@ -319,6 +321,7 @@ impl EvaluateTestObligationsInteractor {
                 };
                 self.emit_waiver_action(
                     edge_id,
+                    obligation.id().clone(),
                     reason,
                     declaration,
                     &anchor_text,
@@ -337,6 +340,7 @@ impl EvaluateTestObligationsInteractor {
         };
         self.emit_waiver_action(
             edge_id,
+            synthetic_obligation_id(edge_id),
             reason,
             declaration,
             &anchor_text,
@@ -346,9 +350,11 @@ impl EvaluateTestObligationsInteractor {
         Ok(())
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn emit_waiver_action(
         &self,
         edge_id: &TestObligationEdgeId,
+        obligation_id: TestObligationId,
         reason: &WaivedReason,
         declaration: String,
         anchor_text: &str,
@@ -363,11 +369,13 @@ impl EvaluateTestObligationsInteractor {
         if let Some(verdict) = cached_waiver_verdict(
             existing_waiver_cache,
             edge_id,
+            &obligation_id,
             &key,
             &self.waiver_verifier_fingerprint,
         ) {
             plan.push(PlannedAction::Immediate(ImmediateOutcome::WaiverCached {
                 edge_id: edge_id.clone(),
+                obligation_id,
                 key,
                 verdict,
             }));
@@ -375,6 +383,7 @@ impl EvaluateTestObligationsInteractor {
         }
         plan.push(PlannedAction::Waiver(WaiverLlmTask {
             edge_id: edge_id.clone(),
+            obligation_id,
             key,
             reason: reason.clone(),
             declaration,
@@ -467,10 +476,11 @@ impl EvaluateTestObligationsInteractor {
                             Some(self.fulfillment_verifier_fingerprint.clone()),
                         ));
                     }
-                    ImmediateOutcome::WaiverCached { edge_id, key, verdict } => {
+                    ImmediateOutcome::WaiverCached { edge_id, obligation_id, key, verdict } => {
                         record_waiver(&edge_id, &verdict, tally);
                         waiver_entries.push(WaiverCacheEntry::new(
                             edge_id,
+                            Some(obligation_id),
                             key,
                             verdict,
                             Some(self.waiver_verifier_fingerprint.clone()),
@@ -503,6 +513,7 @@ impl EvaluateTestObligationsInteractor {
                     record_waiver(&task.edge_id, &verdict, tally);
                     waiver_entries.push(WaiverCacheEntry::new(
                         task.edge_id,
+                        Some(task.obligation_id),
                         task.key,
                         verdict,
                         Some(self.waiver_verifier_fingerprint.clone()),

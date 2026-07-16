@@ -3,6 +3,7 @@
 use std::ffi::OsString;
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 
 use domain::TrackId;
@@ -20,6 +21,8 @@ use super::{
     parse_provider_definition_front_matter, read_front_matter, read_utf8_file,
     system_process_runner,
 };
+
+static OUTPUT_LAST_MESSAGE_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 /// Codex sandbox vocabulary declared by a provider-native skill definition.
 #[derive(Debug, PartialEq, Eq, Deserialize)]
@@ -130,6 +133,14 @@ impl CodexCapabilityAdapter {
         sandbox_mode_from_skill(&definition, capability)
             .map_err(|detail| adapter_preflight_error(request, &self.provider, detail))
     }
+
+    fn output_last_message_path(&self) -> PathBuf {
+        self.runtime_dir.join(format!(
+            "capability-codex-last-message-{}-{}.txt",
+            std::process::id(),
+            OUTPUT_LAST_MESSAGE_SEQUENCE.fetch_add(1, Ordering::Relaxed),
+        ))
+    }
 }
 
 impl CapabilityProviderPort for CodexCapabilityAdapter {
@@ -146,17 +157,27 @@ impl CapabilityProviderPort for CodexCapabilityAdapter {
         let session =
             CapabilitySession::new(request, self.track_id.as_ref(), self.session_cache.clone());
         let resume_id = session.resumable_id(&request.request.resume);
+        let output_last_message = self.output_last_message_path();
         let args = build_codex_args_with_resume(
             request.profile.model.as_str(),
             request.profile.effort,
             sandbox,
             resume_id.as_deref(),
             &prompt,
+            &output_last_message,
         );
         let timeout = request.request.timeout.map(|timeout| Duration::from_secs(timeout.as_secs()));
         let result = self
             .process_runner
-            .run("codex", &args, &self.repo_root, &self.runtime_dir, &self.provider, timeout)
+            .run(
+                "codex",
+                &args,
+                &self.repo_root,
+                &self.runtime_dir,
+                &self.provider,
+                timeout,
+                Some(&output_last_message),
+            )
             .map_err(|error| match error {
                 CapabilityExecError::DispatchFailed { .. } => error,
                 other => dispatch_error(&self.provider, other.to_string()),
@@ -169,11 +190,13 @@ impl CapabilityProviderPort for CodexCapabilityAdapter {
                     request.profile.effort,
                     sandbox,
                     &prompt,
+                    &output_last_message,
                 ),
                 &self.repo_root,
                 &self.runtime_dir,
                 &self.provider,
                 timeout,
+                Some(&output_last_message),
             )?,
             (Some(_), Err(_)) => self.process_runner.run(
                 "codex",
@@ -182,11 +205,13 @@ impl CapabilityProviderPort for CodexCapabilityAdapter {
                     request.profile.effort,
                     sandbox,
                     &prompt,
+                    &output_last_message,
                 ),
                 &self.repo_root,
                 &self.runtime_dir,
                 &self.provider,
                 timeout,
+                Some(&output_last_message),
             )?,
             (_, result) => result?,
         };
@@ -221,8 +246,9 @@ fn build_codex_args(
     effort: ReasoningEffort,
     sandbox: SandboxMode,
     prompt: &str,
+    output_last_message: &std::path::Path,
 ) -> Vec<OsString> {
-    build_codex_args_with_resume(model, effort, sandbox, None, prompt)
+    build_codex_args_with_resume(model, effort, sandbox, None, prompt, output_last_message)
 }
 
 fn build_codex_args_with_resume(
@@ -231,6 +257,7 @@ fn build_codex_args_with_resume(
     sandbox: SandboxMode,
     resume_id: Option<&str>,
     prompt: &str,
+    output_last_message: &std::path::Path,
 ) -> Vec<OsString> {
     vec![
         OsString::from("exec"),
@@ -241,6 +268,8 @@ fn build_codex_args_with_resume(
         OsString::from("--sandbox"),
         OsString::from(sandbox.as_cli_value()),
         OsString::from("--json"),
+        OsString::from("--output-last-message"),
+        output_last_message.as_os_str().to_owned(),
     ]
     .into_iter()
     .chain(resume_id.into_iter().flat_map(|id| [OsString::from("resume"), OsString::from(id)]))
@@ -303,6 +332,7 @@ mod tests {
             _runtime_dir: &Path,
             _provider: &ProviderName,
             timeout: Option<Duration>,
+            _output_last_message: Option<&Path>,
         ) -> Result<ProviderProcessOutput, CapabilityExecError> {
             self.invocations.lock().expect("test process recorder lock").push((
                 binary.to_owned(),
@@ -400,6 +430,7 @@ mod tests {
             ReasoningEffort::XHigh,
             SandboxMode::WorkspaceWrite,
             "$implementer Briefing: Read tmp/briefing.md and perform the task.",
+            Path::new("tmp/runtime/final-message.txt"),
         );
         let values: Vec<_> = args.iter().map(|value| value.to_string_lossy()).collect();
 
@@ -414,6 +445,8 @@ mod tests {
                 "--sandbox",
                 "workspace-write",
                 "--json",
+                "--output-last-message",
+                "tmp/runtime/final-message.txt",
                 "$implementer Briefing: Read tmp/briefing.md and perform the task.",
             ]
         );
@@ -447,10 +480,21 @@ mod tests {
         assert_eq!(invocation.0, "codex");
         let args: Vec<_> =
             invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();
-        let [command, model_flag, model, config_flag, config, sandbox_flag, sandbox, json, prompt] =
-            args.as_slice()
+        let [
+            command,
+            model_flag,
+            model,
+            config_flag,
+            config,
+            sandbox_flag,
+            sandbox,
+            json,
+            output_flag,
+            output_path,
+            prompt,
+        ] = args.as_slice()
         else {
-            return Err("Codex invocation must have nine arguments".into());
+            return Err("Codex invocation must have eleven arguments".into());
         };
         assert_eq!(command, "exec");
         assert_eq!(model_flag, "-m");
@@ -460,6 +504,8 @@ mod tests {
         assert_eq!(sandbox_flag, "--sandbox");
         assert_eq!(sandbox, "workspace-write");
         assert_eq!(json, "--json");
+        assert_eq!(output_flag, "--output-last-message");
+        assert!(output_path.ends_with(".txt"));
         assert!(
             prompt.contains("$implementer Briefing: Read tmp/briefing.md and perform the task.")
         );
@@ -921,16 +967,29 @@ mod tests {
             .iter()
             .map(|value| value.to_string_lossy().into_owned())
             .collect();
-        let [_, _, _, config_flag, config, workspace_write_flag, workspace_write_sandbox, json, _] =
-            workspace_write_args.as_slice()
+        let [
+            _,
+            _,
+            _,
+            config_flag,
+            config,
+            workspace_write_flag,
+            workspace_write_sandbox,
+            json,
+            output_flag,
+            output_path,
+            _,
+        ] = workspace_write_args.as_slice()
         else {
-            return Err("workspace-write invocation must have nine arguments".into());
+            return Err("workspace-write invocation must have eleven arguments".into());
         };
         assert_eq!(config_flag, "--config");
         assert_eq!(config, "model_reasoning_effort=\"high\"");
         assert_eq!(workspace_write_flag, "--sandbox");
         assert_eq!(workspace_write_sandbox, "workspace-write");
         assert_eq!(json, "--json");
+        assert_eq!(output_flag, "--output-last-message");
+        assert!(output_path.ends_with(".txt"));
 
         let default_directory = tempfile::tempdir()?;
         write_skill(
@@ -953,16 +1012,29 @@ mod tests {
             .ok_or("undeclared sandbox dispatch must invoke the provider")?;
         let default_args: Vec<_> =
             default_invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();
-        let [_, _, _, config_flag, config, default_flag, default_sandbox, json, _] =
-            default_args.as_slice()
+        let [
+            _,
+            _,
+            _,
+            config_flag,
+            config,
+            default_flag,
+            default_sandbox,
+            json,
+            output_flag,
+            output_path,
+            _,
+        ] = default_args.as_slice()
         else {
-            return Err("undeclared sandbox invocation must have nine arguments".into());
+            return Err("undeclared sandbox invocation must have eleven arguments".into());
         };
         assert_eq!(config_flag, "--config");
         assert_eq!(config, "model_reasoning_effort=\"high\"");
         assert_eq!(default_flag, "--sandbox");
         assert_eq!(default_sandbox, "read-only");
         assert_eq!(json, "--json");
+        assert_eq!(output_flag, "--output-last-message");
+        assert!(output_path.ends_with(".txt"));
         Ok(())
     }
 

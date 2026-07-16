@@ -151,6 +151,7 @@ mod tests {
             &repository.join("tmp/capability-runtime"),
             &provider,
             Some(Duration::from_secs(1)),
+            None,
         )
         .expect_err("symlinked runtime directory is rejected before process spawn");
 
@@ -173,6 +174,7 @@ mod tests {
             &repository.path().join("tmp/capability-runtime"),
             &provider,
             Some(Duration::from_millis(1)),
+            None,
         )
         .expect_err("provider process exceeds timeout");
 
@@ -194,6 +196,7 @@ mod tests {
             repository.path(),
             &repository.path().join("tmp/capability-runtime"),
             &provider,
+            None,
             None,
         )?;
 
@@ -217,6 +220,7 @@ mod tests {
             &repository.path().join("tmp/capability-runtime"),
             &provider,
             Some(Duration::from_secs(1)),
+            None,
         )
         .expect_err("a detached stderr holder must not hang dispatch");
 

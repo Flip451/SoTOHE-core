@@ -256,6 +256,7 @@ impl WaiverCacheKey {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WaiverCacheEntry {
     edge_id: TestObligationEdgeId,
+    obligation_id: Option<TestObligationId>,
     key: WaiverCacheKey,
     verdict: WaiverVerdict,
     verifier_fingerprint: Option<VerifierPromptFingerprint>,
@@ -266,17 +267,27 @@ impl WaiverCacheEntry {
     #[must_use]
     pub fn new(
         edge_id: TestObligationEdgeId,
+        obligation_id: Option<TestObligationId>,
         key: WaiverCacheKey,
         verdict: WaiverVerdict,
         verifier_fingerprint: Option<VerifierPromptFingerprint>,
     ) -> Self {
-        Self { edge_id, key, verdict, verifier_fingerprint }
+        Self { edge_id, obligation_id, key, verdict, verifier_fingerprint }
     }
 
     /// Returns the obligation edge this waiver verdict is frozen against.
     #[must_use]
     pub fn edge_id(&self) -> &TestObligationEdgeId {
         &self.edge_id
+    }
+
+    /// Returns the obligation that owns this edge adjudication.
+    ///
+    /// `None` denotes a legacy cache entry. Readers fail closed and require it
+    /// to be re-evaluated before it can satisfy the gate.
+    #[must_use]
+    pub fn obligation_id(&self) -> Option<&TestObligationId> {
+        self.obligation_id.as_ref()
     }
 
     /// Returns the three-component cache key freezing this verdict.
@@ -486,6 +497,7 @@ mod tests {
         let fingerprint = verifier_fingerprint();
         let entry = WaiverCacheEntry::new(
             edge_id(),
+            None,
             waiver_key(),
             WaiverVerdict::Waived { citation: citation("cite") },
             Some(fingerprint.clone()),

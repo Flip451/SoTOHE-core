@@ -2,7 +2,7 @@
 
 use std::ffi::OsString;
 use std::fs::{File, OpenOptions};
-use std::io::{BufRead, BufReader, Error, ErrorKind, Read, Write};
+use std::io::{Error, ErrorKind, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, ExitStatus, Stdio};
 use std::sync::Arc;
@@ -20,8 +20,6 @@ const PROVIDER_LOG_DRAIN_TIMEOUT: Duration = Duration::from_secs(1);
 const BOUNDED_COMMAND_POLL_INTERVAL: Duration = Duration::from_millis(50);
 const BOUNDED_COMMAND_DRAIN_TIMEOUT: Duration = Duration::from_secs(1);
 const LOG_TRUNCATION_NOTICE: &[u8] = b"\n[provider stderr truncated]\n";
-const MAX_PROVIDER_SESSION_EVENT_BYTES: usize = 64 * 1024;
-
 static PROVIDER_LOG_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 /// Bounded output collected from a short-lived subprocess.
@@ -180,6 +178,7 @@ fn terminate_bounded_command(child: &mut Child, process_id: u32) -> Result<(), s
 }
 
 pub(crate) trait ProviderProcessRunner: Send + Sync {
+    #[allow(clippy::too_many_arguments)]
     fn run(
         &self,
         binary: &str,
@@ -188,6 +187,7 @@ pub(crate) trait ProviderProcessRunner: Send + Sync {
         runtime_dir: &Path,
         provider: &ProviderName,
         timeout: Option<Duration>,
+        output_last_message: Option<&Path>,
     ) -> Result<ProviderProcessOutput, CapabilityExecError>;
 }
 
@@ -209,8 +209,17 @@ impl ProviderProcessRunner for SystemProviderProcessRunner {
         runtime_dir: &Path,
         provider: &ProviderName,
         timeout: Option<Duration>,
+        output_last_message: Option<&Path>,
     ) -> Result<ProviderProcessOutput, CapabilityExecError> {
-        run_provider_process_with_timeout(binary, args, repo_root, runtime_dir, provider, timeout)
+        run_provider_process_with_timeout(
+            binary,
+            args,
+            repo_root,
+            runtime_dir,
+            provider,
+            timeout,
+            output_last_message,
+        )
     }
 }
 
@@ -225,6 +234,7 @@ pub(crate) fn run_provider_process_with_timeout(
     runtime_dir: &Path,
     provider: &ProviderName,
     timeout: Option<Duration>,
+    output_last_message: Option<&Path>,
 ) -> Result<ProviderProcessOutput, CapabilityExecError> {
     run_provider_process_with_timeout_and_stdout(
         binary,
@@ -233,10 +243,12 @@ pub(crate) fn run_provider_process_with_timeout(
         runtime_dir,
         provider,
         timeout,
+        output_last_message,
         std::io::stdout(),
     )
 }
 
+#[allow(clippy::too_many_arguments)]
 fn run_provider_process_with_timeout_and_stdout<W: Write + Send + 'static>(
     binary: &str,
     args: &[OsString],
@@ -244,9 +256,13 @@ fn run_provider_process_with_timeout_and_stdout<W: Write + Send + 'static>(
     runtime_dir: &Path,
     provider: &ProviderName,
     timeout: Option<Duration>,
+    output_last_message: Option<&Path>,
     passthrough: W,
 ) -> Result<ProviderProcessOutput, CapabilityExecError> {
     let runtime_dir = prepare_runtime_dir(repo_root, runtime_dir, provider)?;
+    let output_last_message = output_last_message
+        .map(|path| initialize_output_last_message(path, &runtime_dir, provider))
+        .transpose()?;
     let timestamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_err(|error| {
@@ -286,120 +302,43 @@ fn run_provider_process_with_timeout_and_stdout<W: Write + Send + 'static>(
         dispatch_error(provider, format!("cannot capture stdout for {binary} provider subprocess"))
     })?;
     let log_writer = spawn_bounded_log_writer(stderr, log_file);
-    let session_collector = spawn_provider_session_collector(stdout, passthrough);
+    let session_collector = spawn_provider_session_collector(stdout, provider.clone());
     let status = wait_for_provider_process(&mut child, provider, binary, timeout)?;
     wait_for_bounded_log_writer(log_writer, process_id, provider, binary, &log_path)?;
-    let session_id = receive_provider_session_id(session_collector, process_id, provider, binary)?;
+    let collected = receive_provider_output(session_collector, process_id, provider, binary)?;
+    // The provider may mutate its writable runtime directory while it runs. Re-check every
+    // component after it exits before opening provider-controlled output so a replaced parent
+    // cannot redirect the leaf read outside the repository runtime.
+    let runtime_dir = prepare_runtime_dir(repo_root, &runtime_dir, provider)?;
+    let final_message = match output_last_message {
+        Some(path) => {
+            validate_output_last_message_parent(&path, &runtime_dir, provider)?;
+            read_output_last_message(&path, provider)?
+        }
+        None => collected.final_message,
+    };
+    if let Some(message) = final_message {
+        let mut passthrough = passthrough;
+        passthrough.write_all(&message).map_err(|error| {
+            dispatch_error(provider, format!("cannot write final message from {binary}: {error}"))
+        })?;
+        passthrough.flush().map_err(|error| {
+            dispatch_error(provider, format!("cannot flush final message from {binary}: {error}"))
+        })?;
+    }
     Ok(ProviderProcessOutput {
         exit_code: status.code().and_then(|code| u8::try_from(code).ok()).unwrap_or(1),
-        session_id,
+        session_id: collected.session_id,
     })
 }
 
-fn spawn_provider_session_collector(
-    stdout: impl Read + Send + 'static,
-    passthrough: impl Write + Send + 'static,
-) -> Receiver<Result<Option<String>, std::io::Error>> {
-    let (sender, receiver) = mpsc::sync_channel(1);
-    thread::spawn(move || {
-        let _ = sender.send(collect_provider_session_id(stdout, passthrough));
-    });
-    receiver
-}
+#[path = "process/output_collector.rs"]
+mod output_collector;
 
-fn receive_provider_session_id(
-    collector: Receiver<Result<Option<String>, std::io::Error>>,
-    process_id: u32,
-    provider: &ProviderName,
-    binary: &str,
-) -> Result<Option<String>, CapabilityExecError> {
-    match collector.recv_timeout(PROVIDER_LOG_DRAIN_TIMEOUT) {
-        Ok(Ok(session_id)) => Ok(session_id),
-        Ok(Err(error)) => Err(dispatch_error(
-            provider,
-            format!("cannot pass through stdout from {binary} provider subprocess: {error}"),
-        )),
-        Err(RecvTimeoutError::Timeout) => {
-            let _ = terminate_provider_process_group(process_id, provider, binary);
-            Err(dispatch_error(
-                provider,
-                format!(
-                    "stdout drain did not close within {} seconds after {binary} exited",
-                    PROVIDER_LOG_DRAIN_TIMEOUT.as_secs(),
-                ),
-            ))
-        }
-        Err(RecvTimeoutError::Disconnected) => {
-            Err(dispatch_error(provider, format!("stdout collector disconnected for {binary}")))
-        }
-    }
-}
-
-/// Passes through provider output while retaining only the first bounded JSON session/thread ID event.
-fn collect_provider_session_id<R: Read, W: Write>(
-    pipe: R,
-    mut passthrough: W,
-) -> Result<Option<String>, std::io::Error> {
-    let mut reader = BufReader::new(pipe);
-    let mut event = Vec::with_capacity(MAX_PROVIDER_SESSION_EVENT_BYTES);
-    let mut discarding_event = false;
-    let mut session_id = None;
-
-    loop {
-        let buffer = reader.fill_buf()?;
-        if buffer.is_empty() {
-            break;
-        }
-        if session_id.is_some() {
-            let consumed = buffer.len();
-            passthrough.write_all(buffer)?;
-            reader.consume(consumed);
-            continue;
-        }
-        let newline = buffer.iter().position(|byte| *byte == b'\n');
-        let event_bytes = newline.unwrap_or(buffer.len());
-        let consumed = newline.map_or(buffer.len(), |index| index.saturating_add(1));
-        let passthrough_bytes = buffer.get(..consumed).ok_or_else(|| {
-            Error::new(
-                ErrorKind::InvalidData,
-                "provider stdout collector returned an invalid byte count",
-            )
-        })?;
-        passthrough.write_all(passthrough_bytes)?;
-        if !discarding_event {
-            let remaining = MAX_PROVIDER_SESSION_EVENT_BYTES.saturating_sub(event.len());
-            if event_bytes <= remaining {
-                if let Some(part) = buffer.get(..event_bytes) {
-                    event.extend_from_slice(part);
-                }
-            } else {
-                discarding_event = true;
-            }
-        }
-        reader.consume(consumed);
-        if newline.is_some() {
-            if !discarding_event {
-                session_id = extract_provider_session_id(&event);
-            }
-            event.clear();
-            discarding_event = false;
-        }
-    }
-    passthrough.flush()?;
-    Ok(session_id)
-}
-
-fn extract_provider_session_id(event: &[u8]) -> Option<String> {
-    let event = std::str::from_utf8(event).ok()?;
-    let value = serde_json::from_str::<serde_json::Value>(event.trim()).ok()?;
-    value
-        .get("session_id")
-        .or_else(|| value.get("thread_id"))?
-        .as_str()
-        .filter(|id| !id.trim().is_empty())
-        .map(str::to_owned)
-}
-
+use output_collector::{
+    initialize_output_last_message, read_output_last_message, receive_provider_output,
+    spawn_provider_session_collector, validate_output_last_message_parent,
+};
 fn wait_for_bounded_log_writer(
     log_writer: Receiver<Result<(), std::io::Error>>,
     process_id: u32,
@@ -699,10 +638,12 @@ mod tests {
     use std::io::{Cursor, Error, Write};
     use std::sync::{Arc, Mutex};
 
-    use super::{
-        MAX_PROVIDER_SESSION_EVENT_BYTES, collect_bounded_pipe, collect_provider_session_id,
-        run_provider_process_with_timeout_and_stdout,
+    use super::output_collector::{
+        MAX_PROVIDER_FINAL_MESSAGE_BYTES, MAX_PROVIDER_SESSION_EVENT_BYTES,
+        collect_provider_output, initialize_output_last_message, read_bounded_output_last_message,
+        read_output_last_message,
     };
+    use super::{collect_bounded_pipe, run_provider_process_with_timeout_and_stdout};
     use usecase::capability_exec::ProviderName;
 
     #[derive(Clone)]
@@ -739,24 +680,29 @@ mod tests {
         stdout.extend_from_slice(br#"{"thread_id":"captured-session"}"#);
         stdout.push(b'\n');
 
+        let provider = ProviderName::try_new("codex".to_owned())
+            .map_err(|error| Error::new(std::io::ErrorKind::InvalidInput, error.to_string()))?;
         assert_eq!(
-            collect_provider_session_id(Cursor::new(stdout), Vec::new())?,
+            collect_provider_output(Cursor::new(stdout), &provider)?.session_id,
             Some("captured-session".to_owned())
         );
         Ok(())
     }
 
     #[test]
-    fn test_provider_process_passthroughs_fake_provider_report_while_capturing_session_id()
+    fn test_provider_process_emits_only_last_message_while_capturing_session_id()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
         let output = Arc::new(Mutex::new(Vec::new()));
         let provider = ProviderName::try_new("codex".to_owned())?;
+        let output_last_message = directory.path().join("tmp/runtime/final-message.txt");
         let args = vec![
             OsString::from("-c"),
             OsString::from(
-                "printf 'specialist final report\\n{\"session_id\":\"captured-session\"}\\n'",
+                "printf '{\"session_id\":\"captured-session\",\"event\":\"envelope\"}\\n'; printf 'specialist final report' > \"$1\"",
             ),
+            OsString::from("sh"),
+            output_last_message.as_os_str().to_owned(),
         ];
 
         let result = run_provider_process_with_timeout_and_stdout(
@@ -766,16 +712,161 @@ mod tests {
             &directory.path().join("tmp/runtime"),
             &provider,
             None,
+            Some(&output_last_message),
             SharedWriter(output.clone()),
         )?;
 
         assert_eq!(result.exit_code, 0);
         assert_eq!(result.session_id.as_deref(), Some("captured-session"));
         let output = output.lock().map_err(|_| Error::other("test passthrough lock poisoned"))?;
-        assert_eq!(
-            output.as_slice(),
-            b"specialist final report\n{\"session_id\":\"captured-session\"}\n"
+        assert_eq!(output.as_slice(), b"specialist final report");
+        Ok(())
+    }
+
+    #[test]
+    fn test_provider_process_missing_last_message_emits_no_fabricated_stdout()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let output = Arc::new(Mutex::new(Vec::new()));
+        let provider = ProviderName::try_new("codex".to_owned())?;
+        let output_last_message = directory.path().join("tmp/runtime/final-message.txt");
+        let result = run_provider_process_with_timeout_and_stdout(
+            "sh",
+            &[OsString::from("-c"), OsString::from("printf '{\"event\":\"envelope\"}\\n'")],
+            directory.path(),
+            &directory.path().join("tmp/runtime"),
+            &provider,
+            None,
+            Some(&output_last_message),
+            SharedWriter(output.clone()),
+        )?;
+
+        assert_eq!(result.session_id, None);
+        assert!(
+            output.lock().map_err(|_| Error::other("test passthrough lock poisoned"))?.is_empty()
         );
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_provider_process_rejects_runtime_dir_replaced_with_symlink()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let output = Arc::new(Mutex::new(Vec::new()));
+        let provider = ProviderName::try_new("codex".to_owned())?;
+        let runtime_dir = directory.path().join("tmp/runtime");
+        let output_last_message = runtime_dir.join("final-message.txt");
+        let outside_dir = directory.path().join("outside");
+        std::fs::create_dir_all(&outside_dir)?;
+        let args = vec![
+            OsString::from("-c"),
+            OsString::from(
+                "rm -rf \"$1\"; ln -s \"$2\" \"$1\"; printf 'outside runtime' > \"$1/final-message.txt\"",
+            ),
+            OsString::from("sh"),
+            runtime_dir.as_os_str().to_owned(),
+            outside_dir.as_os_str().to_owned(),
+        ];
+
+        let result = run_provider_process_with_timeout_and_stdout(
+            "sh",
+            &args,
+            directory.path(),
+            &runtime_dir,
+            &provider,
+            None,
+            Some(&output_last_message),
+            SharedWriter(output.clone()),
+        );
+        let error = match result {
+            Ok(_) => {
+                return Err(
+                    "replaced runtime directory must be rejected before reading output".into()
+                );
+            }
+            Err(error) => error,
+        };
+
+        assert!(error.to_string().contains("refusing to follow symlink"));
+        assert!(
+            output.lock().map_err(|_| Error::other("test passthrough lock poisoned"))?.is_empty()
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_read_bounded_output_last_message_over_limit_returns_error()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let provider = ProviderName::try_new("codex".to_owned())?;
+        let path = std::path::Path::new("final-message.txt");
+        let reader = Cursor::new(vec![b'x'; MAX_PROVIDER_FINAL_MESSAGE_BYTES as usize + 1]);
+
+        let error = match read_bounded_output_last_message(reader, path, &provider) {
+            Ok(_) => return Err("oversized message must be rejected".into()),
+            Err(error) => error,
+        };
+
+        assert!(error.to_string().contains("exceeds"));
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_read_output_last_message_symlink_returns_error()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let target = directory.path().join("provider-output.txt");
+        let link = directory.path().join("final-message.txt");
+        let provider = ProviderName::try_new("codex".to_owned())?;
+        std::fs::write(&target, b"specialist final report")?;
+        std::os::unix::fs::symlink(&target, &link)?;
+
+        let error = match read_output_last_message(&link, &provider) {
+            Ok(_) => return Err("symlinked message must be rejected".into()),
+            Err(error) => error,
+        };
+
+        assert!(error.to_string().contains("not a regular file"));
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_initialize_output_last_message_symlink_preserves_target()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let runtime_dir = directory.path().join("runtime");
+        let target = directory.path().join("provider-output.txt");
+        let link = runtime_dir.join("final-message.txt");
+        let provider = ProviderName::try_new("codex".to_owned())?;
+        std::fs::create_dir_all(&runtime_dir)?;
+        std::fs::write(&target, b"preserve this message")?;
+        std::os::unix::fs::symlink(&target, &link)?;
+
+        let error = match initialize_output_last_message(&link, &runtime_dir, &provider) {
+            Ok(_) => return Err("symlinked message must be rejected".into()),
+            Err(error) => error,
+        };
+
+        assert!(error.to_string().contains("refusing to follow symlink"));
+        assert_eq!(std::fs::read(&target)?, b"preserve this message");
+        Ok(())
+    }
+
+    #[test]
+    fn test_claude_json_envelope_emits_only_result_and_captures_session_id()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let provider = ProviderName::try_new("claude".to_owned())?;
+        let collected = collect_provider_output(
+            Cursor::new(
+                b"{\"session_id\":\"captured-session\",\"result\":\"specialist final report\"}",
+            ),
+            &provider,
+        )?;
+
+        assert_eq!(collected.session_id.as_deref(), Some("captured-session"));
+        assert_eq!(collected.final_message.as_deref(), Some(b"specialist final report".as_slice()));
         Ok(())
     }
 }

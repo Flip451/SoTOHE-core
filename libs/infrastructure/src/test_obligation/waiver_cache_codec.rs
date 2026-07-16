@@ -10,7 +10,9 @@
 //! by cache readers, and recovery is only via re-evaluation (CN-04). A passing
 //! verdict structurally carries its evidence citation.
 
-use std::path::PathBuf;
+use std::fs::{File, OpenOptions};
+use std::io::{Error, ErrorKind, Read, Write};
+use std::path::{Path, PathBuf};
 
 use domain::TrackId;
 use domain::tddd::test_obligation::errors::VerifyCacheError;
@@ -30,11 +32,15 @@ use crate::test_obligation::bindings_codec::{
 use crate::test_obligation::fulfillment_cache_codec::{
     cache_error_from_artifact, parse_cache_citation, parse_cache_hash, parse_cache_reason,
 };
+use crate::test_obligation::obligations_codec::{
+    TestObligationIdDto, obligation_id_from_dto, obligation_id_to_dto,
+};
 use crate::test_obligation::{diagnostic, reject_symlinked_items_root};
 use crate::track::symlink_guard::reject_symlinks_below;
 
 /// Artifact filename for the waiver verdict cache.
 const WAIVER_CACHE_ARTIFACT: &str = "waiver-cache.json";
+const MAX_WAIVER_CACHE_BYTES: u64 = 4 * 1024 * 1024;
 
 // ---------------------------------------------------------------------------
 // DTOs
@@ -75,6 +81,8 @@ struct WaiverCacheKeyWire {
 #[serde(deny_unknown_fields)]
 pub struct WaiverCacheEntryDto {
     edge_id: TestObligationEdgeIdDto,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    obligation_id: Option<TestObligationIdDto>,
     key: WaiverCacheKeyWire,
     verdict: WaiverVerdictDto,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -131,12 +139,7 @@ impl WaiverCachePort for JsonWaiverCacheCodec {
                 ))));
             }
         }
-        let content = std::fs::read_to_string(&path).map_err(|e| {
-            VerifyCacheError::Io(diagnostic(&format!(
-                "failed to read waiver cache {}: {e}",
-                path.display()
-            )))
-        })?;
+        let content = read_bounded_waiver_cache(&path)?;
         let dto: WaiverCacheDocumentDto = serde_json::from_str(&content)
             .map_err(|e| VerifyCacheError::MalformedJson(diagnostic(&e.to_string())))?;
         let doc = document_from_dto(dto)?;
@@ -183,11 +186,141 @@ impl WaiverCachePort for JsonWaiverCacheCodec {
             )));
         }
         let dto = document_to_dto(doc);
-        let json = serde_json::to_string_pretty(&dto)
-            .map_err(|e| diagnostic(&format!("failed to encode waiver cache: {e}")))?;
+        let json = serialize_bounded_waiver_cache(&dto)?;
         std::fs::write(&path, json).map_err(|e| {
             diagnostic(&format!("failed to write waiver cache {}: {e}", path.display()))
         })
+    }
+}
+
+/// Fixed-capacity JSON sink that rejects a cache before its serialized output can grow unbounded.
+struct BoundedWaiverCacheBuffer {
+    bytes: Vec<u8>,
+    exceeded_limit: bool,
+}
+
+impl BoundedWaiverCacheBuffer {
+    fn new() -> Self {
+        Self { bytes: Vec::with_capacity(MAX_WAIVER_CACHE_BYTES as usize), exceeded_limit: false }
+    }
+
+    fn into_inner(self) -> Vec<u8> {
+        self.bytes
+    }
+}
+
+impl Write for BoundedWaiverCacheBuffer {
+    fn write(&mut self, bytes: &[u8]) -> Result<usize, Error> {
+        let remaining = (MAX_WAIVER_CACHE_BYTES as usize).saturating_sub(self.bytes.len());
+        if bytes.len() > remaining {
+            self.exceeded_limit = true;
+            return Err(Error::new(
+                ErrorKind::WriteZero,
+                "waiver cache serialized output exceeds the byte limit",
+            ));
+        }
+        self.bytes.extend_from_slice(bytes);
+        Ok(bytes.len())
+    }
+
+    fn flush(&mut self) -> Result<(), Error> {
+        Ok(())
+    }
+}
+
+/// Serializes a cache into a bounded buffer before replacing the on-disk artifact.
+///
+/// Holding at most [`MAX_WAIVER_CACHE_BYTES`] in memory keeps both serialization and the
+/// eventual write bounded. On overflow, no cache file is written, so the prior cache remains
+/// intact rather than being replaced with a partial document.
+fn serialize_bounded_waiver_cache(
+    dto: &WaiverCacheDocumentDto,
+) -> Result<Vec<u8>, DiagnosticMessage> {
+    let mut writer = BoundedWaiverCacheBuffer::new();
+    serde_json::to_writer_pretty(&mut writer, dto).map_err(|error| {
+        if writer.exceeded_limit {
+            diagnostic(&format!("waiver cache exceeds {MAX_WAIVER_CACHE_BYTES} bytes"))
+        } else {
+            diagnostic(&format!("failed to encode waiver cache: {error}"))
+        }
+    })?;
+    Ok(writer.into_inner())
+}
+
+/// Reads a cache through a regular-file handle while enforcing a fixed byte limit.
+///
+/// The leaf is opened atomically without following symlinks before its handle is inspected.
+/// Metadata is only a snapshot, so the read is capped one byte past the limit as well. This
+/// rejects a cache that grows after inspection without allocating based on its full size.
+fn read_bounded_waiver_cache(path: &Path) -> Result<String, VerifyCacheError> {
+    let file = open_waiver_cache_nofollow(path).map_err(|error| {
+        VerifyCacheError::Io(diagnostic(&format!(
+            "failed to open waiver cache {}: {error}",
+            path.display()
+        )))
+    })?;
+    let opened_metadata = file.metadata().map_err(|error| {
+        VerifyCacheError::Io(diagnostic(&format!(
+            "cannot inspect opened waiver cache {}: {error}",
+            path.display()
+        )))
+    })?;
+    if !opened_metadata.is_file() {
+        return Err(VerifyCacheError::Io(diagnostic(&format!(
+            "waiver cache {} is not a regular file",
+            path.display()
+        ))));
+    }
+    if opened_metadata.len() > MAX_WAIVER_CACHE_BYTES {
+        return Err(VerifyCacheError::Io(diagnostic(&format!(
+            "waiver cache {} exceeds {MAX_WAIVER_CACHE_BYTES} bytes",
+            path.display()
+        ))));
+    }
+
+    let mut reader = file.take(MAX_WAIVER_CACHE_BYTES.saturating_add(1));
+    let mut content = String::new();
+    reader.read_to_string(&mut content).map_err(|error| {
+        VerifyCacheError::Io(diagnostic(&format!(
+            "failed to read waiver cache {}: {error}",
+            path.display()
+        )))
+    })?;
+    if content.len() > MAX_WAIVER_CACHE_BYTES as usize {
+        return Err(VerifyCacheError::Io(diagnostic(&format!(
+            "waiver cache {} exceeds {MAX_WAIVER_CACHE_BYTES} bytes",
+            path.display()
+        ))));
+    }
+    Ok(content)
+}
+
+/// Atomically opens a waiver cache leaf without following a symlink.
+///
+/// A `symlink_metadata` check before `File::open` would leave a replacement window. Platforms
+/// without an equivalent atomic no-follow operation fail closed rather than following a link.
+fn open_waiver_cache_nofollow(path: &Path) -> Result<File, std::io::Error> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt as _;
+
+        OpenOptions::new().read(true).custom_flags(libc::O_NOFOLLOW | libc::O_CLOEXEC).open(path)
+    }
+    #[cfg(windows)]
+    {
+        use std::os::windows::fs::OpenOptionsExt as _;
+
+        // FILE_FLAG_OPEN_REPARSE_POINT opens the reparse point itself, so the handle metadata
+        // check above rejects it rather than following a symlink or junction.
+        OpenOptions::new().read(true).custom_flags(0x0020_0000).open(path)
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        let _ = path;
+        Err(std::io::Error::new(
+            std::io::ErrorKind::Unsupported,
+            "atomic no-follow cache open is unavailable on this platform",
+        ))
     }
 }
 
@@ -219,6 +352,7 @@ fn document_from_dto(dto: WaiverCacheDocumentDto) -> Result<WaiverCacheDocument,
 fn entry_to_dto(entry: &WaiverCacheEntry) -> WaiverCacheEntryDto {
     WaiverCacheEntryDto {
         edge_id: edge_id_to_dto(entry.edge_id()),
+        obligation_id: entry.obligation_id().map(obligation_id_to_dto),
         key: key_to_wire(entry.key()),
         verdict: verdict_to_dto(entry.verdict()),
         verifier_fingerprint: entry
@@ -229,13 +363,18 @@ fn entry_to_dto(entry: &WaiverCacheEntry) -> WaiverCacheEntryDto {
 
 fn entry_from_dto(dto: WaiverCacheEntryDto) -> Result<WaiverCacheEntry, VerifyCacheError> {
     let edge_id = edge_id_from_dto(dto.edge_id).map_err(cache_error_from_artifact)?;
+    let obligation_id = dto
+        .obligation_id
+        .map(obligation_id_from_dto)
+        .transpose()
+        .map_err(cache_error_from_artifact)?;
     let key = key_from_wire(dto.key)?;
     let verdict = verdict_from_dto(dto.verdict)?;
     let verifier_fingerprint = dto
         .verifier_fingerprint
         .map(|fingerprint| parse_cache_hash(&fingerprint).map(VerifierPromptFingerprint::new))
         .transpose()?;
-    Ok(WaiverCacheEntry::new(edge_id, key, verdict, verifier_fingerprint))
+    Ok(WaiverCacheEntry::new(edge_id, obligation_id, key, verdict, verifier_fingerprint))
 }
 
 fn key_to_wire(key: &WaiverCacheKey) -> WaiverCacheKeyWire {
@@ -285,12 +424,24 @@ mod tests {
     use domain::ContentHash;
     use domain::EvidenceCitation;
     use domain::tddd::semantic_verify::CatalogueEntryKey;
-    use domain::tddd::test_obligation::ids::{TestObligationAnchorId, TestObligationEdgeId};
+    use domain::tddd::test_obligation::ids::{
+        TestObligationAnchorId, TestObligationEdgeId, TestObligationId,
+        TestObligationItemIdentifier,
+    };
+    use domain::tddd::test_obligation::vocab::TestObligationKind;
 
     fn edge_id() -> TestObligationEdgeId {
         TestObligationEdgeId::new(
             CatalogueEntryKey::try_new("domain::User".to_owned()).unwrap(),
             TestObligationAnchorId::try_new("spec.json".to_owned(), "IN-09".to_owned()).unwrap(),
+        )
+    }
+
+    fn obligation_id() -> TestObligationId {
+        TestObligationId::new(
+            CatalogueEntryKey::try_new("domain::User".to_owned()).unwrap(),
+            TestObligationKind::Result,
+            TestObligationItemIdentifier::try_new("entry".to_owned()).unwrap(),
         )
     }
 
@@ -309,7 +460,13 @@ mod tests {
     fn document(verdict: WaiverVerdict) -> WaiverCacheDocument {
         WaiverCacheDocument::new(
             TrackId::try_new("my-track").unwrap(),
-            vec![WaiverCacheEntry::new(edge_id(), key(), verdict, Some(verifier_fingerprint()))],
+            vec![WaiverCacheEntry::new(
+                edge_id(),
+                Some(obligation_id()),
+                key(),
+                verdict,
+                Some(verifier_fingerprint()),
+            )],
         )
     }
 
@@ -368,6 +525,18 @@ mod tests {
         assert_eq!(decoded.entries()[0].verifier_fingerprint(), None);
     }
 
+    #[test]
+    fn test_legacy_entry_without_obligation_owner_decodes_as_absent() {
+        let dto = document_to_dto(&document(WaiverVerdict::Pending));
+        let mut json = serde_json::to_value(dto).unwrap();
+        json["entries"][0].as_object_mut().unwrap().remove("obligation_id");
+
+        let legacy: WaiverCacheDocumentDto = serde_json::from_value(json).unwrap();
+        let decoded = document_from_dto(legacy).unwrap();
+
+        assert_eq!(decoded.entries()[0].obligation_id(), None);
+    }
+
     // IN-09 fail-closed: a malformed cache-key hash is a malformed-cache error.
     #[test]
     fn test_malformed_hash_is_malformed_json() {
@@ -424,6 +593,52 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let codec = JsonWaiverCacheCodec::new(dir.path().to_path_buf());
         assert!(codec.load(&TrackId::try_new("absent-track").unwrap()).unwrap().is_none());
+    }
+
+    #[test]
+    fn test_load_oversized_cache_returns_io_error_without_reading_it() {
+        let dir = tempfile::tempdir().unwrap();
+        let codec = JsonWaiverCacheCodec::new(dir.path().to_path_buf());
+        let track_id = TrackId::try_new("oversized-track").unwrap();
+        let path = dir.path().join(track_id.as_ref()).join(WAIVER_CACHE_ARTIFACT);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        File::create(&path).unwrap().set_len(MAX_WAIVER_CACHE_BYTES + 1).unwrap();
+
+        match codec.load(&track_id) {
+            Err(VerifyCacheError::Io(message)) => {
+                assert!(message.as_str().contains("exceeds"));
+            }
+            other => panic!("expected oversized cache Io error, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_codec_save_oversized_cache_returns_error_without_writing_it() {
+        let dir = tempfile::tempdir().unwrap();
+        let codec = JsonWaiverCacheCodec::new(dir.path().to_path_buf());
+        let track_id = TrackId::try_new("oversized-save-track").unwrap();
+        let entry = document(WaiverVerdict::Pending).entries()[0].clone();
+        let doc = WaiverCacheDocument::new(track_id.clone(), vec![entry; 10_000]);
+        let path = dir.path().join(track_id.as_ref()).join(WAIVER_CACHE_ARTIFACT);
+
+        let error = codec.save(&doc).unwrap_err();
+
+        assert!(error.as_str().contains("exceeds"));
+        assert!(!path.exists());
+    }
+
+    // The cache reader must enforce its symlink rejection at open time, not only through a
+    // pre-open metadata snapshot that an attacker could replace before `open`.
+    #[cfg(unix)]
+    #[test]
+    fn test_read_bounded_waiver_cache_symlink_returns_io_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let target = dir.path().join("cache-target.json");
+        let link = dir.path().join("waiver-cache.json");
+        std::fs::write(&target, "{}").unwrap();
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+
+        assert!(matches!(read_bounded_waiver_cache(&link), Err(VerifyCacheError::Io(_))));
     }
 
     // CN-04: a waiver cache whose embedded `track_id` disagrees with the

@@ -9,6 +9,11 @@
           "element_id": "IN-05"
         }
       },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
       "key": {
         "waived_reason_hash": "c569363a4c5e4faf1986987f28a91ccd55f4feaa8a125cd5cc19be1ff0b58581",
         "declaration_hash": "da634d72fdf030f16e412195eeaf616e6638b8eb7538e9538605b27e69f36a99",
@@ -27,6 +32,11 @@
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "IN-06"
         }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
       },
       "key": {
         "waived_reason_hash": "986fdd832d0bf99aaf21ea4224b3c658f5e8e4318c415262b5f3622f0cb946ca",
@@ -47,6 +57,11 @@
           "element_id": "AC-05"
         }
       },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
       "key": {
         "waived_reason_hash": "902837f4c3d241623d2d489152cd1781ef9ce13c092b6041484a4f8b13aa19fa",
         "declaration_hash": "da634d72fdf030f16e412195eeaf616e6638b8eb7538e9538605b27e69f36a99",
@@ -54,7 +69,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "methods: [MethodDeclaration { name: MethodName(Identifier(\"new\")), receiver: None, params: [ParamDeclaration { name: ParamName(Identifier(\"layer_bindings\")), ty: TypeRef(\"std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBindingsPort>\") }, ParamDeclaration { name: ParamName(Identifier(\"executor\")), ty: TypeRef(\"std::sync::Arc<dyn TypeSignalsExecutorPort>\") }], returns: TypeRef(\"Self\") } ]"
+        "citation": "ParamDeclaration { name: ParamName(Identifier(\"executor\")), ty: TypeRef(\"std::sync::Arc<dyn TypeSignalsExecutorPort>\") }"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -65,6 +80,11 @@
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "AC-06"
         }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
       },
       "key": {
         "waived_reason_hash": "32e277e3aef3df2f0849bd7345213824e171ed991952a13d1a5c083ab9ccd31c",
@@ -85,6 +105,11 @@
           "element_id": "IN-09"
         }
       },
+      "obligation_id": {
+        "entry_key": "FsProviderSessionCacheAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::provider_session::ProviderSessionCachePort"
+      },
       "key": {
         "waived_reason_hash": "57591efe64384f907afc6012fdb0033da0671196448003233359a80ef8aa1e63",
         "declaration_hash": "d67fa7b401c0a20783618c4c0c285ce13681cc1ffe622e92b47d0f79d4176d38",
@@ -104,6 +129,11 @@
           "element_id": "IN-04"
         }
       },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
       "key": {
         "waived_reason_hash": "01ec01818f0c7457c0eba33653634d38cc7f681d492d859bf84ae79b9fbfe5c2",
         "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
@@ -111,7 +141,55 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Synchronous machine-local provider-session cache boundary."
+        "citation": "returns: TypeRef(\"Result<Option<ProviderSessionCacheEntry>, ProviderSessionCacheError>\")"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "key": {
+        "waived_reason_hash": "01ec01818f0c7457c0eba33653634d38cc7f681d492d859bf84ae79b9fbfe5c2",
+        "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
+        "anchor_text_hash": "12b1350e138cc06f3478183cd939907fcd5552cc6e22d2179adef96ff00b8b11"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Synchronous machine-local provider-session cache boundary.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:remove"
+      },
+      "key": {
+        "waived_reason_hash": "01ec01818f0c7457c0eba33653634d38cc7f681d492d859bf84ae79b9fbfe5c2",
+        "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
+        "anchor_text_hash": "12b1350e138cc06f3478183cd939907fcd5552cc6e22d2179adef96ff00b8b11"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "returns: TypeRef(\"Result<Option<ProviderSessionCacheEntry>, ProviderSessionCacheError>\")"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -122,6 +200,59 @@
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "IN-08"
         }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "waived_reason_hash": "feb8d4745846ccbc01f7e551248f4660adce764e866bedb87b24b60cfc2d2284",
+        "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
+        "anchor_text_hash": "cb1121edfe3e7d42504d7f4a07514cb6b78742ed5f048b8f98ea64e1f8684c3b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "orchestrator が選ぶ resume option"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "key": {
+        "waived_reason_hash": "feb8d4745846ccbc01f7e551248f4660adce764e866bedb87b24b60cfc2d2284",
+        "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
+        "anchor_text_hash": "cb1121edfe3e7d42504d7f4a07514cb6b78742ed5f048b8f98ea64e1f8684c3b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Synchronous machine-local provider-session cache boundary.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:remove"
       },
       "key": {
         "waived_reason_hash": "feb8d4745846ccbc01f7e551248f4660adce764e866bedb87b24b60cfc2d2284",
@@ -142,10 +273,183 @@
           "element_id": "CN-06"
         }
       },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
       "key": {
         "waived_reason_hash": "cf5ea92ef708f64ca360f558077cd352343198d64f525e54656751c9032e1237",
         "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
         "anchor_text_hash": "07cdc5852c99211b87502f07153d16da0d9e13f03f511f0ec36d0e90ca5ce018"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Synchronous machine-local provider-session cache boundary.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "key": {
+        "waived_reason_hash": "cf5ea92ef708f64ca360f558077cd352343198d64f525e54656751c9032e1237",
+        "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
+        "anchor_text_hash": "07cdc5852c99211b87502f07153d16da0d9e13f03f511f0ec36d0e90ca5ce018"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry { action: Add, role: SecondaryPort, methods: [MethodDeclaration { name: MethodName(Identifier(\"load\")), ... }, MethodDeclaration { name: MethodName(Identifier(\"save\")), ... }, MethodDeclaration { name: MethodName(Identifier(\"remove\")), ... }] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:remove"
+      },
+      "key": {
+        "waived_reason_hash": "cf5ea92ef708f64ca360f558077cd352343198d64f525e54656751c9032e1237",
+        "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
+        "anchor_text_hash": "07cdc5852c99211b87502f07153d16da0d9e13f03f511f0ec36d0e90ca5ce018"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Synchronous machine-local provider-session cache boundary.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "waived_reason_hash": "fd25b6b51e597369c364495971b2d4f515f87ba4fcdf1d0a4705f8361197fae4",
+        "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
+        "anchor_text_hash": "3d6ce5da0d1d309b25d54c5bc7541563b7c71385a68fd95f99ebc8ecc25a4a13"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry { action: Add, role: SecondaryPort, methods: [MethodDeclaration { name: MethodName(Identifier(\"load\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"key\")), ty: TypeRef(\"&ProviderSessionCacheKey\") }], returns: TypeRef(\"Result<Option<ProviderSessionCacheEntry>, ProviderSessionCacheError>\") }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "key": {
+        "waived_reason_hash": "fd25b6b51e597369c364495971b2d4f515f87ba4fcdf1d0a4705f8361197fae4",
+        "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
+        "anchor_text_hash": "3d6ce5da0d1d309b25d54c5bc7541563b7c71385a68fd95f99ebc8ecc25a4a13"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry declares only `load`, `save`, and `remove` methods over `ProviderSessionCacheKey` and `ProviderSessionCacheEntry`; the anchor promises provider/model mismatch handling and fresh-session dispatch."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:remove"
+      },
+      "key": {
+        "waived_reason_hash": "fd25b6b51e597369c364495971b2d4f515f87ba4fcdf1d0a4705f8361197fae4",
+        "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
+        "anchor_text_hash": "3d6ce5da0d1d309b25d54c5bc7541563b7c71385a68fd95f99ebc8ecc25a4a13"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry ... methods: [MethodDeclaration { name: MethodName(Identifier(\"load\")), ... }, MethodDeclaration { name: MethodName(Identifier(\"save\")), ... }, MethodDeclaration { name: MethodName(Identifier(\"remove\")), ... }]"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "waived_reason_hash": "cfb64b2dafef0c1168ad8d86d4c3242fac94205e7e5f9665c734280d7d2dbb95",
+        "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
+        "anchor_text_hash": "6c61fa978e67690504105be79dd73f2649add14f0026cd302f7565c126cc61d7"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Synchronous machine-local provider-session cache boundary.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "key": {
+        "waived_reason_hash": "cfb64b2dafef0c1168ad8d86d4c3242fac94205e7e5f9665c734280d7d2dbb95",
+        "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
+        "anchor_text_hash": "6c61fa978e67690504105be79dd73f2649add14f0026cd302f7565c126cc61d7"
       },
       "verdict": {
         "kind": "waived",
@@ -158,27 +462,13 @@
         "entry_key": "ProviderSessionCachePort",
         "anchor_id": {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-          "element_id": "CN-08"
-        }
-      },
-      "key": {
-        "waived_reason_hash": "fd25b6b51e597369c364495971b2d4f515f87ba4fcdf1d0a4705f8361197fae4",
-        "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
-        "anchor_text_hash": "3d6ce5da0d1d309b25d54c5bc7541563b7c71385a68fd95f99ebc8ecc25a4a13"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "\"load(&ProviderSessionCacheKey) -> Result<Option<ProviderSessionCacheEntry>, ProviderSessionCacheError>\"; \"save(&key, &entry)\"; \"remove(&key)\""
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "ProviderSessionCachePort",
-        "anchor_id": {
-          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "AC-03"
         }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:remove"
       },
       "key": {
         "waived_reason_hash": "cfb64b2dafef0c1168ad8d86d4c3242fac94205e7e5f9665c734280d7d2dbb95",
@@ -187,7 +477,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "methods: [MethodDeclaration { name: MethodName(Identifier(\"load\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"key\")), ty: TypeRef(\"&ProviderSessionCacheKey\") }], returns: TypeRef(\"Result<Option<ProviderSessionCacheEntry>, ProviderSessionCacheError>\") }, MethodDeclaration { name: MethodName(Identifier(\"save\"))"
+        "citation": "\"Synchronous machine-local provider-session cache boundary.\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -199,6 +489,11 @@
           "element_id": "IN-03"
         }
       },
+      "obligation_id": {
+        "entry_key": "FsProviderSessionCacheAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::provider_session::ProviderSessionCachePort"
+      },
       "key": {
         "waived_reason_hash": "ad7e84fbb6bad8de02f67eb3550f7365353769b33a26438178372d2919d8f599",
         "declaration_hash": "d67fa7b401c0a20783618c4c0c285ce13681cc1ffe622e92b47d0f79d4176d38",
@@ -206,7 +501,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "scope の file list と diff を reviewer 自身が確認して全件を再判定する"
+        "citation": "fix 後の同一 scope・同一 round 種別の reviewer 再 roundで、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -217,6 +512,11 @@
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "IN-04"
         }
+      },
+      "obligation_id": {
+        "entry_key": "FsProviderSessionCacheAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::provider_session::ProviderSessionCachePort"
       },
       "key": {
         "waived_reason_hash": "604a6d791eb0c987038ae1dcd6bcb8eca65ddc44d58c612179eb2a3ca438d488",
@@ -237,6 +537,11 @@
           "element_id": "IN-08"
         }
       },
+      "obligation_id": {
+        "entry_key": "FsProviderSessionCacheAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::provider_session::ProviderSessionCachePort"
+      },
       "key": {
         "waived_reason_hash": "6325ede5a9c9ac8cb5ba24eb583832853631f8260805a6e7b63abebf6bb62f8a",
         "declaration_hash": "d67fa7b401c0a20783618c4c0c285ce13681cc1ffe622e92b47d0f79d4176d38",
@@ -244,7 +549,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "TraitImplDeclV2 { action: Add, trait_ref: TypeRef(\"usecase::provider_session::ProviderSessionCachePort\"), for_type: TypeRef(\"FsProviderSessionCacheAdapter\"), impl_generics: [], impl_where_predicates: [] }"
+        "citation": "同一 track・同一 capability の継続作業"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -256,6 +561,11 @@
           "element_id": "CN-06"
         }
       },
+      "obligation_id": {
+        "entry_key": "FsProviderSessionCacheAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::provider_session::ProviderSessionCachePort"
+      },
       "key": {
         "waived_reason_hash": "088550287fe4beff4833254b00ac91a7a9f7dabfa4bea2eb1ab90799414a8b9c",
         "declaration_hash": "d67fa7b401c0a20783618c4c0c285ce13681cc1ffe622e92b47d0f79d4176d38",
@@ -263,7 +573,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "FsProviderSessionCacheAdapter implements cache CRUD, path selection, codec handling, and symlink rejection; starting a new reviewer session after a mismatch, failure, or expiry is consumer control flow outside this adapter."
+        "citation": "FsProviderSessionCacheAdapter implements cache CRUD, path selection, codec handling, and symlink rejection"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -275,6 +585,11 @@
           "element_id": "CN-08"
         }
       },
+      "obligation_id": {
+        "entry_key": "FsProviderSessionCacheAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::provider_session::ProviderSessionCachePort"
+      },
       "key": {
         "waived_reason_hash": "49267a2c65ac50cae823ec95a5624c4ed37a1dfb9cdba40b476201518a58fe3a",
         "declaration_hash": "d67fa7b401c0a20783618c4c0c285ce13681cc1ffe622e92b47d0f79d4176d38",
@@ -282,7 +597,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "FsProviderSessionCacheAdapter persists keyed entries without resolving profiles or dispatching providers"
+        "citation": "FsProviderSessionCacheAdapter"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -293,6 +608,11 @@
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "AC-03"
         }
+      },
+      "obligation_id": {
+        "entry_key": "FsProviderSessionCacheAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::provider_session::ProviderSessionCachePort"
       },
       "key": {
         "waived_reason_hash": "20156156440f85a7de61d22da0d8b8a44472e135b381c9367d04fa9549815392",
@@ -313,6 +633,11 @@
           "element_id": "CN-02"
         }
       },
+      "obligation_id": {
+        "entry_key": "CapabilityProfile",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
       "key": {
         "waived_reason_hash": "0e36fd1ef76ef8b0140185ab6cfde4b3f53214e6340b58aa60a823404eed6bb5",
         "declaration_hash": "00adb8aa6c38615467378e09c596bb95f29cf68136a1ed94c4a2e00bb920e1a1",
@@ -332,6 +657,11 @@
           "element_id": "CN-02"
         }
       },
+      "obligation_id": {
+        "entry_key": "ReasoningEffort",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
       "key": {
         "waived_reason_hash": "c0178880f876f5e2370fca27271ef0cd2ae893be994dca6375c662053939c03d",
         "declaration_hash": "d74eb19499b3b982d3f1ee5c9d8cca9dc5debdbc9c94e758385b5b9c25189154",
@@ -339,7 +669,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Low\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"Medium\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"High\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"XHigh\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"Max\")), payload: Unit }] }, methods: []"
+        "citation": "Closed provider-independent vocabulary for explicitly configured reasoning effort."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -350,6 +680,11 @@
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "IN-07"
         }
+      },
+      "obligation_id": {
+        "entry_key": "Sha256DigestError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
       },
       "key": {
         "waived_reason_hash": "78eaebf5c380582498a73fe3fc23b7cb54a5a5bf7ace55474b5f9dd3b8cde4a7",
@@ -370,6 +705,11 @@
           "element_id": "IN-07"
         }
       },
+      "obligation_id": {
+        "entry_key": "TypeSignalsSchemaVersion",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
       "key": {
         "waived_reason_hash": "973d4f713d9cb506ca040ecc45a18327eb26b4b822e062f5c64397b81484e9e8",
         "declaration_hash": "2ecd992f2125c70dd96d7cecd84a8d9575c71ec89d2bea6b8e79b7b95ace5a84",
@@ -377,7 +717,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"tddd\"), Identifier(\"type_signals_doc\")]), docs: Some(DocString(\"Validated non-zero schema version for the persisted type-signals artifact.\")), spec_refs: [SpecRef { file: \"track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json\", anchor: SpecElementId(\"IN-07\") }, SpecRef { file: \"track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json\", anchor: SpecElementId(\"AC-08\") }], informal_grounds: [] }"
+        "citation": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -388,6 +728,11 @@
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "AC-08"
         }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsSchemaVersionError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
       },
       "key": {
         "waived_reason_hash": "6c6a7fcf2d8c34be4f6d547f53b0f1da87ed23788be4288fa7780593a3f03a03",
@@ -408,6 +753,11 @@
           "element_id": "IN-05"
         }
       },
+      "obligation_id": {
+        "entry_key": "TypeSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
       "key": {
         "waived_reason_hash": "9b8b2517cb97bf05443fb581197844b236bb8111a1e76704c73517b32d104b6a",
         "declaration_hash": "ef898895803b9da66dfe668ad6ba40592a97784c673f999295521e6b8496e110",
@@ -415,7 +765,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Usecase failure contract constructed by TypeSignalsInteractor; opaque failure details reuse the baseline DiagnosticText value object, while track, branch, and layer identities remain validated domain types."
+        "citation": "Usecase failure contract constructed by TypeSignalsInteractor"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -427,6 +777,11 @@
           "element_id": "IN-06"
         }
       },
+      "obligation_id": {
+        "entry_key": "TypeSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-06"
+      },
       "key": {
         "waived_reason_hash": "b9c3d23c0afc8f4a79bb695070d906b9bc5ffac8572571db22d2a779a692997d",
         "declaration_hash": "ef898895803b9da66dfe668ad6ba40592a97784c673f999295521e6b8496e110",
@@ -434,7 +789,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Usecase failure contract constructed by TypeSignalsInteractor; opaque failure details reuse the baseline DiagnosticText value object, while track, branch, and layer identities remain validated domain types."
+        "citation": "TypeEntry { action: Modify, role: ErrorType, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"BranchTrackMismatch\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"branch\")), ty: TypeRef(\"domain::ids::TrackBranch\") }, FieldDecl { name: FieldName(Identifier(\"track_id\")), ty: TypeRef(\"domain::ids::TrackId\") }]) }, VariantDecl { name: VariantName(Identifier(\"LayerBindingsLoad\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"reason\")), ty: TypeRef(\"DiagnosticText\") }]) }, VariantDecl { name: VariantName(Identifier(\"NoLayers\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"EvaluationFailed\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"layer_id\")), ty: TypeRef(\"domain::tddd::layer_id::LayerId\") }, FieldDecl { name: FieldName(Identifier(\"reason\")), ty: TypeRef(\"DiagnosticText\") }]) }, VariantDecl { name: VariantName(Identifier(\"InconsistentRequest\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"reason\")), ty: TypeRef(\"DiagnosticText\") }]) }] }, methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"type_signals\"), Identifier(\"service\")]), docs: Some(DocString(\"Usecase failure contract constructed by TypeSignalsInteractor; opaque failure details reuse the baseline DiagnosticText value object, while track, branch, and layer identities remain validated domain types.\")), spec_refs: [SpecRef { file: \"track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json\", anchor: SpecElementId(\"IN-05\") }, SpecRef { file: \"track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json\", anchor: SpecElementId(\"IN-06\") }, SpecRef { file: \"track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json\", anchor: SpecElementId(\"IN-07\") }], informal_grounds: [] }"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -446,6 +801,11 @@
           "element_id": "IN-07"
         }
       },
+      "obligation_id": {
+        "entry_key": "TypeSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
       "key": {
         "waived_reason_hash": "9ec6d48d2366e91035e030e12dee10b477f78611b0a5e721828a0dbaf9dfef64",
         "declaration_hash": "ef898895803b9da66dfe668ad6ba40592a97784c673f999295521e6b8496e110",
@@ -453,7 +813,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する"
+        "citation": "VariantDecl { name: VariantName(Identifier(\"EvaluationFailed\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"layer_id\")), ty: TypeRef(\"domain::tddd::layer_id::LayerId\") }, FieldDecl { name: FieldName(Identifier(\"reason\")), ty: TypeRef(\"DiagnosticText\") }]) }"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -465,6 +825,11 @@
           "element_id": "IN-05"
         }
       },
+      "obligation_id": {
+        "entry_key": "TypeSignalsRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
       "key": {
         "waived_reason_hash": "49b771a57b8cfef1abeceba5da79a306ad8338b9e8891b799b18871a6847fbf9",
         "declaration_hash": "145c9c4a58963b3005c9c925ffff7114a1b3d080b4abc491c16b90d4e9fabacf",
@@ -472,7 +837,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。"
+        "citation": "fields: [FieldDecl { name: FieldName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }, FieldDecl { name: FieldName(Identifier(\"track_id\")), ty: TypeRef(\"domain::ids::TrackId\") }, FieldDecl { name: FieldName(Identifier(\"branch\")), ty: TypeRef(\"domain::ids::TrackBranch\") }, FieldDecl { name: FieldName(Identifier(\"workspace_root\")), ty: TypeRef(\"std::path::PathBuf\") }, FieldDecl { name: FieldName(Identifier(\"layer\")), ty: TypeRef(\"Option<domain::tddd::layer_id::LayerId>\") }]"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -484,14 +849,19 @@
           "element_id": "CN-05"
         }
       },
+      "obligation_id": {
+        "entry_key": "TypeSignalsRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-05"
+      },
       "key": {
-        "waived_reason_hash": "3a3bd22d65d388d391d505c0586024f8bf105a1ed8a8bb4b980ae17bbca128fa",
+        "waived_reason_hash": "963ab1ea94e4cbbfa78a5df89d745e9d4226cdd6301d4d9e821c7f34503c5dad",
         "declaration_hash": "145c9c4a58963b3005c9c925ffff7114a1b3d080b4abc491c16b90d4e9fabacf",
         "anchor_text_hash": "af95b62f5b63cd6a3382998e0e549d2b50723e293948ce0798e7014632cab448"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Typed signal-evaluation command that prevents invalid track, branch, and layer identities from entering the use case."
+        "citation": "D3 の reuse 判定は、対象 crate の source 内容、依存解決（lockfile）、toolchain 識別子から得る content hash に基づく。判定粒度は layer（crate）単位とし、変更がある layer だけを再計算する。"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -503,6 +873,11 @@
           "element_id": "IN-05"
         }
       },
+      "obligation_id": {
+        "entry_key": "LoadCatalogueSpecSignalsForViewError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
       "key": {
         "waived_reason_hash": "132eff256d3b7e23ad363f33c0d9cf880529e532602d3955d3412a0cab250992",
         "declaration_hash": "782b32cee80f5144dfad64b742219b09c0862811f83a6d683383af7cec0a9e44",
@@ -510,7 +885,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。"
+        "citation": "Fail-closed catalogue-spec signal loading errors"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -522,6 +897,11 @@
           "element_id": "AC-06"
         }
       },
+      "obligation_id": {
+        "entry_key": "LoadCatalogueSpecSignalsForViewError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
       "key": {
         "waived_reason_hash": "49c68def175d5ffd4278a73c146783c37a43be76a4bf5a75544ef488f8c43a22",
         "declaration_hash": "782b32cee80f5144dfad64b742219b09c0862811f83a6d683383af7cec0a9e44",
@@ -529,7 +909,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Fail-closed catalogue-spec signal loading errors"
+        "citation": "Fail-closed catalogue-spec signal loading errors; StaleHash retains both compared catalogue declaration hashes as validated domain values."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -541,6 +921,11 @@
           "element_id": "IN-04"
         }
       },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCacheEntry",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
       "key": {
         "waived_reason_hash": "6ec1a69023d0c2308ccc8d4d73e747da7433a81ce40e283eb2aa9198c4dbea78",
         "declaration_hash": "766ffa8eaaae344039e6a5e69632218141529abad0204dd99e5b0a30f800b168",
@@ -548,7 +933,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -560,29 +945,15 @@
           "element_id": "CN-02"
         }
       },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCacheEntry",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
       "key": {
         "waived_reason_hash": "e11265c9e6a45ee124768669fea63a5f49633212f0b72842d12b00ab77d52362",
         "declaration_hash": "766ffa8eaaae344039e6a5e69632218141529abad0204dd99e5b0a30f800b168",
         "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "\"TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"provider_session\")])\""
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "ProviderSessionCacheEntry",
-        "anchor_id": {
-          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-          "element_id": "CN-06"
-        }
-      },
-      "key": {
-        "waived_reason_hash": "ef836bac3e0466cc5e4a6c01b6a4518d360936ee0359f4eee7b022b3e89edf2e",
-        "declaration_hash": "766ffa8eaaae344039e6a5e69632218141529abad0204dd99e5b0a30f800b168",
-        "anchor_text_hash": "07cdc5852c99211b87502f07153d16da0d9e13f03f511f0ec36d0e90ca5ce018"
       },
       "verdict": {
         "kind": "waived",
@@ -595,8 +966,37 @@
         "entry_key": "ProviderSessionCacheEntry",
         "anchor_id": {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCacheEntry",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
+      },
+      "key": {
+        "waived_reason_hash": "ef836bac3e0466cc5e4a6c01b6a4518d360936ee0359f4eee7b022b3e89edf2e",
+        "declaration_hash": "766ffa8eaaae344039e6a5e69632218141529abad0204dd99e5b0a30f800b168",
+        "anchor_text_hash": "07cdc5852c99211b87502f07153d16da0d9e13f03f511f0ec36d0e90ca5ce018"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCacheEntry",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "CN-08"
         }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCacheEntry",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-08"
       },
       "key": {
         "waived_reason_hash": "6ec1a69023d0c2308ccc8d4d73e747da7433a81ce40e283eb2aa9198c4dbea78",
@@ -605,7 +1005,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "methods: []"
+        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -616,6 +1016,11 @@
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "AC-04"
         }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCacheEntry",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
       },
       "key": {
         "waived_reason_hash": "c6f9ac0fe8e88fe0d02d5835f0710c4af8b6858cd6382e4e5dc4f492043d9b93",
@@ -636,6 +1041,11 @@
           "element_id": "AC-10"
         }
       },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCacheEntry",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-10"
+      },
       "key": {
         "waived_reason_hash": "57079281ba85d0f4d1cfd922e2e47f50ddc13ccdc000a32d08f4f9e21706c6ba",
         "declaration_hash": "766ffa8eaaae344039e6a5e69632218141529abad0204dd99e5b0a30f800b168",
@@ -643,7 +1053,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"provider_session\")]), docs: Some(DocString(\"Stores reusable provider-session metadata.\")), spec_refs: [SpecRef { file: \"track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json\", anchor: SpecElementId(\"IN-04\") }, SpecRef { file: \"track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json\", anchor: SpecElementId(\"CN-02\") }, SpecRef { file: \"track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json\", anchor: SpecElementId(\"CN-06\") }, SpecRef { file: \"track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json\", anchor: SpecElementId(\"CN-08\") }, SpecRef { file: \"track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json\", anchor: SpecElementId(\"AC-04\") }, SpecRef { file: \"track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json\", anchor: SpecElementId(\"AC-10\") }], informal_grounds: [] }"
+        "citation": "Stores reusable provider-session metadata."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -654,6 +1064,11 @@
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "IN-04"
         }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCacheError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
       },
       "key": {
         "waived_reason_hash": "fbba4afd5afa460fffb5b37ee983556cc377b41e72f132abf7b43c49d163958d",
@@ -674,29 +1089,15 @@
           "element_id": "IN-09"
         }
       },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCacheError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-09"
+      },
       "key": {
         "waived_reason_hash": "fbba4afd5afa460fffb5b37ee983556cc377b41e72f132abf7b43c49d163958d",
         "declaration_hash": "e7377a75a2683bb407edc4f5f4a302ceb8ee35bedc8be14781de94fb35e6a38f",
         "anchor_text_hash": "875aeaabc70f7773ea6a5c22c3ffd8eca0526bac8fc0275fe201d43f790c4f6d"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "Use-case cache failure vocabulary with opaque diagnostic detail."
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "ProviderSessionCacheError",
-        "anchor_id": {
-          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-          "element_id": "CN-04"
-        }
-      },
-      "key": {
-        "waived_reason_hash": "fbba4afd5afa460fffb5b37ee983556cc377b41e72f132abf7b43c49d163958d",
-        "declaration_hash": "e7377a75a2683bb407edc4f5f4a302ceb8ee35bedc8be14781de94fb35e6a38f",
-        "anchor_text_hash": "d83bf653d5d0148b2c13a4caf5f7a6173f7eb775ca9d95ae17c4509eadd9d4e9"
       },
       "verdict": {
         "kind": "waived",
@@ -709,8 +1110,37 @@
         "entry_key": "ProviderSessionCacheError",
         "anchor_id": {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCacheError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "waived_reason_hash": "fbba4afd5afa460fffb5b37ee983556cc377b41e72f132abf7b43c49d163958d",
+        "declaration_hash": "e7377a75a2683bb407edc4f5f4a302ceb8ee35bedc8be14781de94fb35e6a38f",
+        "anchor_text_hash": "d83bf653d5d0148b2c13a4caf5f7a6173f7eb775ca9d95ae17c4509eadd9d4e9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "docs: Some(DocString(\"Use-case cache failure vocabulary with opaque diagnostic detail.\"))"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCacheError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "CN-06"
         }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCacheError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
       },
       "key": {
         "waived_reason_hash": "fbba4afd5afa460fffb5b37ee983556cc377b41e72f132abf7b43c49d163958d",
@@ -731,6 +1161,11 @@
           "element_id": "CN-08"
         }
       },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCacheError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-08"
+      },
       "key": {
         "waived_reason_hash": "fbba4afd5afa460fffb5b37ee983556cc377b41e72f132abf7b43c49d163958d",
         "declaration_hash": "e7377a75a2683bb407edc4f5f4a302ceb8ee35bedc8be14781de94fb35e6a38f",
@@ -749,6 +1184,11 @@
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "IN-03"
         }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCacheKey",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
       },
       "key": {
         "waived_reason_hash": "decb261792cd457f7473306f3c29b012345d2d239c990cafd0c3574bd96c1bd5",
@@ -769,6 +1209,11 @@
           "element_id": "AC-03"
         }
       },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCacheKey",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
       "key": {
         "waived_reason_hash": "decb261792cd457f7473306f3c29b012345d2d239c990cafd0c3574bd96c1bd5",
         "declaration_hash": "c72bbcca6adc43daf60195492e38f76af96f95ddb1bf1d4de802b759d591d208",
@@ -776,7 +1221,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "\"Machine-local session cache entry key.\""
+        "citation": "Machine-local session cache entry key."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -787,6 +1232,11 @@
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "IN-03"
         }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionId",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
       },
       "key": {
         "waived_reason_hash": "fb05df181956057730b9ba06846cce1436df3340d91752df36f7884269f0e869",
@@ -807,6 +1257,11 @@
           "element_id": "IN-08"
         }
       },
+      "obligation_id": {
+        "entry_key": "ProviderSessionId",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-08"
+      },
       "key": {
         "waived_reason_hash": "fb05df181956057730b9ba06846cce1436df3340d91752df36f7884269f0e869",
         "declaration_hash": "7ea48952cba3c4a175559ae503b2f01ff32e0d2233d99eb307b3ad5b97d49902",
@@ -825,6 +1280,11 @@
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "CN-06"
         }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionId",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-06"
       },
       "key": {
         "waived_reason_hash": "fb05df181956057730b9ba06846cce1436df3340d91752df36f7884269f0e869",
@@ -845,6 +1305,11 @@
           "element_id": "CN-08"
         }
       },
+      "obligation_id": {
+        "entry_key": "ProviderSessionId",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-08"
+      },
       "key": {
         "waived_reason_hash": "fb05df181956057730b9ba06846cce1436df3340d91752df36f7884269f0e869",
         "declaration_hash": "7ea48952cba3c4a175559ae503b2f01ff32e0d2233d99eb307b3ad5b97d49902",
@@ -863,6 +1328,11 @@
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "IN-03"
         }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewerPrompt",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
       },
       "key": {
         "waived_reason_hash": "fdd4001dfc2ff3f1fa8f3a4e6fdd72f4e6bdd5aadc861a782207ab36f28cf7d4",
@@ -883,6 +1353,11 @@
           "element_id": "CN-03"
         }
       },
+      "obligation_id": {
+        "entry_key": "ReviewerPrompt",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
       "key": {
         "waived_reason_hash": "fdd4001dfc2ff3f1fa8f3a4e6fdd72f4e6bdd5aadc861a782207ab36f28cf7d4",
         "declaration_hash": "9cdbc2d91c0c9762447e4c04f93b5fd4d769ceb2c38740b565fb701043cf7df4",
@@ -890,7 +1365,7 @@
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Plain { fields: [], has_stripped_fields: true }"
+        "citation": "Validated non-empty reviewer prompt used to start or resume reviewer sessions."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }

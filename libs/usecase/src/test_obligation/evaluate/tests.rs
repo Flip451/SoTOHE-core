@@ -1047,7 +1047,13 @@ fn cached_waiver_doc_with_fingerprint(
     );
     WaiverCacheDocument::new(
         track(),
-        vec![WaiverCacheEntry::new(edge(), key, verdict, verifier_fingerprint)],
+        vec![WaiverCacheEntry::new(
+            edge(),
+            Some(obligation().id().clone()),
+            key,
+            verdict,
+            verifier_fingerprint,
+        )],
     )
 }
 
@@ -1308,7 +1314,13 @@ fn test_waiver_adjudicates_every_obligation_owning_the_edge() {
 
     assert_eq!(outcome.pass_count(), 2, "each owning obligation must be adjudicated");
     assert_eq!(*h.waiver_driver.calls.lock().unwrap(), 2);
-    assert_eq!(h.waiver_cache.saved.lock().unwrap().as_ref().unwrap().entries().len(), 2);
+    let cache = h.waiver_cache.saved.lock().unwrap();
+    let entries = cache.as_ref().unwrap().entries();
+    assert_eq!(entries.len(), 2);
+    assert!(entries.iter().any(|entry| entry.obligation_id() == Some(obligation().id())));
+    assert!(
+        entries.iter().any(|entry| entry.obligation_id() == Some(trait_impl_obligation().id()))
+    );
     let declarations = h.waiver_driver.declarations.lock().unwrap();
     assert!(declarations.iter().any(|declaration| declaration.contains("kind")));
     assert!(declarations.iter().any(|declaration| declaration.contains("trait_ref")));

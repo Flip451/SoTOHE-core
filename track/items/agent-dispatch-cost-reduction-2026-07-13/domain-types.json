@@ -166,6 +166,79 @@
         }
       ],
       "type_name": "ImplementationInputHash"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "TestObligationEdgeId"
+            },
+            {
+              "name": "obligation_id",
+              "ty": "Option<TestObligationId>"
+            },
+            {
+              "name": "key",
+              "ty": "WaiverCacheKey"
+            },
+            {
+              "name": "verdict",
+              "ty": "WaiverVerdict"
+            },
+            {
+              "name": "verifier_fingerprint",
+              "ty": "Option<VerifierPromptFingerprint>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "edge_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationEdgeId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "obligation_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&TestObligationId>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "key",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&WaiverCacheKey"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verdict",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&WaiverVerdict"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verifier_fingerprint",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&VerifierPromptFingerprint>"
+        }
+      ],
+      "type_name": "WaiverCacheEntry"
     }
   ],
   "layer": "domain",
@@ -441,6 +514,26 @@
     },
     {
       "for_type": "EdgeOwnership",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverCacheEntry",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverCacheEntry",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverCacheEntry",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "WaiverCacheEntry",
       "trait_ref": "core::cmp::Eq"
     }
   ],
@@ -1578,6 +1671,103 @@
         },
         {
           "anchor": "AC-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "WaiverCacheEntry": {
+      "action": "modify",
+      "docs": "A frozen waiver verdict tied to one obligation edge and its owning obligation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "TestObligationEdgeId"
+            },
+            {
+              "name": "obligation_id",
+              "ty": "Option<TestObligationId>"
+            },
+            {
+              "name": "key",
+              "ty": "WaiverCacheKey"
+            },
+            {
+              "name": "verdict",
+              "ty": "WaiverVerdict"
+            },
+            {
+              "name": "verifier_fingerprint",
+              "ty": "Option<VerifierPromptFingerprint>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "edge_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationEdgeId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "obligation_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&TestObligationId>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "key",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&WaiverCacheKey"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verdict",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&WaiverVerdict"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verifier_fingerprint",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&VerifierPromptFingerprint>"
+        }
+      ],
+      "module_path": "tddd::test_obligation::verdict",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-11",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ]
