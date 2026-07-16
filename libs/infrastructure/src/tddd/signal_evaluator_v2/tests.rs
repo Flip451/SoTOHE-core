@@ -1,6 +1,5 @@
 //! Tests for `SignalEvaluatorV2` (AC-08).
 
-#![cfg(test)]
 #![allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::expect_used, non_snake_case)]
 
 use std::collections::{BTreeMap, HashMap};
@@ -1056,7 +1055,7 @@ fn crate_with_external_trait_impl(
     }
 }
 
-/// T039 (AC-14, case b): `StructuralPartialEq` / `StructuralEq` Impls present
+/// T039 (AC-14, case b): compiler-internal trait Impls present
 /// only in C must NOT trigger `CMinusSUnionD`.  These are compiler-internal
 /// phantom traits that cannot be declared in any workspace catalogue.
 ///
@@ -1068,6 +1067,7 @@ fn test_t039_compiler_internal_traits_excluded_from_identity_map() {
     for (trait_segments, qualified_name) in [
         (["core", "marker", "StructuralPartialEq"].as_slice(), "core::marker::StructuralPartialEq"),
         (["core", "marker", "StructuralEq"].as_slice(), "core::marker::StructuralEq"),
+        (["core", "clone", "TrivialClone"].as_slice(), "core::clone::TrivialClone"),
     ] {
         let a = ExtendedCrate::new(empty_crate(), BTreeMap::new());
         let b = empty_crate();
@@ -1227,12 +1227,16 @@ fn test_t039_compiler_internal_trait_classifier_scope() {
     assert!(is_compiler_internal_trait("core::marker::StructuralEq"));
     assert!(is_compiler_internal_trait("std::marker::StructuralPartialEq"));
     assert!(is_compiler_internal_trait("std::marker::StructuralEq"));
+    assert!(is_compiler_internal_trait("core::clone::TrivialClone"));
+    assert!(is_compiler_internal_trait("std::clone::TrivialClone"));
     // Fallback-form (two segments: core_canonical_path fallback for unknown names) also matches.
     assert!(is_compiler_internal_trait("core::StructuralPartialEq"));
     assert!(is_compiler_internal_trait("core::StructuralEq"));
+    assert!(is_compiler_internal_trait("core::TrivialClone"));
     // Bare short-name fallback (normalize_impl_trait_path when ID absent from krate.paths).
     assert!(is_compiler_internal_trait("StructuralPartialEq"));
     assert!(is_compiler_internal_trait("StructuralEq"));
+    assert!(is_compiler_internal_trait("TrivialClone"));
 
     // Third-party qualified paths with the same short name do NOT match (exact-path check).
     assert!(

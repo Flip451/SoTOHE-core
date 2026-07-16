@@ -885,6 +885,7 @@ dependencies = [
  "fs4",
  "infrastructure",
  "mockall",
+ "rustdoc-types",
  "serde",
  "serde_json",
  "sha2",

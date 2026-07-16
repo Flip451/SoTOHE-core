@@ -29,6 +29,7 @@ use std::sync::Arc;
 
 use domain::ModelTier;
 use domain::tddd::test_obligation::errors::SemanticVerifierError;
+use usecase::dry_write_driver::CapabilityName;
 use usecase::ref_verify::RefVerifyError;
 
 use crate::agent_profiles::{AgentProfiles, ResolvedExecution, RoundType};
@@ -77,11 +78,12 @@ pub(crate) fn resolve_execution_or_err(
     capability: &str,
     round: RoundType,
 ) -> Result<ResolvedExecution, SemanticVerifierError> {
-    profile.resolve_execution(capability, round).ok_or_else(|| {
-        semantic_verifier_error(&format!(
-            "capability '{capability}' is not defined in agent-profiles.json"
-        ))
-    })
+    let capability_name = CapabilityName::try_new(capability).map_err(|error| {
+        semantic_verifier_error(&format!("invalid capability '{capability}': {error}"))
+    })?;
+    profile
+        .resolve_execution(&capability_name, round)
+        .map_err(|error| semantic_verifier_error(&error.to_string()))
 }
 
 /// Parses the verifier response as exactly one JSON verdict object of type `T`.

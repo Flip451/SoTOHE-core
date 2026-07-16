@@ -13,8 +13,10 @@ pub(crate) mod results;
 pub(crate) mod run;
 pub mod run_fix;
 pub(crate) mod scope;
+mod session_context;
 pub(crate) mod shared;
 mod shim;
+mod telemetry_support;
 
 pub use inputs::{
     ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
@@ -42,71 +44,20 @@ use helpers::{
 use results::render_review_results_str;
 use run::{run_claude_review_str, run_codex_review_str};
 use scope::validate_scope_for_track_str;
+use session_context::reviewer_session_context;
 use shared::{build_scope_query_interactor_no_diff_str, build_scope_query_interactor_str};
+use telemetry_support::review_telemetry_for_outcome;
 
 use std::path::PathBuf;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
+use infrastructure::agent_profiles::ResolvedExecution;
 use infrastructure::review_v2::{ClaudeReviewer, CodexReviewer};
+use usecase::{capability_exec::ReasoningEffort, dry_write_driver::CapabilityName};
 
 use crate::{CommandOutcome, error::CompositionError};
 
 pub use shim::ReviewCompositionRoot;
-
-struct ReviewTelemetry<'a> {
-    findings_count: u32,
-    round_type: &'a str,
-    verdict_parse_failed: bool,
-    emit_subprocess: bool,
-    subprocess_started_at: Option<Instant>,
-}
-
-fn review_telemetry_for_outcome<'a, E>(
-    run_result: &'a Result<CodexReviewOutcome, E>,
-    requested_round_type: &'a str,
-) -> Option<ReviewTelemetry<'a>> {
-    match run_result {
-        Ok(CodexReviewOutcome::FinalCompleted {
-            findings_count, subprocess_started_at, ..
-        }) => Some(ReviewTelemetry {
-            findings_count: *findings_count,
-            round_type: "final",
-            verdict_parse_failed: false,
-            emit_subprocess: true,
-            subprocess_started_at: Some(*subprocess_started_at),
-        }),
-        Ok(CodexReviewOutcome::FastCompleted { findings_count, subprocess_started_at, .. }) => {
-            Some(ReviewTelemetry {
-                findings_count: *findings_count,
-                round_type: "fast",
-                verdict_parse_failed: false,
-                emit_subprocess: true,
-                subprocess_started_at: Some(*subprocess_started_at),
-            })
-        }
-        Ok(CodexReviewOutcome::Skipped { .. }) => Some(ReviewTelemetry {
-            findings_count: 0,
-            round_type: requested_round_type,
-            verdict_parse_failed: false,
-            emit_subprocess: false,
-            subprocess_started_at: None,
-        }),
-        Ok(CodexReviewOutcome::SubprocessFailed {
-            round_type,
-            verdict_parse_failed,
-            findings_count,
-            subprocess_started_at,
-            ..
-        }) => Some(ReviewTelemetry {
-            findings_count: *findings_count,
-            round_type,
-            verdict_parse_failed: *verdict_parse_failed,
-            emit_subprocess: true,
-            subprocess_started_at: Some(*subprocess_started_at),
-        }),
-        Err(_) => None,
-    }
-}
 
 impl ReviewCompositionRoot {
     /// Run the local Codex-backed reviewer and auto-record verdict to review.json.
@@ -153,8 +104,25 @@ impl ReviewCompositionRoot {
         .map_err(CompositionError::Infrastructure)?;
 
         let timeout = Duration::from_secs(input.timeout_seconds);
-        let reviewer =
-            CodexReviewer::new(&input.model, timeout, base_prompt).with_scope_label(&group);
+        let session = reviewer_session_context(
+            &track_id,
+            &group,
+            &input.round_type,
+            &input.model,
+            base_prompt,
+            &input.items_dir,
+        )?;
+        let reviewer = CodexReviewer::new(
+            session.track_id,
+            session.scope,
+            session.round_type,
+            session.diff_base,
+            session.model,
+            ReasoningEffort::High,
+            timeout,
+            session.prompt,
+            session.cache,
+        );
 
         let round_start = std::time::Instant::now();
         let run_result =
@@ -238,8 +206,25 @@ impl ReviewCompositionRoot {
         .map_err(CompositionError::Infrastructure)?;
 
         let timeout = Duration::from_secs(input.timeout_seconds);
-        let reviewer =
-            ClaudeReviewer::new(&input.model, timeout, base_prompt).with_scope_label(&group);
+        let session = reviewer_session_context(
+            &track_id,
+            &group,
+            &input.round_type,
+            &input.model,
+            base_prompt,
+            &input.items_dir,
+        )?;
+        let reviewer = ClaudeReviewer::new(
+            session.track_id,
+            session.scope,
+            session.round_type,
+            session.diff_base,
+            session.model,
+            ReasoningEffort::High,
+            timeout,
+            session.prompt,
+            session.cache,
+        );
 
         let round_start = std::time::Instant::now();
         let run_result =
@@ -294,22 +279,20 @@ impl ReviewCompositionRoot {
             .map_err(|e| CompositionError::ConfigLoad(e.to_string()))?;
         let infra_round_type = shared::parse_round_type(&input.round_type)
             .map_err(|e| CompositionError::WiringFailed(e.to_string()))?;
-        let mut resolved =
-            profiles.resolve_execution("reviewer", infra_round_type).ok_or_else(|| {
-                CompositionError::ConfigLoad(
-                    "[ERROR] reviewer capability not defined in agent-profiles.json".to_owned(),
-                )
-            })?;
+        let capability = CapabilityName::try_new("reviewer")
+            .map_err(|error| CompositionError::ConfigLoad(error.to_string()))?;
+        let resolved = profiles
+            .resolve_execution(&capability, infra_round_type)
+            .map_err(|error| CompositionError::ConfigLoad(error.to_string()))?;
+        let ResolvedExecution::ProviderCli { provider, model: profile_model, effort } = resolved
+        else {
+            return Err(CompositionError::ConfigLoad(
+                "[ERROR] reviewer must resolve to a provider CLI execution".to_owned(),
+            ));
+        };
+        let model = input.model.unwrap_or_else(|| profile_model.as_str().to_owned());
 
-        if let Some(model_override) = input.model {
-            resolved.model = Some(model_override);
-        }
-
-        eprintln!(
-            "[sotp review local] provider={} model={}",
-            resolved.provider,
-            resolved.model.as_deref().unwrap_or("<none>")
-        );
+        eprintln!("[sotp review local] provider={} model={}", provider, model);
 
         let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)?;
         let group = input.group.trim().to_owned();
@@ -343,16 +326,27 @@ impl ReviewCompositionRoot {
         let timeout = Duration::from_secs(input.timeout_seconds);
 
         let round_start = std::time::Instant::now();
-        let (run_result, provider_name, effective_model) = match resolved.provider.as_str() {
+        let (run_result, provider_name, effective_model) = match provider.as_str() {
             "codex" => {
-                let model = resolved.model.ok_or_else(|| {
-                    CompositionError::ConfigLoad(
-                        "[ERROR] codex reviewer requires a model (set model in agent-profiles.json)"
-                            .to_owned(),
-                    )
-                })?;
-                let reviewer =
-                    CodexReviewer::new(&model, timeout, base_prompt).with_scope_label(&group);
+                let session = reviewer_session_context(
+                    &track_id,
+                    &group,
+                    &input.round_type,
+                    &model,
+                    base_prompt,
+                    &input.items_dir,
+                )?;
+                let reviewer = CodexReviewer::new(
+                    session.track_id,
+                    session.scope,
+                    session.round_type,
+                    session.diff_base,
+                    session.model,
+                    effort,
+                    timeout,
+                    session.prompt,
+                    session.cache,
+                );
                 let result = run_codex_review_str(
                     &track_id,
                     &input.items_dir,
@@ -363,14 +357,25 @@ impl ReviewCompositionRoot {
                 (result, "codex".to_owned(), model)
             }
             "claude" => {
-                let model = resolved.model.ok_or_else(|| {
-                    CompositionError::ConfigLoad(
-                        "[ERROR] claude reviewer requires a model (set model in agent-profiles.json)"
-                            .to_owned(),
-                    )
-                })?;
-                let reviewer =
-                    ClaudeReviewer::new(&model, timeout, base_prompt).with_scope_label(&group);
+                let session = reviewer_session_context(
+                    &track_id,
+                    &group,
+                    &input.round_type,
+                    &model,
+                    base_prompt,
+                    &input.items_dir,
+                )?;
+                let reviewer = ClaudeReviewer::new(
+                    session.track_id,
+                    session.scope,
+                    session.round_type,
+                    session.diff_base,
+                    session.model,
+                    effort,
+                    timeout,
+                    session.prompt,
+                    session.cache,
+                );
                 let result = run_claude_review_str(
                     &track_id,
                     &input.items_dir,
@@ -419,21 +424,19 @@ impl ReviewCompositionRoot {
         outcome_to_command_outcome(run_result.map_err(CompositionError::Usecase)?)
     }
 
-    /// Run the review-fix-lead fixer with provider auto-resolved from agent-profiles.json.
+    /// Constructs the injected driver for one provider-resolved review-fix run.
     ///
-    /// Resolves the `review-fix-lead` capability from `agent-profiles.json` at the
-    /// repo root. Supports only `"codex"` provider — constructs `CodexReviewFixRunner`
-    /// and runs it through `RunReviewFixInteractor`. Unknown or unsupported providers
-    /// return a clear error (mirrors `review_run_local` provider rejection).
+    /// This crate owns profile resolution and infrastructure wiring. The returned
+    /// driver owns the interactor invocation and command-outcome rendering.
     ///
     /// # Errors
-    /// Returns `Err` when profile loading, provider resolution, arg validation,
-    /// or the fix runner fails.
-    pub fn review_run_fix_local(
+    /// Returns `Err` when profile loading, provider resolution, or typed input
+    /// construction fails.
+    pub(crate) fn review_fix_driver(
         &self,
         input: RunReviewFixLocalInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        run_fix::run_fix_local(input).map_err(CompositionError::Infrastructure)
+    ) -> Result<cli_driver::review::ReviewFixDriver, usecase::review_v2::RunReviewFixError> {
+        run_fix::review_fix_driver(input)
     }
 
     /// Run the review-fix-lead fixer, resolving `track_id` from the current
@@ -459,7 +462,10 @@ impl ReviewCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         let track_id = resolve_track_id_or_branch_write(track_id_opt, &items_dir)?;
         let input = RunReviewFixLocalInput { scope, briefing_file, track_id, round_type, model };
-        self.review_run_fix_local(input)
+        let driver = self
+            .review_fix_driver(input)
+            .map_err(|error| CompositionError::Usecase(error.to_string()))?;
+        Ok(driver.handle())
     }
 
     /// Check if the review state is approved and code hash is current.
@@ -666,28 +672,6 @@ impl ReviewCompositionRoot {
             .map_err(CompositionError::Infrastructure)?;
         Ok(CommandOutcome::success(maybe_path))
     }
-
-    /// Persist a commit hash for the review cycle.
-    ///
-    /// Resolves `track_id` from the current git branch when `None`. Delegates to
-    /// `infrastructure::review_v2::persist_commit_hash_for_track` for all domain
-    /// and I/O operations (CN-02). The `items_dir` parameter is accepted for API
-    /// consistency but the infrastructure function always uses the canonical
-    /// `track/items` path under the repo root.
-    ///
-    /// # Errors
-    /// Returns `Err` when track ID resolution, branch guard, git, or I/O fails.
-    pub fn review_persist_commit_hash(
-        &self,
-        track_id: Option<String>,
-        items_dir: PathBuf,
-    ) -> Result<CommandOutcome, CompositionError> {
-        let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
-        let head_sha =
-            persist_commit_hash_for_track(&track_id).map_err(CompositionError::Infrastructure)?;
-        eprintln!("[review] Recorded .commit_hash: {head_sha}");
-        Ok(CommandOutcome::success(None))
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -695,12 +679,26 @@ impl ReviewCompositionRoot {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use std::ffi::OsString;
     use std::fs;
     use std::path::PathBuf;
     use std::process::Command;
+
+    use super::{ReviewCompositionRoot, ReviewRunCodexInput};
+    use domain::{
+        TrackId,
+        review_v2::{MainScopeName, RoundType, ScopeName},
+    };
+    use infrastructure::provider_session::FsProviderSessionCacheAdapter;
+    use usecase::{
+        capability_exec::{ModelName, ProviderName, ReasoningEffort},
+        provider_session::{
+            ProviderSessionCacheEntry, ProviderSessionCacheKey, ProviderSessionCachePort,
+            ProviderSessionId,
+        },
+    };
 
     use crate::review_v2::process_guards::{CwdGuard, EnvGuard, GitRunner};
     #[cfg(unix)]
@@ -825,6 +823,8 @@ mod tests {
       "model": "review-final",
       "fast_provider": "{provider}",
       "fast_model": "review-fast",
+      "reasoning_effort": "high",
+      "fast_reasoning_effort": "low",
       "execution_mode": "typed-pipeline"
     }},
     "review-fix-lead": {{
@@ -832,12 +832,39 @@ mod tests {
       "model": "gpt-final",
       "fast_provider": "{provider}",
       "fast_model": "gpt-fast",
+      "reasoning_effort": "high",
+      "fast_reasoning_effort": "low",
       "execution_mode": "typed-pipeline"
     }}
   }}
 }}
 "#
         );
+        fs::write(config_dir.join("agent-profiles.json"), content).unwrap();
+    }
+
+    /// Profile whose `review-fix-lead` declares a fast-round override but omits
+    /// `fast_reasoning_effort`, so fast-round resolution must fail closed.
+    fn write_agent_profiles_missing_review_fix_fast_effort(root: &std::path::Path) {
+        let config_dir = root.join(".harness/config");
+        fs::create_dir_all(&config_dir).unwrap();
+        let content = r#"{
+  "schema_version": 1,
+  "providers": {
+    "codex": { "label": "Codex" }
+  },
+  "capabilities": {
+    "review-fix-lead": {
+      "provider": "codex",
+      "model": "gpt-final",
+      "fast_provider": "codex",
+      "fast_model": "gpt-fast",
+      "reasoning_effort": "high",
+      "execution_mode": "typed-pipeline"
+    }
+  }
+}
+"#;
         fs::write(config_dir.join("agent-profiles.json"), content).unwrap();
     }
 
@@ -853,7 +880,19 @@ case "$1" in
     exit 0
     ;;
 esac
-out="${{11}}"
+out=""
+args="$*"
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --output-last-message)
+      out="$2"
+      shift 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
 if [ -z "$out" ]; then
   echo "missing output-last-message" >&2
   exit 9
@@ -879,6 +918,22 @@ exit 0
     }
 
     #[cfg(unix)]
+    fn write_recording_codex_fix_bin(bin_dir: &std::path::Path, arguments_log: &std::path::Path) {
+        write_fake_codex_bin_with_body(
+            bin_dir,
+            &format!(
+                r#"
+printf '%s\n' "$args" >> '{}'
+cat >/dev/null
+printf 'REVIEW_FIX_STATUS: completed\n' > "$out"
+exit 0
+"#,
+                arguments_log.display(),
+            ),
+        );
+    }
+
+    #[cfg(unix)]
     fn write_fake_codex_reviewer_bin(bin_dir: &std::path::Path) {
         write_fake_codex_bin_with_body(
             bin_dir,
@@ -887,6 +942,74 @@ printf '{"verdict":"zero_findings","findings":[]}\n' > "$out"
 exit 0
 "#,
         );
+    }
+
+    #[cfg(unix)]
+    fn write_recording_codex_reviewer_bin(
+        bin_dir: &std::path::Path,
+        arguments_log: &std::path::Path,
+        fail_resume: bool,
+    ) {
+        let resume_failure =
+            if fail_resume { "case \"$args\" in *resume*) exit 7 ;; esac" } else { "" };
+        write_fake_codex_bin_with_body(
+            bin_dir,
+            &format!(
+                r#"
+printf '%s' "$args" | tr '\n' ' ' >> '{}'
+printf '\n' >> '{}'
+{resume_failure}
+printf '{{"verdict":"zero_findings","findings":[]}}\n' > "$out"
+printf '{{"thread_id":"new-session"}}\n'
+exit 0
+"#,
+                arguments_log.display(),
+                arguments_log.display()
+            ),
+        );
+    }
+
+    #[cfg(unix)]
+    fn seed_reviewer_session(
+        repo: &ReviewEntrypointRepo,
+        scope: ScopeName,
+        round_type: RoundType,
+        model: &str,
+    ) {
+        let cache = FsProviderSessionCacheAdapter::new(
+            repo._dir.path().to_path_buf(),
+            PathBuf::from("tmp/capability-runtime"),
+        );
+        let key = ProviderSessionCacheKey::Review {
+            track_id: TrackId::try_new(repo.track_id.clone()).unwrap(),
+            scope,
+            round_type,
+            diff_base: domain::CommitHash::try_new(
+                fs::read_to_string(repo.track_dir.join(".commit_hash")).unwrap().trim(),
+            )
+            .unwrap(),
+        };
+        let entry = ProviderSessionCacheEntry::new(
+            ProviderSessionId::try_new("prior-session".to_owned()).unwrap(),
+            ProviderName::try_new("codex".to_owned()).unwrap(),
+            ModelName::try_new(model.to_owned()).unwrap(),
+            ReasoningEffort::High,
+        );
+        cache.save(&key, &entry).unwrap();
+    }
+
+    #[cfg(unix)]
+    fn codex_review_input(repo: &ReviewEntrypointRepo, round_type: &str) -> ReviewRunCodexInput {
+        ReviewRunCodexInput {
+            model: "codex-review-model".to_owned(),
+            timeout_seconds: 10,
+            briefing_file: None,
+            prompt: Some("Review.".to_owned()),
+            track_id: Some(repo.track_id.clone()),
+            round_type: round_type.to_owned(),
+            group: "cli_composition".to_owned(),
+            items_dir: repo.items_dir.clone(),
+        }
     }
 
     #[cfg(unix)]
@@ -1023,6 +1146,114 @@ exit 0
 
     #[cfg(unix)]
     #[test]
+    fn test_review_composition_root_resumes_matching_scope_session_and_persists_review_record() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-session-resume-2026");
+        let bin_dir = repo.track_dir.join("fake-bin-session-resume");
+        let arguments_log = repo.track_dir.join("codex-arguments.log");
+        write_recording_codex_reviewer_bin(&bin_dir, &arguments_log, false);
+        seed_reviewer_session(
+            &repo,
+            ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+            RoundType::Fast,
+            "codex-review-model",
+        );
+        let _path_guard = prepend_path(&bin_dir);
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let outcome = ReviewCompositionRoot::new()
+            .review_run_codex(codex_review_input(&repo, "fast"))
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        let arguments = fs::read_to_string(arguments_log).unwrap();
+        assert!(arguments.contains("resume prior-session"), "expected resume argv: {arguments}");
+        assert!(
+            arguments.contains("--model codex-review-model"),
+            "missing model argv: {arguments}"
+        );
+        assert!(arguments.contains("--sandbox read-only"), "missing sandbox argv: {arguments}");
+        assert!(
+            arguments.contains("model_reasoning_effort=\"high\""),
+            "missing effort argv: {arguments}"
+        );
+        let review_record = fs::read_to_string(repo.track_dir.join("review.json")).unwrap();
+        assert!(review_record.contains("zero_findings"));
+        assert!(review_record.contains("fast"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_composition_root_starts_fresh_for_model_mismatch_first_round_and_fast_to_final()
+    {
+        let _lock = cwd_lock().lock().unwrap();
+        for (name, round_type, seeded) in [
+            ("model-mismatch", "fast", Some((RoundType::Fast, "previous-model"))),
+            ("first-round", "fast", None),
+            ("fast-to-final", "final", Some((RoundType::Fast, "codex-review-model"))),
+        ] {
+            let repo = setup_review_entrypoint_repo(&format!("review-session-{name}-2026"));
+            let bin_dir = repo.track_dir.join("fake-bin-session-fresh");
+            let arguments_log = repo.track_dir.join("codex-arguments.log");
+            write_recording_codex_reviewer_bin(&bin_dir, &arguments_log, false);
+            if let Some((seed_round, model)) = seeded {
+                seed_reviewer_session(
+                    &repo,
+                    ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+                    seed_round,
+                    model,
+                );
+            }
+            let _path_guard = prepend_path(&bin_dir);
+            let _cwd_guard = CwdGuard::save_current();
+            std::env::set_current_dir(repo._dir.path()).unwrap();
+
+            let outcome = ReviewCompositionRoot::new()
+                .review_run_codex(codex_review_input(&repo, round_type))
+                .unwrap();
+
+            assert_eq!(outcome.exit_code, 0, "{name}");
+            let arguments = fs::read_to_string(arguments_log).unwrap();
+            assert!(!arguments.contains("resume"), "{name} must start fresh: {arguments}");
+            assert!(arguments.contains("--model codex-review-model"), "{name}: {arguments}");
+            assert!(arguments.contains("--sandbox read-only"), "{name}: {arguments}");
+            assert!(arguments.contains("model_reasoning_effort=\"high\""), "{name}: {arguments}");
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_composition_root_resume_failure_falls_back_to_fresh_session() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-session-fallback-2026");
+        let bin_dir = repo.track_dir.join("fake-bin-session-fallback");
+        let arguments_log = repo.track_dir.join("codex-arguments.log");
+        write_recording_codex_reviewer_bin(&bin_dir, &arguments_log, true);
+        seed_reviewer_session(
+            &repo,
+            ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+            RoundType::Fast,
+            "codex-review-model",
+        );
+        let _path_guard = prepend_path(&bin_dir);
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let outcome = ReviewCompositionRoot::new()
+            .review_run_codex(codex_review_input(&repo, "fast"))
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        let arguments = fs::read_to_string(arguments_log).unwrap();
+        let attempts: Vec<&str> = arguments.lines().collect();
+        assert_eq!(attempts.len(), 2, "resume failure must retry fresh: {attempts:?}");
+        assert!(attempts.first().is_some_and(|attempt| attempt.contains("resume prior-session")));
+        assert!(attempts.get(1).is_some_and(|attempt| !attempt.contains("resume")));
+    }
+
+    #[cfg(unix)]
+    #[test]
     fn review_run_claude_happy_path_writes_verdict_and_telemetry() {
         let _lock = cwd_lock().lock().unwrap();
         let repo = setup_review_entrypoint_repo("review-run-claude-2026");
@@ -1088,7 +1319,7 @@ exit 0
 
     #[cfg(unix)]
     #[test]
-    fn review_run_fix_local_codex_completed_status_returns_command_outcome() {
+    fn review_fix_driver_codex_completed_status_returns_command_outcome() {
         let _lock = cwd_lock().lock().unwrap();
 
         let dir = tempfile::tempdir().unwrap();
@@ -1109,21 +1340,58 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(dir.path()).unwrap();
 
-        let outcome = crate::review_v2::ReviewCompositionRoot::new()
-            .review_run_fix_local(run_review_fix_input(briefing))
-            .unwrap();
+        let output = crate::review_v2::ReviewCompositionRoot::new()
+            .review_fix_driver(run_review_fix_input(briefing))
+            .unwrap()
+            .handle();
 
-        assert_eq!(outcome.stdout.as_deref(), Some("REVIEW_FIX_STATUS: completed"));
-        assert_eq!(outcome.stderr, None);
-        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(output.stdout.as_deref(), Some("REVIEW_FIX_STATUS: completed"));
+        assert_eq!(output.stderr, None);
+        assert_eq!(output.exit_code, 0);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_fix_driver_injects_resolved_effort_for_fast_and_final_rounds() {
+        let _lock = cwd_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        write_agent_profiles(dir.path(), "codex");
+        let briefing = dir.path().join("briefing.md");
+        fs::write(&briefing, "# Briefing\n").unwrap();
+        let bin_dir = dir.path().join("bin-test");
+        let arguments_log = dir.path().join("codex-arguments.log");
+        write_recording_codex_fix_bin(&bin_dir, &arguments_log);
+        let _path_guard = prepend_path(&bin_dir);
+        let _sandbox_guard = EnvGuard::remove("CODEX_SANDBOX");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(dir.path()).unwrap();
+
+        for (round_type, expected_effort) in [("fast", "low"), ("final", "high")] {
+            let output = crate::review_v2::ReviewCompositionRoot::new()
+                .review_fix_driver(crate::review_v2::RunReviewFixLocalInput {
+                    scope: "cli_composition".to_owned(),
+                    briefing_file: briefing.clone(),
+                    track_id: "review-fix-effort-2026".to_owned(),
+                    round_type: round_type.to_owned(),
+                    model: None,
+                })
+                .unwrap()
+                .handle();
+            assert_eq!(output.exit_code, 0, "{round_type} round must complete");
+            let arguments = fs::read_to_string(&arguments_log).unwrap();
+            let invocation = arguments.lines().last().unwrap_or_default();
+            assert!(
+                invocation.contains(&format!("model_reasoning_effort=\"{expected_effort}\"")),
+                "{round_type} effort must be explicit in fixer argv: {invocation}"
+            );
+        }
     }
 
     #[test]
-    fn review_run_fix_local_claude_provider_returns_subagent_dispatch_instruction() {
-        // PR #175 follow-up: review-fix-lead.provider = "claude" must return a
-        // structured dispatch instruction (stdout sentinel + JSON, exit code
-        // SUBAGENT_DISPATCH_EXIT_CODE), not an error, so the orchestrator can
-        // route to the Claude Code subagent without provider conditionals.
+    fn review_fix_driver_claude_provider_renders_subagent_dispatch_instruction() {
+        // Composition injects the typed dispatch path; only the CLI driver
+        // invokes it and renders the sentinel and JSON protocol.
         let _lock = cwd_lock().lock().unwrap();
 
         let dir = tempfile::tempdir().unwrap();
@@ -1136,77 +1404,162 @@ exit 0
         std::env::set_current_dir(dir.path()).unwrap();
 
         let outcome = crate::review_v2::ReviewCompositionRoot::new()
-            .review_run_fix_local(run_review_fix_input(briefing.clone()))
-            .expect("claude provider must succeed with a dispatch instruction");
+            .review_fix_driver(run_review_fix_input(briefing.clone()))
+            .unwrap()
+            .handle();
 
-        assert_eq!(
-            outcome.exit_code,
-            crate::review_v2::run_fix::SUBAGENT_DISPATCH_EXIT_CODE,
-            "claude provider must exit with SUBAGENT_DISPATCH_EXIT_CODE"
-        );
-        let stdout = outcome.stdout.expect("dispatch instruction must be on stdout");
-        let mut lines = stdout.lines();
-        let sentinel = lines.next().expect("first stdout line must be the dispatch sentinel");
-        assert_eq!(sentinel, crate::review_v2::run_fix::SUBAGENT_DISPATCH_SENTINEL);
-        let json = lines.next().expect("second stdout line must be the dispatch JSON payload");
-        assert!(json.contains("\"agent\":\"review-fix-lead\""), "JSON must name the agent: {json}");
-        assert!(json.contains("\"scope\":\"cli_composition\""), "JSON must carry scope: {json}");
-        assert!(
-            json.contains(&format!("\"briefing_file\":\"{}\"", briefing.display())),
-            "JSON must carry briefing_file: {json}"
-        );
-        assert!(
-            json.contains("\"track_id\":\"review-fix-codex-rustify-2026-05-31\""),
-            "JSON must carry track_id: {json}"
-        );
-        assert!(json.contains("\"round_type\":\"fast\""), "JSON must carry round_type: {json}");
+        assert_eq!(outcome.exit_code, cli_driver::review::SUBAGENT_DISPATCH_EXIT_CODE);
+        let stdout = outcome.stdout.unwrap();
+        assert!(stdout.starts_with(cli_driver::review::SUBAGENT_DISPATCH_SENTINEL));
+        assert!(stdout.contains("\"agent\":\"review-fix-lead\""));
+        assert!(stdout.contains("\"model\":\"gpt-5.5\""));
+        assert!(stdout.contains("\"effort\":\"low\""));
+        assert!(stdout.contains("\"scope\":\"cli_composition\""));
+        assert!(stdout.contains(&format!("\"briefing_file\":\"{}\"", briefing.display())));
+        assert!(stdout.contains("\"track_id\":\"review-fix-codex-rustify-2026-05-31\""));
+        assert!(stdout.contains("\"round_type\":\"fast\""));
     }
 
-    /// Regression: exit 64 + `SUBAGENT_DISPATCH_REQUIRED` sentinel must pass through
-    /// the full `ReviewDriver` → `ReviewServiceImpl` chain unchanged when
-    /// `review-fix-lead.provider` is `"claude"`.
-    ///
-    /// Before the fix, `ReviewServiceImpl::run_fix_local` mapped exit 64 to
-    /// `status: "failed"` and the driver then rewrote stdout to
-    /// `"REVIEW_FIX_STATUS: failed"` with exit code 1, so the orchestrator never
-    /// saw the dispatch sentinel and could not launch the Claude subagent.
     #[test]
-    fn review_driver_handle_claude_provider_passes_through_subagent_dispatch_sentinel() {
+    fn test_review_run_fix_local_rejects_missing_effort_before_dispatch() {
+        // CN-01: a review-fix dispatch whose resolved round has no configured
+        // effort must be refused fail-closed (no fall-through to the provider
+        // default). The rejection surfaces before any runner subprocess is
+        // constructed, as a typed `RunReviewFixError`.
         let _lock = cwd_lock().lock().unwrap();
 
         let dir = tempfile::tempdir().unwrap();
         GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
-        write_agent_profiles(dir.path(), "claude");
+        write_agent_profiles_missing_review_fix_fast_effort(dir.path());
         let briefing = dir.path().join("briefing.md");
         fs::write(&briefing, "# Briefing\n").unwrap();
 
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(dir.path()).unwrap();
 
-        let input = cli_driver::review::ReviewInput::RunFixLocal {
-            scope: "cli_composition".to_owned(),
-            briefing_file: briefing,
-            track_id: "review-fix-codex-rustify-2026-05-31".to_owned(),
-            round_type: "fast".to_owned(),
-            model: Some("gpt-5.5".to_owned()),
-        };
-        let outcome = crate::review_v2::ReviewCompositionRoot::new().review_driver().handle(input);
+        let result = crate::review_v2::ReviewCompositionRoot::new()
+            .review_fix_driver(run_review_fix_input(briefing));
 
-        assert_eq!(
-            outcome.exit_code,
-            crate::review_v2::run_fix::SUBAGENT_DISPATCH_EXIT_CODE,
-            "driver must pass through SUBAGENT_DISPATCH_EXIT_CODE (64) for claude provider; \
-             got {} — was it remapped to 1 by the failed-status path?",
-            outcome.exit_code
-        );
-        let stdout = outcome.stdout.expect("dispatch sentinel must appear on stdout");
+        match result {
+            Err(usecase::review_v2::RunReviewFixError::FixRunnerFailed(message)) => {
+                assert!(
+                    message.as_str().contains("no reasoning effort"),
+                    "rejection must cite the missing effort, got: {}",
+                    message.as_str()
+                );
+            }
+            Ok(_) => panic!("effort-less fast round must be rejected, not dispatched"),
+            Err(other) => panic!("expected fail-closed effort rejection, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_review_service_validate_scope_accepts_known_and_rejects_unknown_scope() {
+        use usecase::review_v2::aggregate_service::ReviewService as _;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-service-aux-scope-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let service = super::shim::ReviewServiceImpl;
+
+        service
+            .validate_scope(
+                "cli_composition".to_owned(),
+                Some(repo.track_id.clone()),
+                repo.items_dir.clone(),
+            )
+            .expect("configured scope must validate");
+
+        let error = service
+            .validate_scope(
+                "no-such-scope".to_owned(),
+                Some(repo.track_id.clone()),
+                repo.items_dir.clone(),
+            )
+            .expect_err("unconfigured scope must be rejected");
         assert!(
-            stdout.starts_with(crate::review_v2::run_fix::SUBAGENT_DISPATCH_SENTINEL),
-            "stdout first line must be SUBAGENT_DISPATCH_SENTINEL, got: {stdout:?}"
+            error.to_string().contains("Unknown scope"),
+            "rejection must name the unknown scope, got: {error}"
         );
+    }
+
+    #[test]
+    fn test_review_service_get_briefing_returns_none_without_config_and_rejects_bad_scope() {
+        use usecase::review_v2::aggregate_service::ReviewService as _;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-service-aux-briefing-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let service = super::shim::ReviewServiceImpl;
+
+        let briefing = service
+            .get_briefing(
+                "cli_composition".to_owned(),
+                Some(repo.track_id.clone()),
+                repo.items_dir.clone(),
+            )
+            .expect("configured scope without a briefing entry must succeed");
+        assert_eq!(briefing, None, "fixture config declares no briefing file");
+
+        let error = service
+            .get_briefing(
+                "cli_composition".to_owned(),
+                Some("Invalid Track Id!".to_owned()),
+                repo.items_dir.clone(),
+            )
+            .expect_err("invalid track id must be rejected");
         assert!(
-            !stdout.contains("REVIEW_FIX_STATUS:"),
-            "driver must NOT rewrite sentinel to REVIEW_FIX_STATUS line, got: {stdout:?}"
+            error.to_string().contains("invalid --track-id"),
+            "rejection must cite the invalid track id, got: {error}"
+        );
+    }
+
+    #[test]
+    fn test_review_service_results_renders_summary_and_rejects_items_dir_outside_repo() {
+        use usecase::review_v2::aggregate_service::ReviewService as _;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-service-aux-results-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let service = super::shim::ReviewServiceImpl;
+
+        let rendered = service
+            .results(
+                Some(repo.track_id.clone()),
+                repo.items_dir.clone(),
+                None,
+                false,
+                0,
+                "fast".to_owned(),
+                true,
+            )
+            .expect("results for a valid track must render");
+        assert!(
+            rendered.contains("Review results"),
+            "summary header must be rendered, got: {rendered}"
+        );
+
+        let outside = tempfile::tempdir().unwrap();
+        let error = service
+            .results(
+                Some(repo.track_id.clone()),
+                outside.path().to_path_buf(),
+                None,
+                false,
+                0,
+                "fast".to_owned(),
+                true,
+            )
+            .expect_err("items_dir outside the repository must be rejected");
+        assert!(
+            error.to_string().contains("outside the repository root"),
+            "rejection must cite repo containment, got: {error}"
         );
     }
 

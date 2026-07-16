@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "7e38288ef967614b487bbcd9947e87db4878458dcd4a6398fe1dea09fec62665",
+  "signals": [
+    {
+      "type_name": "CatalogueDeclarationHash",
+      "signal": "blue",
+      "entry_hash": "a46698e554afbb94f48d91e0bbb3dcc8dc476db0cf34f92258a5a05011c39261"
+    },
+    {
+      "type_name": "EdgeOwnership",
+      "signal": "blue",
+      "entry_hash": "c5e04e058f1ceab51f3de8aa97688e79e45b0d563954d60c2b2239d522c1af97"
+    },
+    {
+      "type_name": "ImplementationInputHash",
+      "signal": "blue",
+      "entry_hash": "de4fd2927b4914b0d72ded622f0216e9243d260e847b42b3d4a876dffaab3afa"
+    },
+    {
+      "type_name": "LayerId",
+      "signal": "blue",
+      "entry_hash": "292384787dd184cf4e4455f6cc033776cfd67be5eaf848a25471851cb2c644bc"
+    },
+    {
+      "type_name": "ObligationsDocument",
+      "signal": "blue",
+      "entry_hash": "5dc3d81388732fd8ec9ab6788152a65b6dc831e0c3dc3029fb91c13cf185b9e9"
+    },
+    {
+      "type_name": "RoundType",
+      "signal": "blue",
+      "entry_hash": "cb40b930c444e9521a03f71712d9b4a1e85b0db508e5081dd8ae4905cdb41587"
+    },
+    {
+      "type_name": "ScopeName",
+      "signal": "blue",
+      "entry_hash": "cfa1fb1d677fc0138f676483e73d061567234422b98f651bdf4b3c7b7cce947b"
+    },
+    {
+      "type_name": "Sha256Digest",
+      "signal": "blue",
+      "entry_hash": "523a49e8e756990f9cb76cda32aabbd6ca138bf1e599edea885fe5f72d2c33bc"
+    },
+    {
+      "type_name": "Sha256DigestError",
+      "signal": "blue",
+      "entry_hash": "613847554768974e08d8ebff80755dc7b14c46bd3949d0f2f1f74e7dc6c945e1"
+    },
+    {
+      "type_name": "TestBindingsDocument",
+      "signal": "blue",
+      "entry_hash": "7f51f900b481487022f283e9c8cbc5b63ecbe6ac4e660af9df91797ecec85bf7"
+    },
+    {
+      "type_name": "TestObligation",
+      "signal": "blue",
+      "entry_hash": "acd525b7a1d3b3df1f1c66f294aec1ca4f1a44075f4eaff023d59f89fa059680"
+    },
+    {
+      "type_name": "TrackBranch",
+      "signal": "blue",
+      "entry_hash": "ae4e34a05bab27a3ecadbf2f967f0f1f24b889b2b312bdc761ae9dde77b605c4"
+    },
+    {
+      "type_name": "TrackId",
+      "signal": "blue",
+      "entry_hash": "211af6f72e52315d4a2c411e0d030ace13afd2d742867bc9396be54c0c5f4072"
+    },
+    {
+      "type_name": "TypeSignalsDocument",
+      "signal": "blue",
+      "entry_hash": "b8fa715deeced660a8e0266b9bd5c15e6fa40e01551be25bb5545311e2ee1739"
+    },
+    {
+      "type_name": "TypeSignalsLoadResult",
+      "signal": "blue",
+      "entry_hash": "e062f0ad57d26f6a00f9031aff2432f724242114c2a8c1b750709b9587071999"
+    },
+    {
+      "type_name": "TypeSignalsReuseDecision",
+      "signal": "blue",
+      "entry_hash": "0fe08d11dad3a2277e38b84e1851f0cd72fd1f81ea287d50c682e6cbc10a8217"
+    },
+    {
+      "type_name": "TypeSignalsSchemaVersion",
+      "signal": "blue",
+      "entry_hash": "8674d3b804bed0cd21426b90a7b04760978946df5d04dc7005e33add1fcdaabf"
+    },
+    {
+      "type_name": "TypeSignalsSchemaVersionError",
+      "signal": "blue",
+      "entry_hash": "2efbbd40bf63c22b95ce5ef52fbd3e2bc59981072c858146d1c72fc64a1235be"
+    },
+    {
+      "type_name": "WaiverCacheEntry",
+      "signal": "blue",
+      "entry_hash": "75bc5be31648e3e35d55f9ff3bd3956c08985018cb2d5d2de4725e52ab4e420a"
+    },
+    {
+      "type_name": "SchemaExporter",
+      "signal": "blue",
+      "entry_hash": "71d63f5ef37e6f40347bdd9148eac2148b94d6a4b52ee6f0810d924175105a62"
+    },
+    {
+      "type_name": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+      "signal": "blue",
+      "entry_hash": "d0272be83866b55f0cca12e1c95ded5af1b802814955c5f56ba3ed2a22cac2c8"
+    },
+    {
+      "type_name": "TypeSignalsExecutionError",
+      "signal": "blue",
+      "entry_hash": "4af89c4440b20a61f772233b357c0a22a09c5930f40681928c57f5ce641ae8ab"
+    },
+    {
+      "type_name": "TypeSignalsExecutorPort",
+      "signal": "blue",
+      "entry_hash": "cafbb6ce0143e156cd6332c46d59b2200300c8a5da4cbd70b53746c446d63d79"
+    }
+  ]
+}

@@ -124,3 +124,12 @@ Do NOT write to any file other than the target ADR. Do NOT spawn further agents.
 - Do not modify spec.json, metadata.json, impl-plan.json, task-coverage.json, or any catalogue file (`*-types.json`)
 - Do not modify any file outside `knowledge/adr/`
 - Store any reasoning or scratchpad notes in the orchestrator session memory (any provider) rather than writing them to disk
+
+## Session resume
+
+When dispatched as a resumed session (orchestrator opt-in continuation of the same track and
+capability), do not trust context carried over from the prior session: first check whether the
+upstream artifacts of this assignment (the target ADR and the escalation briefing) changed since
+that session, and re-read any that did before continuing. All execution flags are explicitly
+re-specified by the dispatcher on resume; a failed or expired resume falls back to a fresh
+session.

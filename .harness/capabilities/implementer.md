@@ -179,3 +179,12 @@ writer capability, or stop.
 - Use `bin/sotp` and `cargo make` wrappers for repository gates.
 - Keep edits within the assigned task scope. If a required fix crosses ownership boundaries,
   report it rather than silently expanding scope.
+
+## Session resume
+
+When dispatched as a resumed session (orchestrator opt-in continuation of the same track and
+capability), do not trust context carried over from the prior session: first check whether the
+upstream artifacts of this assignment (`spec.json`, the type catalogues, `impl-plan.json`, and
+the task briefing) changed since that session, and re-read any that did before continuing. All
+execution flags are explicitly re-specified by the dispatcher on resume; a failed or expired
+resume falls back to a fresh session.

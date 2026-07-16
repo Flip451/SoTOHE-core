@@ -20,7 +20,9 @@
 
 use domain::SpecDocument;
 use domain::tddd::semantic_verify::ModelTier;
-use domain::tddd::test_obligation::binding::{TestBindingRecord, TestLocation};
+use domain::tddd::test_obligation::binding::{
+    TestBindingRecord, TestBindingsDocument, TestLocation,
+};
 use domain::tddd::test_obligation::errors::{ObligationEvaluateError, TestSourceScanError};
 use domain::tddd::test_obligation::hashes::{
     AnchorTextHash, BoundTestsSetHash, DeclarationHash, WaivedReasonHash,
@@ -37,9 +39,7 @@ use domain::tddd::test_obligation::verdict::{
 };
 
 use super::cache::{cached_fulfillment_verdict, cached_waiver_verdict};
-use super::edges::{
-    find_obligation, find_obligation_for_edge, resolve_anchor_text, synthetic_obligation_id,
-};
+use super::edges::{find_obligation, resolve_anchor_text, synthetic_obligation_id};
 use super::verify::{
     map_verifier_error, record_fulfillment, record_pending_edge, record_pending_obligation_edges,
     record_pending_obligation_id, record_waiver,
@@ -74,6 +74,7 @@ pub(super) enum ImmediateOutcome {
     },
     WaiverCached {
         edge_id: TestObligationEdgeId,
+        obligation_id: TestObligationId,
         key: WaiverCacheKey,
         verdict: WaiverVerdict,
     },
@@ -93,6 +94,7 @@ pub(super) struct FulfillmentLlmTask {
 /// LLM task for the waiver lane.
 pub(super) struct WaiverLlmTask {
     pub(super) edge_id: TestObligationEdgeId,
+    pub(super) obligation_id: TestObligationId,
     pub(super) key: WaiverCacheKey,
     pub(super) reason: WaivedReason,
     pub(super) declaration: String,
@@ -106,13 +108,18 @@ impl EvaluateTestObligationsInteractor {
     /// what downstream `apply_planned` uses to fold results back in.
     pub(super) fn plan_binding_records(
         &self,
-        records: &[TestBindingRecord],
+        bindings: &TestBindingsDocument,
         obligations: &ObligationsDocument,
         catalogues: &[LoadedCatalogueDocument],
         spec: &SpecDocument,
         existing_fulfillment_cache: Option<&ObligationFulfillmentCacheDocument>,
         existing_waiver_cache: Option<&WaiverCacheDocument>,
     ) -> Result<Vec<PlannedAction>, ObligationEvaluateError> {
+        // Waiver-first precedence is the binding model's rule
+        // (TestBindingsDocument::waived_edge_ids); the planner only orchestrates
+        // the resolved outcome so evaluate and check cannot diverge on it.
+        let records = bindings.records();
+        let waived_edges: Vec<&TestObligationEdgeId> = bindings.waived_edge_ids();
         let mut plan = Vec::with_capacity(records.len());
         for record in records {
             match record {
@@ -124,10 +131,18 @@ impl EvaluateTestObligationsInteractor {
                         catalogues,
                         spec,
                         existing_fulfillment_cache,
+                        &waived_edges,
                         &mut plan,
                     )?;
                 }
                 TestBindingRecord::VoluntaryBinding { edge_id, tests } => {
+                    if waived_edges.contains(&edge_id) {
+                        // Same precedence as fulfillment records: the edge's
+                        // waiver record owns its adjudication at the check
+                        // gate, so a voluntary binding on a waived edge must
+                        // not plan a competing fulfillment adjudication.
+                        continue;
+                    }
                     self.plan_voluntary_record(
                         edge_id,
                         tests.as_slice(),
@@ -163,6 +178,7 @@ impl EvaluateTestObligationsInteractor {
         catalogues: &[LoadedCatalogueDocument],
         spec: &SpecDocument,
         existing_fulfillment_cache: Option<&ObligationFulfillmentCacheDocument>,
+        waived_edges: &[&TestObligationEdgeId],
         plan: &mut Vec<PlannedAction>,
     ) -> Result<(), ObligationEvaluateError> {
         let Some(obligation) = find_obligation(obligations, obligation_id) else {
@@ -184,6 +200,12 @@ impl EvaluateTestObligationsInteractor {
         for anchor in obligation.spec_refs() {
             let edge_id =
                 TestObligationEdgeId::new(obligation.id().entry_key().clone(), anchor.clone());
+            if waived_edges.contains(&&edge_id) {
+                // The edge's waiver record owns its adjudication (check-gate
+                // precedence); planning a fulfillment pair here would judge
+                // the bound tests against a claim the waiver already covers.
+                continue;
+            }
             let Some(anchor_text) = resolve_anchor_text(spec, anchor.element_id()) else {
                 plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(edge_id)));
                 continue;
@@ -213,30 +235,40 @@ impl EvaluateTestObligationsInteractor {
         existing_fulfillment_cache: Option<&ObligationFulfillmentCacheDocument>,
         plan: &mut Vec<PlannedAction>,
     ) -> Result<(), ObligationEvaluateError> {
-        // Prefer the derived obligation when the edge still belongs to one;
-        // fall back to catalogue-only edge resolution (AC-12).
-        if let Some(obligation) = find_obligation_for_edge(obligations, edge_id) {
-            let Some(declaration) = obligation_declaration_text_from_loaded(catalogues, obligation)
-            else {
-                plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(edge_id.clone())));
-                return Ok(());
-            };
+        // Prefer the derived obligations when the edge still belongs to any;
+        // fall back to catalogue-only edge resolution (AC-12). Edge ownership
+        // is the domain's predicate (ObligationsDocument::owners_of_edge); each
+        // (edge × obligation) pair is adjudicated independently.
+        let owners = obligations.owners_of_edge(edge_id);
+        if !owners.is_empty() {
             let Some(anchor_text) = resolve_anchor_text(spec, edge_id.anchor_id().element_id())
             else {
                 plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(edge_id.clone())));
                 return Ok(());
             };
-            let declaration_hash = DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
-            return self.emit_fulfillment_action(
-                edge_id.clone(),
-                obligation.id().clone(),
-                &declaration,
-                &anchor_text,
-                declaration_hash,
-                tests,
-                existing_fulfillment_cache,
-                plan,
-            );
+            for obligation in owners {
+                let Some(declaration) =
+                    obligation_declaration_text_from_loaded(catalogues, obligation)
+                else {
+                    plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(
+                        edge_id.clone(),
+                    )));
+                    continue;
+                };
+                let declaration_hash =
+                    DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
+                self.emit_fulfillment_action(
+                    edge_id.clone(),
+                    obligation.id().clone(),
+                    &declaration,
+                    &anchor_text,
+                    declaration_hash,
+                    tests,
+                    existing_fulfillment_cache,
+                    plan,
+                )?;
+            }
+            return Ok(());
         }
 
         let Some((declaration, anchor_text, declaration_hash)) =
@@ -268,12 +300,67 @@ impl EvaluateTestObligationsInteractor {
         existing_waiver_cache: Option<&WaiverCacheDocument>,
         plan: &mut Vec<PlannedAction>,
     ) -> Result<(), ObligationEvaluateError> {
+        // Each derived owner represents a distinct edge × obligation claim,
+        // just as voluntary bindings do. A waiver therefore needs one
+        // adjudication per owner, using that owner's declaration as evidence.
+        let owners = obligations.owners_of_edge(edge_id);
+        if !owners.is_empty() {
+            let Some(anchor_text) = resolve_anchor_text(spec, edge_id.anchor_id().element_id())
+            else {
+                plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(edge_id.clone())));
+                return Ok(());
+            };
+            for obligation in owners {
+                let Some(declaration) =
+                    obligation_declaration_text_from_loaded(catalogues, obligation)
+                else {
+                    plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(
+                        edge_id.clone(),
+                    )));
+                    continue;
+                };
+                self.emit_waiver_action(
+                    edge_id,
+                    obligation.id().clone(),
+                    reason,
+                    declaration,
+                    &anchor_text,
+                    existing_waiver_cache,
+                    plan,
+                );
+            }
+            return Ok(());
+        }
+
         let Some((declaration, anchor_text, _declaration_hash)) =
-            self.resolve_waiver_edge(edge_id, obligations, catalogues, spec)
+            self.resolve_edge(edge_id, catalogues, spec)
         else {
             plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(edge_id.clone())));
             return Ok(());
         };
+        self.emit_waiver_action(
+            edge_id,
+            synthetic_obligation_id(edge_id),
+            reason,
+            declaration,
+            &anchor_text,
+            existing_waiver_cache,
+            plan,
+        );
+        Ok(())
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn emit_waiver_action(
+        &self,
+        edge_id: &TestObligationEdgeId,
+        obligation_id: TestObligationId,
+        reason: &WaivedReason,
+        declaration: String,
+        anchor_text: &str,
+        existing_waiver_cache: Option<&WaiverCacheDocument>,
+        plan: &mut Vec<PlannedAction>,
+    ) {
         let reason_hash = WaivedReasonHash::new(self.hasher.sha256(reason.as_str().as_bytes()));
         let declaration_hash_actual =
             DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
@@ -282,24 +369,26 @@ impl EvaluateTestObligationsInteractor {
         if let Some(verdict) = cached_waiver_verdict(
             existing_waiver_cache,
             edge_id,
+            &obligation_id,
             &key,
             &self.waiver_verifier_fingerprint,
         ) {
             plan.push(PlannedAction::Immediate(ImmediateOutcome::WaiverCached {
                 edge_id: edge_id.clone(),
+                obligation_id,
                 key,
                 verdict,
             }));
-            return Ok(());
+            return;
         }
         plan.push(PlannedAction::Waiver(WaiverLlmTask {
             edge_id: edge_id.clone(),
+            obligation_id,
             key,
             reason: reason.clone(),
             declaration,
-            anchor_text,
+            anchor_text: anchor_text.to_owned(),
         }));
-        Ok(())
     }
 
     /// Emits either a cache-hit `Immediate` or a `Fulfillment` LLM task.
@@ -387,10 +476,11 @@ impl EvaluateTestObligationsInteractor {
                             Some(self.fulfillment_verifier_fingerprint.clone()),
                         ));
                     }
-                    ImmediateOutcome::WaiverCached { edge_id, key, verdict } => {
+                    ImmediateOutcome::WaiverCached { edge_id, obligation_id, key, verdict } => {
                         record_waiver(&edge_id, &verdict, tally);
                         waiver_entries.push(WaiverCacheEntry::new(
                             edge_id,
+                            Some(obligation_id),
                             key,
                             verdict,
                             Some(self.waiver_verifier_fingerprint.clone()),
@@ -423,6 +513,7 @@ impl EvaluateTestObligationsInteractor {
                     record_waiver(&task.edge_id, &verdict, tally);
                     waiver_entries.push(WaiverCacheEntry::new(
                         task.edge_id,
+                        Some(task.obligation_id),
                         task.key,
                         verdict,
                         Some(self.waiver_verifier_fingerprint.clone()),
@@ -505,24 +596,6 @@ impl EvaluateTestObligationsInteractor {
         }
         let hash = BoundTestsSetHash::new(self.hasher.sha256(source.as_bytes()));
         Ok((source, hash))
-    }
-
-    /// Resolves the verification triple for a waiver edge; kept here so
-    /// waiver planning can reuse the fulfillment-first precedence.
-    fn resolve_waiver_edge(
-        &self,
-        edge_id: &TestObligationEdgeId,
-        obligations: &ObligationsDocument,
-        catalogues: &[LoadedCatalogueDocument],
-        spec: &SpecDocument,
-    ) -> Option<(String, String, DeclarationHash)> {
-        if let Some(obligation) = find_obligation_for_edge(obligations, edge_id) {
-            let declaration = obligation_declaration_text_from_loaded(catalogues, obligation)?;
-            let anchor_text = resolve_anchor_text(spec, edge_id.anchor_id().element_id())?;
-            let declaration_hash = DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
-            return Some((declaration, anchor_text, declaration_hash));
-        }
-        self.resolve_edge(edge_id, catalogues, spec)
     }
 
     /// Catalogue-only edge resolution — used when no derived obligation owns

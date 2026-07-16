@@ -3,7 +3,8 @@
 //!
 //! Resolves the `review-fix-lead` capability for the given round type and
 //! dispatches to the infrastructure adapter (currently: `codex` only) via
-//! `CliApp.review_run_fix_local` (CN-02 / CN-03 / AC-03 / AC-04).
+//! `ReviewCompositionRoot::review_run_fix_local_resolve` (CN-02 / CN-03 /
+//! AC-03 / AC-04).
 //! Required flags: `--scope`, `--briefing-file`, `--round-type`.
 //! `--track-id` is optional: when omitted, the active track is auto-resolved
 //! from the current git branch (`track/<id>`). The reviewer model and scope
@@ -16,7 +17,7 @@ use std::process::ExitCode;
 use clap::Args;
 use cli_composition::ReviewCompositionRoot;
 #[cfg(test)]
-use cli_driver::review::ReviewInput;
+use cli_composition::RunReviewFixLocalInput;
 
 use super::CodexRoundTypeArg;
 
@@ -57,12 +58,12 @@ pub struct FixLocalArgs {
 /// resolve + dispatch to `cli_composition::ReviewCompositionRoot::review_run_fix_local_resolve`
 /// without constructing the input here (thin-bin policy).
 #[cfg(test)]
-fn build_review_fix_local_input(args: &FixLocalArgs, track_id: String) -> ReviewInput {
+fn build_review_fix_local_input(args: &FixLocalArgs, track_id: String) -> RunReviewFixLocalInput {
     let round_type = match args.round_type {
         CodexRoundTypeArg::Fast => "fast".to_owned(),
         CodexRoundTypeArg::Final => "final".to_owned(),
     };
-    ReviewInput::RunFixLocal {
+    RunReviewFixLocalInput {
         scope: args.scope.clone(),
         briefing_file: args.briefing_file.clone(),
         track_id,
@@ -147,16 +148,11 @@ mod tests {
 
         let input = build_review_fix_local_input(&cli.args, "review-fix".to_owned());
 
-        match input {
-            ReviewInput::RunFixLocal { scope, briefing_file, track_id, round_type, model } => {
-                assert_eq!(scope, "cli");
-                assert_eq!(briefing_file, PathBuf::from("tmp/reviewer runtime/briefing cli.md"));
-                assert_eq!(track_id, "review-fix");
-                assert_eq!(round_type, "fast");
-                assert_eq!(model, Some("gpt-5.5".to_owned()));
-            }
-            _ => panic!("expected RunFixLocal"),
-        }
+        assert_eq!(input.scope, "cli");
+        assert_eq!(input.briefing_file, PathBuf::from("tmp/reviewer runtime/briefing cli.md"));
+        assert_eq!(input.track_id, "review-fix");
+        assert_eq!(input.round_type, "fast");
+        assert_eq!(input.model, Some("gpt-5.5".to_owned()));
     }
 
     #[test]
@@ -175,13 +171,8 @@ mod tests {
 
         let input = build_review_fix_local_input(&cli.args, "review-fix".to_owned());
 
-        match input {
-            ReviewInput::RunFixLocal { round_type, model, .. } => {
-                assert_eq!(round_type, "final");
-                assert_eq!(model, None);
-            }
-            _ => panic!("expected RunFixLocal"),
-        }
+        assert_eq!(input.round_type, "final");
+        assert_eq!(input.model, None);
     }
 
     #[test]
@@ -235,15 +226,10 @@ mod tests {
 
         let input = build_review_fix_local_input(&cli.args, "review-fix".to_owned());
 
-        match input {
-            ReviewInput::RunFixLocal { model, .. } => {
-                assert_eq!(
-                    model, None,
-                    "omitted --model must produce None so the profile model is used as default"
-                );
-            }
-            _ => panic!("expected RunFixLocal"),
-        }
+        assert_eq!(
+            input.model, None,
+            "omitted --model must produce None so the profile model is used as default"
+        );
     }
 
     /// When --model is explicitly provided, it is forwarded in `input.model`
@@ -266,16 +252,11 @@ mod tests {
 
         let input = build_review_fix_local_input(&cli.args, "review-fix".to_owned());
 
-        match input {
-            ReviewInput::RunFixLocal { model, .. } => {
-                assert_eq!(
-                    model,
-                    Some("my-override-model".to_owned()),
-                    "explicit --model must be forwarded as Some(...) to the input DTO"
-                );
-            }
-            _ => panic!("expected RunFixLocal"),
-        }
+        assert_eq!(
+            input.model,
+            Some("my-override-model".to_owned()),
+            "explicit --model must be forwarded as Some(...) to the input DTO"
+        );
     }
 
     /// Omitting `--briefing-file` must cause clap to reject the command with
@@ -338,12 +319,7 @@ mod tests {
 
         let input = build_review_fix_local_input(&cli.args, "my-feature-2026".to_owned());
 
-        match input {
-            ReviewInput::RunFixLocal { track_id, .. } => {
-                assert_eq!(track_id, "my-feature-2026");
-            }
-            _ => panic!("expected RunFixLocal"),
-        }
+        assert_eq!(input.track_id, "my-feature-2026");
     }
 
     /// On a non-`track/*` branch, `execute_fix_local` with `track_id = None` must

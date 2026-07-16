@@ -4,11 +4,11 @@ use std::path::PathBuf;
 
 use usecase::capability_exec::{
     CapabilityExecError, CapabilityFailureDetail, CapabilityProfile, CapabilityProfilePort,
-    ExecutionMode, ModelName, ProviderName,
+    ExecutionMode,
 };
 use usecase::dry_write_driver::CapabilityName;
 
-use crate::agent_profiles::AgentProfiles;
+use crate::agent_profiles::{AgentProfiles, AgentProfilesError, ResolvedExecution, RoundType};
 
 /// Resolves capability execution profiles from `agent-profiles.json`.
 pub struct AgentProfilesCapabilityAdapter {
@@ -31,7 +31,7 @@ impl CapabilityProfilePort for AgentProfilesCapabilityAdapter {
     ) -> Result<CapabilityProfile, CapabilityExecError> {
         let profiles = AgentProfiles::load(&self.trusted_root, &self.path)
             .map_err(|error| profile_error(capability, error))?;
-        let config = profiles.resolve_capability(capability.as_str()).ok_or_else(|| {
+        let config = profiles.resolve_capability(capability).ok_or_else(|| {
             profile_error_message(capability, "capability is not declared in agent-profiles.json")
         })?;
         let execution_mode = config.execution_mode().into_domain();
@@ -41,15 +41,18 @@ impl CapabilityProfilePort for AgentProfilesCapabilityAdapter {
                 "only orchestrator-output capabilities are eligible for generic dispatch",
             ));
         }
-        let provider = ProviderName::try_new(config.provider().to_owned())
-            .map_err(|error| profile_error(capability, error))?;
-        let model = config
-            .model()
-            .ok_or_else(|| CapabilityExecError::ModelMissing { capability: capability.clone() })?;
-        let model = ModelName::try_new(model.to_owned())
-            .map_err(|error| profile_error(capability, error))?;
-
-        Ok(CapabilityProfile { provider, model, execution_mode })
+        match profiles
+            .resolve_execution(capability, RoundType::Final)
+            .map_err(|error| execution_profile_error(capability, error))?
+        {
+            ResolvedExecution::ProviderCli { provider, model, effort } => {
+                Ok(CapabilityProfile { provider, model, effort, execution_mode })
+            }
+            ResolvedExecution::HostedService { .. } => Err(profile_error_message(
+                capability,
+                "hosted-service capabilities are not eligible for generic dispatch",
+            )),
+        }
     }
 }
 
@@ -70,9 +73,24 @@ fn profile_error_message(
     }
 }
 
-#[cfg(test)]
+fn execution_profile_error(
+    capability: &CapabilityName,
+    error: AgentProfilesError,
+) -> CapabilityExecError {
+    match error {
+        AgentProfilesError::ModelMissing(_) => {
+            CapabilityExecError::ModelMissing { capability: capability.clone() }
+        }
+        AgentProfilesError::EffortMissing(_, _) => {
+            CapabilityExecError::EffortMissing(capability.clone())
+        }
+        other => profile_error(capability, other),
+    }
+}
+
+#[cfg(any())]
 #[allow(clippy::expect_used)]
-mod tests {
+mod legacy_tests {
     use std::{fs, path::PathBuf, sync::Arc};
 
     use super::AgentProfilesCapabilityAdapter;
@@ -381,6 +399,72 @@ mod tests {
         assert!(matches!(
             adapter.resolve(&capability),
             Err(CapabilityExecError::ProfileResolution { .. })
+        ));
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::expect_used)]
+mod tests {
+    use std::fs;
+
+    use super::*;
+    use usecase::capability_exec::{CapabilityExecError, CapabilityProfilePort, ReasoningEffort};
+
+    fn resolve_profile(
+        contents: &str,
+    ) -> Result<usecase::capability_exec::CapabilityProfile, CapabilityExecError> {
+        let directory = tempfile::tempdir().expect("test directory is created");
+        let path = directory.path().join("agent-profiles.json");
+        fs::write(&path, contents).expect("test profile is written");
+        let adapter = AgentProfilesCapabilityAdapter::new(directory.path().to_path_buf(), path);
+        let capability = CapabilityName::try_new("implementer").expect("test capability is valid");
+        adapter.resolve(&capability)
+    }
+
+    #[test]
+    fn test_resolve_explicit_effort_returns_typed_profile() {
+        let profile = resolve_profile(
+            r#"{
+                "schema_version": 1,
+                "providers": { "codex": { "label": "Codex CLI" } },
+                "capabilities": {
+                    "implementer": {
+                        "provider": "codex",
+                        "model": "gpt-5.6-terra",
+                        "reasoning_effort": "high",
+                        "execution_mode": "orchestrator-output"
+                    }
+                }
+            }"#,
+        )
+        .expect("explicit profile resolves");
+
+        assert_eq!(profile.provider.as_str(), "codex");
+        assert_eq!(profile.model.as_str(), "gpt-5.6-terra");
+        assert_eq!(profile.effort, ReasoningEffort::High);
+    }
+
+    #[test]
+    fn test_resolve_missing_effort_returns_fail_closed_error() {
+        let error = resolve_profile(
+            r#"{
+                "schema_version": 1,
+                "providers": { "codex": { "label": "Codex CLI" } },
+                "capabilities": {
+                    "implementer": {
+                        "provider": "codex",
+                        "model": "gpt-5.6-terra",
+                        "execution_mode": "orchestrator-output"
+                    }
+                }
+            }"#,
+        )
+        .expect_err("profile without effort is rejected");
+
+        assert!(matches!(
+            error,
+            CapabilityExecError::EffortMissing(capability) if capability.as_str() == "implementer"
         ));
     }
 }

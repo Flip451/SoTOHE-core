@@ -97,3 +97,12 @@ Apply `knowledge/conventions/prefer-type-safe-abstractions.md` (Newtype / Enum-f
 - Do not run `git` commands
 - Do not modify `spec.json`, `metadata.json`, or any catalogue file (`*-types.json`)
 - Do not write to `knowledge/research/` or `track/items/<id>/research/` — the orchestrator saves your output. Per-track output goes to `track/items/<id>/research/<timestamp>-impl-planner-<feature>.md`; track-cross analyses stay under `knowledge/research/` per the research-placement convention documented in `knowledge/conventions/`
+
+## Session resume
+
+When dispatched as a resumed session (orchestrator opt-in continuation of the same track and
+capability), do not trust context carried over from the prior session: first check whether the
+upstream artifacts of this assignment (`spec.json` and the type catalogues) changed since that
+session, and re-read any that did before continuing. All execution flags are explicitly
+re-specified by the dispatcher on resume; a failed or expired resume falls back to a fresh
+session.

@@ -740,6 +740,57 @@ fn trait_impl_rules_doc() -> TestObligationRulesDocument {
     .unwrap()
 }
 
+fn shared_edge_waiver_rules_doc() -> TestObligationRulesDocument {
+    let empty = || RoleObligationRules::new(vec![]);
+    let data_roles: Vec<(DataRole, RoleObligationRules)> = DATA_ROLE_NAMES
+        .iter()
+        .map(|name| {
+            let rules = if *name == "ValueObject" {
+                RoleObligationRules::new(vec![TestObligationRule::new(
+                    TestObligationKind::Boundary,
+                    TestObligationPerAxis::Entry,
+                    None,
+                    None,
+                )])
+            } else {
+                empty()
+            };
+            (name.parse::<DataRole>().unwrap(), rules)
+        })
+        .collect();
+    let contract_roles: Vec<(ContractRole, RoleObligationRules)> = CONTRACT_ROLE_NAMES
+        .iter()
+        .map(|name| (name.parse::<ContractRole>().unwrap(), empty()))
+        .collect();
+    let function_roles =
+        vec![(FunctionRole::FreeFunction, empty()), (FunctionRole::UseCaseFunction, empty())];
+    let patterns = vec![(TestObligationPatternKind::Typestate, empty())];
+    let trait_impls: Vec<(ContractRole, RoleObligationRules)> = CONTRACT_ROLE_NAMES
+        .iter()
+        .map(|name| {
+            let rules = if *name == "SecondaryPort" {
+                RoleObligationRules::new(vec![TestObligationRule::new(
+                    TestObligationKind::ContractConformance,
+                    TestObligationPerAxis::TraitImpl,
+                    None,
+                    None,
+                )])
+            } else {
+                empty()
+            };
+            (name.parse::<ContractRole>().unwrap(), rules)
+        })
+        .collect();
+    TestObligationRulesDocument::try_new(
+        data_roles,
+        contract_roles,
+        function_roles,
+        patterns,
+        trait_impls,
+    )
+    .unwrap()
+}
+
 fn trait_entry(role: ContractRole) -> TraitEntry {
     TraitEntry::new(
         ItemAction::Add,
@@ -859,12 +910,38 @@ fn fresh_fulfillment_cache_for_catalogue(
     ObligationFulfillmentCacheDocument::new(track(), vec![entry])
 }
 
-fn fresh_waiver_cache_for(obligation: &TestObligation) -> WaiverCacheDocument {
-    fresh_waiver_cache_for_catalogue(
-        obligation,
-        &money_catalogue(),
+/// Waiver cache for a zero-obligation (edge-direct) waiver: evaluate stores the
+/// synthetic voluntary obligation id for ownerless edges, so the frozen entry must
+/// carry that id for the (edge × obligation) resolution to match.
+fn fresh_direct_waiver_cache() -> WaiverCacheDocument {
+    let source = obligation();
+    let reason = WaivedReason::try_new("covered elsewhere".to_owned()).unwrap();
+    let reason_hash = WaivedReasonHash::new(sha256_content_hash(reason.as_str().as_bytes()));
+    let decl = DeclarationHash::new(sha256_content_hash(
+        obligation_declaration_text(std::slice::from_ref(&money_catalogue()), &source)
+            .unwrap()
+            .as_bytes(),
+    ));
+    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
+    let synthetic = TestObligationId::new(
+        edge().entry_key().clone(),
+        TestObligationKind::Logic,
+        TestObligationItemIdentifier::try_new(format!(
+            "voluntary:{}",
+            edge().anchor_id().element_id()
+        ))
+        .unwrap(),
+    );
+    let entry = WaiverCacheEntry::new(
+        edge(),
+        Some(synthetic),
+        WaiverCacheKey::new(reason_hash, decl, anchor_hash),
+        WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("waived by policy".to_owned()).unwrap(),
+        },
         Some(waiver_verifier_fingerprint()),
-    )
+    );
+    WaiverCacheDocument::new(track(), vec![entry])
 }
 
 fn fresh_waiver_cache_for_fingerprint(
@@ -889,6 +966,7 @@ fn fresh_waiver_cache_for_catalogue(
     let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
     let entry = WaiverCacheEntry::new(
         edge(),
+        Some(obligation.id().clone()),
         WaiverCacheKey::new(reason_hash, decl, anchor_hash),
         WaiverVerdict::Waived {
             citation: EvidenceCitation::try_new("waived by policy".to_owned()).unwrap(),
@@ -1301,7 +1379,7 @@ fn test_zero_obligation_cited_edge_waiver_resolves() {
     // D4 / CN-02: a zero-obligation edge is resolved by a fresh waived verdict.
     let obligations = ObligationsDocument::new(track(), vec![]);
     let bindings = TestBindingsDocument::new(track(), vec![waiver_binding()]);
-    let cache = fresh_waiver_cache_for(&obligation());
+    let cache = fresh_direct_waiver_cache();
 
     let outcome = interactor_with_rules(
         Some(obligations),
@@ -2219,6 +2297,42 @@ fn test_trait_impl_waiver_declaration_hash_resolves_from_impl_decl() {
     .unwrap();
 
     assert_eq!(outcome.resolved_edges(), &[edge()]);
+}
+
+#[test]
+fn test_waiver_cache_matches_each_owner_when_shared_edge_has_different_declarations() {
+    let value_owner = obligation();
+    let trait_impl_owner = trait_impl_obligation();
+    let catalogue = trait_impl_catalogue();
+    let cache_entries = [value_owner.clone(), trait_impl_owner.clone()]
+        .into_iter()
+        .map(|owner| {
+            fresh_waiver_cache_for_catalogue(
+                &owner,
+                &catalogue,
+                Some(waiver_verifier_fingerprint()),
+            )
+            .entries()[0]
+                .clone()
+        })
+        .collect();
+    let cache = WaiverCacheDocument::new(track(), cache_entries);
+    let obligations = ObligationsDocument::new(track(), vec![value_owner, trait_impl_owner]);
+    let bindings = TestBindingsDocument::new(track(), vec![waiver_binding()]);
+
+    let outcome = interactor_with_rules_and_catalogue(
+        Some(obligations),
+        Some(bindings),
+        None,
+        Some(cache),
+        shared_edge_waiver_rules_doc(),
+        catalogue,
+        Arc::new(StubScanner),
+    )
+    .execute(&command())
+    .unwrap();
+
+    assert_eq!(outcome.resolved_edges().len(), 2, "both waiver owners must resolve");
 }
 
 #[test]

@@ -24,6 +24,9 @@ pub enum CapabilityInputValidationError {
     /// The supplied file path was not a repository-relative, traversal-free path.
     #[error("file path must be repository-relative and traversal-free")]
     InvalidFilePath,
+    /// The supplied target-artifact collection was empty.
+    #[error("target artifact set must not be empty")]
+    EmptyTargetArtifactSet,
     /// The supplied technical text was empty or whitespace-only.
     #[error("content must not be empty")]
     EmptyContent,
@@ -135,6 +138,83 @@ impl std::fmt::Display for CapabilityFilePath {
     }
 }
 
+/// Validated normalized repository-relative artifact path used in capability
+/// session identity.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct TargetArtifactPath {
+    path: PathBuf,
+}
+
+impl TargetArtifactPath {
+    /// Validates and normalizes a repository-relative artifact path.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`CapabilityInputValidationError::EmptyFilePath`] when `path`
+    /// has no path components, or [`CapabilityInputValidationError::InvalidFilePath`]
+    /// when it cannot identify a repository-relative artifact.
+    pub fn try_new(path: PathBuf) -> Result<Self, CapabilityInputValidationError> {
+        if path.as_os_str().is_empty() {
+            return Err(CapabilityInputValidationError::EmptyFilePath);
+        }
+        if path.is_absolute() {
+            return Err(CapabilityInputValidationError::InvalidFilePath);
+        }
+
+        let mut normalized = PathBuf::new();
+        for component in path.components() {
+            match component {
+                Component::Normal(value) => normalized.push(value),
+                Component::CurDir => {}
+                Component::ParentDir | Component::RootDir | Component::Prefix(_) => {
+                    return Err(CapabilityInputValidationError::InvalidFilePath);
+                }
+            }
+        }
+        if normalized.as_os_str().is_empty() {
+            return Err(CapabilityInputValidationError::InvalidFilePath);
+        }
+        Ok(Self { path: normalized })
+    }
+
+    /// Returns the normalized repository-relative path.
+    #[must_use]
+    pub fn as_path(&self) -> &Path {
+        &self.path
+    }
+}
+
+/// Non-empty sorted deduplicated target-artifact identity for capability resume.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TargetArtifactSet {
+    paths: Vec<TargetArtifactPath>,
+}
+
+impl TargetArtifactSet {
+    /// Builds a canonical artifact identity from one or more validated paths.
+    ///
+    /// # Errors
+    ///
+    /// Returns only [`CapabilityInputValidationError::EmptyTargetArtifactSet`]
+    /// when `paths` is empty.
+    pub fn try_new(
+        mut paths: Vec<TargetArtifactPath>,
+    ) -> Result<Self, CapabilityInputValidationError> {
+        if paths.is_empty() {
+            return Err(CapabilityInputValidationError::EmptyTargetArtifactSet);
+        }
+        paths.sort();
+        paths.dedup();
+        Ok(Self { paths })
+    }
+
+    /// Returns the canonical sorted artifact paths.
+    #[must_use]
+    pub fn as_slice(&self) -> &[TargetArtifactPath] {
+        &self.paths
+    }
+}
+
 /// Fixed provider identifier used by the Codex adapter.
 pub static CODEX_PROVIDER_NAME: LazyLock<ProviderName> =
     LazyLock::new(|| ProviderName("codex".to_owned()));
@@ -239,6 +319,27 @@ impl Clone for ExecutionMode {
     }
 }
 
+/// Provider-independent reasoning effort selected by a capability profile.
+#[derive(Debug, Copy, PartialEq, Eq)]
+pub enum ReasoningEffort {
+    /// Lowest supported reasoning effort.
+    Low,
+    /// Medium reasoning effort.
+    Medium,
+    /// High reasoning effort.
+    High,
+    /// Codex's maximum reasoning effort vocabulary.
+    XHigh,
+    /// Claude's maximum reasoning effort vocabulary.
+    Max,
+}
+
+impl Clone for ReasoningEffort {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
 /// Validated positive provider-process timeout in seconds.
 #[derive(Debug, PartialEq, Eq)]
 pub struct TimeoutSeconds(u64);
@@ -283,6 +384,17 @@ pub struct CapabilityExecRequest {
     pub briefing_file: CapabilityFilePath,
     /// Provider-process timeout; `None` waits without a time limit.
     pub timeout: Option<TimeoutSeconds>,
+    /// The orchestrator-selected session policy for this dispatch.
+    pub resume: CapabilityResumeRequest,
+}
+
+/// Explicit capability-session selection.  A fresh dispatch never consults a
+/// cache; targetless resume is deliberately fail-closed outside a track.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CapabilityResumeRequest {
+    Fresh,
+    ResumeWithoutTarget,
+    Resume(TargetArtifactSet),
 }
 
 /// Typed routing data resolved from the capability profile.
@@ -292,6 +404,8 @@ pub struct CapabilityProfile {
     pub provider: ProviderName,
     /// Single model selected by the profile.
     pub model: ModelName,
+    /// Explicit reasoning effort selected by the profile.
+    pub effort: ReasoningEffort,
     /// Execution category selected by the profile.
     pub execution_mode: ExecutionMode,
 }
@@ -350,8 +464,8 @@ pub trait CapabilityProfilePort: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Implementations may return only [`CapabilityExecError::ProfileResolution`]
-    /// or [`CapabilityExecError::ModelMissing`].
+    /// Implementations may return only [`CapabilityExecError::ProfileResolution`],
+    /// [`CapabilityExecError::ModelMissing`], or [`CapabilityExecError::EffortMissing`].
     fn resolve(
         &self,
         capability: &CapabilityName,
@@ -469,6 +583,9 @@ pub enum CapabilityExecError {
         /// Capability whose profile omitted its model.
         capability: CapabilityName,
     },
+    /// A provider-CLI profile omitted the effort required for dispatch.
+    #[error("capability profile has no reasoning effort for '{0}'")]
+    EffortMissing(CapabilityName),
     /// A provider has no supported generic-dispatch adapter.
     #[error("unsupported capability provider '{provider}'")]
     UnsupportedProvider {
@@ -516,8 +633,9 @@ mod tests {
         BriefingText, CapabilityDispatchOutcome, CapabilityDispatchRequest, CapabilityExecError,
         CapabilityExecInteractor, CapabilityExecRequest, CapabilityExecService,
         CapabilityFailureDetail, CapabilityFilePath, CapabilityInputValidationError,
-        CapabilityProfile, CapabilityProfilePort, CapabilityProviderPort, CapabilitySourcePort,
-        DisciplineText, ExecutionMode, ModelName, ProviderName, TimeoutSeconds,
+        CapabilityProfile, CapabilityProfilePort, CapabilityProviderPort, CapabilityResumeRequest,
+        CapabilitySourcePort, DisciplineText, ExecutionMode, ModelName, ProviderName,
+        ReasoningEffort, TargetArtifactPath, TargetArtifactSet, TimeoutSeconds,
     };
     use crate::dry_write_driver::CapabilityName;
 
@@ -615,6 +733,7 @@ mod tests {
             host: ProviderName::try_new("codex")?,
             briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
             timeout: None,
+            resume: CapabilityResumeRequest::Fresh,
         })
     }
 
@@ -622,6 +741,7 @@ mod tests {
         Ok(CapabilityProfile {
             provider: ProviderName::try_new("codex")?,
             model: ModelName::try_new("gpt-5")?,
+            effort: ReasoningEffort::High,
             execution_mode: mode,
         })
     }
@@ -686,6 +806,29 @@ mod tests {
     }
 
     #[test]
+    fn test_resume_target_inputs_rejected_with_typed_variants_before_dispatch() {
+        // Resume-option targets are validated by this error type before any
+        // dispatch or cache-key derivation: an invalid target can never name a
+        // continuation session outside the requested track/capability scope.
+        assert!(matches!(
+            TargetArtifactPath::try_new(PathBuf::from("../outside/spec.json")),
+            Err(CapabilityInputValidationError::InvalidFilePath)
+        ));
+        assert!(matches!(
+            TargetArtifactPath::try_new(PathBuf::from("/absolute/spec.json")),
+            Err(CapabilityInputValidationError::InvalidFilePath)
+        ));
+        assert!(matches!(
+            TargetArtifactPath::try_new(PathBuf::new()),
+            Err(CapabilityInputValidationError::EmptyFilePath)
+        ));
+        assert!(matches!(
+            TargetArtifactSet::try_new(vec![]),
+            Err(CapabilityInputValidationError::EmptyTargetArtifactSet)
+        ));
+    }
+
+    #[test]
     fn test_briefing_text_whitespace_rejected() {
         assert!(matches!(
             BriefingText::try_new("\n  \t".to_owned()),
@@ -722,11 +865,13 @@ mod tests {
         let profile = CapabilityProfile {
             provider: ProviderName::try_new("codex")?,
             model: ModelName::try_new("gpt-5")?,
+            effort: ReasoningEffort::High,
             execution_mode: ExecutionMode::OrchestratorOutput,
         };
 
         assert_eq!(profile.provider.as_str(), "codex");
         assert_eq!(profile.model.as_str(), "gpt-5");
+        assert_eq!(profile.effort, ReasoningEffort::High);
         assert_eq!(profile.execution_mode, ExecutionMode::OrchestratorOutput);
         Ok(())
     }
@@ -739,6 +884,7 @@ mod tests {
             host: ProviderName::try_new("codex")?,
             briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
             timeout: Some(TimeoutSeconds::try_new(1800)?),
+            resume: CapabilityResumeRequest::Fresh,
         };
 
         assert_eq!(request.capability.as_str(), "implementer");
@@ -866,6 +1012,7 @@ mod tests {
                 profile: CapabilityProfile {
                     provider: provider.clone(),
                     model: ModelName::try_new("claude-opus")?,
+                    effort: ReasoningEffort::High,
                     execution_mode: ExecutionMode::OrchestratorOutput,
                 },
                 calls: Arc::new(AtomicUsize::new(0)),
@@ -976,6 +1123,7 @@ mod tests {
                 profile: CapabilityProfile {
                     provider: ProviderName::try_new("unsupported-provider")?,
                     model: ModelName::try_new("model-x")?,
+                    effort: ReasoningEffort::High,
                     execution_mode: ExecutionMode::OrchestratorOutput,
                 },
                 calls: Arc::new(AtomicUsize::new(0)),

@@ -8,37 +8,107 @@
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::time::Duration;
 
 use domain::schema::SchemaExportError;
 
-/// Resolves the Cargo target directory, respecting `CARGO_TARGET_DIR` and workspace config.
+const MAX_CARGO_METADATA_OUTPUT_BYTES: usize = 16 * 1024 * 1024;
+const MAX_CARGO_METADATA_DURATION: Duration = Duration::from_secs(120);
+
+/// Resolves the Cargo target directory for rustdoc extraction, respecting
+/// `CARGO_TARGET_DIR` and workspace config.
+///
+/// Extraction may safely fall back to Cargo's default target location when
+/// metadata is unavailable because it is about to launch rustdoc and create a
+/// fresh artifact. Snapshot reuse must instead use
+/// [`resolve_target_dir_strict`].
 pub(super) fn resolve_target_dir(workspace_root: &Path) -> Result<PathBuf, SchemaExportError> {
     if let Ok(dir) = std::env::var("CARGO_TARGET_DIR") {
-        let path = PathBuf::from(dir);
-        return resolve_configured_target_dir(workspace_root, path, "CARGO_TARGET_DIR");
+        return resolve_configured_target_dir(
+            workspace_root,
+            PathBuf::from(dir),
+            "CARGO_TARGET_DIR",
+        );
     }
-    let output = Command::new("cargo")
-        .args(["metadata", "--format-version", "1", "--no-deps"])
-        .current_dir(workspace_root)
-        .output()
-        .map_err(|e| SchemaExportError::RustdocFailed(format!("cargo metadata failed: {e}")))?;
+    let output = run_cargo_metadata(workspace_root, "cargo metadata")?;
 
     if !output.status.success() {
         return Ok(workspace_root.join("target"));
     }
 
     let stdout = String::from_utf8_lossy(&output.stdout);
-    if let Ok(meta) = serde_json::from_str::<serde_json::Value>(&stdout) {
-        if let Some(dir) = meta.get("target_directory").and_then(|v| v.as_str()) {
+    if let Ok(metadata) = serde_json::from_str::<serde_json::Value>(&stdout) {
+        if let Some(target_directory) =
+            metadata.get("target_directory").and_then(|value| value.as_str())
+        {
             return resolve_configured_target_dir(
                 workspace_root,
-                PathBuf::from(dir),
+                PathBuf::from(target_directory),
                 "cargo metadata target_directory",
             );
         }
     }
 
     Ok(workspace_root.join("target"))
+}
+
+/// Resolves the target directory for snapshot reuse.
+///
+/// This never guesses `<workspace>/target` when Cargo metadata cannot establish
+/// the configured target directory. Reusing a stale snapshot is safe only when
+/// its location is known exactly.
+pub(super) fn resolve_target_dir_strict(
+    workspace_root: &Path,
+) -> Result<PathBuf, SchemaExportError> {
+    if let Ok(dir) = std::env::var("CARGO_TARGET_DIR") {
+        return resolve_configured_target_dir(
+            workspace_root,
+            PathBuf::from(dir),
+            "CARGO_TARGET_DIR",
+        );
+    }
+    let output = run_cargo_metadata(workspace_root, "target directory for snapshot reuse")?;
+    if !output.status.success() {
+        return Err(SchemaExportError::RustdocFailed(format!(
+            "cannot resolve target directory for snapshot reuse: cargo metadata exited with {}: {}",
+            output.status,
+            String::from_utf8_lossy(&output.stderr).trim()
+        )));
+    }
+    let metadata: serde_json::Value = serde_json::from_slice(&output.stdout).map_err(|error| {
+        SchemaExportError::RustdocFailed(format!(
+            "cannot resolve target directory for snapshot reuse: cargo metadata output is invalid: {error}"
+        ))
+    })?;
+    let target_directory = metadata
+        .get("target_directory")
+        .and_then(serde_json::Value::as_str)
+        .ok_or_else(|| {
+            SchemaExportError::RustdocFailed(
+                "cannot resolve target directory for snapshot reuse: cargo metadata has no target_directory"
+                    .to_owned(),
+            )
+        })?;
+    resolve_configured_target_dir(
+        workspace_root,
+        PathBuf::from(target_directory),
+        "cargo metadata target_directory",
+    )
+}
+
+fn run_cargo_metadata(
+    workspace_root: &Path,
+    purpose: &str,
+) -> Result<crate::capability_exec::process::BoundedCommandOutput, SchemaExportError> {
+    let mut command = Command::new("cargo");
+    command.args(["metadata", "--format-version", "1", "--no-deps"]).current_dir(workspace_root);
+    crate::capability_exec::process::run_command_with_bounded_output(
+        &mut command,
+        MAX_CARGO_METADATA_OUTPUT_BYTES,
+        MAX_CARGO_METADATA_DURATION,
+        purpose,
+    )
+    .map_err(|error| SchemaExportError::RustdocFailed(format!("cargo metadata failed: {error}")))
 }
 
 pub(super) fn resolve_configured_target_dir(
@@ -73,8 +143,9 @@ pub(super) fn resolve_configured_target_dir(
 ///   are rejected: a relative escape is a path-traversal attack pattern, not a
 ///   legitimate CI configuration.
 /// - **Absolute paths outside the workspace** are honored when explicitly
-///   configured. As a minimal defensive measure, the target directory's leaf
-///   is still rejected if it is itself a symlink.
+///   configured only when every path component is non-symlinked. A symlinked
+///   ancestor would otherwise redirect the trusted target root outside its
+///   lexical location.
 fn ensure_target_dir_within_workspace(
     workspace_root: &Path,
     target_dir: &Path,
@@ -89,14 +160,14 @@ fn ensure_target_dir_within_workspace(
         reject_symlinks_for_rustdoc_path(&normalized_target, &trusted_root, source)?;
         Ok(normalized_target)
     } else if allow_outside_workspace {
-        if let Ok(meta) = normalized_target.symlink_metadata() {
-            if meta.file_type().is_symlink() {
-                return Err(SchemaExportError::RustdocFailed(format!(
-                    "{source} target directory is a symlink (rejected for tamper-resistance): {}",
+        crate::track::symlink_guard::reject_symlinks_up_to_root(&normalized_target).map_err(
+            |error| {
+                SchemaExportError::RustdocFailed(format!(
+                    "{source} target directory symlink guard rejected '{}': {error}",
                     normalized_target.display()
-                )));
-            }
-        }
+                ))
+            },
+        )?;
         Ok(normalized_target)
     } else {
         Err(SchemaExportError::RustdocFailed(format!(
@@ -110,6 +181,14 @@ fn ensure_target_dir_within_workspace(
 pub(super) fn checked_workspace_root(workspace_root: &Path) -> Result<PathBuf, SchemaExportError> {
     let workspace_abs = absolutize_for_target_guard(workspace_root)?;
     let normalized_workspace = crate::verify::path_safety::lexical_normalize(&workspace_abs);
+    crate::track::symlink_guard::reject_symlinks_up_to_root(&normalized_workspace).map_err(
+        |error| {
+            SchemaExportError::RustdocFailed(format!(
+                "workspace_root symlink guard rejected '{}': {error}",
+                workspace_root.display()
+            ))
+        },
+    )?;
     crate::verify::trusted_root::ensure_not_symlink_root(normalized_workspace).map_err(|e| {
         SchemaExportError::RustdocFailed(format!(
             "workspace_root symlink guard rejected '{}': {e}",

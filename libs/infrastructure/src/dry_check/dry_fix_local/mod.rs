@@ -20,13 +20,16 @@ mod session_log;
 mod smoke_test;
 mod spawn;
 
+use std::ffi::OsString;
 use std::io::{Read as _, Seek as _};
 use std::path::{Path, PathBuf};
 
 use domain::TrackId;
+use usecase::capability_exec::ReasoningEffort;
 use usecase::dry_driver::{DryDriverOutcome, DryDriverPort, DryFixLocalDriverInput};
+use usecase::dry_write_driver::CapabilityName;
 
-use crate::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
+use crate::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, ResolvedExecution, RoundType};
 use crate::git_cli::SystemGitRepo;
 use crate::track::symlink_guard::reject_symlinks_below;
 
@@ -92,20 +95,25 @@ impl CodexDryFixLocalRunner {
         let profiles = load_dry_fix_agent_profiles(repo.root())?;
         let track_id = TrackId::try_new(input.track_id.trim())
             .map_err(|e| format!("invalid --track-id: {e}"))?;
-        let resolved =
-            profiles.resolve_execution("dry-fix-lead", RoundType::Final).ok_or_else(|| {
-                "[ERROR] dry-fix-lead capability not defined in agent-profiles.json".to_owned()
-            })?;
-        let model = input.model.clone().or_else(|| resolved.model.clone()).ok_or_else(|| {
-            "[ERROR] no model specified: pass --model or set model in agent-profiles.json \
-             dry-fix-lead capability"
-                .to_owned()
-        })?;
-        eprintln!("[sotp dry fix-local] provider={} model={}", resolved.provider, &model);
-        match resolved.provider.as_str() {
-            "codex" => {
-                run_dry_fix_codex(&model, track_id.as_ref(), &input.briefing_file, repo.root())
-            }
+        let capability = CapabilityName::try_new("dry-fix-lead")
+            .map_err(|error| format!("invalid dry-fix-lead capability name: {error}"))?;
+        let resolved = profiles
+            .resolve_execution(&capability, RoundType::Final)
+            .map_err(|error| format!("[ERROR] failed to resolve dry-fix-lead profile: {error}"))?;
+        let ResolvedExecution::ProviderCli { provider, model: profile_model, effort } = resolved
+        else {
+            return Err("[ERROR] dry-fix-lead must resolve to a provider CLI execution".to_owned());
+        };
+        let model = input.model.clone().unwrap_or_else(|| profile_model.as_str().to_owned());
+        eprintln!("[sotp dry fix-local] provider={} model={}", provider, &model);
+        match provider.as_str() {
+            "codex" => run_dry_fix_codex(
+                &model,
+                effort,
+                track_id.as_ref(),
+                &input.briefing_file,
+                repo.root(),
+            ),
             other => Err(format!(
                 "[ERROR] unsupported dry-fix-lead provider '{other}' (supported: 'codex')"
             )),
@@ -127,6 +135,7 @@ fn load_dry_fix_agent_profiles(repo_root: &Path) -> Result<AgentProfiles, String
 
 fn run_dry_fix_codex(
     model: &str,
+    effort: ReasoningEffort,
     track_id: &str,
     briefing_file: &Path,
     trusted_root: &Path,
@@ -145,7 +154,8 @@ fn run_dry_fix_codex(
     std::fs::write(&output_last_message, "")
         .map_err(|e| format!("failed to initialize last-message file: {e}"))?;
     let _last_message_cleanup = DryFixLastMessageCleanup(output_last_message.clone());
-    let args = build_dry_fix_invocation(model, &codex_home, &safe_home, &output_last_message);
+    let mut args = build_dry_fix_invocation(model, &codex_home, &safe_home, &output_last_message);
+    args.extend([OsString::from("--config"), codex_reasoning_effort_config(effort)]);
     let (stdout, log_path) = dry_fix_spawn_and_collect(&codex_bin, &args, &safe_env, &prompt)?;
     let log_cleanup = DryFixSessionLogCleanup::new(log_path.clone());
     let last_message_content = match read_dry_fix_last_message_tail(&output_last_message) {
@@ -179,6 +189,17 @@ fn run_dry_fix_codex(
         stderr: None,
         exit_code: u8::try_from(exit_code).unwrap_or(1),
     })
+}
+
+fn codex_reasoning_effort_config(effort: ReasoningEffort) -> OsString {
+    let effort = match effort {
+        ReasoningEffort::Low => "low",
+        ReasoningEffort::Medium => "medium",
+        ReasoningEffort::High => "high",
+        ReasoningEffort::XHigh => "xhigh",
+        ReasoningEffort::Max => "max",
+    };
+    OsString::from(format!("model_reasoning_effort=\"{effort}\""))
 }
 
 fn dry_fix_path_trusted_root(path: &Path) -> &Path {
@@ -447,12 +468,26 @@ mod tests {
         /// Build the fixture with `profile_model` written into `agent-profiles.json`
         /// (provider fixed to `codex`).
         fn new(profile_model: &str) -> Self {
-            Self::new_with_provider("codex", profile_model)
+            Self::new_with_effort(profile_model, "high")
+        }
+
+        /// Build a Codex fixture with an explicit profile reasoning effort.
+        fn new_with_effort(profile_model: &str, reasoning_effort: &str) -> Self {
+            Self::new_with_provider_and_effort("codex", profile_model, reasoning_effort)
         }
 
         /// Build the fixture with an explicit `dry-fix-lead` provider, so wrapper tests
         /// stay deterministic regardless of the live repo's `agent-profiles.json`.
         fn new_with_provider(provider: &str, profile_model: &str) -> Self {
+            Self::new_with_provider_and_effort(provider, profile_model, "high")
+        }
+
+        /// Build the fixture with explicit provider, model, and reasoning effort values.
+        fn new_with_provider_and_effort(
+            provider: &str,
+            profile_model: &str,
+            reasoning_effort: &str,
+        ) -> Self {
             let project_dir = tempfile::tempdir().unwrap();
             let config_dir = project_dir.path().join(".harness").join("config");
             std::fs::create_dir_all(&config_dir).unwrap();
@@ -466,6 +501,7 @@ mod tests {
     "dry-fix-lead": {{
       "provider": "{provider}",
       "model": "{profile_model}",
+      "reasoning_effort": "{reasoning_effort}",
       "execution_mode": "typed-pipeline"
     }}
   }}
@@ -649,6 +685,41 @@ exit 0
         );
     }
 
+    /// The profile's resolved effort must be injected into the nested Codex
+    /// invocation, even when the caller does not override the model.
+    #[cfg(unix)]
+    #[test]
+    fn test_dry_run_fix_local_forwards_resolved_reasoning_effort_to_codex() {
+        let fixture = DryRunFixLocalFixture::new_with_effort("gpt-profile-model", "low");
+        let outcome = fixture.run(
+            r#"effort=""
+out=""
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -c|--config)
+      case "$2" in
+        model_reasoning_effort=*) effort="$2" ;;
+      esac
+      shift 2
+      ;;
+    --output-last-message) out="$2"; shift 2 ;;
+    *) shift ;;
+  esac
+done
+printf '%s' "$effort" > "${CODEX_HOME}/captured-model.txt"
+while IFS= read -r _line; do :; done
+printf 'DRY_FIX_STATUS: completed\n' > "$out"
+exit 0
+"#,
+            None,
+        );
+
+        assert_eq!(outcome.exit_code, 0, "dry_run_fix_local must succeed: {outcome:?}");
+        let captured_effort = std::fs::read_to_string(&fixture.capture_file)
+            .expect("capture file must be written by fake codex");
+        assert_eq!(captured_effort, "model_reasoning_effort=\"low\"");
+    }
+
     /// Shared helper: write a fake codex runner with `script` body, scope `CODEX_BIN` and
     /// `CODEX_HOME` to it, write a briefing file, and call `run_dry_fix_codex`. Returns the
     /// result so each test can assert its own success or error path.
@@ -665,7 +736,15 @@ exit 0
                 ("CODEX_BIN", Some(fake_codex.as_os_str())),
                 ("CODEX_HOME", Some(codex_home.as_os_str())),
             ],
-            || run_dry_fix_codex("gpt-test", "dry-track", &briefing_file, dir.path()),
+            || {
+                run_dry_fix_codex(
+                    "gpt-test",
+                    ReasoningEffort::High,
+                    "dry-track",
+                    &briefing_file,
+                    dir.path(),
+                )
+            },
         )
     }
 

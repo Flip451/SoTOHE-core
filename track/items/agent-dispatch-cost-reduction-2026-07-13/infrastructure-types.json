@@ -1,0 +1,2051 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args": {
+      "action": "modify",
+      "docs": "Builds Claude ref-verifier argv with the resolved typed effort injected explicitly; model is an upstream-resolved opaque provider CLI token and prompt is unconstrained opaque text.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "model",
+          "ty": "&str"
+        },
+        {
+          "name": "effort",
+          "ty": "usecase::capability_exec::ReasoningEffort"
+        },
+        {
+          "name": "prompt",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Vec<std::ffi::OsString>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args": {
+      "action": "modify",
+      "docs": "Builds sandboxed Codex ref-verifier argv with typed effort and structured-output paths; model is an upstream-resolved opaque provider CLI token and prompt is unconstrained opaque text.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "model",
+          "ty": "&str"
+        },
+        {
+          "name": "effort",
+          "ty": "usecase::capability_exec::ReasoningEffort"
+        },
+        {
+          "name": "prompt",
+          "ty": "&str"
+        },
+        {
+          "name": "output_schema",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "output_last_message",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "Vec<std::ffi::OsString>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args": {
+      "action": "modify",
+      "docs": "Builds Gemini ref-verifier argv; produces only RefVerifyError::VerifierPort. Model and prompt are unconstrained opaque provider CLI text.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "model",
+          "ty": "&str"
+        },
+        {
+          "name": "effort",
+          "ty": "usecase::capability_exec::ReasoningEffort"
+        },
+        {
+          "name": "prompt",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Result<Vec<std::ffi::OsString>, usecase::ref_verify::RefVerifyError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_codec::declaration_hash": {
+      "action": "modify",
+      "docs": "Hashes opaque catalogue bytes into the typed declaration freshness identity through the infallible computed ContentHash conversion path.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "declaration_bytes",
+          "ty": "&[u8]"
+        }
+      ],
+      "returns": "domain::tddd::type_signals_doc::CatalogueDeclarationHash",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_codec::decode": {
+      "action": "reference",
+      "docs": "Decodes the versioned type-signals wire payload and validates every typed freshness hash.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "json",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Result<domain::tddd::type_signals_doc::TypeSignalsDocument, TypeSignalsCodecError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_codec::encode": {
+      "action": "reference",
+      "docs": "Encodes a validated type-signals document into JSON; the only producible error is TypeSignalsCodecError::Json, while schema, timestamp, and digest validation errors are decode-only.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "doc",
+          "ty": "&domain::tddd::type_signals_doc::TypeSignalsDocument"
+        }
+      ],
+      "returns": "Result<String, TypeSignalsCodecError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer": {
+      "action": "modify",
+      "docs": "Executes conservative layer-granular signal reuse or rustdoc re-extraction from implementation-side input-hash freshness.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "items_dir",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&domain::ids::TrackId"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "binding",
+          "ty": "&TdddLayerBinding"
+        }
+      ],
+      "returns": "Result<std::process::ExitCode, EvaluateSignalsError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash": {
+      "action": "modify",
+      "docs": "Computes the typed catalogue declaration hash infallibly for cross-crate integration fixtures.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "catalogue_bytes",
+          "ty": "&[u8]"
+        }
+      ],
+      "returns": "domain::tddd::type_signals_doc::CatalogueDeclarationHash",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "usecase::capability_exec::ReasoningEffort"
+        }
+      ],
+      "type_name": "ReasoningEffortDto"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "workspace_runtime_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FsProviderSessionCacheAdapter"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "RustdocSchemaExporter",
+      "trait_ref": "domain::schema::SchemaExporter"
+    },
+    {
+      "action": "reference",
+      "for_type": "RustdocSchemaExporter",
+      "trait_ref": "usecase::export_schema::SchemaExporterPort"
+    },
+    {
+      "action": "delete",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TypeSignalsExecutorPort"
+    },
+    {
+      "action": "add",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "usecase::type_signals::ports::TypeSignalsExecutorPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "AgentProfilesError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "AgentProfilesError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "AgentProfilesError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "AgentProfilesError",
+      "trait_ref": "core::convert::From<serde_json::Error>"
+    },
+    {
+      "action": "modify",
+      "for_type": "ResolvedExecution",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "ResolvedExecution",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "ResolvedExecution",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "ResolvedExecution",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityConfigDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityConfigDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityConfigDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "modify",
+      "for_type": "AgentProfiles",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "AgentProfilesCapabilityAdapter",
+      "trait_ref": "usecase::capability_exec::CapabilityProfilePort"
+    },
+    {
+      "action": "modify",
+      "for_type": "CodexCapabilityAdapter",
+      "trait_ref": "usecase::capability_exec::CapabilityProviderPort"
+    },
+    {
+      "action": "modify",
+      "for_type": "ClaudeCapabilityAdapter",
+      "trait_ref": "usecase::capability_exec::CapabilityProviderPort"
+    },
+    {
+      "action": "modify",
+      "for_type": "CodexReviewer",
+      "trait_ref": "usecase::review_v2::Reviewer"
+    },
+    {
+      "action": "modify",
+      "for_type": "ClaudeReviewer",
+      "trait_ref": "usecase::review_v2::Reviewer"
+    },
+    {
+      "action": "reference",
+      "for_type": "CodexReviewFixRunner",
+      "trait_ref": "usecase::review_v2::run_review_fix::ReviewFixRunner"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsCodecError",
+      "trait_ref": "core::convert::From<serde_json::Error>"
+    },
+    {
+      "for_type": "ReasoningEffortDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReasoningEffortDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReasoningEffortDto",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "ReasoningEffortDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReasoningEffortDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ReasoningEffortDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "FsProviderSessionCacheAdapter",
+      "trait_ref": "usecase::provider_session::ProviderSessionCachePort"
+    },
+    {
+      "action": "modify",
+      "for_type": "LoadCatalogueSpecSignalsForViewError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "LoadCatalogueSpecSignalsForViewError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "LoadCatalogueSpecSignalsForViewError",
+      "trait_ref": "core::error::Error"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "AgentProfiles": {
+      "action": "modify",
+      "docs": "Trusted routing-profile loader and typed execution resolver; provider_label is unconstrained display text (IN-01, IN-02, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "trusted_root",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "path",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "returns": "Result<Self, AgentProfilesError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_capability",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&usecase::dry_write_driver::failure_details::CapabilityName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&CapabilityConfigDto>"
+        },
+        {
+          "docs": "Produces only AgentProfilesError::CapabilityNotFound, AgentProfilesError::ModelMissing, AgentProfilesError::EffortMissing, or AgentProfilesError::UnsupportedEffort from an already-loaded profile; loader-only variants are unreachable.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_execution",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&usecase::dry_write_driver::failure_details::CapabilityName"
+            },
+            {
+              "name": "round_type",
+              "ty": "RoundType"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ResolvedExecution, AgentProfilesError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provider_label",
+          "params": [
+            {
+              "name": "provider",
+              "ty": "&usecase::capability_exec::ProviderName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&str>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_prompt_template_path",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&usecase::dry_write_driver::failure_details::CapabilityName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<std::path::PathBuf>"
+        }
+      ],
+      "module_path": "agent_profiles",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "AgentProfilesCapabilityAdapter": {
+      "action": "reference",
+      "docs": "Adapts trusted routing profiles to fail-closed typed capability profile resolution.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "trusted_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "capability_exec::agent_profiles",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "AgentProfilesError": {
+      "action": "modify",
+      "docs": "AgentProfiles loading and resolution failures; UnsupportedSchemaVersion values are opaque codec diagnostics (IN-01, IN-02, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "domain::FreeText"
+                },
+                {
+                  "name": "source",
+                  "ty": "std::io::Error"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Symlink",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "PathOutsideTrustedRoot",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "domain::FreeText"
+                },
+                {
+                  "name": "root",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Parse",
+            "payload": {
+              "fields": [
+                "serde_json::Error"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "fields": [
+                {
+                  "name": "found",
+                  "ty": "u32"
+                },
+                {
+                  "name": "expected",
+                  "ty": "u32"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidCapability",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "domain::FreeText"
+                },
+                {
+                  "name": "reason",
+                  "ty": "domain::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CapabilityNotFound",
+            "payload": {
+              "fields": [
+                "usecase::dry_write_driver::failure_details::CapabilityName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ModelMissing",
+            "payload": {
+              "fields": [
+                "usecase::dry_write_driver::failure_details::CapabilityName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EffortMissing",
+            "payload": {
+              "fields": [
+                "usecase::dry_write_driver::failure_details::CapabilityName",
+                "RoundType"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnsupportedEffort",
+            "payload": {
+              "fields": [
+                "usecase::capability_exec::ProviderName",
+                "usecase::capability_exec::ReasoningEffort"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "agent_profiles",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityConfigDto": {
+      "action": "modify",
+      "docs": "Deserialized capability routing row with typed provider, model, effort, and execution mode fields.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provider",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ProviderNameDto"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "model",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&ModelNameDto>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_provider",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&ProviderNameDto>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_model",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&ModelNameDto>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "prompt_template_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&std::path::Path>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "effort",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<ReasoningEffortDto>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_effort",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<ReasoningEffortDto>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execution_mode",
+          "params": [],
+          "receiver": "&self",
+          "returns": "ExecutionModeDto"
+        }
+      ],
+      "module_path": "agent_profiles",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ClaudeCapabilityAdapter": {
+      "action": "modify",
+      "docs": "Dispatches Claude capabilities with explicit current flags and conservative session-resume fallback.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "runtime_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "session_cache",
+              "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<domain::ids::TrackId>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "capability_exec::claude",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ClaudeReviewer": {
+      "action": "modify",
+      "docs": "Runs complete Claude review rounds with typed effort and scope-bound session continuation. The scope-label override is presentation-only free text and carries no domain invariant.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::ids::TrackId"
+            },
+            {
+              "name": "scope",
+              "ty": "domain::review_v2::ScopeName"
+            },
+            {
+              "name": "round_type",
+              "ty": "domain::review_v2::RoundType"
+            },
+            {
+              "name": "diff_base",
+              "ty": "Option<domain::git_ref::CommitHash>"
+            },
+            {
+              "name": "model",
+              "ty": "usecase::capability_exec::ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "usecase::capability_exec::ReasoningEffort"
+            },
+            {
+              "name": "timeout",
+              "ty": "std::time::Duration"
+            },
+            {
+              "name": "base_prompt",
+              "ty": "usecase::provider_session::ReviewerPrompt"
+            },
+            {
+              "name": "session_cache",
+              "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "generics": [
+            {
+              "bounds": [
+                "Into<String>"
+              ],
+              "name": "S"
+            }
+          ],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_scope_label",
+          "params": [
+            {
+              "name": "label",
+              "ty": "S"
+            }
+          ],
+          "receiver": "self",
+          "returns": "Self"
+        }
+      ],
+      "module_path": "review_v2::claude_reviewer",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CodexCapabilityAdapter": {
+      "action": "modify",
+      "docs": "Dispatches Codex capabilities with explicit current flags and conservative session-resume fallback.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "runtime_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "session_cache",
+              "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<domain::ids::TrackId>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "capability_exec::codex",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CodexReviewFixRunner": {
+      "action": "modify",
+      "docs": "Adapts the synchronous review-fix port to Codex CLI; construction requires a validated model and resolved effort before entering the blocking external CLI boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "model",
+              "ty": "usecase::capability_exec::ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "usecase::capability_exec::ReasoningEffort"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "review_v2::review_fix_runner",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CodexReviewer": {
+      "action": "modify",
+      "docs": "Runs complete Codex review rounds with typed effort and scope-bound session continuation. The scope-label override is presentation-only free text and carries no domain invariant.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::ids::TrackId"
+            },
+            {
+              "name": "scope",
+              "ty": "domain::review_v2::ScopeName"
+            },
+            {
+              "name": "round_type",
+              "ty": "domain::review_v2::RoundType"
+            },
+            {
+              "name": "diff_base",
+              "ty": "Option<domain::git_ref::CommitHash>"
+            },
+            {
+              "name": "model",
+              "ty": "usecase::capability_exec::ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "usecase::capability_exec::ReasoningEffort"
+            },
+            {
+              "name": "timeout",
+              "ty": "std::time::Duration"
+            },
+            {
+              "name": "base_prompt",
+              "ty": "usecase::provider_session::ReviewerPrompt"
+            },
+            {
+              "name": "session_cache",
+              "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_scope_label",
+          "params": [
+            {
+              "name": "label",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "receiver": "self",
+          "returns": "Self"
+        }
+      ],
+      "module_path": "review_v2::codex_reviewer",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "EvaluateSignalsError": {
+      "action": "reference",
+      "docs": "Opaque evaluator failure returned by layer signal execution.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            "String"
+          ],
+          "has_stripped_fields": false,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_evaluator",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ExecutionModeDto": {
+      "action": "reference",
+      "docs": "Deserialized execution category for a capability routing row.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OrchestratorOutput",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TypedPipeline",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "ExecutionMode"
+        }
+      ],
+      "module_path": "agent_profiles",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "FsProviderSessionCacheAdapter": {
+      "action": "add",
+      "docs": "Secondary adapter for machine-local provider-session storage; maps filesystem I/O failures to ProviderSessionCacheError::StorageUnavailable, codec failures to ProviderSessionCacheError::EntryInvalid, and symlink or trusted-path violations to ProviderSessionCacheError::IdentityBoundaryViolation before crossing ProviderSessionCachePort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "provider_session",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "LoadCatalogueSpecSignalsForViewError": {
+      "action": "modify",
+      "docs": "Fail-closed catalogue-spec signal loading errors; StaleHash retains both compared catalogue declaration hashes as validated domain values.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotFound",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NotRegularFile",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "source",
+                  "ty": "std::io::Error"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Decode",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "source",
+                  "ty": "CatalogueSpecSignalsCodecError"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "StaleHash",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "declared",
+                  "ty": "domain::tddd::type_signals_doc::CatalogueDeclarationHash"
+                },
+                {
+                  "name": "actual",
+                  "ty": "domain::tddd::type_signals_doc::CatalogueDeclarationHash"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "type_catalogue_render",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ModelNameDto": {
+      "action": "reference",
+      "docs": "Validated profile-side model identifier wrapper.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "ModelName"
+        }
+      ],
+      "module_path": "agent_profiles",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ProviderNameDto": {
+      "action": "reference",
+      "docs": "Validated profile-side provider identifier wrapper.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "ProviderName"
+        }
+      ],
+      "module_path": "agent_profiles",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ReasoningEffortDto": {
+      "action": "add",
+      "docs": "Closed deserialization vocabulary for provider-independent reasoning effort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Low",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Medium",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "High",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "XHigh",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Max",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "agent_profiles",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ResolvedExecution": {
+      "action": "modify",
+      "docs": "Separates fully explicit provider-CLI execution from hosted-service execution exempt from effort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ProviderCli",
+            "payload": {
+              "fields": [
+                {
+                  "name": "provider",
+                  "ty": "usecase::capability_exec::ProviderName"
+                },
+                {
+                  "name": "model",
+                  "ty": "usecase::capability_exec::ModelName"
+                },
+                {
+                  "name": "effort",
+                  "ty": "usecase::capability_exec::ReasoningEffort"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "HostedService",
+            "payload": {
+              "fields": [
+                {
+                  "name": "provider",
+                  "ty": "usecase::capability_exec::ProviderName"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "agent_profiles",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "RoundType": {
+      "action": "reference",
+      "docs": "Selects fast or final profile overrides during reviewer routing resolution.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Final",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Fast",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "agent_profiles",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "RustdocSchemaExporter": {
+      "action": "modify",
+      "docs": "Adds existing_rustdoc_json_path for IN-06 / AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export_rustdoc_json_path",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<std::path::PathBuf, domain::schema::SchemaExportError>"
+        },
+        {
+          "docs": "Produces only domain::schema::SchemaExportError::RustdocFailed; other SchemaExportError variants are unreachable for existing-path resolution.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "existing_rustdoc_json_path",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<std::path::PathBuf, domain::schema::SchemaExportError>"
+        }
+      ],
+      "module_path": "schema_export",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsCodecError": {
+      "action": "modify",
+      "docs": "Reports JSON, schema, timestamp, and semantic digest validation failures while decoding type signals.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Json",
+            "payload": {
+              "fields": [
+                "serde_json::Error"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnsupportedSchemaVersion",
+            "payload": {
+              "fields": [
+                "domain::tddd::type_signals_doc::TypeSignalsSchemaVersion"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidSchemaVersion",
+            "payload": {
+              "fields": [
+                "domain::tddd::type_signals_doc::TypeSignalsSchemaVersionError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTimestamp",
+            "payload": {
+              "fields": [
+                "domain::FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidDigest",
+            "payload": {
+              "fields": [
+                {
+                  "name": "field",
+                  "ty": "domain::FreeText"
+                },
+                {
+                  "name": "source",
+                  "ty": "domain::tddd::type_signals_doc::Sha256DigestError"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_codec",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsExecutorAdapter": {
+      "action": "modify",
+      "docs": "Baseline unit adapter modified to implement the relocated usecase port while removing the legacy domain port implementation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::type_signals_executor_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

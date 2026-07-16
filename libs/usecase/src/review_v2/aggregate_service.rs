@@ -13,7 +13,7 @@ use crate::commit_hash_persistence::CommitHashPersistenceError;
 use crate::review_v2::review_aux::ReviewAuxError;
 use crate::review_v2::{
     ReviewApprovalOutput, ReviewCheckApprovedError, ReviewRunLocalOutput, RunReviewError,
-    RunReviewFixError, RunReviewFixOutput, RunReviewOutput,
+    RunReviewOutput,
 };
 
 // ── Input DTOs ────────────────────────────────────────────────────────────────
@@ -29,16 +29,6 @@ pub struct ReviewRunInput {
     pub round_type: String,
     pub group: String,
     pub items_dir: PathBuf,
-}
-
-/// Input for the `RunFixLocal` review variant.
-#[allow(clippy::exhaustive_structs)]
-pub struct ReviewRunFixInput {
-    pub scope: String,
-    pub briefing_file: PathBuf,
-    pub track_id: String,
-    pub round_type: String,
-    pub model: Option<String>,
 }
 
 // ── ReviewService trait ───────────────────────────────────────────────────────
@@ -70,12 +60,6 @@ pub trait ReviewService: Send + Sync {
         group: String,
         items_dir: PathBuf,
     ) -> ReviewRunLocalOutput;
-
-    /// Run the review-fix-lead fixer.
-    fn run_fix_local(
-        &self,
-        input: ReviewRunFixInput,
-    ) -> Result<RunReviewFixOutput, RunReviewFixError>;
 
     /// Check if review is approved and code hash is current.
     fn check_approved(

@@ -501,8 +501,14 @@ fn production_pair_count(
                     .unwrap_or(1);
                 count = count.saturating_add(edge_count.max(1));
             }
-            TestBindingRecord::VoluntaryBinding { .. } | TestBindingRecord::Waiver { .. } => {
-                count = count.saturating_add(1);
+            TestBindingRecord::VoluntaryBinding { edge_id, .. }
+            | TestBindingRecord::Waiver { edge_id, .. } => {
+                // Voluntary bindings and waivers are both adjudicated once
+                // per owning obligation, so the calibration budget must
+                // scale with the owner count (minimum one for catalogue-only
+                // edges).
+                let owner_count = obligations.owners_of_edge(edge_id).len();
+                count = count.saturating_add(owner_count.max(1));
             }
         }
     }
@@ -575,7 +581,7 @@ impl EvaluateTestObligationsInteractor {
         // task carrying every input the verifier subprocess needs. The plan
         // order is the byte layout downstream cache documents keep.
         let plan = self.plan_binding_records(
-            bindings.records(),
+            &bindings,
             &obligations,
             &catalogues,
             &spec,

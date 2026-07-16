@@ -15,57 +15,71 @@
     "orchestrator": {
       "provider": "codex",
       "model": "gpt-5.5",
+      "reasoning_effort": "high",
       "execution_mode": "typed-pipeline"
     },
     "spec-designer": {
       "provider": "codex",
       "model": "gpt-5.5",
+      "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "impl-planner": {
       "provider": "codex",
       "model": "gpt-5.5",
+      "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "type-designer": {
       "provider": "codex",
       "model": "gpt-5.5",
+      "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "adr-editor": {
       "provider": "codex",
       "model": "gpt-5.5",
+      "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "implementer": {
       "provider": "codex",
       "model": "gpt-5.5",
+      "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "reviewer": {
       "provider": "codex",
       "model": "gpt-5.4",
+      "reasoning_effort": "xhigh",
       "fast_model": "gpt-5.4-mini",
+      "fast_reasoning_effort": "low",
       "execution_mode": "typed-pipeline"
     },
     "researcher": {
       "provider": "codex",
       "model": "gpt-5.4-mini",
+      "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "review-fix-lead": {
       "provider": "codex",
       "model": "gpt-5.5",
+      "reasoning_effort": "high",
       "execution_mode": "typed-pipeline"
     },
     "dry-checker": {
       "provider": "codex",
       "model": "gpt-5.5",
+      "fast_model": "gpt-5.4-mini",
+      "reasoning_effort": "high",
+      "fast_reasoning_effort": "low",
       "execution_mode": "typed-pipeline"
     },
     "dry-fix-lead": {
       "provider": "codex",
       "model": "gpt-5.5",
+      "reasoning_effort": "high",
       "execution_mode": "typed-pipeline"
     }
   }

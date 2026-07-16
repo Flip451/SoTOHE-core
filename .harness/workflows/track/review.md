@@ -41,6 +41,21 @@ Provider / model resolution for the reviewer and the fixer is owned by the CLI
 (`bin/sotp review local` reads `capabilities.reviewer` from `.harness/config/agent-profiles.json`
 internally). The workflow does not branch on provider identity.
 
+**Reviewer session resume (automatic).** A round resumes the prior provider session recorded
+under its track × scope × round-type × diff-base key whenever a valid entry exists — typically
+the fix → re-review loop within one review cycle. A later cycle has a new diff base after its
+commit, so it receives a different key and starts fresh rather than resuming prior-cycle context.
+A round runs fresh when no entry exists for its key (a scope's first-ever round), when the diff
+base cannot be resolved, when the recorded provider or model mismatches the current profile
+resolution, or when the resume attempt fails or the session has expired. Because the round type
+is part of the key, a final round never resumes a fast-round session — escalation cannot inherit
+the fast context — though it may resume a prior final round with the same diff base. Resume is
+built into `bin/sotp review local` — the workflow takes no extra action. On both resumed and fresh rounds,
+the resolved reviewer execution configuration is re-injected; each provider-native adapter supplies
+its applicable flags. Any fallback runs fresh without failing the round. Resume reuses context only: the reviewer must re-read the
+CURRENT scope file list and diff and re-adjudicate the FULL scope, and the round's judgment and
+review record carry the same units and meaning as a fresh round.
+
 **Step 2: Determine required scopes**
 
 ```

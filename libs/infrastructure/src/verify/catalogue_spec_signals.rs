@@ -6,6 +6,7 @@
 
 use std::path::PathBuf;
 
+use domain::tddd::type_signals_doc::CatalogueDeclarationHash;
 use domain::verify::{VerifyFinding, VerifyOutcome};
 use domain::{CatalogueSpecSignalsDocument, ContentHash, Strictness, check_catalogue_spec_signals};
 use usecase::catalogue_traversal::iter_catalogue_entries;
@@ -162,8 +163,9 @@ fn catalogue_spec_signal_freshness_findings(
     doc: &CatalogueSpecSignalsDocument,
 ) -> Vec<VerifyFinding> {
     let mut findings = Vec::new();
+    let declaration_hash = type_signals_codec::declaration_hash(catalogue_text.as_bytes());
     let current_catalogue_hash = match content_hash_from_hex(
-        type_signals_codec::declaration_hash(catalogue_text.as_bytes()),
+        declaration_hash.as_digest().as_str().to_owned(),
         "catalogue declaration hash",
     ) {
         Ok(hash) => hash,
@@ -209,7 +211,7 @@ fn catalogue_spec_signal_freshness_findings(
 /// Exposed for integration tests in other crates that need to build fresh
 /// `catalogue-spec-signals.json` fixtures without going through the full
 /// refresher pipeline.
-pub fn compute_catalogue_declaration_hash(catalogue_bytes: &[u8]) -> String {
+pub fn compute_catalogue_declaration_hash(catalogue_bytes: &[u8]) -> CatalogueDeclarationHash {
     type_signals_codec::declaration_hash(catalogue_bytes)
 }
 
@@ -648,6 +650,9 @@ mod tests {
   "functions": {}
 }"#;
 
+    const V3_CATALOGUE_ONE_TYPE_DECLARATION_HASH: &str =
+        "9581aecfa9c6f4d6da15ff8f51379f1d68dec6f2cf0b5eecffccec0e7968c5f9";
+
     /// Minimal valid v3 domain catalogue with a single type deletion tombstone.
     const V3_CATALOGUE_DELETE_TYPE: &str = r#"{
   "schema_version": 5,
@@ -690,6 +695,9 @@ mod tests {
 
     fn declaration_hash_for(catalogue_content: &str) -> String {
         type_signals_codec::declaration_hash(catalogue_content.as_bytes())
+            .as_digest()
+            .as_str()
+            .to_owned()
     }
 
     fn entry_hash_for(catalogue_content: &str, section: &str, entry_key: &str) -> String {
@@ -728,15 +736,31 @@ mod tests {
     }
 
     #[test]
-    fn test_compute_catalogue_declaration_hash_valid_catalogue_matches_declaration_hash() {
+    fn test_compute_catalogue_declaration_hash_known_catalogue_matches_recorded_snapshot_and_changed_byte_recomputes()
+     {
         let hash = compute_catalogue_declaration_hash(V3_CATALOGUE_ONE_TYPE.as_bytes());
+        assert_eq!(hash.as_digest().as_str(), V3_CATALOGUE_ONE_TYPE_DECLARATION_HASH);
 
-        assert_eq!(hash, declaration_hash_for(V3_CATALOGUE_ONE_TYPE));
-        assert_eq!(hash.len(), 64, "declaration hash must be lowercase hex SHA-256");
-        assert!(
-            hash.chars().all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase()),
-            "declaration hash must be lowercase hex: {hash}"
+        let signals_fixture = signals_referencing_type(
+            "MyType",
+            V3_CATALOGUE_ONE_TYPE_DECLARATION_HASH,
+            &entry_hash_for(V3_CATALOGUE_ONE_TYPE, "types", "MyType"),
         );
+        let recorded_signals = catalogue_spec_signals_codec::decode(&signals_fixture).unwrap();
+        assert_eq!(
+            hash.as_digest().as_str(),
+            recorded_signals.catalogue_declaration_hash.to_hex(),
+            "the catalogue hash must agree with the recorded signal-artifact snapshot"
+        );
+
+        let mut changed_catalogue = V3_CATALOGUE_ONE_TYPE.as_bytes().to_vec();
+        let changed_byte_index = changed_catalogue
+            .iter()
+            .position(|byte| *byte == b'M')
+            .expect("fixture must contain the MyType declaration");
+        changed_catalogue[changed_byte_index] = b'N';
+        let changed_hash = compute_catalogue_declaration_hash(&changed_catalogue);
+        assert_ne!(hash, changed_hash, "a catalogue-byte change must recompute the hash");
     }
 
     #[test]

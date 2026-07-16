@@ -197,6 +197,8 @@ mod tests {
                 "model": "claude-opus-4-8",
                 "fast_provider": "claude",
                 "fast_model": "claude-haiku-4-5",
+                "reasoning_effort": "high",
+                "fast_reasoning_effort": "low",
                 "execution_mode": "typed-pipeline"
             }
         }
@@ -221,6 +223,7 @@ mod tests {
                     "waiver-verifier": {
                         "provider": "codex",
                         "model": "gpt-5",
+                        "reasoning_effort": "high",
                         "execution_mode": "typed-pipeline"
                     }
                 }
@@ -320,7 +323,10 @@ mod tests {
 
         assert!(matches!(verdict, WaiverVerdict::Waived { .. }));
         let (resolved, prompt) = captured.lock().unwrap().clone().unwrap();
-        assert_eq!(resolved.model.as_deref(), Some("claude-opus-4-8"));
+        assert!(matches!(
+            resolved,
+            ResolvedExecution::ProviderCli { model, .. } if model.as_str() == "claude-opus-4-8"
+        ));
         assert!(prompt.contains("waiver verifier"));
         assert!(prompt.contains("this design goal has no independently observable behaviour"));
         assert!(prompt.contains("struct Entry"));
@@ -400,7 +406,10 @@ mod tests {
         let adapter = WaiverVerifierAdapter::with_runner(profiles(), runner);
         adapter.verify_pair("reason", "decl", "anchor", ModelTier::Fast).unwrap();
         let resolved = captured.lock().unwrap().clone().unwrap();
-        assert_eq!(resolved.model.as_deref(), Some("claude-haiku-4-5"));
+        assert!(matches!(
+            resolved,
+            ResolvedExecution::ProviderCli { model, .. } if model.as_str() == "claude-haiku-4-5"
+        ));
     }
 
     #[test]

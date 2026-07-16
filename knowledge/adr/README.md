@@ -211,6 +211,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Claude/Codex 運用文書の .harness SSoT 化](2026-06-30-0425-harness-workflow-ssot-adapters.md) | Proposed | 2026-06-30 |
 | [capability exec: profile 駆動の汎用 capability dispatch コマンド](2026-07-12-0510-capability-exec-unified-dispatch.md) | Proposed | 2026-07-12 |
 | [外部 provider 実行基盤の修復](2026-07-13-0410-capability-exec-infra-repair.md) | Proposed | 2026-07-13 |
+| [外部 agent 呼び出しのコスト削減](2026-07-13-2217-agent-dispatch-cost-reduction.md) | Proposed | 2026-07-13 |
 
 ### テスト・CI ツーリング
 

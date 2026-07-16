@@ -15,17 +15,6 @@ pub(super) fn find_obligation<'a>(
     obligations.obligations().iter().find(|o| o.id() == id)
 }
 
-/// Finds a derived obligation that owns `edge_id`.
-pub(super) fn find_obligation_for_edge<'a>(
-    obligations: &'a ObligationsDocument,
-    edge_id: &TestObligationEdgeId,
-) -> Option<&'a TestObligation> {
-    obligations.obligations().iter().find(|obligation| {
-        obligation.id().entry_key() == edge_id.entry_key()
-            && obligation.spec_refs().iter().any(|anchor| anchor == edge_id.anchor_id())
-    })
-}
-
 /// Resolves the anchor text of the spec element `element_id`, searching every
 /// section of the spec document.
 pub(super) fn resolve_anchor_text(spec: &SpecDocument, element_id: &str) -> Option<String> {

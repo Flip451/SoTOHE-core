@@ -9,9 +9,19 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use usecase::review_v2::ReviewService;
-use usecase::review_v2::aggregate_service::{ReviewRunFixInput, ReviewRunInput};
+use usecase::review_v2::SubagentDispatchInstruction;
+use usecase::review_v2::aggregate_service::ReviewRunInput;
+use usecase::review_v2::run_review_fix::{
+    RunReviewFixCommand, RunReviewFixError, RunReviewFixOutput, RunReviewFixService,
+};
 
 use crate::render::CommandOutcome;
+
+/// First stdout line for a review-fix subagent dispatch.
+pub const SUBAGENT_DISPATCH_SENTINEL: &str = "SUBAGENT_DISPATCH_REQUIRED";
+
+/// Exit code for a review-fix subagent dispatch.
+pub const SUBAGENT_DISPATCH_EXIT_CODE: u8 = 64;
 
 // ---------------------------------------------------------------------------
 // Input type
@@ -75,19 +85,6 @@ pub enum ReviewInput {
         group: String,
         /// Items directory (`track/items`).
         items_dir: PathBuf,
-    },
-    /// Run the review-fix-lead fixer with provider auto-resolved from agent-profiles.json.
-    RunFixLocal {
-        /// Scope name (e.g., `"cli"`, `"infrastructure"`).
-        scope: String,
-        /// Path to the briefing file passed to the fixer. Required.
-        briefing_file: PathBuf,
-        /// Track ID. Required (no auto-resolve from branch for write operations).
-        track_id: String,
-        /// Round type: `"fast"` or `"final"`.
-        round_type: String,
-        /// Optional model override for the fixer subprocess.
-        model: Option<String>,
     },
     /// Check if the review state is approved and code hash is current.
     CheckApproved {
@@ -237,9 +234,6 @@ impl ReviewDriver {
                 group,
                 items_dir,
             ),
-            ReviewInput::RunFixLocal { scope, briefing_file, track_id, round_type, model } => {
-                self.review_run_fix_local(scope, briefing_file, track_id, round_type, model)
-            }
             ReviewInput::CheckApproved { track_id, items_dir } => {
                 self.review_check_approved(track_id, items_dir)
             }
@@ -358,55 +352,6 @@ impl ReviewDriver {
             items_dir,
         );
         CommandOutcome { stdout: out.stdout, stderr: out.stderr, exit_code: out.exit_code }
-    }
-
-    fn review_run_fix_local(
-        &self,
-        scope: String,
-        briefing_file: PathBuf,
-        track_id: String,
-        round_type: String,
-        model: Option<String>,
-    ) -> CommandOutcome {
-        use usecase::review_v2::RunReviewFixError;
-
-        let input = ReviewRunFixInput { scope, briefing_file, track_id, round_type, model };
-        match self.service.run_fix_local(input) {
-            Ok(out) => {
-                // exit_code in RunReviewFixOutput is i32; map valid range to u8.
-                let exit_code: u8 = match out.exit_code {
-                    0 => 0,
-                    2 => 2,
-                    _ => 1,
-                };
-                CommandOutcome {
-                    stdout: Some(format!("REVIEW_FIX_STATUS: {}", out.status)),
-                    stderr: out.stderr,
-                    exit_code,
-                }
-            }
-            // SubagentDispatchRequired: the resolved provider is "claude" and the
-            // composition layer emitted a SUBAGENT_DISPATCH_REQUIRED sentinel.
-            // Pass the payload through verbatim on stdout with exit code 64 so the
-            // orchestrator skill can route to the Claude Code subagent without
-            // parsing provider names. Exit 64 is distinct from 0/1/2 so the
-            // orchestrator can branch on the exit code alone without parsing stdout.
-            Err(RunReviewFixError::SubagentDispatchRequired(payload)) => CommandOutcome {
-                stdout: Some(payload),
-                stderr: None,
-                exit_code: 64, // SUBAGENT_DISPATCH_EXIT_CODE (cli_composition::review_v2::run_fix)
-            },
-            // SmokeTestFailed is a preflight failure (not a review outcome).
-            // Preserve exit 2 + diagnostic on stderr without emitting a
-            // `REVIEW_FIX_STATUS:` line so orchestrators do not classify it
-            // as a normal review-fix outcome.
-            Err(RunReviewFixError::SmokeTestFailed(msg)) => CommandOutcome {
-                stdout: None,
-                stderr: Some(format!("[ERROR] smoke test failed: {msg}")),
-                exit_code: 2,
-            },
-            Err(e) => CommandOutcome::failure(Some(e.to_string())),
-        }
     }
 
     fn review_check_approved(&self, track_id: String, items_dir: PathBuf) -> CommandOutcome {
@@ -536,9 +481,70 @@ impl ReviewDriver {
     }
 }
 
+/// Driving adapter for one fully-wired review-fix invocation.
+///
+/// Composition supplies the validated command and an injected
+/// [`RunReviewFixService`]. This driver owns the interactor invocation and all
+/// review-fix stdout/stderr and exit-code rendering.
+pub struct ReviewFixDriver {
+    service: Arc<dyn RunReviewFixService>,
+    command: RunReviewFixCommand,
+    provider: String,
+}
+
+impl ReviewFixDriver {
+    /// Creates a review-fix driver from composition-owned wiring.
+    #[must_use]
+    pub fn new(
+        service: Arc<dyn RunReviewFixService>,
+        command: RunReviewFixCommand,
+        provider: String,
+    ) -> Self {
+        Self { service, command, provider }
+    }
+
+    /// Executes the injected interactor and renders the review-fix protocol.
+    #[must_use]
+    pub fn handle(&self) -> CommandOutcome {
+        eprintln!(
+            "[sotp review fix-local] provider={} model={}",
+            self.provider, self.command.model
+        );
+        match self.service.run(self.command.clone()) {
+            Ok(output) => review_fix_output_to_outcome(output),
+            Err(RunReviewFixError::SubagentDispatchRequired(instruction)) => {
+                subagent_dispatch_to_outcome(*instruction)
+            }
+            // SmokeTestFailed is a preflight failure (not a review outcome).
+            // Preserve exit 2 + diagnostic on stderr without emitting a
+            // `REVIEW_FIX_STATUS:` line so orchestrators do not classify it
+            // as a normal review-fix outcome.
+            Err(RunReviewFixError::SmokeTestFailed(message)) => CommandOutcome {
+                stdout: None,
+                stderr: Some(format!("[ERROR] smoke test failed: {}", message.as_str())),
+                exit_code: 2,
+            },
+            Err(error) => CommandOutcome::failure(Some(error.to_string())),
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+fn review_fix_output_to_outcome(output: RunReviewFixOutput) -> CommandOutcome {
+    let exit_code = match output.exit_code {
+        0 => 0,
+        2 => 2,
+        _ => 1,
+    };
+    CommandOutcome {
+        stdout: Some(format!("REVIEW_FIX_STATUS: {}", output.status)),
+        stderr: output.stderr,
+        exit_code,
+    }
+}
 
 fn run_review_output_to_outcome(out: usecase::review_v2::RunReviewOutput) -> CommandOutcome {
     if out.skipped {
@@ -550,4 +556,130 @@ fn run_review_output_to_outcome(out: usecase::review_v2::RunReviewOutput) -> Com
     // `findings_remain` returns exit 2 (distinguishing review findings from
     // subprocess failures) survives the cli_driver boundary.
     CommandOutcome { stdout: out.summary, stderr: None, exit_code: out.exit_code }
+}
+
+fn subagent_dispatch_to_outcome(instruction: SubagentDispatchInstruction) -> CommandOutcome {
+    let json = format!(
+        "{{\"agent\":{},\"model\":{},\"effort\":{},\"scope\":{},\"briefing_file\":{},\"track_id\":{},\"round_type\":{}}}",
+        json_str(instruction.agent.as_str()),
+        json_str(instruction.model.as_str()),
+        json_str(effort_value(instruction.effort)),
+        json_str(instruction.scope.as_ref()),
+        json_str(&instruction.briefing_file.display().to_string()),
+        json_str(instruction.track_id.as_ref()),
+        json_str(match instruction.round_type {
+            usecase::review_v2::ReviewRoundType::Fast => "fast",
+            usecase::review_v2::ReviewRoundType::Final => "final",
+        }),
+    );
+    CommandOutcome {
+        stdout: Some(format!("{SUBAGENT_DISPATCH_SENTINEL}\n{json}")),
+        stderr: None,
+        exit_code: SUBAGENT_DISPATCH_EXIT_CODE,
+    }
+}
+
+fn effort_value(effort: usecase::capability_exec::ReasoningEffort) -> &'static str {
+    match effort {
+        usecase::capability_exec::ReasoningEffort::Low => "low",
+        usecase::capability_exec::ReasoningEffort::Medium => "medium",
+        usecase::capability_exec::ReasoningEffort::High => "high",
+        usecase::capability_exec::ReasoningEffort::XHigh => "xhigh",
+        usecase::capability_exec::ReasoningEffort::Max => "max",
+    }
+}
+
+fn json_str(s: &str) -> String {
+    let mut out = String::with_capacity(s.len() + 2);
+    out.push('"');
+    for c in s.chars() {
+        match c {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            '\t' => out.push_str("\\t"),
+            c if (c as u32) < 0x20 => out.push_str(&format!("\\u{:04x}", c as u32)),
+            c => out.push(c),
+        }
+    }
+    out.push('"');
+    out
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used)]
+mod tests {
+    use std::path::PathBuf;
+    use std::sync::Arc;
+
+    use usecase::capability_exec::{ModelName, ReasoningEffort};
+    use usecase::review_v2::run_review_fix::{
+        RunReviewFixCommand, RunReviewFixError, RunReviewFixOutput, RunReviewFixService,
+    };
+    use usecase::review_v2::{
+        ReviewGroupName, ReviewRoundType, SubagentDispatchInstruction, SubagentName, TrackId,
+    };
+
+    use super::{
+        ReviewFixDriver, SUBAGENT_DISPATCH_EXIT_CODE, SUBAGENT_DISPATCH_SENTINEL,
+        subagent_dispatch_to_outcome,
+    };
+
+    struct CompletedFixService;
+
+    impl RunReviewFixService for CompletedFixService {
+        fn run(
+            &self,
+            _command: RunReviewFixCommand,
+        ) -> Result<RunReviewFixOutput, RunReviewFixError> {
+            Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 0, stderr: None })
+        }
+    }
+
+    #[test]
+    fn test_review_fix_driver_completed_renders_status() {
+        let driver = ReviewFixDriver::new(
+            Arc::new(CompletedFixService),
+            RunReviewFixCommand {
+                scope: "cli_driver".to_owned(),
+                briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+                track_id: "review-fix-driver-2026".to_owned(),
+                round_type: "fast".to_owned(),
+                model: "gpt-5.5".to_owned(),
+            },
+            "codex".to_owned(),
+        );
+
+        let outcome = driver.handle();
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout.as_deref(), Some("REVIEW_FIX_STATUS: completed"));
+        assert_eq!(outcome.stderr, None);
+    }
+
+    #[test]
+    fn test_subagent_dispatch_instruction_renders_sentinel_and_single_line_json() {
+        let outcome = subagent_dispatch_to_outcome(SubagentDispatchInstruction {
+            agent: SubagentName::try_new("review-fix-lead").expect("valid test subagent"),
+            model: ModelName::try_new("claude\"model").expect("valid test model"),
+            effort: ReasoningEffort::Low,
+            scope: ReviewGroupName::try_new("cli_driver").expect("valid test review group"),
+            briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing\\file.md"),
+            track_id: TrackId::try_new("dispatch-render-2026").expect("valid test track ID"),
+            round_type: ReviewRoundType::Fast,
+        });
+
+        assert_eq!(outcome.exit_code, SUBAGENT_DISPATCH_EXIT_CODE);
+        let stdout = outcome.stdout.unwrap();
+        let mut lines = stdout.lines();
+        assert_eq!(lines.next(), Some(SUBAGENT_DISPATCH_SENTINEL));
+        assert_eq!(
+            lines.next(),
+            Some(
+                "{\"agent\":\"review-fix-lead\",\"model\":\"claude\\\"model\",\"effort\":\"low\",\"scope\":\"cli_driver\",\"briefing_file\":\"tmp/reviewer-runtime/briefing\\\\file.md\",\"track_id\":\"dispatch-render-2026\",\"round_type\":\"fast\"}"
+            )
+        );
+        assert_eq!(lines.next(), None, "dispatch JSON must occupy one line");
+    }
 }

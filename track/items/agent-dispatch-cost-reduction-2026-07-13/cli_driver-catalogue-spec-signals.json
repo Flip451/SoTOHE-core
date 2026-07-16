@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "6b44480edbfefe4db0217a574c54d3f7c8a1e84e2132eaf090bb2ba6ea594935",
+  "signals": [
+    {
+      "type_name": "CapabilityDriver",
+      "signal": "blue",
+      "entry_hash": "6b699f34c76df97b1864d5e3cd3f7ff062c02842eac2c4bf3cf000cee3a1e936"
+    },
+    {
+      "type_name": "CapabilityExecDriverInput",
+      "signal": "blue",
+      "entry_hash": "3af67028262be63d214db68876c7d065290490de21d7617f2f23b1680296cd64"
+    },
+    {
+      "type_name": "CapabilityResumeArg",
+      "signal": "blue",
+      "entry_hash": "d2f42bea19736d57f528418362dd467817d6f80da9a73a54fcf1bfc5d4846686"
+    },
+    {
+      "type_name": "ReviewFixDriver",
+      "signal": "blue",
+      "entry_hash": "32cd553803343724568ab68aed1276cfbf5cd4f5470a7fcc031b0a753737b145"
+    },
+    {
+      "type_name": "ReviewInput",
+      "signal": "blue",
+      "entry_hash": "cdb1fe1f422021fa7d8979e99be0caf27dcdff1bec5be5f182cfc3468ff89c4b"
+    },
+    {
+      "type_name": "TargetArtifactPathArg",
+      "signal": "blue",
+      "entry_hash": "f2487472a348ab8528bbaaa3634947f92b01faaadd19b3eba450ed67b0602d45"
+    }
+  ]
+}

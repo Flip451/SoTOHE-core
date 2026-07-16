@@ -22,5 +22,9 @@ pub fn run(
     args: CheckCatalogSpecArgs,
 ) -> Result<CommandOutcome, CompositionError> {
     let gate = args.flags.gate_name();
-    app.signal_check_catalog_spec(args.flags.strict, gate, args.flags.workspace_root)
+    app.signal_check_catalog_spec(
+        args.flags.strict.then_some(cli_composition::signal::Strictness::Strict),
+        gate,
+        args.flags.workspace_root,
+    )
 }

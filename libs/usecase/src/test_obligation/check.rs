@@ -592,6 +592,7 @@ impl CheckTestObligationsInteractor {
             obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default();
         self.resolve_waiver_cache_entry(
             edge,
+            obligation.id(),
             reason,
             &declaration,
             target,
@@ -617,6 +618,7 @@ impl CheckTestObligationsInteractor {
             .unwrap_or_default();
         self.resolve_waiver_cache_entry(
             edge,
+            &synthetic_voluntary_obligation_id(edge),
             reason,
             &declaration,
             target,
@@ -631,6 +633,7 @@ impl CheckTestObligationsInteractor {
     fn resolve_waiver_cache_entry(
         &self,
         edge: &TestObligationEdgeId,
+        obligation_id: &TestObligationId,
         reason: &WaivedReason,
         declaration: &str,
         target: &StatusLaneTarget,
@@ -638,7 +641,11 @@ impl CheckTestObligationsInteractor {
         waiver: &WaiverCacheDocument,
         gate: &mut GateState,
     ) {
-        let Some(entry) = waiver.entries().iter().find(|e| e.edge_id() == edge) else {
+        let Some(entry) = waiver
+            .entries()
+            .iter()
+            .find(|entry| entry.edge_id() == edge && entry.obligation_id() == Some(obligation_id))
+        else {
             gate.verdict_absent(edge.clone(), target.clone());
             return;
         };

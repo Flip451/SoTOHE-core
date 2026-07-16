@@ -111,25 +111,48 @@ pub(super) struct LocalTestError(String);
 /// Returns an error if the profiles file cannot be loaded, the `reviewer` capability
 /// is not defined, or the provider is unsupported.
 #[cfg(test)]
+#[derive(Debug)]
+pub(super) struct ResolvedReviewerForTest {
+    pub(super) provider: String,
+    pub(super) model: Option<String>,
+}
+
+#[cfg(test)]
 pub(super) fn resolve_reviewer_for_test(
     trusted_root: &std::path::Path,
     profiles_path: &std::path::Path,
     round_type: CodexRoundTypeArg,
-) -> Result<infrastructure::agent_profiles::ResolvedExecution, LocalTestError> {
+) -> Result<ResolvedReviewerForTest, LocalTestError> {
     let profiles = infrastructure::agent_profiles::AgentProfiles::load(trusted_root, profiles_path)
         .map_err(|e| LocalTestError(format!("[ERROR] failed to load agent-profiles.json: {e}")))?;
     let infra_round_type = match round_type {
         CodexRoundTypeArg::Fast => infrastructure::agent_profiles::RoundType::Fast,
         CodexRoundTypeArg::Final => infrastructure::agent_profiles::RoundType::Final,
     };
-    let resolved = profiles.resolve_execution("reviewer", infra_round_type).ok_or_else(|| {
-        LocalTestError("[ERROR] reviewer capability not defined in agent-profiles.json".to_owned())
-    })?;
-    match resolved.provider.as_str() {
-        "codex" | "claude" => Ok(resolved),
-        other => Err(LocalTestError(format!(
-            "[ERROR] unsupported reviewer provider '{other}' \
-             (supported: 'codex', 'claude')"
-        ))),
+    let capability = usecase::dry_write_driver::CapabilityName::try_new("reviewer")
+        .map_err(|error| LocalTestError(format!("[ERROR] invalid reviewer capability: {error}")))?;
+    let resolved =
+        profiles.resolve_execution(&capability, infra_round_type).map_err(|error| match error {
+            infrastructure::agent_profiles::AgentProfilesError::CapabilityNotFound(_) => {
+                LocalTestError("[ERROR] reviewer capability not defined".to_owned())
+            }
+            error => LocalTestError(format!("[ERROR] failed to resolve reviewer: {error}")),
+        })?;
+    match resolved {
+        infrastructure::agent_profiles::ResolvedExecution::ProviderCli {
+            provider, model, ..
+        } if matches!(provider.as_str(), "codex" | "claude") => Ok(ResolvedReviewerForTest {
+            provider: provider.as_str().to_owned(),
+            model: Some(model.as_str().to_owned()),
+        }),
+        infrastructure::agent_profiles::ResolvedExecution::ProviderCli { provider, .. } => {
+            Err(LocalTestError(format!(
+                "[ERROR] unsupported reviewer provider '{provider}' \
+                 (supported: 'codex', 'claude')"
+            )))
+        }
+        infrastructure::agent_profiles::ResolvedExecution::HostedService { .. } => Err(
+            LocalTestError("[ERROR] reviewer must resolve to a provider CLI execution".to_owned()),
+        ),
     }
 }

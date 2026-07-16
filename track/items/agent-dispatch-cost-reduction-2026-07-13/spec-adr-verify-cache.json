@@ -1,0 +1,1201 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "bd0ca21d8701163530702ecbf2593005f8b5a76016218746fb47aa30978bf0a7",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "effort は capability と round 種別（fast/final）の単位で明示する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "provider CLI subprocess を起動する capability の実行 effort を capability ごと（reviewer 系は fast/final ごと）に profile で明示し、低コストの fast round と完全な final 判定の二段構成を維持したまま、暗黙の provider 既定への依存をなくす。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "79640d5bb73ae1a5980d0fb5f59c8bbf486a2c8bc24ebacc4ca7187be3964e94",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同一 scope × 同一 round 種別の再 round は reviewer session を再開して差分 review する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "同一 scope・同一 round 種別の reviewer 再判定と、同一成果物への capability 継続作業で安全に session を再開できるようにし、再入ごとの文脈再構築コストを削減する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "79640d5bb73ae1a5980d0fb5f59c8bbf486a2c8bc24ebacc4ca7187be3964e94",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同一 track × 同一 capability の**継続作業**（同じ成果物への追補・修正の再入、中断からの続行）と判断した dispatch でこの option を使い"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "同一 scope・同一 round 種別の reviewer 再判定と、同一成果物への capability 継続作業で安全に session を再開できるようにし、再入ごとの文脈再構築コストを削減する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "5a24586b29a7f942be9bc02072047fe1a6e49ac44ff644ca95c4476c9344d674",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skip 判定の状態は別の cache file を新設せず、計算産物である per-layer type-signals artifact 自体に実装側入力の hash として記録する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "reviewer 起動前の signal 前段処理で、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を per-layer artifact の記録値と比較し、判定材料が変わる評価を省略しないまま不要な rustdoc 抽出の再計算コストを削減する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "23d71fb9adabdbde8bd0e55c1f9ce35c3f0aa3c3bb5f7421642aea15b733f73f",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "再開の失敗・session 期限切れも同様に新規 session へ fallback する（resume という最適化は諦めるが、round の実行自体は止めない）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-04",
+          "text_label": "すべての最適化経路を保守的に失効・再計算・新規 session へ倒し、既存の review judgment、review record、および signal の正確性を犠牲にしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "23d71fb9adabdbde8bd0e55c1f9ce35c3f0aa3c3bb5f7421642aea15b733f73f",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "判定不能な場合は skip を許さず再計算に倒す（skip という省略に対して fail-closed）"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-04",
+          "text_label": "すべての最適化経路を保守的に失効・再計算・新規 session へ倒し、既存の review judgment、review record、および signal の正確性を犠牲にしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "23d71fb9adabdbde8bd0e55c1f9ce35c3f0aa3c3bb5f7421642aea15b733f73f",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "再開の失敗・session 期限切れは新規 session に fallback し、dispatch 自体は止めない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-04",
+          "text_label": "すべての最適化経路を保守的に失効・再計算・新規 session へ倒し、既存の review judgment、review record、および signal の正確性を犠牲にしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "b20f39db4c989a6936e63c5a0ef62679886d7325712d976818effec685462aaa",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "したがって committed default profile は対象の全 capability に effort を明示し、reviewer は fast を低 effort（low）、final を各 provider の最大段階（codex は xhigh、claude は max）とする。適用範囲は provider CLI subprocess を起動して実行する全 capability とし、semantic reference 検証の `ref-verifier-chain1` / `ref-verifier-chain2` も対象に含める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "capability routing profile に、provider CLI subprocess を起動する全 capability の effort を宣言する。reviewer-like capability は fast/final ごとに宣言し、default profile の reviewer fast は low、final は各 provider の最大段階とする。semantic reference 検証の ref-verifier-chain1 / ref-verifier-chain2 も対象に含める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7420d40ec830a018aba34515fcb62a45a3143123c691b9dde68835175403c5e4",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "effort 指定の無い dispatch は fail-closed とする — 対象 capability（reviewer は round 種別ごと）の effort が profile から解決できない場合、実行を拒否する。暗黙の provider 既定へ落ちる fail-open は採らない"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "対象 capability（reviewer は round 種別ごと）の effort が profile から解決できない dispatch を拒否し、provider の暗黙既定 effort で実行しない。hosted service 側で実行される pr-reviewer は effort 宣言とこの拒否検査の対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "5ceb5e27f085ca0238a8be48d32f3a5db536584a85022dd551b57fd7a498cc9b",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同一 scope × 同一 round 種別の再 round は reviewer session を再開して差分 review する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。初回 round と fast から final への escalation は新規 session とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "4a0192a8dce970468a6460197209eed1813e7cec9205b0fe5f587428a2e169d4",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cache entry は provider と model を束縛し、現在の profile 解決結果と不一致なら失効として新規 session に落とす。再開の失敗・session 期限切れも同様に新規 session へ fallback する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "reviewer session cache を provider と model に束縛する。現在の profile 解決結果の provider または model が記録値と不一致、resume 失敗、または session 期限切れなら、cache を使わず新規 session を開始する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "fe109946d1995c4c732bc8fb54bbffe76f5ac009147a01c150500c59b2706fa5",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "判定と skip の粒度は layer（crate）単位とし、変更のあった layer のみ再計算する。hash の入力は対象 crate の source 内容に加え、rustdoc 出力に影響する依存解決（lockfile）と toolchain の識別子を含める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "4d96c7f24b5212b1d4d365bae36f9db185a0d0ae6acdf0baa816e2998dd2972f",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue や spec の変更は signal の再評価対象だが rustdoc 抽出の再実行を要しないため、再計算の要否は入力ごとに分離して判定する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または spec の変更時は signal を再評価するが、実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f33153785739162ebf3918b9670f5bc636a95404859166e5f883cbffb5313e1",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skip 判定の状態は別の cache file を新設せず、計算産物である per-layer type-signals artifact 自体に実装側入力の hash として記録する。既存 artifact は catalogue 側入力の hash（declaration_hash）を既に保持しており、実装側入力の hash を対称に加えることで、鮮度判定は「artifact に記録された入力 hash と現在の入力 hash の一致」という artifact 自己記述の検証になる"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "74df0cf41b80fdb8461f2469f8807e5f1c56c5247083791d8ee3a415f4bd2d91",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp capability exec` に session 再開の option を追加する。orchestrator は、同一 track × 同一 capability の**継続作業**（同じ成果物への追補・修正の再入、中断からの続行）と判断した dispatch でこの option を使い、初回 dispatch と関心事の切り替わる dispatch は従来どおり新規 session とする（opt-in — 再開するかの判断は呼び出し側が持つ）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`sotp capability exec` に orchestrator が選ぶ resume option を追加する。同一 track・同一 capability の継続作業（同じ成果物への追補・修正の再入、中断からの続行）を対象とし、初回 dispatch と関心事を切り替える dispatch は orchestrator の判断で新規 session とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "4cabd2650852dcafaf577955b9d2f99d99cb1597a3454dd512217be528610884",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この場合の session id は、workspace の機械 local transient 領域（briefing file 置き場と同じ gitignore 済みの既存 runtime path 配下 — 新設の top-level path は作らない）に capability × 対象 artifact（repo-relative path）のキーで保存する。…対象 path が未確定の dispatch は cache の対象外とする（新規 session で実行し、session id も記録しない）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "capability resume cache を、track 内では track・capability、track 外では workspace transient 配下の capability・対象 artifact の repo-relative path で分離する。対象 path が未確定の track 外 dispatch は cache を使わず記録もしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "3571cef764b264badeb99d012a01d1e9ddfacfe5f8de2c7fd985f804dede1a51",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「2つの軸はそのまま D1 の検証2段に対応する: 件数と種類（＝義務一覧の充足）は存在検証（binding 走査、決定論）が検査し、意味は鮮度⇄fulfillment 検証（obligation-fulfillment verdict、hash はその失効トリガ）が検査する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "obligation gate の check と evaluate の判定対称性を修理する。edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "3571cef764b264badeb99d012a01d1e9ddfacfe5f8de2c7fd985f804dede1a51",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「edge の解消 = (a) implementer が test を bind し、obligation-fulfillment 検証を pass する | (b) implementer が waived 理由（散文）を author し、waiver 検証を pass する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "obligation gate の check と evaluate の判定対称性を修理する。edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "3571cef764b264badeb99d012a01d1e9ddfacfe5f8de2c7fd985f804dede1a51",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**全 edge がいずれかで解決宣言されていること（totality）を check が決定論的に検査する**"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "obligation gate の check と evaluate の判定対称性を修理する。edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "f65dd61814564c4a3aca571ef37769bfbd810af3778f2a46f7fc92188f0867b1",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fast/final 二段構成を維持し"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "fast/final の二段 review 構成を廃止または統合すること、または final round を fast の session から resume することは含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f65dd61814564c4a3aca571ef37769bfbd810af3778f2a46f7fc92188f0867b1",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "初回 round と fast→final の escalation は従来どおり新規 session とする（判定の独立性を保ち、また model が変わる escalation は再開不能なため）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "fast/final の二段 review 構成を廃止または統合すること、または final round を fast の session から resume することは含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "34cbc2966360e226c882f29abdca55b1f63a493fc19f5d4d90aa72373447cd48",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "例外は `pr-reviewer` — 実行が repository 外の hosted service 側で行われ、dispatch 側から model / effort 等の実行パラメータを注入できないため、effort 明示の対象外とし fail-closed 検査も適用しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "repository 外の hosted service で実行される pr-reviewer への model・effort 注入は含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c51996e1436b71ff7dc224e3946eebe29e267f8ba20e7f2bb17e7a507514109e",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "適用範囲は subprocess dispatch 経路（provider CLI の起動を伴うもの）とし、in-host 委譲（host 自身の subagent 機構に委ねる分岐）は対象外とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "in-host subagent delegation の resume 対応は含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "686041268b47d8f8dd3926c703069f4250fa5265b375b907442885706c9b7efe",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "session id は reviewer 実行基盤が track × scope × round 種別のキーで保存する。保存先は track 単位の機械 local transient として track 成果物 directory 配下に gitignore 管理で置き、committed な SoT file には入れない（新設の top-level transient path は template export の境界 manifest 分類に抵触するため作らない）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "session id を committed SoT file、review record、track identity に保存すること、または新しい top-level transient path を作ることは含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "686041268b47d8f8dd3926c703069f4250fa5265b375b907442885706c9b7efe",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "session id は capability 実行基盤が track × capability のキーで保存する。保存先は D2 と共通の規則に従う: track 単位の機械 local transient として track 成果物 directory 配下に gitignore 管理で置き、committed な SoT file（review 記録・track identity 等）には入れない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "session id を committed SoT file、review record、track identity に保存すること、または新しい top-level transient path を作ることは含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "997fd360a5ea580c5c6606008c08ed9fdfbedfe8ba069a5d441c6232eaf5f7a1",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skip 判定の状態は別の cache file を新設せず、計算産物である per-layer type-signals artifact 自体に実装側入力の hash として記録する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "D3 の freshness 状態を per-layer type-signals artifact と別の cache file に保存することは含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "df77e0175c0d8974890d6c7d2c75e7e4baf12b3533df9123f79411592be09c09",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "effort 指定の無い dispatch は fail-closed とする — 対象 capability（reviewer は round 種別ごと）の effort が profile から解決できない場合、実行を拒否する。暗黙の provider 既定へ落ちる fail-open は採らない"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "対象 capability の effort が未指定の dispatch を暗黙の provider 既定で実行せず、dispatch を拒否する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "abd98551eac1e2f5ff60063ab41438480d7b9f728bbbb69d8971125aed426862",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cache entry は provider と model を束縛し、現在の profile 解決結果と不一致なら失効として新規 session に落とす。再開の失敗・session 期限切れも同様に新規 session へ fallback する（resume という最適化は諦めるが、round の実行自体は止めない）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "reviewer session の記録済み provider または model が現在の profile 解決結果と不一致、resume 失敗、または期限切れなら、stale な reuse をせず新規 session で round を実行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "a9065a33eb4a304a8ad5cc05e91b16d06b12b63099e5dc95f1f4092e14690a30",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "判定不能な場合は skip を許さず再計算に倒す（skip という省略に対して fail-closed）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "6d2a30fdf5534cc4e151228c59801756099590e42661757725ae2c39a9f32cce",
+      "evidence_hash": "998af877c919750c1b2b745c08ec9e9b45a81004b3c7afe99d05e50265b598e2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "explicit `--track-id` が渡された場合、その値を現在ブランチから導出した track-id と照合する。一致しなければ fail-closed エラーとして停止する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-11",
+          "text_label": "type-signals 評価の書込み対象は、現在 branch と照合済みの track identity に束縛し、不一致は拒否する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "044d71dcc35d9514510f77881c51b2083654a18517467a2749da14ed316a97c9",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cache entry は session id に加えて **provider と model を束縛**し、読み出し時に現在の profile 解決結果と不一致なら失効（新規 session）として扱う"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-08",
+          "text_label": "capability resume cache は provider と model に束縛する。現在の profile 解決結果の provider または model が記録値と不一致、resume 失敗、または期限切れなら、stale な reuse をせず新規 session で dispatch を実行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "2b1bcd4b2f654058eb4920ab6f0133fb52b34975a32989e5d0a083a51d6300a2",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "再開時は model・sandbox・effort の全実行 flag を、引き継ぎ挙動に依存せず毎回明示的に再指定する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "resume 時も dispatcher は現在の profile と provider-native sandbox 定義を通常どおり解決し、model・sandbox・effort を含む全実行 flag を毎回明示的に再注入する。provider の session 設定継承に依存しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "2b1bcd4b2f654058eb4920ab6f0133fb52b34975a32989e5d0a083a51d6300a2",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "再開時も dispatcher は通常の dispatch と同一の解決（profile からの model / effort、provider-native 定義からの sandbox）を行い、**解決した全実行 flag を明示的に再注入する**（D2 と同一の規則。provider の引き継ぎ挙動に依存しない）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "resume 時も dispatcher は現在の profile と provider-native sandbox 定義を通常どおり解決し、model・sandbox・effort を含む全実行 flag を毎回明示的に再注入する。provider の session 設定継承に依存しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "c0cbefa4a3ba523a52db5b860bd64b9a6f5189de0ad613d567e3a9af4d083029",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "再入 round でも scope 全件を再判定する権限・義務を持つことは、reviewer 系 capability の運用契約（capability SSoT 文書）に常設の規定として記載し、prompt ごとの注入に依存させない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "reviewer は resume 後も scope 全件を再判定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "5251c561488c6b9ea1fa6eb2bca2f158658b2d64634f805bf423637d58c524bc",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「同じ scope・同じ round 種別で再判定する場合、前回 reviewer session を provider の session 再開機構（codex exec resume / claude -p の resume）で継続する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "session resume は review judgment と review record の単位を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "9d3f003df22b1c4e42d7309532955641b80e3a7db524a3a945cd8a4e12e6d68d",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "writer 特有の注意として、再入の間に他 writer が上流 artifact を変更している場合がある（例: spec への要素追加後の型カタログ再入）。再開 prompt に runner が変更点を要約して渡すことはせず、**再開時は上流 artifact の変更有無を自ら確認し、変更があれば再読してから作業する義務**を capability の運用契約（共有 discipline ないし各 capability SSoT）に常設の規定として記載する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-10",
+          "text_label": "writer 系 capability は resume 後に上流 artifact の変更有無を自ら確認し、変更があれば再読してから作業する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "005ff75b15c8786749c37f17ad38945817c2f9faa8f552792bc41e814ed75c67",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "session id は reviewer 実行基盤が track × scope × round 種別のキーで保存する。保存先は track 単位の機械 local transient として track 成果物 directory 配下に gitignore 管理で置き、committed な SoT file には入れない（新設の top-level transient path は template export の境界 manifest 分類に抵触するため作らない）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "session cache は gitignored machine-local transient とし、track 解決時は track artifact directory 配下、track 解決不能時は既存 workspace runtime path 配下に置く。cache の lifecycle と key は track または対象 artifact の境界を越えて混線しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "005ff75b15c8786749c37f17ad38945817c2f9faa8f552792bc41e814ed75c67",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "保存先は D2 と共通の規則に従う: **track 単位の機械 local transient として track 成果物 directory 配下に gitignore 管理で置き、committed な SoT file（review 記録・track identity 等）には入れない**。track の削除・archive と lifecycle を共にし、並行 track 間で混線しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "session cache は gitignored machine-local transient とし、track 解決時は track artifact directory 配下、track 解決不能時は既存 workspace runtime path 配下に置く。cache の lifecycle と key は track または対象 artifact の境界を越えて混線しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "42e488012663edfbfda5cbf685eb05758026cbc08d403a3c9a8b7eabdeeb2299",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hash の入力は対象 crate の source 内容に加え、rustdoc 出力に影響する依存解決（lockfile）と toolchain の識別子を含める。判定と skip の粒度は layer（crate）単位とし、変更のあった layer のみ再計算する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "D3 の reuse 判定は、対象 crate の source 内容、依存解決（lockfile）、toolchain 識別子から得る content hash に基づく。判定粒度は layer（crate）単位とし、変更がある layer だけを再計算する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "34d0becc38f51a0862903a7c929c7000dce6f79fa0fb59c7c9476a87ede2f0b7",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "したがって committed default profile は対象の全 capability に effort を明示し、reviewer は fast を低 effort（low）、final を各 provider の最大段階（codex は xhigh、claude は max）とする。… semantic reference 検証の `ref-verifier-chain1` / `ref-verifier-chain2` も対象に含める。例外は `pr-reviewer`"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "default routing profile は subprocess を起動する対象 capability の effort を解決でき、reviewer-like capability では fast と final の別 effort が解決できる。default profile の reviewer fast は low、final は各 provider の最大段階であり、fast の前置判定と final の完全判定から成る二段 review を維持する。ref-verifier-chain1 / ref-verifier-chain2 は対象であり、pr-reviewer は対象外である。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "69e2999da7c83d00e768a075d9ba500cec59144f1fc22a4cd33017c5d36afd4e",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "effort 指定の無い dispatch は fail-closed とする — 対象 capability（reviewer は round 種別ごと）の effort が profile から解決できない場合、実行を拒否する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "対象 capability の effort が欠ける dispatch は provider の既定値で起動せず拒否され、pr-reviewer は effort 未指定でもこの拒否検査の対象にならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "4366b1c9706f0833d253640513d73ad5eee6c781b408cbdf1e9964e2363a4728",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同一 scope × 同一 round 種別の再 round は reviewer session を再開して差分 review する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "同一 track・scope・round 種別で fixer 後に再実行した reviewer round は、現在の profile 解決結果の provider と model が一致する有効な prior session を resume し、全実行 flag を明示的に再指定したうえで reviewer は現在の file list と diff から scope 全件を再判定する。resume は文脈だけを再利用し、その round の judgment と review record は新規 session の round と同じ単位・意味で記録される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "8fab669df39131c60a84a964399837e9d35abd0be89f8e1f80b907e58f882ee1",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "初回 round と fast→final の escalation は従来どおり新規 session とする。... cache entry は provider と model を束縛し、現在の profile 解決結果と不一致なら失効として新規 session に落とす。再開の失敗・session 期限切れも同様に新規 session へ fallback する... 再開時は model・sandbox・effort の全実行 flag を、引き継ぎ挙動に依存せず毎回明示的に再指定する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "reviewer の初回 round、fast から final への escalation、profile 解決結果の provider または model の不一致、resume 失敗、または session 期限切れでは、新規 session で round を実行する。resume・新規のどちらでも model・sandbox・effort の全 flag は明示指定される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "ddc5c857319ee8bcff94b6ef60d1efbbdd345d5d03c95098a4e33710d77d2a07",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "判定は内容 hash の機械的比較で行い、判定不能な場合は skip を許さず再計算に倒す（skip という省略に対して fail-closed）。catalogue や spec の変更は signal の再評価対象だが rustdoc 抽出の再実行を要しないため、再計算の要否は入力ごとに分離して判定する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "rustdoc 抽出の要否は、layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。一致時は rustdoc 抽出を skip し、不一致または判定不能時は AC-07 の条件に従って rustdoc 抽出から再計算する。declaration_hash または spec の差分は signal 再評価の要否だけを決め、両方が一致するときは評価ごと skip し、declaration_hash のみが不一致で implementation-side input hash が一致するときは AC-06 の条件に従って rustdoc を起動せず signal を再評価する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "f4297f58a9fc5f4c1d1dcc4be1283815b456de3dd577387a3559727daadf4f52",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue や spec の変更は signal の再評価対象だが rustdoc 抽出の再実行を要しないため、再計算の要否は入力ごとに分離して判定する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "ec707111f47c24a28d5c6c1e8921016b80f9f1df9c57f042f873d4658a71b468",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "hash の入力は対象 crate の source 内容に加え、rustdoc 出力に影響する依存解決（lockfile）と toolchain の識別子を含める。判定と skip の粒度は layer（crate）単位とし、変更のあった layer のみ再計算する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "12a6dd207b9fc471c6baee3fbfc9973493acb2a524b5679be39bd041c29730dd",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "skip 判定の状態は別の cache file を新設せず、計算産物である per-layer type-signals artifact 自体に実装側入力の hash として記録する。既存 artifact は catalogue 側入力の hash（declaration_hash）を既に保持しており、実装側入力の hash を対称に加えることで、鮮度判定は「artifact に記録された入力 hash と現在の入力 hash の一致」という artifact 自己記述の検証になる"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact は、D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "6a3047e6a3e70c18439ff82f51f1e54058d97c6aebf518347106d5303ae67dca",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track 外の dispatch でも resume を使えるようにする... session id は、workspace の機械 local transient 領域...に capability × 対象 artifact（repo-relative path）のキーで保存する。... track cache と workspace cache のどちらを使うかは dispatch 時の track 解決結果で機械的に分岐し（解決成功 → track cache、解決失敗 → workspace cache）"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "orchestrator が継続作業と判断して resume option を指定した provider CLI subprocess dispatch の `sotp capability exec` は、track 内では同一 track・capability の有効 cache entry を再開する。track 解決時は track-local cache、track 解決不能時は capability・対象 artifact の repo-relative path による workspace-local cache を選び、初回 dispatch、関心事を切り替えた dispatch、対象 path 未確定の track 外 dispatch、または provider・model 不一致では新規 session で実行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "937d966a0f20ec721cceef92656a12e2918a311e80fd05d24ef46576cc7036e6",
+      "evidence_hash": "795a4e76c746bcb7907adb52c323f99faaaa963c8c737f4c1a1f52cdea38d74d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "再開の失敗・session 期限切れは新規 session に fallback し、dispatch 自体は止めない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "capability resume の再開失敗または session 期限切れは dispatch を中断させず、新規 session に fallback する。resume capability は上流 artifact の変更有無を確認し、変更があれば再読し、全実行 flag を再注入したうえで作業する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-13-2217-agent-dispatch-cost-reduction.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "ae586810ff5e04f64f712f21c0bc592181dc64875bb22b2363d8521fa268f381",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "edge 会計（D4）: (entry, cite 先 anchor) ごとに verdict {fulfilled / waived / fail} へ解決——… 義務の有無を問わず、どの edge もいずれの verdict でも解消できる"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。check と evaluate はこの規則から同一の帰結を得る。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "ae586810ff5e04f64f712f21c0bc592181dc64875bb22b2363d8521fa268f381",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "edge の解消 = (a) implementer が test を bind し、obligation-fulfillment 検証を pass する | (b) implementer が waived 理由（散文）を author し、waiver 検証を pass する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。check と evaluate はこの規則から同一の帰結を得る。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "ae586810ff5e04f64f712f21c0bc592181dc64875bb22b2363d8521fa268f381",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**自発的 binding**: 義務が導出されていない edge への直接テスト結束。fulfillment 検証は導出義務の場合と同一・D4"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。check と evaluate はこの規則から同一の帰結を得る。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D9"
+        }
+      }
+    }
+  ]
+}

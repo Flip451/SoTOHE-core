@@ -8,6 +8,7 @@ mod spawn;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use usecase::capability_exec::{ModelName, ReasoningEffort};
 use usecase::review_v2::run_review_fix::{
     ReviewFixRunner, ReviewFixRunnerError, RunReviewFixCommand, RunReviewFixOutput,
 };
@@ -23,16 +24,18 @@ use spawn::{fixer_runtime_path, spawn_and_collect_codex};
 pub(crate) const CODEX_BIN_ENV: &str = "SOTP_CODEX_BIN";
 
 pub struct CodexReviewFixRunner {
-    model: String,
+    model: ModelName,
+    effort: ReasoningEffort,
     #[cfg(test)]
     bin_override: Option<OsString>,
 }
 
 impl CodexReviewFixRunner {
     #[must_use]
-    pub fn new(model: String, _scope: String, _briefing_file: PathBuf) -> Self {
+    pub fn new(model: ModelName, effort: ReasoningEffort) -> Self {
         Self {
             model,
+            effort,
             #[cfg(test)]
             bin_override: None,
         }
@@ -159,7 +162,12 @@ impl ReviewFixRunner for CodexReviewFixRunner {
         let safe_home = create_safe_home()?;
         let _home_cleanup = SafeHomeCleanup(safe_home.clone());
         let safe_env = build_safe_env(&safe_home, &codex_home, extra_path.as_deref())?;
-        let args = build_codex_fixer_invocation(&self.model, &codex_home, &output_last_message);
+        let args = build_codex_fixer_invocation(
+            self.model.as_str(),
+            self.effort,
+            &codex_home,
+            &output_last_message,
+        );
         let (stdout, log_path) = spawn_and_collect_codex(&bin, &args, &safe_env, &prompt)?;
         // By default the guard removes the log on drop. Disarm it on failure
         // paths so the log is retained for diagnosis.
@@ -226,9 +234,8 @@ mod tests {
 
     fn make_runner() -> CodexReviewFixRunner {
         CodexReviewFixRunner::new(
-            "gpt-5.5".to_owned(),
-            "infrastructure".to_owned(),
-            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            ModelName::try_new("gpt-5.5").expect("valid test model"),
+            ReasoningEffort::Low,
         )
     }
 

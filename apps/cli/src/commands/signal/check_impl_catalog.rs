@@ -22,5 +22,9 @@ pub fn run(
     args: CheckImplCatalogArgs,
 ) -> Result<CommandOutcome, CompositionError> {
     let gate = args.flags.gate_name();
-    app.signal_check_impl_catalog(args.flags.strict, gate, args.flags.workspace_root)
+    app.signal_check_impl_catalog(
+        args.flags.strict.then_some(cli_composition::signal::Strictness::Strict),
+        gate,
+        args.flags.workspace_root,
+    )
 }

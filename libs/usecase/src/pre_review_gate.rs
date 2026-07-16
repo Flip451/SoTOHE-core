@@ -642,7 +642,13 @@ mod tests {
     }
 
     fn make_signals(signals: Vec<TypeSignal>) -> TypeSignalsDocument {
-        TypeSignalsDocument::new(ts("2026-06-27T00:00:00Z"), "hash", signals)
+        let digest = domain::Sha256Digest::try_new("a".repeat(64)).unwrap();
+        TypeSignalsDocument::new(
+            ts("2026-06-27T00:00:00Z"),
+            domain::CatalogueDeclarationHash::new(digest.clone()),
+            domain::ImplementationInputHash::new(digest),
+            signals,
+        )
     }
 
     // ── Mock implementations ──────────────────────────────────────────────────

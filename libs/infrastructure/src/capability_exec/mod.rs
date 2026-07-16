@@ -8,6 +8,7 @@ pub(crate) mod path_guard;
 pub(crate) mod process;
 pub(crate) mod prompt;
 pub(crate) mod read;
+pub(crate) mod session;
 pub mod source;
 
 use usecase::capability_exec::{
@@ -150,6 +151,7 @@ mod tests {
             &repository.join("tmp/capability-runtime"),
             &provider,
             Some(Duration::from_secs(1)),
+            None,
         )
         .expect_err("symlinked runtime directory is rejected before process spawn");
 
@@ -172,6 +174,7 @@ mod tests {
             &repository.path().join("tmp/capability-runtime"),
             &provider,
             Some(Duration::from_millis(1)),
+            None,
         )
         .expect_err("provider process exceeds timeout");
 
@@ -187,16 +190,17 @@ mod tests {
         let provider = ProviderName::try_new("codex")?;
         let args = [OsString::from("-c"), OsString::from("sleep 0.2; exit 7")];
 
-        let exit_code = run_provider_process_with_timeout(
+        let output = run_provider_process_with_timeout(
             "sh",
             &args,
             repository.path(),
             &repository.path().join("tmp/capability-runtime"),
             &provider,
             None,
+            None,
         )?;
 
-        assert_eq!(exit_code, 7);
+        assert_eq!(output.exit_code, 7);
         Ok(())
     }
 
@@ -216,6 +220,7 @@ mod tests {
             &repository.path().join("tmp/capability-runtime"),
             &provider,
             Some(Duration::from_secs(1)),
+            None,
         )
         .expect_err("a detached stderr holder must not hang dispatch");
 
@@ -261,7 +266,7 @@ mod tests {
         let parsed = parse_provider_definition_front_matter(front_matter)
             .expect("top-level tools list parses");
 
-        assert!(parsed.has_tools());
+        assert_eq!(parsed.tools(), Some(vec!["Read", "Edit"]));
         assert_eq!(parsed.validate_identity("implementer", "provider definition"), Ok(()));
     }
 

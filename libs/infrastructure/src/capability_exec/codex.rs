@@ -1,22 +1,30 @@
 //! Codex provider-native adapter for generic capability dispatch.
 
 use std::ffi::OsString;
+use std::io::Write;
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 
+use domain::TrackId;
 use serde::Deserialize;
 use usecase::capability_exec::{
     CODEX_PROVIDER_NAME, CapabilityDispatchOutcome, CapabilityDispatchRequest, CapabilityExecError,
-    CapabilityProviderPort, ProviderName,
+    CapabilityProviderPort, ProviderName, ReasoningEffort,
 };
+use usecase::provider_session::ProviderSessionCachePort;
 
 use super::path_guard::capability_name_path_segment;
+use super::process::emit_provider_final_message;
+use super::session::CapabilitySession;
 use super::{
     ProviderProcessRunner, adapter_preflight_error, capability_prompt, dispatch_error,
     parse_provider_definition_front_matter, read_front_matter, read_utf8_file,
     system_process_runner,
 };
+
+static OUTPUT_LAST_MESSAGE_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 /// Codex sandbox vocabulary declared by a provider-native skill definition.
 #[derive(Debug, PartialEq, Eq, Deserialize)]
@@ -51,17 +59,26 @@ pub struct CodexCapabilityAdapter {
     runtime_dir: PathBuf,
     provider: ProviderName,
     process_runner: Arc<dyn ProviderProcessRunner>,
+    session_cache: Arc<dyn ProviderSessionCachePort>,
+    track_id: Option<TrackId>,
 }
 
 impl CodexCapabilityAdapter {
     /// Creates a Codex adapter rooted at `repo_root` with logs under `runtime_dir`.
     #[must_use]
-    pub fn new(repo_root: PathBuf, runtime_dir: PathBuf) -> Self {
+    pub fn new(
+        repo_root: PathBuf,
+        runtime_dir: PathBuf,
+        session_cache: Arc<dyn ProviderSessionCachePort>,
+        track_id: Option<TrackId>,
+    ) -> Self {
         Self {
             repo_root,
             runtime_dir,
             provider: CODEX_PROVIDER_NAME.clone(),
             process_runner: system_process_runner(),
+            session_cache,
+            track_id,
         }
     }
 
@@ -71,7 +88,35 @@ impl CodexCapabilityAdapter {
         runtime_dir: PathBuf,
         process_runner: Arc<dyn ProviderProcessRunner>,
     ) -> Self {
-        Self { repo_root, runtime_dir, provider: CODEX_PROVIDER_NAME.clone(), process_runner }
+        let session_cache = Arc::new(crate::provider_session::FsProviderSessionCacheAdapter::new(
+            repo_root.clone(),
+            runtime_dir.clone(),
+        ));
+        Self::with_process_runner_and_session_cache(
+            repo_root,
+            runtime_dir,
+            process_runner,
+            session_cache,
+            None,
+        )
+    }
+
+    #[cfg(test)]
+    fn with_process_runner_and_session_cache(
+        repo_root: PathBuf,
+        runtime_dir: PathBuf,
+        process_runner: Arc<dyn ProviderProcessRunner>,
+        session_cache: Arc<dyn ProviderSessionCachePort>,
+        track_id: Option<TrackId>,
+    ) -> Self {
+        Self {
+            repo_root,
+            runtime_dir,
+            provider: CODEX_PROVIDER_NAME.clone(),
+            process_runner,
+            session_cache,
+            track_id,
+        }
     }
 
     fn skill_path(&self, capability: &str) -> PathBuf {
@@ -90,6 +135,14 @@ impl CodexCapabilityAdapter {
         sandbox_mode_from_skill(&definition, capability)
             .map_err(|detail| adapter_preflight_error(request, &self.provider, detail))
     }
+
+    fn output_last_message_path(&self) -> PathBuf {
+        self.runtime_dir.join(format!(
+            "capability-codex-last-message-{}-{}.txt",
+            std::process::id(),
+            OUTPUT_LAST_MESSAGE_SEQUENCE.fetch_add(1, Ordering::Relaxed),
+        ))
+    }
 }
 
 impl CapabilityProviderPort for CodexCapabilityAdapter {
@@ -101,19 +154,87 @@ impl CapabilityProviderPort for CodexCapabilityAdapter {
         &self,
         request: &CapabilityDispatchRequest,
     ) -> Result<CapabilityDispatchOutcome, CapabilityExecError> {
+        self.dispatch_with_stdout(request, &mut std::io::stdout())
+    }
+}
+
+impl CodexCapabilityAdapter {
+    fn dispatch_with_stdout(
+        &self,
+        request: &CapabilityDispatchRequest,
+        passthrough: &mut impl Write,
+    ) -> Result<CapabilityDispatchOutcome, CapabilityExecError> {
         let sandbox = self.sandbox_mode(request)?;
         let prompt = capability_prompt(request);
-        let args = build_codex_args(request.profile.model.as_str(), sandbox, &prompt);
+        let session =
+            CapabilitySession::new(request, self.track_id.as_ref(), self.session_cache.clone());
+        let resume_id = session.resumable_id(&request.request.resume);
+        let output_last_message = self.output_last_message_path();
+        let args = build_codex_args_with_resume(
+            request.profile.model.as_str(),
+            request.profile.effort,
+            sandbox,
+            resume_id.as_deref(),
+            &prompt,
+            &output_last_message,
+        );
         let timeout = request.request.timeout.map(|timeout| Duration::from_secs(timeout.as_secs()));
-        let exit_code = self
+        let result = self
             .process_runner
-            .run("codex", &args, &self.repo_root, &self.runtime_dir, &self.provider, timeout)
+            .run(
+                "codex",
+                &args,
+                &self.repo_root,
+                &self.runtime_dir,
+                &self.provider,
+                timeout,
+                Some(&output_last_message),
+            )
             .map_err(|error| match error {
                 CapabilityExecError::DispatchFailed { .. } => error,
                 other => dispatch_error(&self.provider, other.to_string()),
-            })?;
-
-        Ok(CapabilityDispatchOutcome::Executed { provider: self.provider.clone(), exit_code })
+            });
+        let output = match (resume_id, result) {
+            (Some(_), Ok(output)) if output.exit_code != 0 => self.process_runner.run(
+                "codex",
+                &build_codex_args(
+                    request.profile.model.as_str(),
+                    request.profile.effort,
+                    sandbox,
+                    &prompt,
+                    &output_last_message,
+                ),
+                &self.repo_root,
+                &self.runtime_dir,
+                &self.provider,
+                timeout,
+                Some(&output_last_message),
+            )?,
+            (Some(_), Err(_)) => self.process_runner.run(
+                "codex",
+                &build_codex_args(
+                    request.profile.model.as_str(),
+                    request.profile.effort,
+                    sandbox,
+                    &prompt,
+                    &output_last_message,
+                ),
+                &self.repo_root,
+                &self.runtime_dir,
+                &self.provider,
+                timeout,
+                Some(&output_last_message),
+            )?,
+            (_, result) => result?,
+        };
+        emit_provider_final_message(&output, &self.provider, "codex", passthrough)?;
+        if output.exit_code == 0 {
+            session.save(output.session_id);
+        }
+        Ok(CapabilityDispatchOutcome::Executed {
+            provider: self.provider.clone(),
+            exit_code: output.exit_code,
+        })
     }
 }
 
@@ -133,15 +254,50 @@ fn sandbox_mode_from_skill(
     }
 }
 
-fn build_codex_args(model: &str, sandbox: SandboxMode, prompt: &str) -> Vec<OsString> {
+fn build_codex_args(
+    model: &str,
+    effort: ReasoningEffort,
+    sandbox: SandboxMode,
+    prompt: &str,
+    output_last_message: &std::path::Path,
+) -> Vec<OsString> {
+    build_codex_args_with_resume(model, effort, sandbox, None, prompt, output_last_message)
+}
+
+fn build_codex_args_with_resume(
+    model: &str,
+    effort: ReasoningEffort,
+    sandbox: SandboxMode,
+    resume_id: Option<&str>,
+    prompt: &str,
+    output_last_message: &std::path::Path,
+) -> Vec<OsString> {
     vec![
         OsString::from("exec"),
         OsString::from("-m"),
         OsString::from(model),
+        OsString::from("--config"),
+        OsString::from(format!("model_reasoning_effort=\"{}\"", reasoning_effort_value(effort))),
         OsString::from("--sandbox"),
         OsString::from(sandbox.as_cli_value()),
-        OsString::from(prompt),
+        OsString::from("--json"),
+        OsString::from("--output-last-message"),
+        output_last_message.as_os_str().to_owned(),
     ]
+    .into_iter()
+    .chain(resume_id.into_iter().flat_map(|id| [OsString::from("resume"), OsString::from(id)]))
+    .chain([OsString::from(prompt)])
+    .collect()
+}
+
+fn reasoning_effort_value(effort: ReasoningEffort) -> &'static str {
+    match effort {
+        ReasoningEffort::Low => "low",
+        ReasoningEffort::Medium => "medium",
+        ReasoningEffort::High => "high",
+        ReasoningEffort::XHigh => "xhigh",
+        ReasoningEffort::Max => "max",
+    }
 }
 
 #[cfg(test)]
@@ -153,14 +309,22 @@ mod tests {
     use std::sync::{Arc, Mutex};
     use std::time::Duration;
 
+    use super::super::process::ProviderProcessOutput;
     use super::super::{MAX_CAPABILITY_EXEC_TEXT_BYTES, ProviderProcessRunner};
     use super::{CodexCapabilityAdapter, SandboxMode, build_codex_args, sandbox_mode_from_skill};
+    use crate::provider_session::FsProviderSessionCacheAdapter;
+    use domain::TrackId;
     use usecase::capability_exec::{
         BriefingText, CapabilityDispatchOutcome, CapabilityDispatchRequest, CapabilityExecError,
         CapabilityExecRequest, CapabilityFilePath, CapabilityProfile, CapabilityProviderPort,
-        DisciplineText, ExecutionMode, ModelName, ProviderName, TimeoutSeconds,
+        CapabilityResumeRequest, DisciplineText, ExecutionMode, ModelName, ProviderName,
+        ReasoningEffort, TargetArtifactPath, TargetArtifactSet, TimeoutSeconds,
     };
     use usecase::dry_write_driver::CapabilityName;
+    use usecase::provider_session::{
+        ProviderSessionCacheEntry, ProviderSessionCacheKey, ProviderSessionCachePort,
+        ProviderSessionId,
+    };
 
     type RecordedInvocation = (String, Vec<OsString>, Option<Duration>);
 
@@ -168,6 +332,9 @@ mod tests {
     struct RecordingProcessRunner {
         invocations: Mutex<Vec<RecordedInvocation>>,
         exit_code: u8,
+        exit_codes: Mutex<Vec<u8>>,
+        session_ids: Mutex<Vec<Option<String>>>,
+        final_messages: Mutex<Vec<Option<Vec<u8>>>>,
     }
 
     impl ProviderProcessRunner for RecordingProcessRunner {
@@ -179,13 +346,32 @@ mod tests {
             _runtime_dir: &Path,
             _provider: &ProviderName,
             timeout: Option<Duration>,
-        ) -> Result<u8, CapabilityExecError> {
+            _output_last_message: Option<&Path>,
+        ) -> Result<ProviderProcessOutput, CapabilityExecError> {
             self.invocations.lock().expect("test process recorder lock").push((
                 binary.to_owned(),
                 args.to_vec(),
                 timeout,
             ));
-            Ok(self.exit_code)
+            let exit_code = self
+                .exit_codes
+                .lock()
+                .expect("test process exit-code lock")
+                .pop()
+                .unwrap_or(self.exit_code);
+            let session_id = self
+                .session_ids
+                .lock()
+                .expect("test process session-id lock")
+                .pop()
+                .unwrap_or(None);
+            let final_message = self
+                .final_messages
+                .lock()
+                .expect("test process final-message lock")
+                .pop()
+                .unwrap_or(None);
+            Ok(ProviderProcessOutput { exit_code, session_id, final_message })
         }
     }
 
@@ -199,10 +385,12 @@ mod tests {
                 host: ProviderName::try_new(host)?,
                 briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
                 timeout: None,
+                resume: usecase::capability_exec::CapabilityResumeRequest::Fresh,
             },
             profile: CapabilityProfile {
                 provider: ProviderName::try_new("codex")?,
                 model: ModelName::try_new("gpt-5")?,
+                effort: ReasoningEffort::High,
                 execution_mode: ExecutionMode::OrchestratorOutput,
             },
             briefing: BriefingText::try_new("Implement the assigned task.".to_owned())?,
@@ -256,11 +444,13 @@ mod tests {
     }
 
     #[test]
-    fn test_codex_args_explicit_skill_prompt_uses_profile_model_and_sandbox() {
+    fn test_codex_args_explicit_skill_prompt_uses_profile_model_effort_and_sandbox() {
         let args = build_codex_args(
             "gpt-5",
+            ReasoningEffort::XHigh,
             SandboxMode::WorkspaceWrite,
             "$implementer Briefing: Read tmp/briefing.md and perform the task.",
+            Path::new("tmp/runtime/final-message.txt"),
         );
         let values: Vec<_> = args.iter().map(|value| value.to_string_lossy()).collect();
 
@@ -270,8 +460,13 @@ mod tests {
                 "exec",
                 "-m",
                 "gpt-5",
+                "--config",
+                "model_reasoning_effort=\"xhigh\"",
                 "--sandbox",
                 "workspace-write",
+                "--json",
+                "--output-last-message",
+                "tmp/runtime/final-message.txt",
                 "$implementer Briefing: Read tmp/briefing.md and perform the task.",
             ]
         );
@@ -305,20 +500,371 @@ mod tests {
         assert_eq!(invocation.0, "codex");
         let args: Vec<_> =
             invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();
-        let [command, model_flag, model, sandbox_flag, sandbox, prompt] = args.as_slice() else {
-            return Err("Codex invocation must have six arguments".into());
+        let [
+            command,
+            model_flag,
+            model,
+            config_flag,
+            config,
+            sandbox_flag,
+            sandbox,
+            json,
+            output_flag,
+            output_path,
+            prompt,
+        ] = args.as_slice()
+        else {
+            return Err("Codex invocation must have eleven arguments".into());
         };
         assert_eq!(command, "exec");
         assert_eq!(model_flag, "-m");
         assert_eq!(model, "gpt-5");
+        assert_eq!(config_flag, "--config");
+        assert_eq!(config, "model_reasoning_effort=\"high\"");
         assert_eq!(sandbox_flag, "--sandbox");
         assert_eq!(sandbox, "workspace-write");
+        assert_eq!(json, "--json");
+        assert_eq!(output_flag, "--output-last-message");
+        assert!(output_path.ends_with(".txt"));
         assert!(
             prompt.contains("$implementer Briefing: Read tmp/briefing.md and perform the task.")
         );
         assert!(prompt.contains("Do not stage changes."));
         assert!(!prompt.contains("sandbox: workspace-write"));
         assert_eq!(invocation.2, None, "an omitted timeout runs the provider without a limit");
+        Ok(())
+    }
+
+    #[test]
+    fn test_codex_capability_adapter_resumes_workspace_session_with_explicit_flags()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_skill(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nskill body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let mut adapter = CodexCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+        let mut request = request_from_host("claude")?;
+        let targets = TargetArtifactSet::try_new(vec![TargetArtifactPath::try_new(
+            PathBuf::from("track/items/a/spec.json"),
+        )?])?;
+        request.request.resume = CapabilityResumeRequest::Resume(targets.clone());
+        let cache = Arc::new(FsProviderSessionCacheAdapter::new(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+        ));
+        let key = ProviderSessionCacheKey::WorkspaceCapability {
+            capability: request.request.capability.clone(),
+            target_artifacts: targets,
+        };
+        cache.save(
+            &key,
+            &ProviderSessionCacheEntry::new(
+                ProviderSessionId::try_new("prior-session".to_owned())?,
+                request.profile.provider.clone(),
+                request.profile.model.clone(),
+                request.profile.effort,
+            ),
+        )?;
+        adapter.session_cache = cache;
+
+        adapter.dispatch(&request)?;
+
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        let first = invocations.first().expect("one invocation recorded");
+        let args: Vec<_> =
+            first.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();
+        assert!(args.windows(2).any(|pair| pair == ["resume", "prior-session"]));
+        assert!(args.windows(2).any(|pair| pair == ["-m", "gpt-5"]));
+        assert!(args.contains(&"model_reasoning_effort=\"high\"".to_owned()));
+        assert!(args.windows(2).any(|pair| pair == ["--sandbox", "workspace-write"]));
+        Ok(())
+    }
+
+    #[test]
+    fn test_codex_capability_adapter_injected_cache_persists_and_resumes_track_session()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_skill(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nskill body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner {
+            session_ids: Mutex::new(vec![None, Some("persisted-codex-session".to_owned())]),
+            ..Default::default()
+        });
+        let cache = Arc::new(FsProviderSessionCacheAdapter::new(
+            directory.path().to_owned(),
+            directory.path().join("tmp/runtime"),
+        ));
+        let track_id = TrackId::try_new("track-a")?;
+        let adapter = CodexCapabilityAdapter::with_process_runner_and_session_cache(
+            directory.path().to_owned(),
+            directory.path().join("tmp/runtime"),
+            runner.clone(),
+            cache.clone(),
+            Some(track_id.clone()),
+        );
+        let mut request = request_from_host("claude")?;
+        request.request.resume =
+            CapabilityResumeRequest::Resume(TargetArtifactSet::try_new(vec![
+                TargetArtifactPath::try_new(PathBuf::from("track/items/a/spec.json"))?,
+            ])?);
+        let key = ProviderSessionCacheKey::TrackCapability {
+            track_id,
+            capability: request.request.capability.clone(),
+        };
+
+        adapter.dispatch(&request)?;
+        assert_eq!(
+            cache.load(&key)?.map(|entry| entry.session_id().as_str().to_owned()),
+            Some("persisted-codex-session".to_owned())
+        );
+        adapter.dispatch(&request)?;
+
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        assert_eq!(invocations.len(), 2);
+        let resumed = invocations.get(1).expect("second invocation resumes the saved session");
+        let resumed_args: Vec<_> =
+            resumed.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();
+        assert!(resumed_args.windows(2).any(|pair| pair == ["resume", "persisted-codex-session"]));
+        assert!(resumed_args.windows(2).any(|pair| pair == ["-m", "gpt-5"]));
+        assert!(resumed_args.contains(&"model_reasoning_effort=\"high\"".to_owned()));
+        assert!(resumed_args.windows(2).any(|pair| pair == ["--sandbox", "workspace-write"]));
+        Ok(())
+    }
+
+    #[test]
+    fn test_codex_capability_adapter_provider_mismatch_starts_fresh_with_explicit_flags()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_skill(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nskill body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let mut adapter = CodexCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+        let mut request = request_from_host("claude")?;
+        let targets = TargetArtifactSet::try_new(vec![TargetArtifactPath::try_new(
+            PathBuf::from("track/items/a/spec.json"),
+        )?])?;
+        request.request.resume = CapabilityResumeRequest::Resume(targets.clone());
+        let cache = Arc::new(FsProviderSessionCacheAdapter::new(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+        ));
+        let key = ProviderSessionCacheKey::WorkspaceCapability {
+            capability: request.request.capability.clone(),
+            target_artifacts: targets,
+        };
+        let current_provider = request.profile.provider.clone();
+        let recorded_provider = ProviderName::try_new("claude")?;
+        assert_ne!(current_provider, recorded_provider);
+        cache.save(
+            &key,
+            &ProviderSessionCacheEntry::new(
+                ProviderSessionId::try_new("stale-claude-session".to_owned())?,
+                recorded_provider,
+                request.profile.model.clone(),
+                request.profile.effort,
+            ),
+        )?;
+        adapter.session_cache = cache;
+
+        adapter.dispatch(&request)?;
+
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        let args: Vec<_> = invocations
+            .first()
+            .expect("one fresh invocation recorded")
+            .1
+            .iter()
+            .map(|value| value.to_string_lossy().into_owned())
+            .collect();
+        assert!(!args.contains(&"resume".to_owned()));
+        assert!(args.windows(2).any(|pair| pair == ["-m", "gpt-5"]));
+        assert!(args.contains(&"model_reasoning_effort=\"high\"".to_owned()));
+        assert!(args.windows(2).any(|pair| pair == ["--sandbox", "workspace-write"]));
+        Ok(())
+    }
+
+    #[test]
+    fn test_codex_capability_adapter_model_mismatch_starts_fresh_with_explicit_flags()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_skill(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nskill body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let mut adapter = CodexCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+        let mut request = request_from_host("claude")?;
+        let targets = TargetArtifactSet::try_new(vec![TargetArtifactPath::try_new(
+            PathBuf::from("track/items/a/spec.json"),
+        )?])?;
+        request.request.resume = CapabilityResumeRequest::Resume(targets.clone());
+        let cache = Arc::new(FsProviderSessionCacheAdapter::new(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+        ));
+        let key = ProviderSessionCacheKey::WorkspaceCapability {
+            capability: request.request.capability.clone(),
+            target_artifacts: targets,
+        };
+        let recorded_model = ModelName::try_new("gpt-5-mini")?;
+        assert_ne!(request.profile.model, recorded_model);
+        cache.save(
+            &key,
+            &ProviderSessionCacheEntry::new(
+                ProviderSessionId::try_new("stale-model-session".to_owned())?,
+                request.profile.provider.clone(),
+                recorded_model,
+                request.profile.effort,
+            ),
+        )?;
+        adapter.session_cache = cache;
+
+        adapter.dispatch(&request)?;
+
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        assert_eq!(invocations.len(), 1);
+        let args: Vec<_> = invocations
+            .first()
+            .expect("one fresh invocation recorded")
+            .1
+            .iter()
+            .map(|value| value.to_string_lossy().into_owned())
+            .collect();
+        assert!(!args.contains(&"resume".to_owned()));
+        assert!(args.windows(2).any(|pair| pair == ["-m", "gpt-5"]));
+        assert!(args.contains(&"model_reasoning_effort=\"high\"".to_owned()));
+        assert!(args.windows(2).any(|pair| pair == ["--sandbox", "workspace-write"]));
+        Ok(())
+    }
+
+    #[test]
+    fn test_codex_capability_adapter_resume_nonzero_retries_fresh_with_explicit_flags()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_skill(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nskill body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner {
+            exit_codes: Mutex::new(vec![0, 7]),
+            ..Default::default()
+        });
+        let mut adapter = CodexCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+        let mut request = request_from_host("claude")?;
+        let targets = TargetArtifactSet::try_new(vec![TargetArtifactPath::try_new(
+            PathBuf::from("track/items/a/spec.json"),
+        )?])?;
+        request.request.resume = CapabilityResumeRequest::Resume(targets.clone());
+        let cache = Arc::new(FsProviderSessionCacheAdapter::new(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+        ));
+        let key = ProviderSessionCacheKey::WorkspaceCapability {
+            capability: request.request.capability.clone(),
+            target_artifacts: targets,
+        };
+        cache.save(
+            &key,
+            &ProviderSessionCacheEntry::new(
+                ProviderSessionId::try_new("prior-session".to_owned())?,
+                request.profile.provider.clone(),
+                request.profile.model.clone(),
+                request.profile.effort,
+            ),
+        )?;
+        adapter.session_cache = cache;
+
+        let outcome = adapter.dispatch(&request)?;
+
+        assert!(matches!(outcome, CapabilityDispatchOutcome::Executed { exit_code: 0, .. }));
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        assert_eq!(invocations.len(), 2);
+        for (index, invocation) in invocations.iter().enumerate() {
+            let args: Vec<_> =
+                invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();
+            assert_eq!(args.contains(&"resume".to_owned()), index == 0);
+            assert!(args.windows(2).any(|pair| pair == ["-m", "gpt-5"]));
+            assert!(args.contains(&"model_reasoning_effort=\"high\"".to_owned()));
+            assert!(args.windows(2).any(|pair| pair == ["--sandbox", "workspace-write"]));
+            assert!(args.last().is_some_and(|prompt| prompt.contains(
+                "check whether upstream artifacts changed; if they did, reread them before working"
+            )));
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn test_codex_capability_adapter_resume_failure_emits_only_fresh_final_message()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_skill(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nskill body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner {
+            exit_codes: Mutex::new(vec![0, 7]),
+            final_messages: Mutex::new(vec![
+                Some(b"fresh final message".to_vec()),
+                Some(b"failed partial message".to_vec()),
+            ]),
+            ..Default::default()
+        });
+        let mut adapter = CodexCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner,
+        );
+        let mut request = request_from_host("claude")?;
+        let targets = TargetArtifactSet::try_new(vec![TargetArtifactPath::try_new(
+            PathBuf::from("track/items/a/spec.json"),
+        )?])?;
+        request.request.resume = CapabilityResumeRequest::Resume(targets.clone());
+        let cache = Arc::new(FsProviderSessionCacheAdapter::new(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+        ));
+        let key = ProviderSessionCacheKey::WorkspaceCapability {
+            capability: request.request.capability.clone(),
+            target_artifacts: targets,
+        };
+        cache.save(
+            &key,
+            &ProviderSessionCacheEntry::new(
+                ProviderSessionId::try_new("prior-session".to_owned())?,
+                request.profile.provider.clone(),
+                request.profile.model.clone(),
+                request.profile.effort,
+            ),
+        )?;
+        adapter.session_cache = cache;
+
+        let mut stdout = Vec::new();
+        let outcome = adapter.dispatch_with_stdout(&request, &mut stdout)?;
+
+        assert!(matches!(outcome, CapabilityDispatchOutcome::Executed { exit_code: 0, .. }));
+        assert_eq!(stdout, b"fresh final message");
         Ok(())
     }
 
@@ -494,13 +1040,29 @@ mod tests {
             .iter()
             .map(|value| value.to_string_lossy().into_owned())
             .collect();
-        let [_, _, _, workspace_write_flag, workspace_write_sandbox, _] =
-            workspace_write_args.as_slice()
+        let [
+            _,
+            _,
+            _,
+            config_flag,
+            config,
+            workspace_write_flag,
+            workspace_write_sandbox,
+            json,
+            output_flag,
+            output_path,
+            _,
+        ] = workspace_write_args.as_slice()
         else {
-            return Err("workspace-write invocation must have six arguments".into());
+            return Err("workspace-write invocation must have eleven arguments".into());
         };
+        assert_eq!(config_flag, "--config");
+        assert_eq!(config, "model_reasoning_effort=\"high\"");
         assert_eq!(workspace_write_flag, "--sandbox");
         assert_eq!(workspace_write_sandbox, "workspace-write");
+        assert_eq!(json, "--json");
+        assert_eq!(output_flag, "--output-last-message");
+        assert!(output_path.ends_with(".txt"));
 
         let default_directory = tempfile::tempdir()?;
         write_skill(
@@ -523,11 +1085,29 @@ mod tests {
             .ok_or("undeclared sandbox dispatch must invoke the provider")?;
         let default_args: Vec<_> =
             default_invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();
-        let [_, _, _, default_flag, default_sandbox, _] = default_args.as_slice() else {
-            return Err("undeclared sandbox invocation must have six arguments".into());
+        let [
+            _,
+            _,
+            _,
+            config_flag,
+            config,
+            default_flag,
+            default_sandbox,
+            json,
+            output_flag,
+            output_path,
+            _,
+        ] = default_args.as_slice()
+        else {
+            return Err("undeclared sandbox invocation must have eleven arguments".into());
         };
+        assert_eq!(config_flag, "--config");
+        assert_eq!(config, "model_reasoning_effort=\"high\"");
         assert_eq!(default_flag, "--sandbox");
         assert_eq!(default_sandbox, "read-only");
+        assert_eq!(json, "--json");
+        assert_eq!(output_flag, "--output-last-message");
+        assert!(output_path.ends_with(".txt"));
         Ok(())
     }
 

@@ -107,7 +107,9 @@ pub use tddd::semantic_verify::{
     SemanticVerifyEntry, SpecAdrVerifyCacheDocument,
 };
 pub use tddd::type_signals_doc::{
+    CatalogueDeclarationHash, ImplementationInputHash, Sha256Digest, Sha256DigestError,
     TYPE_SIGNALS_SCHEMA_VERSION, TypeSignalsDocument, TypeSignalsLoadResult,
+    TypeSignalsReuseDecision, TypeSignalsSchemaVersion, TypeSignalsSchemaVersionError,
 };
 pub use template_export::{
     TemplateBoundaryManifest, TemplateBoundaryManifestError, TemplatePathClassification,

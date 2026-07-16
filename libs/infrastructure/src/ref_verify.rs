@@ -23,13 +23,11 @@ use domain::tddd::semantic_verify::{
     SpecAdrVerifyCacheDocument,
 };
 use pair_source::{extract_json_object_parsed, render_prompt_template, validate_template_path};
-pub use process_runner::{
-    build_claude_ref_verifier_args, build_codex_ref_verifier_args, build_gemini_ref_verifier_args,
-    make_ref_verifier_process_runner,
-};
+pub use process_runner::make_ref_verifier_process_runner;
 pub use scope_resolver::{RefVerifyScopeResolver, RefVerifyScopeResolverError};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
+use usecase::dry_write_driver::CapabilityName;
 use usecase::ref_verify::{
     RefVerifierPort, RefVerifyCachePort, RefVerifyCacheScope, RefVerifyCommand, RefVerifyConfig,
     RefVerifyError, RefVerifyPair, RefVerifyPairSourcePort,
@@ -348,22 +346,23 @@ impl RefVerifierPort for AgentRefVerifierAdapter {
 
         let round_type = Self::tier_to_round_type(&tier);
 
-        let resolved =
-            self.profiles.resolve_execution(capability, round_type).ok_or_else(|| {
-                RefVerifyError::VerifierPort {
-                    message: format!(
-                        "capability '{capability}' is not defined in agent-profiles.json"
-                    ),
-                }
+        let capability_name =
+            CapabilityName::try_new(capability).map_err(|error| RefVerifyError::VerifierPort {
+                message: format!("invalid verifier capability: {error}"),
             })?;
+        let resolved = self
+            .profiles
+            .resolve_execution(&capability_name, round_type)
+            .map_err(|error| RefVerifyError::VerifierPort { message: error.to_string() })?;
 
-        let template_path = self.profiles.resolve_prompt_template_path(capability).ok_or_else(
-            || RefVerifyError::VerifierPort {
+        let template_path = self
+            .profiles
+            .resolve_prompt_template_path(&capability_name)
+            .ok_or_else(|| RefVerifyError::VerifierPort {
                 message: format!(
                     "capability '{capability}' has no prompt_template_path in agent-profiles.json"
                 ),
-            },
-        )?;
+            })?;
 
         let validated_template_path = validate_template_path(&template_path, &self.project_root)
             .map_err(|e| RefVerifyError::VerifierPort {
@@ -772,6 +771,8 @@ This section must not make D2 a valid ADR ref.
                 "model": "claude-opus-4-8",
                 "fast_provider": "claude",
                 "fast_model": "claude-haiku-4-5",
+                "reasoning_effort": "high",
+                "fast_reasoning_effort": "low",
                 "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md",
                 "execution_mode": "typed-pipeline"
             },
@@ -780,6 +781,8 @@ This section must not make D2 a valid ADR ref.
                 "model": "claude-opus-4-8",
                 "fast_provider": "claude",
                 "fast_model": "claude-haiku-4-5",
+                "reasoning_effort": "high",
+                "fast_reasoning_effort": "low",
                 "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md",
                 "execution_mode": "typed-pipeline"
             }
@@ -844,6 +847,8 @@ This section must not make D2 a valid ADR ref.
                         "model": "claude-opus-4-8",
                         "fast_provider": "claude",
                         "fast_model": "claude-haiku-4-5",
+                        "reasoning_effort": "high",
+                        "fast_reasoning_effort": "low",
                         "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md",
                         "execution_mode": "typed-pipeline"
                     }
@@ -866,8 +871,11 @@ This section must not make D2 a valid ADR ref.
         assert!(matches!(verdict, SemanticVerdict::Pass { .. }));
         let called = called_with.lock().unwrap();
         let resolved = called.as_ref().unwrap();
-        // Fast tier → fast_model
-        assert_eq!(resolved.model.as_deref(), Some("claude-haiku-4-5"));
+        assert!(matches!(
+            resolved,
+            crate::agent_profiles::ResolvedExecution::ProviderCli { model, .. }
+                if model.as_str() == "claude-haiku-4-5"
+        ));
     }
 
     #[test]
@@ -912,6 +920,8 @@ This section must not make D2 a valid ADR ref.
                         "model": "claude-opus-4-8",
                         "fast_provider": "claude",
                         "fast_model": "claude-haiku-4-5",
+                        "reasoning_effort": "high",
+                        "fast_reasoning_effort": "low",
                         "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md",
                         "execution_mode": "typed-pipeline"
                     }
@@ -949,6 +959,7 @@ This section must not make D2 a valid ADR ref.
                     "ref-verifier-chain1": {
                         "provider": "claude",
                         "model": "claude-opus-4-8",
+                        "reasoning_effort": "high",
                         "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md",
                         "execution_mode": "typed-pipeline"
                     }
@@ -983,6 +994,7 @@ This section must not make D2 a valid ADR ref.
                     "ref-verifier-chain1": {
                         "provider": "claude",
                         "model": "claude-opus-4-8",
+                        "reasoning_effort": "high",
                         "prompt_template_path": ".harness/prompts/ref-verifier-chain1.md",
                         "execution_mode": "typed-pipeline"
                     }
@@ -1039,6 +1051,8 @@ This section must not make D2 a valid ADR ref.
                         "model": "claude-opus-4-8-chain2",
                         "fast_provider": "claude",
                         "fast_model": "claude-haiku-4-5-chain2",
+                        "reasoning_effort": "high",
+                        "fast_reasoning_effort": "low",
                         "prompt_template_path": ".harness/prompts/ref-verifier-chain2.md",
                         "execution_mode": "typed-pipeline"
                     }
@@ -1063,7 +1077,11 @@ This section must not make D2 a valid ADR ref.
         // Fast tier of chain2 must have been selected.
         let called = called_with.lock().unwrap();
         let resolved = called.as_ref().unwrap();
-        assert_eq!(resolved.model.as_deref(), Some("claude-haiku-4-5-chain2"));
+        assert!(matches!(
+            resolved,
+            crate::agent_profiles::ResolvedExecution::ProviderCli { model, .. }
+                if model.as_str() == "claude-haiku-4-5-chain2"
+        ));
     }
 
     // ── validate_template_path ────────────────────────────────────────────────

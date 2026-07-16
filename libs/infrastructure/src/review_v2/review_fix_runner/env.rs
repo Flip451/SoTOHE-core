@@ -1,5 +1,6 @@
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
+use usecase::capability_exec::ReasoningEffort;
 use usecase::review_v2::run_review_fix::ReviewFixRunnerError;
 
 pub(super) fn create_safe_home() -> Result<PathBuf, ReviewFixRunnerError> {
@@ -84,6 +85,7 @@ pub(super) fn resolve_codex_home() -> Result<PathBuf, ReviewFixRunnerError> {
 
 pub(super) fn build_codex_fixer_invocation(
     model: &str,
+    effort: ReasoningEffort,
     codex_home: &Path,
     output_last_message: &Path,
 ) -> Vec<OsString> {
@@ -92,6 +94,10 @@ pub(super) fn build_codex_fixer_invocation(
     let writable_roots_config =
         format!("sandbox_workspace_write.writable_roots=[\"{codex_home_config}\"]");
     let mut args = vec![OsString::from("exec"), OsString::from("--model"), OsString::from(model)];
+    args.extend([
+        OsString::from("--config"),
+        OsString::from(format!("model_reasoning_effort=\"{}\"", effort_value(effort))),
+    ]);
     args.extend([OsString::from("--sandbox"), OsString::from("workspace-write")]);
     args.extend([OsString::from("-c"), OsString::from(writable_roots_config)]);
     args.extend([
@@ -103,6 +109,16 @@ pub(super) fn build_codex_fixer_invocation(
         output_last_message.as_os_str().to_os_string(),
     ]);
     args
+}
+
+fn effort_value(effort: ReasoningEffort) -> &'static str {
+    match effort {
+        ReasoningEffort::Low => "low",
+        ReasoningEffort::Medium => "medium",
+        ReasoningEffort::High => "high",
+        ReasoningEffort::XHigh => "xhigh",
+        ReasoningEffort::Max => "max",
+    }
 }
 
 pub(super) fn escape_config_string(raw: &str) -> String {
@@ -182,7 +198,7 @@ mod tests {
     fn test_build_codex_fixer_invocation_contains_workspace_write_sandbox() {
         let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let olm = dummy_output_last_message();
-        let args = build_codex_fixer_invocation("gpt-5.5", &codex_home, &olm);
+        let args = build_codex_fixer_invocation("gpt-5.5", ReasoningEffort::Low, &codex_home, &olm);
         let args_str: Vec<String> = args.iter().map(|a| a.to_string_lossy().into_owned()).collect();
         let sandbox_pos = args_str.iter().position(|a| a == "--sandbox");
         assert!(sandbox_pos.is_some(), "--sandbox flag must be present");
@@ -196,7 +212,7 @@ mod tests {
     fn test_build_codex_fixer_invocation_contains_writable_roots_config() {
         let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let olm = dummy_output_last_message();
-        let args = build_codex_fixer_invocation("gpt-5.5", &codex_home, &olm);
+        let args = build_codex_fixer_invocation("gpt-5.5", ReasoningEffort::Low, &codex_home, &olm);
         let args_str: Vec<String> = args.iter().map(|a| a.to_string_lossy().into_owned()).collect();
         let has_writable_roots =
             args_str.iter().any(|a| a.contains("sandbox_workspace_write.writable_roots"));
@@ -207,7 +223,7 @@ mod tests {
     fn test_build_codex_fixer_invocation_escapes_writable_roots_config() {
         let codex_home = PathBuf::from("/tmp/a\"b\\c");
         let olm = dummy_output_last_message();
-        let args = build_codex_fixer_invocation("gpt-5.5", &codex_home, &olm);
+        let args = build_codex_fixer_invocation("gpt-5.5", ReasoningEffort::Low, &codex_home, &olm);
         let args_str: Vec<String> = args.iter().map(|a| a.to_string_lossy().into_owned()).collect();
         let config = args_str
             .iter()
@@ -221,7 +237,7 @@ mod tests {
     fn test_build_codex_fixer_invocation_contains_network_access_config() {
         let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let olm = dummy_output_last_message();
-        let args = build_codex_fixer_invocation("gpt-5.5", &codex_home, &olm);
+        let args = build_codex_fixer_invocation("gpt-5.5", ReasoningEffort::Low, &codex_home, &olm);
         let args_str: Vec<String> = args.iter().map(|a| a.to_string_lossy().into_owned()).collect();
         let has_network =
             args_str.iter().any(|a| a.contains("sandbox_workspace_write.network_access=true"));
@@ -232,7 +248,7 @@ mod tests {
     fn test_build_codex_fixer_invocation_contains_output_last_message_flag() {
         let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let olm = PathBuf::from("/tmp/review-fix-test-last-message.txt");
-        let args = build_codex_fixer_invocation("gpt-5.5", &codex_home, &olm);
+        let args = build_codex_fixer_invocation("gpt-5.5", ReasoningEffort::Low, &codex_home, &olm);
         let args_str: Vec<String> = args.iter().map(|a| a.to_string_lossy().into_owned()).collect();
         let olm_pos = args_str.iter().position(|a| a == "--output-last-message");
         assert!(olm_pos.is_some(), "--output-last-message flag must be present");
@@ -249,13 +265,32 @@ mod tests {
     fn test_build_codex_fixer_invocation_has_no_prompt_positional_argument() {
         let codex_home = PathBuf::from("/srv/codex-home/.codex");
         let olm = dummy_output_last_message();
-        let args = build_codex_fixer_invocation("gpt-5.5", &codex_home, &olm);
+        let args = build_codex_fixer_invocation("gpt-5.5", ReasoningEffort::Low, &codex_home, &olm);
         let olm_pos = args.iter().position(|a| a == "--output-last-message");
         let expected_len = olm_pos.map_or(0, |pos| pos + 2);
         assert_eq!(
             args.len(),
             expected_len,
             "prompt must be delivered through stdin, not appended to argv"
+        );
+    }
+
+    #[test]
+    fn test_build_codex_fixer_invocation_injects_resolved_effort() {
+        let codex_home = PathBuf::from("/home/user/.codex");
+        let args = build_codex_fixer_invocation(
+            "gpt-5.5",
+            ReasoningEffort::XHigh,
+            &codex_home,
+            &dummy_output_last_message(),
+        );
+        let args_str: Vec<String> =
+            args.iter().map(|arg| arg.to_string_lossy().into_owned()).collect();
+
+        assert!(
+            args_str
+                .windows(2)
+                .any(|pair| { pair == ["--config", "model_reasoning_effort=\"xhigh\""] })
         );
     }
 

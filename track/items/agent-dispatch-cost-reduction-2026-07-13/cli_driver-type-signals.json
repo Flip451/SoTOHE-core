@@ -1,0 +1,63 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-16T09:03:34Z",
+  "declaration_hash": "6b44480edbfefe4db0217a574c54d3f7c8a1e84e2132eaf090bb2ba6ea594935",
+  "implementation_input_hash": "d5c351b575dcaed0b1bd657e37d2f0ea677114facdaa9cd6e346cf95f1261577",
+  "signals": [
+    {
+      "type_name": "CapabilityExecDriverInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CapabilityResumeArg",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ReviewFixDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TargetArtifactPathArg",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "FromStr",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CapabilityDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

@@ -63,10 +63,12 @@ use domain::{
 
 use domain::SpecDocumentLoaderPort;
 
+use super::plan::PlannedAction;
 use super::{
     EvaluateTestObligationsApplicationService, EvaluateTestObligationsCommand,
     EvaluateTestObligationsInteractor, TestObligationEvaluateConfig,
 };
+use crate::test_obligation::LoadedCatalogueDocument;
 
 fn run<F: Future>(future: F) -> F::Output {
     let mut future = pin!(future);
@@ -304,6 +306,10 @@ impl<T> Drop for TrackedVerdictFuture<T> {
 
 struct BoundedFulfillmentDriver {
     tracker: DispatchTracker,
+    /// When set, non-calibration (real) pairs are tracked here instead of
+    /// `tracker`, so a test can assert that no real adjudication was
+    /// dispatched while the AC-08 calibration probes still flow.
+    real_tracker: Option<DispatchTracker>,
 }
 
 impl
@@ -330,7 +336,12 @@ impl
         } else {
             fulfilled()
         };
-        Box::pin(TrackedVerdictFuture::new(verdict, self.tracker.clone()))
+        let tracker = if source.contains("calibration_probe") {
+            self.tracker.clone()
+        } else {
+            self.real_tracker.clone().unwrap_or_else(|| self.tracker.clone())
+        };
+        Box::pin(TrackedVerdictFuture::new(verdict, tracker))
     }
 }
 
@@ -562,13 +573,24 @@ fn triple_waiver_bindings() -> TestBindingsDocument {
 /// Repeated fulfillment and waiver records provide enough pending verifier
 /// futures to expose the evaluator's configured fan-out ceiling.
 fn repeated_lane_bindings(repetitions: usize) -> TestBindingsDocument {
+    // The waiver lane uses a DISTINCT anchor (IN-06): a waiver on the same
+    // edge as the fulfillment obligation would suppress the fulfillment
+    // adjudication (waiver-precedence rule), collapsing the fulfillment
+    // fan-out this fixture exists to exercise.
+    let waiver_edge = TestObligationEdgeId::new(
+        CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
+        TestObligationAnchorId::try_new("spec.json".to_owned(), "IN-06".to_owned()).unwrap(),
+    );
     let mut records = Vec::with_capacity(repetitions.saturating_mul(2));
     for _ in 0..repetitions {
         records.push(TestBindingRecord::Fulfillment {
             obligation_id: obligation().id().clone(),
             tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
         });
-        records.push(TestBindingRecord::Waiver { edge_id: edge(), reason: waiver_reason() });
+        records.push(TestBindingRecord::Waiver {
+            edge_id: waiver_edge.clone(),
+            reason: waiver_reason(),
+        });
     }
     TestBindingsDocument::new(track(), records)
 }
@@ -583,6 +605,14 @@ fn spec_doc() -> SpecDocument {
             vec![],
         )
         .unwrap(),
+        SpecRequirement::new(
+            SpecElementId::try_new("IN-06").unwrap(),
+            "Money conversions must be lossless.",
+            vec![],
+            vec![],
+            vec![],
+        )
+        .unwrap(),
     ];
     SpecDocument::new(
         "Test spec",
@@ -591,6 +621,31 @@ fn spec_doc() -> SpecDocument {
         SpecScope::new(in_scope, vec![]),
         vec![],
         vec![],
+        vec![],
+        vec![],
+        None,
+    )
+    .unwrap()
+}
+
+fn spec_doc_with_in_scope_and_acceptance_criteria() -> SpecDocument {
+    let requirement = |id: &str| {
+        SpecRequirement::new(
+            SpecElementId::try_new(id).unwrap(),
+            format!("{id} requirement text."),
+            vec![],
+            vec![],
+            vec![],
+        )
+        .unwrap()
+    };
+    SpecDocument::new(
+        "Test spec",
+        "1.0",
+        vec![],
+        SpecScope::new(vec![requirement("IN-05")], vec![]),
+        vec![],
+        vec![requirement("AC-05")],
         vec![],
         vec![],
         None,
@@ -647,6 +702,48 @@ fn empty_catalogue() -> CatalogueDocument {
         CrateName::new("domain").unwrap(),
         LayerId::try_new("domain").unwrap(),
     )
+}
+
+fn voluntary_edge(entry_key: &str, element_id: &str) -> TestObligationEdgeId {
+    TestObligationEdgeId::new(
+        CatalogueEntryKey::try_new(entry_key.to_owned()).unwrap(),
+        TestObligationAnchorId::try_new(
+            "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json".to_owned(),
+            element_id.to_owned(),
+        )
+        .unwrap(),
+    )
+}
+
+fn type_entry(kind: TypeKindV2, role: DataRole) -> TypeEntry {
+    TypeEntry::new(
+        domain::tddd::catalogue_v2::roles::ItemAction::Add,
+        role,
+        kind,
+        vec![],
+        vec![],
+        vec![],
+        ModulePath::root(),
+        None,
+        vec![],
+        vec![],
+    )
+}
+
+fn catalogue_with_type_entries(
+    crate_name: &str,
+    layer: &str,
+    entries: Vec<(&str, TypeEntry)>,
+) -> CatalogueDocument {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new(crate_name).unwrap(),
+        LayerId::try_new(layer).unwrap(),
+    );
+    for (name, entry) in entries {
+        catalogue.insert_type(TypeName::new(name).unwrap(), entry);
+    }
+    catalogue
 }
 
 struct Harness {
@@ -950,7 +1047,13 @@ fn cached_waiver_doc_with_fingerprint(
     );
     WaiverCacheDocument::new(
         track(),
-        vec![WaiverCacheEntry::new(edge(), key, verdict, verifier_fingerprint)],
+        vec![WaiverCacheEntry::new(
+            edge(),
+            Some(obligation().id().clone()),
+            key,
+            verdict,
+            verifier_fingerprint,
+        )],
     )
 }
 
@@ -985,7 +1088,10 @@ fn assert_evaluator_fan_out_bound(config: TestObligationEvaluateConfig, expected
     let interactor = interactor_with_bounded_drivers(
         repeated_lane_bindings(16),
         config,
-        Arc::new(BoundedFulfillmentDriver { tracker: fulfillment_tracker.clone() }),
+        Arc::new(BoundedFulfillmentDriver {
+            tracker: fulfillment_tracker.clone(),
+            real_tracker: None,
+        }),
         Arc::new(BoundedWaiverDriver { tracker: waiver_tracker.clone() }),
     );
 
@@ -1007,6 +1113,44 @@ fn test_default_config_parallelism_bounds_all_evaluation_fan_outs() {
     assert_eq!(config.parallelism(), 4);
 
     assert_evaluator_fan_out_bound(config.clone(), config.parallelism());
+}
+
+/// A waiver record on an edge suppresses the fulfillment record's
+/// adjudication for that edge (the check gate resolves waived edges through
+/// their waiver, so judging the bound tests against the waived claim would
+/// double-adjudicate and fail on behavior the waiver already covers).
+#[test]
+fn test_waiver_edge_suppresses_fulfillment_adjudication_for_that_edge() {
+    let probe_tracker = DispatchTracker::new();
+    let real_fulfillment_tracker = DispatchTracker::new();
+    let waiver_tracker = DispatchTracker::new();
+    let bindings = TestBindingsDocument::new(
+        track(),
+        vec![
+            TestBindingRecord::Fulfillment {
+                obligation_id: obligation().id().clone(),
+                tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+            },
+            TestBindingRecord::Waiver { edge_id: edge(), reason: waiver_reason() },
+        ],
+    );
+    let interactor = interactor_with_bounded_drivers(
+        bindings,
+        TestObligationEvaluateConfig::default(),
+        Arc::new(BoundedFulfillmentDriver {
+            tracker: probe_tracker.clone(),
+            real_tracker: Some(real_fulfillment_tracker.clone()),
+        }),
+        Arc::new(BoundedWaiverDriver { tracker: waiver_tracker.clone() }),
+    );
+
+    let outcome = run(interactor.execute(&command())).unwrap();
+
+    // Only the waiver lane adjudicates: the obligation's sole edge is waived.
+    // The AC-08 calibration probes still flow (probe_tracker), but no real
+    // fulfillment pair may reach the driver.
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(real_fulfillment_tracker.peak(), 0, "waived edge must not be re-adjudicated");
 }
 
 #[test]
@@ -1070,6 +1214,203 @@ fn test_new_accepts_and_wires_declared_dependencies() {
     assert_eq!(outcome.pass_count(), 1);
     assert_eq!(fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);
     assert_eq!(fulfillment_cache.saved.lock().unwrap().as_ref().unwrap().entries().len(), 1);
+}
+
+/// A voluntary binding on an edge owned by SEVERAL obligations must be
+/// adjudicated once per owner: the check gate resolves each
+/// (edge × obligation) pair independently, so a single-owner adjudication
+/// leaves the other owners' verdicts absent.
+#[test]
+fn test_voluntary_binding_adjudicates_every_obligation_owning_the_edge() {
+    let fulfillment_driver = Arc::new(ScriptedFulfillment {
+        fast: fulfilled(),
+        last: fulfillment_fail(),
+        verifier_error: Mutex::new(None),
+        calibration: Mutex::new(None),
+        calibration_contradiction: Mutex::new(None),
+        calibration_substitution: Mutex::new(None),
+        calibration_central_unverified: Mutex::new(None),
+        calibration_calls: Mutex::new(0),
+        calibration_probe_sources: Mutex::new(Vec::new()),
+        tiers: Mutex::new(Vec::new()),
+        declarations: Mutex::new(Vec::new()),
+    });
+    let waiver_driver = Arc::new(ScriptedWaiver {
+        verdict: WaiverVerdict::Pending,
+        calls: Mutex::new(0),
+        tiers: Mutex::new(Vec::new()),
+        declarations: Mutex::new(Vec::new()),
+    });
+    let fulfillment_cache = Arc::new(CapFulfillmentCache::default());
+    // Both obligations own the Money × IN-05 edge (same entry key, same anchor).
+    let obligations =
+        ObligationsDocument::new(track(), vec![obligation(), trait_impl_obligation()]);
+    let bindings = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::VoluntaryBinding {
+            edge_id: edge(),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        }],
+    );
+
+    let interactor = EvaluateTestObligationsInteractor::new(
+        Arc::new(StubObligations(Some(obligations))),
+        Arc::new(StubBindings(Some(bindings))),
+        Arc::new(StubScanner),
+        Arc::clone(&fulfillment_driver)
+            as Arc<
+                dyn SemanticEscalationDriverPort<
+                        ObligationFulfillmentPair,
+                        ObligationFulfillmentCacheKey,
+                        ObligationFulfillmentVerdict,
+                        SemanticVerifierError,
+                    >,
+            >,
+        waiver_driver
+            as Arc<
+                dyn SemanticEscalationDriverPort<
+                        WaiverPair,
+                        WaiverCacheKey,
+                        WaiverVerdict,
+                        SemanticVerifierError,
+                    >,
+            >,
+        Arc::clone(&fulfillment_cache) as Arc<dyn ObligationFulfillmentCachePort + Send + Sync>,
+        Arc::new(CapWaiverCache::default()) as Arc<dyn WaiverCachePort + Send + Sync>,
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        config(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+        Arc::new(SumHasher),
+    );
+
+    let outcome = run(interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 2, "each owning obligation must be adjudicated");
+    assert_eq!(
+        fulfillment_cache.saved.lock().unwrap().as_ref().unwrap().entries().len(),
+        2,
+        "one frozen verdict per (edge × obligation) pair"
+    );
+}
+
+/// A waiver on an edge owned by SEVERAL obligations must be adjudicated once
+/// per owner. Each declaration can make a different claim about the same edge,
+/// so taking the first owner would leave the other claim unverified.
+#[test]
+fn test_waiver_adjudicates_every_obligation_owning_the_edge() {
+    let h = harness(
+        Some(ObligationsDocument::new(track(), vec![obligation(), trait_impl_obligation()])),
+        Some(waiver_bindings()),
+        fulfilled(),
+        fulfillment_fail(),
+        WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("multi-owner waiver".to_owned()).unwrap(),
+        },
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 2, "each owning obligation must be adjudicated");
+    assert_eq!(*h.waiver_driver.calls.lock().unwrap(), 2);
+    let cache = h.waiver_cache.saved.lock().unwrap();
+    let entries = cache.as_ref().unwrap().entries();
+    assert_eq!(entries.len(), 2);
+    assert!(entries.iter().any(|entry| entry.obligation_id() == Some(obligation().id())));
+    assert!(
+        entries.iter().any(|entry| entry.obligation_id() == Some(trait_impl_obligation().id()))
+    );
+    let declarations = h.waiver_driver.declarations.lock().unwrap();
+    assert!(declarations.iter().any(|declaration| declaration.contains("kind")));
+    assert!(declarations.iter().any(|declaration| declaration.contains("trait_ref")));
+}
+
+/// A voluntary binding on an edge that also carries a waiver record must not
+/// plan any fulfillment adjudication: the waiver owns the edge at the check
+/// gate, mirroring the fulfillment-record precedence.
+#[test]
+fn test_waiver_edge_suppresses_voluntary_binding_adjudication() {
+    let probe_tracker = DispatchTracker::new();
+    let real_fulfillment_tracker = DispatchTracker::new();
+    let waiver_tracker = DispatchTracker::new();
+    let bindings = TestBindingsDocument::new(
+        track(),
+        vec![
+            TestBindingRecord::VoluntaryBinding {
+                edge_id: edge(),
+                tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+            },
+            TestBindingRecord::Waiver { edge_id: edge(), reason: waiver_reason() },
+        ],
+    );
+    let interactor = interactor_with_bounded_drivers(
+        bindings,
+        TestObligationEvaluateConfig::default(),
+        Arc::new(BoundedFulfillmentDriver {
+            tracker: probe_tracker.clone(),
+            real_tracker: Some(real_fulfillment_tracker.clone()),
+        }),
+        Arc::new(BoundedWaiverDriver { tracker: waiver_tracker.clone() }),
+    );
+
+    let outcome = run(interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1, "only the waiver lane adjudicates the edge");
+    assert_eq!(
+        real_fulfillment_tracker.peak(),
+        0,
+        "a waived edge's voluntary binding must not be adjudicated"
+    );
+}
+
+/// The calibration budget counts a voluntary binding once per owning
+/// obligation, matching the per-owner adjudication fan-out.
+#[test]
+fn test_production_pair_count_scales_voluntary_bindings_by_owner_count() {
+    let obligations =
+        ObligationsDocument::new(track(), vec![obligation(), trait_impl_obligation()]);
+    let bindings = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::VoluntaryBinding {
+            edge_id: edge(),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        }],
+    );
+    assert_eq!(super::production_pair_count(&obligations, &bindings), 2);
+
+    let waiver = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::Waiver { edge_id: edge(), reason: waiver_reason() }],
+    );
+    assert_eq!(super::production_pair_count(&obligations, &waiver), 2);
+
+    let unowned_edge = TestObligationEdgeId::new(
+        CatalogueEntryKey::try_new("Money".to_owned()).unwrap(),
+        TestObligationAnchorId::try_new("spec.json".to_owned(), "IN-06".to_owned()).unwrap(),
+    );
+    let unowned = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::VoluntaryBinding {
+            edge_id: unowned_edge.clone(),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        }],
+    );
+    assert_eq!(
+        super::production_pair_count(&obligations, &unowned),
+        1,
+        "catalogue-only voluntary edges keep the minimum budget of one"
+    );
+
+    let unowned_waiver = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::Waiver { edge_id: unowned_edge, reason: waiver_reason() }],
+    );
+    assert_eq!(
+        super::production_pair_count(&obligations, &unowned_waiver),
+        1,
+        "catalogue-only waiver edges keep the minimum budget of one"
+    );
 }
 
 #[test]
@@ -1352,6 +1693,94 @@ fn test_voluntary_binding_for_derived_edge_uses_real_obligation_id() {
     let expected_obligation_id = obligation().id().clone();
     assert_eq!(saved.entries()[0].edge_id(), &edge());
     assert_eq!(saved.entries()[0].obligation_id(), &expected_obligation_id);
+}
+
+#[test]
+fn test_plan_voluntary_bindings_for_struct_and_enum_catalogue_entries_uses_llm_lane() {
+    let h = harness(
+        Some(ObligationsDocument::new(track(), vec![])),
+        None,
+        fulfilled(),
+        fulfillment_fail(),
+        WaiverVerdict::Pending,
+    );
+    let plain_struct = TypeKindV2::Struct(StructKind::new(
+        StructShape::Plain { fields: vec![], has_stripped_fields: true },
+        None,
+    ));
+    let domain_catalogue = catalogue_with_type_entries(
+        "domain",
+        "domain",
+        vec![
+            (
+                "TypeSignalsCurrentInputs",
+                type_entry(plain_struct.clone(), DataRole::value_object()),
+            ),
+            ("TypeSignalsFreshness", type_entry(plain_struct, DataRole::value_object())),
+            (
+                "TypeSignalsReuseDecision",
+                type_entry(TypeKindV2::Enum { variants: vec![] }, DataRole::value_object()),
+            ),
+        ],
+    );
+    let infrastructure_catalogue = catalogue_with_type_entries(
+        "infrastructure",
+        "infrastructure",
+        vec![(
+            "LoadCatalogueSpecSignalsForViewError",
+            type_entry(TypeKindV2::Enum { variants: vec![] }, DataRole::ErrorType),
+        )],
+    );
+    let records = vec![
+        TestBindingRecord::VoluntaryBinding {
+            edge_id: voluntary_edge("TypeSignalsCurrentInputs", "AC-05"),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        },
+        TestBindingRecord::VoluntaryBinding {
+            edge_id: voluntary_edge("TypeSignalsFreshness", "IN-05"),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        },
+        TestBindingRecord::VoluntaryBinding {
+            edge_id: voluntary_edge("TypeSignalsReuseDecision", "AC-05"),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        },
+        TestBindingRecord::VoluntaryBinding {
+            edge_id: voluntary_edge("LoadCatalogueSpecSignalsForViewError", "IN-05"),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        },
+        TestBindingRecord::VoluntaryBinding {
+            edge_id: voluntary_edge("LoadCatalogueSpecSignalsForViewError", "AC-05"),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        },
+    ];
+    let catalogues = vec![
+        LoadedCatalogueDocument::new(
+            Path::new("track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json"),
+            domain_catalogue,
+        ),
+        LoadedCatalogueDocument::new(
+            Path::new(
+                "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+            ),
+            infrastructure_catalogue,
+        ),
+    ];
+
+    let bindings = TestBindingsDocument::new(track(), records);
+    let plan = h
+        .interactor
+        .plan_binding_records(
+            &bindings,
+            &ObligationsDocument::new(track(), vec![]),
+            &catalogues,
+            &spec_doc_with_in_scope_and_acceptance_criteria(),
+            None,
+            None,
+        )
+        .unwrap();
+
+    assert_eq!(plan.len(), bindings.records().len());
+    assert!(plan.iter().all(|action| matches!(action, PlannedAction::Fulfillment(_))));
 }
 
 #[test]

@@ -25,3 +25,9 @@ decision rules, return format; the v5 schema reference and pattern cookbook live
 ## Claude-subagent notes
 - You run as a Claude subagent (`subagent_type: "type-designer"`); model/tools/effort come from the frontmatter above.
 - The 12a/12b/12c self-verification gates and the `## 12c Attestation` output requirement in the shared SSoT are mandatory before you emit your final message.
+
+## Session resume conformance
+
+- If your dispatch is a resumed session (orchestrator opt-in continuation), follow the
+  "Session resume" section of the capability SSoT: check whether your upstream artifacts
+  changed since the prior session and re-read any that did before continuing.

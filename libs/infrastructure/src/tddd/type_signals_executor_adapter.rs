@@ -7,14 +7,16 @@
 
 use std::path::Path;
 
-use domain::tddd::catalogue_v2::{
-    TdddLayerBinding as DomainTdddLayerBinding, TypeSignalsExecutionError, TypeSignalsExecutorPort,
-};
+use domain::TrackId;
+use domain::tddd::catalogue_v2::TdddLayerBinding as DomainTdddLayerBinding;
+use usecase::type_signals::{TypeSignalsExecutionError, TypeSignalsExecutorPort};
 
+#[cfg(feature = "test-helpers")]
 use crate::tddd::type_signals_evaluator::{
-    TypeSignalsCataloguePresence, execute_type_signals_for_layer,
-    reject_symlinked_type_signals_anchor, require_type_signals_track_dir,
-    type_signals_catalogue_presence, type_signals_track_dir, validate_type_signals_track_id,
+    RustdocLaunchObserver, execute_type_signals_for_layer_with_launch_observer,
+};
+use crate::tddd::type_signals_evaluator::{
+    execute_type_signals_for_layer, reject_symlinked_type_signals_anchor,
 };
 use crate::verify::tddd_layers::TdddLayerBinding as InfraTdddLayerBinding;
 
@@ -28,17 +30,27 @@ use crate::verify::tddd_layers::TdddLayerBinding as InfraTdddLayerBinding;
 /// [`InfraTdddLayerBinding`] (private getters + `signal_file()` method) and
 /// delegates to [`execute_type_signals_for_layer`].
 ///
-/// An absent catalogue file is always skipped silently (no-op, returns `Ok(())`).
-/// A present catalogue is always evaluated strictly; present multi-target
-/// catalogues return an error (multi-target not yet supported).
+/// Every catalogue input is evaluated conservatively. Missing or unverifiable
+/// inputs fail closed; multi-target catalogues return an error because they are
+/// not yet supported.
 #[derive(Debug, Default)]
-pub struct TypeSignalsExecutorAdapter;
+pub struct TypeSignalsExecutorAdapter {
+    #[cfg(feature = "test-helpers")]
+    launch_observer: Option<RustdocLaunchObserver>,
+}
 
 impl TypeSignalsExecutorAdapter {
     /// Creates a new adapter instance.
     #[must_use]
     pub fn new() -> Self {
-        Self
+        Self::default()
+    }
+
+    /// Create an adapter wired to a test-only rustdoc launch observer.
+    #[cfg(feature = "test-helpers")]
+    #[must_use]
+    pub fn with_rustdoc_launch_observer(launch_observer: RustdocLaunchObserver) -> Self {
+        Self { launch_observer: Some(launch_observer) }
     }
 
     /// Convert a domain binding to an infra binding for use with the evaluator.
@@ -101,18 +113,16 @@ impl TypeSignalsExecutorAdapter {
 impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
     /// Evaluates type signals for one layer binding.
     ///
-    /// An absent catalogue file is always skipped silently (returns `Ok(())`).
-    /// A present catalogue is always evaluated strictly. A present multi-target
-    /// catalogue returns an error (multi-target not yet supported, CN-02).
+    /// Missing catalogue inputs are errors rather than reuse skips. A
+    /// multi-target catalogue returns an error (not yet supported, CN-02).
     ///
     /// # Errors
     ///
     /// Returns [`TypeSignalsExecutionError`] on any evaluation failure.
-    /// An absent catalogue file always returns `Ok(())` (unconditional skip).
     fn evaluate_layer(
         &self,
         items_dir: &Path,
-        track_id: &str,
+        track_id: &TrackId,
         workspace_root: &Path,
         binding: &DomainTdddLayerBinding,
     ) -> Result<(), TypeSignalsExecutionError> {
@@ -132,8 +142,7 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
         // Using `TrackId::try_new` enforces the slug rules (single-segment, no `..`,
         // no path separators) so that the absent-catalogue skip cannot be bypassed
         // via path-traversal track IDs (e.g. `../bad`).
-        let valid_track_id =
-            validate_type_signals_track_id(track_id).map_err(TypeSignalsExecutionError)?;
+        let valid_track_id = track_id;
 
         // Reject empty targets: a binding with no targets is always malformed.
         if binding.targets.is_empty() {
@@ -167,24 +176,7 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
         }
 
         // Multi-target bindings are not yet supported by the strict evaluator.
-        // Skip silently only when the catalogue is absent (CN-02: present catalogues
-        // are always evaluated; no fail-open).
         if binding.targets.len() > 1 {
-            // Apply symlink guard on track directory before catalogue-presence check.
-            // ADR 2026-06-01-0406 D1: the absent-catalogue skip is scoped to "track dir
-            // exists AND catalogue file is missing". A missing track dir is a structural
-            // anomaly and must fail-closed (not be treated as "absent catalogue").
-            let track_dir = type_signals_track_dir(items_dir, &valid_track_id);
-            require_type_signals_track_dir(&track_dir).map_err(TypeSignalsExecutionError)?;
-
-            let catalogue_path = track_dir.join(infra_binding.catalogue_file());
-            if type_signals_catalogue_presence(&catalogue_path)
-                .map_err(TypeSignalsExecutionError)?
-                == TypeSignalsCataloguePresence::Absent
-            {
-                return Ok(());
-            }
-
             return Err(TypeSignalsExecutionError(format!(
                 "layer '{}' has {} schema_export.targets — multi-target not yet supported",
                 binding.layer_id,
@@ -192,37 +184,31 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
             )));
         }
 
-        // Check whether the catalogue file is present before invoking the
-        // (expensive) rustdoc evaluator. Absent catalogue is always skipped
-        // unconditionally (no gate-vs-direct distinction per ADR D1).
-        //
-        // Security: reject a symlinked track directory before treating a
-        // missing catalogue as skippable.  Without this check a symlinked
-        // track directory whose target lacks the catalogue file would be
-        // silently accepted instead of reaching the strict reject_symlinks_below
-        // guard inside `execute_type_signals_for_layer`.
-        //
-        // ADR 2026-06-01-0406 D1: the absent-catalogue skip is scoped to "track dir
-        // exists AND catalogue file is missing". A missing track dir is a structural
-        // anomaly and must fail-closed (not be treated as "absent catalogue").
-        let track_dir = type_signals_track_dir(items_dir, &valid_track_id);
-        require_type_signals_track_dir(&track_dir).map_err(TypeSignalsExecutionError)?;
-
-        let catalogue_path = track_dir.join(infra_binding.catalogue_file());
-        if type_signals_catalogue_presence(&catalogue_path).map_err(TypeSignalsExecutionError)?
-            == TypeSignalsCataloguePresence::Absent
-        {
-            return Ok(());
-        }
-
-        execute_type_signals_for_layer(
+        #[cfg(feature = "test-helpers")]
+        let execution = match &self.launch_observer {
+            Some(observer) => execute_type_signals_for_layer_with_launch_observer(
+                items_dir,
+                valid_track_id,
+                workspace_root,
+                &infra_binding,
+                observer,
+            ),
+            None => execute_type_signals_for_layer(
+                items_dir,
+                valid_track_id,
+                workspace_root,
+                &infra_binding,
+            ),
+        };
+        #[cfg(not(feature = "test-helpers"))]
+        let execution = execute_type_signals_for_layer(
             items_dir,
-            valid_track_id.as_ref(),
+            valid_track_id,
             workspace_root,
             &infra_binding,
-        )
-        .map(|_exit| ())
-        .map_err(|e| TypeSignalsExecutionError(e.0))
+        );
+
+        execution.map(|_exit| ()).map_err(|e| TypeSignalsExecutionError(e.0))
     }
 }
 
@@ -244,6 +230,10 @@ mod tests {
         }
     }
 
+    fn track_id() -> TrackId {
+        TrackId::try_new("my-track").unwrap()
+    }
+
     #[test]
     fn test_to_infra_binding_preserves_layer_id() {
         let domain = domain_binding("domain");
@@ -255,8 +245,8 @@ mod tests {
     }
 
     #[test]
-    fn test_evaluate_layer_absent_catalogue_returns_ok() {
-        // Absent catalogue is always skipped unconditionally.
+    fn test_evaluate_layer_absent_catalogue_returns_error() {
+        // Missing catalogue leaves a freshness input unknown and must fail closed.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("my-track");
@@ -265,13 +255,58 @@ mod tests {
 
         let adapter = TypeSignalsExecutorAdapter::new();
         let result =
-            adapter.evaluate_layer(&items_dir, "my-track", dir.path(), &domain_binding("domain"));
-        assert!(result.is_ok(), "absent catalogue must always return Ok (unconditional skip)");
+            adapter.evaluate_layer(&items_dir, &track_id(), dir.path(), &domain_binding("domain"));
+        assert!(result.is_err(), "absent catalogue must fail closed");
     }
 
     #[test]
-    fn test_evaluate_layer_multi_target_absent_catalogue_returns_ok() {
-        // Multi-target + absent catalogue => skip silently (CN-02 compliant).
+    fn test_evaluate_layer_rejects_items_dir_outside_workspace() {
+        let workspace = tempfile::tempdir().unwrap();
+        let external = tempfile::tempdir().unwrap();
+        let items_dir = external.path().join("track/items");
+        std::fs::create_dir_all(items_dir.join("my-track")).unwrap();
+
+        let result = TypeSignalsExecutorAdapter::new().evaluate_layer(
+            &items_dir,
+            &track_id(),
+            workspace.path(),
+            &domain_binding("domain"),
+        );
+
+        assert!(
+            matches!(&result, Err(error) if error.0.contains("resolves outside workspace_root")),
+            "items_dir outside the workspace must be rejected before reads: {result:?}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_evaluate_layer_rejects_symlinked_catalogue_before_read() {
+        let workspace = tempfile::tempdir().unwrap();
+        let items_dir = workspace.path().join("track/items");
+        let track_dir = items_dir.join("my-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let outside_catalogue = workspace.path().join("outside-types.json");
+        std::fs::write(&outside_catalogue, "{}").unwrap();
+        std::os::unix::fs::symlink(&outside_catalogue, track_dir.join("domain-types.json"))
+            .unwrap();
+
+        let result = TypeSignalsExecutorAdapter::new().evaluate_layer(
+            &items_dir,
+            &track_id(),
+            workspace.path(),
+            &domain_binding("domain"),
+        );
+
+        assert!(
+            matches!(&result, Err(error) if error.0.contains("symlink guard rejected catalogue")),
+            "a symlinked catalogue must be rejected before read: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_evaluate_layer_multi_target_absent_catalogue_returns_error() {
+        // Multi-target evaluation is unsupported even if the catalogue is absent.
         let dir = tempfile::tempdir().unwrap();
         let items_dir = dir.path().join("track/items");
         let track_dir = items_dir.join("my-track");
@@ -286,11 +321,8 @@ mod tests {
         };
 
         let adapter = TypeSignalsExecutorAdapter::new();
-        let result = adapter.evaluate_layer(&items_dir, "my-track", dir.path(), &multi_binding);
-        assert!(
-            result.is_ok(),
-            "multi-target + absent catalogue must skip silently (unconditional)"
-        );
+        let result = adapter.evaluate_layer(&items_dir, &track_id(), dir.path(), &multi_binding);
+        assert!(result.is_err(), "multi-target + absent catalogue must fail closed");
     }
 
     #[test]
@@ -311,7 +343,7 @@ mod tests {
         };
 
         let adapter = TypeSignalsExecutorAdapter::new();
-        let result = adapter.evaluate_layer(&items_dir, "my-track", dir.path(), &multi_binding);
+        let result = adapter.evaluate_layer(&items_dir, &track_id(), dir.path(), &multi_binding);
         assert!(
             result.is_err(),
             "multi-target + present catalogue must return Err (fail-closed, CN-02)"
@@ -333,15 +365,15 @@ mod tests {
 
         let adapter = TypeSignalsExecutorAdapter::new();
         let result =
-            adapter.evaluate_layer(&items_dir, "my-track", dir.path(), &domain_binding("domain"));
+            adapter.evaluate_layer(&items_dir, &track_id(), dir.path(), &domain_binding("domain"));
         assert!(
             result.is_err(),
             "missing track dir must return Err (fail-closed per ADR 2026-06-01-0406 D1)"
         );
         let msg = result.unwrap_err().to_string();
         assert!(
-            msg.contains("missing or unstattable"),
-            "error must mention missing/unstattable track directory, got: {msg}"
+            msg.contains("cannot read catalogue"),
+            "error must identify the missing input, got: {msg}"
         );
     }
 
@@ -363,15 +395,15 @@ mod tests {
         };
 
         let adapter = TypeSignalsExecutorAdapter::new();
-        let result = adapter.evaluate_layer(&items_dir, "my-track", dir.path(), &multi_binding);
+        let result = adapter.evaluate_layer(&items_dir, &track_id(), dir.path(), &multi_binding);
         assert!(
             result.is_err(),
             "multi-target + missing track dir must return Err (fail-closed per ADR 2026-06-01-0406 D1)"
         );
         let msg = result.unwrap_err().to_string();
         assert!(
-            msg.contains("missing or unstattable"),
-            "error must mention missing/unstattable track directory, got: {msg}"
+            msg.contains("multi-target"),
+            "error must preserve the unsupported-target cause, got: {msg}"
         );
     }
 }

@@ -23,15 +23,21 @@
 //! stderr is captured in memory — no session log or output files are written to the workspace
 //! (CN-05).
 
+use std::collections::VecDeque;
 use std::ffi::OsString;
-use std::io::{BufRead, BufReader};
+use std::io::{Read, Write};
 use std::process::{Child, Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
 
 use domain::review_v2::{
-    FastVerdict, LogInfo, ReviewTarget, ReviewerFinding, Verdict, VerdictError,
+    FastVerdict, LogInfo, ReviewTarget, ReviewerFinding, RoundType, ScopeName, Verdict,
+    VerdictError,
 };
+use domain::{CommitHash, TrackId};
+use std::sync::Arc;
+use usecase::capability_exec::{ModelName, ReasoningEffort};
+use usecase::provider_session::{ProviderSessionCachePort, ReviewerPrompt};
 use usecase::review_v2::{ReviewerError, ports::Reviewer};
 use usecase::review_workflow::{
     REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewPayloadVerdict, ReviewVerdict,
@@ -39,13 +45,14 @@ use usecase::review_workflow::{
     render_review_payload,
 };
 
+use super::session::{ReviewerSession, effort_value};
 use crate::codex_common::POLL_INTERVAL;
 
 /// Return type of `spawn_claude`: child process, stderr collector handle, and stdout collector handle.
 ///
 /// Both handles collect the respective streams into `String` in memory (no files written — CN-05).
 type SpawnClaudeResult =
-    Result<(Child, thread::JoinHandle<String>, thread::JoinHandle<String>), String>;
+    Result<(Child, thread::JoinHandle<String>, thread::JoinHandle<Option<String>>), String>;
 
 /// Environment variable for overriding the `claude` binary path in tests.
 #[cfg(any(test, feature = "test-helpers"))]
@@ -74,13 +81,15 @@ pub(crate) const CLAUDE_BIN_ENV: &str = "SOTP_CLAUDE_BIN";
 /// has no sandbox flag; read-only behavior rests on the reviewer role + headless (`-p`) form.
 pub struct ClaudeReviewer {
     /// Claude model name (e.g., `"claude-opus-4-7"`).
-    model: String,
+    model: ModelName,
     /// Maximum time to wait for the Claude subprocess.
     timeout: Duration,
     /// Base review prompt to send to Claude (before the file list is appended).
     base_prompt: String,
     /// Scope label injected into the prompt (e.g., `"cli"`, `"infrastructure"`).
     scope_label: String,
+    /// Scope-bound cache identity and resolved execution profile.
+    session: ReviewerSession,
     /// Test-only: override the Claude binary path (avoids unsafe env var mutation).
     #[cfg(any(test, feature = "test-helpers"))]
     bin_override: Option<OsString>,
@@ -90,19 +99,37 @@ impl ClaudeReviewer {
     /// Constructs a new `ClaudeReviewer`.
     ///
     /// # Arguments
+    /// - `diff_base`: optional persisted review-cycle base that scopes session reuse.
     /// - `model`: Claude model name.
     /// - `timeout`: Maximum time allowed for the review subprocess.
     /// - `base_prompt`: Review instructions without the scope file list.
-    pub fn new<M: Into<String>, B: Into<String>>(
-        model: M,
+    #[allow(clippy::too_many_arguments)] // signature is the catalogue-declared contract
+    pub fn new(
+        track_id: TrackId,
+        scope: ScopeName,
+        round_type: RoundType,
+        diff_base: Option<CommitHash>,
+        model: ModelName,
+        effort: ReasoningEffort,
         timeout: Duration,
-        base_prompt: B,
+        base_prompt: ReviewerPrompt,
+        session_cache: Arc<dyn ProviderSessionCachePort>,
     ) -> Self {
         Self {
-            model: model.into(),
+            session: ReviewerSession::new(
+                track_id,
+                scope.clone(),
+                round_type,
+                diff_base,
+                "claude",
+                model.clone(),
+                effort,
+                session_cache,
+            ),
+            model,
             timeout,
-            base_prompt: base_prompt.into(),
-            scope_label: "scope".to_owned(),
+            base_prompt: base_prompt.as_str().to_owned(),
+            scope_label: scope.to_string(),
             #[cfg(any(test, feature = "test-helpers"))]
             bin_override: None,
         }
@@ -140,6 +167,7 @@ impl ClaudeReviewer {
             "{base}\n\n\
              ## Review scope: `{scope}`\n\n\
              Review ONLY the following files (this is the `{scope}` scope).\n\
+             Re-read the CURRENT file list and CURRENT diff, then fully re-adjudicate this entire scope.\n\
              You have read-only access to the repo — use `git diff` to see changes.\n\n\
              Files:\n{file_list}",
             base = self.base_prompt,
@@ -164,23 +192,45 @@ impl ClaudeReviewer {
         #[cfg(not(any(test, feature = "test-helpers")))]
         let bin = claude_bin();
 
-        let (child, stderr_collector, stdout_collector) =
-            spawn_claude(&bin, &self.model, &prompt).map_err(ReviewerError::Unexpected)?;
-
-        run_claude_child(child, stderr_collector, stdout_collector, self.timeout)
+        let resume_id = self.session.resumable_id();
+        let run = |resume_id: Option<&str>| {
+            let (child, stderr_collector, stdout_collector) = spawn_claude(
+                &bin,
+                self.model.as_str(),
+                effort_value(self.session.effort()),
+                resume_id,
+                &prompt,
+            )
+            .map_err(ReviewerError::Unexpected)?;
+            run_claude_child(child, stderr_collector, stdout_collector, self.timeout)
+        };
+        let attempted = run(resume_id.as_deref());
+        if resume_id.is_some()
+            && !matches!(
+                attempted.as_ref().map(|raw| &raw.verdict),
+                Ok(ReviewVerdict::ZeroFindings | ReviewVerdict::FindingsRemain)
+            )
+        {
+            return run(None);
+        }
+        attempted
     }
 }
 
 impl Reviewer for ClaudeReviewer {
     fn review(&self, target: &ReviewTarget) -> Result<(Verdict, LogInfo), ReviewerError> {
         let raw = self.run_review(target, &self.scope_label)?;
+        let session_id = raw.session_id.clone();
         let (verdict, log_info) = convert_raw_to_final(raw)?;
+        self.session.save(session_id);
         Ok((verdict, log_info))
     }
 
     fn fast_review(&self, target: &ReviewTarget) -> Result<(FastVerdict, LogInfo), ReviewerError> {
         let raw = self.run_review(target, &self.scope_label)?;
+        let session_id = raw.session_id.clone();
         let (verdict, log_info) = convert_raw_to_fast(raw)?;
+        self.session.save(session_id);
         Ok((verdict, log_info))
     }
 }
@@ -191,6 +241,7 @@ struct ReviewOutcomeRaw {
     final_message: Option<String>,
     /// Captured stderr output (in-memory; no files written — CN-05).
     session_stderr: String,
+    session_id: Option<String>,
 }
 
 /// Converts a raw Claude outcome to a final `(Verdict, LogInfo)`.
@@ -333,7 +384,12 @@ const REVIEWER_DISALLOWED_TOOLS: &[&str] = &["Edit", "Write"];
 ///
 /// Uses `--output-format json` so the verdict appears in the `structured_output` field on stdout.
 /// Uses `--json-schema` for API-level schema enforcement (grammar-compiled, CN-01).
-fn build_claude_args(model: &str, prompt: &str) -> Vec<OsString> {
+fn build_claude_args(
+    model: &str,
+    effort: &str,
+    resume_id: Option<&str>,
+    prompt: &str,
+) -> Vec<OsString> {
     let mut args = vec![
         OsString::from("-p"),
         OsString::from("--bare"),
@@ -355,17 +411,39 @@ fn build_claude_args(model: &str, prompt: &str) -> Vec<OsString> {
         OsString::from(REVIEW_OUTPUT_SCHEMA_JSON),
         OsString::from("--model"),
         OsString::from(model),
-        OsString::from(prompt),
+        OsString::from("--effort"),
+        OsString::from(effort),
     ]);
+    if let Some(session_id) = resume_id {
+        args.extend([OsString::from("--resume"), OsString::from(session_id)]);
+    }
+    args.push(OsString::from(prompt));
     args
 }
 
-/// Spawns the Claude subprocess, capturing stdout and stderr in memory (no files written — CN-05).
+/// Maximum stdout retained for Claude's one final JSON envelope.
+const MAX_CLAUDE_STDOUT_BYTES: u64 = 4 * 1024 * 1024;
+
+/// Maximum stderr bytes retained for Claude diagnostics.
+///
+/// The collector keeps the first and last halves of this limit, continuing to
+/// drain the pipe after the limit is reached so a verbose child cannot block.
+const MAX_CLAUDE_STDERR_BYTES: usize = 4 * 1024 * 1024;
+const CLAUDE_STDERR_PREFIX_BYTES: usize = MAX_CLAUDE_STDERR_BYTES / 2;
+const CLAUDE_STDERR_TRUNCATION_NOTICE: &str = "\n[Claude stderr truncated]\n";
+
+/// Spawns the Claude subprocess, capturing bounded stdout and stderr in memory (no files written — CN-05).
 ///
 /// Returns `(child, stderr_collector_handle, stdout_collector_handle)`.
-/// Both handles return the collected stream content as a `String` via their `JoinHandle`.
-fn spawn_claude(bin: &std::ffi::OsStr, model: &str, prompt: &str) -> SpawnClaudeResult {
-    let args = build_claude_args(model, prompt);
+/// The stdout handle returns `None` when the final envelope exceeds its explicit byte bound.
+fn spawn_claude(
+    bin: &std::ffi::OsStr,
+    model: &str,
+    effort: &str,
+    resume_id: Option<&str>,
+    prompt: &str,
+) -> SpawnClaudeResult {
+    let args = build_claude_args(model, effort, resume_id, prompt);
 
     let mut command = Command::new(bin);
     command.args(&args).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
@@ -373,43 +451,17 @@ fn spawn_claude(bin: &std::ffi::OsStr, model: &str, prompt: &str) -> SpawnClaude
     let mut child =
         command.spawn().map_err(|e| format!("failed to spawn {}: {e}", bin.to_string_lossy()))?;
 
-    // Collect stderr in memory (echoed to the process stderr for observability).
+    // Collect bounded stderr in memory (echoed to the process stderr for observability).
     let stderr_collector = match child.stderr.take() {
-        Some(pipe) => thread::spawn(move || {
-            let mut buf = String::new();
-            let reader = BufReader::new(pipe);
-            for line in reader.lines() {
-                match line {
-                    Ok(l) => {
-                        eprintln!("{l}");
-                        buf.push_str(&l);
-                        buf.push('\n');
-                    }
-                    Err(_) => break,
-                }
-            }
-            buf
-        }),
+        Some(pipe) => thread::spawn(move || collect_claude_stderr(pipe)),
         None => thread::spawn(String::new),
     };
 
-    // Collect stdout for later parsing.
+    // Claude emits one final JSON envelope on stdout. Retain it only within the
+    // explicit cap, but always drain the pipe through EOF so the child cannot block.
     let stdout_collector = match child.stdout.take() {
-        Some(pipe) => thread::spawn(move || {
-            let mut buf = String::new();
-            let reader = BufReader::new(pipe);
-            for line in reader.lines() {
-                match line {
-                    Ok(l) => {
-                        buf.push_str(&l);
-                        buf.push('\n');
-                    }
-                    Err(_) => break,
-                }
-            }
-            buf
-        }),
-        None => thread::spawn(String::new),
+        Some(pipe) => thread::spawn(move || collect_claude_stdout(pipe)),
+        None => thread::spawn(|| None),
     };
 
     Ok((child, stderr_collector, stdout_collector))
@@ -418,7 +470,7 @@ fn spawn_claude(bin: &std::ffi::OsStr, model: &str, prompt: &str) -> SpawnClaude
 fn run_claude_child(
     mut child: Child,
     stderr_collector: thread::JoinHandle<String>,
-    stdout_collector: thread::JoinHandle<String>,
+    stdout_collector: thread::JoinHandle<Option<String>>,
     timeout: Duration,
 ) -> Result<ReviewOutcomeRaw, ReviewerError> {
     let start = Instant::now();
@@ -451,19 +503,17 @@ fn run_claude_child(
     // Collect stdout. On timeout we skip the join: a grandchild process may still
     // hold the stdout pipe open, causing join() to block indefinitely. The thread
     // is left detached and will complete once the pipe closes naturally.
-    let stdout_raw =
-        if timed_out { String::new() } else { stdout_collector.join().unwrap_or_default() };
+    let stdout_raw = if timed_out { None } else { stdout_collector.join().unwrap_or_default() };
 
     // Collect stderr similarly — skip join on timeout to avoid blocking.
     let session_stderr =
         if timed_out { String::new() } else { stderr_collector.join().unwrap_or_default() };
 
     // Parse the --output-format json envelope from stdout and extract structured_output.
-    let final_message = if timed_out || stdout_raw.trim().is_empty() {
-        None
-    } else {
-        extract_structured_output(&stdout_raw)
-    };
+    let final_message = stdout_raw
+        .as_deref()
+        .filter(|stdout| !timed_out && !stdout.trim().is_empty())
+        .and_then(extract_structured_output);
 
     let normalized = final_message.as_deref().and_then(normalize_final_message);
     let final_message_state = parse_review_final_message(normalized.as_deref());
@@ -478,7 +528,114 @@ fn run_claude_child(
 
     let verdict = classify_review_verdict(timed_out, exit_success, &final_message_state);
 
-    Ok(ReviewOutcomeRaw { verdict, final_message: rendered_message, session_stderr })
+    let session_id = stdout_raw.as_deref().and_then(extract_claude_session_id);
+    Ok(ReviewOutcomeRaw { verdict, final_message: rendered_message, session_stderr, session_id })
+}
+
+/// Reads at most one Claude final envelope into memory, then drains any remaining stdout.
+fn collect_claude_stdout<R: Read>(mut pipe: R) -> Option<String> {
+    let mut bytes = Vec::new();
+    let read_result =
+        pipe.by_ref().take(MAX_CLAUDE_STDOUT_BYTES.saturating_add(1)).read_to_end(&mut bytes);
+    let drain_result = std::io::copy(&mut pipe, &mut std::io::sink());
+    if read_result.is_err() || drain_result.is_err() || bytes.len() as u64 > MAX_CLAUDE_STDOUT_BYTES
+    {
+        return None;
+    }
+    String::from_utf8(bytes).ok()
+}
+
+/// Drains Claude stderr while retaining only a bounded diagnostic prefix and suffix.
+fn collect_claude_stderr<R: Read>(pipe: R) -> String {
+    collect_claude_stderr_with_limits(
+        pipe,
+        MAX_CLAUDE_STDERR_BYTES,
+        CLAUDE_STDERR_PREFIX_BYTES,
+        true,
+    )
+}
+
+fn collect_claude_stderr_with_limits<R: Read>(
+    mut pipe: R,
+    max_bytes: usize,
+    prefix_bytes: usize,
+    echo_to_stderr: bool,
+) -> String {
+    let prefix_bytes = prefix_bytes.min(max_bytes);
+    let suffix_bytes = max_bytes.saturating_sub(prefix_bytes);
+    let mut prefix = Vec::with_capacity(prefix_bytes);
+    let mut suffix = VecDeque::with_capacity(suffix_bytes);
+    let mut total_bytes = 0usize;
+    let mut chunk = [0_u8; 8 * 1024];
+
+    loop {
+        let read = match pipe.read(&mut chunk) {
+            Ok(0) | Err(_) => break,
+            Ok(read) => read,
+        };
+        let Some(bytes) = chunk.get(..read) else {
+            break;
+        };
+        if echo_to_stderr {
+            let _ = std::io::stderr().write_all(bytes);
+        }
+        total_bytes = total_bytes.saturating_add(read);
+
+        let prefix_remaining = prefix_bytes.saturating_sub(prefix.len());
+        let prefix_part = prefix_remaining.min(bytes.len());
+        if let Some(prefix_part) = bytes.get(..prefix_part) {
+            prefix.extend_from_slice(prefix_part);
+        }
+        append_bounded_suffix(
+            &mut suffix,
+            bytes.get(prefix_part..).unwrap_or_default(),
+            suffix_bytes,
+        );
+    }
+
+    let mut retained = prefix;
+    retained.extend(suffix);
+    if total_bytes > max_bytes {
+        let Some(prefix) = retained.get(..prefix_bytes) else {
+            return String::from_utf8_lossy(&retained).into_owned();
+        };
+        let Some(suffix) = retained.get(prefix_bytes..) else {
+            return String::from_utf8_lossy(&retained).into_owned();
+        };
+        let mut rendered = String::from_utf8_lossy(prefix).into_owned();
+        rendered.push_str(CLAUDE_STDERR_TRUNCATION_NOTICE);
+        rendered.push_str(&String::from_utf8_lossy(suffix));
+        rendered
+    } else {
+        String::from_utf8_lossy(&retained).into_owned()
+    }
+}
+
+fn append_bounded_suffix(suffix: &mut VecDeque<u8>, bytes: &[u8], max_bytes: usize) {
+    if max_bytes == 0 {
+        return;
+    }
+    if bytes.len() >= max_bytes {
+        suffix.clear();
+        suffix.extend(
+            bytes.get(bytes.len().saturating_sub(max_bytes)..).unwrap_or_default().iter().copied(),
+        );
+        return;
+    }
+    let to_drop = suffix.len().saturating_add(bytes.len()).saturating_sub(max_bytes);
+    suffix.drain(..to_drop);
+    suffix.extend(bytes.iter().copied());
+}
+
+fn extract_claude_session_id(stdout: &str) -> Option<String> {
+    stdout.lines().find_map(|line| {
+        serde_json::from_str::<serde_json::Value>(line.trim())
+            .ok()?
+            .get("session_id")?
+            .as_str()
+            .filter(|value| !value.trim().is_empty())
+            .map(str::to_owned)
+    })
 }
 
 /// Extracts the `structured_output` field from the `--output-format json` envelope.
@@ -517,6 +674,135 @@ fn extract_structured_output(stdout: &str) -> Option<String> {
 mod tests {
     use super::*;
 
+    struct StaticSessionCache {
+        entry: Option<usecase::provider_session::ProviderSessionCacheEntry>,
+    }
+
+    impl ProviderSessionCachePort for StaticSessionCache {
+        fn load(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+        ) -> Result<
+            Option<usecase::provider_session::ProviderSessionCacheEntry>,
+            usecase::provider_session::ProviderSessionCacheError,
+        > {
+            Ok(self.entry.clone())
+        }
+
+        fn save(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+            _: &usecase::provider_session::ProviderSessionCacheEntry,
+        ) -> Result<(), usecase::provider_session::ProviderSessionCacheError> {
+            Ok(())
+        }
+
+        fn remove(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+        ) -> Result<(), usecase::provider_session::ProviderSessionCacheError> {
+            Ok(())
+        }
+    }
+
+    struct KeyedSessionCache {
+        entry: Option<usecase::provider_session::ProviderSessionCacheEntry>,
+        expected_key: usecase::provider_session::ProviderSessionCacheKey,
+    }
+
+    impl ProviderSessionCachePort for KeyedSessionCache {
+        fn load(
+            &self,
+            key: &usecase::provider_session::ProviderSessionCacheKey,
+        ) -> Result<
+            Option<usecase::provider_session::ProviderSessionCacheEntry>,
+            usecase::provider_session::ProviderSessionCacheError,
+        > {
+            Ok((key == &self.expected_key).then(|| self.entry.clone()).flatten())
+        }
+
+        fn save(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+            _: &usecase::provider_session::ProviderSessionCacheEntry,
+        ) -> Result<(), usecase::provider_session::ProviderSessionCacheError> {
+            Ok(())
+        }
+
+        fn remove(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+        ) -> Result<(), usecase::provider_session::ProviderSessionCacheError> {
+            Ok(())
+        }
+    }
+
+    struct EmptySessionCache;
+
+    impl ProviderSessionCachePort for EmptySessionCache {
+        fn load(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+        ) -> Result<
+            Option<usecase::provider_session::ProviderSessionCacheEntry>,
+            usecase::provider_session::ProviderSessionCacheError,
+        > {
+            Ok(None)
+        }
+        fn save(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+            _: &usecase::provider_session::ProviderSessionCacheEntry,
+        ) -> Result<(), usecase::provider_session::ProviderSessionCacheError> {
+            Ok(())
+        }
+        fn remove(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+        ) -> Result<(), usecase::provider_session::ProviderSessionCacheError> {
+            Ok(())
+        }
+    }
+
+    fn test_reviewer(timeout: Duration, prompt: &str) -> ClaudeReviewer {
+        test_reviewer_with_cache(timeout, prompt, Arc::new(EmptySessionCache))
+    }
+
+    fn test_reviewer_with_cache(
+        timeout: Duration,
+        prompt: &str,
+        cache: Arc<dyn ProviderSessionCachePort>,
+    ) -> ClaudeReviewer {
+        ClaudeReviewer::new(
+            TrackId::try_new("test-track").unwrap(),
+            ScopeName::Other,
+            RoundType::Fast,
+            Some(CommitHash::try_new("a1b2c3d").unwrap()),
+            ModelName::try_new("claude-opus-4-7").unwrap(),
+            ReasoningEffort::High,
+            timeout,
+            ReviewerPrompt::try_new(prompt.to_owned()).unwrap(),
+            cache,
+        )
+    }
+
+    fn session_entry(provider: &str) -> usecase::provider_session::ProviderSessionCacheEntry {
+        session_entry_with_model(provider, "claude-opus-4-7")
+    }
+
+    fn session_entry_with_model(
+        provider: &str,
+        model: &str,
+    ) -> usecase::provider_session::ProviderSessionCacheEntry {
+        usecase::provider_session::ProviderSessionCacheEntry::new(
+            usecase::provider_session::ProviderSessionId::try_new("prior-session".to_owned())
+                .unwrap(),
+            usecase::capability_exec::ProviderName::try_new(provider.to_owned()).unwrap(),
+            ModelName::try_new(model.to_owned()).unwrap(),
+            ReasoningEffort::High,
+        )
+    }
+
     /// Verifies that `build_claude_args` encodes the CN-05 best-effort read-only contract:
     /// `--bare`, `--permission-mode dontAsk`, each read-only tool as a separate token after
     /// `--allowedTools`, and each disallowed tool as a separate token after `--disallowedTools`.
@@ -528,7 +814,7 @@ mod tests {
     fn test_build_claude_args_encodes_read_only_contract() {
         let model = "claude-opus-4-7";
         let prompt = "Review this.";
-        let args = build_claude_args(model, prompt);
+        let args = build_claude_args(model, "high", None, prompt);
 
         // Collect as &str slices for readable assertions.
         let strs: Vec<&str> = args.iter().filter_map(|a| a.to_str()).collect();
@@ -592,9 +878,18 @@ mod tests {
     }
 
     #[test]
+    fn test_build_claude_resume_args_reinject_all_execution_flags() {
+        let args = build_claude_args("claude-model", "max", Some("prior-session"), "Review.");
+        let args: Vec<&str> = args.iter().filter_map(|arg| arg.to_str()).collect();
+        assert!(args.windows(2).any(|pair| pair == ["--resume", "prior-session"]));
+        assert!(args.windows(2).any(|pair| pair == ["--model", "claude-model"]));
+        assert!(args.windows(2).any(|pair| pair == ["--effort", "max"]));
+        assert!(args.windows(2).any(|pair| pair == ["--permission-mode", "dontAsk"]));
+    }
+
+    #[test]
     fn test_claude_reviewer_build_full_prompt_with_files() {
-        let reviewer =
-            ClaudeReviewer::new("claude-opus-4-7", Duration::from_secs(600), "Review this code.");
+        let reviewer = test_reviewer(Duration::from_secs(600), "Review this code.");
         let files = vec![
             domain::review_v2::FilePath::new("src/lib.rs").unwrap(),
             domain::review_v2::FilePath::new("src/main.rs").unwrap(),
@@ -606,12 +901,324 @@ mod tests {
         assert!(prompt.contains("## Review scope: `domain`"));
         assert!(prompt.contains("- src/lib.rs"));
         assert!(prompt.contains("- src/main.rs"));
+        assert!(prompt.contains("CURRENT file list"));
+        assert!(prompt.contains("CURRENT diff"));
+        assert!(prompt.contains("fully re-adjudicate this entire scope"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_claude_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit()
+     {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = tempfile::tempdir().unwrap();
+        let write_bin = |name: &str, expected_resume: bool| {
+            let script = dir.path().join(name);
+            let resume_check = if expected_resume {
+                "[ \"$has_resume\" -eq 1 ]"
+            } else {
+                "[ \"$has_resume\" -eq 0 ]"
+            };
+            std::fs::write(
+                &script,
+                format!(
+                    r#"#!/bin/sh
+has_model=0
+has_effort=0
+has_permission=0
+has_resume=0
+last=""
+previous=""
+for argument in "$@"; do
+  [ "$previous" = "--model" ] && [ "$argument" = "claude-opus-4-7" ] && has_model=1
+  [ "$previous" = "--effort" ] && [ "$argument" = "high" ] && has_effort=1
+  [ "$previous" = "--permission-mode" ] && [ "$argument" = "dontAsk" ] && has_permission=1
+  [ "$argument" = "--resume" ] && has_resume=1
+  previous="$argument"
+  last="$argument"
+done
+[ "$has_model" -eq 1 ] && [ "$has_effort" -eq 1 ] && [ "$has_permission" -eq 1 ] && {resume_check} || exit 9
+case "$last" in
+  *"CURRENT file list"*"CURRENT diff"*"fully re-adjudicate this entire scope"*"src/lib.rs"*) ;;
+  *) exit 10 ;;
+esac
+printf '{{"type":"result","session_id":"new-session","structured_output":{{"verdict":"zero_findings","findings":[]}}}}\n'
+"#
+                ),
+            )
+            .unwrap();
+            let mut permissions = std::fs::metadata(&script).unwrap().permissions();
+            permissions.set_mode(0o755);
+            std::fs::set_permissions(&script, permissions).unwrap();
+            script
+        };
+
+        let target =
+            ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
+        let resumed = test_reviewer_with_cache(
+            Duration::from_secs(10),
+            "Review this code.",
+            Arc::new(StaticSessionCache { entry: Some(session_entry("claude")) }),
+        )
+        .with_bin(write_bin("resume-claude.sh", true))
+        .review(&target)
+        .unwrap();
+        let model_mismatch = test_reviewer_with_cache(
+            Duration::from_secs(10),
+            "Review this code.",
+            Arc::new(StaticSessionCache {
+                entry: Some(session_entry_with_model("claude", "previous-model")),
+            }),
+        )
+        .with_bin(write_bin("model-mismatch-claude.sh", false))
+        .review(&target)
+        .unwrap();
+        let provider_mismatch = test_reviewer_with_cache(
+            Duration::from_secs(10),
+            "Review this code.",
+            Arc::new(StaticSessionCache { entry: Some(session_entry("codex")) }),
+        )
+        .with_bin(write_bin("provider-mismatch-claude.sh", false))
+        .review(&target)
+        .unwrap();
+        let first_round = test_reviewer_with_cache(
+            Duration::from_secs(10),
+            "Review this code.",
+            Arc::new(EmptySessionCache),
+        )
+        .with_bin(write_bin("first-round-claude.sh", false))
+        .review(&target)
+        .unwrap();
+
+        assert_eq!(resumed.0, model_mismatch.0);
+        assert_eq!(resumed.0, provider_mismatch.0);
+        assert_eq!(resumed.0, first_round.0);
+        assert!(matches!(resumed.0, Verdict::ZeroFindings));
+        // A resume changes only provider context. Every invocation still returns
+        // the same single-round review record shape: verdict plus log info.
+        assert_eq!(resumed.1, model_mismatch.1);
+        assert_eq!(resumed.1, provider_mismatch.1);
+        assert_eq!(resumed.1, first_round.1);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_claude_reviewer_resume_failure_retries_fresh_invocation() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = tempfile::tempdir().unwrap();
+        let attempts = dir.path().join("attempts.log");
+        let script = dir.path().join("resume-fallback-claude.sh");
+        std::fs::write(
+            &script,
+            format!(
+                r#"#!/bin/sh
+has_resume=0
+has_model=0
+has_effort=0
+has_permission=0
+previous=""
+for argument in "$@"; do
+  [ "$argument" = "--resume" ] && has_resume=1
+  [ "$previous" = "--model" ] && [ "$argument" = "claude-opus-4-7" ] && has_model=1
+  [ "$previous" = "--effort" ] && [ "$argument" = "high" ] && has_effort=1
+  [ "$previous" = "--permission-mode" ] && [ "$argument" = "dontAsk" ] && has_permission=1
+  previous="$argument"
+done
+[ "$has_model" -eq 1 ] && [ "$has_effort" -eq 1 ] && [ "$has_permission" -eq 1 ] || exit 9
+if [ "$has_resume" -eq 1 ]; then
+  printf 'resume\n' >> '{}'
+  exit 7
+fi
+printf 'fresh\n' >> '{}'
+printf '{{"type":"result","session_id":"new-session","structured_output":{{"verdict":"zero_findings","findings":[]}}}}\n'
+"#,
+                attempts.display(),
+                attempts.display()
+            ),
+        )
+        .unwrap();
+        let mut permissions = std::fs::metadata(&script).unwrap().permissions();
+        permissions.set_mode(0o755);
+        std::fs::set_permissions(&script, permissions).unwrap();
+
+        let target =
+            ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
+        let record = test_reviewer_with_cache(
+            Duration::from_secs(10),
+            "Review this code.",
+            Arc::new(StaticSessionCache { entry: Some(session_entry("claude")) }),
+        )
+        .with_bin(script)
+        .review(&target)
+        .unwrap();
+
+        assert!(matches!(record.0, Verdict::ZeroFindings));
+        assert_eq!(std::fs::read_to_string(attempts).unwrap(), "resume\nfresh\n");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_claude_reviewer_expired_session_starts_fresh_with_explicit_flags() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = tempfile::tempdir().unwrap();
+        let attempts = dir.path().join("attempts.log");
+        let script = dir.path().join("expired-session-claude.sh");
+        std::fs::write(
+            &script,
+            format!(
+                r#"#!/bin/sh
+has_resume=0
+has_model=0
+has_effort=0
+has_permission=0
+previous=""
+for argument in "$@"; do
+  [ "$argument" = "--resume" ] && has_resume=1
+  [ "$previous" = "--model" ] && [ "$argument" = "claude-opus-4-7" ] && has_model=1
+  [ "$previous" = "--effort" ] && [ "$argument" = "high" ] && has_effort=1
+  [ "$previous" = "--permission-mode" ] && [ "$argument" = "dontAsk" ] && has_permission=1
+  previous="$argument"
+done
+[ "$has_model" -eq 1 ] && [ "$has_effort" -eq 1 ] && [ "$has_permission" -eq 1 ] || exit 9
+if [ "$has_resume" -eq 1 ]; then
+  printf 'resume\n' >> '{}'
+  printf 'expired or unknown session\n' >&2
+  exit 7
+fi
+printf 'fresh\n' >> '{}'
+printf '{{"type":"result","session_id":"new-session","structured_output":{{"verdict":"zero_findings","findings":[]}}}}\n'
+"#,
+                attempts.display(),
+                attempts.display()
+            ),
+        )
+        .unwrap();
+        let mut permissions = std::fs::metadata(&script).unwrap().permissions();
+        permissions.set_mode(0o755);
+        std::fs::set_permissions(&script, permissions).unwrap();
+
+        let target =
+            ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
+        let record = test_reviewer_with_cache(
+            Duration::from_secs(10),
+            "Review this code.",
+            Arc::new(StaticSessionCache { entry: Some(session_entry("claude")) }),
+        )
+        .with_bin(script)
+        .review(&target)
+        .unwrap();
+
+        assert!(matches!(record.0, Verdict::ZeroFindings));
+        assert_eq!(std::fs::read_to_string(attempts).unwrap(), "resume\nfresh\n");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_claude_reviewer_resumes_only_matching_track_scope_and_round_key_unit() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = tempfile::tempdir().unwrap();
+        let write_bin = |name: &str, expected_resume: bool| {
+            let script = dir.path().join(name);
+            let resume_check = if expected_resume {
+                "[ \"$has_resume\" -eq 1 ]"
+            } else {
+                "[ \"$has_resume\" -eq 0 ]"
+            };
+            std::fs::write(
+                &script,
+                format!(
+                    r#"#!/bin/sh
+has_model=0
+has_effort=0
+has_permission=0
+has_resume=0
+previous=""
+for argument in "$@"; do
+  [ "$previous" = "--model" ] && [ "$argument" = "claude-opus-4-7" ] && has_model=1
+  [ "$previous" = "--effort" ] && [ "$argument" = "high" ] && has_effort=1
+  [ "$previous" = "--permission-mode" ] && [ "$argument" = "dontAsk" ] && has_permission=1
+  [ "$argument" = "--resume" ] && has_resume=1
+  previous="$argument"
+done
+[ "$has_model" -eq 1 ] && [ "$has_effort" -eq 1 ] && [ "$has_permission" -eq 1 ] && {resume_check} || exit 9
+printf '{{"type":"result","session_id":"new-session","structured_output":{{"verdict":"zero_findings","findings":[]}}}}\n'
+"#
+                ),
+            )
+            .unwrap();
+            let mut permissions = std::fs::metadata(&script).unwrap().permissions();
+            permissions.set_mode(0o755);
+            std::fs::set_permissions(&script, permissions).unwrap();
+            script
+        };
+        let target =
+            ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let scope = ScopeName::Other;
+        let diff_base = CommitHash::try_new("a1b2c3d").unwrap();
+        let matched_key = usecase::provider_session::ProviderSessionCacheKey::Review {
+            track_id: track_id.clone(),
+            scope: scope.clone(),
+            round_type: RoundType::Fast,
+            diff_base: diff_base.clone(),
+        };
+        let wrong_track_key = usecase::provider_session::ProviderSessionCacheKey::Review {
+            track_id: TrackId::try_new("other-track").unwrap(),
+            scope: scope.clone(),
+            round_type: RoundType::Fast,
+            diff_base: diff_base.clone(),
+        };
+        let wrong_scope_key = usecase::provider_session::ProviderSessionCacheKey::Review {
+            track_id: track_id.clone(),
+            scope: ScopeName::Main(
+                domain::review_v2::MainScopeName::new("infrastructure").unwrap(),
+            ),
+            round_type: RoundType::Fast,
+            diff_base: diff_base.clone(),
+        };
+
+        let run = |round_type, expected_key, name, expects_resume| {
+            ClaudeReviewer::new(
+                track_id.clone(),
+                scope.clone(),
+                round_type,
+                Some(diff_base.clone()),
+                ModelName::try_new("claude-opus-4-7").unwrap(),
+                ReasoningEffort::High,
+                Duration::from_secs(10),
+                ReviewerPrompt::try_new("Review this code.".to_owned()).unwrap(),
+                Arc::new(KeyedSessionCache { entry: Some(session_entry("claude")), expected_key }),
+            )
+            .with_bin(write_bin(name, expects_resume))
+            .review(&target)
+            .unwrap()
+        };
+
+        assert!(matches!(
+            run(RoundType::Fast, wrong_track_key, "wrong-track-claude.sh", false).0,
+            Verdict::ZeroFindings
+        ));
+        assert!(matches!(
+            run(RoundType::Fast, wrong_scope_key, "wrong-scope-claude.sh", false).0,
+            Verdict::ZeroFindings
+        ));
+        assert!(matches!(
+            run(RoundType::Final, matched_key.clone(), "fast-keyed-final-claude.sh", false).0,
+            Verdict::ZeroFindings
+        ));
+        assert!(matches!(
+            run(RoundType::Fast, matched_key, "matching-key-claude.sh", true).0,
+            Verdict::ZeroFindings
+        ));
     }
 
     #[test]
     fn test_claude_reviewer_build_full_prompt_empty_target_returns_base_prompt() {
-        let reviewer =
-            ClaudeReviewer::new("claude-opus-4-7", Duration::from_secs(600), "Review this code.");
+        let reviewer = test_reviewer(Duration::from_secs(600), "Review this code.");
         let target = ReviewTarget::new(vec![]);
         let prompt = reviewer.build_full_prompt(&target, "domain");
 
@@ -637,6 +1244,21 @@ mod tests {
     fn test_extract_structured_output_invalid_json_returns_none() {
         assert!(extract_structured_output("not json at all").is_none());
         assert!(extract_structured_output("").is_none());
+    }
+
+    #[test]
+    fn test_collect_claude_stdout_rejects_oversized_envelope() {
+        let stdout = vec![b'x'; MAX_CLAUDE_STDOUT_BYTES.saturating_add(1) as usize];
+
+        assert_eq!(collect_claude_stdout(std::io::Cursor::new(stdout)), None);
+    }
+
+    #[test]
+    fn test_collect_claude_stderr_over_limit_keeps_bounded_prefix_and_suffix() {
+        let stderr =
+            collect_claude_stderr_with_limits(std::io::Cursor::new(b"abcdefghij"), 8, 4, false);
+
+        assert_eq!(stderr, "abcd\n[Claude stderr truncated]\nghij");
     }
 
     #[test]
@@ -672,8 +1294,7 @@ exit 0
         perms.set_mode(0o755);
         std::fs::set_permissions(&script, perms).unwrap();
 
-        let reviewer = ClaudeReviewer::new("claude-opus-4-7", Duration::from_secs(10), "Review.")
-            .with_bin(&script);
+        let reviewer = test_reviewer(Duration::from_secs(10), "Review.").with_bin(&script);
         let target =
             ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
         let result = reviewer.review(&target);
@@ -723,9 +1344,7 @@ exit 0
         perms.set_mode(0o755);
         std::fs::set_permissions(&script, perms).unwrap();
 
-        let reviewer =
-            ClaudeReviewer::new("claude-opus-4-7", Duration::from_secs(10), "Fast review.")
-                .with_bin(&script);
+        let reviewer = test_reviewer(Duration::from_secs(10), "Fast review.").with_bin(&script);
         let target =
             ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
         let result = reviewer.fast_review(&target);
@@ -756,9 +1375,7 @@ exit 0
         perms.set_mode(0o755);
         std::fs::set_permissions(&script, perms).unwrap();
 
-        let reviewer =
-            ClaudeReviewer::new("claude-opus-4-7", Duration::from_secs(10), "Fast review.")
-                .with_bin(&script);
+        let reviewer = test_reviewer(Duration::from_secs(10), "Fast review.").with_bin(&script);
         let target =
             ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
         let result = reviewer.fast_review(&target);
@@ -783,8 +1400,7 @@ exit 0
         perms.set_mode(0o755);
         std::fs::set_permissions(&script, perms).unwrap();
 
-        let reviewer = ClaudeReviewer::new("claude-opus-4-7", Duration::from_secs(10), "Review.")
-            .with_bin(&script);
+        let reviewer = test_reviewer(Duration::from_secs(10), "Review.").with_bin(&script);
         let target =
             ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
         let result = reviewer.review(&target);
@@ -809,9 +1425,7 @@ exit 0
         perms.set_mode(0o755);
         std::fs::set_permissions(&script, perms).unwrap();
 
-        let reviewer =
-            ClaudeReviewer::new("claude-opus-4-7", Duration::from_millis(200), "Review.")
-                .with_bin(&script);
+        let reviewer = test_reviewer(Duration::from_millis(200), "Review.").with_bin(&script);
         let target = ReviewTarget::new(vec![]);
         let result = reviewer.review(&target);
 

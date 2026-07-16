@@ -12,6 +12,8 @@ use crate::signal_layer_chain::{BindingSignalLayerReader, signal_check_layer_cha
 use crate::{CommandOutcome, cmd_outcome::render_outcome, error::CompositionError};
 use infrastructure::verify::tddd_layers::TdddLayerBinding;
 
+pub use domain::Strictness;
+
 // ---------------------------------------------------------------------------
 // Per-context composition root
 // ---------------------------------------------------------------------------
@@ -41,7 +43,30 @@ impl SignalCompositionRoot {
 
         use service_impl::SignalServiceImpl;
 
-        let service = Arc::new(SignalServiceImpl);
+        let service = Arc::new(SignalServiceImpl::new());
+        cli_driver::signal::SignalDriver::new(service)
+    }
+
+    /// Build a signal driver against an isolated workspace for composition tests.
+    ///
+    /// This is feature-gated test support; production wiring always uses
+    /// [`Self::signal_driver`] and repository discovery.
+    #[cfg(feature = "test-support")]
+    pub fn signal_driver_for_test_workspace(
+        &self,
+        workspace_root: PathBuf,
+        track_id: domain::TrackId,
+        launch_observer: infrastructure::tddd::type_signals_evaluator::RustdocLaunchObserver,
+    ) -> cli_driver::signal::SignalDriver {
+        use std::sync::Arc;
+
+        use service_impl::SignalServiceImpl;
+
+        let service = Arc::new(SignalServiceImpl::for_test_workspace(
+            workspace_root,
+            track_id,
+            launch_observer,
+        ));
         cli_driver::signal::SignalDriver::new(service)
     }
 }
@@ -108,13 +133,13 @@ pub(super) fn load_gate_matrix(
 }
 
 pub(crate) fn resolve_strict(
-    strict_override: bool,
+    strict_override: Option<domain::Strictness>,
     gate: Option<SignalGateName>,
     chain_id: domain::ChainId,
     workspace_root: Option<&Path>,
 ) -> Result<bool, CommandOutcome> {
-    if strict_override {
-        return Ok(true);
+    if let Some(strictness) = strict_override {
+        return Ok(strictness == domain::Strictness::Strict);
     }
     let gate_kind = gate_name_to_kind(gate.unwrap_or(SignalGateName::Commit));
     let matrix = load_gate_matrix(workspace_root)?;
@@ -179,7 +204,7 @@ impl SignalCompositionRoot {
     pub fn signal_check_adr_user(
         &self,
         project_root: PathBuf,
-        strict_override: bool,
+        strict_override: Option<domain::Strictness>,
         gate: Option<SignalGateName>,
         workspace_root: Option<PathBuf>,
     ) -> Result<CommandOutcome, CompositionError> {
@@ -246,7 +271,7 @@ impl SignalCompositionRoot {
     pub fn signal_check_spec_adr(
         &self,
         spec_json_path: Option<PathBuf>,
-        strict_override: bool,
+        strict_override: Option<domain::Strictness>,
         gate: Option<SignalGateName>,
         workspace_root: Option<PathBuf>,
     ) -> Result<CommandOutcome, CompositionError> {
@@ -364,7 +389,7 @@ impl SignalCompositionRoot {
     /// Evaluate chain ② (catalog→spec) gate for all TDDD-enabled layers.
     pub fn signal_check_catalog_spec(
         &self,
-        strict_override: bool,
+        strict_override: Option<domain::Strictness>,
         gate: Option<SignalGateName>,
         workspace_root: Option<PathBuf>,
     ) -> Result<CommandOutcome, CompositionError> {
@@ -393,12 +418,7 @@ impl SignalCompositionRoot {
     /// Compute and persist chain ③ (impl↔catalog) signals for all TDDD-enabled layers.
     pub fn signal_calc_impl_catalog(&self) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::git_cli::SystemGitRepo;
-        use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
-        use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
         use infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter;
-        use usecase::type_signals::{
-            TypeSignalsInteractor, TypeSignalsRequest, TypeSignalsService,
-        };
 
         let repo = SystemGitRepo::discover().map_err(|e| {
             CompositionError::AdapterInit(format!(
@@ -419,13 +439,48 @@ impl SignalCompositionRoot {
                 )
             })?;
 
+        self.signal_calc_impl_catalog_from_context(
+            workspace_root,
+            branch,
+            std::sync::Arc::new(TypeSignalsExecutorAdapter::new()),
+        )
+    }
+
+    #[cfg(feature = "test-support")]
+    pub(crate) fn signal_calc_impl_catalog_for_test_workspace(
+        &self,
+        workspace_root: PathBuf,
+        track_id: domain::TrackId,
+        launch_observer: infrastructure::tddd::type_signals_evaluator::RustdocLaunchObserver,
+    ) -> Result<CommandOutcome, CompositionError> {
+        use infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter;
+
+        self.signal_calc_impl_catalog_from_context(
+            workspace_root,
+            format!("track/{track_id}"),
+            std::sync::Arc::new(TypeSignalsExecutorAdapter::with_rustdoc_launch_observer(
+                launch_observer,
+            )),
+        )
+    }
+
+    fn signal_calc_impl_catalog_from_context(
+        &self,
+        workspace_root: PathBuf,
+        branch: String,
+        executor: std::sync::Arc<dyn usecase::type_signals::TypeSignalsExecutorPort>,
+    ) -> Result<CommandOutcome, CompositionError> {
+        use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
+        use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
+        use usecase::type_signals::{
+            TypeSignalsInteractor, TypeSignalsRequest, TypeSignalsService,
+        };
+
         let items_dir = workspace_root.join("track").join("items");
         let layer_bindings = std::sync::Arc::new(FsTdddLayerBindingsAdapter::new());
-        let executor = std::sync::Arc::new(TypeSignalsExecutorAdapter::new());
         let interactor = TypeSignalsInteractor::new(layer_bindings, executor);
 
-        let reader = LocalSignalLayerReaderAdapter::discover()
-            .map_err(|e| CompositionError::AdapterInit(format!("signal calc-impl-catalog: {e}")))?;
+        let reader = LocalSignalLayerReaderAdapter::new(workspace_root.clone());
 
         let per_layer_fn = {
             let items_dir = items_dir.clone();
@@ -433,13 +488,32 @@ impl SignalCompositionRoot {
             let branch = branch.clone();
             move |layer: domain::tddd::LayerId, _hash_hex: &str, track_id_str: &str| {
                 let layer_str = layer.as_ref().to_owned();
-                let track_id = track_id_str.to_owned();
+                let track_id = match domain::TrackId::try_new(track_id_str) {
+                    Ok(value) => value,
+                    Err(error) => {
+                        return infrastructure::verify::VerifyOutcome::from_findings(vec![
+                            infrastructure::verify::VerifyFinding::error(format!(
+                                "signal calc-impl-catalog: invalid track id '{track_id_str}': {error}"
+                            )),
+                        ]);
+                    }
+                };
+                let branch = match domain::TrackBranch::try_new(branch.clone()) {
+                    Ok(value) => value,
+                    Err(error) => {
+                        return infrastructure::verify::VerifyOutcome::from_findings(vec![
+                            infrastructure::verify::VerifyFinding::error(format!(
+                                "signal calc-impl-catalog: invalid track branch: {error}"
+                            )),
+                        ]);
+                    }
+                };
                 match interactor.run(TypeSignalsRequest {
                     items_dir: items_dir.clone(),
                     track_id,
-                    branch: branch.clone(),
+                    branch,
                     workspace_root: workspace_root.clone(),
-                    layer: Some(layer_str.clone()),
+                    layer: Some(layer),
                 }) {
                     Ok(()) => infrastructure::verify::VerifyOutcome::pass(),
                     Err(e) => infrastructure::verify::VerifyOutcome::from_findings(vec![
@@ -458,7 +532,7 @@ impl SignalCompositionRoot {
     /// Evaluate chain ③ (impl↔catalog) gate for all TDDD-enabled layers.
     pub fn signal_check_impl_catalog(
         &self,
-        strict_override: bool,
+        strict_override: Option<domain::Strictness>,
         gate: Option<SignalGateName>,
         workspace_root: Option<PathBuf>,
     ) -> Result<CommandOutcome, CompositionError> {

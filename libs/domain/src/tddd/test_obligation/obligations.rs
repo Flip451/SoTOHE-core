@@ -77,6 +77,30 @@ impl TestObligation {
     pub fn spec_refs(&self) -> &[TestObligationAnchorId] {
         &self.spec_refs
     }
+
+    /// Returns whether this obligation owns `edge_id`: the catalogue entry
+    /// keys match and the edge's anchor is one of the cited spec references.
+    #[must_use]
+    pub fn owns_edge(&self, edge_id: &TestObligationEdgeId) -> bool {
+        self.id.entry_key() == edge_id.entry_key()
+            && self.spec_refs.iter().any(|spec_ref| {
+                spec_ref.file_path() == edge_id.anchor_id().file_path()
+                    && spec_ref.element_id() == edge_id.anchor_id().element_id()
+            })
+    }
+}
+
+/// Ownership resolution for one edge, keeping the no-owner, unique-owner, and
+/// multiple-owner cases distinct.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum EdgeOwnership<'a> {
+    /// No obligation owns the edge.
+    None,
+    /// Exactly one obligation owns the edge.
+    Unique(&'a TestObligation),
+    /// Several obligations own the edge; each (edge × obligation) pair is
+    /// resolved independently by the gates.
+    Multiple(Vec<&'a TestObligation>),
 }
 
 /// Track-scoped collection of derived obligations (the obligations artifact).
@@ -105,24 +129,27 @@ impl ObligationsDocument {
         &self.obligations
     }
 
-    /// Resolves the unique obligation owning `edge_id` for IN-10 results provenance.
-    ///
-    /// Ownership requires matching catalogue entry keys and a cited spec anchor
-    /// with the same file path and element id. Returns `None` when no unique
-    /// owner exists.
+    /// Resolves the ownership of `edge_id`, distinguishing the no-owner,
+    /// unique-owner, and multiple-owner cases so consumers can never conflate
+    /// "no owner" with "several owners requiring per-pair handling".
     #[must_use]
-    pub fn owning_obligation(&self, edge_id: &TestObligationEdgeId) -> Option<&TestObligation> {
-        let mut owners = self.obligations.iter().filter(|obligation| {
-            obligation.id().entry_key() == edge_id.entry_key()
-                && obligation.spec_refs().iter().any(|spec_ref| {
-                    spec_ref.file_path() == edge_id.anchor_id().file_path()
-                        && spec_ref.element_id() == edge_id.anchor_id().element_id()
-                })
-        });
-        match (owners.next(), owners.next()) {
-            (Some(owner), None) => Some(owner),
-            (None, _) | (Some(_), Some(_)) => None,
+    pub fn edge_ownership(&self, edge_id: &TestObligationEdgeId) -> EdgeOwnership<'_> {
+        let owners = self.owners_of_edge(edge_id);
+        match owners.as_slice() {
+            [] => EdgeOwnership::None,
+            [owner] => EdgeOwnership::Unique(owner),
+            _ => EdgeOwnership::Multiple(owners),
         }
+    }
+
+    /// Returns EVERY obligation owning `edge_id`, in document order.
+    ///
+    /// Several obligations (e.g. one per trait method) can share an entry key
+    /// and cite the same anchor; each (edge × obligation) pair is resolved
+    /// independently by the gates.
+    #[must_use]
+    pub fn owners_of_edge(&self, edge_id: &TestObligationEdgeId) -> Vec<&TestObligation> {
+        self.obligations.iter().filter(|obligation| obligation.owns_edge(edge_id)).collect()
     }
 
     /// Diagnoses whether this persisted obligation document is stale against the
@@ -343,56 +370,93 @@ mod tests {
     }
 
     #[test]
+    fn test_owns_edge_requires_matching_entry_key_and_cited_anchor() {
+        let obligation = sample_obligation();
+
+        assert!(obligation.owns_edge(&edge("domain::User", "IN-05")));
+        assert!(
+            !obligation.owns_edge(&edge("domain::Other", "IN-05")),
+            "a different entry key must not own the edge"
+        );
+        assert!(
+            !obligation.owns_edge(&edge("domain::User", "IN-06")),
+            "an anchor absent from spec_refs must not own the edge"
+        );
+    }
+
+    #[test]
+    fn test_owners_of_edge_returns_every_owner_in_document_order() {
+        let first = obligation_with_id("invariant:first");
+        let second = obligation_with_id("invariant:second");
+        let doc = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![first.clone(), second.clone()],
+        );
+
+        let owners = doc.owners_of_edge(&edge("domain::User", "IN-05"));
+        assert_eq!(
+            owners.iter().map(|o| o.id().clone()).collect::<Vec<_>>(),
+            vec![first.id().clone(), second.id().clone()],
+            "every obligation sharing the entry key and anchor owns the edge"
+        );
+        assert!(doc.owners_of_edge(&edge("domain::User", "IN-06")).is_empty());
+    }
+
+    #[test]
     fn test_empty_obligations_document_is_valid() {
         let doc = ObligationsDocument::new(TrackId::try_new("empty-track").unwrap(), vec![]);
         assert!(doc.obligations().is_empty());
     }
 
     #[test]
-    fn test_owning_obligation_unique_owner_returns_owner() {
+    fn test_edge_ownership_unique_owner_returns_unique() {
         let owner = sample_obligation();
         let owner_id = owner.id().clone();
         let document = ObligationsDocument::new(TrackId::try_new("my-track").unwrap(), vec![owner]);
 
-        let resolved = document.owning_obligation(&edge("domain::User", "IN-05"));
-
-        assert_eq!(resolved.map(TestObligation::id), Some(&owner_id));
+        match document.edge_ownership(&edge("domain::User", "IN-05")) {
+            EdgeOwnership::Unique(resolved) => assert_eq!(resolved.id(), &owner_id),
+            other => panic!("a single owner must resolve as Unique, got {other:?}"),
+        }
     }
 
     #[test]
-    fn test_owning_obligation_unmatched_entry_returns_none() {
+    fn test_edge_ownership_unmatched_entry_returns_none() {
         let document = ObligationsDocument::new(
             TrackId::try_new("my-track").unwrap(),
             vec![sample_obligation()],
         );
 
-        let resolved = document.owning_obligation(&edge("domain::Account", "IN-05"));
-
-        assert_eq!(resolved, None);
+        assert_eq!(document.edge_ownership(&edge("domain::Account", "IN-05")), EdgeOwnership::None);
     }
 
     #[test]
-    fn test_owning_obligation_multiple_owners_returns_none() {
+    fn test_edge_ownership_multiple_owners_returns_multiple() {
+        let first = obligation_with_id("invariant:first");
+        let second = obligation_with_id("invariant:second");
         let document = ObligationsDocument::new(
             TrackId::try_new("my-track").unwrap(),
-            vec![obligation_with_id("invariant:first"), obligation_with_id("invariant:second")],
+            vec![first.clone(), second.clone()],
         );
 
-        let resolved = document.owning_obligation(&edge("domain::User", "IN-05"));
-
-        assert_eq!(resolved, None);
+        match document.edge_ownership(&edge("domain::User", "IN-05")) {
+            EdgeOwnership::Multiple(owners) => assert_eq!(
+                owners.iter().map(|o| o.id().clone()).collect::<Vec<_>>(),
+                vec![first.id().clone(), second.id().clone()],
+                "multiple owners are reported distinctly, never conflated with no-owner"
+            ),
+            other => panic!("shared ownership must resolve as Multiple, got {other:?}"),
+        }
     }
 
     #[test]
-    fn test_owning_obligation_anchor_not_cited_returns_none() {
+    fn test_edge_ownership_anchor_not_cited_returns_none() {
         let document = ObligationsDocument::new(
             TrackId::try_new("my-track").unwrap(),
             vec![sample_obligation()],
         );
 
-        let resolved = document.owning_obligation(&edge("domain::User", "IN-06"));
-
-        assert_eq!(resolved, None);
+        assert_eq!(document.edge_ownership(&edge("domain::User", "IN-06")), EdgeOwnership::None);
     }
 
     #[test]

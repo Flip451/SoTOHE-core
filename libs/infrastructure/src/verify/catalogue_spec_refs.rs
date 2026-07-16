@@ -209,9 +209,10 @@ fn verify_one_layer(
     })?;
 
     let catalogue_hash_hex = type_signals_codec::declaration_hash(&bytes);
-    let catalogue_hash = ContentHash::try_from_hex(&catalogue_hash_hex).map_err(|e| {
-        format!("internal: catalogue hash for layer '{layer_id}' is not canonical hex: {e}")
-    })?;
+    let catalogue_hash = ContentHash::try_from_hex(catalogue_hash_hex.as_digest().as_str())
+        .map_err(|e| {
+            format!("internal: catalogue hash for layer '{layer_id}' is not canonical hex: {e}")
+        })?;
 
     let (current_hash_opt, signals_opt) = if skip_stale {
         (None, None)

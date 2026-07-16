@@ -218,7 +218,7 @@ impl TrackBlobReader for GitShowTrackBlobReader {
             return BlobFetchResult::FetchError(format!("{path}: {filename} decode error: {e}"));
         }
         let hash_hex = crate::tddd::type_signals_codec::declaration_hash(&bytes);
-        BlobFetchResult::Found((bytes, hash_hex))
+        BlobFetchResult::Found((bytes, hash_hex.as_digest().as_str().to_owned()))
     }
 
     fn read_enabled_layers(&self, branch: &str) -> BlobFetchResult<Vec<String>> {
@@ -358,7 +358,7 @@ impl TrackBlobReader for GitShowTrackBlobReader {
             }
         };
 
-        BlobFetchResult::Found((doc, hash_hex, entry_hashes))
+        BlobFetchResult::Found((doc, hash_hex.as_digest().as_str().to_owned(), entry_hashes))
     }
 
     /// Reads `<layer>-catalogue-spec-signals.json` and decodes it via the
@@ -808,7 +808,11 @@ mod tests {
                 let expected = crate::tddd::type_signals_codec::declaration_hash(
                     DOMAIN_TYPES_V3_MINIMAL.as_bytes(),
                 );
-                assert_eq!(hash_hex, expected, "hash must be SHA-256 of raw catalogue bytes");
+                assert_eq!(
+                    hash_hex,
+                    expected.as_digest().as_str(),
+                    "hash must be SHA-256 of raw catalogue bytes"
+                );
                 assert_eq!(hash_hex.len(), 64, "hash must be 64-char hex");
             }
             other => panic!("expected Found, got {other:?}"),
@@ -885,7 +889,8 @@ mod tests {
                     CUSTOM_DOMAIN_TYPES_V3_MINIMAL.as_bytes(),
                 );
                 assert_eq!(
-                    hash_hex, expected,
+                    hash_hex,
+                    expected.as_digest().as_str(),
                     "hash must be SHA-256 of the overridden catalogue bytes"
                 );
             }
@@ -1193,7 +1198,11 @@ decisions:
                 let expected = crate::tddd::type_signals_codec::declaration_hash(
                     DOMAIN_TYPES_V3_MINIMAL.as_bytes(),
                 );
-                assert_eq!(hash_hex, expected, "hash_hex must be SHA-256 of raw catalogue bytes");
+                assert_eq!(
+                    hash_hex,
+                    expected.as_digest().as_str(),
+                    "hash_hex must be SHA-256 of raw catalogue bytes"
+                );
             }
             other => panic!("expected Found, got {other:?}"),
         }
@@ -1348,16 +1357,17 @@ decisions:
 
     // --- read_type_signals ---
 
-    /// A minimal valid `<layer>-type-signals.json` payload (schema_version 1).
+    /// A minimal valid `<layer>-type-signals.json` payload (schema_version 3).
     ///
     /// `declaration_hash` is all-zeroes — valid per the codec (any 64-char
     /// lowercase hex string is accepted; freshness checking lives in the
     /// caller, not the codec). Used by `read_type_signals` tests that only
     /// need successful decoding.
     const TYPE_SIGNALS_MINIMAL: &str = r#"{
-  "schema_version": 1,
+  "schema_version": 3,
   "generated_at": "2026-04-18T12:00:00Z",
   "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "implementation_input_hash": "0000000000000000000000000000000000000000000000000000000000000000",
   "signals": [
     { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
   ]
@@ -1377,7 +1387,7 @@ decisions:
                 assert_eq!(doc.signals().len(), 1);
                 assert_eq!(doc.signals()[0].type_name(), "TrackId");
                 assert_eq!(
-                    doc.declaration_hash(),
+                    doc.declaration_hash().as_digest().as_str(),
                     "0000000000000000000000000000000000000000000000000000000000000000"
                 );
             }

@@ -5,7 +5,6 @@
 //! `verify::merge_gate_adapter` tests can reuse the same helpers without
 //! duplicating the implementation.
 
-#![cfg(test)]
 #![allow(dead_code)]
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
