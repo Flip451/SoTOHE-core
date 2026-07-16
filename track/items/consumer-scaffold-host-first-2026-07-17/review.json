@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:037db866a474470a47ae88e01ca366b70fad204f8a1956d479b4afb895056eeb",
+          "at": "2026-07-16T16:09:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:037db866a474470a47ae88e01ca366b70fad204f8a1956d479b4afb895056eeb",
+          "at": "2026-07-16T16:11:15Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -34,21 +52,252 @@
         }
       ]
     },
-    "harness-policy": {
+    "types": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:037db866a474470a47ae88e01ca366b70fad204f8a1956d479b4afb895056eeb",
-          "at": "2026-07-16T16:09:19Z"
+          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
+          "at": "2026-07-16T16:47:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:037db866a474470a47ae88e01ca366b70fad204f8a1956d479b4afb895056eeb",
-          "at": "2026-07-16T16:11:15Z"
+          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
+          "at": "2026-07-16T16:51:00Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 includes the behavioral promise that the distributed Makefile requires no manual synchronization with the source repository, but no acceptance criterion deterministically verifies that property. AC-01 verifies task-set provenance/exclusions only, not absence of a synchronization obligation or mechanism.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
+              "line": 10,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:eb703b048c7f7b2e1b8f273d6e3b00394d4d86730aa132900ca161d44d426b73",
+          "at": "2026-07-16T16:48:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0723f02dad8586a7aa034ab35fcd7342abfa0d754bc15d6e7dd8842453836e5",
+          "at": "2026-07-16T16:49:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`coding-principles.md#No Panics in Library Code` は `libs/` / `apps/` の Rust プロダクションコード向け規約だが、この spec の in_scope は配布 Makefile、workflow、CI、bootstrap、設定、文書に限定され、Rust ライブラリコードの変更を含まない。したがって、この `related_conventions` は narrative-level で明確に scope 外であり、下流計画に無関係な実装制約を持ち込む。",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
+              "line": 385,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`prefer-type-safe-abstractions.md#Rule` は Rust の型設計やバグクラス排除を扱う規約だが、この spec には型、domain model、Rust API の設計・変更がない。この参照も本 behavioral contract と無関係で、下流の type design / impl-plan を誤誘導する off-topic な `related_conventions` になっている。",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
+              "line": 389,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:e0723f02dad8586a7aa034ab35fcd7342abfa0d754bc15d6e7dd8842453836e5",
+          "at": "2026-07-16T16:54:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:016970402214fe947c077bac4642c3d0f2558117e9cf9a7f8ceb1deaf3f409c3",
+          "at": "2026-07-16T16:56:35Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description includes upstream design/behavior restatement (for example, “workflow-required orchestration...”, “remove unreferenced...”, and “eliminate... passthrough wrappers”); under the impl-plan policy it should contain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description restates the host-first/Docker execution contract and bin/sotp placement instead of limiting itself to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 14,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description restates the shared workflow contract and prohibited wrapper behavior; this is upstream contract prose rather than executable task scope.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 22,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 description restates the canonical direct-operation/aggregate-gate contract and retired-wrapper behavior; remove the rationale/contract prose and retain target + operation + anchors.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 description restates multiple spec behavior contracts (host-first, optional Docker, removal of stale references and obsolete behavior) instead of only executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 38,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 description restates the pinned-toolchain/host-runner/CI provisioning contract in prose; the task should identify the targets, operations, and anchors without duplicating upstream behavior.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 46,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T007 has no concrete target file or symbol: “Consumer-scaffold validation coverage” leaves the implementation boundary for the executor to invent, despite naming operations and anchors.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 54,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "S1 section description restates the workflow-derived task-selection and host-first/Docker environment contract; section descriptions must not duplicate upstream design rationale or behavior.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 75,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S2 section description restates the canonical call-site and direct bin/sotp contract; it should be a concise execution grouping rather than upstream contract prose.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 87,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S3 section description restates the host-first/optional-Docker documentation behavior contract.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 98,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S4 section description restates the pinned provisioning and host-runner CI contract.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 108,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S5 section description restates the validation contract and expected stale-reference checks rather than merely grouping the task.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 118,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:469303d4caaece24ee3c033821752d5e65d4de8b918bb8a542a3c6d6623b65ff",
+          "at": "2026-07-16T16:48:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:745fcfcc3d2ed9de276fa7baf5c952e9f365a49cb6f40c1e0c6a2b26e7249a6e",
+          "at": "2026-07-16T16:50:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 creates `overlay/Makefile.host.toml` and `overlay/Makefile.docker.toml`, but no task updates `.harness/config/template-boundary.json`. The exporter currently declares only `Makefile.toml` and excludes `overlay/`, so these peer files will not reach the exported scaffold and the configured `extend` target will be missing. Consequently IN-04/AC-04 cannot be satisfied as mapped.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 12,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T006 creates `overlay/rust-toolchain.toml`, but no task adds that path to `.harness/config/template-boundary.json`. Because overlay-only files are emitted only when declared by the boundary manifest, the exported scaffold will lack the pinned toolchain required by IN-05/AC-05.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 36,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T004 does not name the distributed Codex adapters under `.agents/skills/`. Current files such as `track-commit/SKILL.md`, `track-init/SKILL.md`, and `track-pr-review/SKILL.md` still invoke passthrough wrappers that T001 retires. No other task targets these adapters, so the plan would leave live distributed references to removed tasks; explicitly include the affected `.agents/skills/` files in T004's target boundary.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 24,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "AC-02 is mapped only to mutation tasks T001/T003/T004. T007 is the sole validation task but omits IN-02/AC-02, leaving the multi-surface direct-call migration and retired-wrapper removal without any validation step. Add the relevant validation operation and mapping to T007.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/task-coverage.json",
+              "line": 31,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:745fcfcc3d2ed9de276fa7baf5c952e9f365a49cb6f40c1e0c6a2b26e7249a6e",
+          "at": "2026-07-16T16:59:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002/T004 do not provide an executable implementation step for the `CODEX_BIN` portion of IN-08/CN-06/AC-08. The actual `asdf which codex` launchers are `track-local-review`, `track-local-review-fix`, and `track-local-dry-fix` in `overlay/Makefile.toml`; T002 only describes the cargo-gate/environment-file split, while T004 targets provider adapters and permission files. T007 can validate the criterion but cannot implement it, so satisfying these mappings currently requires the executor to invent an unlisted operation. Add the affected Makefile symbols and rewrite operation to T001 or T002.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 12,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:99ca5d0cde861c128bc9ea2790d5bb165f738ade55978c9eddfc6a1e8a7695cd",
+          "at": "2026-07-16T17:04:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 is still attributed to IN-08/CN-06/AC-08, but its targets (`.claude/commands/`, `.claude/settings.json`, `.agents/skills/`, and command-policy files) contain none of the `CODEX_BIN`/`asdf`, `WORKER_ID`, or `CARGO_TARGET_DIR_RELATIVE` behavior governed by those elements. That work is now explicitly owned by T002 (with documentation under T005), so the T004 mappings and corresponding S2 anchors are fabricated. Remove IN-08/CN-06/AC-08 from T004/S2 and from their T004 entries in `task-coverage.json`, unless T004 names a concrete affected target and operation.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 24,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:0a1bd426af3810359d6a7edb6e35554ab861519b672eb80502049949a7b63627",
+          "at": "2026-07-16T17:07:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e65fd6dfcaad5efccdbe74f5f5c0f6093ced038eabdfad66c80c649d5768a0c0",
+          "at": "2026-07-16T17:08:58Z"
         }
       ]
     }
