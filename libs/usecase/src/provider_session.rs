@@ -2,8 +2,8 @@
 
 use std::hash::{Hash, Hasher};
 
-use domain::TrackId;
 use domain::review_v2::{RoundType, ScopeName};
+use domain::{CommitHash, TrackId};
 
 use crate::capability_exec::{
     CapabilityInputValidationError, ModelName, ProviderName, ReasoningEffort, TargetArtifactSet,
@@ -112,8 +112,8 @@ impl ProviderSessionCacheEntry {
 /// Separates reviewer, track capability, and workspace capability sessions by identity.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ProviderSessionCacheKey {
-    /// A reviewer session for one track, scope, and round type.
-    Review { track_id: TrackId, scope: ScopeName, round_type: RoundType },
+    /// A reviewer session for one track, scope, round type, and review diff base.
+    Review { track_id: TrackId, scope: ScopeName, round_type: RoundType, diff_base: CommitHash },
     /// A track-bound capability session for one capability.
     TrackCapability { track_id: TrackId, capability: CapabilityName },
     /// A workspace-bound capability session for one capability and artifact identity.
@@ -123,7 +123,7 @@ pub enum ProviderSessionCacheKey {
 impl Hash for ProviderSessionCacheKey {
     fn hash<H: Hasher>(&self, state: &mut H) {
         match self {
-            Self::Review { track_id, scope, round_type } => {
+            Self::Review { track_id, scope, round_type, diff_base } => {
                 0_u8.hash(state);
                 track_id.hash(state);
                 scope.hash(state);
@@ -131,6 +131,7 @@ impl Hash for ProviderSessionCacheKey {
                     RoundType::Fast => 0_u8.hash(state),
                     RoundType::Final => 1_u8.hash(state),
                 }
+                diff_base.hash(state);
             }
             Self::TrackCapability { track_id, capability } => {
                 1_u8.hash(state);

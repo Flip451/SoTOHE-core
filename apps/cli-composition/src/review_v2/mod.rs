@@ -116,6 +116,7 @@ impl ReviewCompositionRoot {
             session.track_id,
             session.scope,
             session.round_type,
+            session.diff_base,
             session.model,
             ReasoningEffort::High,
             timeout,
@@ -217,6 +218,7 @@ impl ReviewCompositionRoot {
             session.track_id,
             session.scope,
             session.round_type,
+            session.diff_base,
             session.model,
             ReasoningEffort::High,
             timeout,
@@ -338,6 +340,7 @@ impl ReviewCompositionRoot {
                     session.track_id,
                     session.scope,
                     session.round_type,
+                    session.diff_base,
                     session.model,
                     effort,
                     timeout,
@@ -366,6 +369,7 @@ impl ReviewCompositionRoot {
                     session.track_id,
                     session.scope,
                     session.round_type,
+                    session.diff_base,
                     session.model,
                     effort,
                     timeout,
@@ -667,28 +671,6 @@ impl ReviewCompositionRoot {
             .map_err(CompositionError::Infrastructure)?;
         Ok(CommandOutcome::success(maybe_path))
     }
-
-    /// Persist a commit hash for the review cycle.
-    ///
-    /// Resolves `track_id` from the current git branch when `None`. Delegates to
-    /// `infrastructure::review_v2::persist_commit_hash_for_track` for all domain
-    /// and I/O operations (CN-02). The `items_dir` parameter is accepted for API
-    /// consistency but the infrastructure function always uses the canonical
-    /// `track/items` path under the repo root.
-    ///
-    /// # Errors
-    /// Returns `Err` when track ID resolution, branch guard, git, or I/O fails.
-    pub fn review_persist_commit_hash(
-        &self,
-        track_id: Option<String>,
-        items_dir: PathBuf,
-    ) -> Result<CommandOutcome, CompositionError> {
-        let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
-        let head_sha =
-            persist_commit_hash_for_track(&track_id).map_err(CompositionError::Infrastructure)?;
-        eprintln!("[review] Recorded .commit_hash: {head_sha}");
-        Ok(CommandOutcome::success(None))
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -960,6 +942,10 @@ exit 0
             track_id: TrackId::try_new(repo.track_id.clone()).unwrap(),
             scope,
             round_type,
+            diff_base: domain::CommitHash::try_new(
+                fs::read_to_string(repo.track_dir.join(".commit_hash")).unwrap().trim(),
+            )
+            .unwrap(),
         };
         let entry = ProviderSessionCacheEntry::new(
             ProviderSessionId::try_new("prior-session".to_owned()).unwrap(),

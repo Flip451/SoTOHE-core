@@ -2,8 +2,8 @@
 
 use std::sync::Arc;
 
-use domain::TrackId;
 use domain::review_v2::{RoundType, ScopeName};
+use domain::{CommitHash, TrackId};
 use usecase::capability_exec::{ModelName, ProviderName, ReasoningEffort};
 use usecase::provider_session::{
     ProviderSessionCacheEntry, ProviderSessionCacheKey, ProviderSessionCachePort, ProviderSessionId,
@@ -12,17 +12,19 @@ use usecase::provider_session::{
 /// Cache identity and resolved profile for one reviewer round.
 pub(super) struct ReviewerSession {
     cache: Arc<dyn ProviderSessionCachePort>,
-    key: ProviderSessionCacheKey,
+    key: Option<ProviderSessionCacheKey>,
     provider: &'static str,
     model: ModelName,
     effort: ReasoningEffort,
 }
 
 impl ReviewerSession {
+    #[allow(clippy::too_many_arguments)] // cache identity and resolved profile are constructed together
     pub(super) fn new(
         track_id: TrackId,
         scope: ScopeName,
         round_type: RoundType,
+        diff_base: Option<CommitHash>,
         provider: &'static str,
         model: ModelName,
         effort: ReasoningEffort,
@@ -30,7 +32,12 @@ impl ReviewerSession {
     ) -> Self {
         Self {
             cache,
-            key: ProviderSessionCacheKey::Review { track_id, scope, round_type },
+            key: diff_base.map(|diff_base| ProviderSessionCacheKey::Review {
+                track_id,
+                scope,
+                round_type,
+                diff_base,
+            }),
             provider,
             model,
             effort,
@@ -38,9 +45,11 @@ impl ReviewerSession {
     }
 
     /// Loads only an entry created by the currently resolved provider and model.
-    /// Cache I/O is intentionally fail-soft: a reviewer round must still start fresh.
+    /// Cache I/O and diff-base resolution are intentionally fail-soft: a reviewer round must
+    /// still start fresh.
     pub(super) fn resumable_id(&self) -> Option<String> {
-        let entry = self.cache.load(&self.key).ok().flatten()?;
+        let key = self.key.as_ref()?;
+        let entry = self.cache.load(key).ok().flatten()?;
         (entry.provider().as_str() == self.provider && entry.model() == &self.model)
             .then(|| entry.session_id().as_str().to_owned())
     }
@@ -62,7 +71,9 @@ impl ReviewerSession {
         };
         let entry =
             ProviderSessionCacheEntry::new(session_id, provider, self.model.clone(), self.effort);
-        let _ = self.cache.save(&self.key, &entry);
+        if let Some(key) = &self.key {
+            let _ = self.cache.save(key, &entry);
+        }
     }
 }
 
@@ -119,11 +130,16 @@ mod tests {
         }
     }
 
+    fn diff_base(value: &str) -> CommitHash {
+        CommitHash::try_new(value).unwrap()
+    }
+
     fn key(round_type: RoundType) -> ProviderSessionCacheKey {
         ProviderSessionCacheKey::Review {
             track_id: TrackId::try_new("session-test").unwrap(),
             scope: ScopeName::Main(MainScopeName::new("infrastructure").unwrap()),
             round_type,
+            diff_base: diff_base("a1b2c3d"),
         }
     }
 
@@ -141,6 +157,7 @@ mod tests {
             TrackId::try_new("session-test").unwrap(),
             ScopeName::Main(MainScopeName::new("infrastructure").unwrap()),
             round_type,
+            Some(diff_base("a1b2c3d")),
             "claude",
             ModelName::try_new("model-current".to_owned()).unwrap(),
             ReasoningEffort::High,
@@ -192,5 +209,51 @@ mod tests {
             saved: Mutex::new(vec![]),
         });
         assert_eq!(session(cache, RoundType::Final).resumable_id(), None);
+    }
+
+    #[test]
+    fn test_reviewer_session_different_diff_base_starts_fresh() {
+        let cache = Arc::new(FakeCache {
+            entry: Some(entry("claude", "model-current")),
+            expected_key: Some(key(RoundType::Fast)),
+            fail_load: false,
+            saved: Mutex::new(vec![]),
+        });
+        let session = ReviewerSession::new(
+            TrackId::try_new("session-test").unwrap(),
+            ScopeName::Main(MainScopeName::new("infrastructure").unwrap()),
+            RoundType::Fast,
+            Some(diff_base("d4e5f6a")),
+            "claude",
+            ModelName::try_new("model-current".to_owned()).unwrap(),
+            ReasoningEffort::High,
+            cache,
+        );
+
+        assert_eq!(session.resumable_id(), None);
+    }
+
+    #[test]
+    fn test_reviewer_session_missing_diff_base_starts_fresh() {
+        let cache = Arc::new(FakeCache {
+            entry: Some(entry("claude", "model-current")),
+            expected_key: Some(key(RoundType::Fast)),
+            fail_load: false,
+            saved: Mutex::new(vec![]),
+        });
+        let session = ReviewerSession::new(
+            TrackId::try_new("session-test").unwrap(),
+            ScopeName::Main(MainScopeName::new("infrastructure").unwrap()),
+            RoundType::Fast,
+            None,
+            "claude",
+            ModelName::try_new("model-current".to_owned()).unwrap(),
+            ReasoningEffort::High,
+            cache.clone(),
+        );
+
+        assert_eq!(session.resumable_id(), None);
+        session.save(Some("new-session".to_owned()));
+        assert!(cache.saved.lock().unwrap().is_empty());
     }
 }

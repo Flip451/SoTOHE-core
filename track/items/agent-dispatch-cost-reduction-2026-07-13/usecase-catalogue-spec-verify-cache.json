@@ -1155,7 +1155,7 @@
       }
     },
     {
-      "claim_hash": "71114c09ebdbd9f1ed9e46f6b00eadc4843b053b51fa16dade686f9321dbb65b",
+      "claim_hash": "40ce4fef4305cadda89f5baaf6815606d7294611dcad481f3dde2fe7ea882899",
       "evidence_hash": "5ceb5e27f085ca0238a8be48d32f3a5db536584a85022dd551b57fd7a498cc9b",
       "verdict": {
         "kind": "pass",
@@ -1179,7 +1179,7 @@
       }
     },
     {
-      "claim_hash": "71114c09ebdbd9f1ed9e46f6b00eadc4843b053b51fa16dade686f9321dbb65b",
+      "claim_hash": "40ce4fef4305cadda89f5baaf6815606d7294611dcad481f3dde2fe7ea882899",
       "evidence_hash": "4cabd2650852dcafaf577955b9d2f99d99cb1597a3454dd512217be528610884",
       "verdict": {
         "kind": "pass",
@@ -1203,7 +1203,7 @@
       }
     },
     {
-      "claim_hash": "71114c09ebdbd9f1ed9e46f6b00eadc4843b053b51fa16dade686f9321dbb65b",
+      "claim_hash": "40ce4fef4305cadda89f5baaf6815606d7294611dcad481f3dde2fe7ea882899",
       "evidence_hash": "005ff75b15c8786749c37f17ad38945817c2f9faa8f552792bc41e814ed75c67",
       "verdict": {
         "kind": "pass",
@@ -1227,7 +1227,7 @@
       }
     },
     {
-      "claim_hash": "71114c09ebdbd9f1ed9e46f6b00eadc4843b053b51fa16dade686f9321dbb65b",
+      "claim_hash": "40ce4fef4305cadda89f5baaf6815606d7294611dcad481f3dde2fe7ea882899",
       "evidence_hash": "4366b1c9706f0833d253640513d73ad5eee6c781b408cbdf1e9964e2363a4728",
       "verdict": {
         "kind": "pass",
@@ -1251,11 +1251,11 @@
       }
     },
     {
-      "claim_hash": "71114c09ebdbd9f1ed9e46f6b00eadc4843b053b51fa16dade686f9321dbb65b",
+      "claim_hash": "40ce4fef4305cadda89f5baaf6815606d7294611dcad481f3dde2fe7ea882899",
       "evidence_hash": "6a3047e6a3e70c18439ff82f51f1e54058d97c6aebf518347106d5303ae67dca",
       "verdict": {
         "kind": "pass",
-        "citation": "track 内では同一 track・capability の有効 cache entry を再開する。track 解決時は track-local cache、track 解決不能時は capability・対象 artifact の repo-relative path による workspace-local cache を選び"
+        "citation": "track 内では同一 track・capability の有効 cache entry を再開する。track 解決時は track-local cache、track 解決不能時は capability・対象 artifact の repo-relative path による workspace-local cache を選び、初回 dispatch、関心事を切り替えた dispatch、対象 path 未確定の track 外 dispatch、または provider・model 不一致では新規 session で実行する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

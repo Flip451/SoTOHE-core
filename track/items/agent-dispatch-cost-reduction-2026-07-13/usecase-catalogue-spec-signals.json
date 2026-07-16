@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "be064953983418afc36f5dd8d04b648b6a151970945bd19cfc35083fa9500b0a",
+  "catalogue_declaration_hash": "b1383d153af6ab8299b9a82fee7a2a3609575dfedbd47c6b682c2ad7ba9a3b9d",
   "signals": [
     {
       "type_name": "CapabilityDispatchOutcome",
@@ -80,7 +80,7 @@
     {
       "type_name": "ProviderSessionCacheKey",
       "signal": "blue",
-      "entry_hash": "71114c09ebdbd9f1ed9e46f6b00eadc4843b053b51fa16dade686f9321dbb65b"
+      "entry_hash": "40ce4fef4305cadda89f5baaf6815606d7294611dcad481f3dde2fe7ea882899"
     },
     {
       "type_name": "ProviderSessionId",

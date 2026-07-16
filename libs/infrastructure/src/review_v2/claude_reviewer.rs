@@ -30,11 +30,11 @@ use std::process::{Child, Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use domain::TrackId;
 use domain::review_v2::{
     FastVerdict, LogInfo, ReviewTarget, ReviewerFinding, RoundType, ScopeName, Verdict,
     VerdictError,
 };
+use domain::{CommitHash, TrackId};
 use std::sync::Arc;
 use usecase::capability_exec::{ModelName, ReasoningEffort};
 use usecase::provider_session::{ProviderSessionCachePort, ReviewerPrompt};
@@ -99,6 +99,7 @@ impl ClaudeReviewer {
     /// Constructs a new `ClaudeReviewer`.
     ///
     /// # Arguments
+    /// - `diff_base`: optional persisted review-cycle base that scopes session reuse.
     /// - `model`: Claude model name.
     /// - `timeout`: Maximum time allowed for the review subprocess.
     /// - `base_prompt`: Review instructions without the scope file list.
@@ -107,6 +108,7 @@ impl ClaudeReviewer {
         track_id: TrackId,
         scope: ScopeName,
         round_type: RoundType,
+        diff_base: Option<CommitHash>,
         model: ModelName,
         effort: ReasoningEffort,
         timeout: Duration,
@@ -118,6 +120,7 @@ impl ClaudeReviewer {
                 track_id,
                 scope.clone(),
                 round_type,
+                diff_base,
                 "claude",
                 model.clone(),
                 effort,
@@ -774,6 +777,7 @@ mod tests {
             TrackId::try_new("test-track").unwrap(),
             ScopeName::Other,
             RoundType::Fast,
+            Some(CommitHash::try_new("a1b2c3d").unwrap()),
             ModelName::try_new("claude-opus-4-7").unwrap(),
             ReasoningEffort::High,
             timeout,
@@ -1155,15 +1159,18 @@ printf '{{"type":"result","session_id":"new-session","structured_output":{{"verd
             ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
         let track_id = TrackId::try_new("test-track").unwrap();
         let scope = ScopeName::Other;
+        let diff_base = CommitHash::try_new("a1b2c3d").unwrap();
         let matched_key = usecase::provider_session::ProviderSessionCacheKey::Review {
             track_id: track_id.clone(),
             scope: scope.clone(),
             round_type: RoundType::Fast,
+            diff_base: diff_base.clone(),
         };
         let wrong_track_key = usecase::provider_session::ProviderSessionCacheKey::Review {
             track_id: TrackId::try_new("other-track").unwrap(),
             scope: scope.clone(),
             round_type: RoundType::Fast,
+            diff_base: diff_base.clone(),
         };
         let wrong_scope_key = usecase::provider_session::ProviderSessionCacheKey::Review {
             track_id: track_id.clone(),
@@ -1171,6 +1178,7 @@ printf '{{"type":"result","session_id":"new-session","structured_output":{{"verd
                 domain::review_v2::MainScopeName::new("infrastructure").unwrap(),
             ),
             round_type: RoundType::Fast,
+            diff_base: diff_base.clone(),
         };
 
         let run = |round_type, expected_key, name, expects_resume| {
@@ -1178,6 +1186,7 @@ printf '{{"type":"result","session_id":"new-session","structured_output":{{"verd
                 track_id.clone(),
                 scope.clone(),
                 round_type,
+                Some(diff_base.clone()),
                 ModelName::try_new("claude-opus-4-7").unwrap(),
                 ReasoningEffort::High,
                 Duration::from_secs(10),

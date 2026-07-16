@@ -95,7 +95,7 @@
     },
     "ReviewCompositionRoot": {
       "action": "modify",
-      "docs": "Wires scope-bound reviewer sessions while preserving existing review judgment and record boundaries. String façade parameters are unvalidated CLI-boundary text; this composition layer validates and converts them to domain value objects before use.",
+      "docs": "Wires CLI-boundary inputs, typed review services, and the review driver.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -291,23 +291,6 @@
             "name": "scope",
             "ty": "String"
           },
-          {
-            "name": "track_id",
-            "ty": "Option<String>"
-            },
-            {
-              "name": "items_dir",
-              "ty": "std::path::PathBuf"
-            }
-          ],
-          "receiver": "&self",
-          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "review_persist_commit_hash",
-          "params": [
           {
             "name": "track_id",
             "ty": "Option<String>"

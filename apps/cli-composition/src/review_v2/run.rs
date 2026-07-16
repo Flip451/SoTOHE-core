@@ -619,6 +619,7 @@ mod tests {
             TrackId::try_new("test-track").unwrap(),
             ScopeName::Other,
             RoundType::Fast,
+            None,
             ModelName::try_new("claude-opus-4-7").unwrap(),
             ReasoningEffort::High,
             Duration::from_secs(10),

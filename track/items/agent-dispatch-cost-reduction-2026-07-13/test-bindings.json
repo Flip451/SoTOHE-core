@@ -1255,6 +1255,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::provider_session::tests",
           "test_name": "test_provider_session_cache_isolates_workspace_artifact_keys"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::provider_session::tests",
+          "test_name": "test_provider_session_cache_workspace_capabilities_isolate_same_target_artifacts"
         }
       ]
     },
@@ -3257,7 +3262,7 @@
       "reason": "ProviderSessionCacheError classifies a failed cache-port operation after it occurs. It has no cache-selection, profile-comparison, resume, expiry, or provider-dispatch operation, so it cannot itself reuse or replace a session."
     },
     {
-      "kind": "waiver",
+      "kind": "voluntary_binding",
       "edge_id": {
         "entry_key": "ProviderSessionCacheKey",
         "anchor_id": {
@@ -3265,7 +3270,28 @@
           "element_id": "IN-03"
         }
       },
-      "reason": "ProviderSessionCacheKey is an identity value that names a cache namespace but cannot load an entry, compare its resolved profile, resume a provider session, or dispatch a new one. Those consumer actions are outside this key declaration's observable surface."
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::session::tests",
+          "test_name": "test_reviewer_session_matching_entry_resumes_and_persists_success"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::session::tests",
+          "test_name": "test_reviewer_session_different_diff_base_starts_fresh"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::session::tests",
+          "test_name": "test_reviewer_session_missing_diff_base_starts_fresh"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::provider_session::tests",
+          "test_name": "test_provider_session_cache_review_keys_isolate_components_in_track_artifacts"
+        }
+      ]
     },
     {
       "kind": "voluntary_binding",
@@ -3298,6 +3324,21 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::provider_session::tests",
           "test_name": "test_provider_session_cache_isolates_review_track_and_workspace_identities"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::provider_session::tests",
+          "test_name": "test_provider_session_cache_review_keys_isolate_components_in_track_artifacts"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::provider_session::tests",
+          "test_name": "test_provider_session_cache_paths_are_gitignored_machine_local_transients"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::provider_session::tests",
+          "test_name": "test_provider_session_cache_workspace_capabilities_isolate_same_target_artifacts"
         }
       ]
     },

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "d2bec862daba71852cd8f5aad2e6a3d46d439a216a19c95ac29aa3b741231302",
+  "catalogue_declaration_hash": "9c77897a888717b400076f9a8e2e45b72107d5bde159dbcb5d2896cc0be64a01",
   "signals": [
     {
       "type_name": "CapabilityCompositionRoot",
@@ -10,7 +10,7 @@
     {
       "type_name": "ReviewCompositionRoot",
       "signal": "blue",
-      "entry_hash": "13615bb3a3c74e6718d8e107c9c3ad7de56f92ef327c46404d61e4c935492bb0"
+      "entry_hash": "cc0652b0d3a7bc04de2668e41dcc6a3ef2d41b57fbe0bfab2dbcff51993ff5e1"
     },
     {
       "type_name": "SignalCompositionRoot",

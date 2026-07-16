@@ -1038,6 +1038,10 @@
               "ty": "domain::review_v2::RoundType"
             },
             {
+              "name": "diff_base",
+              "ty": "Option<domain::git_ref::CommitHash>"
+            },
+            {
               "name": "model",
               "ty": "usecase::capability_exec::ModelName"
             },
@@ -1223,6 +1227,10 @@
             {
               "name": "round_type",
               "ty": "domain::review_v2::RoundType"
+            },
+            {
+              "name": "diff_base",
+              "ty": "Option<domain::git_ref::CommitHash>"
             },
             {
               "name": "model",

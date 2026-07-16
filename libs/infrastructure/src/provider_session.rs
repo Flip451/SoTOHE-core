@@ -36,9 +36,9 @@ impl FsProviderSessionCacheAdapter {
     ) -> Result<(PathBuf, String), ProviderSessionCacheError> {
         let root = self.canonical_repo_root()?;
         let (dir, identity) = match key {
-            ProviderSessionCacheKey::Review { track_id, scope, round_type } => (
+            ProviderSessionCacheKey::Review { track_id, scope, round_type, diff_base } => (
                 root.join("track/items").join(track_id.to_string()).join(".provider-sessions"),
-                format!("review:{track_id}:{scope}:{round_type}"),
+                format!("review:{track_id}:{scope}:{round_type}:{diff_base}"),
             ),
             ProviderSessionCacheKey::TrackCapability { track_id, capability } => (
                 root.join("track/items").join(track_id.to_string()).join(".provider-sessions"),
@@ -288,8 +288,8 @@ mod tests {
     use std::path::{Path, PathBuf};
 
     use super::FsProviderSessionCacheAdapter;
-    use domain::TrackId;
     use domain::review_v2::{MainScopeName, RoundType, ScopeName};
+    use domain::{CommitHash, TrackId};
     use usecase::capability_exec::{
         ModelName, ProviderName, ReasoningEffort, TargetArtifactPath, TargetArtifactSet,
     };
@@ -323,6 +323,29 @@ mod tests {
             ModelName::try_new("gpt-5").unwrap(),
             ReasoningEffort::High,
         )
+    }
+
+    fn entry_with_session_id(session_id: &str) -> ProviderSessionCacheEntry {
+        ProviderSessionCacheEntry::new(
+            ProviderSessionId::try_new(session_id.to_owned()).unwrap(),
+            ProviderName::try_new("codex").unwrap(),
+            ModelName::try_new("gpt-5").unwrap(),
+            ReasoningEffort::High,
+        )
+    }
+
+    fn review_key(
+        track_id: &str,
+        scope: ScopeName,
+        round_type: RoundType,
+        diff_base: &str,
+    ) -> ProviderSessionCacheKey {
+        ProviderSessionCacheKey::Review {
+            track_id: TrackId::try_new(track_id).unwrap(),
+            scope,
+            round_type,
+            diff_base: CommitHash::try_new(diff_base).unwrap(),
+        }
     }
 
     #[test]
@@ -431,6 +454,100 @@ mod tests {
     }
 
     #[test]
+    fn test_provider_session_cache_review_keys_isolate_components_in_track_artifacts() {
+        let directory = tempfile::tempdir().unwrap();
+        let cache = FsProviderSessionCacheAdapter::new(
+            directory.path().to_path_buf(),
+            PathBuf::from("tmp/runtime"),
+        );
+        let infrastructure = ScopeName::Main(MainScopeName::new("infrastructure").unwrap());
+        let base_key = review_key("track-a", infrastructure.clone(), RoundType::Fast, "a1b2c3d");
+        let different_track =
+            review_key("track-b", infrastructure.clone(), RoundType::Fast, "a1b2c3d");
+        let different_scope = review_key("track-a", ScopeName::Other, RoundType::Fast, "a1b2c3d");
+        let different_round =
+            review_key("track-a", infrastructure.clone(), RoundType::Final, "a1b2c3d");
+        let different_diff_base = review_key("track-a", infrastructure, RoundType::Fast, "d4e5f6a");
+        let base_entry = entry_with_session_id("review-base");
+        let track_entry = entry_with_session_id("review-track");
+        let scope_entry = entry_with_session_id("review-scope");
+        let round_entry = entry_with_session_id("review-round");
+        let diff_base_entry = entry_with_session_id("review-diff-base");
+
+        cache.save(&base_key, &base_entry).unwrap();
+        cache.save(&different_track, &track_entry).unwrap();
+        cache.save(&different_scope, &scope_entry).unwrap();
+        cache.save(&different_round, &round_entry).unwrap();
+        cache.save(&different_diff_base, &diff_base_entry).unwrap();
+
+        assert_eq!(cache.load(&base_key).unwrap(), Some(base_entry));
+        assert_eq!(cache.load(&different_track).unwrap(), Some(track_entry));
+        assert_eq!(cache.load(&different_scope).unwrap(), Some(scope_entry));
+        assert_eq!(cache.load(&different_round).unwrap(), Some(round_entry));
+        assert_eq!(cache.load(&different_diff_base).unwrap(), Some(diff_base_entry));
+
+        let base_path = cache.cache_path(&base_key).unwrap().0;
+        let track_path = cache.cache_path(&different_track).unwrap().0;
+        let scope_path = cache.cache_path(&different_scope).unwrap().0;
+        let round_path = cache.cache_path(&different_round).unwrap().0;
+        let diff_base_path = cache.cache_path(&different_diff_base).unwrap().0;
+        assert_ne!(base_path, track_path);
+        assert_ne!(base_path, scope_path);
+        assert_ne!(base_path, round_path);
+        assert_ne!(base_path, diff_base_path);
+        assert!(
+            base_path.starts_with(directory.path().join("track/items/track-a/.provider-sessions"))
+        );
+        assert!(
+            track_path.starts_with(directory.path().join("track/items/track-b/.provider-sessions"))
+        );
+        assert!(base_path.is_file());
+        assert!(track_path.is_file());
+        assert!(scope_path.is_file());
+        assert!(round_path.is_file());
+        assert!(diff_base_path.is_file());
+    }
+
+    #[test]
+    fn test_provider_session_cache_workspace_capabilities_isolate_same_target_artifacts() {
+        let directory = tempfile::tempdir().unwrap();
+        let cache = FsProviderSessionCacheAdapter::new(
+            directory.path().to_path_buf(),
+            PathBuf::from("tmp/runtime"),
+        );
+        let target_artifacts = TargetArtifactSet::try_new(vec![
+            TargetArtifactPath::try_new(PathBuf::from("tmp/briefing.md")).unwrap(),
+        ])
+        .unwrap();
+        let implementer_key = ProviderSessionCacheKey::WorkspaceCapability {
+            capability: CapabilityName::try_new("implementer").unwrap(),
+            target_artifacts: target_artifacts.clone(),
+        };
+        let planner_key = ProviderSessionCacheKey::WorkspaceCapability {
+            capability: CapabilityName::try_new("impl-planner").unwrap(),
+            target_artifacts,
+        };
+        let implementer_entry = entry_with_session_id("implementer-session");
+        let planner_entry = entry_with_session_id("planner-session");
+
+        cache.save(&implementer_key, &implementer_entry).unwrap();
+        cache.save(&planner_key, &planner_entry).unwrap();
+
+        assert_eq!(cache.load(&implementer_key).unwrap(), Some(implementer_entry));
+        assert_eq!(cache.load(&planner_key).unwrap(), Some(planner_entry));
+        let (implementer_path, implementer_identity) = cache.cache_path(&implementer_key).unwrap();
+        let (planner_path, planner_identity) = cache.cache_path(&planner_key).unwrap();
+        assert_ne!(implementer_path, planner_path);
+        assert_ne!(implementer_identity, planner_identity);
+        assert!(
+            implementer_path.starts_with(directory.path().join("tmp/runtime/provider-sessions"))
+        );
+        assert!(planner_path.starts_with(directory.path().join("tmp/runtime/provider-sessions")));
+        assert!(implementer_path.is_file());
+        assert!(planner_path.is_file());
+    }
+
+    #[test]
     fn test_provider_session_cache_paths_are_gitignored_machine_local_transients() {
         let directory = tempfile::tempdir().unwrap();
         let cache = FsProviderSessionCacheAdapter::new(
@@ -486,6 +603,7 @@ mod tests {
             track_id: TrackId::try_new("track-a").unwrap(),
             scope: ScopeName::Main(MainScopeName::new("infrastructure").unwrap()),
             round_type: RoundType::Fast,
+            diff_base: domain::CommitHash::try_new("a1b2c3d").unwrap(),
         };
         let track_key = track_key_for_target_set(target_artifacts.clone());
         let workspace_key = ProviderSessionCacheKey::WorkspaceCapability {

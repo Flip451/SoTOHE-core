@@ -1182,30 +1182,6 @@
         "entry_key": "ProviderSessionCacheKey",
         "anchor_id": {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-          "element_id": "IN-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProviderSessionCacheKey",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-03"
-      },
-      "key": {
-        "waived_reason_hash": "decb261792cd457f7473306f3c29b012345d2d239c990cafd0c3574bd96c1bd5",
-        "declaration_hash": "c72bbcca6adc43daf60195492e38f76af96f95ddb1bf1d4de802b759d591d208",
-        "anchor_text_hash": "ada0a8c57a9d8d40910dc95985d3a9260b7c885da13431c2cd9613cbd79e7805"
-      },
-      "verdict": {
-        "kind": "waived",
-        "citation": "Machine-local session cache entry key."
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "entry_key": "ProviderSessionCacheKey",
-        "anchor_id": {
-          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "AC-03"
         }
       },
@@ -1216,12 +1192,12 @@
       },
       "key": {
         "waived_reason_hash": "decb261792cd457f7473306f3c29b012345d2d239c990cafd0c3574bd96c1bd5",
-        "declaration_hash": "c72bbcca6adc43daf60195492e38f76af96f95ddb1bf1d4de802b759d591d208",
+        "declaration_hash": "6b8a8ad5360160a854056c1192632e029ab5456e36ecdcae6898e554195985b1",
         "anchor_text_hash": "6c61fa978e67690504105be79dd73f2649add14f0026cd302f7565c126cc61d7"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Machine-local session cache entry key."
+        "citation": "docs: Some(DocString(\"Machine-local session cache entry key.\")), methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },

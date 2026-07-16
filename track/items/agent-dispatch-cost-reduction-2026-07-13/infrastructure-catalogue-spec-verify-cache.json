@@ -579,11 +579,11 @@
       }
     },
     {
-      "claim_hash": "df7b0a898d705cf66c009fe316cff7d2d7a9f571742fb70bf6f21ed067d4b7e7",
+      "claim_hash": "f3f24e4fb3001e11cd7f2c370d03d3ff7b3a2a84fbec03b6cf0cecb5d56f1df9",
       "evidence_hash": "5ceb5e27f085ca0238a8be48d32f3a5db536584a85022dd551b57fd7a498cc9b",
       "verdict": {
         "kind": "pass",
-        "citation": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。初回 round と fast から final への escalation は新規 session とする。"
+        "citation": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -603,7 +603,7 @@
       }
     },
     {
-      "claim_hash": "df7b0a898d705cf66c009fe316cff7d2d7a9f571742fb70bf6f21ed067d4b7e7",
+      "claim_hash": "f3f24e4fb3001e11cd7f2c370d03d3ff7b3a2a84fbec03b6cf0cecb5d56f1df9",
       "evidence_hash": "4a0192a8dce970468a6460197209eed1813e7cec9205b0fe5f587428a2e169d4",
       "verdict": {
         "kind": "pass",
@@ -627,7 +627,7 @@
       }
     },
     {
-      "claim_hash": "df7b0a898d705cf66c009fe316cff7d2d7a9f571742fb70bf6f21ed067d4b7e7",
+      "claim_hash": "f3f24e4fb3001e11cd7f2c370d03d3ff7b3a2a84fbec03b6cf0cecb5d56f1df9",
       "evidence_hash": "2b1bcd4b2f654058eb4920ab6f0133fb52b34975a32989e5d0a083a51d6300a2",
       "verdict": {
         "kind": "pass",
@@ -651,7 +651,7 @@
       }
     },
     {
-      "claim_hash": "df7b0a898d705cf66c009fe316cff7d2d7a9f571742fb70bf6f21ed067d4b7e7",
+      "claim_hash": "f3f24e4fb3001e11cd7f2c370d03d3ff7b3a2a84fbec03b6cf0cecb5d56f1df9",
       "evidence_hash": "c0cbefa4a3ba523a52db5b860bd64b9a6f5189de0ad613d567e3a9af4d083029",
       "verdict": {
         "kind": "pass",
@@ -675,7 +675,7 @@
       }
     },
     {
-      "claim_hash": "df7b0a898d705cf66c009fe316cff7d2d7a9f571742fb70bf6f21ed067d4b7e7",
+      "claim_hash": "f3f24e4fb3001e11cd7f2c370d03d3ff7b3a2a84fbec03b6cf0cecb5d56f1df9",
       "evidence_hash": "abd98551eac1e2f5ff60063ab41438480d7b9f728bbbb69d8971125aed426862",
       "verdict": {
         "kind": "pass",
@@ -699,7 +699,7 @@
       }
     },
     {
-      "claim_hash": "df7b0a898d705cf66c009fe316cff7d2d7a9f571742fb70bf6f21ed067d4b7e7",
+      "claim_hash": "f3f24e4fb3001e11cd7f2c370d03d3ff7b3a2a84fbec03b6cf0cecb5d56f1df9",
       "evidence_hash": "5251c561488c6b9ea1fa6eb2bca2f158658b2d64634f805bf423637d58c524bc",
       "verdict": {
         "kind": "pass",
@@ -723,11 +723,11 @@
       }
     },
     {
-      "claim_hash": "df7b0a898d705cf66c009fe316cff7d2d7a9f571742fb70bf6f21ed067d4b7e7",
+      "claim_hash": "f3f24e4fb3001e11cd7f2c370d03d3ff7b3a2a84fbec03b6cf0cecb5d56f1df9",
       "evidence_hash": "4366b1c9706f0833d253640513d73ad5eee6c781b408cbdf1e9964e2363a4728",
       "verdict": {
         "kind": "pass",
-        "citation": "同一 track・scope・round 種別で fixer 後に再実行した reviewer round は、現在の profile 解決結果の provider と model が一致する有効な prior session を resume し、全実行 flag を明示的に再指定したうえで reviewer は現在の file list と diff から scope 全件を再判定する。"
+        "citation": "同一 track・scope・round 種別で fixer 後に再実行した reviewer round は、現在の profile 解決結果の provider と model が一致する有効な prior session を resume し、全実行 flag を明示的に再指定したうえで reviewer は現在の file list と diff から scope 全件を再判定する。resume は文脈だけを再利用し、その round の judgment と review record は新規 session の round と同じ単位・意味で記録される。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -747,7 +747,7 @@
       }
     },
     {
-      "claim_hash": "df7b0a898d705cf66c009fe316cff7d2d7a9f571742fb70bf6f21ed067d4b7e7",
+      "claim_hash": "f3f24e4fb3001e11cd7f2c370d03d3ff7b3a2a84fbec03b6cf0cecb5d56f1df9",
       "evidence_hash": "8fab669df39131c60a84a964399837e9d35abd0be89f8e1f80b907e58f882ee1",
       "verdict": {
         "kind": "pass",
@@ -939,11 +939,11 @@
       }
     },
     {
-      "claim_hash": "e4d5e45a562adfc851196c081c6d4d5727aa3c58dff882b632b3cade8f6c703a",
+      "claim_hash": "09fb95476ff61e954be43e2c72de3d9dde7c9863c284a7210e2f5ae788855c77",
       "evidence_hash": "5ceb5e27f085ca0238a8be48d32f3a5db536584a85022dd551b57fd7a498cc9b",
       "verdict": {
         "kind": "pass",
-        "citation": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。"
+        "citation": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -963,7 +963,7 @@
       }
     },
     {
-      "claim_hash": "e4d5e45a562adfc851196c081c6d4d5727aa3c58dff882b632b3cade8f6c703a",
+      "claim_hash": "09fb95476ff61e954be43e2c72de3d9dde7c9863c284a7210e2f5ae788855c77",
       "evidence_hash": "4a0192a8dce970468a6460197209eed1813e7cec9205b0fe5f587428a2e169d4",
       "verdict": {
         "kind": "pass",
@@ -987,7 +987,7 @@
       }
     },
     {
-      "claim_hash": "e4d5e45a562adfc851196c081c6d4d5727aa3c58dff882b632b3cade8f6c703a",
+      "claim_hash": "09fb95476ff61e954be43e2c72de3d9dde7c9863c284a7210e2f5ae788855c77",
       "evidence_hash": "2b1bcd4b2f654058eb4920ab6f0133fb52b34975a32989e5d0a083a51d6300a2",
       "verdict": {
         "kind": "pass",
@@ -1011,7 +1011,7 @@
       }
     },
     {
-      "claim_hash": "e4d5e45a562adfc851196c081c6d4d5727aa3c58dff882b632b3cade8f6c703a",
+      "claim_hash": "09fb95476ff61e954be43e2c72de3d9dde7c9863c284a7210e2f5ae788855c77",
       "evidence_hash": "c0cbefa4a3ba523a52db5b860bd64b9a6f5189de0ad613d567e3a9af4d083029",
       "verdict": {
         "kind": "pass",
@@ -1035,7 +1035,7 @@
       }
     },
     {
-      "claim_hash": "e4d5e45a562adfc851196c081c6d4d5727aa3c58dff882b632b3cade8f6c703a",
+      "claim_hash": "09fb95476ff61e954be43e2c72de3d9dde7c9863c284a7210e2f5ae788855c77",
       "evidence_hash": "abd98551eac1e2f5ff60063ab41438480d7b9f728bbbb69d8971125aed426862",
       "verdict": {
         "kind": "pass",
@@ -1059,7 +1059,7 @@
       }
     },
     {
-      "claim_hash": "e4d5e45a562adfc851196c081c6d4d5727aa3c58dff882b632b3cade8f6c703a",
+      "claim_hash": "09fb95476ff61e954be43e2c72de3d9dde7c9863c284a7210e2f5ae788855c77",
       "evidence_hash": "5251c561488c6b9ea1fa6eb2bca2f158658b2d64634f805bf423637d58c524bc",
       "verdict": {
         "kind": "pass",
@@ -1083,7 +1083,7 @@
       }
     },
     {
-      "claim_hash": "e4d5e45a562adfc851196c081c6d4d5727aa3c58dff882b632b3cade8f6c703a",
+      "claim_hash": "09fb95476ff61e954be43e2c72de3d9dde7c9863c284a7210e2f5ae788855c77",
       "evidence_hash": "4366b1c9706f0833d253640513d73ad5eee6c781b408cbdf1e9964e2363a4728",
       "verdict": {
         "kind": "pass",
@@ -1107,7 +1107,7 @@
       }
     },
     {
-      "claim_hash": "e4d5e45a562adfc851196c081c6d4d5727aa3c58dff882b632b3cade8f6c703a",
+      "claim_hash": "09fb95476ff61e954be43e2c72de3d9dde7c9863c284a7210e2f5ae788855c77",
       "evidence_hash": "8fab669df39131c60a84a964399837e9d35abd0be89f8e1f80b907e58f882ee1",
       "verdict": {
         "kind": "pass",

@@ -1959,13 +1959,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "27886b8f9469d1421acd761d77a410165d3b48c78aacc15a664c7ec837f2f992",
+        "bound_tests_set_hash": "69d7b900149142024003de6e3e726a25f6f612d9cf4c68dfc281900e91810094",
         "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
         "anchor_text_hash": "875aeaabc70f7773ea6a5c22c3ffd8eca0526bac8fc0275fe201d43f790c4f6d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(\n            first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")),\n            \"workspace capability sessions must stay under the workspace transient path\"\n        );\n        assert!(\n            track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")),\n            \"track capability sessions must stay inside that track's artifact directory\"\n        );\n        assert_ne!(first_path, second_path, \"workspace artifact identities need distinct files\");\n        assert_eq!(track_identity, \"track-capability:track-a:implementer\");"
+        "citation": "assert_ne!(track_path, other_track_path, \"distinct track ids need distinct storage\");\nassert_ne!(track_path, other_capability_path,\n    \"distinct capabilities need distinct storage within one track\");\nassert!(other_track_path.starts_with(directory.path().join(\"track/items/track-b\")),\n    \"each track's entries live under that track's own artifact directory\");\nassert!(first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")),\n    \"workspace capability sessions must stay under the workspace transient path\");\nassert_ne!(first_path, second_path, \"workspace artifact identities need distinct files\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1983,13 +1983,13 @@
         "item_identifier": "trait_method:save"
       },
       "key": {
-        "bound_tests_set_hash": "27886b8f9469d1421acd761d77a410165d3b48c78aacc15a664c7ec837f2f992",
+        "bound_tests_set_hash": "69d7b900149142024003de6e3e726a25f6f612d9cf4c68dfc281900e91810094",
         "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
         "anchor_text_hash": "875aeaabc70f7773ea6a5c22c3ffd8eca0526bac8fc0275fe201d43f790c4f6d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_ne!(first_path, second_path, \"workspace artifact identities need distinct files\");\nassert!(\n    first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")),\n    \"workspace capability sessions must stay under the workspace transient path\"\n);\nassert_ne!(track_path, other_track_path, \"distinct track ids need distinct storage\");\nassert_ne!(\n    track_path, other_capability_path,\n    \"distinct capabilities need distinct storage within one track\"\n);"
+        "citation": "assert!(\n            first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")),\n            \"workspace capability sessions must stay under the workspace transient path\"\n        );\n        assert!(\n            track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")),\n            \"track capability sessions must stay inside that track's artifact directory\"\n        );\n        assert_ne!(first_path, second_path, \"workspace artifact identities need distinct files\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2007,13 +2007,13 @@
         "item_identifier": "trait_method:remove"
       },
       "key": {
-        "bound_tests_set_hash": "27886b8f9469d1421acd761d77a410165d3b48c78aacc15a664c7ec837f2f992",
+        "bound_tests_set_hash": "69d7b900149142024003de6e3e726a25f6f612d9cf4c68dfc281900e91810094",
         "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
         "anchor_text_hash": "875aeaabc70f7773ea6a5c22c3ffd8eca0526bac8fc0275fe201d43f790c4f6d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(track_identity, \"track-capability:track-a:implementer\");\nassert!(workspace_identity.starts_with(\"workspace-capability:implementer:\"));\nassert_ne!(workspace_path, other_workspace_path);"
+        "citation": "assert!(\n            first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")),\n            \"workspace capability sessions must stay under the workspace transient path\"\n        );\n        assert!(\n            track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")),\n            \"track capability sessions must stay inside that track's artifact directory\"\n        );\n        assert_eq!(track_identity, \"track-capability:track-a:implementer\");\n        assert!(first_identity.contains(\"workspace-capability:implementer:\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -2223,7 +2223,31 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "4842953a1ba8fdd5ecf0f914c81ba40bd613f6106dc60984f73612c3843d7f79",
+        "bound_tests_set_hash": "d51ed98b28bb6f0d2000b39115517785448c1af0fc8785f91e3f1cadafa69878",
+        "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
+        "anchor_text_hash": "ada0a8c57a9d8d40910dc95985d3a9260b7c885da13431c2cd9613cbd79e7805"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(cache.load(&review_key).unwrap(), Some(entry()), \"a review-keyed session is retrievable for the same track, scope, and round type\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "key": {
+        "bound_tests_set_hash": "d51ed98b28bb6f0d2000b39115517785448c1af0fc8785f91e3f1cadafa69878",
         "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
         "anchor_text_hash": "ada0a8c57a9d8d40910dc95985d3a9260b7c885da13431c2cd9613cbd79e7805"
       },
@@ -2244,34 +2268,10 @@
       "obligation_id": {
         "entry_key": "ProviderSessionCachePort",
         "obligation_kind": "contract",
-        "item_identifier": "trait_method:save"
-      },
-      "key": {
-        "bound_tests_set_hash": "4842953a1ba8fdd5ecf0f914c81ba40bd613f6106dc60984f73612c3843d7f79",
-        "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
-        "anchor_text_hash": "ada0a8c57a9d8d40910dc95985d3a9260b7c885da13431c2cd9613cbd79e7805"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert_eq!(\n            cache.load(&review_key).unwrap(),\n            Some(entry()),\n            \"a review-keyed session is retrievable for the same track, scope, and round type\"\n        );"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
-    },
-    {
-      "edge_id": {
-        "entry_key": "ProviderSessionCachePort",
-        "anchor_id": {
-          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-          "element_id": "IN-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProviderSessionCachePort",
-        "obligation_kind": "contract",
         "item_identifier": "trait_method:remove"
       },
       "key": {
-        "bound_tests_set_hash": "4842953a1ba8fdd5ecf0f914c81ba40bd613f6106dc60984f73612c3843d7f79",
+        "bound_tests_set_hash": "d51ed98b28bb6f0d2000b39115517785448c1af0fc8785f91e3f1cadafa69878",
         "declaration_hash": "851a26272a60fa71221ad227260d5c7058bf3be880e6c2625d584b5bfd1b9a3a",
         "anchor_text_hash": "ada0a8c57a9d8d40910dc95985d3a9260b7c885da13431c2cd9613cbd79e7805"
       },
@@ -4182,6 +4182,30 @@
         "entry_key": "ProviderSessionCacheKey",
         "anchor_id": {
           "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ProviderSessionCacheKey",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "eee8dbc5517c2dd92b0d2ed5d8c5e2118fc719196ae686f0b410039de0dfc74f",
+        "declaration_hash": "6b8a8ad5360160a854056c1192632e029ab5456e36ecdcae6898e554195985b1",
+        "anchor_text_hash": "ada0a8c57a9d8d40910dc95985d3a9260b7c885da13431c2cd9613cbd79e7805"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(session.resumable_id().as_deref(), Some(\"prior-session\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ProviderSessionCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
           "element_id": "IN-09"
         }
       },
@@ -4191,13 +4215,13 @@
         "item_identifier": "voluntary:IN-09"
       },
       "key": {
-        "bound_tests_set_hash": "7f0cf2eedcc4ce263a480584b9dba939bde6647c17f16e24dd6af64d393ccdc6",
-        "declaration_hash": "c72bbcca6adc43daf60195492e38f76af96f95ddb1bf1d4de802b759d591d208",
+        "bound_tests_set_hash": "ff7d13e22000dbb95bb10ad6f1807ca69ce1cd0b6d023bb3473309b54d799759",
+        "declaration_hash": "6b8a8ad5360160a854056c1192632e029ab5456e36ecdcae6898e554195985b1",
         "anchor_text_hash": "875aeaabc70f7773ea6a5c22c3ffd8eca0526bac8fc0275fe201d43f790c4f6d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_ne!(workspace_path, other_workspace_path);\nassert_eq!(track_identity, \"track-capability:track-a:implementer\");\nassert_eq!(other_track_identity, \"track-capability:track-b:implementer\");"
+        "citation": "assert_eq!(track_identity, \"track-capability:track-a:implementer\");\nassert_eq!(other_track_identity, \"track-capability:track-b:implementer\");\nassert_ne!(workspace_identity, other_workspace_identity);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4215,13 +4239,13 @@
         "item_identifier": "voluntary:CN-04"
       },
       "key": {
-        "bound_tests_set_hash": "7f0cf2eedcc4ce263a480584b9dba939bde6647c17f16e24dd6af64d393ccdc6",
-        "declaration_hash": "c72bbcca6adc43daf60195492e38f76af96f95ddb1bf1d4de802b759d591d208",
+        "bound_tests_set_hash": "2a90eba41def30ae8f1ecd5d31f97bf064ab4676aafba03795056caf3358cca9",
+        "declaration_hash": "6b8a8ad5360160a854056c1192632e029ab5456e36ecdcae6898e554195985b1",
         "anchor_text_hash": "d83bf653d5d0148b2c13a4caf5f7a6173f7eb775ca9d95ae17c4509eadd9d4e9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_ne!(track_path, other_track_path, \"distinct track ids need distinct storage\");\nassert_ne!(\n    track_path, other_capability_path,\n    \"distinct capabilities need distinct storage within one track\"\n);\nassert_ne!(workspace_path, other_workspace_path);\nassert!(\n    other_track_path.starts_with(directory.path().join(\"track/items/track-b\")),\n    \"each track's entries live under that track's own artifact directory\"\n);"
+        "citation": "assert!(other_track_path.starts_with(directory.path().join(\"track/items/track-b\"))); assert!(workspace_identity.starts_with(\"workspace-capability:implementer:\")); assert_ne!(workspace_path, other_workspace_path); assert!(workspace_relative.starts_with(Path::new(\"tmp\"))); assert!(track_relative.starts_with(Path::new(\"track/items/track-a/.provider-sessions\")));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4239,13 +4263,13 @@
         "item_identifier": "voluntary:AC-09"
       },
       "key": {
-        "bound_tests_set_hash": "7f0cf2eedcc4ce263a480584b9dba939bde6647c17f16e24dd6af64d393ccdc6",
-        "declaration_hash": "c72bbcca6adc43daf60195492e38f76af96f95ddb1bf1d4de802b759d591d208",
+        "bound_tests_set_hash": "ff7d13e22000dbb95bb10ad6f1807ca69ce1cd0b6d023bb3473309b54d799759",
+        "declaration_hash": "6b8a8ad5360160a854056c1192632e029ab5456e36ecdcae6898e554195985b1",
         "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_ne!(track_path, other_track_path, \"distinct track ids need distinct storage\");\nassert_ne!(\n    track_path, other_capability_path,\n    \"distinct capabilities need distinct storage within one track\"\n);\nassert_ne!(workspace_path, other_workspace_path);"
+        "citation": "assert_eq!(\n            cache.load(&track_key_for_changed_target_set).unwrap(),\n            Some(entry()),\n            \"one track and capability resolve to one cache entry even when target artifacts change\"\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4767,13 +4791,13 @@
         "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
       },
       "key": {
-        "bound_tests_set_hash": "8adc4a11aa9ee4ad57e6963c6651225bbfb3d6de56e8ae0104fb1626dd44d5c8",
+        "bound_tests_set_hash": "615b8af913c880a583b920f8f620c16bb41bc7686be00a2b0b910c580e411983",
         "declaration_hash": "1ec7b9f5493d1fdfb799c402d091767243e8b8e1ffa9f0d3612106d2a7f9bb9e",
         "anchor_text_hash": "ada0a8c57a9d8d40910dc95985d3a9260b7c885da13431c2cd9613cbd79e7805"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;\n  *) exit 10 ;;\nesac\n\nassert!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
+        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;\n  *) exit 10 ;;\nesac\n\nassert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");\n\nassert!(matches!(\n            run(RoundType::Final, matched_key.clone(), \"fast-keyed-final-claude.sh\", false).0,\n            Verdict::ZeroFindings\n        ));\nassert!(matches!(\n            run(RoundType::Fast, matched_key, \"matching-key-claude.sh\", true).0,\n            Verdict::ZeroFindings\n        ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4791,13 +4815,13 @@
         "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
       },
       "key": {
-        "bound_tests_set_hash": "8adc4a11aa9ee4ad57e6963c6651225bbfb3d6de56e8ae0104fb1626dd44d5c8",
+        "bound_tests_set_hash": "615b8af913c880a583b920f8f620c16bb41bc7686be00a2b0b910c580e411983",
         "declaration_hash": "1ec7b9f5493d1fdfb799c402d091767243e8b8e1ffa9f0d3612106d2a7f9bb9e",
         "anchor_text_hash": "0dee02c08949c142a3ea7edfea8ac737088ad23dd54aa0e7d24bb564776b23e6"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;"
+        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;\n  *) exit 10 ;;\nesac"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4815,13 +4839,13 @@
         "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
       },
       "key": {
-        "bound_tests_set_hash": "8adc4a11aa9ee4ad57e6963c6651225bbfb3d6de56e8ae0104fb1626dd44d5c8",
+        "bound_tests_set_hash": "615b8af913c880a583b920f8f620c16bb41bc7686be00a2b0b910c580e411983",
         "declaration_hash": "1ec7b9f5493d1fdfb799c402d091767243e8b8e1ffa9f0d3612106d2a7f9bb9e",
         "anchor_text_hash": "544150922e44eb510e899f687c37184a771bf9fca61d89487b5353bd44f16517"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(resumed.0, model_mismatch.0);\n        assert_eq!(resumed.0, provider_mismatch.0);\n        assert_eq!(resumed.0, first_round.0);\n        assert!(matches!(resumed.0, Verdict::ZeroFindings));\n        // A resume changes only provider context. Every invocation still returns\n        // the same single-round review record shape: verdict plus log info.\n        assert_eq!(resumed.1, model_mismatch.1);\n        assert_eq!(resumed.1, provider_mismatch.1);\n        assert_eq!(resumed.1, first_round.1);"
+        "citation": "assert_eq!(resumed.0, model_mismatch.0);\n        assert_eq!(resumed.0, provider_mismatch.0);\n        assert_eq!(resumed.0, first_round.0);\n        // A resume changes only provider context. Every invocation still returns\n        // the same single-round review record shape: verdict plus log info.\n        assert_eq!(resumed.1, model_mismatch.1);\n        assert_eq!(resumed.1, provider_mismatch.1);\n        assert_eq!(resumed.1, first_round.1);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4839,13 +4863,13 @@
         "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
       },
       "key": {
-        "bound_tests_set_hash": "4525c61bc7ea5974c298f264cb1f9486c38d416d6ae1ce5535a14e938a029384",
+        "bound_tests_set_hash": "ff3c98893dac01d2fec127cab24267b2bf6b3f92d90a897c9cf4be883d34b12f",
         "declaration_hash": "316f52253430d2303c9e18f36fcd6bdcd2ec45806866cb925b2a413f2508d1b4",
         "anchor_text_hash": "ada0a8c57a9d8d40910dc95985d3a9260b7c885da13431c2cd9613cbd79e7805"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;\n  *) exit 10 ;;\nesac"
+        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;\n  *) exit 10 ;;\nesac\n\nassert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");\n\nassert!(matches!(\n    run(RoundType::Final, matched_key.clone(), \"fast-keyed-final-codex.sh\", false).0,\n    Verdict::ZeroFindings\n));\nassert!(matches!(\n    run(RoundType::Fast, matched_key, \"matching-key-codex.sh\", true).0,\n    Verdict::ZeroFindings\n));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4863,7 +4887,7 @@
         "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
       },
       "key": {
-        "bound_tests_set_hash": "4525c61bc7ea5974c298f264cb1f9486c38d416d6ae1ce5535a14e938a029384",
+        "bound_tests_set_hash": "ff3c98893dac01d2fec127cab24267b2bf6b3f92d90a897c9cf4be883d34b12f",
         "declaration_hash": "316f52253430d2303c9e18f36fcd6bdcd2ec45806866cb925b2a413f2508d1b4",
         "anchor_text_hash": "0dee02c08949c142a3ea7edfea8ac737088ad23dd54aa0e7d24bb564776b23e6"
       },
@@ -4887,13 +4911,13 @@
         "item_identifier": "trait_impl:usecase::review_v2::Reviewer"
       },
       "key": {
-        "bound_tests_set_hash": "4525c61bc7ea5974c298f264cb1f9486c38d416d6ae1ce5535a14e938a029384",
+        "bound_tests_set_hash": "ff3c98893dac01d2fec127cab24267b2bf6b3f92d90a897c9cf4be883d34b12f",
         "declaration_hash": "316f52253430d2303c9e18f36fcd6bdcd2ec45806866cb925b2a413f2508d1b4",
         "anchor_text_hash": "544150922e44eb510e899f687c37184a771bf9fca61d89487b5353bd44f16517"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(resumed.0, model_mismatch.0);\n        assert_eq!(resumed.0, provider_mismatch.0);\n        assert_eq!(resumed.0, first_round.0);\n        assert!(matches!(resumed.0, Verdict::ZeroFindings));\n        assert!(!resumed.1.as_str().is_empty());\n        assert!(!model_mismatch.1.as_str().is_empty());\n        assert!(!provider_mismatch.1.as_str().is_empty());\n        assert!(!first_round.1.as_str().is_empty());"
+        "citation": "assert_eq!(resumed.0, model_mismatch.0);\n        assert_eq!(resumed.0, provider_mismatch.0);\n        assert_eq!(resumed.0, first_round.0);\n        assert!(matches!(resumed.0, Verdict::ZeroFindings));\n        // Codex uses distinct log paths per subprocess, but resumed and fresh\n        // results both preserve the record's verdict + non-empty log-info unit.\n        assert!(!resumed.1.as_str().is_empty());\n        assert!(!model_mismatch.1.as_str().is_empty());\n        assert!(!provider_mismatch.1.as_str().is_empty());\n        assert!(!first_round.1.as_str().is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4912,12 +4936,12 @@
       },
       "key": {
         "bound_tests_set_hash": "f3e485cf8cb23eb6e2c5a0f604914a12948adf42ef0d61b996871f40e468c98f",
-        "declaration_hash": "581728aa50d1e6db1c0c6548623190820247dd17fa37dff1b52386dbd218cd6c",
+        "declaration_hash": "5d69427553e168ad4fe53a3ba6f3fe425ba2901d21afa4acbc3f3992586d27d5",
         "anchor_text_hash": "12b1350e138cc06f3478183cd939907fcd5552cc6e22d2179adef96ff00b8b11"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let model_mismatch = test_reviewer_with_cache(\n            Duration::from_secs(10),\n            \"Review this code.\",\n            Arc::new(StaticSessionCache {\n                entry: Some(session_entry_with_model(\"claude\", \"previous-model\")),\n            }),\n        )\n        .with_bin(write_bin(\"model-mismatch-claude.sh\", false))\n        .review(&target)\n        .unwrap();\n        let provider_mismatch = test_reviewer_with_cache(\n            Duration::from_secs(10),\n            \"Review this code.\",\n            Arc::new(StaticSessionCache { entry: Some(session_entry(\"codex\")) }),\n        )\n        .with_bin(write_bin(\"provider-mismatch-claude.sh\", false))\n        .review(&target)\n        .unwrap();"
+        "citation": "`write_bin(\"model-mismatch-claude.sh\", false)` and `write_bin(\"provider-mismatch-claude.sh\", false)`; `assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");`"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4936,7 +4960,7 @@
       },
       "key": {
         "bound_tests_set_hash": "72cdbe123fd86689af9c4f3343af6be5a9b97c9c2591ac202c13d3f240a7e58d",
-        "declaration_hash": "581728aa50d1e6db1c0c6548623190820247dd17fa37dff1b52386dbd218cd6c",
+        "declaration_hash": "5d69427553e168ad4fe53a3ba6f3fe425ba2901d21afa4acbc3f3992586d27d5",
         "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
       },
       "verdict": {
@@ -4960,12 +4984,12 @@
       },
       "key": {
         "bound_tests_set_hash": "f3e485cf8cb23eb6e2c5a0f604914a12948adf42ef0d61b996871f40e468c98f",
-        "declaration_hash": "581728aa50d1e6db1c0c6548623190820247dd17fa37dff1b52386dbd218cd6c",
+        "declaration_hash": "5d69427553e168ad4fe53a3ba6f3fe425ba2901d21afa4acbc3f3992586d27d5",
         "anchor_text_hash": "07cdc5852c99211b87502f07153d16da0d9e13f03f511f0ec36d0e90ca5ce018"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"let model_mismatch = test_reviewer_with_cache(\\n            Duration::from_secs(10),\\n            \\\"Review this code.\\\",\\n            Arc::new(StaticSessionCache {\\n                entry: Some(session_entry_with_model(\\\"claude\\\", \\\"previous-model\\\")),\\n            }),\\n        )\\n        .with_bin(write_bin(\\\"model-mismatch-claude.sh\\\", false))\"; \"let provider_mismatch = test_reviewer_with_cache(\\n            Duration::from_secs(10),\\n            \\\"Review this code.\\\",\\n            Arc::new(StaticSessionCache { entry: Some(session_entry(\\\"codex\\\")) }),\\n        )\\n        .with_bin(write_bin(\\\"provider-mismatch-claude.sh\\\", false))\"; \"assert_eq!(std::fs::read_to_string(attempts).unwrap(), \\\"resume\\\\nfresh\\\\n\\\");\""
+        "citation": "assert_eq!(resumed.0, model_mismatch.0);\n        assert_eq!(resumed.0, provider_mismatch.0);\n        assert_eq!(resumed.0, first_round.0); ... assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -4983,13 +5007,13 @@
         "item_identifier": "voluntary:AC-03"
       },
       "key": {
-        "bound_tests_set_hash": "5b15e691e6e1ee746d639bd7a7d445e6e1fbb233a6b66b95ebdac21e3bc4a053",
-        "declaration_hash": "581728aa50d1e6db1c0c6548623190820247dd17fa37dff1b52386dbd218cd6c",
+        "bound_tests_set_hash": "e42cf63e123af257501d59fdbc65b2356321f5ec99603b3829966edabfe15a96",
+        "declaration_hash": "5d69427553e168ad4fe53a3ba6f3fe425ba2901d21afa4acbc3f3992586d27d5",
         "anchor_text_hash": "6c61fa978e67690504105be79dd73f2649add14f0026cd302f7565c126cc61d7"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "[ \"$has_model\" -eq 1 ] && [ \"$has_effort\" -eq 1 ] && [ \"$has_permission\" -eq 1 ] && {resume_check} || exit 9\ncase \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;\nassert_eq!(resumed.1, model_mismatch.1);\nassert_eq!(resumed.1, provider_mismatch.1);\nassert_eq!(resumed.1, first_round.1);\nassert!(matches!(\n            run(RoundType::Fast, matched_key, \"matching-key-claude.sh\", true).0,\n            Verdict::ZeroFindings\n        ));"
+        "citation": "[ \"$has_model\" -eq 1 ] && [ \"$has_effort\" -eq 1 ] && [ \"$has_permission\" -eq 1 ] && {resume_check} || exit 9\ncase \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5007,13 +5031,13 @@
         "item_identifier": "voluntary:AC-04"
       },
       "key": {
-        "bound_tests_set_hash": "8adc4a11aa9ee4ad57e6963c6651225bbfb3d6de56e8ae0104fb1626dd44d5c8",
-        "declaration_hash": "581728aa50d1e6db1c0c6548623190820247dd17fa37dff1b52386dbd218cd6c",
+        "bound_tests_set_hash": "615b8af913c880a583b920f8f620c16bb41bc7686be00a2b0b910c580e411983",
+        "declaration_hash": "5d69427553e168ad4fe53a3ba6f3fe425ba2901d21afa4acbc3f3992586d27d5",
         "anchor_text_hash": "042865d7c2f3ee57558d16bbda502891955644407e647ab52193b9aa10aa9c88"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"[ \\\"$has_model\\\" -eq 1 ] && [ \\\"$has_effort\\\" -eq 1 ] && [ \\\"$has_permission\\\" -eq 1 ] && {resume_check} || exit 9\"; \"assert_eq!(std::fs::read_to_string(attempts).unwrap(), \\\"resume\\\\nfresh\\\\n\\\");\"; \"run(RoundType::Final, matched_key.clone(), \\\"fast-keyed-final-claude.sh\\\", false)\""
+        "citation": "[ \"$has_model\" -eq 1 ] && [ \"$has_effort\" -eq 1 ] && [ \"$has_permission\" -eq 1 ] && {resume_check} || exit 9\n...\nassert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5032,7 +5056,7 @@
       },
       "key": {
         "bound_tests_set_hash": "8995fc710d5b957010317b0f4d29c6c7d5b2b81f8859639758b437629e5f5a4a",
-        "declaration_hash": "7c188774e58888e0dc9136fdb9150e33f7cb7c10949a1aa0c44f76cc76867696",
+        "declaration_hash": "276ab0ce806c33bf3e3fba3f89c10f4d0810fe9aff252a9ca1cc317bdbe1ec5b",
         "anchor_text_hash": "12b1350e138cc06f3478183cd939907fcd5552cc6e22d2179adef96ff00b8b11"
       },
       "verdict": {
@@ -5056,7 +5080,7 @@
       },
       "key": {
         "bound_tests_set_hash": "7ff97a43ccfd1f0cf069f529590513d25e35f378b671effc4d45f58fe259295b",
-        "declaration_hash": "7c188774e58888e0dc9136fdb9150e33f7cb7c10949a1aa0c44f76cc76867696",
+        "declaration_hash": "276ab0ce806c33bf3e3fba3f89c10f4d0810fe9aff252a9ca1cc317bdbe1ec5b",
         "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
       },
       "verdict": {
@@ -5080,7 +5104,7 @@
       },
       "key": {
         "bound_tests_set_hash": "8995fc710d5b957010317b0f4d29c6c7d5b2b81f8859639758b437629e5f5a4a",
-        "declaration_hash": "7c188774e58888e0dc9136fdb9150e33f7cb7c10949a1aa0c44f76cc76867696",
+        "declaration_hash": "276ab0ce806c33bf3e3fba3f89c10f4d0810fe9aff252a9ca1cc317bdbe1ec5b",
         "anchor_text_hash": "07cdc5852c99211b87502f07153d16da0d9e13f03f511f0ec36d0e90ca5ce018"
       },
       "verdict": {
@@ -5103,13 +5127,13 @@
         "item_identifier": "voluntary:AC-03"
       },
       "key": {
-        "bound_tests_set_hash": "def3395189ba17c22fc23791b860ff5bf4972dbcca02a79e821f8a4b7559e3e6",
-        "declaration_hash": "7c188774e58888e0dc9136fdb9150e33f7cb7c10949a1aa0c44f76cc76867696",
+        "bound_tests_set_hash": "595cf6b4027dab780eb3d4a55f9bce5bc1a0414677f5be0e034863f30f4c184b",
+        "declaration_hash": "276ab0ce806c33bf3e3fba3f89c10f4d0810fe9aff252a9ca1cc317bdbe1ec5b",
         "anchor_text_hash": "6c61fa978e67690504105be79dd73f2649add14f0026cd302f7565c126cc61d7"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "[ \"$has_model\" -eq 1 ] && [ \"$has_sandbox\" -eq 1 ] && [ \"$has_effort\" -eq 1 ] && [ -n \"$output\" ] && {resume_check} || exit 9\ncase \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;"
+        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;\n  *) exit 10 ;;\nesac"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5127,13 +5151,13 @@
         "item_identifier": "voluntary:AC-04"
       },
       "key": {
-        "bound_tests_set_hash": "85e68d833b1ed8115e61e9c2e5c71f6b3092d522cc6c30a3d9646634066edd2a",
-        "declaration_hash": "7c188774e58888e0dc9136fdb9150e33f7cb7c10949a1aa0c44f76cc76867696",
+        "bound_tests_set_hash": "4e0bc9a035cc76d706075ee4fed53397c601f852c206d5df247f2641967fe523",
+        "declaration_hash": "276ab0ce806c33bf3e3fba3f89c10f4d0810fe9aff252a9ca1cc317bdbe1ec5b",
         "anchor_text_hash": "042865d7c2f3ee57558d16bbda502891955644407e647ab52193b9aa10aa9c88"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");\n\n[ \"$has_model\" -eq 1 ] && [ \"$has_sandbox\" -eq 1 ] && [ \"$has_effort\" -eq 1 ] || exit 9"
+        "citation": "`let first_round = test_reviewer_with_cache(` ... `Arc::new(EmptySessionCache),` ... `let model_mismatch = test_reviewer_with_cache(` ... `session_entry_with_model(\"codex\", \"previous-model\")` ... `let provider_mismatch = test_reviewer_with_cache(` ... `session_entry(\"claude\")` ... `assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");` ... `[ \"$has_model\" -eq 1 ] && [ \"$has_sandbox\" -eq 1 ] && [ \"$has_effort\" -eq 1 ]`"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5151,13 +5175,13 @@
         "item_identifier": "voluntary:IN-03"
       },
       "key": {
-        "bound_tests_set_hash": "dc0102a28b9a1343cc2e148eff2798327bd6b2e3ab82016835c99b808117fced",
-        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "bound_tests_set_hash": "39e26079b24da0ba852f6234af3bf9a8448de758297b1dc70157ef9e0d58af0c",
+        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
         "anchor_text_hash": "ada0a8c57a9d8d40910dc95985d3a9260b7c885da13431c2cd9613cbd79e7805"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(arguments.contains(\"resume prior-session\"), \"expected resume argv: {arguments}\");\nassert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\");"
+        "citation": "assert!(arguments.contains(\"resume prior-session\"), \"expected resume argv: {arguments}\");\n\n(\"first-round\", \"fast\", None),\n(\"fast-to-final\", \"final\", Some((RoundType::Fast, \"codex-review-model\"))),\n\nassert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5176,12 +5200,12 @@
       },
       "key": {
         "bound_tests_set_hash": "2151656b41f2bed7ad4d5b408dbd260e29ddfe552c3a7f669382b84c844dacb4",
-        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
         "anchor_text_hash": "12b1350e138cc06f3478183cd939907fcd5552cc6e22d2179adef96ff00b8b11"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\");\nassert!(arguments.contains(\"--model codex-review-model\"), \"{name}: {arguments}\");"
+        "citation": "assert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\");\nassert_eq!(attempts.len(), 2, \"resume failure must retry fresh: {attempts:?}\");\nassert!(attempts.get(1).is_some_and(|attempt| !attempt.contains(\"resume\")));\nassert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5200,12 +5224,12 @@
       },
       "key": {
         "bound_tests_set_hash": "6ceaf00908367a98830b1da138ee5a2af0563d3ecf5f68a2072e4a0bd047e1ff",
-        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
         "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(arguments.contains(\"--model codex-review-model\"), \"missing model argv: {arguments}\");\nassert!(arguments.contains(\"--sandbox read-only\"), \"missing sandbox argv: {arguments}\");\nassert!(arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"), \"missing effort argv: {arguments}\");"
+        "citation": "assert!(arguments.contains(\"--model codex-review-model\")); assert!(arguments.contains(\"--sandbox read-only\")); assert!(arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5224,12 +5248,12 @@
       },
       "key": {
         "bound_tests_set_hash": "f78ee46fcefc8e24fa67eb1af9fb4fb15d4798964d52bf8b4c77453861687cc8",
-        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
         "anchor_text_hash": "0dee02c08949c142a3ea7edfea8ac737088ad23dd54aa0e7d24bb564776b23e6"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "*\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;"
+        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5248,12 +5272,12 @@
       },
       "key": {
         "bound_tests_set_hash": "e0b79d14d004714edb6a89cd01f0651b10488499ed77a3fcc072394a1845ace6",
-        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
         "anchor_text_hash": "07cdc5852c99211b87502f07153d16da0d9e13f03f511f0ec36d0e90ca5ce018"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\");\n            assert!(attempts.len(), 2, \"resume failure must retry fresh: {attempts:?}\");\n        assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
+        "citation": "assert_eq!(attempts.len(), 2, \"resume failure must retry fresh: {attempts:?}\");\n        assert!(attempts.first().is_some_and(|attempt| attempt.contains(\"resume prior-session\")));\n        assert!(attempts.get(1).is_some_and(|attempt| !attempt.contains(\"resume\")));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5272,12 +5296,12 @@
       },
       "key": {
         "bound_tests_set_hash": "f78ee46fcefc8e24fa67eb1af9fb4fb15d4798964d52bf8b4c77453861687cc8",
-        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
         "anchor_text_hash": "544150922e44eb510e899f687c37184a771bf9fca61d89487b5353bd44f16517"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(resumed.0, model_mismatch.0);\n        assert_eq!(resumed.0, provider_mismatch.0);\n        assert_eq!(resumed.0, first_round.0);\n        assert!(matches!(resumed.0, Verdict::ZeroFindings));\n        // A resume changes only provider context. Every invocation still returns\n        // the same single-round review record shape: verdict plus log info.\n        assert_eq!(resumed.1, model_mismatch.1);\n        assert_eq!(resumed.1, provider_mismatch.1);\n        assert_eq!(resumed.1, first_round.1);"
+        "citation": "// A resume changes only provider context. Every invocation still returns\n        // the same single-round review record shape: verdict plus log info.\n        assert_eq!(resumed.1, model_mismatch.1);\n        assert_eq!(resumed.1, provider_mismatch.1);\n        assert_eq!(resumed.1, first_round.1);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5295,13 +5319,13 @@
         "item_identifier": "voluntary:AC-03"
       },
       "key": {
-        "bound_tests_set_hash": "22de352a2bb28f197e48d79e6fad2561c5a2a071ac7e7b28d465750b6f9ccb8f",
-        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "bound_tests_set_hash": "d4e4a930d1bd26493f20012718f6142de594b9198ce733ea858a13bbfe710872",
+        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
         "anchor_text_hash": "6c61fa978e67690504105be79dd73f2649add14f0026cd302f7565c126cc61d7"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(arguments.contains(\"resume prior-session\"), \"expected resume argv: {arguments}\");\nassert!(\n    arguments.contains(\"--model codex-review-model\"),\n    \"missing model argv: {arguments}\"\n);\nassert!(arguments.contains(\"--sandbox read-only\"), \"missing sandbox argv: {arguments}\");\nassert!(\n    arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"),\n    \"missing effort argv: {arguments}\"\n);"
+        "citation": "assert!(arguments.contains(\"resume prior-session\"), \"expected resume argv: {arguments}\"); ... assert!(arguments.contains(\"--model codex-review-model\"), \"missing model argv: {arguments}\"); ... assert!(arguments.contains(\"--sandbox read-only\"), \"missing sandbox argv: {arguments}\"); ... assert!(arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"), \"missing effort argv: {arguments}\"); ... assert!(review_record.contains(\"zero_findings\")); assert!(review_record.contains(\"fast\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5320,12 +5344,12 @@
       },
       "key": {
         "bound_tests_set_hash": "2151656b41f2bed7ad4d5b408dbd260e29ddfe552c3a7f669382b84c844dacb4",
-        "declaration_hash": "30ae8b07649edc99153cda7226b43fa6eeaeccc613ce9d2374a548f90254f334",
+        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
         "anchor_text_hash": "042865d7c2f3ee57558d16bbda502891955644407e647ab52193b9aa10aa9c88"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(arguments.contains(\"resume prior-session\"), \"expected resume argv: {arguments}\");\n        assert!(arguments.contains(\"--model codex-review-model\"), \"missing model argv: {arguments}\");\n        assert!(arguments.contains(\"--sandbox read-only\"), \"missing sandbox argv: {arguments}\");\n        assert!(arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"), \"missing effort argv: {arguments}\");"
+        "citation": "assert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\"); assert!(arguments.contains(\"--model codex-review-model\"), \"{name}: {arguments}\"); assert!(arguments.contains(\"--sandbox read-only\"), \"{name}: {arguments}\"); assert!(arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"), \"{name}: {arguments}\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5343,13 +5367,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "a3ee0de734508a0b2435d01c171b8d8cce2c4644069eaa37c67fc146cf4034ed",
+        "bound_tests_set_hash": "5a0fd482102da94cc409b4e8f82c43897ea74289adadc8c0a229f22f000a80ce",
         "declaration_hash": "6b1b39446fdbc2e10992246043098766cd1602bd809e4827add12361cb67c467",
         "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(args.windows(2).any(|pair| pair == [\"--model\", \"claude-opus\"]));\n        assert!(args.windows(2).any(|pair| pair == [\"--effort\", \"high\"]));\n        assert!(args.windows(2).any(|pair| pair == [\"--permission-mode\", \"dontAsk\"]));\n        assert!(args.windows(2).any(|pair| pair == [\"--allowedTools\", \"Read\"]));"
+        "citation": "assert!(args.windows(2).any(|pair| pair == [\"--resume\", \"prior-session\"]));\n        assert!(args.windows(2).any(|pair| pair == [\"--model\", \"claude-opus\"]));\n        assert!(args.windows(2).any(|pair| pair == [\"--effort\", \"high\"]));\n        assert!(args.windows(2).any(|pair| pair == [\"--permission-mode\", \"dontAsk\"]));\n        assert!(args.windows(2).any(|pair| pair == [\"--allowedTools\", \"Read\"]));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5367,13 +5391,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "a3ee0de734508a0b2435d01c171b8d8cce2c4644069eaa37c67fc146cf4034ed",
+        "bound_tests_set_hash": "5a0fd482102da94cc409b4e8f82c43897ea74289adadc8c0a229f22f000a80ce",
         "declaration_hash": "6b1b39446fdbc2e10992246043098766cd1602bd809e4827add12361cb67c467",
         "anchor_text_hash": "042865d7c2f3ee57558d16bbda502891955644407e647ab52193b9aa10aa9c88"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(args.windows(2).any(|pair| pair == [\"--model\", \"claude-opus-4-7\"])); assert!(args.windows(2).any(|pair| pair == [\"--effort\", \"high\"])); assert!(args.windows(2).any(|pair| pair == [\"--permission-mode\", \"dontAsk\"]));"
+        "citation": "assert!(!args.contains(&\"--resume\".to_owned()));\nassert!(args.windows(2).any(|pair| pair == [\"--model\", \"claude-opus\"]));\nassert!(args.windows(2).any(|pair| pair == [\"--effort\", \"high\"]));\nassert!(args.windows(2).any(|pair| pair == [\"--permission-mode\", \"dontAsk\"]));\nassert!(args.windows(2).any(|pair| pair == [\"--allowedTools\", \"Read\"]));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5391,13 +5415,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "a3ee0de734508a0b2435d01c171b8d8cce2c4644069eaa37c67fc146cf4034ed",
+        "bound_tests_set_hash": "5a0fd482102da94cc409b4e8f82c43897ea74289adadc8c0a229f22f000a80ce",
         "declaration_hash": "6b1b39446fdbc2e10992246043098766cd1602bd809e4827add12361cb67c467",
         "anchor_text_hash": "352679c83a776ed39e6ab98c82bac69f8455389fad22f2fa56704a6573584b5e"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\"); ... assert!(args.windows(2).any(|pair| pair == [\"--model\", \"claude-opus\"])); assert!(args.windows(2).any(|pair| pair == [\"--effort\", \"high\"])); assert!(args.windows(2).any(|pair| pair == [\"--permission-mode\", \"dontAsk\"])); assert!(args.windows(2).any(|pair| pair == [\"--allowedTools\", \"Read\"])); assert!(args.last().is_some_and(|prompt| prompt.contains(\n                \"check whether upstream artifacts changed; if they did, reread them before working\"\n            )));"
+        "citation": "assert_eq!(invocations.len(), 2);\nfor (index, invocation) in invocations.iter().enumerate() {\n    let args: Vec<_> =\n        invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();\n    assert_eq!(args.contains(&\"--resume\".to_owned()), index == 0);\n    assert!(args.windows(2).any(|pair| pair == [\"--model\", \"claude-opus\"]));\n    assert!(args.windows(2).any(|pair| pair == [\"--effort\", \"high\"]));\n    assert!(args.windows(2).any(|pair| pair == [\"--permission-mode\", \"dontAsk\"]));\n    assert!(args.windows(2).any(|pair| pair == [\"--allowedTools\", \"Read\"]));\n    assert!(args.last().is_some_and(|prompt| prompt.contains(\n        \"check whether upstream artifacts changed; if they did, reread them before working\"\n    )));\n}"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5415,7 +5439,7 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "fccc0dde81d336d8d31d6b359ee1d2d357d87ab7e92906190b06112f23cb809b",
+        "bound_tests_set_hash": "9674d96598f3cf67a50d12ea7c3324e769f9e2f51c726dc141341d3a46ac8317",
         "declaration_hash": "d7c1fb987e30e8ab87dac8a90ebc75a7064d6d65aec6e8e1b3dcb5ebb18dbefc",
         "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
       },
@@ -5439,13 +5463,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "fccc0dde81d336d8d31d6b359ee1d2d357d87ab7e92906190b06112f23cb809b",
+        "bound_tests_set_hash": "9674d96598f3cf67a50d12ea7c3324e769f9e2f51c726dc141341d3a46ac8317",
         "declaration_hash": "d7c1fb987e30e8ab87dac8a90ebc75a7064d6d65aec6e8e1b3dcb5ebb18dbefc",
         "anchor_text_hash": "042865d7c2f3ee57558d16bbda502891955644407e647ab52193b9aa10aa9c88"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(resumed.0, Verdict::ZeroFindings)); ... assert!(matches!(model_mismatch.0, Verdict::ZeroFindings)); ... assert!(matches!(provider_mismatch.0, Verdict::ZeroFindings)); ... assert!(matches!(first_round.0, Verdict::ZeroFindings)); ... assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\"); ... assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\"); ... assert!(matches!(run(RoundType::Final, matched_key.clone(), \"fast-keyed-final-codex.sh\", false).0, Verdict::ZeroFindings)); ... assert!(args.windows(2).any(|pair| pair == [\"-m\", \"gpt-5\"])); assert!(args.contains(&\"model_reasoning_effort=\\\"high\\\"\".to_owned())); assert!(args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace-write\"]));"
+        "citation": "assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\"); ... [\"$has_model\" -eq 1 ] && [ \"$has_sandbox\" -eq 1 ] && [ \"$has_effort\" -eq 1 ] || exit 9"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5463,13 +5487,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "fccc0dde81d336d8d31d6b359ee1d2d357d87ab7e92906190b06112f23cb809b",
+        "bound_tests_set_hash": "9674d96598f3cf67a50d12ea7c3324e769f9e2f51c726dc141341d3a46ac8317",
         "declaration_hash": "d7c1fb987e30e8ab87dac8a90ebc75a7064d6d65aec6e8e1b3dcb5ebb18dbefc",
         "anchor_text_hash": "352679c83a776ed39e6ab98c82bac69f8455389fad22f2fa56704a6573584b5e"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(outcome, CapabilityDispatchOutcome::Executed { exit_code: 0, .. }));\nassert_eq!(invocations.len(), 2);\nassert_eq!(args.contains(&\"resume\".to_owned()), index == 0);\nassert!(args.windows(2).any(|pair| pair == [\"-m\", \"gpt-5\"]));\nassert!(args.contains(&\"model_reasoning_effort=\\\"high\\\"\".to_owned()));\nassert!(args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace-write\"]));\nassert!(args.last().is_some_and(|prompt| prompt.contains(\n    \"check whether upstream artifacts changed; if they did, reread them before working\"\n)));"
+        "citation": "assert_eq!(invocations.len(), 2);\nfor (index, invocation) in invocations.iter().enumerate() {\n    let args: Vec<_> =\n        invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();\n    assert_eq!(args.contains(&\"resume\".to_owned()), index == 0);\n    assert!(args.windows(2).any(|pair| pair == [\"-m\", \"gpt-5\"]));\n    assert!(args.contains(&\"model_reasoning_effort=\\\"high\\\"\".to_owned()));\n    assert!(args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace-write\"]));\n    assert!(args.last().is_some_and(|prompt| prompt.contains(\n        \"check whether upstream artifacts changed; if they did, reread them before working\"\n    )));\n}"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5535,13 +5559,13 @@
         "item_identifier": "voluntary:CN-04"
       },
       "key": {
-        "bound_tests_set_hash": "5d687866f59b685500330b33588e209039f21011a643c570d64b7fae1bdfe460",
+        "bound_tests_set_hash": "b73aec15f8b25e2ca8142a6cc9fdbbdb5cbef2e36475011616dbaa17dd5dc2bc",
         "declaration_hash": "7273f0aafc9daae7f8f3df7eaca3eaaa42646019cff06089666403f36bbdabd1",
         "anchor_text_hash": "d83bf653d5d0148b2c13a4caf5f7a6173f7eb775ca9d95ae17c4509eadd9d4e9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_ne!(cache_key(&first, None), cache_key(&second, None));\nassert_eq!(cache_key(&targetless, None), None);"
+        "citation": "assert!(\n            track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")),\n            \"track capability sessions must stay inside that track's artifact directory\"\n        );\n        assert_ne!(track_path.parent(), first_path.parent());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5799,13 +5823,13 @@
         "item_identifier": "voluntary:CN-04"
       },
       "key": {
-        "bound_tests_set_hash": "a4414347710b3509ada26070ef688323c968990e283af0496cf9b796e2f8087c",
+        "bound_tests_set_hash": "91462f9e2c50a1f88469f6f8d135eaa7b17e79a7cea7ec6ae918c6e1d1702fc7",
         "declaration_hash": "3819300d375ba2d16180d16e1368177b7a8417159d5685c7abc5655d107860ff",
         "anchor_text_hash": "d83bf653d5d0148b2c13a4caf5f7a6173f7eb775ca9d95ae17c4509eadd9d4e9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"the existing runtime directory must stay gitignored\"; \"track-local provider sessions must stay gitignored\"; \"workspace sessions must live under the existing runtime directory\"; \"track sessions must live under the gitignored track-local cache directory\"; \"track_path.starts_with(directory.path().join(\\\"track/items/track-b/.provider-sessions\\\"))\"; \"workspace capability sessions must stay under the workspace transient path\""
+        "citation": "assert!(\n            committed_gitignore.lines().any(|line| line == \"tmp/\"),\n            \"the existing runtime directory must stay gitignored\"\n        );\n        assert!(\n            committed_gitignore.lines().any(|line| line == \"track/items/**/.provider-sessions/\"),\n            \"track-local provider sessions must stay gitignored\"\n        );\n        assert!(\n            track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")),\n            \"track capability sessions must stay inside that track's artifact directory\"\n        );\n        assert!(\n            first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")),\n            \"workspace capability sessions must stay under the workspace transient path\"\n        );\n        assert_ne!(track_path, other_track_path, \"distinct track ids need distinct storage\");\n        assert_ne!(\n            track_path, other_capability_path,\n            \"distinct capabilities need distinct storage within one track\"\n        );\n        assert_eq!(cache.load(&first_key).unwrap(), Some(first_entry));\n        assert_eq!(cache.load(&track_key).unwrap(), Some(track_entry));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5919,13 +5943,13 @@
         "item_identifier": "voluntary:CN-04"
       },
       "key": {
-        "bound_tests_set_hash": "8e6f532c37b1a5275d1c7878e6ff52b3ead66a0960d71ccfbd8d2566df1af130",
+        "bound_tests_set_hash": "3de3829881878403fe60c11832e6e8c7901c8d05613bb09c38552d70426f90d5",
         "declaration_hash": "c146460dd88681f01ec71eaa9a90b45d13d5955135e1f05a2a8cd7c4494120a2",
         "anchor_text_hash": "d83bf653d5d0148b2c13a4caf5f7a6173f7eb775ca9d95ae17c4509eadd9d4e9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"assert!(other_track_path.starts_with(directory.path().join(\\\"track/items/track-b\\\")),\\n            \\\"each track's entries live under that track's own artifact directory\\\"\\n        );\"; \"assert!(\\n            first_path.starts_with(directory.path().join(\\\"tmp/runtime/provider-sessions\\\")),\\n            \\\"workspace capability sessions must stay under the workspace transient path\\\"\\n        );\"; \"assert!(\\n            committed_gitignore.lines().any(|line| line == \\\"tmp/\\\"),\\n            \\\"the existing runtime directory must stay gitignored\\\"\\n        );\\n        assert!(\\n            committed_gitignore.lines().any(|line| line == \\\"track/items/**/.provider-sessions/\\\"),\\n            \\\"track-local provider sessions must stay gitignored\\\"\\n        );\"; \"assert_ne!(track_path, other_track_path, \\\"distinct track ids need distinct storage\\\");\\nassert_ne!(\\n    track_path, other_capability_path,\\n    \\\"distinct capabilities need distinct storage within one track\\\"\\n);\""
+        "citation": "\"assert!(\\n            track_path.starts_with(directory.path().join(\\\"track/items/track-a/.provider-sessions\\\")),\\n            \\\"track capability sessions must stay inside that track's artifact directory\\\"\\n        );\" and \"assert!(\\n            first_path.starts_with(directory.path().join(\\\"tmp/runtime/provider-sessions\\\")),\\n            \\\"workspace capability sessions must stay under the workspace transient path\\\"\\n        );\" and \"assert!(\\n            committed_gitignore.lines().any(|line| line == \\\"tmp/\\\"),\\n            \\\"the existing runtime directory must stay gitignored\\\"\\n        );\" and \"assert!(\\n            committed_gitignore.lines().any(|line| line == \\\"track/items/**/.provider-sessions/\\\"),\\n            \\\"track-local provider sessions must stay gitignored\\\"\\n        );\" and \"assert_ne!(track_path, other_track_path, \\\"distinct track ids need distinct storage\\\");\" and \"assert_ne!(\\n            track_path, other_capability_path,\\n            \\\"distinct capabilities need distinct storage within one track\\\"\\n        );\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },

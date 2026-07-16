@@ -11,11 +11,11 @@ use std::time::{Duration, Instant};
 #[cfg(unix)]
 use std::os::unix::fs::OpenOptionsExt;
 
-use domain::TrackId;
 use domain::review_v2::{
     FastVerdict, LogInfo, ReviewTarget, ReviewerFinding, RoundType, ScopeName, Verdict,
     VerdictError,
 };
+use domain::{CommitHash, TrackId};
 use usecase::capability_exec::{ModelName, ReasoningEffort};
 use usecase::provider_session::{ProviderSessionCachePort, ReviewerPrompt};
 use usecase::review_v2::{ReviewerError, ports::Reviewer};
@@ -58,6 +58,7 @@ impl CodexReviewer {
     /// Constructs a new `CodexReviewer`.
     ///
     /// # Arguments
+    /// - `diff_base`: optional persisted review-cycle base that scopes session reuse.
     /// - `model`: Codex model name.
     /// - `timeout`: Maximum time allowed for the review subprocess.
     /// - `base_prompt`: Review instructions without the scope file list.
@@ -66,6 +67,7 @@ impl CodexReviewer {
         track_id: TrackId,
         scope: ScopeName,
         round_type: RoundType,
+        diff_base: Option<CommitHash>,
         model: ModelName,
         effort: ReasoningEffort,
         timeout: Duration,
@@ -77,6 +79,7 @@ impl CodexReviewer {
                 track_id,
                 scope.clone(),
                 round_type,
+                diff_base,
                 "codex",
                 model.clone(),
                 effort,
@@ -750,6 +753,7 @@ mod tests {
             TrackId::try_new("test-track").unwrap(),
             ScopeName::Other,
             RoundType::Fast,
+            Some(CommitHash::try_new("a1b2c3d").unwrap()),
             ModelName::try_new("gpt-5.4").unwrap(),
             ReasoningEffort::High,
             timeout,
@@ -1111,15 +1115,18 @@ printf '{{"thread_id":"new-session"}}\n'
             ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
         let track_id = TrackId::try_new("test-track").unwrap();
         let scope = ScopeName::Other;
+        let diff_base = CommitHash::try_new("a1b2c3d").unwrap();
         let matched_key = usecase::provider_session::ProviderSessionCacheKey::Review {
             track_id: track_id.clone(),
             scope: scope.clone(),
             round_type: RoundType::Fast,
+            diff_base: diff_base.clone(),
         };
         let wrong_track_key = usecase::provider_session::ProviderSessionCacheKey::Review {
             track_id: TrackId::try_new("other-track").unwrap(),
             scope: scope.clone(),
             round_type: RoundType::Fast,
+            diff_base: diff_base.clone(),
         };
         let wrong_scope_key = usecase::provider_session::ProviderSessionCacheKey::Review {
             track_id: track_id.clone(),
@@ -1127,6 +1134,7 @@ printf '{{"thread_id":"new-session"}}\n'
                 domain::review_v2::MainScopeName::new("infrastructure").unwrap(),
             ),
             round_type: RoundType::Fast,
+            diff_base: diff_base.clone(),
         };
 
         let run = |round_type, expected_key, name, expects_resume| {
@@ -1134,6 +1142,7 @@ printf '{{"thread_id":"new-session"}}\n'
                 track_id.clone(),
                 scope.clone(),
                 round_type,
+                Some(diff_base.clone()),
                 ModelName::try_new("gpt-5.4").unwrap(),
                 ReasoningEffort::High,
                 Duration::from_secs(10),
