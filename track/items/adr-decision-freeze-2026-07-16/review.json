@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c360d647f03cc555655bb93cf2d5a97b39444f9dec01ff8040b260bed1357c0",
+          "at": "2026-07-16T11:14:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は刻印ごとに新しい複製を追加すると規定していますが、ファイル名が `<slug>.<hash8>.md` のみなので、同一内容の再刻印や hash8 衝突時には既存名と衝突します。下流 spec は再利用・失敗・別名生成のどれを受入条件にすべきか導出できません。刻印 identity と衝突時の意味論について amendment proposal による裁定が必要です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+              "line": 68,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D6 は `reason` を5値 enum（init/cite/new-adr/non-semantic-fix/escalation）と規定する一方、直後に escalation の根拠 ref を `reason` に記録すると要求しています。D3 の ledger schema に別の ref field はなく、下流 spec は enum 値と任意 ref を同時に表現できません。ledger/CLI の表現を amendment proposal で裁定する必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+              "line": 94,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "D1 は baseline を「user が最後に承認した文面」と定義していますが、D6 は grounding escalation による adr-editor 編集後、user 承認を前提にせず直ちに working tree を刻印すると規定しています。この snapshot が D1 の承認済み baseline なのか、別の authorized baseline なのかを下流 spec が確定できません。escalation 刻印の承認境界について amendment proposal による裁定が必要です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+              "line": 96,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:4c360d647f03cc555655bb93cf2d5a97b39444f9dec01ff8040b260bed1357c0",
+          "at": "2026-07-16T11:19:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Amendment proposal: D1 states that legitimate D5/D6 re-stamped baselines await final user approval at merge, but D3 still calls every accumulated version approved, and D5 (line 88) calls the latest restored bytes user-approved. After an escalation snapshot, the latest baseline is intentionally still pending approval, so downstream spec cannot assign it a consistent trust state. Distinguish the initially approved anchor from authorized-but-pending re-stamps while preserving the chosen latest-copy restore behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+              "line": 70,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:640a9d194013a218cca7dd9b91373c8a6b0ef22cc2ccf8705e4139f8d4811d1c",
+          "at": "2026-07-16T12:10:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 は baseline を「user が最後に承認した文面」と定義し、Rejected B もそれを唯一の錨としていますが、D7 は未承認（🟡）の自発起草 ADR を `new-adr` として即時刻印します。承認済み文面が存在しない ADR も baseline になり得るため定義が矛盾しています。semantic-freeze に従い、許容される未承認 baseline の信頼状態を明示する amendment proposal として user 裁定が必要です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+              "line": 56,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "D4 は review scope に含まれる全 ADR file の刻印を要求しますが、Neutral は凍結対象を track が cite する ADR のみに限定し、無関係 ADR は write-scope 可視化だけに委ねるとしています。`adr` scope は `knowledge/adr/**` の変更をすべて含むため、無関係 ADR を block・刻印するのか対象外にするのかを downstream spec が一意に導出できません。semantic-freeze に従い amendment proposal として対象集合を裁定する必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+              "line": 74,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "自発起草 ADR は `review_finding_ref` により 🟡 となり strict merge gate で停止しますが、user の非同期裁定後に front-matter をどう 🔵 へ昇格し、どの snapshot kind で再刻印して gate を再開するかが未定義です。既存規約では `user_decision_ref` を追加するだけでは `review_finding_ref` が残る限り 🟡 のため、この遷移なしでは merge lane が閉じたままです。downstream spec が実装可能な承認昇格フローを導出できるよう、semantic-freeze に従い amendment proposal として user 裁定が必要です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+              "line": 102,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:69ef29301b403d55854cba8e0f87275a69e6fd1f27a8dce35272dd2e41a02add",
+          "at": "2026-07-16T12:18:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e177313d4302259b641602368364964ac9d1e1cbe39a2fe6c1bbbd9915353dc",
+          "at": "2026-07-16T12:36:56Z"
+        }
+      ]
+    }
+  }
+}
