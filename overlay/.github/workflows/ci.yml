@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_PROFILE_DEV_DEBUG: 0
+  CARGO_PROFILE_TEST_DEBUG: 0
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Recreate local track branch on PR merge ref
+        if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'track/')
+        run: git checkout -B "$GITHUB_HEAD_REF"
+
+      - name: Set up pinned Rust toolchain
+        uses: dtolnay/rust-toolchain@1.94.0
+        with:
+          components: rustfmt, clippy
+
+      - name: Read pinned sotp tag
+        id: sotp-version
+        run: echo "tag=$(jq -r '.tag' .harness/config/sotp-version.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore pinned sotp installation
+        uses: actions/cache@v4
+        with:
+          path: .cargo-install
+          key: ${{ runner.os }}-sotp-${{ steps.sotp-version.outputs.tag }}
+
+      - name: Install system dependencies for sotp
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes protobuf-compiler
+
+      - name: Install pinned host tools
+        run: |
+          cargo install --locked cargo-make --version 0.37.24
+          cargo install --locked cargo-nextest --version 0.9.129
+          cargo install --locked cargo-deny --version 0.19.0
+
+      - name: Install pinned sotp
+        run: cargo make install-sotp
+
+      - name: Configure git hooks path
+        run: git config --local core.hooksPath .githooks
+
+      - name: Run CI suite (repo-wide)
+        run: cargo make ci
+
+      - name: Run CI suite (track-aware gates)
+        if: github.event_name == 'pull_request'
+        run: cargo make ci-track

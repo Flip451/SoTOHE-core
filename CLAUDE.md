@@ -57,7 +57,7 @@ Derived read-only views — never hand-edit, regenerate via `bin/sotp track view
 ## Hard invariants
 
 - Public UI is `/track:*`; never use legacy aliases.
-- No direct `git add` / `commit` / `merge` / `rebase` / `switch` — hooks block them; go through `cargo make` wrappers and `/track:commit` (`.claude/rules/10-guardrails.md`).
+- No direct `git add` / `commit` / `merge` / `rebase` / `switch` — use `/track:*` or the guarded `bin/sotp git`, `bin/sotp track branch`, and `bin/sotp pr` workflow commands (`.claude/rules/10-guardrails.md`).
 - The orchestrator never edits SoT files directly (1 file = 1 writer): ADR → `adr-editor`, `spec.json` → `spec-designer`, catalogues → `type-designer`, `impl-plan.json` → `impl-planner`. Task state transitions go through `bin/sotp track transition`.
 - Every commit (plan artifacts included) is preceded by a reviewer-capability cycle to `zero_findings`; inline self-review is never a substitute (`knowledge/conventions/review-protocol.md`).
 - Enforce rules by mechanism (type system > CI gate > hook > lint > docs), and prefer type-safe abstractions over lint/doc rules (`knowledge/conventions/{enforce-by-mechanism,prefer-type-safe-abstractions}.md`).
@@ -77,7 +77,7 @@ Six crates, hexagonal (`knowledge/conventions/hexagonal-architecture.md`, enforc
 - `bin/sotp track resolve` — current phase / next command / blocker
 - `bin/sotp track views sync` — regenerate `plan.md` + `registry.md`
 - `cargo make ci` — full pre-commit gate (`ci-rust` = inner Rust-only loop)
-- `cargo make help` — task catalogue (details: `.claude/rules/07-dev-environment.md`)
+- `cargo make --list-all-steps` — task catalogue (details: `.claude/rules/07-dev-environment.md`)
 
 ## Delegation surfaces
 

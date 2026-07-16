@@ -4,32 +4,36 @@
     {
       "id": "T001",
       "description": "overlay/Makefile.toml — rebuild the common distributed task definitions; remove obsolete passthrough and duplicate track-views task definitions (IN-01, IN-02, IN-07, CN-01, CN-02, AC-01, AC-02, AC-07).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "d94cf7bcee5d3ceb553f4a3eccdf7585f69a2494"
     },
     {
       "id": "T002",
       "description": "overlay/Makefile.toml, overlay/Makefile.host.toml, overlay/Makefile.docker.toml, and .harness/config/template-boundary.json — split environment-dependent cargo-gate definitions into host and Docker peer files, declare the new peer overlays for export, update the common environment-selection target, and rewrite the `CODEX_BIN` resolution in `track-local-review`, `track-local-review-fix`, and `track-local-dry-fix` away from `asdf which codex` to the host-first tool-resolution contract (IN-03, IN-04, IN-08, CN-04, CN-06, AC-03, AC-04, AC-08).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "d94cf7bcee5d3ceb553f4a3eccdf7585f69a2494"
     },
     {
       "id": "T003",
       "description": ".harness/workflows/track/ and .harness/capabilities/ — replace single-operation call sites with direct bin/sotp invocations and remove passthrough-wrapper references (IN-02, CN-01, CN-02, AC-02).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "d94cf7bcee5d3ceb553f4a3eccdf7585f69a2494"
     },
     {
       "id": "T004",
       "description": ".claude/commands/, .claude/settings.json, .agents/skills/, and distributed command-policy files — update provider-adapter and distributed Codex skill call sites and permission entries; remove passthrough-wrapper entries (IN-02, CN-01, CN-02, AC-02).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "d94cf7bcee5d3ceb553f4a3eccdf7585f69a2494"
     },
     {
       "id": "T005",
       "description": "README.md, CLAUDE.md, .claude/rules/, and affected distributed conventions — update consumer setup and workflow guidance; remove stale task, environment, tool-resolution, and wrapper references (IN-09, CN-07, AC-09).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T006",
       "description": "overlay/rust-toolchain.toml, overlay/Makefile.toml bootstrap tasks, .github/workflows/ci.yml, and .harness/config/template-boundary.json — pin toolchain and auxiliary-tool versions, declare the pinned toolchain overlay for export, and update bootstrap and CI provisioning (IN-05, IN-06, CN-03, AC-05, AC-06).",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T007",

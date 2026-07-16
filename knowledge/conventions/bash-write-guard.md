@@ -51,7 +51,7 @@ The following file-write vectors are accepted after Layer-2 retirement:
 | Named pipes (`mkfifo`) | Rarely used in Claude Code Bash calls; `mkfifo` is not in `permissions.allow` |
 | `/proc/self/fd/N` writes | Exotic; not practical to detect without filesystem-level sandboxing |
 | `dd of=file` | Not in `permissions.allow`; rare in template workflows |
-| `cargo make` internal writes | Intentionally allowed — cargo make tasks run in Docker containers with their own isolation |
+| `cargo make` internal writes | Intentionally allowed — task execution is reviewed and gated rather than treated as a shell sandbox |
 
 ## Design Decision
 

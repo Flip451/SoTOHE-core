@@ -57,8 +57,8 @@ track 作業には `/adr:add <slug>` で ADR を作り `/track:adr2pr` で PR �
 
 このテンプレートを使うには以下が必要:
 
-- **Docker + docker compose** — CI と開発用サービスはコンテナ内で実行される
-- **Rust toolchain + cargo-make** — host で `cargo make bootstrap` を実行する
+- **Rust toolchain + cargo-make** — `rust-toolchain.toml` が Rust / rustfmt / clippy を固定する。host で `cargo make bootstrap` を実行する
+- **Docker（任意）** — 既定の品質ゲートと CI は host toolchain で実行する。隔離環境を選ぶ場合だけ `Makefile.toml` の extend 参照先を `Makefile.docker.toml` に切り替える
 - **`bin/sotp` の入手** — 以下 2 経路のいずれか (詳細は「はじめ方」参照)
   - a. SoTOHE-core を clone → `sotp template export` を実行すると、出力ツリーに `bin/sotp` が移植された状態で完結する (タグ非依存、初回導入向け)
   - b. 更新時 / 別ホスト再導入時は `.harness/config/sotp-version.json` の固定タグから `cargo install` で導入する
@@ -68,7 +68,6 @@ track 作業には `/adr:add <slug>` で ADR を作り `/track:adr2pr` で PR �
 
 補足:
 
-- Linux で uid/gid が `1000:1000` 以外なら `HOST_UID=$(id -u)` / `HOST_GID=$(id -g)` を export してから compose wrapper を使う
 - capability の担当者は `.harness/config/agent-profiles.json` で切り替えられる
 - 出力ツリー内 `bin/sotp` を git 管理するかどうか (ignore / track) は利用者側の判断領域であり、本テンプレートは強制しない
 - プレビルトバイナリ配布 (GitHub Releases) は現時点では実施していない (将来検討)
@@ -77,7 +76,7 @@ track 作業には `/adr:add <slug>` で ADR を作り `/track:adr2pr` で PR �
 
 ### 初回セットアップ
 
-以下は `sotp template export` で生成された出力ツリーでの初回セットアップ手順である。SoTOHE-core source repo 自体の `cargo make bootstrap` は開発用に `build-sotp` を実行する。
+以下は `sotp template export` で生成された出力ツリーでの初回セットアップ手順である。まず `cargo-make` を host に導入し、固定 toolchain 上で bootstrap を実行する。
 
 出力ツリーでの `bin/sotp` 入手には 2 経路がある。デフォルトの分岐条件はテンプレート利用者が意識せず自動で選ばれる (出力ツリーの `cargo make bootstrap` Step 3 で判定される):
 
@@ -86,7 +85,8 @@ track 作業には `/adr:add <slug>` で ADR を作り `/track:adr2pr` で PR �
 
 ```bash
 # 出力ツリーのターミナルで:
-cargo make bootstrap      # Docker イメージビルド + bin/sotp 入手 (経路 a/b を自動判定) + CI 一括
+cargo install --locked cargo-make --version 0.37.24
+cargo make bootstrap      # pinned auxiliary tools + bin/sotp 入手 (経路 a/b を自動判定) + host CI
 ```
 
 ```text

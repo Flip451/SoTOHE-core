@@ -9,14 +9,14 @@ default_to_workspace = false
 # ---------------------------------------------------------------------------
 
 [tasks.bootstrap]
-description = "[gate] Install the pinned sotp CLI and run host-first CI"
+description = "[gate] Install pinned auxiliary tools and sotp, then run host-first CI"
 script_runner = "@shell"
 script = ['''
 set -e
 echo "=== Bootstrap: development environment setup ==="
 
 echo ""
-echo "--- Step 1/5: Check prerequisites ---"
+echo "--- Step 1/6: Check prerequisites ---"
 if ! command -v cargo >/dev/null 2>&1; then
   echo "[FAIL] cargo not found. Install Rust: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
   exit 1
@@ -24,7 +24,11 @@ fi
 echo "[OK] cargo available"
 
 echo ""
-echo "--- Step 2/5: Install sotp CLI binary (pinned tag) ---"
+echo "--- Step 2/6: Install pinned auxiliary tools ---"
+cargo make install-aux-tools
+
+echo ""
+echo "--- Step 3/6: Install sotp CLI binary (pinned tag) ---"
 if [ -x bin/sotp ] && bin/sotp --help >/dev/null 2>&1; then
   echo "[OK] bin/sotp already present (transplanted by sotp template export); skipping install-sotp"
 else
@@ -33,7 +37,7 @@ else
 fi
 
 echo ""
-echo "--- Step 3/5: Configure git hooks path ---"
+echo "--- Step 4/6: Configure git hooks path ---"
 if [ "$(git config --local core.hooksPath 2>/dev/null || true)" = ".githooks" ]; then
   echo "[OK] core.hooksPath already set"
 else
@@ -43,12 +47,12 @@ fi
 chmod +x .githooks/reference-transaction .githooks/pre-push 2>/dev/null || true
 
 echo ""
-echo "--- Step 4/5: Run CI ---"
+echo "--- Step 5/6: Run CI ---"
 cargo make ci
 echo "[OK] CI passed"
 
 echo ""
-echo "--- Step 5/5: Configure git notes fetch refspec ---"
+echo "--- Step 6/6: Configure git notes fetch refspec ---"
 if git remote get-url origin >/dev/null 2>&1; then
   if git config --get-all remote.origin.fetch | grep -q 'refs/notes'; then
     echo "[OK] git notes refspec already configured"
@@ -62,6 +66,15 @@ fi
 
 echo ""
 echo "=== Bootstrap complete ==="
+''']
+
+[tasks.install-aux-tools]
+description = "[host] Install pinned cargo-nextest and cargo-deny with locked dependencies"
+script_runner = "@shell"
+script = ['''
+set -e
+cargo install --locked cargo-nextest --version 0.9.129
+cargo install --locked cargo-deny --version 0.19.0
 ''']
 
 [tasks.install-sotp]
@@ -82,8 +95,29 @@ GIT_URL="$(jq -r '.git_url' "$PIN")"
 TAG="$(jq -r '.tag' "$PIN")"
 CRATE="$(jq -r '.crate' "$PIN")"
 BINARY="$(jq -r '.binary' "$PIN")"
+PIN_METADATA=".cargo-install/sotp-install.json"
 echo "Installing $CRATE ($BINARY) from $GIT_URL @ $TAG ..."
-cargo install "$CRATE" --git "$GIT_URL" --tag "$TAG" --locked --force --root .cargo-install
+if [ -x ".cargo-install/bin/$BINARY" ] && [ -f "$PIN_METADATA" ] && jq -e \
+  --arg git_url "$GIT_URL" \
+  --arg tag "$TAG" \
+  --arg crate "$CRATE" \
+  --arg binary "$BINARY" \
+  '.git_url == $git_url and .tag == $tag and .crate == $crate and .binary == $binary' \
+  "$PIN_METADATA" >/dev/null 2>&1; then
+  echo "[OK] reusing cached $BINARY from $TAG"
+else
+  if ! command -v protoc >/dev/null 2>&1; then
+    echo "[ERROR] protoc not found. Install the Protocol Buffers compiler before building sotp from source." >&2
+    exit 1
+  fi
+  cargo install "$CRATE" --git "$GIT_URL" --tag "$TAG" --locked --force --root .cargo-install
+  jq -n \
+    --arg git_url "$GIT_URL" \
+    --arg tag "$TAG" \
+    --arg crate "$CRATE" \
+    --arg binary "$BINARY" \
+    '{git_url: $git_url, tag: $tag, crate: $crate, binary: $binary}' > "$PIN_METADATA"
+fi
 mkdir -p bin
 cp ".cargo-install/bin/$BINARY" bin/sotp
 if bin/sotp --help >/dev/null 2>&1; then
