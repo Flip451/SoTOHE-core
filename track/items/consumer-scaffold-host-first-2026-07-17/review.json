@@ -202,145 +202,71 @@
           "findings": [],
           "hash": "rvw1:sha256:399297cee55f291b086e98b5ce892bc89d055abcd6e9b400de6a83767157e784",
           "at": "2026-07-16T18:04:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27325ff727269f55cd2e5253352be34314140cabb5e5708a5be6097699050582",
+          "at": "2026-07-16T18:32:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27325ff727269f55cd2e5253352be34314140cabb5e5708a5be6097699050582",
+          "at": "2026-07-16T23:39:54Z"
         }
       ]
     },
-    "other": {
+    "types": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `track-commit-message` script uses two literal backslashes (`&& \\\\`) at each continuation line. In the shell, the first escapes the second, so the newline is not continued and the script attempts to execute `\\` as a command (or otherwise fails) instead of chaining the following command. This makes the guarded commit workflow fail before completing.",
-              "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 300,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6ecc86be73aef49d5cb0ec364ac42a65be4bb0460baf10589b7e18478c61d3be",
-          "at": "2026-07-16T17:30:26Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:55e9ce76a48e4364f9c7cff91951c82ef05bc93172860f548fc902431ffa9907",
-          "at": "2026-07-16T17:31:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`bootstrap` still fails when Docker/Compose is absent and unconditionally builds the tools image before running host CI. Since bootstrap is the first-run entry point, the default scaffold still requires Docker, contradicting ADR D3 and IN-03/OS-02. Remove this Docker preflight/build from the default bootstrap or make it conditional on explicit Docker selection.",
-              "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 20,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:55e9ce76a48e4364f9c7cff91951c82ef05bc93172860f548fc902431ffa9907",
-          "at": "2026-07-16T17:36:23Z"
+          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
+          "at": "2026-07-16T16:47:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cd8b0f569570547b5498885a1248aa86c711d68f9404936d82b12f4c1e83c017",
-          "at": "2026-07-16T17:39:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:875173a148d732fa5cf0c5f2bc9ad9d5092ba57c7ee1219c6e0f03b4b300a279",
-          "at": "2026-07-16T18:02:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On a cold cache, `cargo make install-sotp` builds sotp from source, whose LanceDB/prost dependency requires `protoc`. The workflow never installs `protobuf-compiler`, and the current Ubuntu 24.04 runner inventory does not include it, so the first CI run or any cache miss fails before either gate executes. Provision `protobuf-compiler` before this step. See the [official runner inventory](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md).",
-              "severity": "P0",
-              "file": "overlay/.github/workflows/ci.yml",
-              "line": 45,
-              "category": "correctness"
-            },
-            {
-              "message": "The cache reuse condition accepts any executable named `$BINARY` without proving it was installed from the current `$GIT_URL` and `$TAG`. After the pin changes, a local `.cargo-install` silently reuses the previous sotp binary and reports it as the new tag, defeating the pinned-install contract. Store and validate pin metadata, key the install directory by tag, or force installation when provenance cannot be confirmed.",
-              "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 99,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:875173a148d732fa5cf0c5f2bc9ad9d5092ba57c7ee1219c6e0f03b4b300a279",
-          "at": "2026-07-16T18:08:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f17bdbf185aca6b55a1f6719c6ccbabacea4644593001ef03f24d4f92a4c0446",
-          "at": "2026-07-16T18:12:03Z"
+          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
+          "at": "2026-07-16T16:51:00Z"
         }
       ]
     },
-    "spec": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 includes the behavioral promise that the distributed Makefile requires no manual synchronization with the source repository, but no acceptance criterion deterministically verifies that property. AC-01 verifies task-set provenance/exclusions only, not absence of a synchronization obligation or mechanism.",
-              "severity": "P1",
-              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
-              "line": 10,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:eb703b048c7f7b2e1b8f273d6e3b00394d4d86730aa132900ca161d44d426b73",
-          "at": "2026-07-16T16:48:00Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e0723f02dad8586a7aa034ab35fcd7342abfa0d754bc15d6e7dd8842453836e5",
-          "at": "2026-07-16T16:49:16Z"
+          "hash": "rvw1:sha256:734204aefc5877342cf30390e9a5c795b5aa18f1ffc6b774c1ae914623b5fc0c",
+          "at": "2026-07-16T16:09:12Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`coding-principles.md#No Panics in Library Code` は `libs/` / `apps/` の Rust プロダクションコード向け規約だが、この spec の in_scope は配布 Makefile、workflow、CI、bootstrap、設定、文書に限定され、Rust ライブラリコードの変更を含まない。したがって、この `related_conventions` は narrative-level で明確に scope 外であり、下流計画に無関係な実装制約を持ち込む。",
+              "message": "D6 explicitly retains the cache-directory preparation task in the distributed Docker environment file and retains `CARGO_TARGET_DIR_RELATIVE`, but this consequence says both the preparation and target-directory environment plumbing disappear from the distribution. The downstream spec cannot consistently derive the optional Docker variant from these conflicting requirements. Clarify that they disappear only from the default host path, or revise D6/D8 accordingly.",
               "severity": "P1",
-              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
-              "line": 385,
-              "category": "broken cross-reference at narrative level"
-            },
-            {
-              "message": "`prefer-type-safe-abstractions.md#Rule` は Rust の型設計やバグクラス排除を扱う規約だが、この spec には型、domain model、Rust API の設計・変更がない。この参照も本 behavioral contract と無関係で、下流の type design / impl-plan を誤誘導する off-topic な `related_conventions` になっている。",
-              "severity": "P1",
-              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
-              "line": 389,
-              "category": "broken cross-reference at narrative level"
+              "file": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+              "line": 126,
+              "category": "inconsistent decisions within the same ADR"
             }
           ],
-          "hash": "rvw1:sha256:e0723f02dad8586a7aa034ab35fcd7342abfa0d754bc15d6e7dd8842453836e5",
-          "at": "2026-07-16T16:54:39Z"
+          "hash": "rvw1:sha256:734204aefc5877342cf30390e9a5c795b5aa18f1ffc6b774c1ae914623b5fc0c",
+          "at": "2026-07-16T16:13:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:016970402214fe947c077bac4642c3d0f2558117e9cf9a7f8ceb1deaf3f409c3",
-          "at": "2026-07-16T16:56:35Z"
+          "hash": "rvw1:sha256:6dc29625f9136f6988c8ea10b486d23725f81250720f7dc1d30cf7a6e00bbfda",
+          "at": "2026-07-16T16:17:46Z"
         }
       ]
     },
@@ -485,54 +411,160 @@
         }
       ]
     },
-    "adr": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:734204aefc5877342cf30390e9a5c795b5aa18f1ffc6b774c1ae914623b5fc0c",
-          "at": "2026-07-16T16:09:12Z"
+          "hash": "rvw1:sha256:89233c04555750fcfbdbecb1d373df2c26aa7f0a5679ac48aa29c3d70a8d6513",
+          "at": "2026-07-16T18:32:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89233c04555750fcfbdbecb1d373df2c26aa7f0a5679ac48aa29c3d70a8d6513",
+          "at": "2026-07-16T23:40:14Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 includes the behavioral promise that the distributed Makefile requires no manual synchronization with the source repository, but no acceptance criterion deterministically verifies that property. AC-01 verifies task-set provenance/exclusions only, not absence of a synchronization obligation or mechanism.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
+              "line": 10,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:eb703b048c7f7b2e1b8f273d6e3b00394d4d86730aa132900ca161d44d426b73",
+          "at": "2026-07-16T16:48:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0723f02dad8586a7aa034ab35fcd7342abfa0d754bc15d6e7dd8842453836e5",
+          "at": "2026-07-16T16:49:16Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "D6 explicitly retains the cache-directory preparation task in the distributed Docker environment file and retains `CARGO_TARGET_DIR_RELATIVE`, but this consequence says both the preparation and target-directory environment plumbing disappear from the distribution. The downstream spec cannot consistently derive the optional Docker variant from these conflicting requirements. Clarify that they disappear only from the default host path, or revise D6/D8 accordingly.",
+              "message": "`coding-principles.md#No Panics in Library Code` は `libs/` / `apps/` の Rust プロダクションコード向け規約だが、この spec の in_scope は配布 Makefile、workflow、CI、bootstrap、設定、文書に限定され、Rust ライブラリコードの変更を含まない。したがって、この `related_conventions` は narrative-level で明確に scope 外であり、下流計画に無関係な実装制約を持ち込む。",
               "severity": "P1",
-              "file": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
-              "line": 126,
-              "category": "inconsistent decisions within the same ADR"
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
+              "line": 385,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`prefer-type-safe-abstractions.md#Rule` は Rust の型設計やバグクラス排除を扱う規約だが、この spec には型、domain model、Rust API の設計・変更がない。この参照も本 behavioral contract と無関係で、下流の type design / impl-plan を誤誘導する off-topic な `related_conventions` になっている。",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
+              "line": 389,
+              "category": "broken cross-reference at narrative level"
             }
           ],
-          "hash": "rvw1:sha256:734204aefc5877342cf30390e9a5c795b5aa18f1ffc6b774c1ae914623b5fc0c",
-          "at": "2026-07-16T16:13:11Z"
+          "hash": "rvw1:sha256:e0723f02dad8586a7aa034ab35fcd7342abfa0d754bc15d6e7dd8842453836e5",
+          "at": "2026-07-16T16:54:39Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6dc29625f9136f6988c8ea10b486d23725f81250720f7dc1d30cf7a6e00bbfda",
-          "at": "2026-07-16T16:17:46Z"
+          "hash": "rvw1:sha256:016970402214fe947c077bac4642c3d0f2558117e9cf9a7f8ceb1deaf3f409c3",
+          "at": "2026-07-16T16:56:35Z"
         }
       ]
     },
-    "types": {
+    "other": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `track-commit-message` script uses two literal backslashes (`&& \\\\`) at each continuation line. In the shell, the first escapes the second, so the newline is not continued and the script attempts to execute `\\` as a command (or otherwise fails) instead of chaining the following command. This makes the guarded commit workflow fail before completing.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 300,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6ecc86be73aef49d5cb0ec364ac42a65be4bb0460baf10589b7e18478c61d3be",
+          "at": "2026-07-16T17:30:26Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
-          "at": "2026-07-16T16:47:58Z"
+          "hash": "rvw1:sha256:55e9ce76a48e4364f9c7cff91951c82ef05bc93172860f548fc902431ffa9907",
+          "at": "2026-07-16T17:31:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`bootstrap` still fails when Docker/Compose is absent and unconditionally builds the tools image before running host CI. Since bootstrap is the first-run entry point, the default scaffold still requires Docker, contradicting ADR D3 and IN-03/OS-02. Remove this Docker preflight/build from the default bootstrap or make it conditional on explicit Docker selection.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 20,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:55e9ce76a48e4364f9c7cff91951c82ef05bc93172860f548fc902431ffa9907",
+          "at": "2026-07-16T17:36:23Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
-          "at": "2026-07-16T16:51:00Z"
+          "hash": "rvw1:sha256:cd8b0f569570547b5498885a1248aa86c711d68f9404936d82b12f4c1e83c017",
+          "at": "2026-07-16T17:39:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:875173a148d732fa5cf0c5f2bc9ad9d5092ba57c7ee1219c6e0f03b4b300a279",
+          "at": "2026-07-16T18:02:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On a cold cache, `cargo make install-sotp` builds sotp from source, whose LanceDB/prost dependency requires `protoc`. The workflow never installs `protobuf-compiler`, and the current Ubuntu 24.04 runner inventory does not include it, so the first CI run or any cache miss fails before either gate executes. Provision `protobuf-compiler` before this step. See the [official runner inventory](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md).",
+              "severity": "P0",
+              "file": "overlay/.github/workflows/ci.yml",
+              "line": 45,
+              "category": "correctness"
+            },
+            {
+              "message": "The cache reuse condition accepts any executable named `$BINARY` without proving it was installed from the current `$GIT_URL` and `$TAG`. After the pin changes, a local `.cargo-install` silently reuses the previous sotp binary and reports it as the new tag, defeating the pinned-install contract. Store and validate pin metadata, key the install directory by tag, or force installation when provenance cannot be confirmed.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 99,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:875173a148d732fa5cf0c5f2bc9ad9d5092ba57c7ee1219c6e0f03b4b300a279",
+          "at": "2026-07-16T18:08:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f17bdbf185aca6b55a1f6719c6ccbabacea4644593001ef03f24d4f92a4c0446",
+          "at": "2026-07-16T18:12:03Z"
         }
       ]
     }

@@ -12,7 +12,7 @@ T006: Pin toolchains and auxiliary tools, then move consumer CI and sotp provisi
 T007: Validate the exported scaffold contract and the removal of stale references.
 Goal traceability: GO-01 -> T001/T003/T004/T005/T007; GO-02 -> T002/T003/T004/T005/T007; GO-03 -> T006/T007.
 
-## Tasks (6/7 resolved)
+## Tasks (7/7 resolved)
 
 ### S1 — Distributed Makefile and environment split
 
@@ -32,16 +32,16 @@ Goal traceability: GO-01 -> T001/T003/T004/T005/T007; GO-02 -> T002/T003/T004/T0
 
 > Run T005 (IN-09, CN-07, AC-09).
 
-- [x] **T005**: README.md, CLAUDE.md, .claude/rules/, and affected distributed conventions — update consumer setup and workflow guidance; remove stale task, environment, tool-resolution, and wrapper references (IN-09, CN-07, AC-09).
+- [x] **T005**: README.md, CLAUDE.md, .claude/rules/, and affected distributed conventions — update consumer setup and workflow guidance; remove stale task, environment, tool-resolution, and wrapper references (IN-09, CN-07, AC-09). (`8df1374ac9ea59fb7444b7e3af039ee1a56fcf96`)
 
 ### S4 — Reproducible host provisioning and CI
 
 > Run T006 after T002 so its export-boundary addition applies cleanly to the environment-file split (IN-05, IN-06, CN-03, AC-05, AC-06).
 
-- [x] **T006**: overlay/rust-toolchain.toml, overlay/Makefile.toml bootstrap tasks, .github/workflows/ci.yml, and .harness/config/template-boundary.json — pin toolchain and auxiliary-tool versions, declare the pinned toolchain overlay for export, and update bootstrap and CI provisioning (IN-05, IN-06, CN-03, AC-05, AC-06).
+- [x] **T006**: overlay/rust-toolchain.toml, overlay/Makefile.toml bootstrap tasks, .github/workflows/ci.yml, and .harness/config/template-boundary.json — pin toolchain and auxiliary-tool versions, declare the pinned toolchain overlay for export, and update bootstrap and CI provisioning (IN-05, IN-06, CN-03, AC-05, AC-06). (`8df1374ac9ea59fb7444b7e3af039ee1a56fcf96`)
 
 ### S5 — Consumer-scaffold regression coverage
 
 > Run T007 after T001 through T006 (IN-01, IN-02, IN-03, IN-04, IN-05, IN-06, IN-07, IN-08, IN-09, AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09).
 
-- [ ] **T007**: apps/cli/tests/consumer_scaffold_host_first.rs — add focused exported-overlay validation cases for the planned scaffold changes, including direct bin/sotp workflow calls and absence of retired passthrough-wrapper references (IN-01, IN-02, IN-03, IN-04, IN-05, IN-06, IN-07, IN-08, IN-09, AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09).
+- [x] **T007**: apps/cli/tests/consumer_scaffold_host_first.rs — add focused exported-overlay validation cases for the planned scaffold changes, including direct bin/sotp workflow calls and absence of retired passthrough-wrapper references (IN-01, IN-02, IN-03, IN-04, IN-05, IN-06, IN-07, IN-08, IN-09, AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09).

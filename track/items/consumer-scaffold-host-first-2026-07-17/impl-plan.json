@@ -28,17 +28,19 @@
     {
       "id": "T005",
       "description": "README.md, CLAUDE.md, .claude/rules/, and affected distributed conventions — update consumer setup and workflow guidance; remove stale task, environment, tool-resolution, and wrapper references (IN-09, CN-07, AC-09).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "8df1374ac9ea59fb7444b7e3af039ee1a56fcf96"
     },
     {
       "id": "T006",
       "description": "overlay/rust-toolchain.toml, overlay/Makefile.toml bootstrap tasks, .github/workflows/ci.yml, and .harness/config/template-boundary.json — pin toolchain and auxiliary-tool versions, declare the pinned toolchain overlay for export, and update bootstrap and CI provisioning (IN-05, IN-06, CN-03, AC-05, AC-06).",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "8df1374ac9ea59fb7444b7e3af039ee1a56fcf96"
     },
     {
       "id": "T007",
       "description": "apps/cli/tests/consumer_scaffold_host_first.rs — add focused exported-overlay validation cases for the planned scaffold changes, including direct bin/sotp workflow calls and absence of retired passthrough-wrapper references (IN-01, IN-02, IN-03, IN-04, IN-05, IN-06, IN-07, IN-08, IN-09, AC-01, AC-02, AC-03, AC-04, AC-05, AC-06, AC-07, AC-08, AC-09).",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "plan": {
