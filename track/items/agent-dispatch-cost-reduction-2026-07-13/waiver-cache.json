@@ -1344,6 +1344,342 @@
         "citation": "Validated non-empty reviewer prompt used to start or resume reviewer sessions."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SubagentDispatchInstruction",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SubagentDispatchInstruction",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "e695b0b3e374d4cf4a52362131e20e841aa349c36420dc16b1e8f5a839fb4605",
+        "declaration_hash": "193a038c24b8ba548eaf45cb6b07bd1bed0875fa33925e6415657c8cde3bffba",
+        "anchor_text_hash": "533bb22502cc654a9c16417a378d2c3df774aae024c4166a61cd678e59b8f744"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "FieldDecl { name: FieldName(Identifier(\"effort\")), ty: TypeRef(\"ReasoningEffort\") }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SubagentName",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SubagentName",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "a4f33444d776caa71b238b15910779cfb5be902c462bc5942edc67817c8a6cb4",
+        "declaration_hash": "6b9687449057b6c79efe9c9b6071ce64ff7ad515fc3e4459b9177fd7b72bec21",
+        "anchor_text_hash": "ee8fe926da5c4652fe116d979eda3b0c854b2799298c3014c22057423bcb6512"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "default routing profile は subprocess を起動する対象 capability の effort を解決でき"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SubagentName",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SubagentName",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "dbf6ba45877c8998a6f74259687e04a92e08c5d2c581ea2fde9602eab4070d02",
+        "declaration_hash": "6b9687449057b6c79efe9c9b6071ce64ff7ad515fc3e4459b9177fd7b72bec21",
+        "anchor_text_hash": "533bb22502cc654a9c16417a378d2c3df774aae024c4166a61cd678e59b8f744"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Validated technical identifier for an in-host review-fix subagent; it lives in usecase because it names the dispatch target rather than a domain concept.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_codex"
+      },
+      "key": {
+        "waived_reason_hash": "a81355a9888210ab20e8360762003fe9d9861ebd9b244197909120dca48d2bee",
+        "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+        "anchor_text_hash": "5bc0cfa4c6691de85adf880f817d98675d4ffb29addc43a2337a9d50114b62a1"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry { action: Modify, role: ApplicationService, methods: [MethodDeclaration { name: MethodName(Identifier(\"run_codex\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"input\")), ty: TypeRef(\"ReviewRunInput\") }], returns: TypeRef(\"Result<RunReviewOutput, RunReviewError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"run_claude\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"input\")), ty: TypeRef(\"ReviewRunInput\") }], returns: TypeRef(\"Result<RunReviewOutput, RunReviewError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"run_local\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"model\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"timeout_seconds\")), ty: TypeRef(\"u64\") }, ParamDeclaration { name: ParamName(Identifier(\"briefing_file\")), ty: TypeRef(\"Option<std::path::PathBuf>\") }, ParamDeclaration { name: ParamName(Identifier(\"prompt\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"round_type\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"group\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"ReviewRunLocalOutput\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None, ... }, MethodDeclaration { name: MethodName(Identifier(\"persist_commit_hash\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"workspace_root\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<String, CommitHashPersistenceError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"review_v2\"), Identifier(\"aggregate_service\")]), docs: Some(DocString(\"Aggregate review application service after removal of the obsolete review-fix lane; its remaining primitive parameters preserve the pre-existing CLI-family boundary and are outside this track's dispatch redesign.\"))"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_claude"
+      },
+      "key": {
+        "waived_reason_hash": "a81355a9888210ab20e8360762003fe9d9861ebd9b244197909120dca48d2bee",
+        "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+        "anchor_text_hash": "5bc0cfa4c6691de85adf880f817d98675d4ffb29addc43a2337a9d50114b62a1"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"its remaining primitive parameters preserve the pre-existing CLI-family boundary and are outside this track's dispatch redesign.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_local"
+      },
+      "key": {
+        "waived_reason_hash": "a81355a9888210ab20e8360762003fe9d9861ebd9b244197909120dca48d2bee",
+        "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+        "anchor_text_hash": "5bc0cfa4c6691de85adf880f817d98675d4ffb29addc43a2337a9d50114b62a1"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry { action: Modify, role: ApplicationService, methods: [MethodDeclaration { name: MethodName(Identifier(\"run_codex\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"input\")), ty: TypeRef(\"ReviewRunInput\") }], returns: TypeRef(\"Result<RunReviewOutput, RunReviewError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"run_claude\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: MethodName(Identifier(\"run_claude\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"input\")), ty: TypeRef(\"ReviewRunInput\") }], returns: TypeRef(\"Result<RunReviewOutput, RunReviewError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"run_local\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"model\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"timeout_seconds\")), ty: TypeRef(\"u64\") }, ParamDeclaration { name: ParamName(Identifier(\"briefing_file\")), ty: TypeRef(\"Option<std::path::PathBuf>\") }, ParamDeclaration { name: ParamName(Identifier(\"prompt\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: MethodName(Identifier(\"round_type\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"round_type\")), ty: TypeRef(\"String\") }], returns: TypeRef(\"ReviewRunLocalOutput\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"check_approved\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<ReviewApprovalOutput, ReviewCheckApprovedError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodDeclaration { name: MethodName(Identifier(\"results\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }, ParamDeclaration { name: ParamName(Identifier(\"scope\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"all\")), ty: TypeRef(\"bool\") }, ParamDeclaration { name: ParamName(Identifier(\"limit\")), ty: TypeRef(\"u32\") }, ParamDeclaration { name: ParamName(Identifier(\"round_type\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"no_hint\")), ty: TypeRef(\"bool\") }], returns: TypeRef(\"Result<String, ReviewAuxError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"classify\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"paths\")), ty: TypeRef(\"Vec<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<Vec<(String, String)>, ReviewAuxError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"files\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"scope\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<Vec<String>, ReviewAuxError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"review_v2\"), Identifier(\"aggregate_service\")]), docs: Some(DocString(\"Aggregate review application service after removal of the obsolete review-fix lane; its remaining primitive parameters preserve the pre-existing CLI-family boundary and are outside this track's dispatch redesign.\")), spec_refs: [SpecRef { file: \"track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json\", anchor: SpecElementId(\"GO-04\") }] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check_approved"
+      },
+      "key": {
+        "waived_reason_hash": "a81355a9888210ab20e8360762003fe9d9861ebd9b244197909120dca48d2bee",
+        "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+        "anchor_text_hash": "5bc0cfa4c6691de85adf880f817d98675d4ffb29addc43a2337a9d50114b62a1"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review application service after removal of the obsolete review-fix lane; its remaining primitive parameters preserve the pre-existing CLI-family boundary and are outside this track's dispatch redesign."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:results"
+      },
+      "key": {
+        "waived_reason_hash": "a81355a9888210ab20e8360762003fe9d9861ebd9b244197909120dca48d2bee",
+        "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+        "anchor_text_hash": "5bc0cfa4c6691de85adf880f817d98675d4ffb29addc43a2337a9d50114b62a1"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry ... docs: Some(DocString(\"Aggregate review application service after removal of the obsolete review-fix lane; its remaining primitive parameters preserve the pre-existing CLI-family boundary and are outside this track's dispatch redesign.\"))"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:classify"
+      },
+      "key": {
+        "waived_reason_hash": "a81355a9888210ab20e8360762003fe9d9861ebd9b244197909120dca48d2bee",
+        "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+        "anchor_text_hash": "5bc0cfa4c6691de85adf880f817d98675d4ffb29addc43a2337a9d50114b62a1"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry ... docs: Some(DocString(\"Aggregate review application service after removal of the obsolete review-fix lane; its remaining primitive parameters preserve the pre-existing CLI-family boundary and are outside this track's dispatch redesign.\"))"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:files"
+      },
+      "key": {
+        "waived_reason_hash": "a81355a9888210ab20e8360762003fe9d9861ebd9b244197909120dca48d2bee",
+        "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+        "anchor_text_hash": "5bc0cfa4c6691de85adf880f817d98675d4ffb29addc43a2337a9d50114b62a1"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry { action: Modify, role: ApplicationService, methods: [MethodDeclaration { name: MethodName(Identifier(\"run_codex\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"input\")), ty: TypeRef(\"ReviewRunInput\") }], returns: TypeRef(\"Result<RunReviewOutput, RunReviewError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"run_claude\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"input\")), ty: TypeRef(\"ReviewRunInput\") }], returns: TypeRef(\"Result<RunReviewOutput, RunReviewError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"run_local\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"model\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: MethodName(Identifier(\"timeout_seconds\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"briefing_file\")), ty: TypeRef(\"Option<std::path::PathBuf>\") }, ParamDeclaration { name: ParamName(Identifier(\"prompt\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"round_type\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"group\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"ReviewRunLocalOutput\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"check_approved\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<ReviewApprovalOutput, ReviewCheckApprovedError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"results\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }, ParamDeclaration { name: ParamName(Identifier(\"scope\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: MethodName(Identifier(\"all\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"limit\")), ty: TypeRef(\"u32\") }, ParamDeclaration { name: ParamName(Identifier(\"round_type\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"no_hint\")), ty: TypeRef(\"bool\") }], returns: TypeRef(\"Result<String, ReviewAuxError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"classify\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"paths\")), ty: TypeRef(\"Vec<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<Vec<(String, String)>, ReviewAuxError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"files\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: MethodName(Identifier(\"scope\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: MethodName(Identifier(\"track_id\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: MethodName(Identifier(\"items_dir\")), receiver: Some(SharedRef), params: [], returns: TypeRef(\"Result<Vec<String>, ReviewAuxError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, ParamDeclaration { name: MethodName(Identifier(\"validate_scope\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"scope\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<(), ReviewAuxError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"get_briefing\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"scope\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<Option<String>, ReviewAuxError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"persist_commit_hash\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"workspace_root\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<String, CommitHashPersistenceError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }], assoc_types: [], assoc_consts: [], supertrait_bounds: [TypeRef(\"Send\"), TypeRef(\"Sync\")], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"review_v2\"), Identifier(\"aggregate_service\")]), docs: Some(DocString(\"Aggregate review application service after removal of the obsolete review-fix lane; its remaining primitive parameters preserve the pre-existing CLI-family boundary and are outside this track's dispatch redesign.\")), spec_refs: [SpecRef { file: \"track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json\", anchor: SpecElementId(\"GO-04\") }], informal_grounds: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:validate_scope"
+      },
+      "key": {
+        "waived_reason_hash": "a81355a9888210ab20e8360762003fe9d9861ebd9b244197909120dca48d2bee",
+        "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+        "anchor_text_hash": "5bc0cfa4c6691de85adf880f817d98675d4ffb29addc43a2337a9d50114b62a1"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"the remaining primitive parameters preserve the pre-existing CLI-family boundary and are outside this track's dispatch redesign.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:get_briefing"
+      },
+      "key": {
+        "waived_reason_hash": "a81355a9888210ab20e8360762003fe9d9861ebd9b244197909120dca48d2bee",
+        "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+        "anchor_text_hash": "5bc0cfa4c6691de85adf880f817d98675d4ffb29addc43a2337a9d50114b62a1"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry { action: Modify, role: ApplicationService, methods: [MethodDeclaration { name: MethodName(Identifier(\"run_codex\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"input\")), ty: TypeRef(\"ReviewRunInput\") }], returns: TypeRef(\"Result<RunReviewOutput, RunReviewError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"run_claude\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"input\")), ty: TypeRef(\"ReviewRunInput\") }], returns: TypeRef(\"Result<RunReviewOutput, RunReviewError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"run_local\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"model\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"timeout_seconds\")), ty: TypeRef(\"u64\") }, ParamDeclaration { name: ParamName(Identifier(\"briefing_file\")), ty: TypeRef(\"Option<std::path::PathBuf>\") }, ParamDeclaration { name: ParamName(Identifier(\"prompt\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"round_type\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"group\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"ReviewRunLocalOutput\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None, }, MethodDeclaration { name: MethodName(Identifier(\"check_approved\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<ReviewApprovalOutput, ReviewCheckApprovedError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }], assoc_types: [], assoc_consts: [], supertrait_bounds: [TypeRef(\"Send\"), TypeRef(\"Sync\")], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"review_v2\"), Identifier(\"aggregate_service\")]), docs: Some(DocString(\"Aggregate review application service after removal of the obsolete review-fix lane; its remaining primitive parameters preserve the pre-existing CLI-family boundary and are outside this track's dispatch redesign.\")), spec_refs: [SpecRef { file: \"track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json\", anchor: SpecElementId(\"GO-04\") }], informal_grounds: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:persist_commit_hash"
+      },
+      "key": {
+        "waived_reason_hash": "a81355a9888210ab20e8360762003fe9d9861ebd9b244197909120dca48d2bee",
+        "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+        "anchor_text_hash": "5bc0cfa4c6691de85adf880f817d98675d4ffb29addc43a2337a9d50114b62a1"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review application service after removal of the obsolete review-fix lane; its remaining primitive parameters preserve the pre-existing CLI-family boundary and are outside this track's dispatch redesign."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewInput",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-04"
+      },
+      "key": {
+        "waived_reason_hash": "2b34f888e09fc0ff2ba8a3c5643b778f10e09e70572fbf5636139f5e4ecf4a0b",
+        "declaration_hash": "4537259ed10843cb915b4853353234288e88daaf086cf4fed18ea07a2e740002",
+        "anchor_text_hash": "5bc0cfa4c6691de85adf880f817d98675d4ffb29addc43a2337a9d50114b62a1"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"CLI-driver command-family DTO\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ]
 }

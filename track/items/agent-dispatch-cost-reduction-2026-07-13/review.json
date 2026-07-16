@@ -1015,741 +1015,34 @@
           "findings": [],
           "hash": "rvw1:sha256:00098a0add5ff0cd1144bc4ef92830761e2bed757c790824c0a42ba004809a72",
           "at": "2026-07-16T05:07:46Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eed5226c767fa495148a2a4468a327ec40ac1035e6a35334d6ea0b7a5a5870a5",
-          "at": "2026-07-14T06:23:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eed5226c767fa495148a2a4468a327ec40ac1035e6a35334d6ea0b7a5a5870a5",
-          "at": "2026-07-14T06:27:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fd668edf234c37a4c569aaab36f14562420d2653dad956fd3370148679e87d42",
-          "at": "2026-07-14T07:12:01Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:23dd453c35b4585a0d281339948769f6c3b2867df0ce2ddcad9e01f7c5bd3b74",
-          "at": "2026-07-14T18:32:14Z"
+          "hash": "rvw1:sha256:06b95d3d5112519e9f388f23a49edf1d81fe035ef39128b2b6970054147a6d2e",
+          "at": "2026-07-16T06:07:15Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:23dd453c35b4585a0d281339948769f6c3b2867df0ce2ddcad9e01f7c5bd3b74",
-          "at": "2026-07-14T19:54:47Z"
+          "hash": "rvw1:sha256:06b95d3d5112519e9f388f23a49edf1d81fe035ef39128b2b6970054147a6d2e",
+          "at": "2026-07-16T06:10:18Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3ab88b864455d9c25e6652cd25301a080d240216e264b807f3a776b996ec34b7",
-          "at": "2026-07-15T00:04:26Z"
+          "hash": "rvw1:sha256:334060efa11458b1ce0f4587cebf2458d314a924384a51855baac1fa550ff2ba",
+          "at": "2026-07-16T08:00:00Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3ab88b864455d9c25e6652cd25301a080d240216e264b807f3a776b996ec34b7",
-          "at": "2026-07-15T00:05:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:942b7c45d06d2c340b84b7b45912376337e74401eb964477db18e2b2bdab9fa0",
-          "at": "2026-07-15T02:12:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:942b7c45d06d2c340b84b7b45912376337e74401eb964477db18e2b2bdab9fa0",
-          "at": "2026-07-15T02:14:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a93c9104245742d2ce749facd64e9283c59b02c6c5c5f4afd094439b38608a2",
-          "at": "2026-07-15T02:50:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a93c9104245742d2ce749facd64e9283c59b02c6c5c5f4afd094439b38608a2",
-          "at": "2026-07-15T02:53:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c43402b83b3061c95434dc77269ccde29068bee66c1fe9ad6fa2fa4384cc06eb",
-          "at": "2026-07-16T01:07:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c43402b83b3061c95434dc77269ccde29068bee66c1fe9ad6fa2fa4384cc06eb",
-          "at": "2026-07-16T01:10:11Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01’s requirement for a low-effort fast round, provider-maximum final effort, and preservation of the two-stage review is not deterministically covered. AC-01 only verifies that distinct fast/final effort values resolve, so an implementation using arbitrary values or not preserving the two-stage behavior could pass all ACs.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 330,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "CN-08 requires a new-session fallback when the capability resume cache cannot be read or hashed, but no AC covers those cases. AC-09 covers valid entries and profile/contract mismatch, while AC-10 covers resume failure and expiry; an implementation could omit read/hash-failure fallback and still satisfy every AC.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 250,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "GO-04 promises preservation of review judgment and review-record semantics, but no acceptance criterion deterministically verifies that session resume leaves the judgment/record unit unchanged. AC-03 verifies full-scope rejudgment only, and AC-04 verifies session selection and flag injection; both could pass while resumed rounds alter record semantics.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 42,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:ef0973d9289a0f7ef6da6420df173797ca945a426216056f958ed7aad2c5253e",
-          "at": "2026-07-13T16:40:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:22f57e52e8eda72c842a70ee3f0529f018cae653e6a35315453739232c03161c",
-          "at": "2026-07-13T16:45:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-05 permits signal-evaluation skip whenever the implementation, catalogue, baseline, and evaluator hashes match, even when the rustdoc-extraction contract changed or the live snapshot cannot be verified. CN-07 and AC-07 require rustdoc extraction and recalculation in those same cases, so the contract simultaneously permits skipping and requires recomputation, risking stale signals. The skip condition must also account for the extraction contract and snapshot-validity requirements.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 370,
-              "category": "scope / acceptance_criteria contradiction"
-            },
-            {
-              "message": "AC-09 applies its resume requirement to any `sotp capability exec` invocation carrying the resume option, but that command also has an in-host delegation outcome. This requires cache-backed resume for the in-host branch that OS-05 explicitly excludes. Restrict this criterion to provider-subprocess dispatches or explicitly specify that in-host dispatch rejects/ignores resume.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 410,
-              "category": "out_of_scope leakage"
-            }
-          ],
-          "hash": "rvw1:sha256:22f57e52e8eda72c842a70ee3f0529f018cae653e6a35315453739232c03161c",
-          "at": "2026-07-13T16:49:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-03 requires every evaluation whose decision inputs changed to run, but AC-05's complete-skip predicate omits the spec/catalogue↔spec input, and AC-06/AC-07 provide no spec-change path. A spec-only change could therefore satisfy the stated skip conditions and leave catalogue↔spec signals stale, contrary to D3. GO-03 lacks deterministic acceptance coverage for this case.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 370,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "CN-08 and AC-09 require invalidation on a capability execution-contract fingerprint mismatch, but the spec never defines that fingerprint's inputs for generic capability resume; IN-04 defines only the reviewer-specific fingerprint. D4 identifies capability SSoT, always-injected discipline, and declared policy/contract files as inputs. Without an equivalent contract here, downstream phases must invent which changes invalidate the cache, making stale-reuse prevention untestable.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 250,
-              "category": "constraint vague or untestable"
-            }
-          ],
-          "hash": "rvw1:sha256:108da43a56156852b9bd84a34fdafa56d8576cf5c188766aebda83000a916b9d",
-          "at": "2026-07-13T16:54:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-08 requires a fresh session when the concern changes, even if the target artifact remains the same. However, AC-09 only checks the resume option and track/capability/artifact identity, so all acceptance criteria can pass while a same-artifact concern switch incorrectly resumes stale context. This leaves GO-02/GO-04 without deterministic coverage for a prohibited reuse path.",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 410,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:d46257338e0adf1ff89460ffa3a3b546f012a8687dfd402f1a78e49915cc5b4a",
-          "at": "2026-07-13T16:58:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0b0673238fe06b26b1bfe37b71c4c5e5a44f3e572d61f83156a1e8c5e7c9191b",
-          "at": "2026-07-13T17:02:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f8e5981a7be92172bfa4dd064dfe92c1bed7668a0ce317b2f4f1290eddeb91e6",
-          "at": "2026-07-14T18:34:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-05 の第1文は declaration_hash の一致も rustdoc 抽出を skip する必要条件にしていますが、同じ AC の第3文と AC-06 は、implementation-side input hash が一致して declaration_hash だけが不一致の場合にも rustdoc を起動しないと定めています。同一状態に対して相反する routing となるため、rustdoc 抽出の要否は implementation-side input hash のみに基づき、declaration/spec の差分は signal 再評価の要否だけを決める契約に統一する必要があります。",
-              "severity": "P1",
-              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
-              "line": 366,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f8e5981a7be92172bfa4dd064dfe92c1bed7668a0ce317b2f4f1290eddeb91e6",
-          "at": "2026-07-14T19:55:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b9c085bd4ba08195fabcfa858e002be63b3ae1bdc0b035b435cb83ae30088999",
-          "at": "2026-07-14T19:58:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b9c085bd4ba08195fabcfa858e002be63b3ae1bdc0b035b435cb83ae30088999",
-          "at": "2026-07-14T19:59:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d7ea3576ae23b7baa74f3acf9d55bf7f5f52347f549dc1fa9fee25a26f409b45",
-          "at": "2026-07-15T01:51:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d7ea3576ae23b7baa74f3acf9d55bf7f5f52347f549dc1fa9fee25a26f409b45",
-          "at": "2026-07-15T01:53:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a343392f8f0ca60ab5996df09d0fab5afeda437fdd26dc7e69d29c1d72628b2",
-          "at": "2026-07-15T04:33:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a343392f8f0ca60ab5996df09d0fab5afeda437fdd26dc7e69d29c1d72628b2",
-          "at": "2026-07-15T04:37:09Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f823dbe2f4d57aa7514f3bee9dd3e60725bc9194d47e63ded184ebefccd042fc",
-          "at": "2026-07-13T21:19:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f823dbe2f4d57aa7514f3bee9dd3e60725bc9194d47e63ded184ebefccd042fc",
-          "at": "2026-07-13T21:25:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:24b5c380b1839ad24c958d3695386c78ef662c5f0bca2e0a881e615b88eafe80",
-          "at": "2026-07-14T06:23:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`waived_edges` は `plan_fulfillment_record` にしか適用されません。Waiver と同じ edge の `VoluntaryBinding` はこの owner ループで Fulfillment action を生成し続けるため、check gate の waiver precedence と不一致になり、不要な二重 adjudication と誤った tally/cache を生じます。",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
-              "line": 241,
-              "category": "orchestration correctness"
-            },
-            {
-              "message": "この変更で 1 件の voluntary binding が複数 owner 分の Fulfillment action を生成する一方、calibration の production-pair 数は voluntary binding を 1 件として数えます。そのため複数 owner のケースでは実際の adjudication 数より少ない calibration probe しか発行されず、検出率ゲートが過少評価されます。",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
-              "line": 248,
-              "category": "orchestration correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:6b6a98fc2331e19453ade77317f50a4a5648166317cc5b825aba29526d079a9c",
-          "at": "2026-07-14T18:36:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77b39e740d38b8c312b79f4d65f284144539b4a20d0ed0614bf2eaa9987ed39f",
-          "at": "2026-07-14T18:41:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ProviderSessionCacheError` exposes filesystem/codec mechanics (`Io`, `Symlink`, `Path`, `Codec`) through the usecase port. This makes callers aware of adapter implementation details and allows infrastructure errors to leak across the abstraction boundary. Replace these with usecase-level cache failure concepts and map filesystem-specific causes inside the infrastructure adapter.",
-              "severity": "P1",
-              "file": "libs/usecase/src/provider_session.rs",
-              "line": 155,
-              "category": "error type confusion"
-            }
-          ],
-          "hash": "rvw1:sha256:77b39e740d38b8c312b79f4d65f284144539b4a20d0ed0614bf2eaa9987ed39f",
-          "at": "2026-07-14T19:56:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbe2efc47790d96ebec9fd456250b18d44e7bafd732646ce5de448ce087421f0",
-          "at": "2026-07-14T20:37:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbe2efc47790d96ebec9fd456250b18d44e7bafd732646ce5de448ce087421f0",
-          "at": "2026-07-14T20:40:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3428042737be1093ef766fefd09810ce32140240cb273a364f51bd9de7018551",
-          "at": "2026-07-14T23:43:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`plan_binding_records` decides the domain-level precedence rule that a waiver suppresses fulfillment and voluntary bindings. This duplicates the same rule from the check gate, allowing evaluators to diverge when the rule changes. Move precedence/mutual-exclusivity resolution onto the domain binding model and let the usecase orchestrate the resolved outcome, per `hexagonal-architecture.md` §CLI as Composition Root.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
-              "line": 121,
-              "category": "business logic leak"
-            },
-            {
-              "message": "The usecase defines edge ownership by comparing an obligation's entry key and spec references. That relationship is a domain predicate, and duplicating it here (including the existing single-owner variant) risks inconsistent ownership semantics across check/evaluate flows. Expose this through `TestObligation` or `ObligationsDocument` in domain and consume it from the orchestrator, per `hexagonal-architecture.md` §CLI as Composition Root.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/edges.rs",
-              "line": 41,
-              "category": "business logic leak"
-            }
-          ],
-          "hash": "rvw1:sha256:3428042737be1093ef766fefd09810ce32140240cb273a364f51bd9de7018551",
-          "at": "2026-07-14T23:45:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bba94a081460da6b47f3077c640556b4eadb7fe5b772f2e417c4b9579db279d4",
-          "at": "2026-07-15T00:00:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bba94a081460da6b47f3077c640556b4eadb7fe5b772f2e417c4b9579db279d4",
-          "at": "2026-07-15T00:02:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f59a5f81fe369af64ec0b69a9cc7be4908e4698d9fd0a00bf06b8972360a637",
-          "at": "2026-07-15T01:56:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9f59a5f81fe369af64ec0b69a9cc7be4908e4698d9fd0a00bf06b8972360a637",
-          "at": "2026-07-15T01:58:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0b4a1a4603984292f0a680187437b174a8167798e231327f6044dc8a43aa85c",
-          "at": "2026-07-15T02:52:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c0b4a1a4603984292f0a680187437b174a8167798e231327f6044dc8a43aa85c",
-          "at": "2026-07-15T02:54:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:45cacd8e84f2e402102653d766c58e4557ec4e151dbb8d84d80ccda27af322a1",
-          "at": "2026-07-15T12:50:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:45cacd8e84f2e402102653d766c58e4557ec4e151dbb8d84d80ccda27af322a1",
-          "at": "2026-07-15T12:54:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3494f1d71b023b424a55293c4e54f3601f69dc6f3e2ac2087066ec1e002a28ab",
-          "at": "2026-07-15T15:43:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3494f1d71b023b424a55293c4e54f3601f69dc6f3e2ac2087066ec1e002a28ab",
-          "at": "2026-07-15T15:46:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca769ccf6dc05a328efb8c0a9c3f327da141d87b779cb280b365095127558117",
-          "at": "2026-07-16T01:07:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca769ccf6dc05a328efb8c0a9c3f327da141d87b779cb280b365095127558117",
-          "at": "2026-07-16T01:10:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c5bad4aba6ad9c89e6ddf685df856f93244f0c38ff6d7a7f23067dfc828bb29",
-          "at": "2026-07-16T03:11:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c5bad4aba6ad9c89e6ddf685df856f93244f0c38ff6d7a7f23067dfc828bb29",
-          "at": "2026-07-16T03:13:20Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87e87b14d4c8e91a357d128fcbb8e4196031695a6f19a91c0d4ed4e0dbcffc41",
-          "at": "2026-07-13T21:25:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87e87b14d4c8e91a357d128fcbb8e4196031695a6f19a91c0d4ed4e0dbcffc41",
-          "at": "2026-07-13T21:29:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5faabd6f4992094ae491ab34e77daacd508ac27bed236a5129174d35dbff45a7",
-          "at": "2026-07-14T06:27:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:025f67073c99dc3eee1f830758dddda733535422314c950503c19a27a495eb95",
-          "at": "2026-07-15T12:50:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:025f67073c99dc3eee1f830758dddda733535422314c950503c19a27a495eb95",
-          "at": "2026-07-15T12:52:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e70e26897ad937ab006f225f2087ef063566bd5c314537089b858aa0b3e1ebbc",
-          "at": "2026-07-15T13:12:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e70e26897ad937ab006f225f2087ef063566bd5c314537089b858aa0b3e1ebbc",
-          "at": "2026-07-15T13:13:13Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cd1e35ac0e823201b3e5b4c896c45283acffed50c237e5d426b404c97a5c681",
-          "at": "2026-07-15T12:49:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cd1e35ac0e823201b3e5b4c896c45283acffed50c237e5d426b404c97a5c681",
-          "at": "2026-07-15T12:52:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Resume(Vec::new())` and other invalid target sets now return a rendered error and skip dispatch, but the briefing explicitly defines this case as an intentional fail-closed degradation to `ResumeWithoutTarget`. This changes the required resume behavior and can abort otherwise valid capability execution.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/capability.rs",
-              "line": 141,
-              "category": "business logic in adapter"
-            }
-          ],
-          "hash": "rvw1:sha256:5776bdc89941cc653b6e0314c015af0a4349be3a555fe78fe02dd8fbe1bb0c6e",
-          "at": "2026-07-15T13:12:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18ba76cccfbc548eef69269bbaccd674dee7d73efb15d5eeb66a6e0ab72d58be",
-          "at": "2026-07-15T13:13:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18ba76cccfbc548eef69269bbaccd674dee7d73efb15d5eeb66a6e0ab72d58be",
-          "at": "2026-07-15T13:15:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e38c0fe96f82077bb0623a6d339b4e3f078a5532dcc718769b94716673a11658",
-          "at": "2026-07-15T13:22:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e38c0fe96f82077bb0623a6d339b4e3f078a5532dcc718769b94716673a11658",
-          "at": "2026-07-15T13:23:22Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54109f1fe1308de7696fd7f46c8a0965d2773cc418181a293d1e1dc48a30815e",
-          "at": "2026-07-13T21:30:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54109f1fe1308de7696fd7f46c8a0965d2773cc418181a293d1e1dc48a30815e",
-          "at": "2026-07-13T22:27:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab3669fc27032c1fb5d689af213ea7e3f55436714e4b3a272470d89d9baaf100",
-          "at": "2026-07-14T07:13:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:46f2d5e0321ddbbf632186fbd3a0c11e022bacccbaa62c884e9a6874a158447f",
-          "at": "2026-07-14T19:01:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:46f2d5e0321ddbbf632186fbd3a0c11e022bacccbaa62c884e9a6874a158447f",
-          "at": "2026-07-15T00:30:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:627d86d50a439095bd58ec77a1dcf5878abb1f51d609205c43c045469c7727a7",
-          "at": "2026-07-15T07:14:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:627d86d50a439095bd58ec77a1dcf5878abb1f51d609205c43c045469c7727a7",
-          "at": "2026-07-15T07:19:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d6a9b0c3f101fed82f6cb2f76a1d6e5f10c50fd83872a27b421ddc758b0e7e58",
-          "at": "2026-07-15T09:03:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d6a9b0c3f101fed82f6cb2f76a1d6e5f10c50fd83872a27b421ddc758b0e7e58",
-          "at": "2026-07-15T09:07:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2aa44a8e618b737ad8ec92f5d2e88f18d545171e354055cc29fb1169e3a0067b",
-          "at": "2026-07-15T12:50:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2aa44a8e618b737ad8ec92f5d2e88f18d545171e354055cc29fb1169e3a0067b",
-          "at": "2026-07-15T12:53:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`render_verdict_payload` assembles the user-facing review JSON payload and exit result inside `cli_composition`; output rendering belongs in `cli_driver` under this scope’s render-leak policy.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/review_v2/run.rs",
-              "line": 31,
-              "category": "render leak"
-            }
-          ],
-          "hash": "rvw1:sha256:5b74a0d6cf75b215540e171bef0378cc7902465ea60492c1c793f0ef1bea706b",
-          "at": "2026-07-16T03:10:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5b74a0d6cf75b215540e171bef0378cc7902465ea60492c1c793f0ef1bea706b",
-          "at": "2026-07-16T03:12:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5b74a0d6cf75b215540e171bef0378cc7902465ea60492c1c793f0ef1bea706b",
-          "at": "2026-07-16T03:18:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`review_persist_commit_hash` emits the user-facing status string via `eprintln!` in the composition layer. Rendering/output belongs in `cli_driver` under the scope policy; the composition root should return the typed outcome without formatting user-visible text.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/review_v2/commit_hash.rs",
-              "line": 31,
-              "category": "render leak"
-            }
-          ],
-          "hash": "rvw1:sha256:b2881f144d6e53f68646a02eb0932c13d69ff7036c7a98067704e8ea4926e064",
-          "at": "2026-07-16T03:34:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a971a59abfe02d6137c358928ae421ce3b9d82b9c33889df2894cbb9d8fa142",
-          "at": "2026-07-16T03:54:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a971a59abfe02d6137c358928ae421ce3b9d82b9c33889df2894cbb9d8fa142",
-          "at": "2026-07-16T03:57:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a971a59abfe02d6137c358928ae421ce3b9d82b9c33889df2894cbb9d8fa142",
-          "at": "2026-07-16T04:00:24Z"
+          "hash": "rvw1:sha256:334060efa11458b1ce0f4587cebf2458d314a924384a51855baac1fa550ff2ba",
+          "at": "2026-07-16T08:03:46Z"
         }
       ]
     },
@@ -2646,6 +1939,159 @@
           "findings": [],
           "hash": "rvw1:sha256:be659f6e32aebe6cd380a014078a990ac1924829544ed0e9430118573ca46eea",
           "at": "2026-07-16T05:06:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 attributes `usecase::ReviewFixRunner` and `infrastructure::CodexReviewFixRunner`, but T002's task description does not claim work on either entry or their review-fix-runner files. Update the task description or move the attributions to the task that actually owns these changes.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/task-contract.json",
+              "line": 14,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:a440ff56ba552ba2806c674e426264b3fd792ef606ce130b1b1f7d8c70d3a879",
+          "at": "2026-07-16T06:07:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:284527667b73dcaf77fba0c09cd3d3ceb8dd4ff4a3de8b99016d2d9f41f7f61d",
+          "at": "2026-07-16T06:12:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:284527667b73dcaf77fba0c09cd3d3ceb8dd4ff4a3de8b99016d2d9f41f7f61d",
+          "at": "2026-07-16T06:17:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b10f5fc82871247ffcab67c6acb7bb2d8e91bb9a1a95daa66873142d03bfffeb",
+          "at": "2026-07-16T07:59:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 explicitly claims changes to the review-fix wiring in `apps/cli-composition/src/review_v2/mod.rs`, and the current catalogue changes `ReviewCompositionRoot::review_run_fix_local` accordingly, but T002 omits the `cli_composition/ReviewCompositionRoot` attribution. That entry is attributed only to T004, so T002's claimed public-surface modification is not represented in its task contract. Add the shared `ReviewCompositionRoot` attribution to T002 while retaining T004's attribution.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/task-contract.json",
+              "line": 14,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:b10f5fc82871247ffcab67c6acb7bb2d8e91bb9a1a95daa66873142d03bfffeb",
+          "at": "2026-07-16T08:03:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:96c1919c9feb2ea2237dd1e9c2b409994b1ee38a923b06823b82104bf223ec40",
+          "at": "2026-07-16T08:05:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d29f89fabdd96de76acbf93540aa2865d3468d0038e8a5ce7218cee5aeae1a8e",
+          "at": "2026-07-16T09:26:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d29f89fabdd96de76acbf93540aa2865d3468d0038e8a5ce7218cee5aeae1a8e",
+          "at": "2026-07-16T09:29:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec0404adcf53b9a50a0b682aaaec80406c3bdbc08ea1bdf050fdb6e8ea992148",
+          "at": "2026-07-16T10:11:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec0404adcf53b9a50a0b682aaaec80406c3bdbc08ea1bdf050fdb6e8ea992148",
+          "at": "2026-07-16T10:14:00Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87e87b14d4c8e91a357d128fcbb8e4196031695a6f19a91c0d4ed4e0dbcffc41",
+          "at": "2026-07-13T21:25:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87e87b14d4c8e91a357d128fcbb8e4196031695a6f19a91c0d4ed4e0dbcffc41",
+          "at": "2026-07-13T21:29:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5faabd6f4992094ae491ab34e77daacd508ac27bed236a5129174d35dbff45a7",
+          "at": "2026-07-14T06:27:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:025f67073c99dc3eee1f830758dddda733535422314c950503c19a27a495eb95",
+          "at": "2026-07-15T12:50:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:025f67073c99dc3eee1f830758dddda733535422314c950503c19a27a495eb95",
+          "at": "2026-07-15T12:52:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e70e26897ad937ab006f225f2087ef063566bd5c314537089b858aa0b3e1ebbc",
+          "at": "2026-07-15T13:12:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e70e26897ad937ab006f225f2087ef063566bd5c314537089b858aa0b3e1ebbc",
+          "at": "2026-07-15T13:13:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19d508fdfd4f92b5a5cf0615730b6dd57091cf67684ec621965bbc3ac5fb1502",
+          "at": "2026-07-16T09:26:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19d508fdfd4f92b5a5cf0615730b6dd57091cf67684ec621965bbc3ac5fb1502",
+          "at": "2026-07-16T09:29:25Z"
         }
       ]
     },
@@ -3298,228 +2744,70 @@
           "findings": [],
           "hash": "rvw1:sha256:398d9e3bdd423bdfd1c76cc0286d5c3fefd038079be0dcd8233ca14823850c83",
           "at": "2026-07-16T04:54:33Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The dry-checker final/default effort is set to `high`, but D1 requires reviewer-like final lanes on Codex to use the provider maximum, `xhigh`. The final DRY-check lane therefore runs below the required effort level; set `reasoning_effort` to `xhigh`.",
-              "severity": "P0",
-              "file": ".harness/config/agent-profiles.json",
-              "line": 81,
-              "category": "capability routing mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:38493a7a5e525dd585c55f0aac489e462d7e87d6b58fc11dc7c10f321a082eac",
-          "at": "2026-07-13T21:20:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`dry-checker` の fast/final 用キーが契約と異なります。`reasoning_effort` ではなく `final_reasoning_effort: \"xhigh\"` が必要で、現在の `fast_reasoning_effort: \"medium\"` も D1 の fast=low に違反します。このままでは final dispatch が必須 effort を解決できず fail-closed で失敗します。",
-              "severity": "P0",
-              "file": ".harness/config/agent-profiles.json",
-              "line": 81,
-              "category": "capability routing mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:56cef24bd4ad1204fc52f69b0366c24a6f7ce7fc00292bb3e385cd1f50ccabb2",
-          "at": "2026-07-13T21:25:34Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:94558f51cde94d5697892908fc3135e71a440eab683d03a8e4718095e93bc3f1",
-          "at": "2026-07-13T21:29:27Z"
+          "hash": "rvw1:sha256:ed8a8705455eb9a1dfaa80c7463edbd76845bceadef9f0d694cd24478cd696aa",
+          "at": "2026-07-16T06:07:34Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:94558f51cde94d5697892908fc3135e71a440eab683d03a8e4718095e93bc3f1",
-          "at": "2026-07-13T22:28:51Z"
+          "hash": "rvw1:sha256:ed8a8705455eb9a1dfaa80c7463edbd76845bceadef9f0d694cd24478cd696aa",
+          "at": "2026-07-16T06:14:34Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:39de4b61175f8eae85d637acc63f231904a65f78d4e677d60f7585dd5cdf6d4c",
-          "at": "2026-07-15T08:15:27Z"
+          "hash": "rvw1:sha256:aff682e1a7d7f1c2922cda87e9bde3df0259216d002e75ee647d368c10e75263",
+          "at": "2026-07-16T07:59:38Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:39de4b61175f8eae85d637acc63f231904a65f78d4e677d60f7585dd5cdf6d4c",
-          "at": "2026-07-15T08:17:25Z"
+          "hash": "rvw1:sha256:aff682e1a7d7f1c2922cda87e9bde3df0259216d002e75ee647d368c10e75263",
+          "at": "2026-07-16T08:02:43Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7d4bd5d68e5b3e70c2441ba5c1c48bfaa3501c5a3b32e0c547bfdd11b4d1db53",
-          "at": "2026-07-15T09:24:03Z"
+          "hash": "rvw1:sha256:593d351867ccb61d7b588767a3c687a77a2d10ec7a465610ca7b33e19ef474a1",
+          "at": "2026-07-16T09:26:34Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`review_operational` excludes only the fulfillment half of the test-obligation verdict-cache pair. `bin/sotp test-obligation evaluate` persists both `obligation-fulfillment-cache.json` and `waiver-cache.json`, and the workflow explicitly treats both as generated frozen-verdict outputs. Because `waiver-cache.json` still classifies as `other`, any evaluation that refreshes a waiver verdict changes the reviewed `other` hash and recreates the evaluate → stale → re-review loop this change is intended to eliminate. Add `track/items/<track-id>/waiver-cache.json` to `review_operational` as well.",
+              "message": "This edge-level waiver takes precedence over fulfillment records for every obligation owning `ReviewService × GO-04`. Consequently, all ten newly derived `ReviewService` method obligations are recorded as waived and none of the fulfillment records on lines 4241–4250 is semantically adjudicated, contradicting the waiver reason and briefing claim that they remain fulfilled. This silently bypasses the intended Result coverage; remove/reroute the blanket waiver (or correct the upstream edge ownership/spec refs) so the method obligations are actually evaluated.",
               "severity": "P1",
-              "file": ".harness/config/review-scope.json",
-              "line": 90,
-              "category": "review-scope or briefing wiring inconsistency"
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/test-bindings.json",
+              "line": 4252,
+              "category": "testing"
             }
           ],
-          "hash": "rvw1:sha256:7d4bd5d68e5b3e70c2441ba5c1c48bfaa3501c5a3b32e0c547bfdd11b4d1db53",
-          "at": "2026-07-15T09:27:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b569660c79bb29bbb7ed6dc39be4ddfcb2ca4fe7a62de8bbdabab215886ea65d",
-          "at": "2026-07-15T09:29:59Z"
+          "hash": "rvw1:sha256:593d351867ccb61d7b588767a3c687a77a2d10ec7a465610ca7b33e19ef474a1",
+          "at": "2026-07-16T09:31:25Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:aae9342da9eedebd987c16d4d4d7b9d287efbb8fa4c744ca5fbd192fd5fa26df",
-          "at": "2026-07-15T13:42:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The workflow promises that a scope's first round and every fast→final escalation always start fresh, but the implemented reviewer cache has only a persistent track×scope×round-type key and no production invalidation at a review-cycle or batch boundary. After one completed cycle, the next batch's initial fast round can resume the old fast session and its final escalation can resume the old final session. This SSoT therefore documents behavior `bin/sotp review local` cannot enforce; add a cycle boundary/invalidation or describe the broader reuse accurately.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 46,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "The orchestrator opt-in rule is placed in the discipline text delivered to a capability only after `capability exec` has already resolved the request as fresh or resumed, so it cannot drive the caller's `--resume` decision. Codex gets a separate root-facing instruction, but the Claude root caller still invokes `bin/sotp capability exec` without `--resume` on back-and-forth re-entry. Consequently the documented capability-resume behavior is not wired for both hosts. Put the continuation/fresh decision in the shared caller workflow and its Claude invocation adapter before dispatch.",
-              "severity": "P1",
-              "file": ".harness/prompts/capability-exec-discipline.md",
-              "line": 22,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:aae9342da9eedebd987c16d4d4d7b9d287efbb8fa4c744ca5fbd192fd5fa26df",
-          "at": "2026-07-15T13:53:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c8e02fc1d7041151d3a36509e3f43c14081d16c5ffeba3e2beccf22360c801bf",
-          "at": "2026-07-15T13:56:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The rule says resume handling applies identically on Claude and Codex roots, but when both host and capability provider are Claude, `ClaudeCapabilityAdapter::dispatch` returns `DelegateInHost` before consulting the resume cache; the governing ADR also explicitly excludes in-host delegation from session resume. Thus `--resume` is silently ineffective for Claude-routed capabilities. Qualify this guidance as subprocess-only and state that Claude in-host delegation remains fresh, or add native in-host resume wiring.",
-              "severity": "P1",
-              "file": ".claude/rules/08-orchestration.md",
-              "line": 65,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:c8e02fc1d7041151d3a36509e3f43c14081d16c5ffeba3e2beccf22360c801bf",
-          "at": "2026-07-15T14:02:19Z"
+          "hash": "rvw1:sha256:1b0bdc23df3b625e82b4f3b19435534407d2416865408f6071aac3a49bdd58e9",
+          "at": "2026-07-16T10:12:01Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2da228fd2a6908de53c3c7f5a217a06cfd9537f76847461d177b00a16efeaffd",
-          "at": "2026-07-15T14:05:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The codex-heavy sample adds `fast_reasoning_effort` to `dry-checker` without a corresponding `fast_model`. This does not mirror the active profile’s fast lane and leaves the copied sample with an incomplete fast-lane configuration, so fast execution cannot use the declared effort setting.",
-              "severity": "P1",
-              "file": ".harness/config/samples/agent-profiles.codex-heavy.json",
-              "line": 75,
-              "category": "capability routing mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:407507c601766c1c20833f6b50a83932817b46e0e069ddae257c9469f7e1db37",
-          "at": "2026-07-15T23:45:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3098f818487e15f4aba21fe456d0c859617b65b94177f1a8f2b626b597c6bc07",
-          "at": "2026-07-15T23:46:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Claude-heavy reviewer assigns `reasoning_effort: \"xhigh\"`, but the profile loader explicitly rejects `XHigh` for provider `claude` (`xhigh` is Codex vocabulary; Claude's maximum is `max`). Copying this shipped sample therefore makes final reviewer resolution fail with `UnsupportedEffort` and prevents review execution. Use a Claude-supported value such as `max`.",
-              "severity": "P1",
-              "file": ".harness/config/samples/agent-profiles.claude-heavy.json",
-              "line": 54,
-              "category": "capability routing mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:3098f818487e15f4aba21fe456d0c859617b65b94177f1a8f2b626b597c6bc07",
-          "at": "2026-07-15T23:49:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2fc4b0f5ff600eee9e306026c368c255759b530df402d54bbe501d27668d9e5",
-          "at": "2026-07-15T23:51:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6579d7dd6952ceedfc4c6715016123a665e481ce8f8d2338a43422ec7ec32ce2",
-          "at": "2026-07-16T03:10:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The provider-agnostic workflow SSoT names `sandbox` as a common execution flag, but Codex uses `--sandbox` while Claude explicitly has no sandbox flag and uses `--permission-mode`. This violates the adapter-SSoT policy requiring provider-specific sandbox/permission details to remain in adapters and makes the cross-host contract inaccurate. State the requirement generically here and leave exact flags to each adapter.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 54,
-              "category": "adapter-SSoT synchronization"
-            }
-          ],
-          "hash": "rvw1:sha256:6579d7dd6952ceedfc4c6715016123a665e481ce8f8d2338a43422ec7ec32ce2",
-          "at": "2026-07-16T03:14:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c073d65d609a060b56f7ca15a36eb1acde48ae9fd03580d04524eeb333bc5962",
-          "at": "2026-07-16T03:16:39Z"
+          "hash": "rvw1:sha256:1b0bdc23df3b625e82b4f3b19435534407d2416865408f6071aac3a49bdd58e9",
+          "at": "2026-07-16T10:14:20Z"
         }
       ]
     },
@@ -4200,6 +3488,1112 @@
           "findings": [],
           "hash": "rvw1:sha256:fc53bc4529e83ca758ad625c19990682e8a397af033fc7357ffb956403c92133",
           "at": "2026-07-16T04:13:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2fd89d726bab4312ef387921b2279b62d2c0ee1aa78313564269b331b415c30e",
+          "at": "2026-07-16T06:07:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodexReviewFixRunner` makes required D1 configuration optional: `new(...) -> Self` returns an immediately runnable adapter, while effort is supplied only through the skippable `with_reasoning_effort` builder. Because that `Self` implements `ReviewFixRunner`, callers can still launch Codex with no explicit effort and fall back to the provider default, contrary to AC-01/CN-01. Make validated effort mandatory at construction or reject the missing-effort state before spawning.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/infrastructure-types.json",
+              "line": 1222,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "`ReviewFixRunner::run_fix` is a synchronous secondary port backed by a long-running external CLI subprocess, but the entry only says that it invokes a runner and does not acknowledge the intentional blocking/synchronous boundary. The type contract therefore leaves its async color ambiguous; document the blocking choice or expose an asynchronous port.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 660,
+              "category": "sync/async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:2fd89d726bab4312ef387921b2279b62d2c0ee1aa78313564269b331b415c30e",
+          "at": "2026-07-16T06:18:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:095ad5932daf4442d43a700632136c3ddd0783a4ecba8e85932630e9eb5fbd6f",
+          "at": "2026-07-16T08:00:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ReviewCompositionRoot::review_run_fix_local` remains a public production method in `apps/cli-composition/src/review_v2/mod.rs` (returning `Result<RunReviewFixOutput, RunReviewFixError>`), but the current `cli_composition-types.json` no longer declares that method. The catalogue therefore omits a surviving public API surface while only retaining `review_run_fix_local_resolve`; add/update the `ReviewCompositionRoot::review_run_fix_local` entry to match the source.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_composition-types.json",
+              "line": null,
+              "category": "missing companion modify"
+            }
+          ],
+          "hash": "rvw1:sha256:63f9a0a85db377cab815370cf20775bcae291b4946ebb65e750b69a32c4404fc",
+          "at": "2026-07-16T09:26:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ReviewCompositionRoot::review_run_fix_local` remains a public production method in `apps/cli-composition/src/review_v2/mod.rs`, but the current `cli_composition-types.json` omits it entirely. The catalogue therefore does not declare a surviving public API surface; restore the method entry with its current `RunReviewFixLocalInput` parameter and `Result<RunReviewFixOutput, RunReviewFixError>` return type.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_composition-types.json",
+              "line": null,
+              "category": "missing companion modify"
+            }
+          ],
+          "hash": "rvw1:sha256:63f9a0a85db377cab815370cf20775bcae291b4946ebb65e750b69a32c4404fc",
+          "at": "2026-07-16T09:27:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63f9a0a85db377cab815370cf20775bcae291b4946ebb65e750b69a32c4404fc",
+          "at": "2026-07-16T09:29:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::SubagentName::try_new` returns the repository-wide `domain::ValidationError` enum, although its `NonEmptyString` construction path can produce only `ValidationError::EmptyString`. The catalogue documents neither that subset nor a justification for exposing the other 36 unreachable variants, leaving callers with an unnecessarily broad error contract. Declare a narrow error or document the sole producible variant.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+              "line": 2502,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:63f9a0a85db377cab815370cf20775bcae291b4946ebb65e750b69a32c4404fc",
+          "at": "2026-07-16T09:39:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b28398d72ed9c7b80231a9dbc220682e9bf8bae861465a10103d8e45446319f3",
+          "at": "2026-07-16T10:11:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b28398d72ed9c7b80231a9dbc220682e9bf8bae861465a10103d8e45446319f3",
+          "at": "2026-07-16T10:18:05Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54109f1fe1308de7696fd7f46c8a0965d2773cc418181a293d1e1dc48a30815e",
+          "at": "2026-07-13T21:30:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54109f1fe1308de7696fd7f46c8a0965d2773cc418181a293d1e1dc48a30815e",
+          "at": "2026-07-13T22:27:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab3669fc27032c1fb5d689af213ea7e3f55436714e4b3a272470d89d9baaf100",
+          "at": "2026-07-14T07:13:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46f2d5e0321ddbbf632186fbd3a0c11e022bacccbaa62c884e9a6874a158447f",
+          "at": "2026-07-14T19:01:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46f2d5e0321ddbbf632186fbd3a0c11e022bacccbaa62c884e9a6874a158447f",
+          "at": "2026-07-15T00:30:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:627d86d50a439095bd58ec77a1dcf5878abb1f51d609205c43c045469c7727a7",
+          "at": "2026-07-15T07:14:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:627d86d50a439095bd58ec77a1dcf5878abb1f51d609205c43c045469c7727a7",
+          "at": "2026-07-15T07:19:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6a9b0c3f101fed82f6cb2f76a1d6e5f10c50fd83872a27b421ddc758b0e7e58",
+          "at": "2026-07-15T09:03:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6a9b0c3f101fed82f6cb2f76a1d6e5f10c50fd83872a27b421ddc758b0e7e58",
+          "at": "2026-07-15T09:07:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2aa44a8e618b737ad8ec92f5d2e88f18d545171e354055cc29fb1169e3a0067b",
+          "at": "2026-07-15T12:50:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2aa44a8e618b737ad8ec92f5d2e88f18d545171e354055cc29fb1169e3a0067b",
+          "at": "2026-07-15T12:53:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`render_verdict_payload` assembles the user-facing review JSON payload and exit result inside `cli_composition`; output rendering belongs in `cli_driver` under this scope’s render-leak policy.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 31,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:5b74a0d6cf75b215540e171bef0378cc7902465ea60492c1c793f0ef1bea706b",
+          "at": "2026-07-16T03:10:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b74a0d6cf75b215540e171bef0378cc7902465ea60492c1c793f0ef1bea706b",
+          "at": "2026-07-16T03:12:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b74a0d6cf75b215540e171bef0378cc7902465ea60492c1c793f0ef1bea706b",
+          "at": "2026-07-16T03:18:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review_persist_commit_hash` emits the user-facing status string via `eprintln!` in the composition layer. Rendering/output belongs in `cli_driver` under the scope policy; the composition root should return the typed outcome without formatting user-visible text.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/commit_hash.rs",
+              "line": 31,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:b2881f144d6e53f68646a02eb0932c13d69ff7036c7a98067704e8ea4926e064",
+          "at": "2026-07-16T03:34:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a971a59abfe02d6137c358928ae421ce3b9d82b9c33889df2894cbb9d8fa142",
+          "at": "2026-07-16T03:54:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a971a59abfe02d6137c358928ae421ce3b9d82b9c33889df2894cbb9d8fa142",
+          "at": "2026-07-16T03:57:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a971a59abfe02d6137c358928ae421ce3b9d82b9c33889df2894cbb9d8fa142",
+          "at": "2026-07-16T04:00:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b86b495d7fd71ba304e3fddd986b9db564cd9b9d0c82c8817d6b10c6bc4fd1f3",
+          "at": "2026-07-16T06:07:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The modified Claude branch still serializes the dispatch payload and assembles stdout directly in `cli_composition`, now including the effort field. This is an output-templating leak: ADR D2/D3 require the composition root to only wire dependencies and `cli_driver` to render/serialize output. Return a typed dispatch result carrying `ReasoningEffort` and serialize it in the driver instead.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run_fix.rs",
+              "line": 87,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:b86b495d7fd71ba304e3fddd986b9db564cd9b9d0c82c8817d6b10c6bc4fd1f3",
+          "at": "2026-07-16T06:14:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`run_fix_local` directly invokes the use-case interactor via `interactor.run(command)` in the composition layer. This is an invoke leak: `cli_composition` should construct and inject the interactor into the driving adapter, leaving execution to `cli_driver`.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/review_v2/run_fix.rs",
+              "line": 121,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:1c8f605bb7d2e5e98473bc648a602d69edccfae0737f3694e6e283f310ff44d6",
+          "at": "2026-07-16T07:59:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e76650f02d51aad6fe552405f1da595174369aeca1c69a86434fbcf1ec581294",
+          "at": "2026-07-16T09:26:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e76650f02d51aad6fe552405f1da595174369aeca1c69a86434fbcf1ec581294",
+          "at": "2026-07-16T09:34:10Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cd1e35ac0e823201b3e5b4c896c45283acffed50c237e5d426b404c97a5c681",
+          "at": "2026-07-15T12:49:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cd1e35ac0e823201b3e5b4c896c45283acffed50c237e5d426b404c97a5c681",
+          "at": "2026-07-15T12:52:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Resume(Vec::new())` and other invalid target sets now return a rendered error and skip dispatch, but the briefing explicitly defines this case as an intentional fail-closed degradation to `ResumeWithoutTarget`. This changes the required resume behavior and can abort otherwise valid capability execution.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/capability.rs",
+              "line": 141,
+              "category": "business logic in adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:5776bdc89941cc653b6e0314c015af0a4349be3a555fe78fe02dd8fbe1bb0c6e",
+          "at": "2026-07-15T13:12:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18ba76cccfbc548eef69269bbaccd674dee7d73efb15d5eeb66a6e0ab72d58be",
+          "at": "2026-07-15T13:13:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18ba76cccfbc548eef69269bbaccd674dee7d73efb15d5eeb66a6e0ab72d58be",
+          "at": "2026-07-15T13:15:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e38c0fe96f82077bb0623a6d339b4e3f078a5532dcc718769b94716673a11658",
+          "at": "2026-07-15T13:22:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e38c0fe96f82077bb0623a6d339b4e3f078a5532dcc718769b94716673a11658",
+          "at": "2026-07-15T13:23:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6614fcf16a4edff6ea74de162907609d136be7ec7d51cdf3bb90bdb187700d9d",
+          "at": "2026-07-16T07:59:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6614fcf16a4edff6ea74de162907609d136be7ec7d51cdf3bb90bdb187700d9d",
+          "at": "2026-07-16T08:02:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bda0b6e19d3cd950b75f04c063dfaccdb1550ea831e2873ff89ef0005e042ab3",
+          "at": "2026-07-16T09:27:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bda0b6e19d3cd950b75f04c063dfaccdb1550ea831e2873ff89ef0005e042ab3",
+          "at": "2026-07-16T09:29:29Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eed5226c767fa495148a2a4468a327ec40ac1035e6a35334d6ea0b7a5a5870a5",
+          "at": "2026-07-14T06:23:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eed5226c767fa495148a2a4468a327ec40ac1035e6a35334d6ea0b7a5a5870a5",
+          "at": "2026-07-14T06:27:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd668edf234c37a4c569aaab36f14562420d2653dad956fd3370148679e87d42",
+          "at": "2026-07-14T07:12:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23dd453c35b4585a0d281339948769f6c3b2867df0ce2ddcad9e01f7c5bd3b74",
+          "at": "2026-07-14T18:32:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23dd453c35b4585a0d281339948769f6c3b2867df0ce2ddcad9e01f7c5bd3b74",
+          "at": "2026-07-14T19:54:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ab88b864455d9c25e6652cd25301a080d240216e264b807f3a776b996ec34b7",
+          "at": "2026-07-15T00:04:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ab88b864455d9c25e6652cd25301a080d240216e264b807f3a776b996ec34b7",
+          "at": "2026-07-15T00:05:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:942b7c45d06d2c340b84b7b45912376337e74401eb964477db18e2b2bdab9fa0",
+          "at": "2026-07-15T02:12:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:942b7c45d06d2c340b84b7b45912376337e74401eb964477db18e2b2bdab9fa0",
+          "at": "2026-07-15T02:14:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a93c9104245742d2ce749facd64e9283c59b02c6c5c5f4afd094439b38608a2",
+          "at": "2026-07-15T02:50:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a93c9104245742d2ce749facd64e9283c59b02c6c5c5f4afd094439b38608a2",
+          "at": "2026-07-15T02:53:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c43402b83b3061c95434dc77269ccde29068bee66c1fe9ad6fa2fa4384cc06eb",
+          "at": "2026-07-16T01:07:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c43402b83b3061c95434dc77269ccde29068bee66c1fe9ad6fa2fa4384cc06eb",
+          "at": "2026-07-16T01:10:11Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The dry-checker final/default effort is set to `high`, but D1 requires reviewer-like final lanes on Codex to use the provider maximum, `xhigh`. The final DRY-check lane therefore runs below the required effort level; set `reasoning_effort` to `xhigh`.",
+              "severity": "P0",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 81,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:38493a7a5e525dd585c55f0aac489e462d7e87d6b58fc11dc7c10f321a082eac",
+          "at": "2026-07-13T21:20:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry-checker` の fast/final 用キーが契約と異なります。`reasoning_effort` ではなく `final_reasoning_effort: \"xhigh\"` が必要で、現在の `fast_reasoning_effort: \"medium\"` も D1 の fast=low に違反します。このままでは final dispatch が必須 effort を解決できず fail-closed で失敗します。",
+              "severity": "P0",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 81,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:56cef24bd4ad1204fc52f69b0366c24a6f7ce7fc00292bb3e385cd1f50ccabb2",
+          "at": "2026-07-13T21:25:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94558f51cde94d5697892908fc3135e71a440eab683d03a8e4718095e93bc3f1",
+          "at": "2026-07-13T21:29:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94558f51cde94d5697892908fc3135e71a440eab683d03a8e4718095e93bc3f1",
+          "at": "2026-07-13T22:28:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39de4b61175f8eae85d637acc63f231904a65f78d4e677d60f7585dd5cdf6d4c",
+          "at": "2026-07-15T08:15:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39de4b61175f8eae85d637acc63f231904a65f78d4e677d60f7585dd5cdf6d4c",
+          "at": "2026-07-15T08:17:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d4bd5d68e5b3e70c2441ba5c1c48bfaa3501c5a3b32e0c547bfdd11b4d1db53",
+          "at": "2026-07-15T09:24:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review_operational` excludes only the fulfillment half of the test-obligation verdict-cache pair. `bin/sotp test-obligation evaluate` persists both `obligation-fulfillment-cache.json` and `waiver-cache.json`, and the workflow explicitly treats both as generated frozen-verdict outputs. Because `waiver-cache.json` still classifies as `other`, any evaluation that refreshes a waiver verdict changes the reviewed `other` hash and recreates the evaluate → stale → re-review loop this change is intended to eliminate. Add `track/items/<track-id>/waiver-cache.json` to `review_operational` as well.",
+              "severity": "P1",
+              "file": ".harness/config/review-scope.json",
+              "line": 90,
+              "category": "review-scope or briefing wiring inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:7d4bd5d68e5b3e70c2441ba5c1c48bfaa3501c5a3b32e0c547bfdd11b4d1db53",
+          "at": "2026-07-15T09:27:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b569660c79bb29bbb7ed6dc39be4ddfcb2ca4fe7a62de8bbdabab215886ea65d",
+          "at": "2026-07-15T09:29:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aae9342da9eedebd987c16d4d4d7b9d287efbb8fa4c744ca5fbd192fd5fa26df",
+          "at": "2026-07-15T13:42:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow promises that a scope's first round and every fast→final escalation always start fresh, but the implemented reviewer cache has only a persistent track×scope×round-type key and no production invalidation at a review-cycle or batch boundary. After one completed cycle, the next batch's initial fast round can resume the old fast session and its final escalation can resume the old final session. This SSoT therefore documents behavior `bin/sotp review local` cannot enforce; add a cycle boundary/invalidation or describe the broader reuse accurately.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 46,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The orchestrator opt-in rule is placed in the discipline text delivered to a capability only after `capability exec` has already resolved the request as fresh or resumed, so it cannot drive the caller's `--resume` decision. Codex gets a separate root-facing instruction, but the Claude root caller still invokes `bin/sotp capability exec` without `--resume` on back-and-forth re-entry. Consequently the documented capability-resume behavior is not wired for both hosts. Put the continuation/fresh decision in the shared caller workflow and its Claude invocation adapter before dispatch.",
+              "severity": "P1",
+              "file": ".harness/prompts/capability-exec-discipline.md",
+              "line": 22,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:aae9342da9eedebd987c16d4d4d7b9d287efbb8fa4c744ca5fbd192fd5fa26df",
+          "at": "2026-07-15T13:53:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c8e02fc1d7041151d3a36509e3f43c14081d16c5ffeba3e2beccf22360c801bf",
+          "at": "2026-07-15T13:56:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rule says resume handling applies identically on Claude and Codex roots, but when both host and capability provider are Claude, `ClaudeCapabilityAdapter::dispatch` returns `DelegateInHost` before consulting the resume cache; the governing ADR also explicitly excludes in-host delegation from session resume. Thus `--resume` is silently ineffective for Claude-routed capabilities. Qualify this guidance as subprocess-only and state that Claude in-host delegation remains fresh, or add native in-host resume wiring.",
+              "severity": "P1",
+              "file": ".claude/rules/08-orchestration.md",
+              "line": 65,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:c8e02fc1d7041151d3a36509e3f43c14081d16c5ffeba3e2beccf22360c801bf",
+          "at": "2026-07-15T14:02:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2da228fd2a6908de53c3c7f5a217a06cfd9537f76847461d177b00a16efeaffd",
+          "at": "2026-07-15T14:05:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The codex-heavy sample adds `fast_reasoning_effort` to `dry-checker` without a corresponding `fast_model`. This does not mirror the active profile’s fast lane and leaves the copied sample with an incomplete fast-lane configuration, so fast execution cannot use the declared effort setting.",
+              "severity": "P1",
+              "file": ".harness/config/samples/agent-profiles.codex-heavy.json",
+              "line": 75,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:407507c601766c1c20833f6b50a83932817b46e0e069ddae257c9469f7e1db37",
+          "at": "2026-07-15T23:45:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3098f818487e15f4aba21fe456d0c859617b65b94177f1a8f2b626b597c6bc07",
+          "at": "2026-07-15T23:46:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Claude-heavy reviewer assigns `reasoning_effort: \"xhigh\"`, but the profile loader explicitly rejects `XHigh` for provider `claude` (`xhigh` is Codex vocabulary; Claude's maximum is `max`). Copying this shipped sample therefore makes final reviewer resolution fail with `UnsupportedEffort` and prevents review execution. Use a Claude-supported value such as `max`.",
+              "severity": "P1",
+              "file": ".harness/config/samples/agent-profiles.claude-heavy.json",
+              "line": 54,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:3098f818487e15f4aba21fe456d0c859617b65b94177f1a8f2b626b597c6bc07",
+          "at": "2026-07-15T23:49:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2fc4b0f5ff600eee9e306026c368c255759b530df402d54bbe501d27668d9e5",
+          "at": "2026-07-15T23:51:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6579d7dd6952ceedfc4c6715016123a665e481ce8f8d2338a43422ec7ec32ce2",
+          "at": "2026-07-16T03:10:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The provider-agnostic workflow SSoT names `sandbox` as a common execution flag, but Codex uses `--sandbox` while Claude explicitly has no sandbox flag and uses `--permission-mode`. This violates the adapter-SSoT policy requiring provider-specific sandbox/permission details to remain in adapters and makes the cross-host contract inaccurate. State the requirement generically here and leave exact flags to each adapter.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 54,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:6579d7dd6952ceedfc4c6715016123a665e481ce8f8d2338a43422ec7ec32ce2",
+          "at": "2026-07-16T03:14:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c073d65d609a060b56f7ca15a36eb1acde48ae9fd03580d04524eeb333bc5962",
+          "at": "2026-07-16T03:16:39Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f823dbe2f4d57aa7514f3bee9dd3e60725bc9194d47e63ded184ebefccd042fc",
+          "at": "2026-07-13T21:19:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f823dbe2f4d57aa7514f3bee9dd3e60725bc9194d47e63ded184ebefccd042fc",
+          "at": "2026-07-13T21:25:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24b5c380b1839ad24c958d3695386c78ef662c5f0bca2e0a881e615b88eafe80",
+          "at": "2026-07-14T06:23:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`waived_edges` は `plan_fulfillment_record` にしか適用されません。Waiver と同じ edge の `VoluntaryBinding` はこの owner ループで Fulfillment action を生成し続けるため、check gate の waiver precedence と不一致になり、不要な二重 adjudication と誤った tally/cache を生じます。",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 241,
+              "category": "orchestration correctness"
+            },
+            {
+              "message": "この変更で 1 件の voluntary binding が複数 owner 分の Fulfillment action を生成する一方、calibration の production-pair 数は voluntary binding を 1 件として数えます。そのため複数 owner のケースでは実際の adjudication 数より少ない calibration probe しか発行されず、検出率ゲートが過少評価されます。",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 248,
+              "category": "orchestration correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6b6a98fc2331e19453ade77317f50a4a5648166317cc5b825aba29526d079a9c",
+          "at": "2026-07-14T18:36:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77b39e740d38b8c312b79f4d65f284144539b4a20d0ed0614bf2eaa9987ed39f",
+          "at": "2026-07-14T18:41:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ProviderSessionCacheError` exposes filesystem/codec mechanics (`Io`, `Symlink`, `Path`, `Codec`) through the usecase port. This makes callers aware of adapter implementation details and allows infrastructure errors to leak across the abstraction boundary. Replace these with usecase-level cache failure concepts and map filesystem-specific causes inside the infrastructure adapter.",
+              "severity": "P1",
+              "file": "libs/usecase/src/provider_session.rs",
+              "line": 155,
+              "category": "error type confusion"
+            }
+          ],
+          "hash": "rvw1:sha256:77b39e740d38b8c312b79f4d65f284144539b4a20d0ed0614bf2eaa9987ed39f",
+          "at": "2026-07-14T19:56:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbe2efc47790d96ebec9fd456250b18d44e7bafd732646ce5de448ce087421f0",
+          "at": "2026-07-14T20:37:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbe2efc47790d96ebec9fd456250b18d44e7bafd732646ce5de448ce087421f0",
+          "at": "2026-07-14T20:40:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3428042737be1093ef766fefd09810ce32140240cb273a364f51bd9de7018551",
+          "at": "2026-07-14T23:43:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan_binding_records` decides the domain-level precedence rule that a waiver suppresses fulfillment and voluntary bindings. This duplicates the same rule from the check gate, allowing evaluators to diverge when the rule changes. Move precedence/mutual-exclusivity resolution onto the domain binding model and let the usecase orchestrate the resolved outcome, per `hexagonal-architecture.md` §CLI as Composition Root.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 121,
+              "category": "business logic leak"
+            },
+            {
+              "message": "The usecase defines edge ownership by comparing an obligation's entry key and spec references. That relationship is a domain predicate, and duplicating it here (including the existing single-owner variant) risks inconsistent ownership semantics across check/evaluate flows. Expose this through `TestObligation` or `ObligationsDocument` in domain and consume it from the orchestrator, per `hexagonal-architecture.md` §CLI as Composition Root.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/edges.rs",
+              "line": 41,
+              "category": "business logic leak"
+            }
+          ],
+          "hash": "rvw1:sha256:3428042737be1093ef766fefd09810ce32140240cb273a364f51bd9de7018551",
+          "at": "2026-07-14T23:45:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bba94a081460da6b47f3077c640556b4eadb7fe5b772f2e417c4b9579db279d4",
+          "at": "2026-07-15T00:00:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bba94a081460da6b47f3077c640556b4eadb7fe5b772f2e417c4b9579db279d4",
+          "at": "2026-07-15T00:02:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f59a5f81fe369af64ec0b69a9cc7be4908e4698d9fd0a00bf06b8972360a637",
+          "at": "2026-07-15T01:56:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f59a5f81fe369af64ec0b69a9cc7be4908e4698d9fd0a00bf06b8972360a637",
+          "at": "2026-07-15T01:58:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b4a1a4603984292f0a680187437b174a8167798e231327f6044dc8a43aa85c",
+          "at": "2026-07-15T02:52:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c0b4a1a4603984292f0a680187437b174a8167798e231327f6044dc8a43aa85c",
+          "at": "2026-07-15T02:54:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45cacd8e84f2e402102653d766c58e4557ec4e151dbb8d84d80ccda27af322a1",
+          "at": "2026-07-15T12:50:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45cacd8e84f2e402102653d766c58e4557ec4e151dbb8d84d80ccda27af322a1",
+          "at": "2026-07-15T12:54:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3494f1d71b023b424a55293c4e54f3601f69dc6f3e2ac2087066ec1e002a28ab",
+          "at": "2026-07-15T15:43:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3494f1d71b023b424a55293c4e54f3601f69dc6f3e2ac2087066ec1e002a28ab",
+          "at": "2026-07-15T15:46:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca769ccf6dc05a328efb8c0a9c3f327da141d87b779cb280b365095127558117",
+          "at": "2026-07-16T01:07:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca769ccf6dc05a328efb8c0a9c3f327da141d87b779cb280b365095127558117",
+          "at": "2026-07-16T01:10:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c5bad4aba6ad9c89e6ddf685df856f93244f0c38ff6d7a7f23067dfc828bb29",
+          "at": "2026-07-16T03:11:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c5bad4aba6ad9c89e6ddf685df856f93244f0c38ff6d7a7f23067dfc828bb29",
+          "at": "2026-07-16T03:13:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f1220d56f9135fd57acd612bc27b73ac5a4368132ddb0f7a4f3fd5fedc75075",
+          "at": "2026-07-16T08:00:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a6994d47a04d4bb4bb59a258fd96fb0aadbb2c74ed7594285c153f3e0222e31",
+          "at": "2026-07-16T09:26:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a6994d47a04d4bb4bb59a258fd96fb0aadbb2c74ed7594285c153f3e0222e31",
+          "at": "2026-07-16T09:30:27Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01’s requirement for a low-effort fast round, provider-maximum final effort, and preservation of the two-stage review is not deterministically covered. AC-01 only verifies that distinct fast/final effort values resolve, so an implementation using arbitrary values or not preserving the two-stage behavior could pass all ACs.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 330,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "CN-08 requires a new-session fallback when the capability resume cache cannot be read or hashed, but no AC covers those cases. AC-09 covers valid entries and profile/contract mismatch, while AC-10 covers resume failure and expiry; an implementation could omit read/hash-failure fallback and still satisfy every AC.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 250,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "GO-04 promises preservation of review judgment and review-record semantics, but no acceptance criterion deterministically verifies that session resume leaves the judgment/record unit unchanged. AC-03 verifies full-scope rejudgment only, and AC-04 verifies session selection and flag injection; both could pass while resumed rounds alter record semantics.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 42,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:ef0973d9289a0f7ef6da6420df173797ca945a426216056f958ed7aad2c5253e",
+          "at": "2026-07-13T16:40:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:22f57e52e8eda72c842a70ee3f0529f018cae653e6a35315453739232c03161c",
+          "at": "2026-07-13T16:45:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 permits signal-evaluation skip whenever the implementation, catalogue, baseline, and evaluator hashes match, even when the rustdoc-extraction contract changed or the live snapshot cannot be verified. CN-07 and AC-07 require rustdoc extraction and recalculation in those same cases, so the contract simultaneously permits skipping and requires recomputation, risking stale signals. The skip condition must also account for the extraction contract and snapshot-validity requirements.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 370,
+              "category": "scope / acceptance_criteria contradiction"
+            },
+            {
+              "message": "AC-09 applies its resume requirement to any `sotp capability exec` invocation carrying the resume option, but that command also has an in-host delegation outcome. This requires cache-backed resume for the in-host branch that OS-05 explicitly excludes. Restrict this criterion to provider-subprocess dispatches or explicitly specify that in-host dispatch rejects/ignores resume.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 410,
+              "category": "out_of_scope leakage"
+            }
+          ],
+          "hash": "rvw1:sha256:22f57e52e8eda72c842a70ee3f0529f018cae653e6a35315453739232c03161c",
+          "at": "2026-07-13T16:49:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-03 requires every evaluation whose decision inputs changed to run, but AC-05's complete-skip predicate omits the spec/catalogue↔spec input, and AC-06/AC-07 provide no spec-change path. A spec-only change could therefore satisfy the stated skip conditions and leave catalogue↔spec signals stale, contrary to D3. GO-03 lacks deterministic acceptance coverage for this case.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 370,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "CN-08 and AC-09 require invalidation on a capability execution-contract fingerprint mismatch, but the spec never defines that fingerprint's inputs for generic capability resume; IN-04 defines only the reviewer-specific fingerprint. D4 identifies capability SSoT, always-injected discipline, and declared policy/contract files as inputs. Without an equivalent contract here, downstream phases must invent which changes invalidate the cache, making stale-reuse prevention untestable.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 250,
+              "category": "constraint vague or untestable"
+            }
+          ],
+          "hash": "rvw1:sha256:108da43a56156852b9bd84a34fdafa56d8576cf5c188766aebda83000a916b9d",
+          "at": "2026-07-13T16:54:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-08 requires a fresh session when the concern changes, even if the target artifact remains the same. However, AC-09 only checks the resume option and track/capability/artifact identity, so all acceptance criteria can pass while a same-artifact concern switch incorrectly resumes stale context. This leaves GO-02/GO-04 without deterministic coverage for a prohibited reuse path.",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 410,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:d46257338e0adf1ff89460ffa3a3b546f012a8687dfd402f1a78e49915cc5b4a",
+          "at": "2026-07-13T16:58:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b0673238fe06b26b1bfe37b71c4c5e5a44f3e572d61f83156a1e8c5e7c9191b",
+          "at": "2026-07-13T17:02:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f8e5981a7be92172bfa4dd064dfe92c1bed7668a0ce317b2f4f1290eddeb91e6",
+          "at": "2026-07-14T18:34:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 の第1文は declaration_hash の一致も rustdoc 抽出を skip する必要条件にしていますが、同じ AC の第3文と AC-06 は、implementation-side input hash が一致して declaration_hash だけが不一致の場合にも rustdoc を起動しないと定めています。同一状態に対して相反する routing となるため、rustdoc 抽出の要否は implementation-side input hash のみに基づき、declaration/spec の差分は signal 再評価の要否だけを決める契約に統一する必要があります。",
+              "severity": "P1",
+              "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+              "line": 366,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f8e5981a7be92172bfa4dd064dfe92c1bed7668a0ce317b2f4f1290eddeb91e6",
+          "at": "2026-07-14T19:55:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9c085bd4ba08195fabcfa858e002be63b3ae1bdc0b035b435cb83ae30088999",
+          "at": "2026-07-14T19:58:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b9c085bd4ba08195fabcfa858e002be63b3ae1bdc0b035b435cb83ae30088999",
+          "at": "2026-07-14T19:59:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7ea3576ae23b7baa74f3acf9d55bf7f5f52347f549dc1fa9fee25a26f409b45",
+          "at": "2026-07-15T01:51:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d7ea3576ae23b7baa74f3acf9d55bf7f5f52347f549dc1fa9fee25a26f409b45",
+          "at": "2026-07-15T01:53:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a343392f8f0ca60ab5996df09d0fab5afeda437fdd26dc7e69d29c1d72628b2",
+          "at": "2026-07-15T04:33:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a343392f8f0ca60ab5996df09d0fab5afeda437fdd26dc7e69d29c1d72628b2",
+          "at": "2026-07-15T04:37:09Z"
         }
       ]
     }

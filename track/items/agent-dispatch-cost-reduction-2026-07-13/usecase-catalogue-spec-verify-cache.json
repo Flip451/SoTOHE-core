@@ -1563,6 +1563,150 @@
       }
     },
     {
+      "claim_hash": "7f998a7a7e718ec499a9327c2c05034c8fde200d1dc74d15a0084687fcbceef6",
+      "evidence_hash": "34d0becc38f51a0862903a7c929c7000dce6f79fa0fb59c7c9476a87ede2f0b7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer-like capability では fast と final の別 effort が解決できる。default profile の reviewer fast は low、final は各 provider の最大段階であり、fast の前置判定と final の完全判定から成る二段 review を維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "RunReviewFixError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "default routing profile は subprocess を起動する対象 capability の effort を解決でき、reviewer-like capability では fast と final の別 effort が解決できる。default profile の reviewer fast は low、final は各 provider の最大段階であり、fast の前置判定と final の完全判定から成る二段 review を維持する。ref-verifier-chain1 / ref-verifier-chain2 は対象であり、pr-reviewer は対象外である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f998a7a7e718ec499a9327c2c05034c8fde200d1dc74d15a0084687fcbceef6",
+      "evidence_hash": "df77e0175c0d8974890d6c7d2c75e7e4baf12b3533df9123f79411592be09c09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対象 capability の effort が未指定の dispatch を暗黙の provider 既定で実行せず、dispatch を拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "RunReviewFixError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "対象 capability の effort が未指定の dispatch を暗黙の provider 既定で実行せず、dispatch を拒否する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c203fda1df62d6915dc5ef3d57b02264bbf00ac848d918317bc60f96e60b6d2b",
+      "evidence_hash": "34d0becc38f51a0862903a7c929c7000dce6f79fa0fb59c7c9476a87ede2f0b7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "default routing profile は subprocess を起動する対象 capability の effort を解決でき、reviewer-like capability では fast と final の別 effort が解決できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SubagentDispatchInstruction"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "default routing profile は subprocess を起動する対象 capability の effort を解決でき、reviewer-like capability では fast と final の別 effort が解決できる。default profile の reviewer fast は low、final は各 provider の最大段階であり、fast の前置判定と final の完全判定から成る二段 review を維持する。ref-verifier-chain1 / ref-verifier-chain2 は対象であり、pr-reviewer は対象外である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c203fda1df62d6915dc5ef3d57b02264bbf00ac848d918317bc60f96e60b6d2b",
+      "evidence_hash": "df77e0175c0d8974890d6c7d2c75e7e4baf12b3533df9123f79411592be09c09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対象 capability の effort が未指定の dispatch を暗黙の provider 既定で実行せず、dispatch を拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SubagentDispatchInstruction"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "対象 capability の effort が未指定の dispatch を暗黙の provider 既定で実行せず、dispatch を拒否する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "82d189b52f549a8002666c13dda9f60f0ab7bc9a3939ba760bb6b5ba5e102c1c",
+      "evidence_hash": "34d0becc38f51a0862903a7c929c7000dce6f79fa0fb59c7c9476a87ede2f0b7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "default routing profile は subprocess を起動する対象 capability の effort を解決でき、reviewer-like capability では fast と final の別 effort が解決できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SubagentName"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "default routing profile は subprocess を起動する対象 capability の effort を解決でき、reviewer-like capability では fast と final の別 effort が解決できる。default profile の reviewer fast は low、final は各 provider の最大段階であり、fast の前置判定と final の完全判定から成る二段 review を維持する。ref-verifier-chain1 / ref-verifier-chain2 は対象であり、pr-reviewer は対象外である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "82d189b52f549a8002666c13dda9f60f0ab7bc9a3939ba760bb6b5ba5e102c1c",
+      "evidence_hash": "df77e0175c0d8974890d6c7d2c75e7e4baf12b3533df9123f79411592be09c09",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対象 capability の effort が未指定の dispatch を暗黙の provider 既定で実行せず、dispatch を拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SubagentName"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "対象 capability の effort が未指定の dispatch を暗黙の provider 既定で実行せず、dispatch を拒否する。"
+        }
+      }
+    },
+    {
       "claim_hash": "99d9c6c6af9ff2d707c03cccca02b2aa99144dd0b5a42386090245d18a03fdd6",
       "evidence_hash": "74df0cf41b80fdb8461f2469f8807e5f1c56c5247083791d8ee3a415f4bd2d91",
       "verdict": {
@@ -2379,6 +2523,54 @@
       }
     },
     {
+      "claim_hash": "7952a75705445ba71b1ff350a728b77fa18a4008ca76946132413a78c49845c0",
+      "evidence_hash": "34d0becc38f51a0862903a7c929c7000dce6f79fa0fb59c7c9476a87ede2f0b7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "default routing profile は subprocess を起動する対象 capability の effort を解決でき"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ReviewFixRunner"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "default routing profile は subprocess を起動する対象 capability の effort を解決でき、reviewer-like capability では fast と final の別 effort が解決できる。default profile の reviewer fast は low、final は各 provider の最大段階であり、fast の前置判定と final の完全判定から成る二段 review を維持する。ref-verifier-chain1 / ref-verifier-chain2 は対象であり、pr-reviewer は対象外である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d00111d8a249b70cd50e12967dbe29d486e1fb794f215cf121283210b23900a8",
+      "evidence_hash": "23d71fb9adabdbde8bd0e55c1f9ce35c3f0aa3c3bb5f7421642aea15b733f73f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "すべての最適化経路を保守的に失効・再計算・新規 session へ倒し、既存の review judgment、review record、および signal の正確性を犠牲にしない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ReviewService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-04",
+          "text_label": "すべての最適化経路を保守的に失効・再計算・新規 session へ倒し、既存の review judgment、review record、および signal の正確性を犠牲にしない。"
+        }
+      }
+    },
+    {
       "claim_hash": "f3178e0184a5589f89dae97a21f29add6faa53d158c1098e3e9fdb68895b090a",
       "evidence_hash": "5ceb5e27f085ca0238a8be48d32f3a5db536584a85022dd551b57fd7a498cc9b",
       "verdict": {
@@ -2735,6 +2927,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-05",
           "text_label": "rustdoc 抽出の要否は、layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。一致時は rustdoc 抽出を skip し、不一致または判定不能時は AC-07 の条件に従って rustdoc 抽出から再計算する。declaration_hash または spec の差分は signal 再評価の要否だけを決め、両方が一致するときは評価ごと skip し、declaration_hash のみが不一致で implementation-side input hash が一致するときは AC-06 の条件に従って rustdoc を起動せず signal を再評価する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5308bf4daa4bbca38c89f1a434027abe7393d4cb4810623a41ab43971c85070d",
+      "evidence_hash": "34d0becc38f51a0862903a7c929c7000dce6f79fa0fb59c7c9476a87ede2f0b7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "default routing profile は subprocess を起動する対象 capability の effort を解決でき、reviewer-like capability では fast と final の別 effort が解決できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewRunFixInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "default routing profile は subprocess を起動する対象 capability の effort を解決でき、reviewer-like capability では fast と final の別 effort が解決できる。default profile の reviewer fast は low、final は各 provider の最大段階であり、fast の前置判定と final の完全判定から成る二段 review を維持する。ref-verifier-chain1 / ref-verifier-chain2 は対象であり、pr-reviewer は対象外である。"
         }
       }
     }

@@ -787,6 +787,246 @@
     },
     {
       "id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_codex"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:run_codex' of ReviewService",
+      "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_claude"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:run_claude' of ReviewService",
+      "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_local"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:run_local' of ReviewService",
+      "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check_approved"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:check_approved' of ReviewService",
+      "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:results"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:results' of ReviewService",
+      "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:classify"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:classify' of ReviewService",
+      "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:files"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:files' of ReviewService",
+      "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:validate_scope"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:validate_scope' of ReviewService",
+      "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:get_briefing"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:get_briefing' of ReviewService",
+      "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:persist_commit_hash"
+      },
+      "target_entry": {
+        "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:persist_commit_hash' of ReviewService",
+      "declaration_hash": "a3ddb1be3dcef4ee7fe266a4929a066a41e03d99788f66a0d30e4d0c49267a60",
+      "spec_refs": [
+        {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "GO-04"
+        }
+      ]
+    },
+    {
+      "id": {
         "entry_key": "TypeSignalsExecutorPort",
         "obligation_kind": "contract",
         "item_identifier": "trait_method:evaluate_layer"

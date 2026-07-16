@@ -12,6 +12,7 @@ use infrastructure::review_v2::{
     SystemReviewHasher, load_v2_scope_config,
 };
 use thiserror::Error;
+use usecase::capability_exec::ReasoningEffort;
 use usecase::dry_write_driver::CapabilityName;
 use usecase::review_v2::{ReviewCycle, ScopeQueryInteractor};
 
@@ -553,6 +554,7 @@ pub(crate) fn load_agent_profiles_from_repo(
 pub(crate) struct ResolvedAgentExecution {
     pub(crate) provider: String,
     pub(crate) model: String,
+    pub(crate) effort: ReasoningEffort,
 }
 
 /// Resolves an agent capability execution from `agent-profiles.json`, applying
@@ -573,7 +575,7 @@ pub(crate) fn resolve_agent_execution(
     let resolved = profiles
         .resolve_execution(&capability_name, round_type)
         .map_err(|error| ReviewSharedError::Config(error.to_string()))?;
-    let infrastructure::agent_profiles::ResolvedExecution::ProviderCli { provider, model, .. } =
+    let infrastructure::agent_profiles::ResolvedExecution::ProviderCli { provider, model, effort } =
         resolved
     else {
         return Err(ReviewSharedError::Config(format!(
@@ -581,7 +583,7 @@ pub(crate) fn resolve_agent_execution(
         )));
     };
     let model = model_override.map(str::to_owned).unwrap_or_else(|| model.as_str().to_owned());
-    Ok(ResolvedAgentExecution { provider: provider.as_str().to_owned(), model })
+    Ok(ResolvedAgentExecution { provider: provider.as_str().to_owned(), model, effort })
 }
 
 /// Parses a `round_type` string (`"fast"` or `"final"`) into the infra

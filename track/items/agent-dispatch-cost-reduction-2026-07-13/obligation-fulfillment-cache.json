@@ -5176,12 +5176,12 @@
       },
       "key": {
         "bound_tests_set_hash": "39e26079b24da0ba852f6234af3bf9a8448de758297b1dc70157ef9e0d58af0c",
-        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
+        "declaration_hash": "f38419af94f57a694ca594ce5ed862b94d5e31e765aa955138dbed487a46fdb3",
         "anchor_text_hash": "ada0a8c57a9d8d40910dc95985d3a9260b7c885da13431c2cd9613cbd79e7805"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(arguments.contains(\"resume prior-session\"), \"expected resume argv: {arguments}\");\n\n(\"first-round\", \"fast\", None),\n(\"fast-to-final\", \"final\", Some((RoundType::Fast, \"codex-review-model\"))),\n\nassert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\");"
+        "citation": "assert!(arguments.contains(\"resume prior-session\"), \"expected resume argv: {arguments}\");\nassert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5200,12 +5200,12 @@
       },
       "key": {
         "bound_tests_set_hash": "2151656b41f2bed7ad4d5b408dbd260e29ddfe552c3a7f669382b84c844dacb4",
-        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
+        "declaration_hash": "f38419af94f57a694ca594ce5ed862b94d5e31e765aa955138dbed487a46fdb3",
         "anchor_text_hash": "12b1350e138cc06f3478183cd939907fcd5552cc6e22d2179adef96ff00b8b11"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\");\nassert_eq!(attempts.len(), 2, \"resume failure must retry fresh: {attempts:?}\");\nassert!(attempts.get(1).is_some_and(|attempt| !attempt.contains(\"resume\")));\nassert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
+        "citation": "assert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\");\nassert!(attempts.first().is_some_and(|attempt| attempt.contains(\"resume prior-session\")));\nassert!(attempts.get(1).is_some_and(|attempt| !attempt.contains(\"resume\")));\nassert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5223,13 +5223,13 @@
         "item_identifier": "voluntary:CN-02"
       },
       "key": {
-        "bound_tests_set_hash": "6ceaf00908367a98830b1da138ee5a2af0563d3ecf5f68a2072e4a0bd047e1ff",
-        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
+        "bound_tests_set_hash": "afcc87e8fbdc00c5c16bcff2edb490b39b814a1e286a5f30d82a0fc80963cc96",
+        "declaration_hash": "f38419af94f57a694ca594ce5ed862b94d5e31e765aa955138dbed487a46fdb3",
         "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(arguments.contains(\"--model codex-review-model\")); assert!(arguments.contains(\"--sandbox read-only\")); assert!(arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"));"
+        "citation": "assert!(arguments.contains(\"resume prior-session\"), \"expected resume argv: {arguments}\"); assert!(arguments.contains(\"--model codex-review-model\"), \"missing model argv: {arguments}\"); assert!(arguments.contains(\"--sandbox read-only\"), \"missing sandbox argv: {arguments}\"); assert!(arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"), \"missing effort argv: {arguments}\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5248,12 +5248,12 @@
       },
       "key": {
         "bound_tests_set_hash": "f78ee46fcefc8e24fa67eb1af9fb4fb15d4798964d52bf8b4c77453861687cc8",
-        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
+        "declaration_hash": "f38419af94f57a694ca594ce5ed862b94d5e31e765aa955138dbed487a46fdb3",
         "anchor_text_hash": "0dee02c08949c142a3ea7edfea8ac737088ad23dd54aa0e7d24bb564776b23e6"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;"
+        "citation": "case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;\n  *) exit 10 ;;\nesac"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5272,12 +5272,12 @@
       },
       "key": {
         "bound_tests_set_hash": "e0b79d14d004714edb6a89cd01f0651b10488499ed77a3fcc072394a1845ace6",
-        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
+        "declaration_hash": "f38419af94f57a694ca594ce5ed862b94d5e31e765aa955138dbed487a46fdb3",
         "anchor_text_hash": "07cdc5852c99211b87502f07153d16da0d9e13f03f511f0ec36d0e90ca5ce018"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(attempts.len(), 2, \"resume failure must retry fresh: {attempts:?}\");\n        assert!(attempts.first().is_some_and(|attempt| attempt.contains(\"resume prior-session\")));\n        assert!(attempts.get(1).is_some_and(|attempt| !attempt.contains(\"resume\")));"
+        "citation": "assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5296,12 +5296,12 @@
       },
       "key": {
         "bound_tests_set_hash": "f78ee46fcefc8e24fa67eb1af9fb4fb15d4798964d52bf8b4c77453861687cc8",
-        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
+        "declaration_hash": "f38419af94f57a694ca594ce5ed862b94d5e31e765aa955138dbed487a46fdb3",
         "anchor_text_hash": "544150922e44eb510e899f687c37184a771bf9fca61d89487b5353bd44f16517"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "// A resume changes only provider context. Every invocation still returns\n        // the same single-round review record shape: verdict plus log info.\n        assert_eq!(resumed.1, model_mismatch.1);\n        assert_eq!(resumed.1, provider_mismatch.1);\n        assert_eq!(resumed.1, first_round.1);"
+        "citation": "assert_eq!(resumed.0, model_mismatch.0);\n        assert_eq!(resumed.0, provider_mismatch.0);\n        assert_eq!(resumed.0, first_round.0);\n        assert!(matches!(resumed.0, Verdict::ZeroFindings));\n        // A resume changes only provider context. Every invocation still returns\n        // the same single-round review record shape: verdict plus log info.\n        assert_eq!(resumed.1, model_mismatch.1);\n        assert_eq!(resumed.1, provider_mismatch.1);\n        assert_eq!(resumed.1, first_round.1);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5320,12 +5320,12 @@
       },
       "key": {
         "bound_tests_set_hash": "d4e4a930d1bd26493f20012718f6142de594b9198ce733ea858a13bbfe710872",
-        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
+        "declaration_hash": "f38419af94f57a694ca594ce5ed862b94d5e31e765aa955138dbed487a46fdb3",
         "anchor_text_hash": "6c61fa978e67690504105be79dd73f2649add14f0026cd302f7565c126cc61d7"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(arguments.contains(\"resume prior-session\"), \"expected resume argv: {arguments}\"); ... assert!(arguments.contains(\"--model codex-review-model\"), \"missing model argv: {arguments}\"); ... assert!(arguments.contains(\"--sandbox read-only\"), \"missing sandbox argv: {arguments}\"); ... assert!(arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"), \"missing effort argv: {arguments}\"); ... assert!(review_record.contains(\"zero_findings\")); assert!(review_record.contains(\"fast\"));"
+        "citation": "assert!(arguments.contains(\"resume prior-session\")); assert!(arguments.contains(\"--model codex-review-model\")); assert!(arguments.contains(\"--sandbox read-only\")); assert!(arguments.contains(\"model_reasoning_effort=\\\"high\\\"\")); case \"$last\" in\n  *\"CURRENT file list\"*\"CURRENT diff\"*\"fully re-adjudicate this entire scope\"*\"src/lib.rs\"*) ;;\nassert!(review_record.contains(\"zero_findings\"));\nassert!(review_record.contains(\"fast\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5344,12 +5344,12 @@
       },
       "key": {
         "bound_tests_set_hash": "2151656b41f2bed7ad4d5b408dbd260e29ddfe552c3a7f669382b84c844dacb4",
-        "declaration_hash": "4574fefcdbcfe134e2619b155d0872a62e68b017916c5e1b6c40bfeba6b394b2",
+        "declaration_hash": "f38419af94f57a694ca594ce5ed862b94d5e31e765aa955138dbed487a46fdb3",
         "anchor_text_hash": "042865d7c2f3ee57558d16bbda502891955644407e647ab52193b9aa10aa9c88"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\"); assert!(arguments.contains(\"--model codex-review-model\"), \"{name}: {arguments}\"); assert!(arguments.contains(\"--sandbox read-only\"), \"{name}: {arguments}\"); assert!(arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"), \"{name}: {arguments}\");"
+        "citation": "assert!(arguments.contains(\"resume prior-session\"), \"expected resume argv: {arguments}\"); assert!(arguments.contains(\"--model codex-review-model\"), \"missing model argv: {arguments}\"); assert!(arguments.contains(\"--sandbox read-only\"), \"missing sandbox argv: {arguments}\"); assert!(arguments.contains(\"model_reasoning_effort=\\\"high\\\"\"), \"missing effort argv: {arguments}\"); assert!(!arguments.contains(\"resume\"), \"{name} must start fresh: {arguments}\"); assert!(attempts.first().is_some_and(|attempt| attempt.contains(\"resume prior-session\"))); assert!(attempts.get(1).is_some_and(|attempt| !attempt.contains(\"resume\"))); assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -6286,6 +6286,126 @@
       "verdict": {
         "kind": "fulfilled",
         "citation": "assert_eq!(into_driver_input(fresh).resume, CapabilityResumeArg::Fresh);\n        assert!(targetless.target_artifacts.is_empty());\n        assert_eq!(into_driver_input(targetless).resume, CapabilityResumeArg::ResumeWithoutTarget);\n        assert_eq!(\n            into_driver_input(targeted).resume,\n            CapabilityResumeArg::Resume(vec![\n                \"track/items/a/spec.json\"\n                    .parse::<TargetArtifactPathArg>()\n                    .expect(\"normalized target\")\n            ])\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CodexReviewFixRunner",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CodexReviewFixRunner",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "398ab8efbf6eb5a9732a346a375c49cd82afaebf75585465911f6dae23588198",
+        "declaration_hash": "e01d2c6e2bf93355a72788b05cf59de186baf0f9e7f7ef628cd32916d5e0fe14",
+        "anchor_text_hash": "ee8fe926da5c4652fe116d979eda3b0c854b2799298c3014c22057423bcb6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for (round_type, expected_effort) in [(\"fast\", \"low\"), (\"final\", \"high\")] { ... assert!( invocation.contains(&format!(\"model_reasoning_effort=\\\"{expected_effort}\\\"\")), \"{round_type} effort must be explicit in fixer argv: {invocation}\" ); }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SubagentDispatchInstruction",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SubagentDispatchInstruction",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "7799acd6f2cd103175a9d44029704bac9cce13b406dae71fe0d53f11ba41860c",
+        "declaration_hash": "193a038c24b8ba548eaf45cb6b07bd1bed0875fa33925e6415657c8cde3bffba",
+        "anchor_text_hash": "ee8fe926da5c4652fe116d979eda3b0c854b2799298c3014c22057423bcb6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(stdout.contains(\"\\\"effort\\\":\\\"low\\\"\"));\nassert!(stdout.contains(\"\\\"round_type\\\":\\\"fast\\\"\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "RunReviewFixError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RunReviewFixError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "cd539bb195094abb25448197f77592b84165a09fcd7f6115ea9141c0c009a259",
+        "declaration_hash": "7c8ac6aeaf47f6e4f55e5521fc74f4d8de857eaeced4fe6e21029114460cd63b",
+        "anchor_text_hash": "ee8fe926da5c4652fe116d979eda3b0c854b2799298c3014c22057423bcb6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(stdout.contains(\"\\\"effort\\\":\\\"low\\\"\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "RunReviewFixError",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RunReviewFixError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "a5a1ae024956dc0b6ea787a526656c7798263c9736e0b1ef169cdec1f9704278",
+        "declaration_hash": "7c8ac6aeaf47f6e4f55e5521fc74f4d8de857eaeced4fe6e21029114460cd63b",
+        "anchor_text_hash": "533bb22502cc654a9c16417a378d2c3df774aae024c4166a61cd678e59b8f744"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(usecase::review_v2::RunReviewFixError::FixRunnerFailed(message)) => {\n                assert!(\n                    message.as_str().contains(\"no reasoning effort\"),\n                    \"rejection must cite the missing effort, got: {}\",\n                    message.as_str()\n                );\n            }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewFixDriver",
+        "anchor_id": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewFixDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "c83942fd9012238d8beb36ce2658994c365bb526eda3359c2444ee47e34274dc",
+        "declaration_hash": "b49e43e020dc4f8129aabd363e0d08348441607940efecddf0ce1c3062addddd",
+        "anchor_text_hash": "ee8fe926da5c4652fe116d979eda3b0c854b2799298c3014c22057423bcb6512"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for (round_type, expected_effort) in [(\"fast\", \"low\"), (\"final\", \"high\")] { ... assert!( invocation.contains(&format!(\"model_reasoning_effort=\\\"{expected_effort}\\\"\")) ); }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     }

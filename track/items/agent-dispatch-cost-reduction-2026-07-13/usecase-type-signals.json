@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-16T03:00:44Z",
-  "declaration_hash": "b1383d153af6ab8299b9a82fee7a2a3609575dfedbd47c6b682c2ad7ba9a3b9d",
-  "implementation_input_hash": "e6cef8f710b6ec97d451716b19f37adde57d75ce70e77d8477e267664e0874bd",
+  "generated_at": "2026-07-16T09:45:45Z",
+  "declaration_hash": "14fdd1ece6790671bf8082e707db79f63643c71b2081c8710865be739b0d66c8",
+  "implementation_input_hash": "3fb3211169dc33521268dc63dc659f5ccd0f98a1dba5bfb2e372eae77fd27ff2",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -130,6 +130,12 @@
       ]
     },
     {
+      "type_name": "ReviewService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "ReviewerPrompt",
       "kind_tag": "value_object",
       "signal": "blue",
@@ -137,6 +143,37 @@
       "found_items": [
         "Clone",
         "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "RunReviewFixError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SubagentDispatchInstruction",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SubagentName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Display",
         "Eq",
         "PartialEq"
       ]
@@ -206,6 +243,21 @@
       "found_type": true
     },
     {
+      "type_name": "RunReviewFixCommand",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone"
+      ]
+    },
+    {
+      "type_name": "ReviewRunFixInput",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
       "type_name": "CapabilityDispatchOutcome",
       "kind_tag": "enum",
       "signal": "blue",
@@ -262,6 +314,12 @@
     {
       "type_name": "ProviderName",
       "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewFixRunner",
+      "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true
     },

@@ -219,6 +219,54 @@
       }
     },
     {
+      "claim_hash": "32cd553803343724568ab68aed1276cfbf5cd4f5470a7fcc031b0a753737b145",
+      "evidence_hash": "34d0becc38f51a0862903a7c929c7000dce6f79fa0fb59c7c9476a87ede2f0b7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "default routing profile は subprocess を起動する対象 capability の effort を解決でき、reviewer-like capability では fast と final の別 effort が解決できる。default profile の reviewer fast は low、final は各 provider の最大段階であり、fast の前置判定と final の完全判定から成る二段 review を維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewFixDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "default routing profile は subprocess を起動する対象 capability の effort を解決でき、reviewer-like capability では fast と final の別 effort が解決できる。default profile の reviewer fast は low、final は各 provider の最大段階であり、fast の前置判定と final の完全判定から成る二段 review を維持する。ref-verifier-chain1 / ref-verifier-chain2 は対象であり、pr-reviewer は対象外である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cdb1fe1f422021fa7d8979e99be0caf27dcdff1bec5be5f182cfc3468ff89c4b",
+      "evidence_hash": "23d71fb9adabdbde8bd0e55c1f9ce35c3f0aa3c3bb5f7421642aea15b733f73f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "すべての最適化経路を保守的に失効・再計算・新規 session へ倒し、既存の review judgment、review record、および signal の正確性を犠牲にしない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-04",
+          "text_label": "すべての最適化経路を保守的に失効・再計算・新規 session へ倒し、既存の review judgment、review record、および signal の正確性を犠牲にしない。"
+        }
+      }
+    },
+    {
       "claim_hash": "f2487472a348ab8528bbaaa3634947f92b01faaadd19b3eba450ed67b0602d45",
       "evidence_hash": "74df0cf41b80fdb8461f2469f8807e5f1c56c5247083791d8ee3a415f4bd2d91",
       "verdict": {

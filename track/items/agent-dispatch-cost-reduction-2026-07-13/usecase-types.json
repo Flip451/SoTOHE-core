@@ -166,11 +166,41 @@
         }
       ],
       "type_name": "ProviderSessionCacheEntry"
+    },
+    {
+      "methods": [
+        {
+          "docs": "Produces only domain::ValidationError::EmptyString because the backing domain::NonEmptyString constructor is the sole failure path.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, domain::ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "SubagentName"
     }
   ],
   "layer": "usecase",
   "schema_version": 5,
   "trait_impls": [
+    {
+      "for_type": "RunReviewFixCommand",
+      "trait_ref": "core::clone::Clone"
+    },
     {
       "action": "reference",
       "for_type": "TypeSignalsInteractor",
@@ -465,6 +495,57 @@
     {
       "for_type": "TypeSignalsExecutionError",
       "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "SubagentDispatchInstruction",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SubagentDispatchInstruction",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SubagentDispatchInstruction",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SubagentDispatchInstruction",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "RunReviewFixError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "RunReviewFixError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "RunReviewFixError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "SubagentName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SubagentName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SubagentName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SubagentName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SubagentName",
+      "trait_ref": "core::fmt::Display"
     }
   ],
   "traits": {
@@ -647,6 +728,283 @@
         },
         {
           "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ReviewFixRunner": {
+      "action": "reference",
+      "docs": "Synchronous secondary port forming the intentional blocking boundary around a long-running external CLI subprocess.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run_fix",
+          "params": [
+            {
+              "name": "command",
+              "ty": "RunReviewFixCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<RunReviewFixOutput, ReviewFixRunnerError>"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ReviewService": {
+      "action": "modify",
+      "docs": "Aggregate review application service after removal of the obsolete review-fix lane; its remaining primitive parameters preserve the pre-existing CLI-family boundary and are outside this track's dispatch redesign.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run_codex",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewRunInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<RunReviewOutput, RunReviewError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run_claude",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewRunInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<RunReviewOutput, RunReviewError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run_local",
+          "params": [
+            {
+              "name": "model",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "timeout_seconds",
+              "ty": "u64"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "Option<std::path::PathBuf>"
+            },
+            {
+              "name": "prompt",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "round_type",
+              "ty": "String"
+            },
+            {
+              "name": "group",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "ReviewRunLocalOutput"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check_approved",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ReviewApprovalOutput, ReviewCheckApprovedError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "results",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "scope",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "all",
+              "ty": "bool"
+            },
+            {
+              "name": "limit",
+              "ty": "u32"
+            },
+            {
+              "name": "round_type",
+              "ty": "String"
+            },
+            {
+              "name": "no_hint",
+              "ty": "bool"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<String, ReviewAuxError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "classify",
+          "params": [
+            {
+              "name": "paths",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<(String, String)>, ReviewAuxError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "files",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "String"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<String>, ReviewAuxError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "validate_scope",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "String"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), ReviewAuxError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "get_briefing",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "String"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Option<String>, ReviewAuxError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "persist_commit_hash",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<String, CommitHashPersistenceError>"
+        }
+      ],
+      "module_path": "review_v2::aggregate_service",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-04",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ],
@@ -1944,6 +2302,17 @@
         }
       ]
     },
+    "ReviewRunFixInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "review_v2::aggregate_service",
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
     "ReviewerPrompt": {
       "action": "add",
       "docs": "Validated non-empty reviewer prompt used to start or resume reviewer sessions.",
@@ -1968,6 +2337,192 @@
         },
         {
           "anchor": "CN-03",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "RunReviewFixError": {
+      "action": "modify",
+      "docs": "Usecase error vocabulary carrying validated diagnostic messages for invalid review-fix inputs and runner failures, plus typed required-external-dispatch detail.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidScope",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTrackId",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidRoundType",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SmokeTestFailed",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "FixRunnerFailed",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SubagentDispatchRequired",
+            "payload": {
+              "fields": [
+                "Box<SubagentDispatchInstruction>"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "SubagentDispatchInstruction": {
+      "action": "add",
+      "docs": "Usecase-owned DTO carrying provider-neutral review-fix dispatch values to the CLI-driver rendering boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "agent",
+              "ty": "SubagentName"
+            },
+            {
+              "name": "model",
+              "ty": "ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "ReasoningEffort"
+            },
+            {
+              "name": "scope",
+              "ty": "domain::ids::ReviewGroupName"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "domain::ids::TrackId"
+            },
+            {
+              "name": "round_type",
+              "ty": "ReviewRoundType"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "SubagentName": {
+      "action": "add",
+      "docs": "Validated technical identifier for an in-host review-fix subagent; it lives in usecase because it names the dispatch target rather than a domain concept.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Produces only domain::ValidationError::EmptyString because the backing domain::NonEmptyString constructor is the sole failure path.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, domain::ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-01",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ]

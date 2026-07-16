@@ -424,21 +424,19 @@ impl ReviewCompositionRoot {
         outcome_to_command_outcome(run_result.map_err(CompositionError::Usecase)?)
     }
 
-    /// Run the review-fix-lead fixer with provider auto-resolved from agent-profiles.json.
+    /// Constructs the injected driver for one provider-resolved review-fix run.
     ///
-    /// Resolves the `review-fix-lead` capability from `agent-profiles.json` at the
-    /// repo root. Supports only `"codex"` provider — constructs `CodexReviewFixRunner`
-    /// and runs it through `RunReviewFixInteractor`. Unknown or unsupported providers
-    /// return a clear error (mirrors `review_run_local` provider rejection).
+    /// This crate owns profile resolution and infrastructure wiring. The returned
+    /// driver owns the interactor invocation and command-outcome rendering.
     ///
     /// # Errors
-    /// Returns `Err` when profile loading, provider resolution, arg validation,
-    /// or the fix runner fails.
-    pub fn review_run_fix_local(
+    /// Returns `Err` when profile loading, provider resolution, or typed input
+    /// construction fails.
+    pub(crate) fn review_fix_driver(
         &self,
         input: RunReviewFixLocalInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        run_fix::run_fix_local(input).map_err(CompositionError::Infrastructure)
+    ) -> Result<cli_driver::review::ReviewFixDriver, usecase::review_v2::RunReviewFixError> {
+        run_fix::review_fix_driver(input)
     }
 
     /// Run the review-fix-lead fixer, resolving `track_id` from the current
@@ -464,7 +462,10 @@ impl ReviewCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         let track_id = resolve_track_id_or_branch_write(track_id_opt, &items_dir)?;
         let input = RunReviewFixLocalInput { scope, briefing_file, track_id, round_type, model };
-        self.review_run_fix_local(input)
+        let driver = self
+            .review_fix_driver(input)
+            .map_err(|error| CompositionError::Usecase(error.to_string()))?;
+        Ok(driver.handle())
     }
 
     /// Check if the review state is approved and code hash is current.
@@ -678,7 +679,7 @@ impl ReviewCompositionRoot {
 // ---------------------------------------------------------------------------
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use std::ffi::OsString;
     use std::fs;
@@ -842,6 +843,31 @@ mod tests {
         fs::write(config_dir.join("agent-profiles.json"), content).unwrap();
     }
 
+    /// Profile whose `review-fix-lead` declares a fast-round override but omits
+    /// `fast_reasoning_effort`, so fast-round resolution must fail closed.
+    fn write_agent_profiles_missing_review_fix_fast_effort(root: &std::path::Path) {
+        let config_dir = root.join(".harness/config");
+        fs::create_dir_all(&config_dir).unwrap();
+        let content = r#"{
+  "schema_version": 1,
+  "providers": {
+    "codex": { "label": "Codex" }
+  },
+  "capabilities": {
+    "review-fix-lead": {
+      "provider": "codex",
+      "model": "gpt-final",
+      "fast_provider": "codex",
+      "fast_model": "gpt-fast",
+      "reasoning_effort": "high",
+      "execution_mode": "typed-pipeline"
+    }
+  }
+}
+"#;
+        fs::write(config_dir.join("agent-profiles.json"), content).unwrap();
+    }
+
     #[cfg(unix)]
     fn write_fake_codex_bin_with_body(bin_dir: &std::path::Path, body: &str) {
         fs::create_dir_all(bin_dir).unwrap();
@@ -888,6 +914,22 @@ printf 'REVIEW_FIX_STATUS: completed\n' > "$out"
 printf 'fake stdout\n'
 exit 0
 "#,
+        );
+    }
+
+    #[cfg(unix)]
+    fn write_recording_codex_fix_bin(bin_dir: &std::path::Path, arguments_log: &std::path::Path) {
+        write_fake_codex_bin_with_body(
+            bin_dir,
+            &format!(
+                r#"
+printf '%s\n' "$args" >> '{}'
+cat >/dev/null
+printf 'REVIEW_FIX_STATUS: completed\n' > "$out"
+exit 0
+"#,
+                arguments_log.display(),
+            ),
         );
     }
 
@@ -1277,7 +1319,7 @@ exit 0
 
     #[cfg(unix)]
     #[test]
-    fn review_run_fix_local_codex_completed_status_returns_command_outcome() {
+    fn review_fix_driver_codex_completed_status_returns_command_outcome() {
         let _lock = cwd_lock().lock().unwrap();
 
         let dir = tempfile::tempdir().unwrap();
@@ -1298,21 +1340,58 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(dir.path()).unwrap();
 
-        let outcome = crate::review_v2::ReviewCompositionRoot::new()
-            .review_run_fix_local(run_review_fix_input(briefing))
-            .unwrap();
+        let output = crate::review_v2::ReviewCompositionRoot::new()
+            .review_fix_driver(run_review_fix_input(briefing))
+            .unwrap()
+            .handle();
 
-        assert_eq!(outcome.stdout.as_deref(), Some("REVIEW_FIX_STATUS: completed"));
-        assert_eq!(outcome.stderr, None);
-        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(output.stdout.as_deref(), Some("REVIEW_FIX_STATUS: completed"));
+        assert_eq!(output.stderr, None);
+        assert_eq!(output.exit_code, 0);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_fix_driver_injects_resolved_effort_for_fast_and_final_rounds() {
+        let _lock = cwd_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        write_agent_profiles(dir.path(), "codex");
+        let briefing = dir.path().join("briefing.md");
+        fs::write(&briefing, "# Briefing\n").unwrap();
+        let bin_dir = dir.path().join("bin-test");
+        let arguments_log = dir.path().join("codex-arguments.log");
+        write_recording_codex_fix_bin(&bin_dir, &arguments_log);
+        let _path_guard = prepend_path(&bin_dir);
+        let _sandbox_guard = EnvGuard::remove("CODEX_SANDBOX");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(dir.path()).unwrap();
+
+        for (round_type, expected_effort) in [("fast", "low"), ("final", "high")] {
+            let output = crate::review_v2::ReviewCompositionRoot::new()
+                .review_fix_driver(crate::review_v2::RunReviewFixLocalInput {
+                    scope: "cli_composition".to_owned(),
+                    briefing_file: briefing.clone(),
+                    track_id: "review-fix-effort-2026".to_owned(),
+                    round_type: round_type.to_owned(),
+                    model: None,
+                })
+                .unwrap()
+                .handle();
+            assert_eq!(output.exit_code, 0, "{round_type} round must complete");
+            let arguments = fs::read_to_string(&arguments_log).unwrap();
+            let invocation = arguments.lines().last().unwrap_or_default();
+            assert!(
+                invocation.contains(&format!("model_reasoning_effort=\"{expected_effort}\"")),
+                "{round_type} effort must be explicit in fixer argv: {invocation}"
+            );
+        }
     }
 
     #[test]
-    fn review_run_fix_local_claude_provider_returns_subagent_dispatch_instruction() {
-        // PR #175 follow-up: review-fix-lead.provider = "claude" must return a
-        // structured dispatch instruction (stdout sentinel + JSON, exit code
-        // SUBAGENT_DISPATCH_EXIT_CODE), not an error, so the orchestrator can
-        // route to the Claude Code subagent without provider conditionals.
+    fn review_fix_driver_claude_provider_renders_subagent_dispatch_instruction() {
+        // Composition injects the typed dispatch path; only the CLI driver
+        // invokes it and renders the sentinel and JSON protocol.
         let _lock = cwd_lock().lock().unwrap();
 
         let dir = tempfile::tempdir().unwrap();
@@ -1325,77 +1404,162 @@ exit 0
         std::env::set_current_dir(dir.path()).unwrap();
 
         let outcome = crate::review_v2::ReviewCompositionRoot::new()
-            .review_run_fix_local(run_review_fix_input(briefing.clone()))
-            .expect("claude provider must succeed with a dispatch instruction");
+            .review_fix_driver(run_review_fix_input(briefing.clone()))
+            .unwrap()
+            .handle();
 
-        assert_eq!(
-            outcome.exit_code,
-            crate::review_v2::run_fix::SUBAGENT_DISPATCH_EXIT_CODE,
-            "claude provider must exit with SUBAGENT_DISPATCH_EXIT_CODE"
-        );
-        let stdout = outcome.stdout.expect("dispatch instruction must be on stdout");
-        let mut lines = stdout.lines();
-        let sentinel = lines.next().expect("first stdout line must be the dispatch sentinel");
-        assert_eq!(sentinel, crate::review_v2::run_fix::SUBAGENT_DISPATCH_SENTINEL);
-        let json = lines.next().expect("second stdout line must be the dispatch JSON payload");
-        assert!(json.contains("\"agent\":\"review-fix-lead\""), "JSON must name the agent: {json}");
-        assert!(json.contains("\"scope\":\"cli_composition\""), "JSON must carry scope: {json}");
-        assert!(
-            json.contains(&format!("\"briefing_file\":\"{}\"", briefing.display())),
-            "JSON must carry briefing_file: {json}"
-        );
-        assert!(
-            json.contains("\"track_id\":\"review-fix-codex-rustify-2026-05-31\""),
-            "JSON must carry track_id: {json}"
-        );
-        assert!(json.contains("\"round_type\":\"fast\""), "JSON must carry round_type: {json}");
+        assert_eq!(outcome.exit_code, cli_driver::review::SUBAGENT_DISPATCH_EXIT_CODE);
+        let stdout = outcome.stdout.unwrap();
+        assert!(stdout.starts_with(cli_driver::review::SUBAGENT_DISPATCH_SENTINEL));
+        assert!(stdout.contains("\"agent\":\"review-fix-lead\""));
+        assert!(stdout.contains("\"model\":\"gpt-5.5\""));
+        assert!(stdout.contains("\"effort\":\"low\""));
+        assert!(stdout.contains("\"scope\":\"cli_composition\""));
+        assert!(stdout.contains(&format!("\"briefing_file\":\"{}\"", briefing.display())));
+        assert!(stdout.contains("\"track_id\":\"review-fix-codex-rustify-2026-05-31\""));
+        assert!(stdout.contains("\"round_type\":\"fast\""));
     }
 
-    /// Regression: exit 64 + `SUBAGENT_DISPATCH_REQUIRED` sentinel must pass through
-    /// the full `ReviewDriver` → `ReviewServiceImpl` chain unchanged when
-    /// `review-fix-lead.provider` is `"claude"`.
-    ///
-    /// Before the fix, `ReviewServiceImpl::run_fix_local` mapped exit 64 to
-    /// `status: "failed"` and the driver then rewrote stdout to
-    /// `"REVIEW_FIX_STATUS: failed"` with exit code 1, so the orchestrator never
-    /// saw the dispatch sentinel and could not launch the Claude subagent.
     #[test]
-    fn review_driver_handle_claude_provider_passes_through_subagent_dispatch_sentinel() {
+    fn test_review_run_fix_local_rejects_missing_effort_before_dispatch() {
+        // CN-01: a review-fix dispatch whose resolved round has no configured
+        // effort must be refused fail-closed (no fall-through to the provider
+        // default). The rejection surfaces before any runner subprocess is
+        // constructed, as a typed `RunReviewFixError`.
         let _lock = cwd_lock().lock().unwrap();
 
         let dir = tempfile::tempdir().unwrap();
         GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
-        write_agent_profiles(dir.path(), "claude");
+        write_agent_profiles_missing_review_fix_fast_effort(dir.path());
         let briefing = dir.path().join("briefing.md");
         fs::write(&briefing, "# Briefing\n").unwrap();
 
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(dir.path()).unwrap();
 
-        let input = cli_driver::review::ReviewInput::RunFixLocal {
-            scope: "cli_composition".to_owned(),
-            briefing_file: briefing,
-            track_id: "review-fix-codex-rustify-2026-05-31".to_owned(),
-            round_type: "fast".to_owned(),
-            model: Some("gpt-5.5".to_owned()),
-        };
-        let outcome = crate::review_v2::ReviewCompositionRoot::new().review_driver().handle(input);
+        let result = crate::review_v2::ReviewCompositionRoot::new()
+            .review_fix_driver(run_review_fix_input(briefing));
 
-        assert_eq!(
-            outcome.exit_code,
-            crate::review_v2::run_fix::SUBAGENT_DISPATCH_EXIT_CODE,
-            "driver must pass through SUBAGENT_DISPATCH_EXIT_CODE (64) for claude provider; \
-             got {} — was it remapped to 1 by the failed-status path?",
-            outcome.exit_code
-        );
-        let stdout = outcome.stdout.expect("dispatch sentinel must appear on stdout");
+        match result {
+            Err(usecase::review_v2::RunReviewFixError::FixRunnerFailed(message)) => {
+                assert!(
+                    message.as_str().contains("no reasoning effort"),
+                    "rejection must cite the missing effort, got: {}",
+                    message.as_str()
+                );
+            }
+            Ok(_) => panic!("effort-less fast round must be rejected, not dispatched"),
+            Err(other) => panic!("expected fail-closed effort rejection, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_review_service_validate_scope_accepts_known_and_rejects_unknown_scope() {
+        use usecase::review_v2::aggregate_service::ReviewService as _;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-service-aux-scope-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let service = super::shim::ReviewServiceImpl;
+
+        service
+            .validate_scope(
+                "cli_composition".to_owned(),
+                Some(repo.track_id.clone()),
+                repo.items_dir.clone(),
+            )
+            .expect("configured scope must validate");
+
+        let error = service
+            .validate_scope(
+                "no-such-scope".to_owned(),
+                Some(repo.track_id.clone()),
+                repo.items_dir.clone(),
+            )
+            .expect_err("unconfigured scope must be rejected");
         assert!(
-            stdout.starts_with(crate::review_v2::run_fix::SUBAGENT_DISPATCH_SENTINEL),
-            "stdout first line must be SUBAGENT_DISPATCH_SENTINEL, got: {stdout:?}"
+            error.to_string().contains("Unknown scope"),
+            "rejection must name the unknown scope, got: {error}"
         );
+    }
+
+    #[test]
+    fn test_review_service_get_briefing_returns_none_without_config_and_rejects_bad_scope() {
+        use usecase::review_v2::aggregate_service::ReviewService as _;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-service-aux-briefing-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let service = super::shim::ReviewServiceImpl;
+
+        let briefing = service
+            .get_briefing(
+                "cli_composition".to_owned(),
+                Some(repo.track_id.clone()),
+                repo.items_dir.clone(),
+            )
+            .expect("configured scope without a briefing entry must succeed");
+        assert_eq!(briefing, None, "fixture config declares no briefing file");
+
+        let error = service
+            .get_briefing(
+                "cli_composition".to_owned(),
+                Some("Invalid Track Id!".to_owned()),
+                repo.items_dir.clone(),
+            )
+            .expect_err("invalid track id must be rejected");
         assert!(
-            !stdout.contains("REVIEW_FIX_STATUS:"),
-            "driver must NOT rewrite sentinel to REVIEW_FIX_STATUS line, got: {stdout:?}"
+            error.to_string().contains("invalid --track-id"),
+            "rejection must cite the invalid track id, got: {error}"
+        );
+    }
+
+    #[test]
+    fn test_review_service_results_renders_summary_and_rejects_items_dir_outside_repo() {
+        use usecase::review_v2::aggregate_service::ReviewService as _;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-service-aux-results-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let service = super::shim::ReviewServiceImpl;
+
+        let rendered = service
+            .results(
+                Some(repo.track_id.clone()),
+                repo.items_dir.clone(),
+                None,
+                false,
+                0,
+                "fast".to_owned(),
+                true,
+            )
+            .expect("results for a valid track must render");
+        assert!(
+            rendered.contains("Review results"),
+            "summary header must be rendered, got: {rendered}"
+        );
+
+        let outside = tempfile::tempdir().unwrap();
+        let error = service
+            .results(
+                Some(repo.track_id.clone()),
+                outside.path().to_path_buf(),
+                None,
+                false,
+                0,
+                "fast".to_owned(),
+                true,
+            )
+            .expect_err("items_dir outside the repository must be rejected");
+        assert!(
+            error.to_string().contains("outside the repository root"),
+            "rejection must cite repo containment, got: {error}"
         );
     }
 

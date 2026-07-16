@@ -9,6 +9,12 @@ use std::sync::Arc;
 
 use thiserror::Error;
 
+pub use domain::{ReviewGroupName, TrackId};
+
+use crate::DiagnosticMessage;
+use crate::capability_exec::{ModelName, ReasoningEffort};
+use crate::review_v2::ReviewRoundType;
+
 // ── RunReviewFixCommand ───────────────────────────────────────────────────────
 
 /// CQRS command for the run-review-fix use case (`sotp review fix-local`).
@@ -22,6 +28,7 @@ use thiserror::Error;
 /// D1/D3). `round_type` is a plain `String` (converted to `ReviewRoundType`
 /// internally by the interactor). The `model` field covers the fixer's own
 /// model override (optional).
+#[derive(Clone)]
 pub struct RunReviewFixCommand {
     pub scope: String,
     /// Path to the briefing file passed to the fixer. Required.
@@ -73,7 +80,54 @@ pub enum ReviewFixRunnerError {
 
 // ── RunReviewFixError ─────────────────────────────────────────────────────────
 
+/// Validated name of an in-host review-fix subagent.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SubagentName(domain::NonEmptyString);
+
+impl SubagentName {
+    /// Validates and wraps an in-host review-fix subagent name.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`domain::ValidationError`] when `value` is empty or
+    /// whitespace-only.
+    pub fn try_new(value: impl Into<String>) -> Result<Self, domain::ValidationError> {
+        Ok(Self(domain::NonEmptyString::try_new(value)?))
+    }
+
+    /// Returns the validated subagent name.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        self.0.as_ref()
+    }
+}
+
+impl std::fmt::Display for SubagentName {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.write_str(self.as_str())
+    }
+}
+
+/// Typed instruction for an external review-fix runner dispatch.
+///
+/// The usecase transports provider-neutral values only. The CLI driver owns
+/// rendering this instruction for the orchestrator-facing stdout protocol.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SubagentDispatchInstruction {
+    pub agent: SubagentName,
+    pub model: ModelName,
+    pub effort: ReasoningEffort,
+    pub scope: ReviewGroupName,
+    pub briefing_file: PathBuf,
+    pub track_id: TrackId,
+    pub round_type: ReviewRoundType,
+}
+
 /// Error type for [`RunReviewFixService`].
+///
+/// `SubagentDispatchRequired` signals that the request must be delegated to an
+/// external review-fix runner. The typed payload is rendered only by the CLI
+/// driver, which owns the external stdout protocol.
 ///
 /// `InvalidScope` / `InvalidTrackId` / `InvalidRoundType` cover argument
 /// validation failures. `SmokeTestFailed` covers forbidden sandbox flag
@@ -81,25 +135,36 @@ pub enum ReviewFixRunnerError {
 /// wraps the [`ReviewFixRunnerError`] from the port without leaking
 /// infrastructure types. `EmptyScopeFiles` is removed — the fixer skill
 /// self-resolves the scope boundary (ADR 2026-06-01-2300 D1).
-/// `SubagentDispatchRequired` signals that the request must be delegated to an
-/// external review-fix runner. The tuple field is an opaque dispatch
-/// instruction; adapters decide how to transport it.
 #[derive(Debug, Error)]
 pub enum RunReviewFixError {
-    #[error("invalid scope: {0}")]
-    InvalidScope(String),
-    #[error("invalid track ID: {0}")]
-    InvalidTrackId(String),
-    #[error("invalid round type: {0}")]
-    InvalidRoundType(String),
-    #[error("smoke test failed: {0}")]
-    SmokeTestFailed(String),
-    #[error("fix runner failed: {0}")]
-    FixRunnerFailed(String),
-    /// The request must be delegated to an external review-fix runner. The
-    /// payload is an opaque instruction owned by the adapter boundary.
+    #[error("invalid scope: {}", .0.as_str())]
+    InvalidScope(DiagnosticMessage),
+    #[error("invalid track ID: {}", .0.as_str())]
+    InvalidTrackId(DiagnosticMessage),
+    #[error("invalid round type: {}", .0.as_str())]
+    InvalidRoundType(DiagnosticMessage),
+    #[error("smoke test failed: {}", .0.as_str())]
+    SmokeTestFailed(DiagnosticMessage),
+    #[error("fix runner failed: {}", .0.as_str())]
+    FixRunnerFailed(DiagnosticMessage),
+    /// The request must be delegated to an external review-fix runner.
     #[error("external review-fix runner dispatch required")]
-    SubagentDispatchRequired(String),
+    SubagentDispatchRequired(Box<SubagentDispatchInstruction>),
+}
+
+/// Builds a non-empty diagnostic payload for [`RunReviewFixError`].
+#[must_use]
+fn diagnostic_message(value: impl Into<String>) -> DiagnosticMessage {
+    let mut value = value.into();
+    if value.trim().is_empty() {
+        value = "review-fix diagnostic detail unavailable".to_owned();
+    }
+    loop {
+        match DiagnosticMessage::try_new(value) {
+            Ok(message) => return message,
+            Err(_) => value = "review-fix diagnostic detail unavailable".to_owned(),
+        }
+    }
 }
 
 // ── ReviewFixRunner ───────────────────────────────────────────────────────────
@@ -173,19 +238,23 @@ impl RunReviewFixService for RunReviewFixInteractor {
     fn run(&self, command: RunReviewFixCommand) -> Result<RunReviewFixOutput, RunReviewFixError> {
         // Validate scope (must be non-empty)
         if command.scope.is_empty() {
-            return Err(RunReviewFixError::InvalidScope("scope must not be empty".to_owned()));
+            return Err(RunReviewFixError::InvalidScope(diagnostic_message(
+                "scope must not be empty",
+            )));
         }
         // Validate track_id (must be non-empty)
         if command.track_id.is_empty() {
-            return Err(RunReviewFixError::InvalidTrackId("track_id must not be empty".to_owned()));
+            return Err(RunReviewFixError::InvalidTrackId(diagnostic_message(
+                "track_id must not be empty",
+            )));
         }
         // Validate round_type (must be "fast" or "final")
         match command.round_type.as_str() {
             "fast" | "final" => {}
             other => {
-                return Err(RunReviewFixError::InvalidRoundType(format!(
+                return Err(RunReviewFixError::InvalidRoundType(diagnostic_message(format!(
                     "unknown round type: '{other}' (expected 'fast' or 'final')"
-                )));
+                ))));
             }
         }
         let out = (self.run_fn)(command)?;
@@ -198,17 +267,17 @@ impl RunReviewFixService for RunReviewFixInteractor {
             "blocked_cross_scope" => 2,
             "failed" => 1,
             other => {
-                return Err(RunReviewFixError::FixRunnerFailed(format!(
+                return Err(RunReviewFixError::FixRunnerFailed(diagnostic_message(format!(
                     "invalid status sentinel: '{other}' (expected 'completed', \
                      'blocked_cross_scope', or 'failed')"
-                )));
+                ))));
             }
         };
         if out.exit_code != expected_exit_code {
-            return Err(RunReviewFixError::FixRunnerFailed(format!(
+            return Err(RunReviewFixError::FixRunnerFailed(diagnostic_message(format!(
                 "exit_code {} does not match status '{}' (expected {})",
                 out.exit_code, out.status, expected_exit_code
-            )));
+            ))));
         }
         Ok(out)
     }
@@ -217,7 +286,7 @@ impl RunReviewFixService for RunReviewFixInteractor {
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::panic)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
 
@@ -235,32 +304,80 @@ mod tests {
 
     #[test]
     fn test_run_review_fix_error_invalid_scope_variant_exists() {
-        let e = RunReviewFixError::InvalidScope("bad".to_owned());
+        let e = RunReviewFixError::InvalidScope(diagnostic_message("bad"));
         assert!(matches!(e, RunReviewFixError::InvalidScope(_)));
     }
 
     #[test]
     fn test_run_review_fix_error_invalid_track_id_variant_exists() {
-        let e = RunReviewFixError::InvalidTrackId("bad".to_owned());
+        let e = RunReviewFixError::InvalidTrackId(diagnostic_message("bad"));
         assert!(matches!(e, RunReviewFixError::InvalidTrackId(_)));
     }
 
     #[test]
     fn test_run_review_fix_error_invalid_round_type_variant_exists() {
-        let e = RunReviewFixError::InvalidRoundType("bad".to_owned());
+        let e = RunReviewFixError::InvalidRoundType(diagnostic_message("bad"));
         assert!(matches!(e, RunReviewFixError::InvalidRoundType(_)));
     }
 
     #[test]
     fn test_run_review_fix_error_smoke_test_failed_variant_exists() {
-        let e = RunReviewFixError::SmokeTestFailed("reason".to_owned());
+        let e = RunReviewFixError::SmokeTestFailed(diagnostic_message("reason"));
         assert!(matches!(e, RunReviewFixError::SmokeTestFailed(_)));
     }
 
     #[test]
     fn test_run_review_fix_error_fix_runner_failed_variant_exists() {
-        let e = RunReviewFixError::FixRunnerFailed("reason".to_owned());
+        let e = RunReviewFixError::FixRunnerFailed(diagnostic_message("reason"));
         assert!(matches!(e, RunReviewFixError::FixRunnerFailed(_)));
+    }
+
+    #[test]
+    fn test_run_review_fix_error_diagnostic_payload_display_preserves_text() {
+        let cases = [
+            (
+                RunReviewFixError::InvalidScope(diagnostic_message("bad scope")),
+                "invalid scope: bad scope",
+            ),
+            (
+                RunReviewFixError::InvalidTrackId(diagnostic_message("bad track")),
+                "invalid track ID: bad track",
+            ),
+            (
+                RunReviewFixError::InvalidRoundType(diagnostic_message("bad round")),
+                "invalid round type: bad round",
+            ),
+            (
+                RunReviewFixError::SmokeTestFailed(diagnostic_message("smoke detail")),
+                "smoke test failed: smoke detail",
+            ),
+            (
+                RunReviewFixError::FixRunnerFailed(diagnostic_message("runner detail")),
+                "fix runner failed: runner detail",
+            ),
+        ];
+
+        for (error, expected) in cases {
+            assert_eq!(error.to_string(), expected);
+        }
+    }
+
+    #[test]
+    fn test_run_review_fix_error_subagent_dispatch_required_retains_typed_instruction() {
+        let instruction = SubagentDispatchInstruction {
+            agent: SubagentName::try_new("review-fix-lead").expect("valid test subagent"),
+            model: ModelName::try_new("claude-opus").expect("valid test model"),
+            effort: ReasoningEffort::Low,
+            scope: ReviewGroupName::try_new("cli_driver").expect("valid test review group"),
+            briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            track_id: TrackId::try_new("dispatch-render-2026").expect("valid test track ID"),
+            round_type: ReviewRoundType::Fast,
+        };
+        let error = RunReviewFixError::SubagentDispatchRequired(Box::new(instruction.clone()));
+
+        assert!(
+            matches!(error, RunReviewFixError::SubagentDispatchRequired(value) if *value == instruction)
+        );
     }
 
     // ── ReviewFixRunnerError variants ─────────────────────────────────────────
@@ -383,7 +500,7 @@ mod tests {
     #[test]
     fn test_run_review_fix_interactor_propagates_run_fn_error() {
         let run_fn = Arc::new(|_cmd: RunReviewFixCommand| {
-            Err(RunReviewFixError::FixRunnerFailed("runner error".to_owned()))
+            Err(RunReviewFixError::FixRunnerFailed(diagnostic_message("runner error")))
         });
         let interactor = RunReviewFixInteractor::new(run_fn);
         match interactor.run(make_valid_command()) {

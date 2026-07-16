@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "8c66dd0a8bb779f0682efc30ab541a51657250cbe065734ec2d2240cef89c48c",
+  "catalogue_declaration_hash": "6b44480edbfefe4db0217a574c54d3f7c8a1e84e2132eaf090bb2ba6ea594935",
   "signals": [
     {
       "type_name": "CapabilityDriver",
@@ -16,6 +16,16 @@
       "type_name": "CapabilityResumeArg",
       "signal": "blue",
       "entry_hash": "d2f42bea19736d57f528418362dd467817d6f80da9a73a54fcf1bfc5d4846686"
+    },
+    {
+      "type_name": "ReviewFixDriver",
+      "signal": "blue",
+      "entry_hash": "32cd553803343724568ab68aed1276cfbf5cd4f5470a7fcc031b0a753737b145"
+    },
+    {
+      "type_name": "ReviewInput",
+      "signal": "blue",
+      "entry_hash": "cdb1fe1f422021fa7d8979e99be0caf27dcdff1bec5be5f182cfc3468ff89c4b"
     },
     {
       "type_name": "TargetArtifactPathArg",

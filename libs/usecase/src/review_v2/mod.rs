@@ -17,7 +17,7 @@ pub mod scope_query;
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests;
 
-pub use aggregate_service::{ReviewRunFixInput, ReviewRunInput, ReviewService};
+pub use aggregate_service::{ReviewRunInput, ReviewService};
 pub use check_approved::{
     ReviewApprovalDecision, ReviewApprovalOutput, ReviewCheckApprovedError,
     ReviewCheckApprovedInteractor, ReviewCheckApprovedService,
@@ -36,8 +36,9 @@ pub use run_review::{
     RunReviewService,
 };
 pub use run_review_fix::{
-    ReviewFixRunner, ReviewFixRunnerError, RunReviewFixCommand, RunReviewFixError,
-    RunReviewFixInteractor, RunReviewFixOutput, RunReviewFixService,
+    ReviewFixRunner, ReviewFixRunnerError, ReviewGroupName, RunReviewFixCommand, RunReviewFixError,
+    RunReviewFixInteractor, RunReviewFixOutput, RunReviewFixService, SubagentDispatchInstruction,
+    SubagentName, TrackId,
 };
 pub use scope_query::{
     PathClassification, ScopeClassification, ScopeClassificationOutput, ScopeQueryError,

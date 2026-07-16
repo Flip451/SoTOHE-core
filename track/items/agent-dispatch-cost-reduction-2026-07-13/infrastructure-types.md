@@ -35,6 +35,7 @@
 | ClaudeCapabilityAdapter | secondary_adapter | modify | impl CapabilityProviderPort | 🔵 | 🔵 |
 | ClaudeReviewer | secondary_adapter | modify | impl Reviewer | 🔵 | 🔵 |
 | CodexCapabilityAdapter | secondary_adapter | modify | impl CapabilityProviderPort | 🔵 | 🔵 |
+| CodexReviewFixRunner | secondary_adapter | modify | impl ReviewFixRunner | 🔵 | 🔵 |
 | CodexReviewer | secondary_adapter | modify | impl Reviewer | 🔵 | 🔵 |
 | FsProviderSessionCacheAdapter | secondary_adapter | add | impl ProviderSessionCachePort | 🔵 | 🔵 |
 | RustdocSchemaExporter | secondary_adapter | modify | impl SchemaExporter, impl SchemaExporterPort | 🔵 | 🔵 |

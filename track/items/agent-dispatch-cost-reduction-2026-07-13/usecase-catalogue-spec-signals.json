@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "b1383d153af6ab8299b9a82fee7a2a3609575dfedbd47c6b682c2ad7ba9a3b9d",
+  "catalogue_declaration_hash": "14fdd1ece6790671bf8082e707db79f63643c71b2081c8710865be739b0d66c8",
   "signals": [
     {
       "type_name": "CapabilityDispatchOutcome",
@@ -98,6 +98,21 @@
       "entry_hash": "ed33de96e7ebe88cbf07385665b97a4db4c7008726e9d6b118057f50189d5e50"
     },
     {
+      "type_name": "RunReviewFixError",
+      "signal": "blue",
+      "entry_hash": "7f998a7a7e718ec499a9327c2c05034c8fde200d1dc74d15a0084687fcbceef6"
+    },
+    {
+      "type_name": "SubagentDispatchInstruction",
+      "signal": "blue",
+      "entry_hash": "c203fda1df62d6915dc5ef3d57b02264bbf00ac848d918317bc60f96e60b6d2b"
+    },
+    {
+      "type_name": "SubagentName",
+      "signal": "blue",
+      "entry_hash": "82d189b52f549a8002666c13dda9f60f0ab7bc9a3939ba760bb6b5ba5e102c1c"
+    },
+    {
       "type_name": "TargetArtifactPath",
       "signal": "blue",
       "entry_hash": "99d9c6c6af9ff2d707c03cccca02b2aa99144dd0b5a42386090245d18a03fdd6"
@@ -148,6 +163,16 @@
       "entry_hash": "90edf4710b6ed8945fffd9c5044020a2104f88c38a2fb97295ba4bb4ca856ad1"
     },
     {
+      "type_name": "ReviewFixRunner",
+      "signal": "blue",
+      "entry_hash": "7952a75705445ba71b1ff350a728b77fa18a4008ca76946132413a78c49845c0"
+    },
+    {
+      "type_name": "ReviewService",
+      "signal": "blue",
+      "entry_hash": "d00111d8a249b70cd50e12967dbe29d486e1fb794f215cf121283210b23900a8"
+    },
+    {
       "type_name": "Reviewer",
       "signal": "blue",
       "entry_hash": "f3178e0184a5589f89dae97a21f29add6faa53d158c1098e3e9fdb68895b090a"
@@ -166,6 +191,11 @@
       "type_name": "TypeSignalsService",
       "signal": "blue",
       "entry_hash": "c6dbff53a575e12ed2fbc2aa48432ca03e583988f991b8c521ba542d907aa953"
+    },
+    {
+      "type_name": "ReviewRunFixInput",
+      "signal": "blue",
+      "entry_hash": "5308bf4daa4bbca38c89f1a434027abe7393d4cb4810623a41ab43971c85070d"
     }
   ]
 }

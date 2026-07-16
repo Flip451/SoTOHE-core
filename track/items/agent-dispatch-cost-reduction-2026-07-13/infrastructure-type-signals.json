@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-16T05:03:55Z",
-  "declaration_hash": "a683b83f25845d9cee15fee3f14820caf2f6e851529aa58c392b4efd3c64d988",
-  "implementation_input_hash": "5571551b645d8fc02aa914b2c7491e45f43afcbd766d352b3ce83ec8cb25ca7c",
+  "generated_at": "2026-07-16T07:09:19Z",
+  "declaration_hash": "d3fe0f59d951fa2c5532ea855268137aa702c264244442e7a7edcb67a7311d9c",
+  "implementation_input_hash": "13aaf9a7622ca04ab1e97b982d2b6a0fb68d73924c1e976087258ea3b1d6e966",
   "signals": [
     {
       "type_name": "AgentProfiles",
@@ -62,6 +62,12 @@
       "found_items": [
         "CapabilityProviderPort"
       ]
+    },
+    {
+      "type_name": "CodexReviewFixRunner",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CodexReviewer",

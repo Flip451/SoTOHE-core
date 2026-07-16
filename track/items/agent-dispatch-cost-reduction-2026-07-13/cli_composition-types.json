@@ -146,19 +146,6 @@
         {
           "has_default_impl": false,
           "is_async": false,
-          "name": "review_run_fix_local",
-          "params": [
-            {
-              "name": "input",
-              "ty": "RunReviewFixLocalInput"
-            }
-          ],
-          "receiver": "&self",
-          "returns": "Result<cli_driver::CommandOutcome, CompositionError>"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
           "name": "review_run_fix_local_resolve",
           "params": [
           {

@@ -445,6 +445,11 @@
       "trait_ref": "usecase::review_v2::Reviewer"
     },
     {
+      "action": "reference",
+      "for_type": "CodexReviewFixRunner",
+      "trait_ref": "usecase::review_v2::run_review_fix::ReviewFixRunner"
+    },
+    {
       "action": "modify",
       "for_type": "TypeSignalsCodecError",
       "trait_ref": "core::fmt::Debug"
@@ -514,14 +519,14 @@
       "action": "modify",
       "docs": "Trusted routing-profile loader and typed execution resolver; provider_label is unconstrained display text (IN-01, IN-02, CN-01).",
       "informal_grounds": [],
-    "kind": {
-      "kind": "struct",
-      "shape": {
-        "fields": [],
-        "has_stripped_fields": true,
-        "kind": "plain"
-      }
-    },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
       "methods": [
         {
           "has_default_impl": false,
@@ -1194,6 +1199,47 @@
         },
         {
           "anchor": "AC-10",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CodexReviewFixRunner": {
+      "action": "modify",
+      "docs": "Adapts the synchronous review-fix port to Codex CLI; construction requires a validated model and resolved effort before entering the blocking external CLI boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "model",
+              "ty": "usecase::capability_exec::ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "usecase::capability_exec::ReasoningEffort"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "review_v2::review_fix_runner",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
           "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
         }
       ]
@@ -1953,14 +1999,14 @@
       "action": "modify",
       "docs": "Baseline unit adapter modified to implement the relocated usecase port while removing the legacy domain port implementation.",
       "informal_grounds": [],
-    "kind": {
-      "kind": "struct",
-      "shape": {
-        "fields": [],
-        "has_stripped_fields": false,
-        "kind": "plain"
-      }
-    },
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
       "methods": [
         {
           "has_default_impl": false,

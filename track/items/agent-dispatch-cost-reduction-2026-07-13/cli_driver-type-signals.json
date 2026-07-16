@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-16T02:14:03Z",
-  "declaration_hash": "8c66dd0a8bb779f0682efc30ab541a51657250cbe065734ec2d2240cef89c48c",
-  "implementation_input_hash": "2b16285ad7699f8b422ead6371a5fe97290639ab3eb67adfd5c4531cc65befd9",
+  "generated_at": "2026-07-16T09:03:34Z",
+  "declaration_hash": "6b44480edbfefe4db0217a574c54d3f7c8a1e84e2132eaf090bb2ba6ea594935",
+  "implementation_input_hash": "d5c351b575dcaed0b1bd657e37d2f0ea677114facdaa9cd6e346cf95f1261577",
   "signals": [
     {
       "type_name": "CapabilityExecDriverInput",
@@ -27,6 +27,18 @@
         "Eq",
         "PartialEq"
       ]
+    },
+    {
+      "type_name": "ReviewFixDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TargetArtifactPathArg",

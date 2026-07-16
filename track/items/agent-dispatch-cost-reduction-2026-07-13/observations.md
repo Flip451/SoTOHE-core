@@ -104,3 +104,31 @@ user 裁定: 「一旦許容。問題が顕在化したら対処」（2026-07-16
   types 裁定済みの fix を差し戻す事故を観測 — cross-scope fix では briefing 間の
   整合性維持が前提条件。scope hash の自己失効（.provider-sessions / obligation
   cache の review_operational 未登録）も dogfooding が発見。
+
+## 2026-07-16: Accepted Deviation — wide delegation port の obligation 表現ギャップ
+
+PR round-9 fix 群の SoT 収束で framework の設計ギャップを発見・確定:
+
+- obligation の anchor は **entry 単位のみ**（per-method spec_refs は schema に
+  存在しない）。traits の 4 role（SecondaryPort / SpecificationPort / Repository /
+  ApplicationService）は**全て per-trait_method obligation を派生**させる。
+- よって `ReviewService`（10 method の delegation aggregate port、invoke-leak 是正
+  で action=modify 化）は、どの entry anchor を選んでも
+  `persist_commit_hash × AC-01` のような method×anchor 不整合組が生じ、
+  per-method LLM 裁定を honest に通せない（GO-04 でも Fail(Substitution) を実測）。
+- edge waiver は fulfillment 裁定を skip させる（evaluate/plan.rs の waiver-first
+  precedence）ため、waiver 併用時は per-method fulfillment record が
+  「CI 実行はされるが LLM 裁定されない」状態になる — other scope final review が
+  この silent bypass を P1 指摘（正当）。
+- **user 裁定（2026-07-16）: Accepted Deviation として受容**。waiver reason は
+  宣言文から検証可能な core のみ（最適化経路が宣言 surface に存在しない）。
+  fulfillment records は CI 実行される実 test を列挙するが、waiver 優先により
+  LLM 裁定は非適用。
+- 根治は後続 track で: **ReviewService の port 分離**（ISP / use-case boundary
+  準拠 — 単一 `Arc<dyn ReviewService>` は伝統的 hexagonal/clean の観点では
+  facade 都合の god interface であり、専用 track の spec なら分離後 port の
+  全 method が anchor に honest に接続する）。あわせて per-method spec_refs の
+  schema 拡張も候補（幅広い baseline port 一般への対策）。
+- 副次の学び: waiver verifier は (reason, entry 宣言文, anchor 本文) のみを見る —
+  宣言の外（impl の実態・他 entry の binding・framework 機構）への言及は
+  CentralUnverified で棄却される。reason は宣言文から自己完結で書くこと。

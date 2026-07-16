@@ -9,11 +9,11 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use usecase::commit_hash_persistence::CommitHashPersistenceError;
-use usecase::review_v2::aggregate_service::{ReviewRunFixInput, ReviewRunInput, ReviewService};
+use usecase::review_v2::aggregate_service::{ReviewRunInput, ReviewService};
 use usecase::review_v2::review_aux::ReviewAuxError;
 use usecase::review_v2::{
     ReviewApprovalOutput, ReviewCheckApprovedError, ReviewRunLocalOutput, RunReviewError,
-    RunReviewFixError, RunReviewFixOutput, RunReviewOutput,
+    RunReviewOutput,
 };
 
 // ── Per-context composition root ──────────────────────────────────────────────
@@ -144,66 +144,6 @@ impl ReviewService for ReviewServiceImpl {
             Err(e) => {
                 ReviewRunLocalOutput { stdout: None, stderr: Some(e.to_string()), exit_code: 1 }
             }
-        }
-    }
-
-    fn run_fix_local(
-        &self,
-        input: ReviewRunFixInput,
-    ) -> Result<RunReviewFixOutput, RunReviewFixError> {
-        let root = ReviewCompositionRoot::new();
-        let comp_input = super::RunReviewFixLocalInput {
-            scope: input.scope,
-            briefing_file: input.briefing_file,
-            track_id: input.track_id,
-            round_type: input.round_type,
-            model: input.model,
-        };
-        match root.review_run_fix_local(comp_input) {
-            Ok(outcome) => {
-                // Detect claude subagent dispatch sentinel: exit 64 +
-                // `SUBAGENT_DISPATCH_REQUIRED` on the first stdout line.
-                // The composition root already handles the claude provider
-                // path correctly — this shim must NOT map exit 64 to
-                // "failed" and overwrite stdout with "REVIEW_FIX_STATUS:
-                // failed". Propagate as a typed error so the driver can
-                // pass the payload through verbatim without knowing the
-                // sentinel string or exit code itself.
-                let stdout_str = outcome.stdout.as_deref().unwrap_or("");
-                if outcome.exit_code == super::run_fix::SUBAGENT_DISPATCH_EXIT_CODE
-                    && stdout_str.starts_with(super::run_fix::SUBAGENT_DISPATCH_SENTINEL)
-                {
-                    let payload = outcome.stdout.unwrap_or_default();
-                    return Err(RunReviewFixError::SubagentDispatchRequired(payload));
-                }
-                // Smoke-test failures from cli_composition::review_v2::run_fix
-                // return exit 2 with `[ERROR] smoke test failed: ...` on stderr
-                // and no stdout sentinel. Distinguish them from genuine
-                // `REVIEW_FIX_STATUS: blocked_cross_scope` (which has the
-                // sentinel on stdout) by inspecting whether the runner emitted
-                // a sentinel — exit 2 alone is ambiguous between "blocked" and
-                // "smoke test failed". Propagate the smoke-test case as a
-                // typed `SmokeTestFailed` error so the driver can preserve
-                // exit 2 + stderr diagnostic without inventing a fake status
-                // string.
-                let stdout_has_sentinel =
-                    outcome.stdout.as_deref().is_some_and(|s| s.contains("REVIEW_FIX_STATUS:"));
-                if outcome.exit_code == 2 && !stdout_has_sentinel {
-                    let msg = outcome
-                        .stderr
-                        .unwrap_or_else(|| "smoke test failed (no diagnostic)".to_owned());
-                    return Err(RunReviewFixError::SmokeTestFailed(msg));
-                }
-                let exit_code = i32::from(outcome.exit_code);
-                let status = match outcome.exit_code {
-                    0 => "completed",
-                    2 => "blocked_cross_scope",
-                    _ => "failed",
-                }
-                .to_owned();
-                Ok(RunReviewFixOutput { status, exit_code, stderr: outcome.stderr })
-            }
-            Err(e) => Err(RunReviewFixError::FixRunnerFailed(e.to_string())),
         }
     }
 

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a683b83f25845d9cee15fee3f14820caf2f6e851529aa58c392b4efd3c64d988",
+  "catalogue_declaration_hash": "d3fe0f59d951fa2c5532ea855268137aa702c264244442e7a7edcb67a7311d9c",
   "signals": [
     {
       "type_name": "AgentProfiles",
@@ -36,6 +36,11 @@
       "type_name": "CodexCapabilityAdapter",
       "signal": "blue",
       "entry_hash": "19a05c231ed0a95a608b31d424bead744e60aaf2e3d6615567120239ce64e4b6"
+    },
+    {
+      "type_name": "CodexReviewFixRunner",
+      "signal": "blue",
+      "entry_hash": "92192b98c4d025a871112c585d9add4e900d5519103e7642ca7a22ec10bd37ce"
     },
     {
       "type_name": "CodexReviewer",

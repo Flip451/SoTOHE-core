@@ -147,7 +147,7 @@
       }
     },
     {
-      "claim_hash": "cc0652b0d3a7bc04de2668e41dcc6a3ef2d41b57fbe0bfab2dbcff51993ff5e1",
+      "claim_hash": "1e1d4aacdbfdba9136d2a240eebd7786eae40e73adc0261b1890037d6b974cad",
       "evidence_hash": "5ceb5e27f085ca0238a8be48d32f3a5db536584a85022dd551b57fd7a498cc9b",
       "verdict": {
         "kind": "pass",
@@ -171,7 +171,7 @@
       }
     },
     {
-      "claim_hash": "cc0652b0d3a7bc04de2668e41dcc6a3ef2d41b57fbe0bfab2dbcff51993ff5e1",
+      "claim_hash": "1e1d4aacdbfdba9136d2a240eebd7786eae40e73adc0261b1890037d6b974cad",
       "evidence_hash": "4a0192a8dce970468a6460197209eed1813e7cec9205b0fe5f587428a2e169d4",
       "verdict": {
         "kind": "pass",
@@ -195,11 +195,11 @@
       }
     },
     {
-      "claim_hash": "cc0652b0d3a7bc04de2668e41dcc6a3ef2d41b57fbe0bfab2dbcff51993ff5e1",
+      "claim_hash": "1e1d4aacdbfdba9136d2a240eebd7786eae40e73adc0261b1890037d6b974cad",
       "evidence_hash": "2b1bcd4b2f654058eb4920ab6f0133fb52b34975a32989e5d0a083a51d6300a2",
       "verdict": {
         "kind": "pass",
-        "citation": "resume 時も dispatcher は現在の profile と provider-native sandbox 定義を通常どおり解決し、model・sandbox・effort を含む全実行 flag を毎回明示的に再注入する。"
+        "citation": "resume 時も dispatcher は現在の profile と provider-native sandbox 定義を通常どおり解決し、model・sandbox・effort を含む全実行 flag を毎回明示的に再注入する。provider の session 設定継承に依存しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -219,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "cc0652b0d3a7bc04de2668e41dcc6a3ef2d41b57fbe0bfab2dbcff51993ff5e1",
+      "claim_hash": "1e1d4aacdbfdba9136d2a240eebd7786eae40e73adc0261b1890037d6b974cad",
       "evidence_hash": "c0cbefa4a3ba523a52db5b860bd64b9a6f5189de0ad613d567e3a9af4d083029",
       "verdict": {
         "kind": "pass",
@@ -243,7 +243,7 @@
       }
     },
     {
-      "claim_hash": "cc0652b0d3a7bc04de2668e41dcc6a3ef2d41b57fbe0bfab2dbcff51993ff5e1",
+      "claim_hash": "1e1d4aacdbfdba9136d2a240eebd7786eae40e73adc0261b1890037d6b974cad",
       "evidence_hash": "abd98551eac1e2f5ff60063ab41438480d7b9f728bbbb69d8971125aed426862",
       "verdict": {
         "kind": "pass",
@@ -267,7 +267,7 @@
       }
     },
     {
-      "claim_hash": "cc0652b0d3a7bc04de2668e41dcc6a3ef2d41b57fbe0bfab2dbcff51993ff5e1",
+      "claim_hash": "1e1d4aacdbfdba9136d2a240eebd7786eae40e73adc0261b1890037d6b974cad",
       "evidence_hash": "5251c561488c6b9ea1fa6eb2bca2f158658b2d64634f805bf423637d58c524bc",
       "verdict": {
         "kind": "pass",
@@ -291,11 +291,11 @@
       }
     },
     {
-      "claim_hash": "cc0652b0d3a7bc04de2668e41dcc6a3ef2d41b57fbe0bfab2dbcff51993ff5e1",
+      "claim_hash": "1e1d4aacdbfdba9136d2a240eebd7786eae40e73adc0261b1890037d6b974cad",
       "evidence_hash": "4366b1c9706f0833d253640513d73ad5eee6c781b408cbdf1e9964e2363a4728",
       "verdict": {
         "kind": "pass",
-        "citation": "同一 track・scope・round 種別で fixer 後に再実行した reviewer round は、現在の profile 解決結果の provider と model が一致する有効な prior session を resume し、全実行 flag を明示的に再指定したうえで reviewer は現在の file list と diff から scope 全件を再判定する。"
+        "citation": "同一 track・scope・round 種別で fixer 後に再実行した reviewer round は、現在の profile 解決結果の provider と model が一致する有効な prior session を resume し、全実行 flag を明示的に再指定したうえで reviewer は現在の file list と diff から scope 全件を再判定する。resume は文脈だけを再利用し、その round の judgment と review record は新規 session の round と同じ単位・意味で記録される。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -315,7 +315,7 @@
       }
     },
     {
-      "claim_hash": "cc0652b0d3a7bc04de2668e41dcc6a3ef2d41b57fbe0bfab2dbcff51993ff5e1",
+      "claim_hash": "1e1d4aacdbfdba9136d2a240eebd7786eae40e73adc0261b1890037d6b974cad",
       "evidence_hash": "8fab669df39131c60a84a964399837e9d35abd0be89f8e1f80b907e58f882ee1",
       "verdict": {
         "kind": "pass",
