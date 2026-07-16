@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "consumer-scaffold-host-first-2026-07-17",
+  "title": "配布 scaffold の host-first 刷新と Makefile ゼロベース再構成",
+  "branch": "track/consumer-scaffold-host-first-2026-07-17",
+  "created_at": "2026-07-16T16:05:09Z",
+  "updated_at": "2026-07-16T16:05:09Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

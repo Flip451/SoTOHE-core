@@ -83,8 +83,6 @@
     "allow": [
       "Read(./**)",
       "Edit(./**)",
-      "Write(./**)",
-      "Glob(./**)",
       "Grep(./**)",
       "Task(*)",
       "Skill(*)",
@@ -180,7 +178,6 @@
     "deny": [
       "Read(./track/archive/**)",
       "Grep(./track/archive/**)",
-      "Glob(./track/archive/**)",
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./.cache/cargo/**)",
