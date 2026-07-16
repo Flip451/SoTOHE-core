@@ -4,6 +4,11 @@ use std::fs::{self, OpenOptions};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 
+#[cfg(unix)]
+use std::os::unix::fs::OpenOptionsExt;
+#[cfg(windows)]
+use std::os::windows::fs::OpenOptionsExt;
+
 use sha2::{Digest as _, Sha256};
 use usecase::capability_exec::{ModelName, ProviderName, ReasoningEffort};
 use usecase::git_workflow::DiagnosticText;
@@ -142,12 +147,13 @@ impl ProviderSessionCachePort for FsProviderSessionCacheAdapter {
         if content.len() as u64 > MAX_CACHE_ENTRY_BYTES {
             return Err(entry_invalid("cache entry exceeds the maximum size; refusing to save"));
         }
-        let mut file = OpenOptions::new()
-            .create(true)
-            .truncate(true)
-            .write(true)
-            .open(path)
-            .map_err(map_io)?;
+        let mut options = OpenOptions::new();
+        options.create(true).truncate(true).write(true);
+        let mut file = open_cache_entry_nofollow(&path, &mut options).map_err(map_cache_open)?;
+        let metadata = file.metadata().map_err(map_io)?;
+        if metadata.file_type().is_symlink() || !metadata.is_file() {
+            return Err(identity_boundary("cache entry is not a regular file"));
+        }
         file.write_all(&content).map_err(map_io)?;
         file.sync_all().map_err(map_io)
     }
@@ -218,17 +224,17 @@ impl PersistedEntry {
 }
 
 fn bounded_regular_file(path: &Path) -> Result<Vec<u8>, ProviderSessionCacheError> {
-    let metadata = fs::symlink_metadata(path).map_err(map_io)?;
-    if metadata.file_type().is_symlink() {
-        return Err(identity_boundary("cache entry was a symlink"));
-    }
+    let mut options = OpenOptions::new();
+    options.read(true);
+    let file = open_cache_entry_nofollow(path, &mut options).map_err(map_cache_open)?;
+    let metadata = file.metadata().map_err(map_io)?;
     if !metadata.is_file() || metadata.len() > MAX_CACHE_ENTRY_BYTES {
         return Err(entry_invalid("cache entry was not a bounded regular file"));
     }
-    // The take-bound caps the allocation even if the file grows between the
-    // stat above and this read; reading one extra byte detects that race.
+    // The descriptor remains fixed between the metadata inspection and read.
+    // The take-bound caps the allocation even if that file grows meanwhile;
+    // reading one extra byte detects the growth.
     let mut bytes = Vec::new();
-    let file = fs::File::open(path).map_err(map_io)?;
     file.take(MAX_CACHE_ENTRY_BYTES.saturating_add(1)).read_to_end(&mut bytes).map_err(map_io)?;
     if bytes.len() as u64 > MAX_CACHE_ENTRY_BYTES {
         return Err(entry_invalid("cache entry exceeded the maximum size after reading"));
@@ -272,6 +278,44 @@ fn map_io(error: std::io::Error) -> ProviderSessionCacheError {
         "filesystem operation failed: {}",
         error.kind()
     )))
+}
+
+fn map_cache_open(error: std::io::Error) -> ProviderSessionCacheError {
+    #[cfg(unix)]
+    if error.raw_os_error() == Some(libc::ELOOP) {
+        return identity_boundary("symlink encountered while opening cache storage");
+    }
+    map_io(error)
+}
+
+/// Atomically opens the cache leaf without following a symlink.
+///
+/// The directory walk protects the known path components; this operation closes the gap where
+/// an attacker swaps the leaf after that walk and before the write is opened.
+fn open_cache_entry_nofollow(
+    path: &Path,
+    options: &mut OpenOptions,
+) -> Result<fs::File, std::io::Error> {
+    #[cfg(unix)]
+    {
+        options.custom_flags(libc::O_NOFOLLOW);
+        options.open(path)
+    }
+    #[cfg(windows)]
+    {
+        // Open the reparse point itself so descriptor metadata can reject it instead of
+        // following a symlink or junction.
+        options.custom_flags(0x0020_0000);
+        options.open(path)
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        let _ = (path, options);
+        Err(std::io::Error::new(
+            std::io::ErrorKind::Unsupported,
+            "atomic no-follow cache open is unavailable on this platform",
+        ))
+    }
 }
 
 fn map_symlink_or_io(error: std::io::Error) -> ProviderSessionCacheError {
@@ -775,5 +819,42 @@ mod tests {
             Err(ProviderSessionCacheError::IdentityBoundaryViolation(detail))
                 if detail.as_str().contains("non-symlink directory")
         ));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_provider_session_cache_save_leaf_symlink_does_not_clobber_target() {
+        let directory = tempfile::tempdir().unwrap();
+        let cache = FsProviderSessionCacheAdapter::new(
+            directory.path().to_path_buf(),
+            PathBuf::from("tmp/runtime"),
+        );
+        let key = workspace_key();
+        cache.save(&key, &entry()).unwrap();
+        let (cache_path, _) = cache.cache_path(&key).unwrap();
+        let external_target = directory.path().join("external-session.json");
+        std::fs::write(&external_target, b"outside cache data").unwrap();
+        std::fs::remove_file(&cache_path).unwrap();
+        std::os::unix::fs::symlink(&external_target, &cache_path).unwrap();
+
+        let error = cache.save(&key, &entry()).unwrap_err();
+
+        assert!(matches!(error, ProviderSessionCacheError::IdentityBoundaryViolation(_)));
+        assert_eq!(std::fs::read(&external_target).unwrap(), b"outside cache data");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_bounded_regular_file_rejects_symlink_without_reading_target() {
+        let directory = tempfile::tempdir().unwrap();
+        let external_target = directory.path().join("external-session.json");
+        std::fs::write(&external_target, b"outside cache data").unwrap();
+        let cache_leaf = directory.path().join("cache-leaf.json");
+        std::os::unix::fs::symlink(&external_target, &cache_leaf).unwrap();
+
+        let error = super::bounded_regular_file(&cache_leaf).unwrap_err();
+
+        assert!(matches!(error, ProviderSessionCacheError::IdentityBoundaryViolation(_)));
+        assert_eq!(std::fs::read(&external_target).unwrap(), b"outside cache data");
     }
 }

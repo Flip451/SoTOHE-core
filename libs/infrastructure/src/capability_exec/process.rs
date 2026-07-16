@@ -196,6 +196,8 @@ pub(crate) trait ProviderProcessRunner: Send + Sync {
 pub(crate) struct ProviderProcessOutput {
     pub(crate) exit_code: u8,
     pub(crate) session_id: Option<String>,
+    /// The bounded provider result retained until the adapter adopts this attempt.
+    pub(crate) final_message: Option<Vec<u8>>,
 }
 
 pub(crate) struct SystemProviderProcessRunner;
@@ -236,7 +238,7 @@ pub(crate) fn run_provider_process_with_timeout(
     timeout: Option<Duration>,
     output_last_message: Option<&Path>,
 ) -> Result<ProviderProcessOutput, CapabilityExecError> {
-    run_provider_process_with_timeout_and_stdout(
+    run_provider_process_with_timeout_inner(
         binary,
         args,
         repo_root,
@@ -244,12 +246,11 @@ pub(crate) fn run_provider_process_with_timeout(
         provider,
         timeout,
         output_last_message,
-        std::io::stdout(),
     )
 }
 
 #[allow(clippy::too_many_arguments)]
-fn run_provider_process_with_timeout_and_stdout<W: Write + Send + 'static>(
+fn run_provider_process_with_timeout_inner(
     binary: &str,
     args: &[OsString],
     repo_root: &Path,
@@ -257,7 +258,6 @@ fn run_provider_process_with_timeout_and_stdout<W: Write + Send + 'static>(
     provider: &ProviderName,
     timeout: Option<Duration>,
     output_last_message: Option<&Path>,
-    passthrough: W,
 ) -> Result<ProviderProcessOutput, CapabilityExecError> {
     let runtime_dir = prepare_runtime_dir(repo_root, runtime_dir, provider)?;
     let output_last_message = output_last_message
@@ -317,18 +317,28 @@ fn run_provider_process_with_timeout_and_stdout<W: Write + Send + 'static>(
         }
         None => collected.final_message,
     };
-    if let Some(message) = final_message {
-        let mut passthrough = passthrough;
-        passthrough.write_all(&message).map_err(|error| {
-            dispatch_error(provider, format!("cannot write final message from {binary}: {error}"))
-        })?;
-        passthrough.flush().map_err(|error| {
-            dispatch_error(provider, format!("cannot flush final message from {binary}: {error}"))
-        })?;
-    }
     Ok(ProviderProcessOutput {
         exit_code: status.code().and_then(|code| u8::try_from(code).ok()).unwrap_or(1),
         session_id: collected.session_id,
+        final_message,
+    })
+}
+
+/// Emits the final message of an attempt the adapter has selected for adoption.
+pub(crate) fn emit_provider_final_message(
+    output: &ProviderProcessOutput,
+    provider: &ProviderName,
+    binary: &str,
+    passthrough: &mut impl Write,
+) -> Result<(), CapabilityExecError> {
+    let Some(message) = output.final_message.as_deref() else {
+        return Ok(());
+    };
+    passthrough.write_all(message).map_err(|error| {
+        dispatch_error(provider, format!("cannot write final message from {binary}: {error}"))
+    })?;
+    passthrough.flush().map_err(|error| {
+        dispatch_error(provider, format!("cannot flush final message from {binary}: {error}"))
     })
 }
 
@@ -635,33 +645,15 @@ use termination::{
 #[cfg(test)]
 mod tests {
     use std::ffi::OsString;
-    use std::io::{Cursor, Error, Write};
-    use std::sync::{Arc, Mutex};
+    use std::io::{Cursor, Error};
 
     use super::output_collector::{
         MAX_PROVIDER_FINAL_MESSAGE_BYTES, MAX_PROVIDER_SESSION_EVENT_BYTES,
         collect_provider_output, initialize_output_last_message, read_bounded_output_last_message,
         read_output_last_message,
     };
-    use super::{collect_bounded_pipe, run_provider_process_with_timeout_and_stdout};
+    use super::{collect_bounded_pipe, run_provider_process_with_timeout_inner};
     use usecase::capability_exec::ProviderName;
-
-    #[derive(Clone)]
-    struct SharedWriter(Arc<Mutex<Vec<u8>>>);
-
-    impl Write for SharedWriter {
-        fn write(&mut self, bytes: &[u8]) -> Result<usize, Error> {
-            self.0
-                .lock()
-                .map_err(|_| Error::other("test passthrough lock poisoned"))?
-                .extend_from_slice(bytes);
-            Ok(bytes.len())
-        }
-
-        fn flush(&mut self) -> Result<(), Error> {
-            Ok(())
-        }
-    }
 
     #[test]
     fn test_collect_bounded_pipe_discards_excess_after_limit() -> Result<(), std::io::Error> {
@@ -693,7 +685,6 @@ mod tests {
     fn test_provider_process_emits_only_last_message_while_capturing_session_id()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
-        let output = Arc::new(Mutex::new(Vec::new()));
         let provider = ProviderName::try_new("codex".to_owned())?;
         let output_last_message = directory.path().join("tmp/runtime/final-message.txt");
         let args = vec![
@@ -705,7 +696,7 @@ mod tests {
             output_last_message.as_os_str().to_owned(),
         ];
 
-        let result = run_provider_process_with_timeout_and_stdout(
+        let result = run_provider_process_with_timeout_inner(
             "sh",
             &args,
             directory.path(),
@@ -713,24 +704,21 @@ mod tests {
             &provider,
             None,
             Some(&output_last_message),
-            SharedWriter(output.clone()),
         )?;
 
         assert_eq!(result.exit_code, 0);
         assert_eq!(result.session_id.as_deref(), Some("captured-session"));
-        let output = output.lock().map_err(|_| Error::other("test passthrough lock poisoned"))?;
-        assert_eq!(output.as_slice(), b"specialist final report");
+        assert_eq!(result.final_message.as_deref(), Some(b"specialist final report".as_slice()));
         Ok(())
     }
 
     #[test]
-    fn test_provider_process_missing_last_message_emits_no_fabricated_stdout()
+    fn test_provider_process_missing_last_message_retains_no_fabricated_output()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
-        let output = Arc::new(Mutex::new(Vec::new()));
         let provider = ProviderName::try_new("codex".to_owned())?;
         let output_last_message = directory.path().join("tmp/runtime/final-message.txt");
-        let result = run_provider_process_with_timeout_and_stdout(
+        let result = run_provider_process_with_timeout_inner(
             "sh",
             &[OsString::from("-c"), OsString::from("printf '{\"event\":\"envelope\"}\\n'")],
             directory.path(),
@@ -738,13 +726,10 @@ mod tests {
             &provider,
             None,
             Some(&output_last_message),
-            SharedWriter(output.clone()),
         )?;
 
         assert_eq!(result.session_id, None);
-        assert!(
-            output.lock().map_err(|_| Error::other("test passthrough lock poisoned"))?.is_empty()
-        );
+        assert_eq!(result.final_message, None);
         Ok(())
     }
 
@@ -753,7 +738,6 @@ mod tests {
     fn test_provider_process_rejects_runtime_dir_replaced_with_symlink()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
-        let output = Arc::new(Mutex::new(Vec::new()));
         let provider = ProviderName::try_new("codex".to_owned())?;
         let runtime_dir = directory.path().join("tmp/runtime");
         let output_last_message = runtime_dir.join("final-message.txt");
@@ -769,7 +753,7 @@ mod tests {
             outside_dir.as_os_str().to_owned(),
         ];
 
-        let result = run_provider_process_with_timeout_and_stdout(
+        let result = run_provider_process_with_timeout_inner(
             "sh",
             &args,
             directory.path(),
@@ -777,7 +761,6 @@ mod tests {
             &provider,
             None,
             Some(&output_last_message),
-            SharedWriter(output.clone()),
         );
         let error = match result {
             Ok(_) => {
@@ -789,9 +772,6 @@ mod tests {
         };
 
         assert!(error.to_string().contains("refusing to follow symlink"));
-        assert!(
-            output.lock().map_err(|_| Error::other("test passthrough lock poisoned"))?.is_empty()
-        );
         Ok(())
     }
 

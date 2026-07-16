@@ -1,6 +1,7 @@
 //! Codex provider-native adapter for generic capability dispatch.
 
 use std::ffi::OsString;
+use std::io::Write;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -15,6 +16,7 @@ use usecase::capability_exec::{
 use usecase::provider_session::ProviderSessionCachePort;
 
 use super::path_guard::capability_name_path_segment;
+use super::process::emit_provider_final_message;
 use super::session::CapabilitySession;
 use super::{
     ProviderProcessRunner, adapter_preflight_error, capability_prompt, dispatch_error,
@@ -152,6 +154,16 @@ impl CapabilityProviderPort for CodexCapabilityAdapter {
         &self,
         request: &CapabilityDispatchRequest,
     ) -> Result<CapabilityDispatchOutcome, CapabilityExecError> {
+        self.dispatch_with_stdout(request, &mut std::io::stdout())
+    }
+}
+
+impl CodexCapabilityAdapter {
+    fn dispatch_with_stdout(
+        &self,
+        request: &CapabilityDispatchRequest,
+        passthrough: &mut impl Write,
+    ) -> Result<CapabilityDispatchOutcome, CapabilityExecError> {
         let sandbox = self.sandbox_mode(request)?;
         let prompt = capability_prompt(request);
         let session =
@@ -215,6 +227,7 @@ impl CapabilityProviderPort for CodexCapabilityAdapter {
             )?,
             (_, result) => result?,
         };
+        emit_provider_final_message(&output, &self.provider, "codex", passthrough)?;
         if output.exit_code == 0 {
             session.save(output.session_id);
         }
@@ -321,6 +334,7 @@ mod tests {
         exit_code: u8,
         exit_codes: Mutex<Vec<u8>>,
         session_ids: Mutex<Vec<Option<String>>>,
+        final_messages: Mutex<Vec<Option<Vec<u8>>>>,
     }
 
     impl ProviderProcessRunner for RecordingProcessRunner {
@@ -351,7 +365,13 @@ mod tests {
                 .expect("test process session-id lock")
                 .pop()
                 .unwrap_or(None);
-            Ok(ProviderProcessOutput { exit_code, session_id })
+            let final_message = self
+                .final_messages
+                .lock()
+                .expect("test process final-message lock")
+                .pop()
+                .unwrap_or(None);
+            Ok(ProviderProcessOutput { exit_code, session_id, final_message })
         }
     }
 
@@ -792,6 +812,59 @@ mod tests {
                 "check whether upstream artifacts changed; if they did, reread them before working"
             )));
         }
+        Ok(())
+    }
+
+    #[test]
+    fn test_codex_capability_adapter_resume_failure_emits_only_fresh_final_message()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_skill(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nskill body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner {
+            exit_codes: Mutex::new(vec![0, 7]),
+            final_messages: Mutex::new(vec![
+                Some(b"fresh final message".to_vec()),
+                Some(b"failed partial message".to_vec()),
+            ]),
+            ..Default::default()
+        });
+        let mut adapter = CodexCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner,
+        );
+        let mut request = request_from_host("claude")?;
+        let targets = TargetArtifactSet::try_new(vec![TargetArtifactPath::try_new(
+            PathBuf::from("track/items/a/spec.json"),
+        )?])?;
+        request.request.resume = CapabilityResumeRequest::Resume(targets.clone());
+        let cache = Arc::new(FsProviderSessionCacheAdapter::new(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+        ));
+        let key = ProviderSessionCacheKey::WorkspaceCapability {
+            capability: request.request.capability.clone(),
+            target_artifacts: targets,
+        };
+        cache.save(
+            &key,
+            &ProviderSessionCacheEntry::new(
+                ProviderSessionId::try_new("prior-session".to_owned())?,
+                request.profile.provider.clone(),
+                request.profile.model.clone(),
+                request.profile.effort,
+            ),
+        )?;
+        adapter.session_cache = cache;
+
+        let mut stdout = Vec::new();
+        let outcome = adapter.dispatch_with_stdout(&request, &mut stdout)?;
+
+        assert!(matches!(outcome, CapabilityDispatchOutcome::Executed { exit_code: 0, .. }));
+        assert_eq!(stdout, b"fresh final message");
         Ok(())
     }
 

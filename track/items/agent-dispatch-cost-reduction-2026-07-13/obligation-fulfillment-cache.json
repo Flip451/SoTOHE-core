@@ -2175,13 +2175,13 @@
         "item_identifier": "trait_impl:usecase::provider_session::ProviderSessionCachePort"
       },
       "key": {
-        "bound_tests_set_hash": "50e836da69a869b27461aee20adbc1fcd32b1f6bd7559d36584d20a83bc56b54",
+        "bound_tests_set_hash": "59377ef49fa2d1059281733103bc3de1e08c847630d78db256ad8865ee78a2e5",
         "declaration_hash": "d67fa7b401c0a20783618c4c0c285ce13681cc1ffe622e92b47d0f79d4176d38",
         "anchor_text_hash": "d83bf653d5d0148b2c13a4caf5f7a6173f7eb775ca9d95ae17c4509eadd9d4e9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(\n            first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\")),\n            \"workspace capability sessions must stay under the workspace transient path\"\n        );\n        assert!(\n            track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\")),\n            \"track capability sessions must stay inside that track's artifact directory\"\n        );\n        assert_ne!(track_path.parent(), first_path.parent());\n        assert_eq!(track_identity, \"track-capability:track-a:implementer\");\n        assert!(first_identity.contains(\"workspace-capability:implementer:\"));"
+        "citation": "assert!(first_path.starts_with(directory.path().join(\"tmp/runtime/provider-sessions\"))); assert!(track_path.starts_with(directory.path().join(\"track/items/track-a/.provider-sessions\"))); assert_ne!(track_path.parent(), first_path.parent()); assert_eq!(track_identity, \"track-capability:track-a:implementer\"); assert!(first_identity.contains(\"workspace-capability:implementer:\")); assert!(committed_gitignore.lines().any(|line| line == \"tmp/\")); assert!(committed_gitignore.lines().any(|line| line == \"track/items/**/.provider-sessions/\")); assert!(matches!(error, ProviderSessionCacheError::IdentityBoundaryViolation(_)));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5439,13 +5439,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "9674d96598f3cf67a50d12ea7c3324e769f9e2f51c726dc141341d3a46ac8317",
+        "bound_tests_set_hash": "3818a1e2c9bd780f23b3989b3189b148a2ad221371b0d4755e09af60db29fd02",
         "declaration_hash": "d7c1fb987e30e8ab87dac8a90ebc75a7064d6d65aec6e8e1b3dcb5ebb18dbefc",
         "anchor_text_hash": "250168b7ff1d59876e5417d8829c58707e599260d201d537fdf90f8981c818fe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(args.windows(2).any(|pair| pair == [\"-m\", \"gpt-5\"]));\n        assert!(args.contains(&\"model_reasoning_effort=\\\"high\\\"\".to_owned()));\n        assert!(args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace-write\"]));"
+        "citation": "assert!(args.windows(2).any(|pair| pair == [\"-m\", \"gpt-5\"])); assert!(args.contains(&\"model_reasoning_effort=\\\"high\\\"\".to_owned())); assert!(args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace-write\"]));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5463,13 +5463,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "9674d96598f3cf67a50d12ea7c3324e769f9e2f51c726dc141341d3a46ac8317",
+        "bound_tests_set_hash": "3818a1e2c9bd780f23b3989b3189b148a2ad221371b0d4755e09af60db29fd02",
         "declaration_hash": "d7c1fb987e30e8ab87dac8a90ebc75a7064d6d65aec6e8e1b3dcb5ebb18dbefc",
         "anchor_text_hash": "042865d7c2f3ee57558d16bbda502891955644407e647ab52193b9aa10aa9c88"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\"); ... [\"$has_model\" -eq 1 ] && [ \"$has_sandbox\" -eq 1 ] && [ \"$has_effort\" -eq 1 ] || exit 9"
+        "citation": "assert!(args.windows(2).any(|pair| pair == [\"-m\", \"gpt-5\"]));\n        assert!(args.contains(&\"model_reasoning_effort=\\\"high\\\"\".to_owned()));\n        assert!(args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace-write\"]));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5487,13 +5487,13 @@
         "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
       },
       "key": {
-        "bound_tests_set_hash": "9674d96598f3cf67a50d12ea7c3324e769f9e2f51c726dc141341d3a46ac8317",
+        "bound_tests_set_hash": "3818a1e2c9bd780f23b3989b3189b148a2ad221371b0d4755e09af60db29fd02",
         "declaration_hash": "d7c1fb987e30e8ab87dac8a90ebc75a7064d6d65aec6e8e1b3dcb5ebb18dbefc",
         "anchor_text_hash": "352679c83a776ed39e6ab98c82bac69f8455389fad22f2fa56704a6573584b5e"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(invocations.len(), 2);\nfor (index, invocation) in invocations.iter().enumerate() {\n    let args: Vec<_> =\n        invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();\n    assert_eq!(args.contains(&\"resume\".to_owned()), index == 0);\n    assert!(args.windows(2).any(|pair| pair == [\"-m\", \"gpt-5\"]));\n    assert!(args.contains(&\"model_reasoning_effort=\\\"high\\\"\".to_owned()));\n    assert!(args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace-write\"]));\n    assert!(args.last().is_some_and(|prompt| prompt.contains(\n        \"check whether upstream artifacts changed; if they did, reread them before working\"\n    )));\n}"
+        "citation": "assert!(args.last().is_some_and(|prompt| prompt.contains(\n                \"check whether upstream artifacts changed; if they did, reread them before working\"\n            ))); ... assert_eq!(invocations.len(), 2); ... assert_eq!(std::fs::read_to_string(attempts).unwrap(), \"resume\\nfresh\\n\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -5991,13 +5991,13 @@
         "item_identifier": "voluntary:AC-09"
       },
       "key": {
-        "bound_tests_set_hash": "7edc250065621c80c12bf9739d77c32ce130a2384f9222f4a0ccf55f3b526dc1",
+        "bound_tests_set_hash": "f51dc82a56ab81ec5e1fb60d6f24b3d8984a49eec430a32c5272a6a06e955d34",
         "declaration_hash": "c146460dd88681f01ec71eaa9a90b45d13d5955135e1f05a2a8cd7c4494120a2",
         "anchor_text_hash": "5dfc7841f392458194c2bae4a0d3f0a7cb441940a33b0d193d63c8fda6ac5722"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let adapter = CodexCapabilityAdapter::with_process_runner_and_session_cache(\n            directory.path().to_owned(),\n            directory.path().join(\"tmp/runtime\"),\n            runner.clone(),\n            cache.clone(),\n            Some(track_id.clone()),\n        );\n...\nadapter.dispatch(&request)?;\n...\nadapter.dispatch(&request)?;\n...\nassert!(resumed_args.windows(2).any(|pair| pair == [\"resume\", \"persisted-codex-session\"]));"
+        "citation": "assert!(resumed_args.windows(2).any(|pair| pair == [\"resume\", \"persisted-codex-session\"])); ... assert_eq!(same_track.resumable_id(&request.request.resume), Some(\"same-track-session\".to_owned())); ... assert_eq!(other_track.resumable_id(&request.request.resume), None); ... assert_ne!(cache_key(&first, None), cache_key(&second, None)); assert_eq!(cache_key(&targetless, None), None); ... assert!(!args.contains(&\"resume\".to_owned())); ... assert_ne!(request.profile.model, recorded_model); ... assert!(!args.contains(&\"resume\".to_owned()));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },

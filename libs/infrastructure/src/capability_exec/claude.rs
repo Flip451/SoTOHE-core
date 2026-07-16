@@ -1,6 +1,7 @@
 //! Claude provider-native adapter for generic capability dispatch.
 
 use std::ffi::OsString;
+use std::io::Write;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::Duration;
@@ -13,6 +14,7 @@ use usecase::capability_exec::{
 use usecase::provider_session::ProviderSessionCachePort;
 
 use super::path_guard::capability_name_path_segment;
+use super::process::emit_provider_final_message;
 use super::session::CapabilitySession;
 use super::{
     ProviderProcessRunner, adapter_preflight_error, capability_prompt,
@@ -96,6 +98,16 @@ impl CapabilityProviderPort for ClaudeCapabilityAdapter {
         &self,
         request: &CapabilityDispatchRequest,
     ) -> Result<CapabilityDispatchOutcome, CapabilityExecError> {
+        self.dispatch_with_stdout(request, &mut std::io::stdout())
+    }
+}
+
+impl ClaudeCapabilityAdapter {
+    fn dispatch_with_stdout(
+        &self,
+        request: &CapabilityDispatchRequest,
+        passthrough: &mut impl Write,
+    ) -> Result<CapabilityDispatchOutcome, CapabilityExecError> {
         let allowed_tools = self.agent_tools(request)?;
         if request.request.host == self.provider {
             return Ok(CapabilityDispatchOutcome::DelegateInHost {
@@ -160,6 +172,7 @@ impl CapabilityProviderPort for ClaudeCapabilityAdapter {
             )?,
             (_, result) => result?,
         };
+        emit_provider_final_message(&output, &self.provider, "claude", passthrough)?;
         if output.exit_code == 0 {
             session.save(output.session_id);
         }
@@ -299,7 +312,7 @@ mod tests {
                 .expect("test process exit-code lock")
                 .pop()
                 .unwrap_or(self.exit_code);
-            Ok(ProviderProcessOutput { exit_code, session_id: None })
+            Ok(ProviderProcessOutput { exit_code, session_id: None, final_message: None })
         }
     }
 

@@ -75,6 +75,20 @@ PR #195 round-3 の Codex P1（manifest 変更で stale signal が fresh 扱い�
 crate 境界内の解釈であり、棄却済みの workspace build-input closure（他 crate /
 workspace root / 抽出契約の hash 化）とは別物。crate 境界の外へは広げない。
 
+## 2026-07-16: PR round-8 rustdoc 再利用 finding の Accepted Deviation（user 裁定）
+
+Codex review round-8 の「catalogue-only 変更での既存 rustdoc JSON 再利用が
+implementation hash に束縛されていない（別 source での target/doc 上書き→元 source
+への revert で hash 一致のまま stale JSON を信頼し得る）」に対し、user 裁定
+（2026-07-16）で **Accepted Deviation（現状維持）**。理由: リスク条件は限定的で、
+対策候補の content-hash field は棄却済みの snapshot hash 検証 lane の復活、常時
+再抽出は承認済みの D3 最小実現（既存 JSON 読み直し）の放棄にあたるため。
+最悪ケースの明示（user 確認済み）: 偽 🔴（無害・時間損失のみ）に加えて**偽 🔵
+（構造整合 gate の誤通過）が低確率で起き得る**。発火には「別 source での
+target/doc 上書き → 厳密 revert で hash 一致 → source 無変更のまま catalogue-only
+変更」の 3 条件が必要で、次の実装変更（hash 変化→再抽出）で自己回復する有界汚染。
+user 裁定: 「一旦許容。問題が顕在化したら対処」（2026-07-16）。
+
 ## 2026-07-15/16: PR #195 review cycle と resume dogfooding の副産物
 
 - Codex Cloud review が実バグ 3 件を検出: waiver 裁定の多重 owner 欠落（T019 の

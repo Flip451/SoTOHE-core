@@ -1332,6 +1332,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::provider_session::tests",
           "test_name": "test_provider_session_cache_paths_are_gitignored_machine_local_transients"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::provider_session::tests",
+          "test_name": "test_provider_session_cache_save_leaf_symlink_does_not_clobber_target"
         }
       ]
     },
@@ -4185,6 +4190,7 @@
         { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_provider_mismatch_starts_fresh_with_explicit_flags" },
         { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_model_mismatch_starts_fresh_with_explicit_flags" },
         { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_resume_nonzero_retries_fresh_with_explicit_flags" },
+        { "layer": "infrastructure", "module_path": "infrastructure::capability_exec::codex::tests", "test_name": "test_codex_capability_adapter_resume_failure_emits_only_fresh_final_message" },
         { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit" },
         { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_resume_failure_retries_fresh_invocation" },
         { "layer": "infrastructure", "module_path": "infrastructure::review_v2::codex_reviewer::tests", "test_name": "test_codex_reviewer_expired_session_starts_fresh_with_explicit_flags" },
