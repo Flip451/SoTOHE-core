@@ -517,6 +517,9 @@ fn build_codex_reviewer_invocation(
     output_last_message: &Path,
     output_schema: &Path,
 ) -> Vec<std::ffi::OsString> {
+    // All exec-level options must precede the `resume` subcommand: the documented
+    // form is `codex exec [OPTIONS] resume [SESSION_ID] [PROMPT]`, and options
+    // placed after `resume` are not guaranteed to bind to the run.
     let mut args = vec![
         "exec".into(),
         "--model".into(),
@@ -525,18 +528,16 @@ fn build_codex_reviewer_invocation(
         "read-only".into(),
         "--config".into(),
         format!("model_reasoning_effort=\"{effort}\"").into(),
-    ];
-    if let Some(session_id) = resume_id {
-        args.extend(["resume".into(), session_id.into()]);
-    }
-    args.extend([
         "--json".into(),
         "--output-schema".into(),
         output_schema.as_os_str().to_os_string(),
         "--output-last-message".into(),
         output_last_message.as_os_str().to_os_string(),
-        prompt.into(),
-    ]);
+    ];
+    if let Some(session_id) = resume_id {
+        args.extend(["resume".into(), session_id.into()]);
+    }
+    args.push(prompt.into());
     args
 }
 
