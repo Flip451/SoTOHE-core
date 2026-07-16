@@ -1,0 +1,188 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-16T15:03:39Z",
+  "declaration_hash": "28ace489c16415627fd2b8b31d216c0877ea46e5672899a3e9dd85f13ef345e8",
+  "implementation_input_hash": "2f72e943933fe4641b9146cc7a2652f57fe736a8f9c8d1cb751342d0b21e25bd",
+  "signals": [
+    {
+      "type_name": "AdrBaselineCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "Error",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "AdrBaselineService"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineOutput",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineQuery",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineQueryError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "Error",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineQueryInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "AdrBaselineQueryService"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineQueryOutput",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineQueryService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrBaselineService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrBaselineSourceError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "Error",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineSourcePort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrBaselineStoreError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "Error",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineStorePort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrBaselineStoreReadError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "Error",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineStoreReadPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrBaselineValidationError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "Error",
+        "PartialEq"
+      ]
+    }
+  ]
+}

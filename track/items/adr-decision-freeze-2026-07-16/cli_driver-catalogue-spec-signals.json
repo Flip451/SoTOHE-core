@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "46e4d0b9e13e4dd34d5e3f7cb8777bfcc540beb8df7c627252805674caaec267",
+  "signals": [
+    {
+      "type_name": "AdrBaselineDriver",
+      "signal": "blue",
+      "entry_hash": "6825b1f467e97eb22853e2555e225ca01209106cf169a0ce38b9eeb64e59d8e6"
+    },
+    {
+      "type_name": "AdrBaselineInput",
+      "signal": "blue",
+      "entry_hash": "74e08e95df7d7af5b4bb1087ba2d8d57fbf625320618cd6a5d9692b88a455682"
+    },
+    {
+      "type_name": "AdrBaselineKindInput",
+      "signal": "blue",
+      "entry_hash": "1239fc8d1cfebc34d9940af0d86d077f1d50fbddee2136f712f89418be7dff51"
+    },
+    {
+      "type_name": "AdrBaselineReasonInput",
+      "signal": "blue",
+      "entry_hash": "63f80b5f0d3ae011eabbd88d1c9b091471e52e6100da3a25f0dadd845fb6bf1e"
+    },
+    {
+      "type_name": "AdrSourceFileNameInput",
+      "signal": "blue",
+      "entry_hash": "a4d44e55b41b3664843df2da7698d3a7ccbb3f4b2a0db66d5cd872e27ee73b87"
+    },
+    {
+      "type_name": "TrackIdInput",
+      "signal": "blue",
+      "entry_hash": "c28b482c86365c1f210922ae300b44c3a5c47338e2aab36444cd21c80de5e566"
+    }
+  ]
+}

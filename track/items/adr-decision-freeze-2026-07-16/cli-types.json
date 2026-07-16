@@ -1,0 +1,373 @@
+{
+  "crate_name": "cli",
+  "functions": {
+    "cli::commands::adr_baseline::execute": {
+      "action": "add",
+      "docs": "Dispatches the dedicated top-level ADR-baseline command family and converts the structured result into a process exit code.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "cmd",
+          "ty": "AdrBaselineCommand"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "cli::commands::adr_baseline::execute_with_error_chain": {
+      "action": "add",
+      "docs": "Dispatches the dedicated top-level ADR-baseline command while retaining a sanitized diagnostic string for the CLI error-chain renderer.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "cmd",
+          "ty": "AdrBaselineCommand"
+        }
+      ],
+      "returns": "(std::process::ExitCode, Option<String>)",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "cli",
+  "schema_version": 5,
+  "trait_impls": [
+    { "for_type": "AdrBaselineCommand", "trait_ref": "core::fmt::Debug" },
+    { "for_type": "AdrBaselineCommand", "trait_ref": "core::clone::Clone" },
+    { "for_type": "AdrBaselineCommand", "trait_ref": "clap_builder::derive::FromArgMatches" },
+    { "for_type": "AdrBaselineCommand", "trait_ref": "clap_builder::derive::Subcommand" },
+    { "for_type": "AdrBaselineSnapshotArgs", "trait_ref": "core::fmt::Debug" },
+    { "for_type": "AdrBaselineSnapshotArgs", "trait_ref": "core::clone::Clone" },
+    { "for_type": "AdrBaselineSnapshotArgs", "trait_ref": "clap_builder::derive::Args" },
+    { "for_type": "AdrBaselineSnapshotArgs", "trait_ref": "clap_builder::derive::FromArgMatches" },
+    { "for_type": "AdrBaselineRestoreArgs", "trait_ref": "core::fmt::Debug" },
+    { "for_type": "AdrBaselineRestoreArgs", "trait_ref": "core::clone::Clone" },
+    { "for_type": "AdrBaselineRestoreArgs", "trait_ref": "clap_builder::derive::Args" },
+    { "for_type": "AdrBaselineRestoreArgs", "trait_ref": "clap_builder::derive::FromArgMatches" },
+    { "for_type": "AdrBaselineCheckReviewArgs", "trait_ref": "core::fmt::Debug" },
+    { "for_type": "AdrBaselineCheckReviewArgs", "trait_ref": "core::clone::Clone" },
+    { "for_type": "AdrBaselineCheckReviewArgs", "trait_ref": "clap_builder::derive::Args" },
+    { "for_type": "AdrBaselineCheckReviewArgs", "trait_ref": "clap_builder::derive::FromArgMatches" },
+    { "for_type": "AdrBaselineCheckCommitArgs", "trait_ref": "core::fmt::Debug" },
+    { "for_type": "AdrBaselineCheckCommitArgs", "trait_ref": "core::clone::Clone" },
+    { "for_type": "AdrBaselineCheckCommitArgs", "trait_ref": "clap_builder::derive::Args" },
+    { "for_type": "AdrBaselineCheckCommitArgs", "trait_ref": "clap_builder::derive::FromArgMatches" }
+  ],
+  "traits": {},
+  "types": {
+    "AdrBaselineCheckCommitArgs": {
+      "action": "add",
+      "docs": "ADR baseline commit-check CLI arguments.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<cli_driver::adr_baseline::TrackIdInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::adr_baseline",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineCheckReviewArgs": {
+      "action": "add",
+      "docs": "ADR baseline review-check CLI arguments.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<cli_driver::adr_baseline::TrackIdInput>"
+            },
+            {
+              "name": "primary_source",
+              "ty": "cli_driver::adr_baseline::AdrSourceFileNameInput"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::adr_baseline",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineCommand": {
+      "action": "add",
+      "docs": "ADR baseline CLI subcommand family.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Snapshot",
+            "payload": {
+              "fields": [
+                "AdrBaselineSnapshotArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Restore",
+            "payload": {
+              "fields": [
+                "AdrBaselineRestoreArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CheckReview",
+            "payload": {
+              "fields": [
+                "AdrBaselineCheckReviewArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CheckCommit",
+            "payload": {
+              "fields": [
+                "AdrBaselineCheckCommitArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::adr_baseline",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineRestoreArgs": {
+      "action": "add",
+      "docs": "ADR baseline restore CLI arguments.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<cli_driver::adr_baseline::TrackIdInput>"
+            },
+            {
+              "name": "source",
+              "ty": "cli_driver::adr_baseline::AdrSourceFileNameInput"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::adr_baseline",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineSnapshotArgs": {
+      "action": "add",
+      "docs": "ADR baseline snapshot CLI arguments.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<cli_driver::adr_baseline::TrackIdInput>"
+            },
+            {
+              "name": "source",
+              "ty": "cli_driver::adr_baseline::AdrSourceFileNameInput"
+            },
+            {
+              "name": "kind",
+              "ty": "cli_driver::adr_baseline::AdrBaselineKindInput"
+            },
+            {
+              "name": "reason",
+              "ty": "Option<cli_driver::adr_baseline::AdrBaselineReasonInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::adr_baseline",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    }
+  }
+}

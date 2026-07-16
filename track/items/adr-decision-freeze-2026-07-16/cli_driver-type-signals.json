@@ -1,0 +1,89 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-16T15:14:28Z",
+  "declaration_hash": "46e4d0b9e13e4dd34d5e3f7cb8777bfcc540beb8df7c627252805674caaec267",
+  "implementation_input_hash": "52b7917cd19c39481aeac16e6762b05801b4f82d8c94e0a6f66bba79a80d6e38",
+  "signals": [
+    {
+      "type_name": "AdrBaselineDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "AdrBaselineInput",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineKindInput",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "AsRef<str>",
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "FromStr",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineReasonInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "AsRef<str>",
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "FromStr",
+        "PartialEq",
+        "TryFrom<String>"
+      ]
+    },
+    {
+      "type_name": "AdrSourceFileNameInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "AsRef<str>",
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "FromStr",
+        "PartialEq",
+        "TryFrom<String>"
+      ]
+    },
+    {
+      "type_name": "TrackIdInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "AsRef<str>",
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "FromStr",
+        "PartialEq",
+        "TryFrom<String>"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "72d514145d91fd8551d7957ecb3447c26f3767a2c4d4cb46e69034bcc0d98744",
+  "signals": [
+    {
+      "type_name": "AdrBaselineCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "3482743c5093b80d96448c44692f6d5461690a5b6e0674f56429ed7a3ba73790"
+    }
+  ]
+}

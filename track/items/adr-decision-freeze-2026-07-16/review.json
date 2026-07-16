@@ -91,6 +91,459 @@
           "at": "2026-07-16T12:36:56Z"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 contains upstream design-contract restatements (filename validation, kind/reason legality, append-only semantics, source state, and byte-check violations). Keep the task description to target + operation + anchor cites.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 restates upstream behavior (permitted source bytes, draft exemption, and fail-closed error preservation) instead of limiting the description to target + operation + anchor cites.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 contains extensive upstream contract restatements (atomic snapshot/ledger writes, preservation and collision rules, merge-base citation, draft classification, deterministic byte comparison, and latest-copy restore).",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 restates the input-validation behavior contract (validation of untrusted track ID, filename, kind, and reason) rather than only naming the target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 restates the diagnostic and exit-status behavior contract (structured/sanitized diagnostics and status handling) beyond the permitted target + operation + anchor form.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 restates the out-of-scope strictness invariant (preserving adr_user evaluator and signal-gate strictness) in prose; cite OS-01/AC-09 without re-litigating the upstream contract.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T007 restates the diagnoser's behavioral routing contract and prohibition on direct ADR/baseline edits. The task should name the target files/sections, operations, and anchors only.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S1 restates upstream design rationale/behavior ('approved domain model and fail-closed vocabulary'); plan sections must contain executable sequencing and anchor references, not contract prose.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 56,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S2 restates upstream layer/dependency rationale ('secondary adapters implement the established ports and invariants') rather than only sequencing tasks with anchors.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 65,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S3 restates the downstream dependency rationale ('rebuild ... before downstream gate wiring depends on the new commands') in the plan section; keep this as a dependency/order statement with task references, not a design-contract restatement.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 74,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S4 restates operational policy rationale ('diagnoser and reviewer/fixer policy are active when a mismatch is found') instead of limiting the section to task ordering and anchors.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 83,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:31415ed67b27c2eda710894e72530e4fa58789b7007e51f694e5013162035b5e",
+          "at": "2026-07-16T14:02:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3002bc77773173b1d8c34ed4f908ae88c50e43e2ccd4e2d6303984a49809d590",
+          "at": "2026-07-16T14:04:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 explicitly cites IN-03, CN-04, and AC-04 in its description, and its attributed CLI entries implement those anchors, but the corresponding coverage arrays omit T004. Reconcile these mappings so task completion remains traceable.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/task-coverage.json",
+              "line": 6,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T006 names only `Makefile.toml` precisely; “the track-init workflow” and “the affected maintainer, README, convention, verification-gate, and hook documentation” leave several possible files and provider adapters. Enumerate the exact targets so the executor does not have to invent the task boundary.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 36,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T006 is the sole task mapped to AC-09 and owns the workflow wiring needed by AC-04/AC-07, but it contains no validation step. The component tests in earlier tasks do not verify invocation from review, guarded commit, and track-aware CI or confirm that signal-gate strictness remains unchanged. Add explicit gate-wiring and unchanged-strictness verification.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 36,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T007 is the only task mapped to AC-08, yet its explicit targets cover the diagnoser and ADR reviewer prompt only. “Affected workflow documentation” neither identifies the fixer instruction/capability contract required by AC-08 nor supplies a validation step, so the task could complete without establishing the mandated fixer prohibition. Name the applicable fixer targets and verification explicitly.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 42,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:3002bc77773173b1d8c34ed4f908ae88c50e43e2ccd4e2d6303984a49809d590",
+          "at": "2026-07-16T14:11:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006の「Verify the init snapshot is required before review...」以降は、AC-01/AC-04/AC-07/AC-09 の期待挙動を task 内で文単位に再記述している。`knowledge/conventions/no-upstream-restatement.md` に従い、正確な対象ファイル、検証操作、anchor cite だけに縮めること。",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T007の「ADR meaning must not change...」および verdict ごとの検証説明は、IN-04/IN-06/CN-05/AC-05/AC-08 の挙動契約を散文で再記述している。`knowledge/conventions/no-upstream-restatement.md` に従い、対象ファイルへの clause 追加と focused verification の操作を anchor cite で指定する形にすること。",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:6dcac922db734f1d3496dcbec7ca6031b4c7d05de8626ca3ea198a3ed28f61f3",
+          "at": "2026-07-16T14:15:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:10cdc6266bd1aeefb91a51c0b7532ff398e000ee2e247beee3a30e2fd54681b1",
+          "at": "2026-07-16T14:18:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`task-coverage.json` maps AC-04 to T004, but T004 only implements the CLI/primary-adapter command boundary and argument validation. It does not wire or validate the review-entrance, guarded-commit, and track-aware CI enforcement required by AC-04; that work is described in T006. Remove T004 from AC-04 unless the task description is expanded with an actual AC-04 validation step.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/task-coverage.json",
+              "line": 28,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:4c6f9bbd646d4d879b2bde1d73112e7566ab8fef03bdea988d662630d43d2776",
+          "at": "2026-07-16T14:32:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a314e2ce9aef1ead8171ca284a9c1e36fa087148ab6f35ec24ece7a20c99acd1",
+          "at": "2026-07-16T14:34:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a314e2ce9aef1ead8171ca284a9c1e36fa087148ab6f35ec24ece7a20c99acd1",
+          "at": "2026-07-16T14:36:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:363ad31ee5d03caf899d994b3c8fe25e642f599546094c455a75d93a19afc93a",
+          "at": "2026-07-16T15:08:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:363ad31ee5d03caf899d994b3c8fe25e642f599546094c455a75d93a19afc93a",
+          "at": "2026-07-16T15:09:46Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:06f2686b1090a4afacd627c6d055f499b04a26929c3b7db25b34f142f1aa45e1",
+          "at": "2026-07-16T14:03:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::AdrBaselineCheckOutcome::Blocked` exposes `violations: Vec<AdrBaselineCheckViolation>` publicly, so callers can construct `Blocked { violations: vec![] }` directly. The `blocked()` constructor therefore cannot enforce the documented non-empty invariant; use a non-empty collection type or a private wrapper.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/domain-types.json",
+              "line": 298,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "`usecase::AdrBaselineService::execute` combines mutating `Snapshot`/`Restore` commands with non-mutating `CheckReview`/`CheckCommit` queries returning a check read model. Split the command and query contracts/interactors so callers and implementations do not depend on both sides.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 100,
+              "category": "CQRS: command/query mixing"
+            },
+            {
+              "message": "All four CLI argument DTOs carry `items_dir`, but `cli_driver::AdrBaselineInput` has no corresponding field and `AdrBaselineCompositionRoot` accepts only `project_root`. A custom items directory therefore cannot cross the CLI→driver→composition boundary. Preserve it in the mirror chain or document and type an explicit lossless conversion.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli-types.json",
+              "line": 104,
+              "category": "mirror chain divergence"
+            },
+            {
+              "message": "`usecase::AdrBaselineStorePort` exposes ledger entries but no operation or documented guarantee for verifying that each referenced verbatim baseline copy still exists and matches its ledger hash. Consequently the check contract cannot enforce AC-03 against a deleted or modified copy; `MissingBaseline` merely declares vocabulary without naming an enforcement owner.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 255,
+              "category": "enforcement-owner contradiction"
+            },
+            {
+              "message": "`working_bytes` and `fork_point_bytes` return `Result<Option<Vec<u8>>, AdrBaselineError>`, while `AdrBaselineError::SourceUnavailable(AdrSourceFileName)` also represents unavailable source bytes. With no documented distinction, `None` and `Err(SourceUnavailable)` overlap and adapters can encode the same state inconsistently.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 162,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "`AdrBaselineSourcePort` performs filesystem/Git reads and `AdrBaselineStorePort` performs filesystem persistence, but every method is synchronous and neither entry acknowledges the blocking execution choice. The port contract should explicitly justify synchronous I/O or declare the appropriate async color.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 153,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "Both secondary ports return the shared six-variant `AdrBaselineError` without documenting producible subsets. Source reads cannot structurally produce `Store`, `InvalidReason`, or primary-adapter filename-validation failures; store operations likewise cannot produce source-reader and primary-adapter variants. Use port-specific errors or document precise per-method subsets.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 162,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`decode_ledger_line` and `encode_ledger_entry` return `AdrBaselineCodecError`, whose `Io` and `Transaction` variants cannot be produced by these pure string codecs. The entry docs do not declare a producible subset, forcing callers to handle structurally unreachable failures.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/infrastructure-types.json",
+              "line": 15,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`cli_driver::TrackIdInput::try_new`, `AdrSourceFileNameInput::try_new`, and `AdrBaselineReasonInput::try_new` return broad shared errors. Each constructor can produce only its own validation subset, but the declarations neither use precise errors nor document those subsets.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+              "line": 17,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "The docs for `domain::AdrBaselineKind`, `domain::AdrBaselineLedgerEntry`, `domain::AdrBaselineSourceState`, and `domain::AdrSourceFileName` restate CN-01–CN-04/AC-06–AC-07 behavior such as reason requirements, fork-point selection, draft exemption, and path restrictions. Replace these restatements with short identifying phrases and anchor references.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/domain-types.json",
+              "line": 452,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `usecase::AdrBaselineSourcePort`, `usecase::AdrBaselineStorePort`, and `usecase::AdrBaselineInteractor` reproduce upstream behavior including fork-point reads, atomic append, mechanical restore, reason legality, and draft exemption. Keep the behavior in spec.json and cite its anchors instead.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 148,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `infrastructure::adr_baseline::{decode_ledger_line,encode_ledger_entry}`, `infrastructure::FsAdrBaselineStore`, and `infrastructure::FsGitAdrBaselineSource` restate CN-01–CN-04/AC-02/AC-07 behavior, including append-only encoding, collision handling, merge-base reads, and draft classification.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/infrastructure-types.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `cli_driver::AdrBaselineInput`, `AdrBaselineReasonInput`, and `AdrSourceFileNameInput` restate upstream reason-permission, non-empty-reason, and ADR-path validation behavior instead of referring to CN-02/CN-03/AC-06.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+              "line": 300,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `cli::AdrBaselineCheckCommitArgs`, `AdrBaselineCheckReviewArgs`, `AdrBaselineCommand`, `AdrBaselineRestoreArgs`, and `AdrBaselineSnapshotArgs` reproduce AC-04/CN-02/CN-05 behavior such as fail-closed entry checks, atomic snapshots, and latest-copy restoration. Replace the prose restatements with anchor-based identification.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli-types.json",
+              "line": 97,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:06f2686b1090a4afacd627c6d055f499b04a26929c3b7db25b34f142f1aa45e1",
+          "at": "2026-07-16T14:15:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:85200fba7b213a589f785ebf07835684ebf5ef7233626ba74db8e690de2c289b",
+          "at": "2026-07-16T14:33:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_composition::AdrBaselineCompositionRoot::new` returns the broad `CompositionError`, but the declared construction chain uses only infallible adapter, interactor, and driver constructors. Variants such as `ConfigLoad`, `Usecase`, and `Infrastructure` therefore have no structural origin, and the docs specify no reachable subset. Return `Self` or declare the actual fallible step and precise error subset.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli_composition-types.json",
+              "line": 10,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "The `as_str(&self) -> &str` signature is duplicated across `TrackIdInput`, `AdrSourceFileNameInput`, `AdrBaselineKindInput`, and `AdrBaselineReasonInput`; `try_new(String) -> Result<Self, AdrBaselineValidationError>` is also duplicated across the source-name and reason inputs. These sibling `add` entries should share contracts such as `AsRef<str>` and `TryFrom<String>` or a local trait.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+              "line": 22,
+              "category": "duplicated method signature across sibling types"
+            },
+            {
+              "message": "`FsAdrBaselineStore` and `FsGitAdrBaselineSource` duplicate the exact sibling constructor `new(PathBuf) -> Self`. Declare a shared construction contract such as `From<PathBuf>` instead of repeating the public signature.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/infrastructure-types.json",
+              "line": 67,
+              "category": "duplicated method signature across sibling types"
+            },
+            {
+              "message": "`AdrBaselineLedgerRecordDto.docs` restates the upstream ledger wire contract by enumerating `source/hash/kind/reason/timestamp`. The catalogue field shape and `spec_refs` already carry that information; retain only a short role phrase and anchor references to avoid a second behavioral SoT.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/infrastructure-types.json",
+              "line": 220,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`AdrBaselineInteractor` and `AdrBaselineQueryInteractor` duplicate the exact constructor taking `Arc<dyn AdrBaselineStorePort>` and `Arc<dyn AdrBaselineSourcePort>`. These sibling `add` entries should share a dependency value or constructor trait rather than repeat the same contract.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 10,
+              "category": "duplicated method signature across sibling types"
+            },
+            {
+              "message": "`AdrBaselineQueryService::execute` exposes the full `AdrBaselineQueryError`: a valid query cannot produce `AdrBaselineStoreError::Write`, and source unavailability is already modeled as the fail-closed `AdrBaselineCheckViolation::SourceMissing` rather than an operational query error. The docs specify no subset, so callers must handle unreachable leaves. Use a query-specific read error or document and enforce the exact mapping.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 261,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`AdrBaselineStorePort` combines the query-only `read_entries`/`verify_recorded_copy` group with the command-only `snapshot`/`restore` group. The separate command and query interactors consequently depend on methods they must not use. Split read/verification and mutation ports; the filesystem adapter may implement both.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 434,
+              "category": "Interface Segregation violation"
+            },
+            {
+              "message": "`AdrBaselineCommand::Snapshot` and `AdrBaselineStorePort::snapshot` both admit every `kind + Option<reason>` combination, but no entry names the sole AC-06 enforcement owner. `AdrBaselineReasonInput` cannot enforce the rule because it cannot see `kind`, while the store port cannot return `AdrBaselineValidationError`. Assign the interactor or another capable layer as the exactly-one owner of required/forbidden-reason rejection.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 589,
+              "category": "enforcement-owner contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:85200fba7b213a589f785ebf07835684ebf5ef7233626ba74db8e690de2c289b",
+          "at": "2026-07-16T14:53:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76d42b289840e41b3f566f5fb13ad1fa73fbac5a1585870ecde4465147fcd3eb",
+          "at": "2026-07-16T15:08:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76d42b289840e41b3f566f5fb13ad1fa73fbac5a1585870ecde4465147fcd3eb",
+          "at": "2026-07-16T15:12:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f79e5eb7184ef80a8356a9fa54d0c1bc922b276d77593b1815509f13638aa57",
+          "at": "2026-07-16T15:17:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f79e5eb7184ef80a8356a9fa54d0c1bc922b276d77593b1815509f13638aa57",
+          "at": "2026-07-16T15:20:18Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 の「可視化できる」という明示的な目標意図を、完了時に決定論的に証明する AC がありません。AC-02/AC-05 は累積記録と復元・briefing を定めていますが、init 版と最終版などの baseline 差分を review/PR で可視化できることを検証していないため、目標の一部が未カバーです。",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/spec.json",
+              "line": 6,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:4087c4ed8b1000824bf71fef0f5fdbeccf3c8cad07cdfac51e6866e281197de6",
+          "at": "2026-07-16T14:02:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cc606df76ca85a0d58701ab50d9180f52d183ccbb7ab216f71d3285a2456b92",
+          "at": "2026-07-16T14:03:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cc606df76ca85a0d58701ab50d9180f52d183ccbb7ab216f71d3285a2456b92",
+          "at": "2026-07-16T14:06:26Z"
+        }
+      ]
     }
   }
 }

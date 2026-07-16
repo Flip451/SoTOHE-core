@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "28ace489c16415627fd2b8b31d216c0877ea46e5672899a3e9dd85f13ef345e8",
+  "signals": [
+    {
+      "type_name": "AdrBaselineCommand",
+      "signal": "blue",
+      "entry_hash": "d8d826bfd5fc36a4e8330ea8521d8b6d67e58413eca5cb8d63e0678ae6b8d335"
+    },
+    {
+      "type_name": "AdrBaselineError",
+      "signal": "blue",
+      "entry_hash": "e15ba3760e3f5a946ee0e14c00bb2c15160054caf0f2ae4b7ea17ccf443286ba"
+    },
+    {
+      "type_name": "AdrBaselineInteractor",
+      "signal": "blue",
+      "entry_hash": "688a397a5bdc885bf1ce7adf2de29573147bd4453fafbc7e83cc8a5577dbd44a"
+    },
+    {
+      "type_name": "AdrBaselineOutput",
+      "signal": "blue",
+      "entry_hash": "db1b4411d770694eaff5802501da1d1bf41c1dc1a8ff9c0f6e6795c8768e2099"
+    },
+    {
+      "type_name": "AdrBaselineQuery",
+      "signal": "blue",
+      "entry_hash": "d5fb0ef6facb52b5d90f0034015fe1c35bad180ef1d3024cf04f90ca275acbbb"
+    },
+    {
+      "type_name": "AdrBaselineQueryError",
+      "signal": "blue",
+      "entry_hash": "0706f5a959bbf5c4d7d934a5a86bde742afa828acf4f8de416dfbd77163f740b"
+    },
+    {
+      "type_name": "AdrBaselineQueryInteractor",
+      "signal": "blue",
+      "entry_hash": "2c5c51910bc6a932ecfc9cecad84092cef7a165e473a152735a39953e74839b2"
+    },
+    {
+      "type_name": "AdrBaselineQueryOutput",
+      "signal": "blue",
+      "entry_hash": "8372f8f07dae8b59f1770fc4f0eec758c91d9ec87fa8ce10a529effa6382f318"
+    },
+    {
+      "type_name": "AdrBaselineSourceError",
+      "signal": "blue",
+      "entry_hash": "3da579f0da75410f93ba7df2d752788c02178b7b27b3dc639dc67560187818cd"
+    },
+    {
+      "type_name": "AdrBaselineStoreError",
+      "signal": "blue",
+      "entry_hash": "972514b6d53a7c4ddcb9a77d85c7f94d1f04bb0568174dff3b61472df151967d"
+    },
+    {
+      "type_name": "AdrBaselineStoreReadError",
+      "signal": "blue",
+      "entry_hash": "48560272eac36653b5e6a741af928f3ec85258e2cf1ad1db183845b1a8482d57"
+    },
+    {
+      "type_name": "AdrBaselineValidationError",
+      "signal": "blue",
+      "entry_hash": "9676cae57308e3c9ff90ca25a5b942e93f60d753b1921a9d907af3878aaf4f71"
+    },
+    {
+      "type_name": "AdrBaselineQueryService",
+      "signal": "blue",
+      "entry_hash": "c28908a15d037b34c290b1befb9c18475d11a9e21939107bff1f5a22f1b9f0c6"
+    },
+    {
+      "type_name": "AdrBaselineService",
+      "signal": "blue",
+      "entry_hash": "9988a87381af531333ceca06bc7ea33b53788befe45a192591c793700385ff2d"
+    },
+    {
+      "type_name": "AdrBaselineSourcePort",
+      "signal": "blue",
+      "entry_hash": "8020d6ae1c9a9cc2f7961671c63a1cb242f332b2614fa7cce81bc1e3af01c72a"
+    },
+    {
+      "type_name": "AdrBaselineStorePort",
+      "signal": "blue",
+      "entry_hash": "e153bfedef2746cc0e664cb43e4f3acceff79099d2222181a370ef4f5635ed37"
+    },
+    {
+      "type_name": "AdrBaselineStoreReadPort",
+      "signal": "blue",
+      "entry_hash": "a287bc1090b4547ef9cc27e001e321b6b31939f0bb5e8a125d7f6b066827bdd0"
+    }
+  ]
+}

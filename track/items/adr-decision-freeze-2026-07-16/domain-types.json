@@ -1,0 +1,938 @@
+{
+  "crate_name": "domain",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, AdrSourceFileNameError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "AdrSourceFileName"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "requires_reason",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "uses_fork_point",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "type_name": "AdrBaselineKind"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "kind",
+          "params": [],
+          "receiver": "&self",
+          "returns": "AdrBaselineKind"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "source",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&AdrSourceFileName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ContentHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "timestamp",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&Timestamp"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "reason",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&NonEmptyString>"
+        }
+      ],
+      "type_name": "AdrBaselineLedgerEntry"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "blocked",
+          "params": [
+            {
+              "name": "violations",
+              "ty": "AdrBaselineCheckViolations"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "AdrBaselineCheckOutcome"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "violations",
+              "ty": "Vec<AdrBaselineCheckViolation>"
+            }
+          ],
+          "returns": "Result<Self, AdrBaselineCheckOutcomeError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_slice",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[AdrBaselineCheckViolation]"
+        }
+      ],
+      "type_name": "AdrBaselineCheckViolations"
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "AdrSourceFileName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrSourceFileName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrSourceFileName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrSourceFileName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrSourceFileName",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "AdrSourceFileName",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "for_type": "AdrSourceFileName",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "for_type": "AdrSourceFileName",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdrSourceFileNameError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrSourceFileNameError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrSourceFileNameError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrSourceFileNameError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrSourceFileNameError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdrSourceFileNameError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "AdrBaselineKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineKind",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineKind",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "AdrBaselineLedgerEntry",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineLedgerEntry",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineLedgerEntry",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineLedgerEntry",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineSourceState",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineSourceState",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineSourceState",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineSourceState",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineCheckViolation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineCheckViolation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineCheckViolation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineCheckViolation",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineCheckOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineCheckOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineCheckOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineCheckOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineCheckOutcomeError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineCheckOutcomeError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineCheckOutcomeError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineCheckOutcomeError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineCheckOutcomeError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdrBaselineCheckOutcomeError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "AdrBaselineCheckViolations",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineCheckViolations",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineCheckViolations",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineCheckViolations",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineRecordedCopyStatus",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineRecordedCopyStatus",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineRecordedCopyStatus",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineRecordedCopyStatus",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "AdrBaselineCheckOutcome": {
+      "action": "add",
+      "docs": "ADR baseline freeze-check outcome.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Passed",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Blocked",
+            "payload": {
+              "fields": [
+                {
+                  "name": "violations",
+                  "ty": "AdrBaselineCheckViolations"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineCheckOutcomeError": {
+      "action": "add",
+      "docs": "Construction error returned when a blocked freeze-check outcome is requested without any violations.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "EmptyViolations",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineCheckViolation": {
+      "action": "add",
+      "docs": "Typed fail-closed reasons produced by the ADR baseline byte-comparison gate.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MissingPrimaryInit",
+            "payload": {
+              "fields": [
+                "AdrSourceFileName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "MissingRequiredStamp",
+            "payload": {
+              "fields": [
+                "AdrSourceFileName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SourceMissing",
+            "payload": {
+              "fields": [
+                "AdrSourceFileName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "BaselineCopyMissing",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "AdrSourceFileName"
+                },
+                {
+                  "name": "expected",
+                  "ty": "ContentHash"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "BaselineCopyMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "AdrSourceFileName"
+                },
+                {
+                  "name": "expected",
+                  "ty": "ContentHash"
+                },
+                {
+                  "name": "actual",
+                  "ty": "ContentHash"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ByteMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "AdrSourceFileName"
+                },
+                {
+                  "name": "expected",
+                  "ty": "ContentHash"
+                },
+                {
+                  "name": "actual",
+                  "ty": "ContentHash"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineCheckViolations": {
+      "action": "add",
+      "docs": "Non-empty ADR baseline check-violation collection.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineKind": {
+      "action": "add",
+      "docs": "ADR baseline snapshot kind.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Init",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Cite",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "NewAdr",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "NonSemanticFix",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Escalation",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineLedgerEntry": {
+      "action": "add",
+      "docs": "Kind-indexed ADR baseline ledger record.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Init",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "AdrSourceFileName"
+                },
+                {
+                  "name": "hash",
+                  "ty": "ContentHash"
+                },
+                {
+                  "name": "timestamp",
+                  "ty": "Timestamp"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Cite",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "AdrSourceFileName"
+                },
+                {
+                  "name": "hash",
+                  "ty": "ContentHash"
+                },
+                {
+                  "name": "timestamp",
+                  "ty": "Timestamp"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NewAdr",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "AdrSourceFileName"
+                },
+                {
+                  "name": "hash",
+                  "ty": "ContentHash"
+                },
+                {
+                  "name": "reason",
+                  "ty": "NonEmptyString"
+                },
+                {
+                  "name": "timestamp",
+                  "ty": "Timestamp"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NonSemanticFix",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "AdrSourceFileName"
+                },
+                {
+                  "name": "hash",
+                  "ty": "ContentHash"
+                },
+                {
+                  "name": "timestamp",
+                  "ty": "Timestamp"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Escalation",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "AdrSourceFileName"
+                },
+                {
+                  "name": "hash",
+                  "ty": "ContentHash"
+                },
+                {
+                  "name": "reason",
+                  "ty": "NonEmptyString"
+                },
+                {
+                  "name": "timestamp",
+                  "ty": "Timestamp"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineRecordedCopyStatus": {
+      "action": "add",
+      "docs": "Recorded ADR baseline-copy verification status.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Matches",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Missing",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "HashMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "actual",
+                  "ty": "ContentHash"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineSourceState": {
+      "action": "add",
+      "docs": "ADR source provenance classification.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ExistingAtForkPoint",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TrackBornDraft",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TrackBornPromoted",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrSourceFileName": {
+      "action": "add",
+      "docs": "Validated ADR source filename; the constructor String is transient unvalidated input.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrSourceFileNameError": {
+      "action": "add",
+      "docs": "Validation error carrying the rejected, untrusted file-name text as a validated DiagnosticMessage rather than a raw primitive.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidFileName",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    }
+  }
+}
