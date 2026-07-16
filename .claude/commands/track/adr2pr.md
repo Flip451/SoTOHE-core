@@ -17,7 +17,7 @@ User invokes this command as `/track:adr2pr`. `$ARGUMENTS` is unused (reserved).
   - `type-designer`: `subagent_type: "type-designer"`
   - `impl-planner`: `subagent_type: "impl-planner"`
   - `adr-editor` (back-and-forth escalation): `subagent_type: "adr-editor"`
-- **Staging**: `cargo make add-all`
+- **Staging**: `bin/sotp git add-all`
 - **Commit**: write to `tmp/track-commit/commit-message.txt`, then `cargo make track-commit-message`
 
 ## Report format

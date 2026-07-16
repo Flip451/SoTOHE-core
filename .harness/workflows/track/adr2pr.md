@@ -63,7 +63,7 @@ tree. The absence of `spec.md` does not block the review.
 
 **Step 3: Stage**
 
-Run `cargo make add-all` after the final review round (per the canonical staging-order rule in
+Run `bin/sotp git add-all` after the final review round (per the canonical staging-order rule in
 the `commit` workflow: review must complete before staging).
 
 **Step 4: commit workflow — ADR + metadata commit**
@@ -99,7 +99,7 @@ artifacts (`spec.json`, type catalogues, `impl-plan.json`).
 
 **Step 7: Stage**
 
-Run `cargo make add-all` after the final review round.
+Run `bin/sotp git add-all` after the final review round.
 
 **Step 8: commit workflow — plan artifacts commit**
 

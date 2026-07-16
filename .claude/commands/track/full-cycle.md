@@ -21,7 +21,7 @@ Key tool interactions:
 
 - Scope ceiling config: Read `.harness/config/review-scope.json`
 - Diff measurement: `git diff --numstat <batch-base> --`, `git ls-files --others --exclude-standard` (read-only)
-- Staging: `cargo make add-all`
+- Staging: `bin/sotp git add-all`
 - Task transitions: run `bin/sotp track transition` from the orchestrator host. The command's sequencing, timing, and ownership boundary live in the workflow SSoT (`.harness/workflows/track/full-cycle.md` Step 1d / Step 3) — do not restate them here.
 
 ## Report format

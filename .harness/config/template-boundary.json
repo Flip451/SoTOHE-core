@@ -25,6 +25,8 @@
     { "pattern": "deny.toml", "classification": "overlay" },
     { "pattern": "Dockerfile", "classification": "overlay" },
     { "pattern": "Makefile.toml", "classification": "overlay" },
+    { "pattern": "Makefile.host.toml", "classification": "overlay" },
+    { "pattern": "Makefile.docker.toml", "classification": "overlay" },
     { "pattern": "architecture-rules.json", "classification": "overlay" },
     { "pattern": "libs", "classification": "overlay" },
     { "pattern": "apps", "classification": "overlay" },

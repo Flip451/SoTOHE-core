@@ -13,7 +13,7 @@ User invokes this command as `/track:init`. Use `$ARGUMENTS` as the feature name
 This command runs directly — no subagents. Key Bash wrappers used:
 
 - `git branch --show-current`, `git status --short` (read-only pre-flight)
-- `cargo make track-branch-create '<track-id>'`
+- `bin/sotp track branch create --items-dir track/items '<track-id>'`
 - `bin/sotp track views sync`
 - `cargo make verify-track-metadata`
 

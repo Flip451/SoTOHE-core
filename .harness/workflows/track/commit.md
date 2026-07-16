@@ -80,7 +80,7 @@ After a successful commit, generate and attach a structured git note to HEAD.
 2. Read `spec.md` and `plan.md`; also read `observations.md` if it exists.
 3. Run `git show HEAD --stat` to get the changed file list.
 4. Generate the note text using the format below and write it to `tmp/track-commit/note.md`.
-5. Run `cargo make track-note`.
+5. Run `bin/sotp git note-from-file tmp/track-commit/note.md --cleanup`.
 
 *Step 3b — Skip note*: if no track directory exists and no generated scratch note is available,
 skip note generation and mention this in the summary.
@@ -114,15 +114,15 @@ skip note generation and mention this in the summary.
 ## Failure / recovery
 
 - **No commit message supplied**: generate proposals and stop. Do not execute commit.
-- **Empty or wrong staged diff**: fix staging with `cargo make add-all` or selective
-  `cargo make track-add-paths`, then re-run the workflow.
+- **Empty or wrong staged diff**: fix staging with `bin/sotp git add-all` or selective
+  `bin/sotp git add-from-file tmp/track-commit/add-paths.txt --cleanup`, then re-run the workflow.
 - **Non-track branch**: switch to the track branch and re-run.
 - **`cargo make track-commit-message` failure**:
   - CI/gate failure (fmt, clippy, test, deny, layers, verify-*, track-aware gates,
     test-obligation, DRY): fix the failing gate and re-run.
     Do not re-stage — the working tree is the same. Do not proceed to note generation.
   - git commit error: diagnose (index state, branch protection) and resolve before retrying.
-- **Note generation failure** (`cargo make track-note` non-zero): report the error. The commit
+- **Note generation failure** (`bin/sotp git note-from-file` non-zero): report the error. The commit
   itself already succeeded; note failure is non-fatal but should be investigated.
 
 ## Outputs
