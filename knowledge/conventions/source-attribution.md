@@ -51,7 +51,7 @@ Tags appear inline at the end of the requirement statement:
 
 - New logic must be implemented in Rust, not Python [source: feedback — Rust-first policy]
 - TDD workflow is mandatory [source: convention — knowledge/conventions/testing.md]
-- Input validation uses domain types [source: knowledge/conventions/hexagonal-architecture.md §domain]
+- Input validation uses domain types [source: knowledge/conventions/prefer-type-safe-abstractions.md]
 ```
 
 For acceptance criteria:

@@ -11,21 +11,21 @@ decisions: []
 - **フォーマット**: Nygard 式 + Rejected Alternatives + Reassess When
 - **言語**: 日本語
 - **採番**: `YYYY-MM-DD-HHMM-slug.md`（例: `2026-03-11-1430-track-status-derived.md`）
-- **Status**: `Proposed` / `Accepted` / `Superseded` / `Deprecated`
-  - `Proposed`: ADR is authored and under review / pending activation of the associated track
-  - `Accepted`: Decision is accepted and implementation may proceed
-  - `Superseded`: Replaced by a newer ADR (reference the superseding ADR)
-  - `Deprecated`: Decision is withdrawn without replacement
-- **Superseded の場合**: 新 ADR を作成し、旧 ADR の Status を `Superseded by YYYY-MM-DD-HHMM-slug.md` に変更
+- **front-matter**: MD body の前に `adr_id` と `decisions[]` を必須で置く。各 decision は根拠 ref と decision 単位の `status` を持つ。
+- **decision status**: `proposed` / `accepted` / `implemented` / `superseded` / `deprecated`。`implemented` には `implemented_in`、`superseded` には `superseded_by` が必須。
+- **根拠**: 新規 decision には `user_decision_ref` または `review_finding_ref` を入れる。file-level の `## Status` は使用しない。
 
 ## ADR テンプレート
 
 ```markdown
+---
+adr_id: "<YYYY-MM-DD-HHMM>-<slug>"
+decisions:
+  - id: decision-1
+    user_decision_ref: "chat_segment:<session>:<date>"
+    status: proposed
+---
 # {タイトル}
-
-## Status
-
-Proposed / Accepted / Superseded / Deprecated
 
 ## Context
 

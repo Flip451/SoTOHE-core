@@ -19,7 +19,7 @@ Analyze large Rust codebases using your 1M context:
 
 - Cargo workspace structure and crate boundaries
 - Domain model: key types, value objects, aggregates
-- Port definitions (traits in domain layer)
+- Port definitions (traits in the domain and usecase layers)
 - Adapter implementations (infra layer)
 - Async patterns and Tokio usage
 - Error handling strategy

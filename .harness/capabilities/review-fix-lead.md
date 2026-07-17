@@ -167,9 +167,11 @@ Keep N small (1–3) to avoid context bloat.
 Before modifying any file, verify it belongs to the correct architecture layer per
 `knowledge/conventions/impl-delegation-arch-guard.md`:
 
-- Domain types stay in `libs/domain/`
+- Domain types and domain ports stay in `libs/domain/`
+- Usecase interactors and usecase ports stay in `libs/usecase/`
 - Infrastructure adapters stay in `libs/infrastructure/`
 - CLI composition-root wiring stays in `apps/cli-composition/` (the `apps/cli` crate is the bin entry point only)
+- `apps/cli-driver` is the primary adapter layer
 - Do not move types between layers without explicit ADR authorization.
 
 ## Output contract

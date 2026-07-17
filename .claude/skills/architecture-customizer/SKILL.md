@@ -47,7 +47,15 @@ Define which crates may depend on which crates.
 1. Record the architecture decision in a pre-track ADR under `knowledge/adr/`.
 2. Update `Makefile.toml` `ci-local` / `ci-container` dependencies if quality gates change, and ensure `sotp verify layers` still reflects the new architecture rules.
 3. Update `knowledge/conventions/coding-principles.md` module layout example if module conventions change.
-4. Update `CLAUDE.md` file tree if crate map changed.
+4. Synchronize the live architecture-document set: `CLAUDE.md`, `AGENTS.md`,
+   `.claude/rules/09-maintainer-checklist.md`, this skill,
+   `.harness/capabilities/{implementer,dry-fix-lead,review-fix-lead,rollback-diagnoser}.md`,
+   `.harness/custom/review-prompts/{cli,cli_composition,cli_driver,domain,infrastructure,types,usecase}.md`,
+   the survey prompts (`.gemini/GEMINI.md`,
+   `.claude/skills/{gemini-system,repomix-snapshot}/SKILL.md`),
+   and applicable `knowledge/conventions/` references (especially
+   `coding-principles.md`, `type-designer-kind-selection.md`, and
+   `impl-delegation-arch-guard.md`).
 
 ## Step 5: Validation Gates
 

@@ -69,11 +69,11 @@ Derived read-only views — never hand-edit, regenerate via `bin/sotp track view
 ## Rules and conventions
 
 - `.claude/rules/` — Claude Code-specific operating rules (only these five): `01-language.md` (think in English, answer in Japanese), `07-dev-environment.md` (toolchain, cargo-make, `bin/sotp` build), `08-orchestration.md` (delegation), `09-maintainer-checklist.md` (co-update matrix), `10-guardrails.md` (guards, hooks, permissions).
-- `knowledge/conventions/` — ~30 engineering conventions; the index in its `README.md` is auto-generated (`bin/sotp conventions update-index`) and lists them in reading order. Load-bearing for daily work: `track-lifecycle.md`, `branch-strategy.md`, `git-notes.md`, `task-completion-flow.md`, `pre-track-adr-authoring.md`, `adr.md`, `review-protocol.md`, `coding-principles.md`, `hexagonal-architecture.md`, `no-upstream-restatement.md`.
+- `knowledge/conventions/` — ~30 engineering conventions; the index in its `README.md` is auto-generated (`bin/sotp conventions update-index`) and lists them in reading order. Load-bearing for daily work: `track-lifecycle.md`, `branch-strategy.md`, `git-notes.md`, `task-completion-flow.md`, `pre-track-adr-authoring.md`, `adr.md`, `review-protocol.md`, `coding-principles.md`, `type-designer-kind-selection.md`, `no-upstream-restatement.md`.
 
 ## Workspace shape
 
-Six crates, hexagonal (`knowledge/conventions/hexagonal-architecture.md`, enforced by `architecture-rules.json` + `deny.toml` via `cargo make check-layers` / `deny`): `libs/domain` → `libs/usecase` → `libs/infrastructure`; delivery split into `apps/cli` (bin) / `apps/cli-driver` (primary adapter) / `apps/cli-composition` (composition root). Inspect with `bin/sotp arch tree` / `tree-full`.
+Six crates. `architecture-rules.json` and `deny.toml` are the SSoT for permitted dependency direction and are enforced by `cargo make check-layers` / `deny`; `type-designer-kind-selection.md` R1 is the SSoT for role × layer placement. Delivery is split into `apps/cli` (bin), `apps/cli-driver` (primary adapter that depends on usecase only), and `apps/cli-composition` (composition root that wires all layers). Inspect with `bin/sotp arch tree` / `tree-full`.
 
 ## Quick commands
 

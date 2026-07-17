@@ -150,10 +150,11 @@ commit, or transition tasks.
 
 ## Architecture Guard
 
-- Domain types stay in `libs/domain/`.
-- Usecase interactors / ports stay in `libs/usecase/`.
+- Domain types and domain ports stay in `libs/domain/`.
+- Usecase interactors and usecase ports stay in `libs/usecase/`.
 - Infrastructure adapters stay in `libs/infrastructure/`.
 - CLI composition-root wiring stays in `apps/cli-composition/`.
+- `apps/cli-driver` is the primary adapter layer.
 - The `apps/cli` crate is the bin entry point and should stay thin: parse args, build/dispatch
   through composition, print results, return exit codes.
 

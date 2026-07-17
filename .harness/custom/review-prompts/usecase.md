@@ -14,7 +14,7 @@ Report findings ONLY for the following categories:
 - **purity violation by trait or generic**: a `T: Reader` bound that effectively
   forces an `std::io::Read` dependency the syn scanner cannot see (e.g., via
   a re-export), or a generic constraint that lets infrastructure leak into
-  usecase. Cite `hexagonal-architecture.md` §Usecase Layer Purity Rules.
+  usecase. Cite `coding-principles.md` §Usecase Layer Purity.
 - **implicit time / env / process dependency**: a function that calls a port
   whose only implementation reads `SystemTime` / `env::var()` / spawns a
   process without that being a documented port contract (the port is
@@ -22,13 +22,13 @@ Report findings ONLY for the following categories:
   must be parameters to the usecase entrypoint, not retrieved inside.
 - **business logic leak**: a calculation, branching, or decision that belongs
   in `domain` (e.g., a comparison that should be a domain method on a
-  Newtype) executed in usecase. Cite §CLI as Composition Root for the
-  inverse boundary: usecase orchestrates, domain decides.
+  Newtype) executed in usecase. Cite `coding-principles.md` §Usecase Layer
+  Purity for the inverse boundary: usecase orchestrates, domain decides.
 - **port placement mistake**: a port defined in usecase that should live in
   domain (a port abstracting a domain concept, not an infrastructure
-  capability). Cite `hexagonal-architecture.md` §Port Placement Rules.
+  capability). Cite `type-designer-kind-selection.md` R1.
 - **direct infrastructure reference**: any non-test code in usecase importing
-  from `infrastructure::*` (even via re-export). Cite §Layer Dependencies.
+  from `infrastructure::*` (even via re-export). Cite `architecture-rules.json`.
 - **error type confusion**: the usecase error enum re-exposes infrastructure
   error variants (e.g., `io::Error`) instead of mapping them to a
   usecase-level concept, breaking the abstraction. The interactor's

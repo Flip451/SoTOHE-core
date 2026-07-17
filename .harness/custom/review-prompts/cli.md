@@ -6,7 +6,7 @@ parse arguments into typed `Input` structs, obtain a wired Driver from
 `cli_composition`, and call `driver.handle(input)` to receive a `CommandOutcome`
 which it emits (stdout/stderr + `ExitCode`). It must not contain business logic,
 perform direct I/O for application purposes, or import from `usecase`/`domain`
-directly. Cite `hexagonal-architecture.md` and `architecture-rules.json` when
+directly. Cite `architecture-rules.json` and `type-designer-kind-selection.md` R1 when
 reporting a boundary violation.
 
 ## What to report
@@ -17,7 +17,7 @@ Report findings ONLY for the following categories:
   transformation, or multi-step orchestration in `src/main.rs` or a
   `src/commands/*.rs` handler. The handler must be a thin parse-dispatch-emit
   wrapper. Computations that belong in `usecase` or `domain` must not be
-  inlined here. Cite `hexagonal-architecture.md` §CLI as Composition Root.
+  inlined here. Cite `type-designer-kind-selection.md` R1 (`CompositionRoot`).
 - **direct I/O in bin**: production code in `apps/cli/` that writes to `stdout`
   / files / the network for application purposes (e.g., telemetry persistence via
   `std::fs` / `serde_json` / `chrono::Utc::now()` inlined in `main.rs`).

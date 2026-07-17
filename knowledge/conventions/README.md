@@ -65,7 +65,6 @@
 - `enforce-by-mechanism.md`: Enforce by Mechanism Convention
 - `filesystem-persistence-guard.md`: Filesystem Persistence Guard Convention
 - `git-notes.md`: Git Notes Convention
-- `hexagonal-architecture.md`: Hexagonal Architecture Convention
 - `impl-delegation-arch-guard.md`: Implementation Delegation Architecture Guard
 - `language-policy.md`: Language Policy Convention
 - `nightly-dev-tool.md`: Nightly Toolchain Dev-Tool Convention

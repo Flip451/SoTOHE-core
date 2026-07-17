@@ -125,4 +125,4 @@ cargo nextest run -E 'test(test_email_with_valid_format)'
 ## Decision Reference
 
 - `knowledge/conventions/coding-principles.md`: エラーハンドリング・パニック禁止ルール（テスト例外を含む）
-- `knowledge/conventions/hexagonal-architecture.md`: ポート（Trait）定義と mockall を使ったアダプタのテスト戦略
+- `knowledge/conventions/type-designer-kind-selection.md` R1: ポート（Trait）の配置

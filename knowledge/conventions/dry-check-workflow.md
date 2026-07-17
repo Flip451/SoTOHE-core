@@ -40,7 +40,9 @@ fixpoint（DRY gate + 全 review scope が同時に green）
 1. **DFP は RFP より先**: `sotp dry check-approved` が exit 0 になるまで RFP に入らない。
 2. **RFP から DFP への back-edge**: RFP 中に DRY 違反が検出された場合、rfl は即座に RFP を止めて DFP に戻る。rfl は DRY 違反を修正しない。
 3. **fixpoint がコミットゲート**: DRY gate（`sotp dry check-approved` exit 0）と全 review scope の `zero_findings` が同時に green になった時点でのみコミット可。どちらか片方だけでは不十分。
-4. **DFP は全コードベーススコープ**: DRY は scope をまたぐため dfl が単一スコープで扱う。rfl の scope（cli / domain / infrastructure 等）に分割しない。
+4. **DFP は全コードベーススコープ**: 一部の DRY 違反は scope をまたぐため dfl が単一スコープで扱う。rfl の scope（cli / domain / infrastructure 等）に分割しない。
+5. **構造類似を機械的に統合しない**: core 型と adapter mirror DTO / enum の意図的な構造類似は、関心分離に由来するため DRY 違反ではない。知識の重複だけを違反候補とし、偶発的なテキスト類似は違反としない。
+6. **共通化の抽出方向**: 正当な cross-layer 共通化は、関係する両層が依存できるより内側の層へ抽出する。上位層への引き上げで依存方向を逆転してはならない。
 
 ---
 

@@ -4,32 +4,27 @@
     {
       "id": "T001",
       "description": "`knowledge/conventions/hexagonal-architecture.md`; `knowledge/conventions/coding-principles.md`; `knowledge/conventions/README.md`: remove the retired convention, migrate the retained material, regenerate the convention index, and validate the surviving convention citations (IN-01/IN-02/CN-01/CN-02/AC-01/AC-02).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T002",
-      "description": "`knowledge/conventions/type-designer-kind-selection.md`; `.harness/capabilities/dry-fix-lead.md`; `.harness/capabilities/dry-check-workflow.md` and their applicable wrappers/prompts: update the cited R1, R3, and R6 rules and the DRY workflow guidance (IN-04/IN-05/IN-06/AC-05/AC-06/AC-07).",
-      "status": "todo",
-      "commit_hash": null
+      "description": "`knowledge/conventions/type-designer-kind-selection.md`; `.harness/capabilities/{dry-fix-lead,implementer,review-fix-lead}.md`; `knowledge/conventions/dry-check-workflow.md`; `.claude/agents/dry-fix-lead.md`; `.agents/skills/dry-fix-lead/SKILL.md`; `.gemini/GEMINI.md`; `.claude/skills/{gemini-system,repomix-snapshot}/SKILL.md`: update the cited R1, R3, and R6 rules, the DRY workflow guidance, and all affected architecture guidance (IN-04/IN-05/IN-06/AC-05/AC-06/AC-07).",
+      "status": "done"
     },
     {
       "id": "T003",
-      "description": "All current working-tree references to `hexagonal-architecture.md`, including rules, review prompts, skills, entry documents, and Rust doc comments; `.harness/customizers/architecture-customizer.md`; `knowledge/conventions/task-completion-flow.md`; `CLAUDE.md`: replace retired-document citations, synchronize the architecture-document checklist, and update the entry-document presentation (IN-03/IN-07/CN-04/AC-03/AC-04/AC-08).",
-      "status": "todo",
-      "commit_hash": null
+      "description": "All current working-tree references to `hexagonal-architecture.md`, including rules, review prompts, skills, entry documents, and Rust doc comments; `.claude/skills/architecture-customizer/SKILL.md`; `.claude/rules/09-maintainer-checklist.md`; `knowledge/conventions/task-completion-flow.md`; `CLAUDE.md`: replace retired-document citations, synchronize the architecture-document checklist, and update the entry-document presentation (IN-03/IN-07/CN-04/AC-03/AC-04/AC-08).",
+      "status": "done"
     },
     {
       "id": "T004",
       "description": "`overlay/knowledge/adr/README.md`; `knowledge/adr/README.md`: update both ADR templates to the current front-matter format (IN-08/AC-09).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T005",
       "description": "`.github/workflows/ci.yml`: update the track-aware gate and branch-recreation conditions and their relationship comment (IN-09/CN-03/AC-10).",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     }
   ],
   "plan": {

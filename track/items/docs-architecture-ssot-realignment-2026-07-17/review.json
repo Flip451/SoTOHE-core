@@ -1,90 +1,21 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
-          "at": "2026-07-17T18:51:40Z"
+          "hash": "rvw1:sha256:ab9ae42a419132aa39ac291dc31350237351b4049d5d5ea5ab47930afeed1b86",
+          "at": "2026-07-17T19:48:00Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
-          "at": "2026-07-17T18:54:49Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25dc0b504f4840afa786dc0940927d45a6c18a4a82a75140c72b0735351b9da9",
-          "at": "2026-07-17T19:21:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-01 は依存・配置規則を人間可読文書に再記述せず SSoT 参照だけで表現するよう要求していますが、IN-04／AC-05 は調査プロンプトと architecture guard に domain/usecase の二層配置を示すことを、AC-08 は CLAUDE.md に delivery crate の具体的な依存関係を示すことを要求しています。参照だけでは後者を満たせず、具体的に記述すれば CN-01 に違反するため、契約を同時に充足できません。許容する要約と禁止する再記述の境界を明確化する必要があります。",
-              "severity": "P1",
-              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/spec.json",
-              "line": 188,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:25dc0b504f4840afa786dc0940927d45a6c18a4a82a75140c72b0735351b9da9",
-          "at": "2026-07-17T19:24:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31e2395e6a0cb34cab34fec57059f13e580d82e7396e0b798f80e7992e5ed9ed",
-          "at": "2026-07-17T19:26:22Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
-          "at": "2026-07-17T19:21:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
-          "at": "2026-07-17T19:25:01Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:38d4042fd185260e3d183bca503f9b287c7006c3a466b2fbecfdef9a05f6dc2f",
-          "at": "2026-07-17T18:51:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:38d4042fd185260e3d183bca503f9b287c7006c3a466b2fbecfdef9a05f6dc2f",
-          "at": "2026-07-17T18:55:45Z"
+          "hash": "rvw1:sha256:ab9ae42a419132aa39ac291dc31350237351b4049d5d5ea5ab47930afeed1b86",
+          "at": "2026-07-17T19:50:24Z"
         }
       ]
     },
@@ -266,6 +197,317 @@
           "findings": [],
           "hash": "rvw1:sha256:ea27130e7dcdf5f3671e7a4159850d9614bbc0d8a3bbca657fdda472e271452b",
           "at": "2026-07-17T19:28:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8544b7c940c6ff05b3bd5a3187d23b066ac416828795e74c16ffee84e0f5b84b",
+          "at": "2026-07-17T19:47:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 names `.harness/capabilities/dry-check-workflow.md`, but that path does not exist (including at the reviewed plan commit); the actual convention is `knowledge/conventions/dry-check-workflow.md`. Together with the unspecified “applicable wrappers/prompts,” this leaves the executor to invent part of the task boundary. Replace the path and name the applicable wrapper/prompt targets.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 11,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003 names the nonexistent `.harness/customizers/architecture-customizer.md`; the tracked architecture-customizer artifacts are under `.claude/`, and the implementation changes `.claude/skills/architecture-customizer/SKILL.md`. Correct the target so the task identifies the actual file rather than requiring the executor to infer it.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 16,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:8544b7c940c6ff05b3bd5a3187d23b066ac416828795e74c16ffee84e0f5b84b",
+          "at": "2026-07-17T19:51:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is the sole mapping for IN-04/AC-05, but its target list omits the three research prompts (`.gemini/GEMINI.md`, `.claude/skills/gemini-system/SKILL.md`, and `.claude/skills/repomix-snapshot/SKILL.md`) and the `implementer` and `review-fix-lead` architecture guards. Those prompts still contain the excluded domain-only port wording, so executing T002 as written cannot close AC-05. Add the omitted targets.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 11,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T003 is the sole mapping for AC-04, which covers both the architecture-customizer update set and the maintainer checklist, but the task names only the customizer skill and never identifies `.claude/rules/09-maintainer-checklist.md`. Add that file to T003's target boundary so AC-04 is executable without inference.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 16,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:acac9ac40b0b961800705910bc7c045dbff23e7126bf7840c1bbeec0177842ab",
+          "at": "2026-07-17T19:55:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49ba20b25e719bd14781ef5875def02a1c7805146c2ed254c44a63fd68560331",
+          "at": "2026-07-17T19:57:06Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b5bb72f14d715458ec608df81362e4dafca7dace65c09b40cfd03a015b6fdd6",
+          "at": "2026-07-17T19:48:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b5bb72f14d715458ec608df81362e4dafca7dace65c09b40cfd03a015b6fdd6",
+          "at": "2026-07-17T19:50:38Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38d4042fd185260e3d183bca503f9b287c7006c3a466b2fbecfdef9a05f6dc2f",
+          "at": "2026-07-17T18:51:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:38d4042fd185260e3d183bca503f9b287c7006c3a466b2fbecfdef9a05f6dc2f",
+          "at": "2026-07-17T18:55:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc7eed4fd28a321c713a7ed2278982136472ed400d718cf0330648068bc8ab77",
+          "at": "2026-07-17T19:48:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc7eed4fd28a321c713a7ed2278982136472ed400d718cf0330648068bc8ab77",
+          "at": "2026-07-17T19:49:39Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cb5673148929321b958b8ea3495d27008ca8b38f53d263a252b1a5412b5d02e",
+          "at": "2026-07-17T19:48:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "新設した「live architecture-document set」が実集合を網羅していません。`.gemini/GEMINI.md` と `.claude/skills/{gemini-system,repomix-snapshot}/SKILL.md` は現在も「port は domain layer の trait」と記述していますが、この一覧と architecture-customizer 側の複製一覧の双方から漏れています。そのため今回の二層配置への同期自体が未完了で、今後も同じドリフトが再発します。これらの配布文書を一覧へ追加し、R1 の domain/usecase 判別規則へ更新してください。",
+              "severity": "P1",
+              "file": ".claude/rules/09-maintainer-checklist.md",
+              "line": 23,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "`§CLI as Composition Root` は削除された `hexagonal-architecture.md` にしか存在しない節です。fresh consumer checkout では引用先がなく、usecase reviewer が finding を根拠付けできません。現行の R1 または coding-principles の該当規則へ付け替えてください。",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/usecase.md",
+              "line": 25,
+              "category": "template-distribution reference leak"
+            },
+            {
+              "message": "role/kind mismatch の例が現行 R1 と矛盾しています。v5 の実際の role は `Entity`、`SpecificationPort`、`SecondaryPort` 等であり、`DomainEntity` と汎用の `Port` は role 値ではありません。また domain に置くべき port もあるため、「port が domain にある」こと自体を mismatch 例にすると正しい catalogue を誤検出します。現行 role 名を使い、usecase に属する capability port に限定してください。",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/types.md",
+              "line": 38,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "`Repository` 行は aggregate-root persistence port を usecase にも無条件で許可していますが、直後の tie-break は aggregate の語彙・永続化 port を domain に置くと規定しています。`Repository` は必ず `aggregate: TypeRef` を持つため、同じ entry が表では許可され tie-break では拒否される状態です。usecase 列を禁止または要根拠にするなど、R1 内で一意な判断になるよう整合させてください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 63,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2cb5673148929321b958b8ea3495d27008ca8b38f53d263a252b1a5412b5d02e",
+          "at": "2026-07-17T19:58:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`§CLI as Composition Root` は削除された `hexagonal-architecture.md` にしか存在しない節です。fresh consumer checkout では引用先がなく、usecase reviewer が finding を根拠付けできません。現行の R1 または coding-principles の該当規則へ付け替えてください。",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/usecase.md",
+              "line": 25,
+              "category": "template-distribution reference leak"
+            },
+            {
+              "message": "role/kind mismatch の例が現行 R1 と矛盾しています。v5 の実際の role は `Entity`、`SpecificationPort`、`SecondaryPort` 等であり、`DomainEntity` と汎用の `Port` は role 値ではありません。また domain に置くべき port もあるため、「port が domain にある」こと自体を mismatch 例にすると正しい catalogue を誤検出します。現行 role 名を使い、usecase に属する capability port に限定してください。",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/types.md",
+              "line": 38,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "`Repository` 行は aggregate-root persistence port を usecase にも無条件で許可していますが、直後の tie-break は aggregate の語彙・永続化 port を domain に置くと規定しています。`Repository` は必ず `aggregate: TypeRef` を持つため、同じ entry が表では許可され tie-break では拒否されます。usecase 列を禁止または要根拠にするなど、R1 内で判断を一意にしてください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 63,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f48a932786547d499c48bf298b4e1aa25ec1e41cd455849997ed7ab59ef37122",
+          "at": "2026-07-17T20:03:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "「live architecture-document set」はまだ実集合を網羅していません。この変更自身が `.harness/capabilities/rollback-diagnoser.md` の配置規則参照を R1 へ更新しているのに capability 一覧から同ファイルが漏れており、`infrastructure` 層の責務と逆依存を規定する `.harness/custom/review-prompts/infrastructure.md` も prompt 一覧にありません。同じ不完全な一覧が architecture-customizer にも複製されているため、次の層名・crate 構成変更で両文書が同期対象から外れます。両一覧へ追加してください。",
+              "severity": "P1",
+              "file": ".claude/rules/09-maintainer-checklist.md",
+              "line": 24,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:136b97413bdc1fd6377b37ccf960e0be0e138234fb0c0d53165e01e03ac5bf50",
+          "at": "2026-07-17T20:06:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4bd5f944964779ad75a769e0f3e44e1f36fb29307037d270b8539e54157dd80",
+          "at": "2026-07-17T20:08:55Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
+          "at": "2026-07-17T18:51:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
+          "at": "2026-07-17T18:54:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c06351cab606ce73bfa0933662cc45d248edda4b0e4d4c9448d4d2e2502a0cdf",
+          "at": "2026-07-17T19:47:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The gate-step comment still claims that PR runs acquire a local `track/<id>` branch, which is false for the newly exempt develop → main release PR and for non-track PRs that intentionally reach this gate without track context. D9/AC-10 requires the condition relationship to be documented on both steps; update this comment to state that only release PRs are skipped, track heads are recreated above, and other non-track PRs run the gate and fail closed.",
+              "severity": "P1",
+              "file": ".github/workflows/ci.yml",
+              "line": 111,
+              "category": "requirements"
+            }
+          ],
+          "hash": "rvw1:sha256:c06351cab606ce73bfa0933662cc45d248edda4b0e4d4c9448d4d2e2502a0cdf",
+          "at": "2026-07-17T19:51:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:95888b9be332a8c53603a8a344b9ae77a3387d7710206ff56f16f0366c456e42",
+          "at": "2026-07-17T19:52:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4d4707a538ec97f00a7c0a656021390bdae3af5fbe3b6be6b906419efcf9daa",
+          "at": "2026-07-17T20:01:46Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25dc0b504f4840afa786dc0940927d45a6c18a4a82a75140c72b0735351b9da9",
+          "at": "2026-07-17T19:21:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-01 は依存・配置規則を人間可読文書に再記述せず SSoT 参照だけで表現するよう要求していますが、IN-04／AC-05 は調査プロンプトと architecture guard に domain/usecase の二層配置を示すことを、AC-08 は CLAUDE.md に delivery crate の具体的な依存関係を示すことを要求しています。参照だけでは後者を満たせず、具体的に記述すれば CN-01 に違反するため、契約を同時に充足できません。許容する要約と禁止する再記述の境界を明確化する必要があります。",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/spec.json",
+              "line": 188,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:25dc0b504f4840afa786dc0940927d45a6c18a4a82a75140c72b0735351b9da9",
+          "at": "2026-07-17T19:24:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31e2395e6a0cb34cab34fec57059f13e580d82e7396e0b798f80e7992e5ed9ed",
+          "at": "2026-07-17T19:26:22Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
+          "at": "2026-07-17T19:21:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
+          "at": "2026-07-17T19:25:01Z"
         }
       ]
     }

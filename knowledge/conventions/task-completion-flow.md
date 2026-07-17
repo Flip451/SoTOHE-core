@@ -9,6 +9,9 @@ merge 前のタスク done 遷移と commit_hash 埋め戻しの正式手順。`
 - Applies to: `/track:commit` → `/track:pr` → `/track:merge` → `/track:done` のワークフロー全体。track ブランチ上での実装完了後、**merge** タイミングで検証される。
 - Does not apply to: `plan/` ブランチ（計画 artifacts のみ、ガードがスキップされる）
 
+アーキテクチャ変更を含む task では、実装完了前に
+`.claude/skills/architecture-customizer/SKILL.md` の Documentation 更新対象も同期する。
+
 ## Rules
 
 ### 正式フロー
