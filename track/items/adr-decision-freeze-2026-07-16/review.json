@@ -1,6 +1,97 @@
 {
   "schema_version": 2,
   "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c360d647f03cc555655bb93cf2d5a97b39444f9dec01ff8040b260bed1357c0",
+          "at": "2026-07-16T11:14:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は刻印ごとに新しい複製を追加すると規定していますが、ファイル名が `<slug>.<hash8>.md` のみなので、同一内容の再刻印や hash8 衝突時には既存名と衝突します。下流 spec は再利用・失敗・別名生成のどれを受入条件にすべきか導出できません。刻印 identity と衝突時の意味論について amendment proposal による裁定が必要です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+              "line": 68,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D6 は `reason` を5値 enum（init/cite/new-adr/non-semantic-fix/escalation）と規定する一方、直後に escalation の根拠 ref を `reason` に記録すると要求しています。D3 の ledger schema に別の ref field はなく、下流 spec は enum 値と任意 ref を同時に表現できません。ledger/CLI の表現を amendment proposal で裁定する必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+              "line": 94,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "D1 は baseline を「user が最後に承認した文面」と定義していますが、D6 は grounding escalation による adr-editor 編集後、user 承認を前提にせず直ちに working tree を刻印すると規定しています。この snapshot が D1 の承認済み baseline なのか、別の authorized baseline なのかを下流 spec が確定できません。escalation 刻印の承認境界について amendment proposal による裁定が必要です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+              "line": 96,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:4c360d647f03cc555655bb93cf2d5a97b39444f9dec01ff8040b260bed1357c0",
+          "at": "2026-07-16T11:19:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Amendment proposal: D1 states that legitimate D5/D6 re-stamped baselines await final user approval at merge, but D3 still calls every accumulated version approved, and D5 (line 88) calls the latest restored bytes user-approved. After an escalation snapshot, the latest baseline is intentionally still pending approval, so downstream spec cannot assign it a consistent trust state. Distinguish the initially approved anchor from authorized-but-pending re-stamps while preserving the chosen latest-copy restore behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+              "line": 70,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:640a9d194013a218cca7dd9b91373c8a6b0ef22cc2ccf8705e4139f8d4811d1c",
+          "at": "2026-07-16T12:10:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 は baseline を「user が最後に承認した文面」と定義し、Rejected B もそれを唯一の錨としていますが、D7 は未承認（🟡）の自発起草 ADR を `new-adr` として即時刻印します。承認済み文面が存在しない ADR も baseline になり得るため定義が矛盾しています。semantic-freeze に従い、許容される未承認 baseline の信頼状態を明示する amendment proposal として user 裁定が必要です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+              "line": 56,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "D4 は review scope に含まれる全 ADR file の刻印を要求しますが、Neutral は凍結対象を track が cite する ADR のみに限定し、無関係 ADR は write-scope 可視化だけに委ねるとしています。`adr` scope は `knowledge/adr/**` の変更をすべて含むため、無関係 ADR を block・刻印するのか対象外にするのかを downstream spec が一意に導出できません。semantic-freeze に従い amendment proposal として対象集合を裁定する必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+              "line": 74,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "自発起草 ADR は `review_finding_ref` により 🟡 となり strict merge gate で停止しますが、user の非同期裁定後に front-matter をどう 🔵 へ昇格し、どの snapshot kind で再刻印して gate を再開するかが未定義です。既存規約では `user_decision_ref` を追加するだけでは `review_finding_ref` が残る限り 🟡 のため、この遷移なしでは merge lane が閉じたままです。downstream spec が実装可能な承認昇格フローを導出できるよう、semantic-freeze に従い amendment proposal として user 裁定が必要です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+              "line": 102,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:69ef29301b403d55854cba8e0f87275a69e6fd1f27a8dce35272dd2e41a02add",
+          "at": "2026-07-16T12:18:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e177313d4302259b641602368364964ac9d1e1cbe39a2fe6c1bbbd9915353dc",
+          "at": "2026-07-16T12:36:56Z"
+        }
+      ]
+    },
     "cli_driver": {
       "rounds": [
         {
@@ -75,6 +166,255 @@
           "findings": [],
           "hash": "rvw1:sha256:d4c3c60306a6708a149b467a97682a22be2b154fc22ec9f6505373bd59c8ebb1",
           "at": "2026-07-16T18:42:14Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 の「可視化できる」という明示的な目標意図を、完了時に決定論的に証明する AC がありません。AC-02/AC-05 は累積記録と復元・briefing を定めていますが、init 版と最終版などの baseline 差分を review/PR で可視化できることを検証していないため、目標の一部が未カバーです。",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/spec.json",
+              "line": 6,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:4087c4ed8b1000824bf71fef0f5fdbeccf3c8cad07cdfac51e6866e281197de6",
+          "at": "2026-07-16T14:02:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cc606df76ca85a0d58701ab50d9180f52d183ccbb7ab216f71d3285a2456b92",
+          "at": "2026-07-16T14:03:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cc606df76ca85a0d58701ab50d9180f52d183ccbb7ab216f71d3285a2456b92",
+          "at": "2026-07-16T14:06:26Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a997565405b37111634003216facf15dcc1cd113fef5438b034f6159d863b8fc",
+          "at": "2026-07-16T17:32:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a997565405b37111634003216facf15dcc1cd113fef5438b034f6159d863b8fc",
+          "at": "2026-07-16T17:35:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:493ae95354f89d151f1e5abe5d7b9b903a530e21f8e403eda707b521e08934cc",
+          "at": "2026-07-16T18:10:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute` converts project-root and track-resolution failures directly into `CommandOutcome::failure` (here and at line 37), placing user-facing stderr rendering in the composition root. Keep these failures typed and let `cli_driver`/the CLI boundary map them to output.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/adr_baseline.rs",
+              "line": 33,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:493ae95354f89d151f1e5abe5d7b9b903a530e21f8e403eda707b521e08934cc",
+          "at": "2026-07-16T18:13:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:beae3c836bf890d609edd3f6864c26ec0b6351f802a4c2a202608c985c5e31ec",
+          "at": "2026-07-16T18:40:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:beae3c836bf890d609edd3f6864c26ec0b6351f802a4c2a202608c985c5e31ec",
+          "at": "2026-07-16T18:41:56Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8c7706400707f5ff64485a112e7e772476c1a78d0dde221f72089abd3ba0f8f",
+          "at": "2026-07-16T17:33:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Snapshot/Restore では write 用、CheckReview/CheckCommit では read 用の track-id 解決を選択し、別の TrackCompositionRoot 呼び出しと再パースまで CLI 内で行っています。これは単一の typed Input を Driver に渡す範囲を超えた分岐・多段オーケストレーションです。`knowledge/conventions/hexagonal-architecture.md` §CLI as Composition Root の境界に従い、未解決の track-id と操作種別を driver/usecase 側へ渡してください。",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/adr_baseline.rs",
+              "line": 116,
+              "category": "business logic in bin"
+            },
+            {
+              "message": "`project_root_from_items_dir` が `items_dir` の構造を解釈・検証し、adapter 用 project root を算出しています。このアプリケーション固有のパス変換と分岐は thin-bin の責務外です。`items_dir` をそのまま composition/driver 境界へ渡し、`knowledge/conventions/hexagonal-architecture.md` §CLI as Composition Root に沿って request-scoped wiring 側で解決してください。",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/adr_baseline.rs",
+              "line": 184,
+              "category": "business logic in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:d8c7706400707f5ff64485a112e7e772476c1a78d0dde221f72089abd3ba0f8f",
+          "at": "2026-07-16T17:36:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d799aece9a1c84d90bda8c1263235111880b4196eb3debef6d787b123545e9c",
+          "at": "2026-07-16T18:10:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d799aece9a1c84d90bda8c1263235111880b4196eb3debef6d787b123545e9c",
+          "at": "2026-07-16T18:12:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b73eecbcc863b6b175e7b749101441b09654e232344a547e319926f218790078",
+          "at": "2026-07-16T18:40:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b73eecbcc863b6b175e7b749101441b09654e232344a547e319926f218790078",
+          "at": "2026-07-16T18:41:52Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a6dc6508399291015b12e768b9adff2b818b7148dfeac4ec878e2e578eee3e7",
+          "at": "2026-07-17T00:12:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:176187bb87c3131899e3c776e5e8c34cec832bb91468a67449c6e1082f364cf0",
+          "at": "2026-07-17T00:18:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`init` は primary ADR filename を必須入力に変更したが、既存の `plan` workflow は feature name だけで `init` を呼び、`adr2pr` も自身の ADR 入力を渡していない。このままでは正規の複合フローが branch/metadata 作成後の snapshot で失敗し、部分初期化状態を残す。両 caller から選択済み ADR filename を明示的に引き渡す必要がある。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/init.md",
+              "line": 20,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "新しい ADR-baseline 経路が `/track:diagnose` adapter と同期していない。adapter は依然 `rollback-diagnoser` のみを dispatch し、旧 `routing_target` schema だけを返す一方、SSoT は `adr-diagnoser` verdict と snapshot/restore を要求する。さらに同じ SSoT の Constraints/Outputs は mutating subcommand と file modification を禁止したままであるため、実行者がどちらに従っても文書化された recovery を完遂できない。adapter と diagnose-only/recovery-write 境界を同時に更新すべきである。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/diagnose.md",
+              "line": 20,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "ADR semantic freeze は非任意の framework review methodology だが、consumer-owned の `.harness/custom/` severity policy に置かれている。これは `knowledge/conventions/responsibility-boundary.md` の「framework methodology は custom に置かない」という境界に反し、consumer の severity customization で凍結規定まで消せる。凍結規定を framework-owned reviewer contract/prompt に移し、custom file は severity preferences に限定する必要がある。",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/adr.md",
+              "line": 11,
+              "category": "responsibility-boundary cross"
+            }
+          ],
+          "hash": "rvw1:sha256:176187bb87c3131899e3c776e5e8c34cec832bb91468a67449c6e1082f364cf0",
+          "at": "2026-07-17T00:25:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d63f0c34dc1ffe65d3ae600398dcf66c50f9f73b8de9627c9a6ddd214a2069a1",
+          "at": "2026-07-17T00:33:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adr2pr` の唯一の引数は primary ADR filename だが、呼び出し先の `/track:init` が必須とする feature name の取得元が adapter/SSoT のどちらにもない。「feature context と共に渡す」とだけ記載されているため、新規 track の Step 1 は `/track:init <feature> --primary-adr <file>` を構成できない。さらに README の正規フローは依然 `/track:adr2pr` を引数なしで呼んでいる。feature と ADR を含む一貫した invocation contract を定義し、README と init forwarding を同期する必要がある。",
+              "severity": "P1",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 17,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "`/track:diagnose` は inline の diagnostic input を受け付ける一方、この adapter は briefing の作成を禁止している。しかし `bin/sotp capability exec` は非空の `--briefing-file` が必須であり、SSoT も caller-provided briefing のみを使用する。このため、pre-existing briefing を持たない直接の user invocation や inline input はどちらの diagnoser も起動できない。command 外で必ず briefing を作る caller contract に限定するか、read-only capability dispatch 前の scratch briefing 作成を adapter/orchestrator の責務として復元すべきである。",
+              "severity": "P1",
+              "file": ".claude/commands/track/diagnose.md",
+              "line": 24,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:d63f0c34dc1ffe65d3ae600398dcf66c50f9f73b8de9627c9a6ddd214a2069a1",
+          "at": "2026-07-17T00:38:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:12e905bbd3eec237c137ee1eca8aa7e7a954a5cfba6b9503031a8848e0bf811f",
+          "at": "2026-07-17T00:41:55Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ff1cac9946731548246e11785f423ae9785c35590de0c40ce695a96ab86fe93",
+          "at": "2026-07-16T17:32:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ff1cac9946731548246e11785f423ae9785c35590de0c40ce695a96ab86fe93",
+          "at": "2026-07-16T17:37:12Z"
         }
       ]
     },
@@ -294,144 +634,6 @@
           "findings": [],
           "hash": "rvw1:sha256:1fd0577e9ba8552e7fbae73762a8bfc7edc7aa09d1f5bd1fc26967b3aa8c12df",
           "at": "2026-07-17T00:35:12Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a6dc6508399291015b12e768b9adff2b818b7148dfeac4ec878e2e578eee3e7",
-          "at": "2026-07-17T00:12:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:176187bb87c3131899e3c776e5e8c34cec832bb91468a67449c6e1082f364cf0",
-          "at": "2026-07-17T00:18:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`init` は primary ADR filename を必須入力に変更したが、既存の `plan` workflow は feature name だけで `init` を呼び、`adr2pr` も自身の ADR 入力を渡していない。このままでは正規の複合フローが branch/metadata 作成後の snapshot で失敗し、部分初期化状態を残す。両 caller から選択済み ADR filename を明示的に引き渡す必要がある。",
-              "severity": "P1",
-              "file": ".harness/workflows/track/init.md",
-              "line": 20,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "新しい ADR-baseline 経路が `/track:diagnose` adapter と同期していない。adapter は依然 `rollback-diagnoser` のみを dispatch し、旧 `routing_target` schema だけを返す一方、SSoT は `adr-diagnoser` verdict と snapshot/restore を要求する。さらに同じ SSoT の Constraints/Outputs は mutating subcommand と file modification を禁止したままであるため、実行者がどちらに従っても文書化された recovery を完遂できない。adapter と diagnose-only/recovery-write 境界を同時に更新すべきである。",
-              "severity": "P1",
-              "file": ".harness/workflows/track/diagnose.md",
-              "line": 20,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "ADR semantic freeze は非任意の framework review methodology だが、consumer-owned の `.harness/custom/` severity policy に置かれている。これは `knowledge/conventions/responsibility-boundary.md` の「framework methodology は custom に置かない」という境界に反し、consumer の severity customization で凍結規定まで消せる。凍結規定を framework-owned reviewer contract/prompt に移し、custom file は severity preferences に限定する必要がある。",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/adr.md",
-              "line": 11,
-              "category": "responsibility-boundary cross"
-            }
-          ],
-          "hash": "rvw1:sha256:176187bb87c3131899e3c776e5e8c34cec832bb91468a67449c6e1082f364cf0",
-          "at": "2026-07-17T00:25:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d63f0c34dc1ffe65d3ae600398dcf66c50f9f73b8de9627c9a6ddd214a2069a1",
-          "at": "2026-07-17T00:33:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`adr2pr` の唯一の引数は primary ADR filename だが、呼び出し先の `/track:init` が必須とする feature name の取得元が adapter/SSoT のどちらにもない。「feature context と共に渡す」とだけ記載されているため、新規 track の Step 1 は `/track:init <feature> --primary-adr <file>` を構成できない。さらに README の正規フローは依然 `/track:adr2pr` を引数なしで呼んでいる。feature と ADR を含む一貫した invocation contract を定義し、README と init forwarding を同期する必要がある。",
-              "severity": "P1",
-              "file": ".claude/commands/track/adr2pr.md",
-              "line": 17,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "`/track:diagnose` は inline の diagnostic input を受け付ける一方、この adapter は briefing の作成を禁止している。しかし `bin/sotp capability exec` は非空の `--briefing-file` が必須であり、SSoT も caller-provided briefing のみを使用する。このため、pre-existing briefing を持たない直接の user invocation や inline input はどちらの diagnoser も起動できない。command 外で必ず briefing を作る caller contract に限定するか、read-only capability dispatch 前の scratch briefing 作成を adapter/orchestrator の責務として復元すべきである。",
-              "severity": "P1",
-              "file": ".claude/commands/track/diagnose.md",
-              "line": 24,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:d63f0c34dc1ffe65d3ae600398dcf66c50f9f73b8de9627c9a6ddd214a2069a1",
-          "at": "2026-07-17T00:38:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:12e905bbd3eec237c137ee1eca8aa7e7a954a5cfba6b9503031a8848e0bf811f",
-          "at": "2026-07-17T00:41:55Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f03ac0992576ba29f896eb60db46a4cf0f809508e1acc8b24ac5d0190cf59a5a",
-          "at": "2026-07-17T00:19:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `init` record contains `\"reason\":null`, but the ledger contract and briefing require `reason` to be absent for kinds other than `new-adr` and `escalation`. Fix the machine serializer to omit a missing reason and regenerate this ledger entry.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/adr-baseline/ledger.jsonl",
-              "line": 1,
-              "category": "schema_contract"
-            }
-          ],
-          "hash": "rvw1:sha256:f03ac0992576ba29f896eb60db46a4cf0f809508e1acc8b24ac5d0190cf59a5a",
-          "at": "2026-07-17T00:22:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2b979c896403094b03936c7574007efc8524de9fb969170e50f02e2ffdf3d144",
-          "at": "2026-07-17T00:33:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The snapshot command left an unignored runtime lock file in the current diff, although the baseline artifact contract contains only the snapshot copy and `ledger.jsonl`. Do not commit this coordination sidecar; ignore `*.jsonl.lock` or place the lock outside the tracked baseline directory.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/adr-baseline/ledger.jsonl.lock",
-              "line": null,
-              "category": "artifact_contract"
-            }
-          ],
-          "hash": "rvw1:sha256:2b979c896403094b03936c7574007efc8524de9fb969170e50f02e2ffdf3d144",
-          "at": "2026-07-17T00:36:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9733df3a38f7457f9fe2a86f30f7b714709945edd63d2d69a24b88c6c1755f5c",
-          "at": "2026-07-17T00:37:49Z"
         }
       ]
     },
@@ -707,39 +909,115 @@
           "findings": [],
           "hash": "rvw1:sha256:dabce4bcc5adc35573f08dce3c5f0e4b25d887395e1d541747c7c1e60c931fbb",
           "at": "2026-07-17T00:21:24Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 の「可視化できる」という明示的な目標意図を、完了時に決定論的に証明する AC がありません。AC-02/AC-05 は累積記録と復元・briefing を定めていますが、init 版と最終版などの baseline 差分を review/PR で可視化できることを検証していないため、目標の一部が未カバーです。",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/spec.json",
-              "line": 6,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:4087c4ed8b1000824bf71fef0f5fdbeccf3c8cad07cdfac51e6866e281197de6",
-          "at": "2026-07-16T14:02:08Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4cc606df76ca85a0d58701ab50d9180f52d183ccbb7ab216f71d3285a2456b92",
-          "at": "2026-07-16T14:03:42Z"
+          "hash": "rvw1:sha256:97237402dbca833eb052d0af37827c3f5b77e3bc31d2157553c247f7b818ed88",
+          "at": "2026-07-17T00:46:47Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4cc606df76ca85a0d58701ab50d9180f52d183ccbb7ab216f71d3285a2456b92",
-          "at": "2026-07-16T14:06:26Z"
+          "hash": "rvw1:sha256:97237402dbca833eb052d0af37827c3f5b77e3bc31d2157553c247f7b818ed88",
+          "at": "2026-07-17T00:48:55Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:348a53c61162134bebd0e9bf69d384e36972bbea007ed0a268a65e4cc2a339cd",
+          "at": "2026-07-16T17:32:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Snapshot` 入力と `AdrBaselineStorePort::snapshot` に timestamp がなく、唯一の production adapter が内部で `timestamp_now()` → `chrono::Utc::now()` を呼んでいます。同一の usecase 入力が暗黙の時計に依存し、Usecase Layer Purity Rules の「時刻は entrypoint の引数として渡す」に違反します。`Timestamp` を command／port 引数へ追加し、composition root で取得してください。",
+              "severity": "P1",
+              "file": "libs/usecase/src/adr_baseline.rs",
+              "line": 20,
+              "category": "implicit time / env / process dependency"
+            }
+          ],
+          "hash": "rvw1:sha256:348a53c61162134bebd0e9bf69d384e36972bbea007ed0a268a65e4cc2a339cd",
+          "at": "2026-07-16T17:40:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9d157288de0812d5b81b09c9c589f4ecaa7c2c1ea3748d2ab39eca8ff5713fb",
+          "at": "2026-07-16T18:10:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9d157288de0812d5b81b09c9c589f4ecaa7c2c1ea3748d2ab39eca8ff5713fb",
+          "at": "2026-07-16T18:13:10Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f03ac0992576ba29f896eb60db46a4cf0f809508e1acc8b24ac5d0190cf59a5a",
+          "at": "2026-07-17T00:19:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `init` record contains `\"reason\":null`, but the ledger contract and briefing require `reason` to be absent for kinds other than `new-adr` and `escalation`. Fix the machine serializer to omit a missing reason and regenerate this ledger entry.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/adr-baseline/ledger.jsonl",
+              "line": 1,
+              "category": "schema_contract"
+            }
+          ],
+          "hash": "rvw1:sha256:f03ac0992576ba29f896eb60db46a4cf0f809508e1acc8b24ac5d0190cf59a5a",
+          "at": "2026-07-17T00:22:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b979c896403094b03936c7574007efc8524de9fb969170e50f02e2ffdf3d144",
+          "at": "2026-07-17T00:33:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The snapshot command left an unignored runtime lock file in the current diff, although the baseline artifact contract contains only the snapshot copy and `ledger.jsonl`. Do not commit this coordination sidecar; ignore `*.jsonl.lock` or place the lock outside the tracked baseline directory.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/adr-baseline/ledger.jsonl.lock",
+              "line": null,
+              "category": "artifact_contract"
+            }
+          ],
+          "hash": "rvw1:sha256:2b979c896403094b03936c7574007efc8524de9fb969170e50f02e2ffdf3d144",
+          "at": "2026-07-17T00:36:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9733df3a38f7457f9fe2a86f30f7b714709945edd63d2d69a24b88c6c1755f5c",
+          "at": "2026-07-17T00:37:49Z"
         }
       ]
     },
@@ -1013,270 +1291,6 @@
           "findings": [],
           "hash": "rvw1:sha256:b0c89fb121b4a0359974cf9fb53ef0ac57dae17979f9daa27becf747321cd6ee",
           "at": "2026-07-16T18:44:33Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:348a53c61162134bebd0e9bf69d384e36972bbea007ed0a268a65e4cc2a339cd",
-          "at": "2026-07-16T17:32:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Snapshot` 入力と `AdrBaselineStorePort::snapshot` に timestamp がなく、唯一の production adapter が内部で `timestamp_now()` → `chrono::Utc::now()` を呼んでいます。同一の usecase 入力が暗黙の時計に依存し、Usecase Layer Purity Rules の「時刻は entrypoint の引数として渡す」に違反します。`Timestamp` を command／port 引数へ追加し、composition root で取得してください。",
-              "severity": "P1",
-              "file": "libs/usecase/src/adr_baseline.rs",
-              "line": 20,
-              "category": "implicit time / env / process dependency"
-            }
-          ],
-          "hash": "rvw1:sha256:348a53c61162134bebd0e9bf69d384e36972bbea007ed0a268a65e4cc2a339cd",
-          "at": "2026-07-16T17:40:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9d157288de0812d5b81b09c9c589f4ecaa7c2c1ea3748d2ab39eca8ff5713fb",
-          "at": "2026-07-16T18:10:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9d157288de0812d5b81b09c9c589f4ecaa7c2c1ea3748d2ab39eca8ff5713fb",
-          "at": "2026-07-16T18:13:10Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d8c7706400707f5ff64485a112e7e772476c1a78d0dde221f72089abd3ba0f8f",
-          "at": "2026-07-16T17:33:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Snapshot/Restore では write 用、CheckReview/CheckCommit では read 用の track-id 解決を選択し、別の TrackCompositionRoot 呼び出しと再パースまで CLI 内で行っています。これは単一の typed Input を Driver に渡す範囲を超えた分岐・多段オーケストレーションです。`knowledge/conventions/hexagonal-architecture.md` §CLI as Composition Root の境界に従い、未解決の track-id と操作種別を driver/usecase 側へ渡してください。",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/adr_baseline.rs",
-              "line": 116,
-              "category": "business logic in bin"
-            },
-            {
-              "message": "`project_root_from_items_dir` が `items_dir` の構造を解釈・検証し、adapter 用 project root を算出しています。このアプリケーション固有のパス変換と分岐は thin-bin の責務外です。`items_dir` をそのまま composition/driver 境界へ渡し、`knowledge/conventions/hexagonal-architecture.md` §CLI as Composition Root に沿って request-scoped wiring 側で解決してください。",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/adr_baseline.rs",
-              "line": 184,
-              "category": "business logic in bin"
-            }
-          ],
-          "hash": "rvw1:sha256:d8c7706400707f5ff64485a112e7e772476c1a78d0dde221f72089abd3ba0f8f",
-          "at": "2026-07-16T17:36:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4d799aece9a1c84d90bda8c1263235111880b4196eb3debef6d787b123545e9c",
-          "at": "2026-07-16T18:10:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4d799aece9a1c84d90bda8c1263235111880b4196eb3debef6d787b123545e9c",
-          "at": "2026-07-16T18:12:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b73eecbcc863b6b175e7b749101441b09654e232344a547e319926f218790078",
-          "at": "2026-07-16T18:40:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b73eecbcc863b6b175e7b749101441b09654e232344a547e319926f218790078",
-          "at": "2026-07-16T18:41:52Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3ff1cac9946731548246e11785f423ae9785c35590de0c40ce695a96ab86fe93",
-          "at": "2026-07-16T17:32:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3ff1cac9946731548246e11785f423ae9785c35590de0c40ce695a96ab86fe93",
-          "at": "2026-07-16T17:37:12Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c360d647f03cc555655bb93cf2d5a97b39444f9dec01ff8040b260bed1357c0",
-          "at": "2026-07-16T11:14:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 は刻印ごとに新しい複製を追加すると規定していますが、ファイル名が `<slug>.<hash8>.md` のみなので、同一内容の再刻印や hash8 衝突時には既存名と衝突します。下流 spec は再利用・失敗・別名生成のどれを受入条件にすべきか導出できません。刻印 identity と衝突時の意味論について amendment proposal による裁定が必要です。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
-              "line": 68,
-              "category": "decision underspecified for downstream consumption"
-            },
-            {
-              "message": "D6 は `reason` を5値 enum（init/cite/new-adr/non-semantic-fix/escalation）と規定する一方、直後に escalation の根拠 ref を `reason` に記録すると要求しています。D3 の ledger schema に別の ref field はなく、下流 spec は enum 値と任意 ref を同時に表現できません。ledger/CLI の表現を amendment proposal で裁定する必要があります。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
-              "line": 94,
-              "category": "inconsistent decisions within the same ADR"
-            },
-            {
-              "message": "D1 は baseline を「user が最後に承認した文面」と定義していますが、D6 は grounding escalation による adr-editor 編集後、user 承認を前提にせず直ちに working tree を刻印すると規定しています。この snapshot が D1 の承認済み baseline なのか、別の authorized baseline なのかを下流 spec が確定できません。escalation 刻印の承認境界について amendment proposal による裁定が必要です。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
-              "line": 96,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:4c360d647f03cc555655bb93cf2d5a97b39444f9dec01ff8040b260bed1357c0",
-          "at": "2026-07-16T11:19:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Amendment proposal: D1 states that legitimate D5/D6 re-stamped baselines await final user approval at merge, but D3 still calls every accumulated version approved, and D5 (line 88) calls the latest restored bytes user-approved. After an escalation snapshot, the latest baseline is intentionally still pending approval, so downstream spec cannot assign it a consistent trust state. Distinguish the initially approved anchor from authorized-but-pending re-stamps while preserving the chosen latest-copy restore behavior.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
-              "line": 70,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:640a9d194013a218cca7dd9b91373c8a6b0ef22cc2ccf8705e4139f8d4811d1c",
-          "at": "2026-07-16T12:10:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1 は baseline を「user が最後に承認した文面」と定義し、Rejected B もそれを唯一の錨としていますが、D7 は未承認（🟡）の自発起草 ADR を `new-adr` として即時刻印します。承認済み文面が存在しない ADR も baseline になり得るため定義が矛盾しています。semantic-freeze に従い、許容される未承認 baseline の信頼状態を明示する amendment proposal として user 裁定が必要です。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
-              "line": 56,
-              "category": "inconsistent decisions within the same ADR"
-            },
-            {
-              "message": "D4 は review scope に含まれる全 ADR file の刻印を要求しますが、Neutral は凍結対象を track が cite する ADR のみに限定し、無関係 ADR は write-scope 可視化だけに委ねるとしています。`adr` scope は `knowledge/adr/**` の変更をすべて含むため、無関係 ADR を block・刻印するのか対象外にするのかを downstream spec が一意に導出できません。semantic-freeze に従い amendment proposal として対象集合を裁定する必要があります。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
-              "line": 74,
-              "category": "inconsistent decisions within the same ADR"
-            },
-            {
-              "message": "自発起草 ADR は `review_finding_ref` により 🟡 となり strict merge gate で停止しますが、user の非同期裁定後に front-matter をどう 🔵 へ昇格し、どの snapshot kind で再刻印して gate を再開するかが未定義です。既存規約では `user_decision_ref` を追加するだけでは `review_finding_ref` が残る限り 🟡 のため、この遷移なしでは merge lane が閉じたままです。downstream spec が実装可能な承認昇格フローを導出できるよう、semantic-freeze に従い amendment proposal として user 裁定が必要です。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
-              "line": 102,
-              "category": "decision underspecified for downstream consumption"
-            }
-          ],
-          "hash": "rvw1:sha256:69ef29301b403d55854cba8e0f87275a69e6fd1f27a8dce35272dd2e41a02add",
-          "at": "2026-07-16T12:18:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e177313d4302259b641602368364964ac9d1e1cbe39a2fe6c1bbbd9915353dc",
-          "at": "2026-07-16T12:36:56Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a997565405b37111634003216facf15dcc1cd113fef5438b034f6159d863b8fc",
-          "at": "2026-07-16T17:32:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a997565405b37111634003216facf15dcc1cd113fef5438b034f6159d863b8fc",
-          "at": "2026-07-16T17:35:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:493ae95354f89d151f1e5abe5d7b9b903a530e21f8e403eda707b521e08934cc",
-          "at": "2026-07-16T18:10:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`execute` converts project-root and track-resolution failures directly into `CommandOutcome::failure` (here and at line 37), placing user-facing stderr rendering in the composition root. Keep these failures typed and let `cli_driver`/the CLI boundary map them to output.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/adr_baseline.rs",
-              "line": 33,
-              "category": "render leak"
-            }
-          ],
-          "hash": "rvw1:sha256:493ae95354f89d151f1e5abe5d7b9b903a530e21f8e403eda707b521e08934cc",
-          "at": "2026-07-16T18:13:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:beae3c836bf890d609edd3f6864c26ec0b6351f802a4c2a202608c985c5e31ec",
-          "at": "2026-07-16T18:40:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:beae3c836bf890d609edd3f6864c26ec0b6351f802a4c2a202608c985c5e31ec",
-          "at": "2026-07-16T18:41:56Z"
         }
       ]
     }
