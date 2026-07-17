@@ -38,6 +38,42 @@
           "findings": [],
           "hash": "rvw1:sha256:56a9cb4bd73de514cd2fdedcadf47920f1be6dc31934ea8b67dec44e18a24add",
           "at": "2026-07-17T12:55:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd9adc09df90141b4462501d095dbf1177ed2744b042ceb2853c44b2fb1aac25",
+          "at": "2026-07-17T15:00:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 の追加後も Context が「修理は 1 決定で足りる」と断言しており、front-matter と Decision が記録する D1・D2 の二決定構成と矛盾しています。下流が D2 を正式な決定として導出すべきか判断できるよう、D1 は機構修理の一決定であり、D2 は workflow SSoT の追随義務を記録する別決定だと整合させる amendment proposal が必要です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+              "line": 22,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:dd9adc09df90141b4462501d095dbf1177ed2744b042ceb2853c44b2fb1aac25",
+          "at": "2026-07-17T15:04:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f567f0183f253c0d568bd250dc899072ac116f0320240a41cfa2c67836ff8031",
+          "at": "2026-07-17T15:08:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f567f0183f253c0d568bd250dc899072ac116f0320240a41cfa2c67836ff8031",
+          "at": "2026-07-17T15:10:21Z"
         }
       ]
     },
@@ -262,6 +298,124 @@
         }
       ]
     },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 is not mapped to any spec element in task-coverage.json, so this executable task is an untraced briefing-only addition.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/task-coverage.json",
+              "line": 4,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "plan.summary is empty and therefore provides no GO-01 goal-to-task traceability, despite the policy requiring goal traceability in impl-plan.json.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/impl-plan.json",
+              "line": 30,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T001 restates the spec behavior in prose (including fail-closed conditions, byte-mismatch handling, and retained enforcement) instead of limiting the description to target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 restates the workflow behavior contract in prose (init-designation handling and guardian-result relay) beyond target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates multiple upstream workflow constraints and convergence behaviors in prose (approval carve-out, no intermediate stamping, convergence distinction, and fresh review) beyond target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 restates the upstream review-gate behavior in prose rather than using only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 restates the upstream workflow behavior contract in prose rather than using only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/impl-plan.json",
+              "line": 46,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 restates the upstream workflow behavior contract in prose rather than using only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/impl-plan.json",
+              "line": 56,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:9efb660839b7235e12aedb89b75a24f476a80981a1391d4d4f95a4c52eb8acdc",
+          "at": "2026-07-17T15:01:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d1d9e0b4fd3b938cd51bfa158510edfa618592ae38fe510f382dd9eecb9f282",
+          "at": "2026-07-17T15:03:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d1d9e0b4fd3b938cd51bfa158510edfa618592ae38fe510f382dd9eecb9f282",
+          "at": "2026-07-17T15:07:29Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1f73b563536c379b19135a786be676d78e87c242f4b68c3b768894ba15a58ea",
+          "at": "2026-07-17T15:00:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1f73b563536c379b19135a786be676d78e87c242f4b68c3b768894ba15a58ea",
+          "at": "2026-07-17T15:05:24Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cab4b024d793e5d247e7753c7c982afc37fd0eed6f17978422da6a04c270142d",
+          "at": "2026-07-17T15:00:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cab4b024d793e5d247e7753c7c982afc37fd0eed6f17978422da6a04c270142d",
+          "at": "2026-07-17T15:04:40Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -291,6 +445,34 @@
           "findings": [],
           "hash": "rvw1:sha256:ad4d148edc8d0b1b22e3088fc0907fcb7fea14a5f5dbcd950cd70edc2678841b",
           "at": "2026-07-17T14:18:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eca0cd9320d4c9321225ec7889d61910c1bd909f73af1b737c9df3b37167675",
+          "at": "2026-07-17T15:00:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eca0cd9320d4c9321225ec7889d61910c1bd909f73af1b737c9df3b37167675",
+          "at": "2026-07-17T15:04:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52eaa62a87c01db54cbe9c2c492e167b41634e32c8a0a77fd995941a2ce963ee",
+          "at": "2026-07-17T15:11:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52eaa62a87c01db54cbe9c2c492e167b41634e32c8a0a77fd995941a2ce963ee",
+          "at": "2026-07-17T15:13:29Z"
         }
       ]
     }

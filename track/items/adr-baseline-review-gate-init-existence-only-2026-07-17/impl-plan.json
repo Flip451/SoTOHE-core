@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Update ADR-baseline review-entry components and their tests in `apps/cli/src/commands/adr_baseline.rs`, `apps/cli-driver/src/adr_baseline.rs`, `apps/cli-composition/src/adr_baseline.rs`, and `libs/usecase/src/adr_baseline.rs`. IN-01/IN-02/CN-01/AC-01/AC-02/AC-03.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Update `.harness/workflows/track/review.md` for ADR-diagnoser routing and finding-origin relay. IN-03/CN-02/CN-03/AC-04/AC-05.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "Update `.harness/workflows/track/plan.md` and `.harness/workflows/track/adr2pr.md` for ADR-diagnoser routing, Phase 0 approval carve-out, and fresh-review flow. IN-03/IN-04/CN-02/CN-03/AC-05/AC-06.",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "GO-01: T001, T002, T003."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "ADR-baseline review-gate behavior",
+        "description": [
+          "Update ADR-baseline review-entry components. IN-01/IN-02/CN-01/AC-01/AC-02/AC-03."
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Review workflow guardian routing",
+        "description": [
+          "Update `.harness/workflows/track/review.md`. IN-03/CN-02/CN-03/AC-04/AC-05."
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Phase 0 workflow follow-through",
+        "description": [
+          "Update `.harness/workflows/track/plan.md` and `.harness/workflows/track/adr2pr.md`. IN-03/IN-04/CN-02/CN-03/AC-05/AC-06."
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      }
+    ]
+  }
+}

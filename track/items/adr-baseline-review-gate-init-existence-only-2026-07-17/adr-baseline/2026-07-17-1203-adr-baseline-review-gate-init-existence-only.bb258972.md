@@ -19,7 +19,7 @@ decisions:
 
 freeze 機構を定めた ADR（`2026-07-16-2001-adr-decision-freeze.md`）を精読すると、review 入口での byte 照合 block は D4 が決定しているが、その設計根拠は「**init 刻印忘れ**が fixer の走る前に loud に発覚する」ことにあり、byte 照合の本来の守備範囲は「commit gate は review 中の fixer 編集を含むそれ以降の乖離を捕捉する」と commit / CI 側に置かれている。さらに同 ADR の D7 は「**本機構は user の承認成果物の保護を目的とし、user 承認前の新規成果物の変化を遮らない**」という原則を track 生まれの draft ADR について既に確立している。Phase 0 修正ループの導入は「持ち込み ADR も承認までは draft」という状態を生んだのであり、review を byte 照合で止めることは同機構自身の原則に照らしても過剰である。また同 ADR の D1 は「正規経路の再刻印を経た baseline は merge 時の user 監査を待つ文面」と定めており、Phase 0 承認後の刻印はこの錨定義にそのまま収まる。
 
-したがって、機構修理そのものは D1 の 1 決定で足りる。一方、承認済みの Consequences / Neutral に記録されていた workflow SSoT の追随義務は、下流が機械的に参照できる別決定 D2 として記録する。
+したがって修理は 1 決定で足りる。
 
 ## Decision
 
