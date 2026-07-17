@@ -46,7 +46,7 @@ Derive `<track-id>` from the feature name: kebab-case ASCII + date suffix `YYYY-
 `date -u +"%Y-%m-%d"`. Then create and switch to the track branch:
 
 ```
-cargo make track-branch-create '<track-id>'
+bin/sotp track branch create --items-dir track/items '<track-id>'
 ```
 
 **Step 3: Create metadata.json**
@@ -108,7 +108,7 @@ metadata write failure, or gate failure). On ERROR, stop and report to the calle
   configured base branch manually, or abort). Do not auto-switch.
 - **Unrelated dirty state**: list the modified files, classify them, and ask the user for a
   resolution action.
-- **Branch creation failure** (`cargo make track-branch-create` non-zero): report the error.
+- **Branch creation failure** (`bin/sotp track branch create` non-zero): report the error.
   A pre-existing branch with the same name is the most common cause; adjust the track-id slug
   or rename the existing branch.
 - **verify-track-metadata failure**: report the schema validation errors from the command output.

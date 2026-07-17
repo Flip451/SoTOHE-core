@@ -20,13 +20,13 @@ or failure-recovery procedures here.
 
 - Requires `--sandbox workspace-write`: the workflow pushes the branch to origin and
   interacts with the GitHub API via `gh` / `bin/sotp pr` wrappers.
-- Branch push uses `cargo make track-pr-push`; PR creation uses `bin/sotp pr ensure-pr`.
+- Branch push uses `bin/sotp pr push`; PR creation uses `bin/sotp pr ensure-pr`.
 - Do not run `git push` directly.
 
 ### (3) Sub-workflow and capability invocation
 
-- PR creation and push are performed via `bin/sotp pr` and `cargo make track-pr-push`.
-- PR-level review is triggered via `cargo make track-pr-review` (which dispatches `@codex review`).
+- PR creation and push are performed via `bin/sotp pr push` and `bin/sotp pr ensure-pr`.
+- PR-level review is triggered via `bin/sotp pr review-cycle` (which dispatches `@codex review`).
 - Codex-specific prerequisite: the **Codex Cloud GitHub App** must be installed on the
   repository so `@codex review` is acted upon.
 

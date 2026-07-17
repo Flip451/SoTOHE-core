@@ -97,16 +97,12 @@ pub trait UserRepository: Send + Sync {
 
 ```bash
 cargo make test                 # 標準の全体テスト
-cargo make test-nocapture       # テスト出力（stdout/stderr）を表示しながら実行
 cargo make test-doc             # ドキュメントテスト（必要時のみ）
-cargo make llvm-cov             # カバレッジ（HTML レポート）
 ```
 
-特定のテストだけを実行したい場合は、コンテナシェル内で nextest のフィルタ構文を使う。
+特定のテストだけを実行したい場合は、host toolchain 上で nextest のフィルタ構文を使う。
 
 ```bash
-cargo make shell
-# コンテナ内で:
 cargo nextest run -E 'test(test_email_with_valid_format)'
 ```
 

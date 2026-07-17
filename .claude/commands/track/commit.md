@@ -16,7 +16,7 @@ This command runs directly — no subagents. Key wrappers used:
 - `git show HEAD --stat` (read-only — changed files for git note)
 - Write commit message to `tmp/track-commit/commit-message.txt` (Read + Edit preferred)
 - `cargo make track-commit-message` — guarded commit (CI + commit)
-- Write note to `tmp/track-commit/note.md`, then `cargo make track-note`
+- Write note to `tmp/track-commit/note.md`, then `bin/sotp git note-from-file tmp/track-commit/note.md --cleanup`
 
 `track/registry.md` is gitignored — do NOT stage or commit it.
 

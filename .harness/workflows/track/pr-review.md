@@ -39,13 +39,13 @@ preflight internally; surface its fail-closed error if it rejects the configured
 
 **Step 1: Push and ensure PR**
 
-Run the following wrappers in sequence:
+Run the following commands in sequence:
 
 ```
-cargo make track-pr-push
+bin/sotp pr push
 ```
 
-> `track-pr-push` does NOT enforce task completion. Push is allowed with unresolved tasks.
+> `bin/sotp pr push` does NOT enforce task completion. Push is allowed with unresolved tasks.
 > Task completion is only enforced at merge time.
 
 Then:
@@ -61,7 +61,7 @@ This creates a new PR or reuses an existing one for this track branch.
 Run the full cycle which handles trigger, poll, and parse:
 
 ```
-cargo make track-pr-review
+bin/sotp pr review-cycle
 ```
 
 This executes `sotp pr review-cycle`, which:
@@ -77,7 +77,7 @@ This executes `sotp pr review-cycle`, which:
 
 **Step 3: Handle results — continue until explicit zero-findings signal**
 
-After `cargo make track-pr-review` completes, apply the following loop:
+After `bin/sotp pr review-cycle` completes, apply the following loop:
 
 - If the reviewer **signalled zero findings** (👍 reaction or a "no major issues" comment):
   machine PASS. Report success to the caller and recommend the `merge` workflow once ready.

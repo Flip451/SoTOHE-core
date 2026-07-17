@@ -16,19 +16,19 @@ fail the workflow, preserving the pre-track CLI behavior contract exactly.
 ## Inputs
 
 None. The workflow resolves the base branch from the configured `BranchStrategyPort` (via
-`cargo make track-switch-base`).
+`bin/sotp track switch-base`).
 
 ## Sequence
 
 **Step 1: Switch to the configured base branch and attempt sync**
 
 ```
-cargo make track-switch-base
+bin/sotp track switch-base
 ```
 
 Checks out the configured base branch and then runs a ff-only current-branch sync (the same pull
-operation exposed by `cargo make sync` / `bin/sotp git sync` / `git pull --ff-only`) against
-origin. The switch+sync composition belongs to `cargo make track-switch-base` /
+operation exposed by `bin/sotp git sync` / `git pull --ff-only`) against
+origin. The switch+sync composition belongs to `bin/sotp track switch-base` /
 `bin/sotp track switch-base`: the CLI's track-git logic switches branches, then syncs the current
 branch; all fail-closed sync modes are downgraded to the non-fatal "[WARN] Pull failed" message
 so the branch switch itself always succeeds when possible.
@@ -40,11 +40,11 @@ on any other non-`track/<id>` branch, the command fails-closed. In that case, sw
 the track branch manually before invoking `/track:done`.
 
 To sync only (without a branch switch — e.g. on the track branch to catch up with the
-remote), use `cargo make sync` directly.
+remote), use `bin/sotp git sync` directly.
 
 **Step 2: Completion summary**
 
-After `cargo make track-switch-base`:
+After `bin/sotp track switch-base`:
 
 1. Report the command's branch/sync result verbatim without paraphrase:
    - On success, the wrapper prints `[OK] On <base>, up to date.` — surface that line as-is.
@@ -53,7 +53,7 @@ After `cargo make track-switch-base`:
    - The latest completed track name and date.
    - The count of active tracks remaining.
 3. Recommend the next action:
-   - If active tracks remain: `/track:implement` or `/track:full-cycle <task>`.
+   - If active tracks remain: `/track:implement` or `/track:full-cycle`.
    - If no active tracks: `/track:plan <feature>` to start new work.
 
 ## Gates

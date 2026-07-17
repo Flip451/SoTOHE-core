@@ -1,0 +1,28 @@
+# Host-first cargo toolchain gates. This file is selected by Makefile.toml.
+
+[tasks.fmt-check]
+description = "[gate] Check formatting on the host toolchain"
+command = "cargo"
+args = ["fmt", "--all", "--", "--check"]
+
+[tasks.clippy]
+description = "[gate] Run clippy on the host toolchain"
+command = "cargo"
+args = ["clippy", "--all-targets", "--all-features", "--", "-D", "warnings"]
+
+[tasks.test]
+description = "[gate] Run tests with nextest on the host toolchain"
+env = { SOTP_TELEMETRY = "0" }
+command = "cargo"
+args = ["nextest", "run", "--all-targets", "--all-features", "--no-tests=warn"]
+
+[tasks.test-doc]
+description = "[gate] Run documentation tests on the host toolchain"
+env = { SOTP_TELEMETRY = "0" }
+command = "cargo"
+args = ["test", "--doc", "--all-features"]
+
+[tasks.deny]
+description = "[gate] Run dependency policy checks on the host toolchain"
+command = "cargo"
+args = ["deny", "check"]

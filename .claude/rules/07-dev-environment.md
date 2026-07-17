@@ -2,232 +2,87 @@
 
 ## Toolchain
 
+The distributed scaffold is host-first. `rust-toolchain.toml` selects the required Rust
+toolchain (including rustfmt and clippy); install `cargo-make` before running its tasks.
+Docker is optional: change the single `extend` target in `Makefile.toml` from
+`Makefile.host.toml` to `Makefile.docker.toml` when an isolated toolchain is needed.
+
 ```bash
-# 必須: Docker + docker compose
-docker --version
-docker compose version
-
-# 任意（補助実行用）
 rustup show
-rustup component add rustfmt clippy
-
-# ホスト側 protoc（TDDD type-signals 用）
-# `bin/sotp signal calc-impl-catalog`（commit gate の track-active-gate が呼ぶ）は
-# ホスト上で `cargo rustdoc` を実行する。TDDD 対象 crate（infrastructure 等）が protoc を要求する依存
-# （protobuf 生成を伴う crate を pull する場合）を持つとき、Docker イメージだけでなくホストにも protoc が必要。
-# Debian/Ubuntu: sudo apt-get install -y protobuf-compiler
-protoc --version
+cargo install --locked cargo-make --version 0.37.24
+cargo make bootstrap
 ```
+
+`bootstrap` installs the pinned `cargo-nextest` and `cargo-deny` tools with `--locked`,
+installs `bin/sotp` when a transplanted binary is unavailable, configures local hooks, and
+runs the repository gate. It does not add a separate tool-version preflight.
 
 ## Task Runner: cargo-make
 
-`Makefile.toml` でタスクを管理する：
+`Makefile.toml` owns the current task table. Use `cargo make --list-all-steps` for discovery;
+the workflow-stable commands below work in both the source repository and an exported scaffold.
 
 ```bash
-cargo make bootstrap    # 初回セットアップ（Docker + CI 一括）
-cargo make build-tools  # ツールコンテナのビルド
-cargo make fmt          # rustfmt でフォーマット（compose内）
-cargo make clippy       # clippy で静的解析（-D warnings）
-cargo make test         # cargo nextest でテスト
-cargo make ci-rust      # Rust専用CI（fmt-check + clippy + test + deny + check-layers）アプリ開発内側ループ用
-cargo make ci           # 全体CI（ci-rust + verify-* すべて）コミット前ゲート
-# Quality Gates の SSoT は Makefile.toml の `ci-local` / `ci-container` task の
-# `dependencies` 配列（機械可読）。doc 化した checklist は維持しない。
-# 内訳の discovery surface は `cargo make help` のカテゴリ表示を使う。
-cargo make check-layers     # レイヤー依存関係チェック（標準CIに含む）
-cargo make verify-arch-docs # ドキュメント乖離チェック（標準CIに含む）
-bin/sotp arch tree          # crate のみの workspace tree を表示
-bin/sotp arch tree-full     # crate + 非 crate ディレクトリを含む workspace tree を表示
-cargo make add <files>            # 手動の低レベル staging（terminal 直実行用）
-cargo make add-all                # worktree 全体を stage（transient scratch file は除外）
-cargo make sync                   # 現在のブランチを ff-only pull（bin/sotp git sync の wrapper）
-cargo make track-add-paths        # tmp/track-commit/add-paths.txt から選択的に stage
-cargo make unstage <paths>        # index から除去（worktree 変更は保持）
-cargo make track-commit-message   # tmp/track-commit/commit-message.txt から commit（唯一のコミット経路）
-cargo make track-note             # tmp/track-commit/note.md から note を適用して削除
-bin/sotp track transition         # タスク状態遷移 + ビュー自動再生成
-bin/sotp track views sync         # plan.md + registry.md を metadata.json から再生成
-cargo make track-pr-push          # 現在のトラックブランチを origin にプッシュ
-bin/sotp pr ensure-pr             # PR 作成（既存なら再利用）
-bin/sotp pr wait-and-merge <pr> --method <merge|squash|rebase>  # CI 待ち → マージ
-bin/sotp pr status <pr>           # PR チェック状況表示
-cargo make track-pr-review        # PR レビューサイクル（push + PR作成 + @codex review）
-cargo make track-switch-base      # configured base branch に切替 + ff-only sync (cargo make sync 相当)
-bin/sotp track resolve            # 現在の track phase / next command / blocker を表示
-cargo make track-branch-create    # configured base branch からトラックブランチを作成して切替
-cargo make track-branch-switch    # 既存トラックブランチに切替
-cargo make help                   # カテゴリ付きタスク一覧表示
-cargo make export-schema -- --crate domain --pretty  # domain crate の pub API を JSON 出力（要 nightly）
-cargo make shell                  # tools コンテナ内でシェルを開く
-cargo make check                  # cargo check（docker compose 経由）
-cargo make test-doc               # ドキュメントテスト
+cargo make bootstrap    # install pinned auxiliary tools, provision sotp, and run CI
+cargo make fmt-check    # verify formatting
+cargo make clippy       # lint with warnings denied
+cargo make test         # run cargo-nextest
+cargo make deny         # run cargo-deny
+cargo make ci-rust      # Rust-only inner-loop gate
+cargo make ci           # repository-wide gate
+cargo make ci-track     # track-aware gate on track/<id>
+cargo make --list-all-steps # task catalogue
+
+bin/sotp arch tree
+bin/sotp arch tree-full
 ```
 
-### `bin/sotp` Native Subcommands
+## Workflow commands
 
-Non-git track operations (transition, sync-views, resolve, add-task, etc.) use
-`bin/sotp` native subcommands directly — there are no `cargo make` wrapper tasks for them.
-Git-write operations (add-all, commit, note, branch ops, PR push, current-branch sync)
-remain routed through `cargo make` tasks to stay within the `block-direct-git-ops` hook boundary.
+Use `bin/sotp` for single workflow operations; use `cargo make` only for aggregate gates.
+This keeps the documentation valid when the source repository and exported scaffold select
+different Makefile execution environments.
+
+Commits are the exception: write the message to `tmp/track-commit/commit-message.txt` and run
+the guarded `cargo make track-commit-message` (CI + track-aware gates + review/ref-verify +
+DRY gate before the commit). Never call the commit subcommand it wraps directly.
 
 ```bash
-# Direct bin/sotp (native subcommands with default --items-dir track/items)
+bin/sotp git add-from-file tmp/track-commit/add-paths.txt
+bin/sotp git unstage <paths>
+bin/sotp git note-from-file tmp/track-commit/note.md --cleanup
+bin/sotp git sync
+bin/sotp track branch create <track-id>
+bin/sotp track branch switch <track-id>
+bin/sotp track switch-base
+bin/sotp pr push
+bin/sotp pr ensure-pr
+bin/sotp pr review-cycle
 bin/sotp track transition T001 done
 bin/sotp track views sync
 bin/sotp track resolve
-bin/sotp track add-task "description with spaces"
-bin/sotp review results
-bin/sotp review check-approved
-bin/sotp review local --round-type fast --group <scope> --track-id <track-id> --briefing-file tmp/reviewer-runtime/briefing-<scope>.md
-bin/sotp dry fix-local --track-id <track-id> --briefing-file tmp/reviewer-runtime/dry-fix-briefing.md
-bin/sotp signal calc-spec-adr --spec-json <SPEC_JSON>
-bin/sotp arch tree
-bin/sotp arch tree-full
-bin/sotp arch members
-bin/sotp arch direct-checks
-bin/sotp conventions add <name> --slug <slug> --title <title> --summary <summary>
-bin/sotp conventions update-index
-bin/sotp conventions verify-index
-bin/sotp pr status <pr>
-bin/sotp pr wait-and-merge <pr>
-bin/sotp pr ensure-pr
 bin/sotp capability exec <capability> --host <provider> --briefing-file tmp/capability-runtime/briefing.md
 ```
 
-### `bin/sotp` バイナリ管理
+## `bin/sotp` provisioning
 
-`bin/sotp` はホスト toolchain でビルドされる実行バイナリ（`.gitignore` 済み）。
-**必ず `cargo make build-sotp` 経由でビルドすること。**
-
-```bash
-# OK: 検証付きビルド（glibc 不一致を自動検出）
-cargo make build-sotp
-
-# NG: 手動ビルド＆コピー（glibc 不一致を検出できない）
-cargo build --release -p cli && cp target/release/sotp bin/sotp
-```
-
-`build-sotp` はビルド後に `bin/sotp --help` を実行して動作を検証する。
-glibc 不一致などで実行不能な場合はバイナリを自動削除してエラー終了する。
-
-**`bin/sotp` が壊れた場合の復旧手順:**
-1. `rm bin/sotp`
-2. `cargo make build-sotp`
-
-### `-local` タスクについて
-
-`Makefile.toml` には `fmt-local`, `clippy-local`, `ci-local` などの `-local` サフィックス付きタスクがある。
-これらは **コンテナ内部から呼ばれる実装詳細** であり、ホストから直接呼び出してはならない。
-
-```
-# NG: ホストから直接呼ぶ
-cargo make fmt-local
-cargo make ci-local
-
-# OK: compose ラッパー経由で呼ぶ（内部で -local を呼ぶ）
-cargo make fmt
-cargo make ci
-```
-
-**理由**: `-local` タスクはホストの Rust ツールチェーンで実行されるため、
-コンテナ内の toolchain バージョンと一致しない可能性がある。
-再現性を保つため、常に compose ラッパー（非 `-local` タスク）を使うこと。
-
-## Parallel Worker Isolation (CARGO_TARGET_DIR_RELATIVE)
-
-起動側が worker ごとに環境変数を設定できる経路（Agent Teams 等）で複数ワーカーが同時に
-ビルドする場合、`CARGO_TARGET_DIR_RELATIVE` 環境変数で `CARGO_TARGET_DIR` を分離すると
-build lock 競合による待ちを避けられる：
-
-```bash
-# Worker ごとに固有の target dir を設定
-CARGO_TARGET_DIR_RELATIVE=target-w1 cargo make test    # → target-w1/
-CARGO_TARGET_DIR_RELATIVE=target-w2 cargo make clippy  # → target-w2/
-
-# デフォルト（未設定）は従来通り target/ を使用
-cargo make test                                        # → target/
-```
-
-| 項目 | 動作 |
-|------|------|
-| `CARGO_TARGET_DIR_RELATIVE` 未設定 | `CARGO_TARGET_DIR=/workspace/target`（従来互換） |
-| `CARGO_TARGET_DIR_RELATIVE=target-w1` | `CARGO_TARGET_DIR=/workspace/target-w1` |
-| sccache | ワーカー間で共有（`SCCACHE_DIR` は共通） |
-| 対象タスク | `run --rm` ラッパー（`cargo make test`, `cargo make clippy` 等） |
-
-この分離は**性能最適化であって安全性の前提条件ではない**。共有 target のまま並行ビルド
-しても、cargo の build lock が内部で直列化するだけで成果物は壊れない。review fixer
-dispatch（`bin/sotp review fix-local`）は worker への環境変数 forwarding を持たず共有
-target で動作する。並行 review の安全性は review scope partition の互いに素性と hash gate
-が担う（`.harness/workflows/track/review.md` Step 4）。
+`bin/sotp` is gitignored. In an exported scaffold, template export transplants the running
+binary when possible; otherwise `cargo make install-sotp` retrieves the pinned tag declared
+in `.harness/config/sotp-version.json`. The exported scaffold's CI follows the latter path
+and caches `.cargo-install` under a key containing that tag. In the SoTOHE-core source
+repository itself, build the binary from the working tree with `cargo make build-sotp`
+(rebuild it after changing sotp source code).
 
 ## Project Bootstrap (Version Research)
 
-プロジェクト開始時に active `researcher` capability で最新版を調査する。
-既定 profile では Gemini CLI を使う：
+Research new version baselines before changing pinned tool versions. Record the result under
+`knowledge/research/` and update the corresponding toolchain, bootstrap, and CI pins together.
+
+## Testing and dependency auditing
 
 ```bash
-gemini -p "Research latest stable versions as of today:
-- Rust stable toolchain (version + release date)
-- cargo-make, cargo-nextest, cargo-deny, cargo-machete
-- crates used in Cargo.toml (name, current constraint, latest stable)
-Return markdown table with: item | current | latest | recommendation.
-Include source links." 2>/dev/null
+cargo make test
+cargo make deny
 ```
 
-調査結果を `knowledge/research/version-baseline-YYYY-MM-DD.md` に保存し、
-`Cargo.toml` / `Dockerfile` に反映してから実装を開始する。バージョン選定を
-決定として残す場合は pre-track ADR (`knowledge/adr/`) に記録する。
-
-## Lint & Format
-
-```bash
-rustfmt --edition 2024 src/main.rs
-cargo make fmt-check         # CI用（修正なし確認のみ）
-cargo make clippy            # 標準 lint
-cargo make clippy-tests      # テスト対象のみ個別確認したい時
-```
-
-### rustfmt.toml
-
-```toml
-edition = "2024"
-style_edition = "2024"
-max_width = 100
-use_small_heuristics = "Max"
-```
-
-`rustfmt.toml` には `rustfmt --print-config default` ベースの full catalog を保持する。
-`group_imports` / `imports_granularity` は stable rustfmt では warning になるため、
-必要な候補値をコメントで残して AI が参照できるようにする。
-
-## Testing
-
-```bash
-cargo make test                 # 標準テスト
-cargo make llvm-cov             # カバレッジ
-cargo make test-nocapture       # 出力表示（必要時のみ）
-```
-
-## Dependency Auditing
-
-```bash
-cargo audit          # セキュリティ脆弱性
-cargo make deny      # ライセンス・禁止クレート（標準CIに含む）
-cargo make machete   # 未使用依存の検出（依存変更時の補助監査）
-```
-
-## Pre-commit Checklist
-
-- [ ] `cargo make fmt-check` passes
-- [ ] `cargo make clippy` passes
-- [ ] `cargo make test` passes
-- [ ] `cargo make deny` passes
-
-## Package Management
-
-```bash
-cargo add <crate>           # 依存関係追加
-cargo add --dev <crate>     # dev-dependency
-cargo update                # 依存関係の更新
-```
+Run `cargo make ci` before handing off a change.
