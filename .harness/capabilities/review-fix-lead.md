@@ -60,9 +60,19 @@ in `.harness/config/review-scope.json`.
 When the assigned scope includes ADR files, do not change an ADR's semantics from its recorded
 baseline. A semantic finding must be reported as an amendment proposal, not applied as an
 in-place ADR edit. Judge ADR completeness by whether it faithfully records the decision, not by
-whether a different design would be preferable. If an ADR-baseline check blocks, stop the fixer
-and let the orchestrator use the `adr-diagnoser` recovery route; only its
-`non-semantic-restamp` verdict can lead to a new baseline snapshot.
+whether a different design would be preferable. A current ADR byte mismatch is a normal Phase 0
+draft state and does not block a review loop; byte matching is enforced at the commit gate and
+track-aware CI. If the ADR-baseline review check blocks on its retained ledger-integrity
+conditions, stop the fixer and let the orchestrator use the sanctioned recovery route described
+by the review workflow.
+
+**Termination contract (guardian-lane handoff).** When a round records a finding whose fix
+requires an ADR semantic edit, do not re-loop on it: apply any other in-scope fixes that do not
+touch ADR semantics, leave the semantic finding recorded on the round (`findings_remain`), and
+terminate immediately with `failed`, citing that finding as the reason. This `failed` is the
+deterministic handoff into the orchestrator's guardian lane
+(`.harness/workflows/track/review.md` Step 4), not a tooling error; continuing the loop in the
+hope that the reviewer withdraws the finding is prohibited.
 
 ## Internal pipeline
 
@@ -99,7 +109,9 @@ After each reviewer invocation, parse the verdict from command output:
 
 - `zero_findings` → proceed to the canonical API confirmation step (mandatory before reporting
   `completed`).
-- `findings_remain` → proceed to the fix phase.
+- `findings_remain` → proceed to the fix phase — unless every remaining finding requires an ADR
+  semantic edit, in which case terminate per the guardian-lane handoff
+  (§ADR baseline semantic freeze).
 - Error → return `failed`.
 
 **Canonical API confirmation (mandatory before reporting `completed`):**
@@ -168,7 +180,7 @@ Return exactly one of the following statuses:
 |--------|---------|
 | `completed` | The assigned `round_type` returned `zero_findings`, confirmed via the canonical API (`bin/sotp review results --limit 1` shows `findings: zero_findings`). |
 | `blocked_cross_scope` | A fix requires modifying files outside this capability's scope. Include the list of out-of-scope files needed. |
-| `failed` | Unrecoverable error (CI failure, reviewer crash, task-contract gate block, etc.). Include error details. |
+| `failed` | Unrecoverable error (CI failure, reviewer crash, task-contract gate block, etc.), or the ADR guardian-lane handoff: an ADR-scoped semantic finding remains recorded under the semantic freeze (§ADR baseline semantic freeze). Include error details or the finding reference. |
 
 ## Boundary with other capabilities
 

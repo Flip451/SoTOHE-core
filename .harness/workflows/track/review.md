@@ -27,10 +27,11 @@ briefing preparation, and capability dispatching.
   in `plan.md` is the source of truth.
 - **Primary ADR sources** — Phase-0 init-kind ledger records are the orchestrator's primary-ADR
   designation records; no separate primary identity exists. The review prelude requires a
-  nonempty init-record designation set, then verifies every recorded ledger copy and byte-matches
-  every recorded ADR against its latest baseline. `--primary-source <file>` is available only for
-  direct `bin/sotp adr-baseline check-review` invocation. Coverage for ADRs cited by `spec.json`
-  is enforced separately at the commit gate.
+  nonempty init-record designation set and verifies every recorded ledger copy. It does not
+  block a review for an ADR byte mismatch: a mismatch is the normal draft state during
+  Phase 0. `--primary-source <file>` is available only for direct `bin/sotp adr-baseline
+  check-review` invocation. Byte matching and coverage for ADRs cited by `spec.json` remain
+  enforced at the commit gate and track-aware CI.
 
 ## Sequence
 
@@ -48,10 +49,10 @@ Before any reviewer or fixer can modify the worktree, run:
 cargo make adr-baseline-check-review
 ```
 
-This fails closed when the ledger is missing or empty, has no init record, a required init
-snapshot is absent, or a current ADR differs from its snapshot. The same gate is a dependency of
-both review wrappers. A byte mismatch enters the ADR-baseline recovery route in
-`.harness/workflows/track/diagnose.md` before any reviewer or fixer is dispatched.
+This fails closed when the ledger is missing or empty, has no init record, or a recorded ledger
+copy is missing or corrupt. The same gate is a dependency of both review wrappers. A current ADR
+that differs from its latest baseline is a draft state and does not block review dispatch; byte
+matching remains a commit-gate and track-aware-CI check.
 
 Confirm that `bin/sotp review local` and the `review-fix-lead` dispatch wrapper are available.
 Provider / model resolution for the reviewer and the fixer is owned by the CLI
@@ -105,12 +106,9 @@ be enumerated in full for the round — all matches reported, not truncated afte
 finding — with the same sentence stating that the severity constraints themselves remain
 unchanged.
 
-For an ADR scope, every briefing must also include this framework-owned reviewer instruction:
-do not change an ADR's semantics from its recorded baseline; report a semantic concern as an
-amendment proposal rather than applying an in-place ADR edit; and, if the baseline check blocks,
-stop and return control to the orchestrator's `adr-diagnoser` route. Only a
-`non-semantic-restamp` verdict can lead to a new baseline snapshot. This standing methodology is
-not a consumer-owned severity preference and cannot be relaxed by a scope policy.
+For an ADR scope, every briefing must reference
+`knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`. This standing
+methodology is not a consumer-owned severity preference and cannot be relaxed by a scope policy.
 
 The CLI auto-injects the scope file list and severity policy. Do NOT hand-author the
 `## Scope-specific severity policy` section: scopes with `briefing_file` configured in
@@ -161,11 +159,34 @@ The `review-fix-lead` capability self-resolves its modification boundary via
 `bin/sotp review files --scope {scope}`. The workflow does not pass scope file lists to the
 capability directly.
 
+**ADR-scope repair lane (before re-launching the affected review).** The orchestrator, rather
+than `review-fix-lead`, owns any ADR edit requested by an ADR-scoped finding. First resolve the
+ADR's effective merge-target lifecycle. For a post-merge semantic finding, do not dispatch an
+in-place editor. Dispatch `adr-diagnoser` in edit-judgment mode against the finding as a
+semantic proposal with its post-merge lifecycle judgment, relay its `alternative` or
+`no_change_rationale` verbatim to the finding's origin, and route an alternative through the
+new-ADR draft path required by `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`.
+For a pre-merge ADR, dispatch `adr-editor` with the finding as the originating input, then
+immediately dispatch `adr-diagnoser` in edit-judgment mode against that edit. Follow
+`knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権` for the resulting
+adopt-or-revert/relay action and its adjudication point. Re-launch the affected ADR review only
+after that guardian path completes; do not create an intermediate baseline stamp. This lane is
+capability-routed through the active profile and does not introduce a provider-specific branch.
+
+The handoff channel into this lane is the recorded round itself: a fixer honoring the ADR
+semantic freeze applies no ADR edit, leaves the finding recorded on the round
+(`findings_remain`), and terminates with a non-`completed` status (typically `failed`). The
+orchestrator reads the recorded finding via
+`bin/sotp review results --track-id <track-id> --scope <adr-scope> --round-type <round-type> --limit 1`
+and enters the guardian lane. No dedicated fixer status exists for this lane; for an ADR-scoped
+semantic finding, `failed` + a recorded finding is the expected handoff, not a tooling error.
+
 Fixer terminal statuses (uniform across providers):
 
 - `completed` — fast `zero_findings` confirmed; proceed to Step 5 for this scope immediately
 - `blocked_cross_scope` — fix dependencies in other scopes, then relaunch this scope
-- `failed` / timeout — relaunch or report to user depending on cause
+- `failed` / timeout — for an ADR-scoped semantic finding with a recorded round, this is the
+  guardian-lane handoff (see above); otherwise relaunch or report to user depending on cause
 
 **Step 5: Escalate to final round (per-scope, immediate)**
 
@@ -185,7 +206,8 @@ Final round fixer terminal statuses:
 
 - `completed` — scope is review-complete
 - `blocked_cross_scope` — fix cross-scope dependencies, then relaunch
-- `failed` / timeout — relaunch or report to user depending on cause
+- `failed` / timeout — for an ADR-scoped semantic finding with a recorded round, this is the
+  guardian-lane handoff (see above); otherwise relaunch or report to user depending on cause
 
 **Step 6: Final validation**
 
@@ -215,14 +237,14 @@ All five gates must pass before the workflow reports readiness.
 
 - **Non-track branch**: stop and instruct the caller to switch to the `track/<id>` branch.
 - **ADR baseline review check failure**: stop before dispatching a reviewer or fixer. For a
-  missing init snapshot, use the sanctioned init snapshot route. For a byte mismatch, invoke the
-  ADR-baseline recovery route in `diagnose.md`: dispatch `adr-diagnoser`; a
-  `non-semantic-restamp` verdict permits `snapshot --kind non-semantic-fix` and a retry, while a
-  `deviation` or `unknown-editor` verdict requires `restore` before the review can restart.
+  missing init snapshot, use the sanctioned init snapshot route. A byte mismatch is not a
+  review-check failure: continue the draft review loop and let the commit gate / track-aware CI
+  enforce byte matching.
 - **Fixer `blocked_cross_scope`**: fix the cross-scope dependencies from the orchestrator
   context, then relaunch the affected scope.
-- **Fixer `failed` / timeout**: relaunch (up to 2 retries). If retries also fail, report to
-  the user and ask for a decision.
+- **Fixer `failed` / timeout**: for an ADR-scoped semantic finding with a recorded round, enter
+  the guardian lane before any retry. Otherwise relaunch (up to 2 retries). If retries also
+  fail, report to the user and ask for a decision.
 - **`cargo make ci` failure**: fix the CI failure (format, clippy, test), re-run, and continue
   the workflow. CI failure does not reset the review loop.
 - **`bin/sotp review check-approved` non-zero**: diagnose — stale hash (re-stage and re-run

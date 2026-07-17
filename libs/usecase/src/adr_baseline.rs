@@ -259,7 +259,7 @@ impl AdrBaselineQueryInteractor {
         &self,
         track_id: &TrackId,
         primary: Option<&AdrSourceFileName>,
-        require_cited: bool,
+        commit_gate: bool,
     ) -> Result<AdrBaselineQueryOutput, AdrBaselineQueryError> {
         let entries = self.store.read_entries(track_id).map_err(AdrBaselineQueryError::Store)?;
         let mut violations = Vec::new();
@@ -302,7 +302,7 @@ impl AdrBaselineQueryInteractor {
                     ));
                 }
             }
-            None if !require_cited
+            None if !commit_gate
                 && !entries.iter().any(|entry| entry.kind() == AdrBaselineKind::Init) =>
             {
                 violations.push(AdrBaselineCheckViolation::PrimaryInitUnavailable);
@@ -310,7 +310,7 @@ impl AdrBaselineQueryInteractor {
             None => {}
         }
 
-        if require_cited {
+        if commit_gate {
             let cited = self.source.cited_sources(track_id).map_err(source_read_error)?;
             for cited_source in cited {
                 let source_state =
@@ -323,24 +323,26 @@ impl AdrBaselineQueryInteractor {
             }
         }
 
-        for (source, entry) in latest {
-            let bytes = match self.source.working_bytes(&source) {
-                Ok(bytes) => bytes,
-                Err(AdrBaselineSourceError::Unavailable(_)) => {
-                    violations.push(AdrBaselineCheckViolation::SourceMissing(source));
-                    continue;
+        if commit_gate {
+            for (source, entry) in latest {
+                let bytes = match self.source.working_bytes(&source) {
+                    Ok(bytes) => bytes,
+                    Err(AdrBaselineSourceError::Unavailable(_)) => {
+                        violations.push(AdrBaselineCheckViolation::SourceMissing(source));
+                        continue;
+                    }
+                    Err(AdrBaselineSourceError::Read(message)) => {
+                        return Err(AdrBaselineQueryError::SourceRead(message));
+                    }
+                };
+                let actual = content_hash(&bytes);
+                if actual != *entry.hash() {
+                    violations.push(AdrBaselineCheckViolation::ByteMismatch {
+                        source,
+                        expected: entry.hash().clone(),
+                        actual,
+                    });
                 }
-                Err(AdrBaselineSourceError::Read(message)) => {
-                    return Err(AdrBaselineQueryError::SourceRead(message));
-                }
-            };
-            let actual = content_hash(&bytes);
-            if actual != *entry.hash() {
-                violations.push(AdrBaselineCheckViolation::ByteMismatch {
-                    source,
-                    expected: entry.hash().clone(),
-                    actual,
-                });
             }
         }
 
@@ -530,6 +532,25 @@ mod tests {
         }
     }
 
+    struct MissingCopyStore;
+
+    impl AdrBaselineStoreReadPort for MissingCopyStore {
+        fn read_entries(
+            &self,
+            _: &TrackId,
+        ) -> Result<Vec<AdrBaselineLedgerEntry>, AdrBaselineStoreReadError> {
+            Ok(vec![entry(AdrBaselineKind::Init)])
+        }
+
+        fn verify_recorded_copy(
+            &self,
+            _: &TrackId,
+            _: &AdrBaselineLedgerEntry,
+        ) -> Result<AdrBaselineRecordedCopyStatus, AdrBaselineStoreReadError> {
+            Ok(AdrBaselineRecordedCopyStatus::Missing)
+        }
+    }
+
     #[test]
     fn test_adr_baseline_snapshot_rejects_reason_for_init() {
         let store = Arc::new(Store { entries: Mutex::new(Vec::new()) });
@@ -651,6 +672,48 @@ mod tests {
     }
 
     #[test]
+    fn test_adr_baseline_query_passes_review_check_with_draft_bytes() {
+        let store = Arc::new(Store { entries: Mutex::new(vec![entry(AdrBaselineKind::Init)]) });
+        let interactor = AdrBaselineQueryInteractor::new(
+            store,
+            Arc::new(Source {
+                working: b"draft".to_vec(),
+                fork: Vec::new(),
+                cited: Vec::new(),
+                state: AdrBaselineSourceState::ExistingAtForkPoint,
+            }),
+        );
+
+        assert_eq!(
+            interactor
+                .execute(AdrBaselineQuery::CheckReview { track_id: track(), primary_source: None })
+                .unwrap(),
+            AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Passed)
+        );
+    }
+
+    #[test]
+    fn test_adr_baseline_query_blocks_review_check_when_init_copy_is_missing() {
+        let interactor = AdrBaselineQueryInteractor::new(
+            Arc::new(MissingCopyStore),
+            Arc::new(Source {
+                working: b"current".to_vec(),
+                fork: Vec::new(),
+                cited: Vec::new(),
+                state: AdrBaselineSourceState::ExistingAtForkPoint,
+            }),
+        );
+
+        let result = interactor
+            .execute(AdrBaselineQuery::CheckReview { track_id: track(), primary_source: None })
+            .unwrap();
+
+        assert!(
+            matches!(result, AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Blocked { violations }) if matches!(violations.as_slice(), [AdrBaselineCheckViolation::BaselineCopyMissing { .. }]))
+        );
+    }
+
+    #[test]
     fn test_adr_baseline_query_blocks_derived_review_check_without_init_record() {
         let store = Arc::new(Store { entries: Mutex::new(Vec::new()) });
         let interactor = AdrBaselineQueryInteractor::new(
@@ -709,6 +772,27 @@ mod tests {
         assert_eq!(
             interactor.execute(AdrBaselineQuery::CheckCommit { track_id: track() }).unwrap(),
             AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Passed)
+        );
+    }
+
+    #[test]
+    fn test_adr_baseline_query_blocks_commit_check_when_bytes_differ() {
+        let store = Arc::new(Store { entries: Mutex::new(vec![entry(AdrBaselineKind::Init)]) });
+        let interactor = AdrBaselineQueryInteractor::new(
+            store,
+            Arc::new(Source {
+                working: b"draft".to_vec(),
+                fork: Vec::new(),
+                cited: Vec::new(),
+                state: AdrBaselineSourceState::ExistingAtForkPoint,
+            }),
+        );
+
+        let result =
+            interactor.execute(AdrBaselineQuery::CheckCommit { track_id: track() }).unwrap();
+
+        assert!(
+            matches!(result, AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Blocked { violations }) if matches!(violations.as_slice(), [AdrBaselineCheckViolation::ByteMismatch { .. }]))
         );
     }
 }

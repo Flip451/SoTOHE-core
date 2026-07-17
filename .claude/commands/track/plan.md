@@ -17,10 +17,8 @@ User invokes this command as `/track:plan`. `$ARGUMENTS`:
 
 - **Progress tracking**: use `TaskCreate` to register Phase 0–3 steps + Termination as tasks.
 - **Timestamps**: `date -u +"%Y-%m-%dT%H:%M:%SZ"` (ISO 8601 UTC) — manual input is forbidden.
-- **Phase 0** (`/track:init`): the orchestrator selects the relevant primary ADR's direct
-  filename under `knowledge/adr/` and passes it explicitly with the feature name so init can
-  create the ledger designation record. Run by reading `.claude/commands/track/init.md`; do not
-  infer the filename from the feature name or retain a separate primary pointer.
+- **Phase 0**: invoke `/track:init`, `/track:review`, then `/track:commit`; their transition
+  rules and inputs are owned by the plan workflow SSoT.
 - **Phase writer dispatch** — write the phase briefing, then invoke the matching
   `bin/sotp capability exec <capability> --host claude --briefing-file <path>` command. The
   dispatcher resolves the capability's provider internally from
@@ -42,7 +40,7 @@ User invokes this command as `/track:plan`. `$ARGUMENTS`:
 | 1 | spec-designer | `tmp/spec-designer-briefing.md` |
 | 2 | type-designer | `tmp/type-designer-briefing.md` |
 | 3 | impl-planner | `tmp/impl-planner-briefing.md` |
-| B&F | adr-editor | `tmp/adr-editor-briefing.md` |
+| B&F | adr-editor / adr-diagnoser | capability-specific briefing path |
 
 - **Semantic review check**: `bin/sotp ref-verify run`
 
