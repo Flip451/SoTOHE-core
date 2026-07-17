@@ -1,99 +1,234 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
+    "types": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
-          "at": "2026-07-17T18:51:40Z"
+          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
+          "at": "2026-07-17T19:21:20Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
-          "at": "2026-07-17T18:54:49Z"
-        },
+          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
+          "at": "2026-07-17T19:25:01Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c06351cab606ce73bfa0933662cc45d248edda4b0e4d4c9448d4d2e2502a0cdf",
-          "at": "2026-07-17T19:47:57Z"
+          "hash": "rvw1:sha256:ab9ae42a419132aa39ac291dc31350237351b4049d5d5ea5ab47930afeed1b86",
+          "at": "2026-07-17T19:48:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab9ae42a419132aa39ac291dc31350237351b4049d5d5ea5ab47930afeed1b86",
+          "at": "2026-07-17T19:50:24Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b5bb72f14d715458ec608df81362e4dafca7dace65c09b40cfd03a015b6fdd6",
+          "at": "2026-07-17T19:48:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b5bb72f14d715458ec608df81362e4dafca7dace65c09b40cfd03a015b6fdd6",
+          "at": "2026-07-17T19:50:38Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cb5673148929321b958b8ea3495d27008ca8b38f53d263a252b1a5412b5d02e",
+          "at": "2026-07-17T19:48:27Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The gate-step comment still claims that PR runs acquire a local `track/<id>` branch, which is false for the newly exempt develop → main release PR and for non-track PRs that intentionally reach this gate without track context. D9/AC-10 requires the condition relationship to be documented on both steps; update this comment to state that only release PRs are skipped, track heads are recreated above, and other non-track PRs run the gate and fail closed.",
+              "message": "新設した「live architecture-document set」が実集合を網羅していません。`.gemini/GEMINI.md` と `.claude/skills/{gemini-system,repomix-snapshot}/SKILL.md` は現在も「port は domain layer の trait」と記述していますが、この一覧と architecture-customizer 側の複製一覧の双方から漏れています。そのため今回の二層配置への同期自体が未完了で、今後も同じドリフトが再発します。これらの配布文書を一覧へ追加し、R1 の domain/usecase 判別規則へ更新してください。",
               "severity": "P1",
-              "file": ".github/workflows/ci.yml",
-              "line": 111,
-              "category": "requirements"
+              "file": ".claude/rules/09-maintainer-checklist.md",
+              "line": 23,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "`§CLI as Composition Root` は削除された `hexagonal-architecture.md` にしか存在しない節です。fresh consumer checkout では引用先がなく、usecase reviewer が finding を根拠付けできません。現行の R1 または coding-principles の該当規則へ付け替えてください。",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/usecase.md",
+              "line": 25,
+              "category": "template-distribution reference leak"
+            },
+            {
+              "message": "role/kind mismatch の例が現行 R1 と矛盾しています。v5 の実際の role は `Entity`、`SpecificationPort`、`SecondaryPort` 等であり、`DomainEntity` と汎用の `Port` は role 値ではありません。また domain に置くべき port もあるため、「port が domain にある」こと自体を mismatch 例にすると正しい catalogue を誤検出します。現行 role 名を使い、usecase に属する capability port に限定してください。",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/types.md",
+              "line": 38,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "`Repository` 行は aggregate-root persistence port を usecase にも無条件で許可していますが、直後の tie-break は aggregate の語彙・永続化 port を domain に置くと規定しています。`Repository` は必ず `aggregate: TypeRef` を持つため、同じ entry が表では許可され tie-break では拒否される状態です。usecase 列を禁止または要根拠にするなど、R1 内で一意な判断になるよう整合させてください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 63,
+              "category": "convention contradiction"
             }
           ],
-          "hash": "rvw1:sha256:c06351cab606ce73bfa0933662cc45d248edda4b0e4d4c9448d4d2e2502a0cdf",
-          "at": "2026-07-17T19:51:07Z"
+          "hash": "rvw1:sha256:2cb5673148929321b958b8ea3495d27008ca8b38f53d263a252b1a5412b5d02e",
+          "at": "2026-07-17T19:58:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`§CLI as Composition Root` は削除された `hexagonal-architecture.md` にしか存在しない節です。fresh consumer checkout では引用先がなく、usecase reviewer が finding を根拠付けできません。現行の R1 または coding-principles の該当規則へ付け替えてください。",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/usecase.md",
+              "line": 25,
+              "category": "template-distribution reference leak"
+            },
+            {
+              "message": "role/kind mismatch の例が現行 R1 と矛盾しています。v5 の実際の role は `Entity`、`SpecificationPort`、`SecondaryPort` 等であり、`DomainEntity` と汎用の `Port` は role 値ではありません。また domain に置くべき port もあるため、「port が domain にある」こと自体を mismatch 例にすると正しい catalogue を誤検出します。現行 role 名を使い、usecase に属する capability port に限定してください。",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/types.md",
+              "line": 38,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "`Repository` 行は aggregate-root persistence port を usecase にも無条件で許可していますが、直後の tie-break は aggregate の語彙・永続化 port を domain に置くと規定しています。`Repository` は必ず `aggregate: TypeRef` を持つため、同じ entry が表では許可され tie-break では拒否されます。usecase 列を禁止または要根拠にするなど、R1 内で判断を一意にしてください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 63,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f48a932786547d499c48bf298b4e1aa25ec1e41cd455849997ed7ab59ef37122",
+          "at": "2026-07-17T20:03:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "「live architecture-document set」はまだ実集合を網羅していません。この変更自身が `.harness/capabilities/rollback-diagnoser.md` の配置規則参照を R1 へ更新しているのに capability 一覧から同ファイルが漏れており、`infrastructure` 層の責務と逆依存を規定する `.harness/custom/review-prompts/infrastructure.md` も prompt 一覧にありません。同じ不完全な一覧が architecture-customizer にも複製されているため、次の層名・crate 構成変更で両文書が同期対象から外れます。両一覧へ追加してください。",
+              "severity": "P1",
+              "file": ".claude/rules/09-maintainer-checklist.md",
+              "line": 24,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:136b97413bdc1fd6377b37ccf960e0be0e138234fb0c0d53165e01e03ac5bf50",
+          "at": "2026-07-17T20:06:37Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:95888b9be332a8c53603a8a344b9ae77a3387d7710206ff56f16f0366c456e42",
-          "at": "2026-07-17T19:52:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c4d4707a538ec97f00a7c0a656021390bdae3af5fbe3b6be6b906419efcf9daa",
-          "at": "2026-07-17T20:01:46Z"
+          "hash": "rvw1:sha256:a4bd5f944964779ad75a769e0f3e44e1f36fb29307037d270b8539e54157dd80",
+          "at": "2026-07-17T20:08:55Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d4f6615e95bef1f61c39ebb094ad089f1a1de54bec866ce396dfe1a01692544c",
-          "at": "2026-07-17T20:25:59Z"
+          "hash": "rvw1:sha256:a64159412781779ee6dd91df5e2499986f28ba3e1aa38ffff568cedcfe56f5c8",
+          "at": "2026-07-17T20:53:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The revised checklist limits every ValueObject method to deriving a value or predicate from an existing value, but R3 explicitly permits invariant-establishing constructors such as `Email::new()` (lines 96–100). Following this checklist would reject an R3-approved ValueObject; include constructors/validation methods in the allowed wording.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 303,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "This item still requires every field-plus-behavior domain struct to be a `DomainService` and treats `ValueObject` as a misclassification. That contradicts R3/R6, which now classify value-equal, field-bearing types with side-effect-free derivation methods (for example `Email::normalized()`) as ValueObjects. Narrow this check to service-centric, non-value behavior.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 304,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a64159412781779ee6dd91df5e2499986f28ba3e1aa38ffff568cedcfe56f5c8",
+          "at": "2026-07-17T20:57:15Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d4f6615e95bef1f61c39ebb094ad089f1a1de54bec866ce396dfe1a01692544c",
-          "at": "2026-07-17T20:28:21Z"
+          "hash": "rvw1:sha256:2f16a040dda659c2e6dcd59f8db64646a6e4538c454a7f41a518afe928f507d6",
+          "at": "2026-07-17T21:00:34Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3895fd4c989a9f5270e710da2708f73f75a53ce52cadcf09bbd3fffbf9691a76",
-          "at": "2026-07-17T20:39:26Z"
+          "hash": "rvw1:sha256:d20d829d270f8c268fe2736b4e441650abd21b09f3b2554554e31da567a3694c",
+          "at": "2026-07-17T21:25:34Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3895fd4c989a9f5270e710da2708f73f75a53ce52cadcf09bbd3fffbf9691a76",
-          "at": "2026-07-17T20:41:53Z"
+          "hash": "rvw1:sha256:d20d829d270f8c268fe2736b4e441650abd21b09f3b2554554e31da567a3694c",
+          "at": "2026-07-17T21:29:36Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9debfe133401755ea29edb72ec711e65a5b73bc5c64811cde9a6424f89076ddd",
-          "at": "2026-07-17T21:25:47Z"
+          "hash": "rvw1:sha256:35137c6089bd45f9c5f12cc24ea4e1d2b2d41a1a0385021dd7aa5d2bbaf9f767",
+          "at": "2026-07-17T21:58:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The present-tense delegation table still says the CLI is the composition root and directly shows `CLI → ReviewCycle::review()`, contradicting the newly documented three-crate split and `architecture-rules.json`. This can still instruct implementers to wire adapters or invoke the use case from `apps/cli`. Update both example rows to route `apps/cli` through `cli_composition` and `cli_driver`; the accepted historical-narrative exception does not apply here.",
+              "severity": "P1",
+              "file": "knowledge/conventions/impl-delegation-arch-guard.md",
+              "line": 29,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:35137c6089bd45f9c5f12cc24ea4e1d2b2d41a1a0385021dd7aa5d2bbaf9f767",
+          "at": "2026-07-17T22:01:49Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9debfe133401755ea29edb72ec711e65a5b73bc5c64811cde9a6424f89076ddd",
-          "at": "2026-07-17T21:28:24Z"
+          "hash": "rvw1:sha256:ebf23a7141ed4fd4c04d0dcc2f3a35c88dece2495887fba731fd2ab6596d6679",
+          "at": "2026-07-17T22:03:50Z"
         }
       ]
     },
@@ -154,24 +289,6 @@
           "findings": [],
           "hash": "rvw1:sha256:95a0425e2141e79994cca0895f0a9ccc9292f42413eac1ae083abe0c71949ebf",
           "at": "2026-07-17T21:27:28Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab9ae42a419132aa39ac291dc31350237351b4049d5d5ea5ab47930afeed1b86",
-          "at": "2026-07-17T19:48:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab9ae42a419132aa39ac291dc31350237351b4049d5d5ea5ab47930afeed1b86",
-          "at": "2026-07-17T19:50:24Z"
         }
       ]
     },
@@ -428,172 +545,6 @@
         }
       ]
     },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
-          "at": "2026-07-17T19:21:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
-          "at": "2026-07-17T19:25:01Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2cb5673148929321b958b8ea3495d27008ca8b38f53d263a252b1a5412b5d02e",
-          "at": "2026-07-17T19:48:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "新設した「live architecture-document set」が実集合を網羅していません。`.gemini/GEMINI.md` と `.claude/skills/{gemini-system,repomix-snapshot}/SKILL.md` は現在も「port は domain layer の trait」と記述していますが、この一覧と architecture-customizer 側の複製一覧の双方から漏れています。そのため今回の二層配置への同期自体が未完了で、今後も同じドリフトが再発します。これらの配布文書を一覧へ追加し、R1 の domain/usecase 判別規則へ更新してください。",
-              "severity": "P1",
-              "file": ".claude/rules/09-maintainer-checklist.md",
-              "line": 23,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "`§CLI as Composition Root` は削除された `hexagonal-architecture.md` にしか存在しない節です。fresh consumer checkout では引用先がなく、usecase reviewer が finding を根拠付けできません。現行の R1 または coding-principles の該当規則へ付け替えてください。",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/usecase.md",
-              "line": 25,
-              "category": "template-distribution reference leak"
-            },
-            {
-              "message": "role/kind mismatch の例が現行 R1 と矛盾しています。v5 の実際の role は `Entity`、`SpecificationPort`、`SecondaryPort` 等であり、`DomainEntity` と汎用の `Port` は role 値ではありません。また domain に置くべき port もあるため、「port が domain にある」こと自体を mismatch 例にすると正しい catalogue を誤検出します。現行 role 名を使い、usecase に属する capability port に限定してください。",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/types.md",
-              "line": 38,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "`Repository` 行は aggregate-root persistence port を usecase にも無条件で許可していますが、直後の tie-break は aggregate の語彙・永続化 port を domain に置くと規定しています。`Repository` は必ず `aggregate: TypeRef` を持つため、同じ entry が表では許可され tie-break では拒否される状態です。usecase 列を禁止または要根拠にするなど、R1 内で一意な判断になるよう整合させてください。",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 63,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:2cb5673148929321b958b8ea3495d27008ca8b38f53d263a252b1a5412b5d02e",
-          "at": "2026-07-17T19:58:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`§CLI as Composition Root` は削除された `hexagonal-architecture.md` にしか存在しない節です。fresh consumer checkout では引用先がなく、usecase reviewer が finding を根拠付けできません。現行の R1 または coding-principles の該当規則へ付け替えてください。",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/usecase.md",
-              "line": 25,
-              "category": "template-distribution reference leak"
-            },
-            {
-              "message": "role/kind mismatch の例が現行 R1 と矛盾しています。v5 の実際の role は `Entity`、`SpecificationPort`、`SecondaryPort` 等であり、`DomainEntity` と汎用の `Port` は role 値ではありません。また domain に置くべき port もあるため、「port が domain にある」こと自体を mismatch 例にすると正しい catalogue を誤検出します。現行 role 名を使い、usecase に属する capability port に限定してください。",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/types.md",
-              "line": 38,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "`Repository` 行は aggregate-root persistence port を usecase にも無条件で許可していますが、直後の tie-break は aggregate の語彙・永続化 port を domain に置くと規定しています。`Repository` は必ず `aggregate: TypeRef` を持つため、同じ entry が表では許可され tie-break では拒否されます。usecase 列を禁止または要根拠にするなど、R1 内で判断を一意にしてください。",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 63,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f48a932786547d499c48bf298b4e1aa25ec1e41cd455849997ed7ab59ef37122",
-          "at": "2026-07-17T20:03:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "「live architecture-document set」はまだ実集合を網羅していません。この変更自身が `.harness/capabilities/rollback-diagnoser.md` の配置規則参照を R1 へ更新しているのに capability 一覧から同ファイルが漏れており、`infrastructure` 層の責務と逆依存を規定する `.harness/custom/review-prompts/infrastructure.md` も prompt 一覧にありません。同じ不完全な一覧が architecture-customizer にも複製されているため、次の層名・crate 構成変更で両文書が同期対象から外れます。両一覧へ追加してください。",
-              "severity": "P1",
-              "file": ".claude/rules/09-maintainer-checklist.md",
-              "line": 24,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:136b97413bdc1fd6377b37ccf960e0be0e138234fb0c0d53165e01e03ac5bf50",
-          "at": "2026-07-17T20:06:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a4bd5f944964779ad75a769e0f3e44e1f36fb29307037d270b8539e54157dd80",
-          "at": "2026-07-17T20:08:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a64159412781779ee6dd91df5e2499986f28ba3e1aa38ffff568cedcfe56f5c8",
-          "at": "2026-07-17T20:53:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The revised checklist limits every ValueObject method to deriving a value or predicate from an existing value, but R3 explicitly permits invariant-establishing constructors such as `Email::new()` (lines 96–100). Following this checklist would reject an R3-approved ValueObject; include constructors/validation methods in the allowed wording.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 303,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "This item still requires every field-plus-behavior domain struct to be a `DomainService` and treats `ValueObject` as a misclassification. That contradicts R3/R6, which now classify value-equal, field-bearing types with side-effect-free derivation methods (for example `Email::normalized()`) as ValueObjects. Narrow this check to service-centric, non-value behavior.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 304,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:a64159412781779ee6dd91df5e2499986f28ba3e1aa38ffff568cedcfe56f5c8",
-          "at": "2026-07-17T20:57:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2f16a040dda659c2e6dcd59f8db64646a6e4538c454a7f41a518afe928f507d6",
-          "at": "2026-07-17T21:00:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d20d829d270f8c268fe2736b4e441650abd21b09f3b2554554e31da567a3694c",
-          "at": "2026-07-17T21:25:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d20d829d270f8c268fe2736b4e441650abd21b09f3b2554554e31da567a3694c",
-          "at": "2026-07-17T21:29:36Z"
-        }
-      ]
-    },
     "spec": {
       "rounds": [
         {
@@ -641,21 +592,99 @@
         }
       ]
     },
-    "usecase": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0b5bb72f14d715458ec608df81362e4dafca7dace65c09b40cfd03a015b6fdd6",
-          "at": "2026-07-17T19:48:05Z"
+          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
+          "at": "2026-07-17T18:51:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0b5bb72f14d715458ec608df81362e4dafca7dace65c09b40cfd03a015b6fdd6",
-          "at": "2026-07-17T19:50:38Z"
+          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
+          "at": "2026-07-17T18:54:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c06351cab606ce73bfa0933662cc45d248edda4b0e4d4c9448d4d2e2502a0cdf",
+          "at": "2026-07-17T19:47:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The gate-step comment still claims that PR runs acquire a local `track/<id>` branch, which is false for the newly exempt develop → main release PR and for non-track PRs that intentionally reach this gate without track context. D9/AC-10 requires the condition relationship to be documented on both steps; update this comment to state that only release PRs are skipped, track heads are recreated above, and other non-track PRs run the gate and fail closed.",
+              "severity": "P1",
+              "file": ".github/workflows/ci.yml",
+              "line": 111,
+              "category": "requirements"
+            }
+          ],
+          "hash": "rvw1:sha256:c06351cab606ce73bfa0933662cc45d248edda4b0e4d4c9448d4d2e2502a0cdf",
+          "at": "2026-07-17T19:51:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:95888b9be332a8c53603a8a344b9ae77a3387d7710206ff56f16f0366c456e42",
+          "at": "2026-07-17T19:52:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4d4707a538ec97f00a7c0a656021390bdae3af5fbe3b6be6b906419efcf9daa",
+          "at": "2026-07-17T20:01:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4f6615e95bef1f61c39ebb094ad089f1a1de54bec866ce396dfe1a01692544c",
+          "at": "2026-07-17T20:25:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4f6615e95bef1f61c39ebb094ad089f1a1de54bec866ce396dfe1a01692544c",
+          "at": "2026-07-17T20:28:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3895fd4c989a9f5270e710da2708f73f75a53ce52cadcf09bbd3fffbf9691a76",
+          "at": "2026-07-17T20:39:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3895fd4c989a9f5270e710da2708f73f75a53ce52cadcf09bbd3fffbf9691a76",
+          "at": "2026-07-17T20:41:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9debfe133401755ea29edb72ec711e65a5b73bc5c64811cde9a6424f89076ddd",
+          "at": "2026-07-17T21:25:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9debfe133401755ea29edb72ec711e65a5b73bc5c64811cde9a6424f89076ddd",
+          "at": "2026-07-17T21:28:24Z"
         }
       ]
     }
