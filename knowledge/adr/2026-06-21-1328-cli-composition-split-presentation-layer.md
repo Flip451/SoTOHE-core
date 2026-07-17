@@ -234,6 +234,6 @@ driving adapter 型を持たず、composition root が `Arc<dyn UseCase>` を返
 - `knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md` — usecase 出力 DTO（本 ADR が D5 で流用）と cli→usecase 境界の前提。
 - `knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md` — 下流の TDDD/ロール配置制約 ADR。本 ADR の 3 層分解後に cli 系の型・ロール・allowlist を定義する（それまで保留）。
 - `knowledge/research/2026-06-21-1420-layer-violation-check/` — 本 ADR の D2/D4/D7/D8 の根拠となる層違反監査（36 件）。
-- `knowledge/conventions/hexagonal-architecture.md` — CLI as Composition Root / port placement。composition root（wire）と primary adapter（invoke+render）の区別、`SecondaryAdapter`（driven）との対比の根拠。本 ADR 実装後にこの節を 3 層構成へ更新する。
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — CLI as Composition Root / port placement。composition root（wire）と primary adapter（invoke+render）の区別、`SecondaryAdapter`（driven）との対比の根拠。本 ADR 実装後にこの節を 3 層構成へ更新する。
 - `knowledge/adr/2026-06-18-1406-review-prompts-relocation-per-layer-briefings.md` / `.harness/custom/review-prompts/` — レイヤー別 reviewer severity policy。本 ADR の層構成変更に伴い `cli_driver.md` 新設 + `cli.md` / `cli_composition.md` 更新が必要（D6）。
 - `architecture-rules.json` — 層定義と依存ポリシーの SSoT。本 ADR は `cli-driver` 層エントリの追加と依存グラフ更新で実体化される。

@@ -418,7 +418,7 @@ ADR `2026-04-11-0002-tddd-multilayer-extension.md` D6 の不変条件 (TDDD の�
 - `libs/domain/src/tddd/signals.rs` — `evaluate_secondary_adapter` の追加対象
 - `libs/domain/src/schema.rs` — `TraitImplEntry` 新型と `TypeNode::trait_impls` / `TypeGraph::get_impl` の追加対象
 - `knowledge/research/2026-04-16-tddd-05-rustdoc-impl.md` — rustdoc Item::Impl 構造調査 (researcher 出力)
-- `knowledge/conventions/hexagonal-architecture.md` — port の配置と adapter のルール
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — port の配置と adapter のルール
 - `knowledge/conventions/source-attribution.md` — signal のソースタグ付け
 - `knowledge/conventions/typed-deserialization.md` — codec の DTO 設計原則
 - `knowledge/conventions/prefer-type-safe-abstractions.md` — 型システムでバグクラスを排除する原則

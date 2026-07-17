@@ -220,7 +220,7 @@ catalogue 更新後、`sotp track type-signals tddd-04-finding-taxonomy-cleanup-
 
 却下理由:
 
-- `domain::review_v2::Finding` (新名 `ReviewerFinding`) に `Serialize` / `Deserialize` を追加すると、domain 型が serializable になり DTO / domain 境界が溶ける。注: `libs/domain` は既に `serde` 依存を持つ (`catalogue.rs` / `schema.rs` で使用) ため、新規の crate 依存は入らない。しかし serde の利用範囲が validated newtype レイヤーにまで拡張される — これは `knowledge/conventions/hexagonal-architecture.md` が示す hexagonal intent (validated domain type は wire format 型になってはならない) に反する。
+- `domain::review_v2::Finding` (新名 `ReviewerFinding`) に `Serialize` / `Deserialize` を追加すると、domain 型が serializable になり DTO / domain 境界が溶ける。注: `libs/domain` は既に `serde` 依存を持つ (`catalogue.rs` / `schema.rs` で使用) ため、新規の crate 依存は入らない。しかし serde の利用範囲が validated newtype レイヤーにまで拡張される — これは `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） が示す hexagonal intent (validated domain type は wire format 型になってはならない) に反する。
 - DTO / domain 境界が崩れる。現状 `Finding::new()` + `FindingError::EmptyMessage` + `convert_findings_to_domain` の `filter_map` が強制している non-empty message 不変条件が、(a) 完全に失われるか、(b) 表現の面倒な domain-level な serde validation hook を必要とする。この不変条件は load-bearing であり、現在 empty-message な reviewer 出力は silent に捨てられていて、上流コードはこの挙動に依存している。
 - 今後「この domain 型にも serde を追加したい」という要望に抵抗しづらい前例を作る。
 
@@ -280,7 +280,7 @@ catalogue 更新後、`sotp track type-signals tddd-04-finding-taxonomy-cleanup-
 
 - **ADR `2026-04-11-0002-tddd-multilayer-extension.md`** (Phase 1 Completion Amendment §3.B): 本 track を指名した deferral 通知。
 - **ADR `2026-04-13-1813-tddd-taxonomy-expansion.md`**: `TraitPort` → `SecondaryPort` cascade rename の前例。同じ「後方互換性なし」ポリシー。
-- **`knowledge/conventions/hexagonal-architecture.md`**: Option A を却下する根拠の domain purity ルール。
+- **`knowledge/conventions/hexagonal-architecture.md`**（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`）: Option A を却下する根拠の domain purity ルール。
 - **`.claude/rules/04-coding-principles.md`**: 「Make Illegal States Unrepresentable」 — non-empty message 不変条件はこの原則の具体的な適用であり、Option C はこれを弱める。
 - **`libs/infrastructure/src/code_profile_builder.rs` (~line 54)**: collision warning を emit しているポイント。
 - **`track/items/tddd-01-multilayer-2026-04-12/domain-types.json` (`"Finding"` reference entry、`type_definitions` の 4 番目)**: 本 track で削除する suppression entry。

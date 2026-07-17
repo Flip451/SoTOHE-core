@@ -198,5 +198,5 @@ per-layer デフォルトを `samples/` に置き、利用者が `custom/` に�
 
 - `knowledge/adr/2026-04-18-1354-review-scope-prompt-injection.md` — `briefing_file` 機構の起点。本 ADR はその Rollout Phase 4（各 scope への briefing 展開）の実現にあたる。
 - `knowledge/conventions/responsibility-boundary.md` — framework enforce 領域と利用者所有領域の分界。`.harness/custom/`（D6）の根拠。
-- `knowledge/conventions/coding-principles.md` / `knowledge/conventions/hexagonal-architecture.md` / `knowledge/conventions/prefer-type-safe-abstractions.md` — 各層 briefing が参照する severity 観点の原典。
+- `knowledge/conventions/coding-principles.md` / `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） / `knowledge/conventions/prefer-type-safe-abstractions.md` — 各層 briefing が参照する severity 観点の原典。
 - `knowledge/adr/README.md` — ADR 索引。

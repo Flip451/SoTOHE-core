@@ -194,4 +194,4 @@ tddd-01 は `libs/domain/src/tddd/` が layer-agnostic であることを確立�
 - **Track `tddd-01-multilayer-2026-04-12`**: 本 ADR が土台とする multilayer インフラを実装した track。
 - **Track `tddd-02-usecase-wiring-2026-04-14`**: 本 ADR を実装する track。
 - **`.claude/rules/04-coding-principles.md` (Enum-first パターン)**: boolean フラグより variant を優先する設計原則。
-- **`knowledge/conventions/hexagonal-architecture.md`**: primary/secondary port の区別を説明する convention。
+- **`knowledge/conventions/hexagonal-architecture.md`**（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`）: primary/secondary port の区別を説明する convention。

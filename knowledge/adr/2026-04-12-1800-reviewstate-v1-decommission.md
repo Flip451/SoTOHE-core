@@ -155,7 +155,7 @@ pub enum RoundType {
 - `knowledge/strategy/TODO.md` の **RVW-54** (CLI 統合テストハーネス) は `persist_approved_head` / `set-approved-head` への言及部分のみ削除 (残りの CLI test harness ニーズは継続)
 - `knowledge/strategy/TODO.md` の **RVW-55** (v1 `persist_approved_head` 残骸の削除) を done マーク。D6 が `persist_approved_head` 関数本体と `dispatch_commit_from_file` 内の呼び出しを削除するため、RVW-55 の削除目的が本トラックで達成される
 - `knowledge/DESIGN.md` に V1 review state 残存の言及があれば削除 (実装時に grep 確認)
-- `knowledge/conventions/hexagonal-architecture.md` の `RecordRoundProtocol` / `ReviewJsonReader` への参照を削除する (V1 API が消えることで dead reference になるため)
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） の `RecordRoundProtocol` / `ReviewJsonReader` への参照を削除する (V1 API が消えることで dead reference になるため)
 - `knowledge/conventions/security.md` の `FsReviewJsonStore` への参照を削除する (V1 API が消えることで dead reference になるため)
 
 ## Rejected Alternatives

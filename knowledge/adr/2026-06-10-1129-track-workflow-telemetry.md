@@ -204,6 +204,6 @@ gitignored ランタイム成果物」という既存パターンにも沿う。
 ## Related
 
 - `knowledge/adr/` — ADR 索引
-- `knowledge/conventions/hexagonal-architecture.md` — 計装の層配置の前提
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — 計装の層配置の前提
 - `track/tech-stack.md` — オブザーバビリティ欄（本 ADR 採用時に更新対象）
 - 戦略草案「純粋テンプレートを抽出した並行レーンで別トポロジーの外部実証を行う」（未採択・未配置）— 本 ADR はその D3（定点観測指標の記録）の実装手段。草案の正式採用時に配置先パスを追記する
