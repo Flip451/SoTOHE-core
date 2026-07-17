@@ -1,6 +1,57 @@
 {
   "schema_version": 2,
   "scopes": {
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
+          "at": "2026-07-16T16:47:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
+          "at": "2026-07-16T16:51:00Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:734204aefc5877342cf30390e9a5c795b5aa18f1ffc6b774c1ae914623b5fc0c",
+          "at": "2026-07-16T16:09:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D6 explicitly retains the cache-directory preparation task in the distributed Docker environment file and retains `CARGO_TARGET_DIR_RELATIVE`, but this consequence says both the preparation and target-directory environment plumbing disappear from the distribution. The downstream spec cannot consistently derive the optional Docker variant from these conflicting requirements. Clarify that they disappear only from the default host path, or revise D6/D8 accordingly.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+              "line": 126,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:734204aefc5877342cf30390e9a5c795b5aa18f1ffc6b774c1ae914623b5fc0c",
+          "at": "2026-07-16T16:13:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6dc29625f9136f6988c8ea10b486d23725f81250720f7dc1d30cf7a6e00bbfda",
+          "at": "2026-07-16T16:17:46Z"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -233,112 +284,6 @@
         }
       ]
     },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
-          "at": "2026-07-16T16:47:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
-          "at": "2026-07-16T16:51:00Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 includes the behavioral promise that the distributed Makefile requires no manual synchronization with the source repository, but no acceptance criterion deterministically verifies that property. AC-01 verifies task-set provenance/exclusions only, not absence of a synchronization obligation or mechanism.",
-              "severity": "P1",
-              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
-              "line": 10,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:eb703b048c7f7b2e1b8f273d6e3b00394d4d86730aa132900ca161d44d426b73",
-          "at": "2026-07-16T16:48:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e0723f02dad8586a7aa034ab35fcd7342abfa0d754bc15d6e7dd8842453836e5",
-          "at": "2026-07-16T16:49:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`coding-principles.md#No Panics in Library Code` は `libs/` / `apps/` の Rust プロダクションコード向け規約だが、この spec の in_scope は配布 Makefile、workflow、CI、bootstrap、設定、文書に限定され、Rust ライブラリコードの変更を含まない。したがって、この `related_conventions` は narrative-level で明確に scope 外であり、下流計画に無関係な実装制約を持ち込む。",
-              "severity": "P1",
-              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
-              "line": 385,
-              "category": "broken cross-reference at narrative level"
-            },
-            {
-              "message": "`prefer-type-safe-abstractions.md#Rule` は Rust の型設計やバグクラス排除を扱う規約だが、この spec には型、domain model、Rust API の設計・変更がない。この参照も本 behavioral contract と無関係で、下流の type design / impl-plan を誤誘導する off-topic な `related_conventions` になっている。",
-              "severity": "P1",
-              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
-              "line": 389,
-              "category": "broken cross-reference at narrative level"
-            }
-          ],
-          "hash": "rvw1:sha256:e0723f02dad8586a7aa034ab35fcd7342abfa0d754bc15d6e7dd8842453836e5",
-          "at": "2026-07-16T16:54:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:016970402214fe947c077bac4642c3d0f2558117e9cf9a7f8ceb1deaf3f409c3",
-          "at": "2026-07-16T16:56:35Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:734204aefc5877342cf30390e9a5c795b5aa18f1ffc6b774c1ae914623b5fc0c",
-          "at": "2026-07-16T16:09:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D6 explicitly retains the cache-directory preparation task in the distributed Docker environment file and retains `CARGO_TARGET_DIR_RELATIVE`, but this consequence says both the preparation and target-directory environment plumbing disappear from the distribution. The downstream spec cannot consistently derive the optional Docker variant from these conflicting requirements. Clarify that they disappear only from the default host path, or revise D6/D8 accordingly.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
-              "line": 126,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:734204aefc5877342cf30390e9a5c795b5aa18f1ffc6b774c1ae914623b5fc0c",
-          "at": "2026-07-16T16:13:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6dc29625f9136f6988c8ea10b486d23725f81250720f7dc1d30cf7a6e00bbfda",
-          "at": "2026-07-16T16:17:46Z"
-        }
-      ]
-    },
     "harness-policy": {
       "rounds": [
         {
@@ -519,6 +464,35 @@
           "findings": [],
           "hash": "rvw1:sha256:ca1635a0ec2b668005a23b8b465e94c37cd9e9f0511edf6632507aa4213dcb63",
           "at": "2026-07-17T00:56:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e66203764946c6de29b8e2f8656adb31dac5991d0035ae757b62f5d90562222a",
+          "at": "2026-07-17T01:27:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new command summary is broader than the Command Policy it cites. `cargo make ci-track` is neither listed in `.codex/instructions.md` nor allowed by `.codex/rules/default.rules`, while the namespace-wide `bin/sotp git` / `pr` / `track` wording includes many subcommands beyond the specifically allowed prefixes. This leaves the root agent instructed to use commands outside its declared Codex policy. Use the exact permitted command forms or defer entirely to the linked Command Policy.",
+              "severity": "P1",
+              "file": ".codex/agents/orchestrator.toml",
+              "line": 16,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:e66203764946c6de29b8e2f8656adb31dac5991d0035ae757b62f5d90562222a",
+          "at": "2026-07-17T01:31:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b39ba4a8c209ff3965d8bf369bacc6349038912d0f4d19ae89ba7e09a361f8f",
+          "at": "2026-07-17T01:37:52Z"
         }
       ]
     },
@@ -677,6 +651,61 @@
           "findings": [],
           "hash": "rvw1:sha256:f76fee48b92e92da058a1f55182a75edddc2bc008a3a898799dd2c6751514216",
           "at": "2026-07-17T00:22:27Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 includes the behavioral promise that the distributed Makefile requires no manual synchronization with the source repository, but no acceptance criterion deterministically verifies that property. AC-01 verifies task-set provenance/exclusions only, not absence of a synchronization obligation or mechanism.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
+              "line": 10,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:eb703b048c7f7b2e1b8f273d6e3b00394d4d86730aa132900ca161d44d426b73",
+          "at": "2026-07-16T16:48:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0723f02dad8586a7aa034ab35fcd7342abfa0d754bc15d6e7dd8842453836e5",
+          "at": "2026-07-16T16:49:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`coding-principles.md#No Panics in Library Code` は `libs/` / `apps/` の Rust プロダクションコード向け規約だが、この spec の in_scope は配布 Makefile、workflow、CI、bootstrap、設定、文書に限定され、Rust ライブラリコードの変更を含まない。したがって、この `related_conventions` は narrative-level で明確に scope 外であり、下流計画に無関係な実装制約を持ち込む。",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
+              "line": 385,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`prefer-type-safe-abstractions.md#Rule` は Rust の型設計やバグクラス排除を扱う規約だが、この spec には型、domain model、Rust API の設計・変更がない。この参照も本 behavioral contract と無関係で、下流の type design / impl-plan を誤誘導する off-topic な `related_conventions` になっている。",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
+              "line": 389,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:e0723f02dad8586a7aa034ab35fcd7342abfa0d754bc15d6e7dd8842453836e5",
+          "at": "2026-07-16T16:54:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:016970402214fe947c077bac4642c3d0f2558117e9cf9a7f8ceb1deaf3f409c3",
+          "at": "2026-07-16T16:56:35Z"
         }
       ]
     }
