@@ -254,6 +254,19 @@ dependencies = ["task-contract-coverage"]
 command = "bin/sotp"
 args = ["task-contract", "check"]
 
+[tasks.task-contract-coverage-local]
+private = true
+description = "[internal] Verify task-contract attribution completeness without a nightly signal refresh for CI"
+command = "bin/sotp"
+args = ["task-contract", "coverage"]
+
+[tasks.task-contract-check-local]
+private = true
+description = "[internal] Verify task-contract liveness without a nightly signal refresh for CI"
+dependencies = ["task-contract-coverage-local"]
+command = "bin/sotp"
+args = ["task-contract", "check"]
+
 # ---------------------------------------------------------------------------
 # CI aggregates
 # ---------------------------------------------------------------------------
@@ -268,7 +281,7 @@ dependencies = ["fmt-check", "clippy", "test", "test-doc", "deny", "check-layers
 
 [tasks.ci-track]
 description = "[gate] Run track-aware CI gates. Requires a track/<id> branch."
-dependencies = ["task-contract-check", "verify-spec-states-current", "signal-check-impl-catalog", "verify-catalogue-spec-refs", "check-catalogue-spec-signals"]
+dependencies = ["task-contract-check-local", "verify-spec-states-current", "signal-check-impl-catalog", "verify-catalogue-spec-refs", "check-catalogue-spec-signals"]
 
 # ---------------------------------------------------------------------------
 # Review and guarded commit

@@ -2,7 +2,7 @@
 
 #![allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -77,6 +77,37 @@ fn task_names(makefile: &str) -> BTreeSet<&str> {
         .collect()
 }
 
+fn task_dependency_closure(makefile: &str, task_name: &str) -> BTreeSet<String> {
+    let mut dependencies = BTreeMap::<String, BTreeSet<String>>::new();
+    let mut current_task = None;
+
+    for line in makefile.lines() {
+        if let Some(name) = line.strip_prefix("[tasks.").and_then(|name| name.strip_suffix(']')) {
+            current_task = Some(name);
+        } else if let (Some(task), Some(values)) = (
+            current_task,
+            line.trim()
+                .strip_prefix("dependencies = [")
+                .and_then(|values| values.strip_suffix(']')),
+        ) {
+            dependencies.insert(
+                task.to_owned(),
+                values.split(',').map(|value| value.trim().trim_matches('"').to_owned()).collect(),
+            );
+        }
+    }
+
+    let mut closure = BTreeSet::new();
+    let mut pending = vec![task_name.to_owned()];
+    while let Some(task) = pending.pop() {
+        if closure.insert(task.clone()) {
+            pending.extend(dependencies.get(&task).into_iter().flatten().cloned());
+        }
+    }
+
+    closure
+}
+
 fn collect_text_files(path: &Path, files: &mut Vec<PathBuf>) {
     if path.is_file() {
         if matches!(
@@ -146,6 +177,8 @@ fn test_exported_scaffold_makefile_has_only_host_first_workflow_tasks() {
         "task-contract-refresh-impl-catalog",
         "task-contract-coverage",
         "task-contract-check",
+        "task-contract-coverage-local",
+        "task-contract-check-local",
         "ci-rust",
         "ci",
         "ci-track",
@@ -164,6 +197,19 @@ fn test_exported_scaffold_makefile_has_only_host_first_workflow_tasks() {
             .matches("args = [\"track\", \"views\", \"validate\", \"--project-root\", \".\"]")
             .count(),
         1
+    );
+}
+
+#[test]
+fn test_exported_ci_track_avoids_nightly_refresh_dependency() {
+    let makefile = exported_file("Makefile.toml");
+    let closure = task_dependency_closure(&makefile, "ci-track");
+
+    assert!(closure.contains("task-contract-coverage-local"));
+    assert!(closure.contains("task-contract-check-local"));
+    assert!(
+        !closure.contains("task-contract-refresh-impl-catalog"),
+        "ci-track must not depend on the nightly-required implementation-catalogue refresh: {closure:?}"
     );
 }
 
