@@ -111,10 +111,12 @@ jobs:
         # track-aware gates (spec/catalogue/impl signal chains) require a
         # track/<id> branch context. The recreation step above supplies that
         # context only for track/* heads. This gate's condition is deliberately
-        # broader: it skips only the develop → main release PR; every other PR,
-        # including a non-track head without context, runs the gate and fails
-        # closed. Push (main / develop) runs are outside this PR-only gate.
-        if: github.event_name == 'pull_request' && !(github.head_ref == 'develop' && github.base_ref == 'main')
+        # broader: it skips only this repository's own develop → main release PR
+        # (the head-repo identity check excludes fork branches merely named
+        # "develop"); every other PR, including a non-track head without context,
+        # runs the gate and fails closed. Push (main / develop) runs are outside
+        # this PR-only gate.
+        if: github.event_name == 'pull_request' && !(github.head_ref == 'develop' && github.base_ref == 'main' && github.event.pull_request.head.repo.full_name == github.repository)
         run: docker exec -e CARGO_INCREMENTAL=0 -e CARGO_HOME=/usr/local/cargo -e CARGO_TARGET_DIR=/cargo-target ci-runner cargo make ci-track-container
 
       - name: Show sccache stats
