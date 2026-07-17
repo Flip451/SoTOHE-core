@@ -162,7 +162,7 @@ with `failed` (tooling error).
 | aspect | dry-fix-lead (this capability) | review-fix-lead |
 |---|---|---|
 | output | DRY refactors across workspace + status report | fixes within one review scope + status report |
-| scope | whole workspace (DRY violations cross layers) | single review scope, bounded to `bin/sotp review files --scope <scope>` result |
+| scope | whole workspace (some DRY violations span layers) | single review scope, bounded to `bin/sotp review files --scope <scope>` result |
 | trigger | orchestrator assigns track-id for DFP | orchestrator assigns scope + `round_type` |
 | artifact written | source files across workspace; `dry-check.json` via `sotp dry write` only | source files within scope boundary |
 | verdict source | `bin/sotp dry check-approved` (reads `dry-check.json`) | `bin/sotp review results` (reads `review.json`) |

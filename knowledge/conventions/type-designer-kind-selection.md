@@ -300,8 +300,8 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 
 - [ ] 各 entry の `role` × layer の組合せが R1 マトリクスで OK か (✗ / ONLY 違反がないか、`DomainService` は infrastructure 層に置かれていないか)
 - [ ] zero-field struct + 1 method の entry がないか (あれば R2: `role: FreeFunction` に折り畳めないか確認)
-- [ ] `role: ValueObject` の entry がすべて R3 を満たすか (validated value のみで behavior を持たないか、`methods` が空か — ただし typestate state の entry は遷移メソッドを `methods` に持つため例外)
-- [ ] field + behavior を持つ domain struct が `role: DomainService` (R6) で起草されているか (`role: ValueObject` / `role: Interactor` への誤分類がないか)
+- [ ] `role: ValueObject` の entry がすべて R3 を満たすか (値等価で識別され、`methods` が生成時に不変条件を確立する constructor / validation、または自身の値から値または述語を導出する side-effect-free なものに限られるか。依存や外部リソースを扱う service 的 behavior がないか。typestate state の entry は遷移メソッドを `methods` に持つ)
+- [ ] R6 の採用条件を満たし、値等価で識別される ValueObject (R3) ではない service 中心の field + behavior を持つ domain struct が `role: DomainService` で起草されているか (`role: ValueObject` / `role: Interactor` への誤分類がないか)
 - [ ] role 起草前に偵察 (R4) を実施したか (近接 track の role 分布を確認したか)
 - [ ] catch-all として `role: ValueObject` / `role: UseCase` を選んでいないか (R5)
 - [ ] top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の型を指す entry の `trait_ref` で参照するすべての trait (port) が当該 track の catalogue に `traits` エントリ (role は `SecondaryPort` または `Repository`) として declare されているか (R7)。baseline 由来の port は `action: "reference"` で declare されているか

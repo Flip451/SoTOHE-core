@@ -189,7 +189,7 @@ Return exactly one of the following statuses:
 | aspect | review-fix-lead (this capability) | dry-fix-lead | rollback-diagnoser |
 |---|---|---|---|
 | output | fixes within one review scope + status report | source-code DRY refactors + status report | structured routing decision |
-| scope | single review scope, bounded to `bin/sotp review files --scope <scope>` result | whole workspace (DRY violations cross layers) | read-only |
+| scope | single review scope, bounded to `bin/sotp review files --scope <scope>` result | whole workspace (some DRY violations span layers) | read-only |
 | trigger | orchestrator assigns scope + `round_type` | orchestrator assigns track-id for DFP | orchestrator passes diagnostic text |
 | artifact written | source files within scope boundary | source files across workspace | none |
 | verdict source | `bin/sotp review results` (reads `review.json`) | `bin/sotp dry check-approved` (reads `dry-check.json`) | none |

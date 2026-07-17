@@ -129,6 +129,39 @@
         }
       ]
     },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25dc0b504f4840afa786dc0940927d45a6c18a4a82a75140c72b0735351b9da9",
+          "at": "2026-07-17T19:21:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-01 は依存・配置規則を人間可読文書に再記述せず SSoT 参照だけで表現するよう要求していますが、IN-04／AC-05 は調査プロンプトと architecture guard に domain/usecase の二層配置を示すことを、AC-08 は CLAUDE.md に delivery crate の具体的な依存関係を示すことを要求しています。参照だけでは後者を満たせず、具体的に記述すれば CN-01 に違反するため、契約を同時に充足できません。許容する要約と禁止する再記述の境界を明確化する必要があります。",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/spec.json",
+              "line": 188,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:25dc0b504f4840afa786dc0940927d45a6c18a4a82a75140c72b0735351b9da9",
+          "at": "2026-07-17T19:24:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31e2395e6a0cb34cab34fec57059f13e580d82e7396e0b798f80e7992e5ed9ed",
+          "at": "2026-07-17T19:26:22Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -224,6 +257,78 @@
           "findings": [],
           "hash": "rvw1:sha256:a4bd5f944964779ad75a769e0f3e44e1f36fb29307037d270b8539e54157dd80",
           "at": "2026-07-17T20:08:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a64159412781779ee6dd91df5e2499986f28ba3e1aa38ffff568cedcfe56f5c8",
+          "at": "2026-07-17T20:53:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The revised checklist limits every ValueObject method to deriving a value or predicate from an existing value, but R3 explicitly permits invariant-establishing constructors such as `Email::new()` (lines 96–100). Following this checklist would reject an R3-approved ValueObject; include constructors/validation methods in the allowed wording.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 303,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "This item still requires every field-plus-behavior domain struct to be a `DomainService` and treats `ValueObject` as a misclassification. That contradicts R3/R6, which now classify value-equal, field-bearing types with side-effect-free derivation methods (for example `Email::normalized()`) as ValueObjects. Narrow this check to service-centric, non-value behavior.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 304,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a64159412781779ee6dd91df5e2499986f28ba3e1aa38ffff568cedcfe56f5c8",
+          "at": "2026-07-17T20:57:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f16a040dda659c2e6dcd59f8db64646a6e4538c454a7f41a518afe928f507d6",
+          "at": "2026-07-17T21:00:34Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
+          "at": "2026-07-17T19:21:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
+          "at": "2026-07-17T19:25:01Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab9ae42a419132aa39ac291dc31350237351b4049d5d5ea5ab47930afeed1b86",
+          "at": "2026-07-17T19:48:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab9ae42a419132aa39ac291dc31350237351b4049d5d5ea5ab47930afeed1b86",
+          "at": "2026-07-17T19:50:24Z"
         }
       ]
     },
@@ -477,75 +582,6 @@
           "findings": [],
           "hash": "rvw1:sha256:469d9716f9a26e5af9718f25fb0c648aa8cae5f8a095e77f743456faf06477af",
           "at": "2026-07-17T20:15:24Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab9ae42a419132aa39ac291dc31350237351b4049d5d5ea5ab47930afeed1b86",
-          "at": "2026-07-17T19:48:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ab9ae42a419132aa39ac291dc31350237351b4049d5d5ea5ab47930afeed1b86",
-          "at": "2026-07-17T19:50:24Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25dc0b504f4840afa786dc0940927d45a6c18a4a82a75140c72b0735351b9da9",
-          "at": "2026-07-17T19:21:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-01 は依存・配置規則を人間可読文書に再記述せず SSoT 参照だけで表現するよう要求していますが、IN-04／AC-05 は調査プロンプトと architecture guard に domain/usecase の二層配置を示すことを、AC-08 は CLAUDE.md に delivery crate の具体的な依存関係を示すことを要求しています。参照だけでは後者を満たせず、具体的に記述すれば CN-01 に違反するため、契約を同時に充足できません。許容する要約と禁止する再記述の境界を明確化する必要があります。",
-              "severity": "P1",
-              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/spec.json",
-              "line": 188,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:25dc0b504f4840afa786dc0940927d45a6c18a4a82a75140c72b0735351b9da9",
-          "at": "2026-07-17T19:24:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31e2395e6a0cb34cab34fec57059f13e580d82e7396e0b798f80e7992e5ed9ed",
-          "at": "2026-07-17T19:26:22Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
-          "at": "2026-07-17T19:21:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
-          "at": "2026-07-17T19:25:01Z"
         }
       ]
     },
