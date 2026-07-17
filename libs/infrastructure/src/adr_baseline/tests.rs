@@ -92,6 +92,18 @@ fn test_adr_baseline_ledger_codec_round_trips_entry() {
 }
 
 #[test]
+fn test_adr_baseline_ledger_codec_init_record_omits_reason_key() {
+    let encoded = encode_ledger_entry(&entry()).unwrap();
+    let record = serde_json::from_str::<serde_json::Value>(&encoded).unwrap();
+
+    assert!(
+        !record.as_object().unwrap().contains_key("reason"),
+        "init ledger records must omit an absent reason"
+    );
+    assert_eq!(decode_ledger_line(&encoded).unwrap(), entry());
+}
+
+#[test]
 fn test_fs_adr_baseline_store_appends_identical_snapshot_without_duplicate_copy() {
     let temp = tempfile::tempdir().unwrap();
     let store = FsAdrBaselineStore::from(temp.path().to_path_buf());

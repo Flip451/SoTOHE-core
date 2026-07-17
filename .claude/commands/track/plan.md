@@ -17,7 +17,9 @@ User invokes this command as `/track:plan`. `$ARGUMENTS`:
 
 - **Progress tracking**: use `TaskCreate` to register Phase 0–3 steps + Termination as tasks.
 - **Timestamps**: `date -u +"%Y-%m-%dT%H:%M:%SZ"` (ISO 8601 UTC) — manual input is forbidden.
-- **Phase 0** (`/track:init`): run by reading `.claude/commands/track/init.md`.
+- **Phase 0** (`/track:init`): the orchestrator selects the relevant primary ADR's direct
+  filename under `knowledge/adr/` and passes it explicitly with the feature name. Run by reading
+  `.claude/commands/track/init.md`; do not infer the filename from the feature name.
 - **Phase writer dispatch** — write the phase briefing, then invoke the matching
   `bin/sotp capability exec <capability> --host claude --briefing-file <path>` command. The
   dispatcher resolves the capability's provider internally from

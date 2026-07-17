@@ -124,6 +124,19 @@ Before writing new parsing/analysis logic, verify the following:
 
 Reference: `knowledge/conventions/shell-parsing.md`
 
+## ADR Baseline Guardrail
+
+ADR baseline copies and `ledger.jsonl` under `track/items/<id>/adr-baseline/` are machine-owned.
+Only `bin/sotp adr-baseline snapshot` may add them and only `bin/sotp adr-baseline restore` may
+restore an ADR from them. Never hand-edit, copy, delete, or re-create a baseline record. The
+orchestrator supplies the primary ADR filename at init; the pre-review check derives it from the
+ledger's init record. `ADR_BASELINE_PRIMARY_SOURCE` is available only as an explicit override. A
+failed `check-review` or `check-commit` is fail-closed; use the diagnoser/recovery path instead
+of bypassing the gate.
+
+This is an independent byte-comparison guard. Do not weaken or modify `adr_user` evaluation or
+`.harness/config/signal-gates.json` to accommodate it.
+
 ## Reviewer Capability Constraint
 
 The `reviewer` capability delegates to a provider defined in `.harness/config/agent-profiles.json`.

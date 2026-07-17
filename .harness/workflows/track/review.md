@@ -25,6 +25,9 @@ briefing preparation, and capability dispatching.
   `## Related Conventions (Required Reading)` section of `spec.md` (or `plan.md` for legacy
   tracks). For exact type signatures / module trees / Mermaid diagrams, `## Canonical Blocks`
   in `plan.md` is the source of truth.
+- **Primary ADR source filename** — the review prelude derives the init-stamped direct
+  `knowledge/adr/` Markdown filename from this track's ledger. Set
+  `ADR_BASELINE_PRIMARY_SOURCE` only when an explicit override is required.
 
 ## Sequence
 
@@ -34,7 +37,18 @@ Extract the track id from the current git branch (`track/<id>`). Read the curren
 `spec.md`, `plan.md`, `metadata.json`, and every convention listed under
 `## Related Conventions (Required Reading)`.
 
-**Step 1: Resolve dispatch capabilities**
+**Step 1: Verify the primary ADR baseline and resolve dispatch capabilities**
+
+Before any reviewer or fixer can modify the worktree, run:
+
+```
+cargo make adr-baseline-check-review
+```
+
+This fails closed when the ledger or required init snapshot is absent, or when the current ADR
+differs from that snapshot. `ADR_BASELINE_PRIMARY_SOURCE` is an optional explicit override. The
+same gate is a dependency of both review wrappers. A byte mismatch enters the ADR-baseline recovery route in
+`.harness/workflows/track/diagnose.md` before any reviewer or fixer is dispatched.
 
 Confirm that `bin/sotp review local` and the `review-fix-lead` dispatch wrapper are available.
 Provider / model resolution for the reviewer and the fixer is owned by the CLI
@@ -87,6 +101,13 @@ Every briefing must include one sentence requiring that findings matching the se
 be enumerated in full for the round — all matches reported, not truncated after the first
 finding — with the same sentence stating that the severity constraints themselves remain
 unchanged.
+
+For an ADR scope, every briefing must also include this framework-owned reviewer instruction:
+do not change an ADR's semantics from its recorded baseline; report a semantic concern as an
+amendment proposal rather than applying an in-place ADR edit; and, if the baseline check blocks,
+stop and return control to the orchestrator's `adr-diagnoser` route. Only a
+`non-semantic-restamp` verdict can lead to a new baseline snapshot. This standing methodology is
+not a consumer-owned severity preference and cannot be relaxed by a scope policy.
 
 The CLI auto-injects the scope file list and severity policy. Do NOT hand-author the
 `## Scope-specific severity policy` section: scopes with `briefing_file` configured in
@@ -179,16 +200,22 @@ Once any local round is recorded, the bypass is no longer available.
 
 | Step | Gate | Verdict |
 |------|------|---------|
+| 1 | `cargo make adr-baseline-check-review` exits 0 | pass / fail |
 | 2 | `bin/sotp review results` produces scope list | required / approved / not required |
 | 5 | Each `required` scope reaches `final` `zero_findings` | completed / blocked / failed |
 | 6a | `cargo make ci` exits 0 | pass / fail |
 | 6b | `bin/sotp review check-approved` exits 0 | pass / fail |
 
-All four gates must pass before the workflow reports readiness.
+All five gates must pass before the workflow reports readiness.
 
 ## Failure / recovery
 
 - **Non-track branch**: stop and instruct the caller to switch to the `track/<id>` branch.
+- **ADR baseline review check failure**: stop before dispatching a reviewer or fixer. For a
+  missing init snapshot, use the sanctioned init snapshot route. For a byte mismatch, invoke the
+  ADR-baseline recovery route in `diagnose.md`: dispatch `adr-diagnoser`; a
+  `non-semantic-restamp` verdict permits `snapshot --kind non-semantic-fix` and a retry, while a
+  `deviation` or `unknown-editor` verdict requires `restore` before the review can restart.
 - **Fixer `blocked_cross_scope`**: fix the cross-scope dependencies from the orchestrator
   context, then relaunch the affected scope.
 - **Fixer `failed` / timeout**: relaunch (up to 2 retries). If retries also fail, report to

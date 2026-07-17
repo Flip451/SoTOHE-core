@@ -6,26 +6,40 @@ description: Diagnose a phase-rollback target for an impl-phase or later structu
 
 ## Invocation
 
-User (or the orchestrator's main loop) invokes this command as `/track:diagnose`.
-
-- `$ARGUMENTS`: the diagnostic input — a PreReviewGate Blocked summary, a review finding on an
-  SoT scope, or a free-form reviewer comment. May be passed inline or via a
-  `--briefing-file <path>` reference. If empty, ask the user for the diagnostic input and stop.
+The orchestrator invokes this command as `/track:diagnose --briefing-file <path>`. The briefing
+is prepared by the caller before this read-only command starts and must contain either an
+ADR-baseline byte-mismatch report (including its source filename, active track id, latest-baseline
+diff, and originating capability when known) or a PreReviewGate Blocked summary, a SoT-scope
+review finding, or a free-form reviewer comment. If `--briefing-file` is absent or empty, stop
+and ask the caller for a complete briefing path; inline diagnostic input is not supported.
 
 ## Claude Code invocation constraints
 
-- Write the diagnostic briefing, then run
-  `bin/sotp capability exec rollback-diagnoser --host claude --briefing-file <path>`. The
-  dispatcher resolves the provider and model internally from
-  `.harness/config/agent-profiles.json`, validates the provider-native read-only definition,
-  and either completes the dispatch or returns the in-host delegation instruction to follow.
-- This command performs no writes: no SoT artifact edits, no staging/commits, no writer
-  subagent invocation, no mutating `bin/sotp` subcommands (see the workflow SSoT's
-  Constraints section).
+- For an ADR-baseline byte mismatch, dispatch `adr-diagnoser` with the caller-supplied briefing:
+  `bin/sotp capability exec adr-diagnoser --host claude --briefing-file <path>`. For every other
+  input, dispatch `rollback-diagnoser` with the same form. The dispatcher resolves provider and
+  model internally from `.harness/config/agent-profiles.json`, validates the provider-native
+  read-only definition, and either completes the dispatch or returns the in-host delegation
+  instruction to follow.
+- This command and both diagnosers are strictly read-only: do not create the briefing here, edit
+  SoT artifacts, stage/commit, invoke writer subagents, or run mutating `bin/sotp` subcommands.
+  After a verdict returns, only the calling orchestrator may run ADR-baseline snapshot or restore
+  outside this diagnose workflow.
 
 ## Report format
 
-After execution, return the structured routing decision verbatim to the caller:
+After execution, return the matching structured verdict verbatim to the caller. For an
+ADR-baseline mismatch:
+
+```
+{
+  "verdict": "non-semantic-restamp" | "deviation" | "unknown-editor",
+  "reason": "<Japanese explanation>",
+  "recommended_next_action": "<Japanese orchestrator action>"
+}
+```
+
+For every other diagnostic input:
 
 ```
 {
@@ -35,12 +49,13 @@ After execution, return the structured routing decision verbatim to the caller:
 }
 ```
 
-The orchestrator then dispatches per the workflow SSoT's "Step 3" table and may override the
-suggested target if it judges `reason` insufficiently convincing.
+The orchestrator then performs the workflow SSoT's post-verdict action outside this command:
+ADR-baseline snapshot/restore for an ADR verdict, or routing dispatch for a rollback verdict.
 
 ## References
 
 - `.harness/workflows/track/diagnose.md` — provider-agnostic workflow SSoT
+- `.harness/capabilities/adr-diagnoser.md` — ADR-baseline verdict contract
 - `.harness/capabilities/rollback-diagnoser.md` — capability operational contract
 - `.claude/agents/rollback-diagnoser.md` — Claude subagent wrapper
 - `.agents/skills/rollback-diagnoser/SKILL.md` — Codex skill wrapper

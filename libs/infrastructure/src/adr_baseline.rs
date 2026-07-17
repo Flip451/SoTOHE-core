@@ -36,7 +36,7 @@ struct RawLedgerRecord {
     source: String,
     hash: String,
     kind: String,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     reason: Option<String>,
     timestamp: String,
 }

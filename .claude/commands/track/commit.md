@@ -15,7 +15,7 @@ This command runs directly — no subagents. Key wrappers used:
 - `git diff --cached --stat` (read-only — verify staged scope)
 - `git show HEAD --stat` (read-only — changed files for git note)
 - Write commit message to `tmp/track-commit/commit-message.txt` (Read + Edit preferred)
-- `cargo make track-commit-message` — guarded commit (CI + commit)
+- `cargo make track-commit-message` — guarded commit (CI, ADR-baseline check, + commit)
 - Write note to `tmp/track-commit/note.md`, then `cargo make track-note`
 
 `track/registry.md` is gitignored — do NOT stage or commit it.

@@ -471,8 +471,8 @@ dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local
 
 [tasks.ci-track-local]
 private = true
-description = "[internal] Run track-aware CI gates (task-contract coverage + check liveness + signal chains spec/catalogue/impl + test-obligation check). Assumes a track/<id> branch context — fails closed on base branch / non-track branches by design."
-dependencies = ["task-contract-coverage-local", "task-contract-check-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local", "test-obligation-check-local"]
+description = "[internal] Run track-aware CI gates (task-contract coverage + check liveness + ADR-baseline freeze + signal chains spec/catalogue/impl + test-obligation check). Assumes a track/<id> branch context — fails closed on base branch / non-track branches by design."
+dependencies = ["task-contract-coverage-local", "task-contract-check-local", "adr-baseline-check-commit-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local", "test-obligation-check-local"]
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
@@ -483,8 +483,8 @@ description = "[gate] Run repo-wide CI checks inside a pre-existing container (n
 dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-machine-paths-local", "verify-template-refs-local", "template-export-smoke-local"]
 
 [tasks.ci-track-container]
-description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + check liveness + spec/catalogue/impl signal chains + test-obligation check). Skip on base branch / non-track CI runs."
-dependencies = ["task-contract-coverage-local", "task-contract-check-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local", "test-obligation-check-local"]
+description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + check liveness + ADR-baseline freeze + spec/catalogue/impl signal chains + test-obligation check). Skip on base branch / non-track CI runs."
+dependencies = ["task-contract-coverage-local", "task-contract-check-local", "adr-baseline-check-commit-local", "verify-spec-states-current-local", "signal-check-impl-catalog-local", "verify-catalogue-spec-refs-local", "check-catalogue-spec-signals-local", "test-obligation-check-local"]
 
 # Compose wrappers
 [tasks.fmt]
@@ -720,6 +720,35 @@ description = "[gate] Run the active track's pure-read test-obligation fulfillme
 command = "bin/sotp"
 args = ["test-obligation", "check"]
 
+[tasks.adr-baseline-check-review]
+description = "[gate] Verify the primary ADR has an init baseline before review. Derive its source from the active track's init ledger record; ADR_BASELINE_PRIMARY_SOURCE is an optional explicit override."
+script_runner = "@shell"
+script = ['''
+missing_primary_source() {
+  echo "[FAIL] ADR_BASELINE_PRIMARY_SOURCE must name the primary ADR Markdown file" >&2
+  exit 2
+}
+
+primary_source="${ADR_BASELINE_PRIMARY_SOURCE:-}"
+if [ -z "$primary_source" ]; then
+  track_branch="$(git branch --show-current)"
+  case "$track_branch" in
+    track/*) track_id="${track_branch#track/}" ;;
+    *) missing_primary_source ;;
+  esac
+  case "$track_id" in
+    ""|*/*|*[!a-z0-9-]*) missing_primary_source ;;
+  esac
+
+  ledger="track/items/$track_id/adr-baseline/ledger.jsonl"
+  [ -s "$ledger" ] || missing_primary_source
+  primary_source="$(jq -r -s '[.[] | select(.kind == "init") | .source] | unique | if length == 1 then .[0] else empty end' "$ledger")" || missing_primary_source
+  [ -n "$primary_source" ] || missing_primary_source
+fi
+
+bin/sotp adr-baseline check-review --primary-source "$primary_source"
+''']
+
 [tasks.track-active-gate]
 private = true
 description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec → catalogue-lint check-active-track → catalog check → views sync. Both track-commit-message and review invocations depend on this shared task. Fail-closed: non-zero exit aborts the chain."
@@ -779,11 +808,17 @@ description = "[internal] Pure-read test-obligation fulfillment gate. Active tra
 command = "cargo"
 args = ["run", "--quiet", "-p", "cli", "--", "test-obligation", "check"]
 
+[tasks.adr-baseline-check-commit-local]
+private = true
+description = "[internal] Verify recorded and currently required ADR baselines. Active track auto-resolved by CLI; cargo-run keeps CI on the current source tree."
+command = "cargo"
+args = ["run", "--quiet", "-p", "cli", "--", "adr-baseline", "check-commit"]
+
 # Cargo-make dependencies run before task scripts, so pre-gate track/branch
 # guards must live outside these wrappers or inside the gate commands.
 [tasks.track-local-review]
-description = "[wrapper] Fire attribution-completeness + liveness gates (via task-contract-check), refresh signals + rendered views (via track-active-gate), then invoke a single reviewer round via bin/sotp review local. Both gates auto-resolve the active track from the current git branch. Running track-active-gate after task-contract-check ensures the reviewer sees view artifacts rendered from the latest signal state (the fixer's between-rounds code edits would otherwise leave *-types.md stale)."
-dependencies = ["task-contract-check", "track-active-gate"]
+description = "[wrapper] Verify the primary ADR init baseline, fire attribution-completeness + liveness gates (via task-contract-check), refresh signals + rendered views (via track-active-gate), then invoke a single reviewer round via bin/sotp review local. The baseline gate derives the primary ADR source from the active track's init ledger record; ADR_BASELINE_PRIMARY_SOURCE remains an optional override. Running track-active-gate after task-contract-check ensures the reviewer sees view artifacts rendered from the latest signal state (the fixer's between-rounds code edits would otherwise leave *-types.md stale)."
+dependencies = ["adr-baseline-check-review", "task-contract-check", "track-active-gate"]
 script_runner = "@shell"
 script = ['''
 case "${1:-}" in --) shift ;; esac
@@ -791,8 +826,8 @@ CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bi
 ''']
 
 [tasks.track-local-review-fix]
-description = "[wrapper] Same as track-local-review but invokes bin/sotp review fix-local instead of review local. Runs task-contract gates, then refreshes signals + rendered views before delegation. Provider-agnostic: bin/sotp resolves provider/model from .harness/config/agent-profiles.json. Active track auto-resolved from current git branch (--track-id is intentionally not accepted at the cargo-make layer)."
-dependencies = ["task-contract-check", "track-active-gate"]
+description = "[wrapper] Same as track-local-review but invokes bin/sotp review fix-local instead of review local. It first verifies the init baseline derived from the active track ledger (or ADR_BASELINE_PRIMARY_SOURCE when explicitly overridden), runs task-contract gates, then refreshes signals + rendered views before delegation. Provider-agnostic: bin/sotp resolves provider/model from .harness/config/agent-profiles.json. Active track auto-resolved from current git branch (--track-id is intentionally not accepted at the cargo-make layer)."
+dependencies = ["adr-baseline-check-review", "task-contract-check", "track-active-gate"]
 script_runner = "@shell"
 script = ['''
 case "${1:-}" in --) shift ;; esac
@@ -810,7 +845,7 @@ command = "bin/sotp"
 args = ["git", "add-from-file", "tmp/track-commit/add-paths.txt", "--cleanup"]
 
 [tasks.track-commit-message]
-description = "[wrapper] Regenerate signals + views (via track-active-gate; that gate runs no ref-verify call), then run the strict commit gate: stage working tree, full cargo make ci, track-aware cargo make ci-track, code-review gate (review not approved → BLOCK), semantic review refresh (`sotp ref-verify run` — the scope derives from track artifact existence, so pre-Phase-1 tracks pass with zero pairs; the only writing step, positioned after the code-review gate per CN-02 / IN-02), re-stage to capture verify-cache artifact writes, `sotp ref-verify check-approved` (non-Pass pairs → BLOCK; same existence-derived scope), test-obligation fulfillment gate (`sotp test-obligation check`; missing bindings / unresolved edges / stale verdicts → BLOCK), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. The regen sequence is shared with review invocations via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + ci-track + check-approved + semantic review + test-obligation + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
+description = "[wrapper] Regenerate signals + views (via track-active-gate; that gate runs no ref-verify call), then run the strict commit gate: stage working tree, full cargo make ci, track-aware cargo make ci-track (including ADR-baseline check-commit), code-review gate (review not approved → BLOCK), semantic review refresh (`sotp ref-verify run` — the scope derives from track artifact existence, so pre-Phase-1 tracks pass with zero pairs; the only writing step, positioned after the code-review gate per CN-02 / IN-02), re-stage to capture verify-cache artifact writes, `sotp ref-verify check-approved` (non-Pass pairs → BLOCK; same existence-derived scope), test-obligation fulfillment gate (`sotp test-obligation check`; missing bindings / unresolved edges / stale verdicts → BLOCK), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. The regen sequence is shared with review invocations via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + ci-track + check-approved + semantic review + test-obligation + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
 dependencies = ["track-active-gate"]
 script_runner = "@shell"
 script = ['''

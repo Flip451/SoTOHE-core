@@ -10,7 +10,8 @@
 Stage the working tree, create a guarded commit from the current track branch, and attach a
 structured git note for traceability. The commit is protected by the `cargo make track-commit-message`
 wrapper, which runs full CI (`cargo make ci`), track-aware gates (`cargo make ci-track`),
-review/ref-verify approvals, the test-obligation fulfillment gate, and the DRY gate before
+including the ADR-baseline commit check, review/ref-verify approvals, the test-obligation
+fulfillment gate, and the DRY gate before
 writing the commit. Commits from non-track branches are rejected (fail-closed). The canonical staging order is:
 implement → review → stage → commit. Staging before the final review round silently omits the
 `review.json` delta from the commit, producing a stale artifact on disk.
@@ -30,6 +31,9 @@ implement → review → stage → commit. Staging before the final review round
   proceeds; missing bindings, unresolved edges, or stale verdicts block the commit.
 - **`bin/sotp dry check-approved` exit 0** — required before the guarded commit wrapper
   proceeds.
+- **`bin/sotp adr-baseline check-commit` exit 0** — required through `cargo make ci-track`;
+  every recorded ADR must match its latest baseline and every cited, non-draft ADR must be
+  stamped.
 
 ## Sequence
 
@@ -64,11 +68,14 @@ Write the commit message to `tmp/track-commit/commit-message.txt`. Then run:
 cargo make track-commit-message
 ```
 
-This wrapper executes `cargo make ci`, `cargo make ci-track`, review/ref-verify approval
-checks, `bin/sotp test-obligation check`, and `bin/sotp dry check-approved`, then commits
+This wrapper executes `cargo make ci`, `cargo make ci-track` (including
+`bin/sotp adr-baseline check-commit`), review/ref-verify approval checks,
+`bin/sotp test-obligation check`, and `bin/sotp dry check-approved`, then commits
 from `tmp/track-commit/commit-message.txt`. It deletes the scratch file on success.
 If the commit fails (CI failure or git error), report the error and stop. Do not proceed to
-note generation.
+note generation. A byte mismatch from `adr-baseline check-commit` or its CI path is recovered
+through the ADR-baseline route in `.harness/workflows/track/diagnose.md`, not by retrying the
+guarded commit unchanged.
 
 **Step 3: Attach git note**
 
@@ -109,7 +116,7 @@ skip note generation and mention this in the summary.
 |------|------|---------|
 | 1 | Staged diff non-empty and matches intent | OK / fix-staging |
 | 1 | Current branch matches `track/<id>` | OK / ERROR |
-| 2 | `cargo make track-commit-message` exits 0 (CI + track-aware gates + commit) | OK / ERROR |
+| 2 | `cargo make track-commit-message` exits 0 (CI + ADR-baseline-aware track gates + commit) | OK / ERROR |
 
 ## Failure / recovery
 
@@ -118,9 +125,15 @@ skip note generation and mention this in the summary.
   `cargo make track-add-paths`, then re-run the workflow.
 - **Non-track branch**: switch to the track branch and re-run.
 - **`cargo make track-commit-message` failure**:
-  - CI/gate failure (fmt, clippy, test, deny, layers, verify-*, track-aware gates,
+  - CI/gate failure (fmt, clippy, test, deny, layers, verify-*, ADR-baseline-aware track gates,
     test-obligation, DRY): fix the failing gate and re-run.
     Do not re-stage — the working tree is the same. Do not proceed to note generation.
+  - ADR-baseline byte mismatch from `check-commit` or CI: stop the commit flow and enter the
+    ADR-baseline recovery route in `diagnose.md`. The orchestrator dispatches `adr-diagnoser`;
+    only `non-semantic-restamp` permits `snapshot --kind non-semantic-fix` and a retry.
+    `deviation` restores the latest baseline and injects an amendment-proposal request into the
+    originating capability briefing; `unknown-editor` restores and records the history in
+    `observations.md`.
   - git commit error: diagnose (index state, branch protection) and resolve before retrying.
 - **Note generation failure** (`cargo make track-note` non-zero): report the error. The commit
   itself already succeeded; note failure is non-fatal but should be investigated.

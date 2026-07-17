@@ -21,6 +21,7 @@ Each downstream artifact must cite its direct upstream (no layer skipping, no re
 - commit gate — `spec_adr` / `catalog_spec` strict; `adr_user` / `impl_catalog` interim (in-progress implementation may carry 🟡 into a commit, but design-chain references must already be grounded)
 - merge gate — strict on all four chains
 - pre-review task-contract gate (`bin/sotp task-contract check`, binary) — reads `impl_catalog` signals per task status via `task-contract.json`: entries attributed to done / in_progress tasks must be 🔵, todo-task entries may remain 🟡, 🔴 always blocks. Its precondition — every catalogue entry attributed to an existing task — is enforced separately by `bin/sotp task-contract coverage` (in `cargo make ci`). The gate asserts structural conformance only; body semantics remain the reviewer's lane.
+- ADR-baseline freeze gate (`bin/sotp adr-baseline`) — `/track:init` records the orchestrator-selected primary ADR with an `init` snapshot. Review wrappers derive that primary filename from the active track ledger and run `check-review` before fixers start; `ADR_BASELINE_PRIMARY_SOURCE` remains an optional explicit override. `cargo make ci-track` and guarded commits run `check-commit` for all recorded and required ADRs. This is a separate byte-comparison gate; it does not change `adr_user` evaluation or `.harness/config/signal-gates.json`.
 
 The unit of work is a **track** (one feature / fix / refactor) living on branch `track/<id>` with its artifacts under `track/items/<id>/`. The active track id is resolved from the current git branch name (branch-bound); on the base branch resolution fail-closes as `NotTrackBranch`, and only read commands with an explicit `--track-id` work there (`knowledge/conventions/branch-strategy.md`).
 
@@ -29,7 +30,7 @@ The unit of work is a **track** (one feature / fix / refactor) living on branch 
 The canonical implementation flow is **pre-track ADR → `/track:adr2pr`**:
 
 1. Author a front-matter-complete ADR under `knowledge/adr/` **before** any track exists (`knowledge/conventions/pre-track-adr-authoring.md`). YAML front-matter with grounded `decisions[]` is mandatory (`knowledge/conventions/adr.md`); ungrounded decisions are 🔴.
-2. `/track:adr2pr` — autonomous drive to a reviewed PR, no merge: init → ADR-baseline review + commit → Phase 1-3 (spec-design → type-design → impl-plan) → plan-artifacts review + commit → full-cycle (implement → DRY check → review → commit, batch-first) → pr-review. Stops with the PR open; the user merges (`/track:merge`).
+2. `/track:adr2pr <feature> --primary-adr <filename>.md` — autonomous drive to a reviewed PR, no merge: init → ADR-baseline review + commit → Phase 1-3 (spec-design → type-design → impl-plan) → plan-artifacts review + commit → full-cycle (implement → DRY check → review → commit, batch-first) → pr-review. The feature and ADR filename are forwarded unchanged to `/track:init <feature> --primary-adr <filename>.md`. Stops with the PR open; the user merges (`/track:merge`).
 3. `/track:done` — after merge, return to the configured base branch.
 
 Every pipeline stage also exists as an individual `/track:*` command (`plan` orchestrates Phase 0-3 only; `status` / `catchup` are safe anywhere). `/track:diagnose` routes impl-phase structural inconsistencies back to the phase that owns the root cause.
@@ -51,6 +52,7 @@ Workflow logic SSoT for workflow-backed track commands is `.harness/workflows/tr
 | Type contracts (Phase 2) | `track/items/<id>/<layer>-types.json` (schema: `knowledge/conventions/catalogue-schema-reference.md`) |
 | Implementation plan / spec coverage / contract attribution (Phase 3) | `track/items/<id>/impl-plan.json` + `task-coverage.json` + `task-contract.json` |
 | Architectural decisions | `knowledge/adr/` (index: `knowledge/adr/README.md`) |
+| ADR baseline ledger and verbatim copies | `track/items/<id>/adr-baseline/` (written only by `bin/sotp adr-baseline snapshot`) |
 
 Derived read-only views — never hand-edit, regenerate via `bin/sotp track views sync`: `spec.md`, `plan.md`, `track/registry.md` (gitignored), `contract-map.md`, `*-graph/`. Optional free-form manual log: `track/items/<id>/observations.md`.
 
@@ -60,6 +62,7 @@ Derived read-only views — never hand-edit, regenerate via `bin/sotp track view
 - No direct `git add` / `commit` / `merge` / `rebase` / `switch` — hooks block them; go through `cargo make` wrappers and `/track:commit` (`.claude/rules/10-guardrails.md`).
 - The orchestrator never edits SoT files directly (1 file = 1 writer): ADR → `adr-editor`, `spec.json` → `spec-designer`, catalogues → `type-designer`, `impl-plan.json` → `impl-planner`. Task state transitions go through `bin/sotp track transition`.
 - Every commit (plan artifacts included) is preceded by a reviewer-capability cycle to `zero_findings`; inline self-review is never a substitute (`knowledge/conventions/review-protocol.md`).
+- Do not manually copy, edit, or remove ADR baseline records. A missing init snapshot or a byte mismatch blocks review and commit; use the sanctioned snapshot, restore, and diagnoser routes.
 - Enforce rules by mechanism (type system > CI gate > hook > lint > docs), and prefer type-safe abstractions over lint/doc rules (`knowledge/conventions/{enforce-by-mechanism,prefer-type-safe-abstractions}.md`).
 - Read `.claude/rules/08-orchestration.md`, `09-maintainer-checklist.md`, and `10-guardrails.md` before making changes.
 
@@ -77,6 +80,7 @@ Six crates, hexagonal (`knowledge/conventions/hexagonal-architecture.md`, enforc
 - `bin/sotp track resolve` — current phase / next command / blocker
 - `bin/sotp track views sync` — regenerate `plan.md` + `registry.md`
 - `cargo make ci` — full pre-commit gate (`ci-rust` = inner Rust-only loop)
+- `cargo make ci-track` — active-track gates, including ADR-baseline `check-commit`
 - `cargo make help` — task catalogue (details: `.claude/rules/07-dev-environment.md`)
 
 ## Delegation surfaces

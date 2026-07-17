@@ -30,8 +30,11 @@ Sub-workflows used (in execution order):
 
 ## Inputs
 
-- **ADR** — a pre-track ADR under `knowledge/adr/`. If none exists, stop and ask the user to
-  author one.
+- **Feature name** — a slug-ready phrase or descriptive string. When Step 1 initializes a new
+  track, pass it unchanged as `init`'s primary argument; do not infer it from the ADR filename.
+- **ADR** — the selected pre-track ADR's direct Markdown filename under `knowledge/adr/`. If it
+  does not exist, stop and ask the user to author one. When Step 1 initializes a track, this
+  exact filename is the required primary-ADR input passed to `init`.
 - **Track initialization state** — Step 1 is conditional: if a `track/<id>` branch already
   exists with `metadata.json`, skip `init` and start at Step 2.
 - **Autonomy level** — this workflow is fully autonomous (Constraint 2). All commit messages are
@@ -51,8 +54,11 @@ is complete.
 
 If the track is already initialized (on a `track/<id>` branch with `metadata.json`), skip
 this step and start at Step 2. Otherwise, invoke the `init` workflow
-(`.harness/workflows/track/init.md`) to create the track directory, write `metadata.json`,
-and materialize the branch. On ERROR, stop and report.
+(`.harness/workflows/track/init.md`) as
+`/track:init <feature> --primary-adr <file>` to create the track directory, write
+`metadata.json`, and materialize the branch. Pass both inputs explicitly: `init` derives the
+track id from the feature and records the ADR's required `--kind init` baseline. Do not ask
+`init` to rediscover either value. On ERROR, stop and report.
 
 **Step 2: review workflow — ADR baseline**
 
