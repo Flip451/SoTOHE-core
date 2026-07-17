@@ -23,14 +23,22 @@ or failure-recovery procedures here.
 
 ### (3) Sub-workflow and capability invocation
 
-- Phase 0 is delegated to `$track-init`.
-- Phase 1 is delegated to `$track-spec-design` (which internally uses the `spec-designer`
-  capability via `.codex/agents/spec-designer.toml`).
-- Phase 2 is delegated to `$track-type-design` (which internally uses the `type-designer`
-  capability via `.codex/agents/type-designer.toml`).
-- Phase 3 is delegated to `$track-impl-plan` (which internally uses the `impl-planner`
-  capability via `.codex/agents/impl-planner.toml`).
-- Back-and-forth escalation re-invokes the upstream phase skill when a downstream signal fails.
+- Phase 0 is delegated to `$track-init`, then `$track-review`, then `$track-commit`; their
+  transition rules and inputs are owned by the plan workflow SSoT.
+- Phase 1 is delegated to `$track-spec-design` (which dispatches the `spec-designer`
+  capability through `bin/sotp capability exec`, provider resolved from
+  `.harness/config/agent-profiles.json`).
+- Phase 2 is delegated to `$track-type-design` (which dispatches the `type-designer`
+  capability the same way).
+- Phase 3 is delegated to `$track-impl-plan` (which dispatches the `impl-planner`
+  capability the same way).
+- Back-and-forth escalation transitions (lifecycle branching, guardian judgment, retry
+  counters) are owned by the plan workflow SSoT. When the SSoT selects a capability to dispatch
+  (`adr-editor`, `adr-diagnoser`, or a phase writer), invoke it through
+  `bin/sotp capability exec <capability> --host codex --briefing-file <path>` (invoke the
+  matching `.codex/agents/<capability>.toml` in-host only on
+  `CAPABILITY_EXEC_OUTCOME: delegate-in-host`); upstream phase re-invocations go through the
+  matching `$track-*` skill.
 
 ### (4) Reporting format
 

@@ -25,8 +25,11 @@ or failure-recovery procedures here.
 
 ### (3) Sub-workflow and capability invocation
 
-- The review-fix loop per scope is delegated to the `review-fix-lead` capability via
-  `$review-fix-lead` (`.codex/agents/review-fix-lead.toml`).
+- The review-fix loop per scope is dispatched through the typed-pipeline wrapper
+  `cargo make track-local-review-fix -- --scope <scope> --briefing-file <path> --round-type <fast|final>`,
+  which resolves `capabilities.review-fix-lead` internally from
+  `.harness/config/agent-profiles.json`; never invoke `$review-fix-lead`
+  (`.codex/agents/review-fix-lead.toml`) directly on an assumed provider.
 - Scope discovery and briefing preparation are handled by the workflow orchestrator (this skill).
 
 ### (4) Reporting format

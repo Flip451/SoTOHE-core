@@ -19,11 +19,22 @@ is recorded as that track's init baseline.
 - **Phase 0 input forwarding**: when Step 1 invokes
   `/track:init <feature> --primary-adr <file>`, pass both command inputs explicitly. Do not
   re-select or derive either value in `init`.
-- **Phase writer subagents** — invoke via the Agent tool with `run_in_background: true`:
-  - `spec-designer`: `subagent_type: "spec-designer"`
-  - `type-designer`: `subagent_type: "type-designer"`
-  - `impl-planner`: `subagent_type: "impl-planner"`
-  - `adr-editor` (back-and-forth escalation): `subagent_type: "adr-editor"`
+- **Phase writer capabilities** (`spec-designer` / `type-designer` / `impl-planner` /
+  `adr-editor` for back-and-forth escalation) — dispatch every invocation through
+  `bin/sotp capability exec <capability> --host claude --briefing-file <path>`. The dispatcher
+  resolves `capabilities.<name>.provider` internally from `.harness/config/agent-profiles.json`
+  and either completes the provider dispatch or returns
+  `CAPABILITY_EXEC_OUTCOME: delegate-in-host`. Only on that outcome invoke the Agent tool
+  (`subagent_type: "<capability>"`, `run_in_background: true`) with the briefing path and
+  discipline body as the task prompt. Never invoke a capability's Agent-tool subagent without
+  that delegation outcome; this adapter must not resolve or assume the provider itself. Pass
+  `--resume` only when continuing the same assignment (`.claude/rules/08-orchestration.md`).
+- **Autonomy boundary (Phase 0 user approval)**: the workflow SSoT's fully-autonomous
+  constraint carries one mandated exception per
+  `knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権 — when the
+  Phase 0 ADR-baseline review reaches `zero_findings`, stop and escalate to the user with the
+  init-stamp diff and any guardian-withheld proposals; only after user approval may the
+  post-approval stamp and ADR-baseline commit proceed. No other step pauses for confirmation.
 - **Staging**: `bin/sotp git add-all`
 - **Commit**: write to `tmp/track-commit/commit-message.txt`, then `cargo make track-commit-message`
 

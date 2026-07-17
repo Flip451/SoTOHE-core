@@ -23,10 +23,15 @@ or failure-recovery procedures here.
 
 ### (3) Sub-workflow and capability invocation
 
-- The spec.json authoring is delegated entirely to the `spec-designer` capability via
-  `.codex/agents/spec-designer.toml`.
-- Back-and-forth escalation (when the spec → ADR signal turns red) re-invokes the
-  `adr-editor` capability via `.codex/agents/adr-editor.toml`.
+- The spec.json authoring is delegated to the `spec-designer` capability via
+  `bin/sotp capability exec spec-designer --host codex --briefing-file <path>`; the dispatcher
+  resolves the provider from `.harness/config/agent-profiles.json`. Invoke
+  `.codex/agents/spec-designer.toml` in-host only when the dispatcher returns
+  `CAPABILITY_EXEC_OUTCOME: delegate-in-host`.
+- This skill is single-shot per the workflow SSoT: when the spec → ADR signal turns red,
+  surface the failing element ids and cited ADR paths back to the caller (`$track-plan`), which
+  owns the back-and-forth escalation (adr-editor dispatch, retry counters). Do not dispatch
+  `adr-editor` from inside this skill.
 
 ### (4) Reporting format
 

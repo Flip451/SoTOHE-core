@@ -116,11 +116,13 @@ Only `bin/sotp adr-baseline snapshot` may add them and only `bin/sotp adr-baseli
 restore an ADR from them. Never hand-edit, copy, delete, or re-create a baseline record. At Phase
 0, the orchestrator designates primary ADR source(s) by init-stamping them; the ledger init
 records are the designation records, with no separate primary identity. The pre-review CLI
-requires a nonempty init-record designation set, then verifies every recorded ledger copy and
-byte-matches every recorded ADR against its latest baseline. `--primary-source <file>` is
-available only for a direct `bin/sotp adr-baseline check-review` invocation. Spec-cited ADR
-coverage is enforced separately at the commit gate. A failed `check-review` or `check-commit` is
-fail-closed; use the diagnoser/recovery path instead of bypassing the gate.
+requires a nonempty init-record designation set and verifies every recorded ledger copy; a
+current ADR that differs from its latest baseline is a normal Phase 0 draft state and does not
+block review. `--primary-source <file>` is available only for a direct
+`bin/sotp adr-baseline check-review` invocation. Byte matching fail-closes at the commit gate
+and track-aware CI (`check-commit`); spec-cited ADR coverage is enforced separately at the
+commit gate. A failed `check-review` or `check-commit` is fail-closed; use the
+diagnoser/recovery path instead of bypassing the gate.
 
 This is an independent byte-comparison guard. Do not weaken or modify `adr_user` evaluation or
 `.harness/config/signal-gates.json` to accommodate it.

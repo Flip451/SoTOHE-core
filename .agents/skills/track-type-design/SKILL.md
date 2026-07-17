@@ -23,10 +23,15 @@ or failure-recovery procedures here.
 
 ### (3) Sub-workflow and capability invocation
 
-- The type catalogue authoring is delegated entirely to the `type-designer` capability via
-  `.codex/agents/type-designer.toml`.
-- Back-and-forth escalation (when a type-signal turns red) may re-invoke the `spec-designer`
-  or `adr-editor` capability via their respective `.codex/agents/<name>.toml` agents.
+- The type catalogue authoring is delegated to the `type-designer` capability via
+  `bin/sotp capability exec type-designer --host codex --briefing-file <path>`; the dispatcher
+  resolves the provider from `.harness/config/agent-profiles.json`. Invoke
+  `.codex/agents/type-designer.toml` in-host only when the dispatcher returns
+  `CAPABILITY_EXEC_OUTCOME: delegate-in-host`.
+- This skill is single-shot per the workflow SSoT: when a type-signal turns red, surface the
+  failing layer(s) and signal detail back to the caller (`$track-plan`), which owns the
+  escalation path (spec-design re-invocation / adr-editor dispatch, independent retry
+  counters). Do not dispatch those capabilities from inside this skill.
 
 ### (4) Reporting format
 

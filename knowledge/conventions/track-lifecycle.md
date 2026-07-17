@@ -39,15 +39,17 @@
   copies; its init records are the designation records. The filename is context-dependent and is
   never derived or stored as a metadata pointer or other external primary identity.
 - Before a review cycle, `cargo make adr-baseline-check-review` invokes the CLI. It requires a
-  nonempty active-track ledger init-record designation set, then verifies every recorded ledger
-  copy and byte-matches every recorded ADR against its latest baseline before any fixer may
-  write. `--primary-source <file>` is only an override for a direct `bin/sotp adr-baseline
-  check-review` invocation. `cargo make ci-track` and the guarded commit path run
+  nonempty active-track ledger init-record designation set and verifies every recorded ledger
+  copy before any fixer may write; a current ADR that differs from its latest baseline is a
+  normal Phase 0 draft state and does not block the review. `--primary-source <file>` is only
+  an override for a direct `bin/sotp adr-baseline check-review` invocation. Byte matching fires
+  at the commit gate and track-aware CI: `cargo make ci-track` and the guarded commit path run
   `adr-baseline check-commit` for recorded ADRs; coverage for every non-draft ADR cited by
   `spec.json` is enforced separately at that commit gate.
 - A track-born ADR without `user_decision_ref` remains outside the required-stamp set. Once
   promoted or cited as an existing ADR, the relevant sanctioned snapshot is required; missing
-  records and byte mismatches fail closed. These checks are independent from signal-gate policy.
+  records fail closed at review and commit, and byte mismatches fail closed at the commit gate
+  and track-aware CI. These checks are independent from signal-gate policy.
 - Baseline records are not lifecycle state and do not belong in `metadata.json`. Never edit,
   remove, or manually recreate the ledger or copies; diagnose mismatch and use the snapshot or
   restore command as appropriate.

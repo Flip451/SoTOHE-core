@@ -11,12 +11,11 @@ User invokes this command as `/track:review`. No arguments.
 ## Claude Code invocation constraints
 
 - **Scope discovery**: `bin/sotp review results`
-- **ADR freeze prelude**: Phase-0 init stamps are the orchestrator's primary-ADR designation
-  records. `cargo make adr-baseline-check-review` requires a nonempty ledger init-record
-  designation set, then verifies every recorded ledger copy and byte-matches every recorded ADR
-  against its latest baseline. Only a direct `bin/sotp adr-baseline check-review
-  --primary-source <file>.md` invocation may override the derived designation. Do not launch a
-  reviewer if this gate fails; spec-cited ADR coverage is checked separately at commit time.
+- **ADR guardian dispatch**: when the workflow SSoT selects an ADR guardian-lane capability,
+  dispatch that selected `adr-editor` or `adr-diagnoser` capability through
+  `bin/sotp capability exec <capability> --host claude --briefing-file <path>`. If the dispatch
+  returns `CAPABILITY_EXEC_OUTCOME: delegate-in-host`, invoke the matching Claude Agent tool
+  with the returned briefing path and discipline body before continuing.
 - **Briefing files**: write to `tmp/reviewer-runtime/briefing-{scope}.md`; use Read + Edit tools for existing files.
 - **Fix loop dispatch** (provider-agnostic wrapper — do NOT branch on `capabilities.review-fix-lead.provider` here):
   ```

@@ -10,13 +10,21 @@ User invokes this command as `/track:type-design`. No arguments.
 
 ## Claude Code invocation constraints
 
-Invoke the type-designer via the Agent tool (`subagent_type: "type-designer"`, `run_in_background: true`). Briefing must include:
+Write a briefing to `tmp/type-designer-briefing.md` containing:
 
 - Track id and `track/items/<track-id>/spec.json` path
 - `architecture-rules.json` path (source of truth for TDDD-enabled layers)
 - Paths to the related ADR(s) under `knowledge/adr/` and conventions under `knowledge/conventions/`
 
-The subagent owns: baseline capture, each `<layer>-types.json` write, all rendered views, and the type → spec signal evaluation (🔵🟡🔴). No direct CLI calls from this adapter body.
+Then run `bin/sotp capability exec type-designer --host claude --briefing-file tmp/type-designer-briefing.md`.
+The dispatcher resolves `capabilities.type-designer` internally from
+`.harness/config/agent-profiles.json` and either completes the provider dispatch or returns
+`CAPABILITY_EXEC_OUTCOME: delegate-in-host`; only on that outcome invoke the Agent tool
+(`subagent_type: "type-designer"`, `run_in_background: true`) with the briefing path and
+discipline body as the task prompt. Never invoke the Agent-tool subagent without that
+delegation outcome; this adapter must not resolve or assume the provider itself.
+
+The capability owns: baseline capture, each `<layer>-types.json` write, all rendered views, and the type → spec signal evaluation (🔵🟡🔴).
 
 ## Report format
 

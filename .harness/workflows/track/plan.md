@@ -17,6 +17,8 @@ from `.harness/config/agent-profiles.json`.
 Sub-workflows used:
 
 - `.harness/workflows/track/init.md` (Phase 0)
+- `.harness/workflows/track/review.md` (Phase 0 ADR-baseline review loop)
+- `.harness/workflows/track/commit.md` (Phase 0 ADR-baseline commit)
 - `.harness/workflows/track/spec-design.md` (Phase 1)
 - `.harness/workflows/track/type-design.md` (Phase 2)
 - `.harness/workflows/track/impl-plan.md` (Phase 3)
@@ -45,7 +47,8 @@ Sub-workflows used:
 Before executing the state machine, register the following items as a task list so progress
 stays visible across phases and back-and-forth loops:
 
-1. Phase 0 — invoke `init` workflow
+1. Phase 0 — invoke `init` workflow, then the ADR-baseline `review` loop (stamp-free draft
+   loop with guardian judgment) through user adjudication, staging, and the ADR-baseline commit
 2. Phase 1 loop — invoke `spec-design` workflow, evaluate spec → ADR signal, escalate on 🔴
 3. Phase 2 loop — invoke `type-design` workflow, evaluate type → spec signal per layer, escalate on 🔴
 4. Phase 3 loop — invoke `impl-plan` workflow, evaluate task-coverage gate, re-invoke on ERROR
@@ -79,17 +82,26 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
 
 | Phase | Workflow | Writer capability | Gate |
 |-------|----------|-------------------|------|
-| 0 | `init` | orchestrator (direct) | metadata identity schema (OK / ERROR) |
+| 0 | `init` → `review` → `commit` | orchestrator (direct) | init identity, ADR-baseline `zero_findings`, user adjudication, and ADR-baseline commit |
 | 1 | `spec-design` | spec-designer | spec → ADR signal (🔵🟡🔴) |
 | 2 | `type-design` | type-designer | type → spec signal, per layer (🔵🟡🔴) |
 | 3 | `impl-plan` | impl-planner | task-coverage binary gate (OK / ERROR) |
 
 ### Phase 0: init workflow
 
-Invoke the `init` workflow (`.harness/workflows/track/init.md`) with the feature name **and** the
-direct ADR source filename to designate. `init` records that exact filename through its `--kind
-init` snapshot step; that ledger record becomes the primary designation. On ERROR, stop and
-report. On OK, mark Phase 0 `completed` and proceed to Phase 1.
+1. Invoke the `init` workflow (`.harness/workflows/track/init.md`) with the feature name **and**
+   the direct ADR source filename to designate. `init` records that exact filename through its
+   `--kind init` snapshot step; that ledger record becomes the primary designation. On ERROR,
+   stop and report.
+2. Invoke the `review` workflow for the ADR baseline. On `zero_findings`, present the init-stamp
+   diff and any guardian-withheld proposals to the user for the Phase 0 adjudication required by
+   `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`.
+3. Do not stamp during the review loop. After approval, stamp the approved ADR text only when it
+   differs from the init record. If the adjudication changes the text, route that edit through
+   the guardian path and restart the ADR-baseline review before stamping or proceeding.
+4. After the required stamp, run `bin/sotp git add-all` and invoke the `commit` workflow for
+   the ADR baseline. Mark Phase 0 `completed` only after that guarded commit succeeds; then
+   proceed to Phase 1. The commit workflow owns its message and other commit preconditions.
 
 ### Phase 1 loop: spec-design workflow
 
@@ -103,14 +115,29 @@ report. On OK, mark Phase 0 `completed` and proceed to Phase 1.
    - **🟡**: log warning and proceed to Phase 2. Yellow must be resolved before merge.
    - **🔴**: escalate per ADR auto-edit criteria:
      a. Identify the target ADR path from the 🔴 element.
-     b. If the ADR has commit history: resolve `merge_target` from the effective branch
-        strategy — read `metadata.json#branch_strategy_snapshot.merge_target` when a track
-        context exists, or `.harness/config/branch-strategy.json#merge_target` when no track
-        has been initialized yet — then invoke the `adr-editor` capability. Briefing must
-        include the 🔴 element(s), ADR path, the resolved `merge_target` value, and the
-        constraint "edit working tree only; do not commit inside the loop".
-     c. If no commit history: pause for user — instruct them to commit the ADR first.
-     d. After ADR edit, re-invoke `spec-design`. Count against `max_retry`; on overflow, stop.
+     b. Resolve `merge_target` from the effective branch strategy — read
+        `metadata.json#branch_strategy_snapshot.merge_target` when a track context exists, or
+        `.harness/config/branch-strategy.json#merge_target` when no track has been initialized
+        yet — and determine the ADR's effective merge-target lifecycle.
+     c. If the ADR is pre-merge and has commit history, invoke the `adr-editor` capability.
+        Briefing must include the 🔴 element(s), ADR path, the resolved `merge_target` value,
+        and the constraint "edit working tree only; do not commit inside the loop".
+     d. If the ADR is pre-merge and has no commit history, pause for user — instruct them to
+        commit the ADR first.
+     e. If the ADR is post-merge, do not invoke `adr-editor`. Dispatch `adr-diagnoser` in
+        edit-judgment mode on the recorded semantic proposal with its lifecycle judgment, then
+        relay its `alternative` or `no_change_rationale` verbatim and use the new-ADR draft path
+        required by `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`.
+        Stop this escalation pending that path; do not re-invoke `spec-design` against an
+        unchanged merged ADR.
+     f. After every pre-merge ADR edit, invoke `adr-diagnoser` in edit-judgment mode before adoption, as
+        required by `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`.
+        On a decision-preserving verdict, adopt and stamp the edit through the normal escalation
+        path. On a decision-breaking verdict, revert it and relay the verdict's `alternative` or
+        `no_change_rationale` verbatim to the originating signal/finding; route an unresolved
+        conflict to that norm's adjudication point.
+     g. After the pre-merge guardian loop resolves, re-invoke `spec-design`. Count against `max_retry`; on
+        overflow, stop.
 
 ### Phase 2 loop: type-design workflow
 
@@ -180,8 +207,9 @@ capability's domain expert judgment. Each capability is the domain expert for it
 
 | Gate style | Phases | Signals |
 |------------|--------|---------|
+| ADR-baseline review + user adjudication + commit | Phase 0 after `init` | `zero_findings` → adjudicate → stamp as required → commit |
 | SoT Chain signal (🔵🟡🔴) | Phase 1, Phase 2 | Blue = pass, Yellow = warn + proceed, Red = escalate |
-| Binary check (OK / ERROR) | Phase 0, Phase 3 | OK = pass, ERROR = re-invoke or stop |
+| Binary check (OK / ERROR) | Phase 0 `init`, Phase 3 | OK = pass, ERROR = re-invoke or stop |
 
 Pre-approval exceptions (outside the gate system — user is asked only on irreversible actions):
 `git push` / `git commit`, external API calls (PR / issue creation), destructive filesystem
@@ -193,8 +221,11 @@ operations, environment-breaking changes. Artifact generation uses post-hoc revi
 - **Non-compatible branch**: report the branch and available options.
 - **Phase N 🔴 after max_retry overflows**: stop and present options (continue with warnings,
   abort, manual edit).
-- **adr-editor invoked on ADR without commit history**: pause for user to commit the ADR first,
-  then resume.
+- **Pre-merge `adr-editor` path without commit history**: pause for user to commit the ADR
+  first, then resume.
+- **Post-merge Phase 1 ADR proposal**: route through `adr-diagnoser` to the new-ADR draft path
+  specified by `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`; do
+  not retry the unchanged signal.
 - **`[ESCALATE]` from `ref-verify`**: report to user and stop. Do not retry.
 
 ## Outputs
@@ -206,4 +237,4 @@ operations, environment-breaking changes. Artifact generation uses post-hoc revi
 - Per-phase gate results (🔵🟡🔴 / OK / ERROR) and final `max_retry` counters
 - Back-and-forth edits that occurred (target artifact and its writer)
 - ADR working-tree diff against HEAD (if any) and user termination decision
-- No commit is created by this workflow (commit is a separate caller decision)
+- The guarded Phase 0 ADR-baseline commit result

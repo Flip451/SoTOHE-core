@@ -19,9 +19,9 @@ pre-read, output schema, and boundaries.
 
 ## ADR-baseline mismatch diagnosis route
 
-When `adr-baseline check-review`, `adr-baseline check-commit`, or the track-aware CI path blocks
-on a byte mismatch, the orchestrator enters this route before the ordinary phase-rollback
-diagnosis. The binary check remains purely byte-based; semantic classification occurs only here,
+When `adr-baseline check-commit` or the track-aware CI path blocks on a byte mismatch, the
+orchestrator enters this route before the ordinary phase-rollback diagnosis (`check-review`
+does not byte-match; a Phase 0 draft divergence does not block review). The binary check remains purely byte-based; semantic classification occurs only here,
 after the block.
 
 1. The calling orchestrator prepares and supplies a briefing containing the triggering check output, direct
@@ -56,8 +56,8 @@ outside the diagnose workflow.
   any SoT scope (`adr` / `spec` / `types` / `impl-plan`), or a free-form reviewer comment.
   Inline diagnostic input is not supported because both diagnosers require the same briefing-file
   dispatch contract.
-- **ADR-baseline mismatch** — a byte-mismatch output from `check-review`, `check-commit`, or
-  CI, plus the source filename, latest-baseline diff, and originating capability when known.
+- **ADR-baseline mismatch** — a byte-mismatch output from `check-commit` or CI, plus the
+  source filename, latest-baseline diff, and originating capability when known.
 
 ## Trigger scenarios
 

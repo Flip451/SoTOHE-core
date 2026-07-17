@@ -7,21 +7,34 @@
 
 ## Mission
 
-Edit an existing ADR (`knowledge/adr/*.md`) in the working tree to resolve a downstream 🔴 signal. The edit is always triggered by a concrete failure in the SoT Chain (Phase 1 spec → ADR signal, or Phase 2 type contract → spec → ADR propagation) — not by style preferences or proactive restructuring.
+Edit an existing ADR (`knowledge/adr/*.md`) in the working tree to resolve a downstream 🔴 signal or an ADR-scoped review finding relayed through the orchestrator's guardian lane. The edit is always triggered by a concrete recorded input — a SoT Chain failure (Phase 1 spec → ADR signal, or Phase 2 type contract → spec → ADR propagation) or a recorded ADR-scope review finding — not by style preferences or proactive restructuring.
 
 This capability is **write-only to `knowledge/adr/*.md`**. It must not edit spec.json, type catalogues, metadata.json, impl-plan.json, task-coverage.json, or any other artifact.
 
 ## Invocation contract
 
-The orchestrator (`/track:plan`) invokes this capability only when:
+The orchestrator invokes this capability only on one of two triggers:
 
-1. The Phase 1 gate (spec → ADR signal) evaluated a 🔴 signal. Phase 2 🔴 escalates to `spec-designer` (not adr-editor); Phase 3 ERROR re-invokes `impl-planner` in the same phase.
-2. The ADR file at the target path has commit history (determined by the orchestrator before invocation; no commit history → user pause, not adr-editor invocation).
+1. **Signal escalation** (`/track:plan` Phase 1 loop): the Phase 1 gate (spec → ADR signal)
+   evaluated a 🔴 signal. Phase 2 🔴 escalates to `spec-designer` (not adr-editor); Phase 3
+   ERROR re-invokes `impl-planner` in the same phase.
+2. **Guardian-lane review finding** (review workflow ADR-scope repair lane): a recorded
+   ADR-scoped review finding whose fix requires an ADR edit, relayed by the orchestrator per
+   `knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権. Every edit
+   produced under this trigger passes `adr-diagnoser` edit judgment before adoption.
+
+Rollback-safety precondition (either trigger): the target ADR has commit history, or — for a
+Phase 0 draft not yet committed — an `init`-kind ADR-baseline ledger record exists for it in the
+active track (its verbatim copy and `bin/sotp adr-baseline restore` provide the recovery route).
+With neither, the orchestrator pauses for the user instead of invoking adr-editor.
 
 The briefing from the orchestrator must include:
 
 - The target ADR path (e.g., `knowledge/adr/YYYY-MM-DD-HHMM-<slug>.md`)
-- The specific signal failure: which spec element(s) fired 🔴, which `adr_refs[]` or `convention_refs[]` cited the ADR, and what the mismatch is
+- The originating input — signal trigger: which spec element(s) fired 🔴, which `adr_refs[]` or
+  `convention_refs[]` cited the ADR, and what the mismatch is; guardian-lane trigger: the
+  recorded review finding verbatim (and, on re-invocation after a decision-breaking verdict, the
+  guardian's `alternative` / `no_change_rationale` relayed verbatim)
 - `merge_target`: the effective branch strategy's merge target value, resolved by the orchestrator before invocation (reading `metadata.json#branch_strategy_snapshot.merge_target` when a track context exists, or `.harness/config/branch-strategy.json#merge_target` when no track has been initialized yet — see `.harness/workflows/track/plan.md` Phase 1 loop step b). Used for the pre-merge / post-merge detection described in Editing rules below.
 - An explicit instruction: "edit the working tree only; do not commit inside the loop"
 
@@ -30,7 +43,7 @@ The briefing from the orchestrator must include:
 | aspect | adr-editor (this capability) | spec-designer | impl-planner | type-designer |
 |---|---|---|---|---|
 | output | `knowledge/adr/*.md` edits | `spec.json` + `spec.md` | `impl-plan.json` + `task-coverage.json` | `<layer>-types.json` + rendered views |
-| trigger | Phase 1 🔴 signal escalation | `/track:spec-design` (Phase 1) | `/track:impl-plan` (Phase 3) | `/track:type-design` (Phase 2) |
+| trigger | Phase 1 🔴 signal escalation / ADR-scope review finding via guardian lane | `/track:spec-design` (Phase 1) | `/track:impl-plan` (Phase 3) | `/track:type-design` (Phase 2) |
 | scope | working tree only, no commit | writes own SSoT + rendered view | writes own SSoT files | writes own SSoT + rendered views |
 
 If the briefing asks for:

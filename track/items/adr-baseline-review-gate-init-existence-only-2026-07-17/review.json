@@ -1,0 +1,858 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:654731a8e3004a5184c628027913ef5b88c8421993d6d471e9c6e6eeb1294fa8",
+          "at": "2026-07-17T12:37:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "edit-judgment モードでも `recommended_next_action` だけを含む出力を要求していますが、Capability SSoT は `verdict` / `reason` と、`decision-breaking` 時の `alternative` または `no_change_rationale` を要求します。このままでは Codex adapter が無効な guardian verdict を返すため、モード別契約を参照する記述へ更新してください。",
+              "severity": "P1",
+              "file": ".agents/skills/adr-diagnoser/SKILL.md",
+              "line": 17,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "`spec-design` workflow SSoT は single-shot で、赤信号後の adr-editor escalation を caller (`plan`) の責務としています。この skill が escalation を直接 dispatch すると retry/state ownership が二重化するため、赤信号は caller へ返すだけにしてください。",
+              "severity": "P1",
+              "file": ".agents/skills/track-spec-design/SKILL.md",
+              "line": 31,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "`type-design` workflow SSoT は single-shot で、spec-designer / adr-editor への escalation は caller の責務です。この adapter が直接 dispatch すると plan 側の独立 retry counter と状態遷移を迂回するため、signal detail の返却だけに限定してください。",
+              "severity": "P1",
+              "file": ".agents/skills/track-type-design/SKILL.md",
+              "line": 31,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "`impl-plan` workflow SSoT は task-coverage ERROR 後の再実行を caller (`plan`) の責務としています。skill 内で `--resume` 再 dispatch すると plan の `max_retry` 管理外でループするため、この再実行指示を caller 側へ戻してください。",
+              "severity": "P1",
+              "file": ".agents/skills/track-impl-plan/SKILL.md",
+              "line": 31,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "`pre-track` は `pre-merge` と同義ではありません。既に merge target に入った ADR も新しい track の前段で選択できますが、この規則はその既存 ADR の大きな決定変更まで直接編集可能にします。これは `knowledge/conventions/adr.md` の post-merge ADR 不変規則と矛盾するため、effective merge-target 上の lifecycle 判定を追加し、post-merge の semantic change は新 ADR に限定してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 18,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "手順2は reviewer が finding を維持した未解消対立を手順3へ送る一方、手順3は全 required scope の `zero_findings` を前提とします。維持された finding がある限り `review-protocol.md` 上 zero_findings には到達できず、user 裁定点が到達不能になります。zero_findings 前の明示的な裁定経路か、所見を正当に disposition する手順が必要です。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 43,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "全 scope が zero_findings になった後で、user が差し止め proposal を採用すると ADR を再編集し、そのまま刻印・commit へ進みます。この編集は承認済み review hash を stale にし、`review-protocol.md` の「修正後は confirmation round 必須」にも反します。proposal 適用後に guardian 判定と review を再実行して再収束する back-edge を定義してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 44,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:654731a8e3004a5184c628027913ef5b88c8421993d6d471e9c6e6eeb1294fa8",
+          "at": "2026-07-17T12:47:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc0018af13d4e714a7e3059521e9d45592e56d93bad3d7ca0ac5ec675e843933",
+          "at": "2026-07-17T13:02:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Codex plan adapter leaves the Phase 1 red-signal path without an owner. `track-spec-design` now explicitly returns red findings to `$track-plan`, and the plan SSoT requires the caller to dispatch `adr-editor`; however, this adapter only says to re-invoke an upstream phase skill and never routes `adr-editor` through `bin/sotp capability exec ... --host codex`. A red result can therefore retry an unchanged spec until `max_retry`. Add the profile-routed `adr-editor` dispatch and delegate-in-host condition before re-running spec-design.",
+              "severity": "P1",
+              "file": ".agents/skills/track-plan/SKILL.md",
+              "line": 34,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "The new post-merge immutability rule is not propagated through this convention. Later rules auto-edit any ADR with commit history and allow decision-preserving semantic refinements during Phase 0/1+ without checking effective merge status. Thus a reused ADR already on the merge target may be edited in place, contradicting `knowledge/conventions/adr.md` §Lifecycle, which permits only typo/reference/back-reference edits post-merge and requires a new ADR for semantic refinement. Gate all in-track edit lanes on effective merge status or route post-merge refinements to a new ADR.",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 18,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bc0018af13d4e714a7e3059521e9d45592e56d93bad3d7ca0ac5ec675e843933",
+          "at": "2026-07-17T13:11:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c506d7f809f56043e23841c208b276d7f6ffe738bbd2a4c4c656d9159b4d6e63",
+          "at": "2026-07-17T13:19:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Post-merge 不変則を guardian が実行できません。edit-judgment briefing には effective merge target／pre-merge 判定がなく、`decision-preserved` は常に既存 ADR へ採用されます。一方、convention は merge 済み ADR への decision-preserving refinement も禁止し、新 ADR 起草へ送るよう要求しています。lifecycle 判定を入力に加え、post-merge では新 ADR へ routing してください。",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 62,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "Phase 0 の user 裁定で decision-breaking な変更を採用できません。guardian は Phase 0 中ずっと init record を比較基準とし、decision-breaking edit を必ず revert しますが、convention は未解消対立を user が裁定して変更を適用後、同じ guardian を再度通すよう定めています。その変更は再び init record に対して breaking と判定され、fresh review に戻れません。user 承認文面を新しい比較基準にする明示的な rebase／override 経路が必要です。",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 37,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "ここでは ADR の存在・可読性を運用上の「承認」と定義していますが、同じ convention の Phase 0 は zero_findings 後の明示的 user 承認を刻印・commit の必須条件としています。存在確認だけで承認済みと解釈すると新しい裁定点を迂回できます。存在は `/track:plan` の開始条件にすぎず、Phase 0 承認の代替ではないことを明記してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 17,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c506d7f809f56043e23841c208b276d7f6ffe738bbd2a4c4c656d9159b4d6e63",
+          "at": "2026-07-17T13:29:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The full-cycle SSoT requires invoking the `implement` and `dry-check` sub-workflows, but this adapter dispatches their inner capability/wrapper directly. That bypasses implement’s task-state, obligation, and full-CI orchestration and dry-check’s opt-out precheck and terminal verification. Delegate through `$track-implement` and `$track-dry-check`; keep provider routing in those adapters.",
+              "severity": "P1",
+              "file": ".agents/skills/track-full-cycle/SKILL.md",
+              "line": 27,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "The table restricts `decision-preserved` to pre-merge ADRs, although the preceding rule and `knowledge/conventions/adr.md` explicitly allow post-merge typo, reference-path, and back-reference edits. Such an edit fits neither verdict despite the contract requiring exactly one. Permit `decision-preserved` for these allowed non-semantic post-merge edits or define an equivalent valid verdict.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 79,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fdc07091cfcf9278b5684999c15c1170e52825dda1a2039c84abc44c52ba0f7b",
+          "at": "2026-07-17T13:40:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "出力契約内で、`decision-breaking` 時に `alternative` / `no_change_rationale` のどちらか1つを必須と明記している一方、JSON例では `alternative` を「任意採用」と記載しており、両フィールドを省略した不正な verdict を許す矛盾があります。必須制約と一致する表現に修正してください。",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 126,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9eb98a1f2b2295f481d150b483b9faf15e7a5b7f1b637b58c9d7181fc5dc28b0",
+          "at": "2026-07-17T13:44:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 0 の `zero_findings` 後には user 承認エスカレーションが必須ですが、この adapter は「fully autonomous」「no user confirmation is required for any step」と定義しており、`knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権の承認境界と矛盾します。Phase 0 の user 承認を明示的な例外として扱う必要があります。",
+              "severity": "P1",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 44,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2dfd253d5ffc48ae44b6d626e7702e4de3f0f3f658812fa90d8b5a13c5c2904d",
+          "at": "2026-07-17T13:45:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa2d223d3a59837346f453602d88cd5e8530a774dfeea0800ac6481bae9ad48a",
+          "at": "2026-07-17T13:50:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The post-merge handoff has no valid writer. Post-merge semantic proposals must be returned as new-ADR drafts, but this rule says an adopted `alternative` is applied by `adr-editor`. That capability only edits existing ADRs and explicitly refuses new ADR creation, which the convention assigns to the pre-track user/main path. Split the handoff: existing pre-merge edit alternatives may go to `adr-editor`; new-ADR drafts must go through the new-ADR authoring and approval path.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 84,
+              "category": "responsibility-boundary cross"
+            },
+            {
+              "message": "Mismatch classification can bypass the new post-merge immutability rule. Edit judgment permits only typo, reference-path, or back-reference corrections after merge, while `non-semantic-restamp` still permits any formatting-only change and its briefing supplies no lifecycle judgment. A post-merge formatting diff can therefore be restamped through mismatch mode even though `knowledge/conventions/adr.md` limits post-merge edits to the three enumerated cases. Apply the lifecycle restriction in mismatch mode or reconcile the allowed edit set explicitly.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 96,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:aa2d223d3a59837346f453602d88cd5e8530a774dfeea0800ac6481bae9ad48a",
+          "at": "2026-07-17T14:02:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c377f209d2c21fe0bcf51d886e1d1b89e61f560c00e83288a34853891391f7c",
+          "at": "2026-07-17T14:13:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c846cef704d4b265c56b55cee61f09b338419bfae4d8da49f0c66b00d3ee92c5",
+          "at": "2026-07-17T16:06:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new-track Phase 0 still transitions directly from `init` to Phase 1. It never runs the required ADR-baseline review, zero-findings user approval, or fresh-review path, so `/track:plan` can stamp Phase 1 ADR edits before the Phase 0 approval boundary. Add the review/approval transition before Phase 1.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 92,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "“Approval without a text change” can include approving an already-modified review draft as-is. That path incorrectly retains only the init snapshot, causing the subsequent commit gate to reject the draft/init byte mismatch. Skip the additional stamp only when no review-loop edit occurred and the ADR remains identical to init.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 80,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "Putting guardian rules in the ADR briefing does not create an executable guardian loop. Steps 4–5 still dispatch only `review-fix-lead`, whose capability contract forbids semantic ADR fixes and defines no `adr-editor` → `adr-diagnoser` → revert/relay handoff. Wire this orchestrator-owned flow explicitly before relaunching the affected review.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 109,
+              "category": "responsibility-boundary cross"
+            },
+            {
+              "message": "The changed gate semantics leave the Claude adapter inconsistent: `.claude/commands/track/review.md` lines 14–19 still duplicate the old byte-matching prelude and state that an ADR mismatch blocks reviewer launch. Remove or update that duplicated adapter logic so it follows the new draft-state SSoT.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 30,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:c846cef704d4b265c56b55cee61f09b338419bfae4d8da49f0c66b00d3ee92c5",
+          "at": "2026-07-17T16:14:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The changed review-gate semantics are still not synchronized with the Claude adapter. `.claude/commands/track/review.md` lines 14–19 duplicate the old byte-matching prelude and say mismatches block reviewer launch, contradicting this SSoT's normal draft-state behavior. Remove or update that duplicated adapter logic.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 30,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "The new Phase 0 `init → review` transition is absent from the adapter surface: the Claude plan command and Codex plan skill still describe Phase 0 as only `/track:init`/`$track-init`. This file's own sub-workflow list and task preamble also omit `review`, so an adapter can skip the newly required review and adjudication. Synchronize the invocation surfaces and sub-workflow registration.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 82,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "The ADR repair lane has no reachable handoff from `review-fix-lead` to the orchestrator. The wrapper runs that capability until one of only `completed`, `blocked_cross_scope`, or `failed`; an ADR edit is inside the ADR scope, so no status returns the originating finding for this lane. Both review adapters only launch the wrapper. Add an explicit ADR-repair handoff/status and adapter routing, or restructure the round so the orchestrator receives the finding before fixer execution.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 162,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:04e90afdb61c64a204282b17fb17f00e2df842930df4abb5b799fa6ebbee9775",
+          "at": "2026-07-17T16:20:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b8d10374e157157e0c3641856b4a068d4a5a909b2c2e957f85de7f550a81761",
+          "at": "2026-07-17T16:26:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The proposed handoff relies on `review-fix-lead` returning `failed` for an ADR semantic finding, but that capability defines `failed` only for unrecoverable errors and otherwise loops on `findings_remain`; it has no instruction to terminate after recording an amendment proposal. The orchestrator therefore cannot rely on this handoff. Add an explicit capability status/termination contract or another deterministic handoff.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 171,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The guardian-handoff exception is applied only to the fast-round status table. Final-round `failed` and the general failure-recovery rule still mandate retry/report, so an ADR semantic finding discovered during final review bypasses the guardian lane. Apply the recorded-finding handoff consistently in both locations.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 203,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The new Claude adapter block duplicates the workflow's guardian state transition but omits the adapter-owned Claude launch mechanics for `adr-editor` and `adr-diagnoser` (`capability exec --host claude` and delegate-in-host handling). Following this adapter reaches an abstract “guardian lane” with no executable dispatch. Keep generic routing in the workflow and put the provider-specific invocation here.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 23,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:8b8d10374e157157e0c3641856b4a068d4a5a909b2c2e957f85de7f550a81761",
+          "at": "2026-07-17T16:32:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The ADR semantic-freeze contract still instructs the fixer that an ADR-baseline check can enter the old `adr-diagnoser` recovery route and that only a `non-semantic-restamp` verdict may create a new snapshot. This contradicts the updated review workflow, which explicitly treats current-ADR byte mismatches as normal draft state and reserves baseline enforcement for commit/CI; the stale instruction can route the fixer into a removed/incorrect recovery path.",
+              "severity": "P1",
+              "file": ".harness/capabilities/review-fix-lead.md",
+              "line": 63,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0195ed05b334fc1f6310b658e6b7a19f9de452899320eb5de3f6641ce8f18587",
+          "at": "2026-07-17T16:36:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f190ea45c31d3ccdbe653271b370394354ffd179b68710d86b40e13d1e7c8bf5",
+          "at": "2026-07-17T16:38:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The guardian lane dispatches `adr-editor` for Phase 0 review findings, but that capability accepts only Phase 1 red-signal escalations and requires the ADR to have commit history. A Phase 0 ADR is intentionally before its first baseline commit, so this dispatch pauses or rejects instead of repairing the finding. Extend `adr-editor`’s invocation contract for init-baselined Phase 0 review findings or use a compatible writer path.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 163,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The adapter now reproduces the baseline gate and guardian handoff state machine in detail. Only the Claude-specific `capability exec --host claude` and delegate-in-host mechanics belong here; retained conditions, failed-status interpretation, and adopt/revert routing belong exclusively in the workflow SSoT. This duplication violates the adapter/SSoT boundary and can drift again.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 14,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "The Codex adapter explicitly repeats the Phase 0 sequence, `zero_findings` gate, user-adjudication transition, and no-stamp condition despite its own header prohibiting duplicated steps and gate conditions. Keep only the provider-specific `$track-init` then `$track-review` invocation and defer the transition rules to the plan workflow SSoT.",
+              "severity": "P1",
+              "file": ".agents/skills/track-plan/SKILL.md",
+              "line": 26,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "The Claude plan adapter likewise duplicates the Phase 0 review-loop gate and user-adjudication state transition. Retain only the Claude command invocation/input-forwarding details and reference the workflow SSoT for stamp-free, zero-findings, and approval behavior.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 20,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:f190ea45c31d3ccdbe653271b370394354ffd179b68710d86b40e13d1e7c8bf5",
+          "at": "2026-07-17T16:41:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Codex `track-plan` adapter still duplicates provider-agnostic Phase 0 transition logic by specifying the init→review sequence, the `zero_findings` user escalation, and the stamp/commit boundary. The adapter-SSoT contract requires this workflow logic to remain in `.harness/workflows/track/plan.md`; the adapter should retain only Codex-specific invocation mechanics and defer these transitions to the SSoT.",
+              "severity": "P1",
+              "file": ".agents/skills/track-plan/SKILL.md",
+              "line": 26,
+              "category": "adapter-SSoT 同期 check"
+            }
+          ],
+          "hash": "rvw1:sha256:66b06cef98a2c0fd5e12f705d1a598c31cd0af295faa9538547d6f2013e9c9a9",
+          "at": "2026-07-17T16:49:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a77512643ae202a63910c5126fa31e08ec458f30e34aad9bb6e2684ba30fb579",
+          "at": "2026-07-17T16:52:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The guardian handoff cannot retrieve the finding it must relay: `bin/sotp review results --scope <adr-scope>` defaults to `--limit 0`, which prints only the state summary and no finding block. Query round history (for example with the appropriate `--round-type` and `--limit 1`) before constructing the adr-editor briefing.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 174,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The repair lane unconditionally dispatches adr-editor and then adr-diagnoser “against that edit,” but adr-editor must refuse semantic edits to post-merge ADRs and instead route them to new-ADR authoring. No edit exists in that case, so the unconditional diagnoser/re-review sequence cannot complete. Resolve lifecycle status first and define the post-merge new-ADR handoff.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 163,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "Phase 0 is marked complete and Phase 1 begins immediately after approval/stamping, without the ADR-baseline commit mandated by `pre-track-adr-authoring.md` §Phase 0 step 4. This lets downstream planning proceed beyond the Phase 0 boundary on an uncommitted ADR and conflicts with the Phase 1 commit-history path at lines 116–122. Commit the approved baseline, or stop for the separate commit workflow, before advancing.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 101,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a77512643ae202a63910c5126fa31e08ec458f30e34aad9bb6e2684ba30fb579",
+          "at": "2026-07-17T17:02:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 0 now requires an ADR-baseline commit before Phase 1, but `commit.md` is absent from the sub-workflow list and sequence, no staging step exists, and the output contract still says this workflow creates no commit. The fallback to a separate commit also has no resume transition: re-running plan on the resulting track branch invokes `init`, whose base-branch precondition fails. Add an in-workflow stage/commit path or an explicit initialized-and-committed resume state that skips init/review.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 101,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The Phase 1 escalation treats commit history as sufficient to invoke adr-editor. A post-merge ADR necessarily has history, but adr-editor must refuse its semantic amendment; because no edit is produced, the subsequent guardian and retry steps cannot resolve the red signal. Resolve effective merge-target lifecycle first, invoke adr-editor only for pre-merge ADRs, and route post-merge proposals through the required new-ADR path.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 118,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The post-merge branch explicitly skips adr-diagnoser, contradicting the cited convention's requirement that the guardian classify a merged-ADR semantic proposal and provide either a new-ADR preservation alternative or a no-change rationale. Routing directly to new-ADR authoring bypasses that responsibility and makes the orchestrator choose the semantic remedy. Dispatch adr-diagnoser on the proposal, then relay its result to the new-ADR authoring path.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 164,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5250d7ac66243d4dfd4763776c7d88c5cf406aa0874e06beab68b74c7318559a",
+          "at": "2026-07-17T17:08:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Codex adapter still defines Phase 0 as `$track-init` followed only by `$track-review`, while the current workflow SSoT now requires staging and `$track-commit` before Phase 1. Following this adapter leaves the new Phase 0 commit gate unsatisfied. Add the commit sub-workflow invocation while leaving its transition details in the SSoT.",
+              "severity": "P1",
+              "file": ".agents/skills/track-plan/SKILL.md",
+              "line": 26,
+              "category": "adapter-SSoT sync"
+            },
+            {
+              "message": "The Claude adapter still invokes only `/track:init` and `/track:review` for Phase 0, omitting the newly mandatory `/track:commit`. Consequently the Claude command cannot execute the SSoT's init → review → commit sequence before advancing to Phase 1.",
+              "severity": "P1",
+              "file": ".claude/commands/track/plan.md",
+              "line": 20,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "This adapter retains the obsolete Phase 1 transition that always dispatches adr-editor and then immediately re-invokes spec-design. The SSoT now requires lifecycle branching, adr-diagnoser judgment after every pre-merge edit, and a diagnoser/new-ADR route instead of editor invocation for post-merge ADRs. Following the adapter bypasses those gates; defer the transition to the SSoT and retain only provider-specific dispatch mechanics for both capabilities.",
+              "severity": "P1",
+              "file": ".agents/skills/track-plan/SKILL.md",
+              "line": 35,
+              "category": "adapter-SSoT sync"
+            },
+            {
+              "message": "The Claude review adapter unconditionally specifies adr-editor followed by adr-diagnoser whenever the guardian lane is entered. The workflow SSoT now dispatches only adr-diagnoser for post-merge findings and uses editor → diagnoser only for pre-merge ADRs, so this adapter would incorrectly invoke the in-place editor on an immutable merged ADR. Dispatch only the capability sequence selected by the SSoT lifecycle branch.",
+              "severity": "P1",
+              "file": ".claude/commands/track/review.md",
+              "line": 14,
+              "category": "adapter-SSoT sync"
+            }
+          ],
+          "hash": "rvw1:sha256:8ccb7c65c83fa75422156df99f79ec41a4ab4179e2f1b4c02003793b06eb811d",
+          "at": "2026-07-17T17:13:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Codex adapter still defines Phase 0 as `$track-init` followed only by `$track-review`, while the workflow SSoT now requires staging and `$track-commit` before Phase 1. Following this adapter leaves the Phase 0 commit gate unsatisfied; add the commit sub-workflow invocation while leaving transition details in the SSoT.",
+              "severity": "P1",
+              "file": ".agents/skills/track-plan/SKILL.md",
+              "line": 26,
+              "category": "adapter-SSoT sync"
+            },
+            {
+              "message": "The Codex adapter retains the obsolete Phase 1 transition that always dispatches adr-editor and then immediately re-invokes spec-design. The current SSoT requires lifecycle branching, adr-diagnoser judgment after every pre-merge edit, and diagnoser/new-ADR routing without editor invocation for post-merge ADRs. Defer these transitions to the SSoT and retain only provider-specific dispatch mechanics for the selected capability.",
+              "severity": "P1",
+              "file": ".agents/skills/track-plan/SKILL.md",
+              "line": 35,
+              "category": "adapter-SSoT sync"
+            }
+          ],
+          "hash": "rvw1:sha256:fb5609a9f16169656df91709d85585d60386d67bb894f178433bea6841db7a9d",
+          "at": "2026-07-17T17:17:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:478fdf98fd1672514c762335b9e41f8591c95f9be1f00798a59aadebba2db473",
+          "at": "2026-07-17T17:19:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:478fdf98fd1672514c762335b9e41f8591c95f9be1f00798a59aadebba2db473",
+          "at": "2026-07-17T17:22:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fc4a47f4863dd1af6d5b881ba74f737107992bddf31bda4cf629fc232faef91",
+          "at": "2026-07-17T17:39:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fc4a47f4863dd1af6d5b881ba74f737107992bddf31bda4cf629fc232faef91",
+          "at": "2026-07-17T17:46:03Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 is not mapped to any spec element in task-coverage.json, so this executable task is an untraced briefing-only addition.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/task-coverage.json",
+              "line": 4,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "plan.summary is empty and therefore provides no GO-01 goal-to-task traceability, despite the policy requiring goal traceability in impl-plan.json.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/impl-plan.json",
+              "line": 30,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T001 restates the spec behavior in prose (including fail-closed conditions, byte-mismatch handling, and retained enforcement) instead of limiting the description to target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 restates the workflow behavior contract in prose (init-designation handling and guardian-result relay) beyond target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates multiple upstream workflow constraints and convergence behaviors in prose (approval carve-out, no intermediate stamping, convergence distinction, and fresh review) beyond target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 restates the upstream review-gate behavior in prose rather than using only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 restates the upstream workflow behavior contract in prose rather than using only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/impl-plan.json",
+              "line": 46,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 restates the upstream workflow behavior contract in prose rather than using only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/adr-baseline-review-gate-init-existence-only-2026-07-17/impl-plan.json",
+              "line": 56,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:9efb660839b7235e12aedb89b75a24f476a80981a1391d4d4f95a4c52eb8acdc",
+          "at": "2026-07-17T15:01:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d1d9e0b4fd3b938cd51bfa158510edfa618592ae38fe510f382dd9eecb9f282",
+          "at": "2026-07-17T15:03:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d1d9e0b4fd3b938cd51bfa158510edfa618592ae38fe510f382dd9eecb9f282",
+          "at": "2026-07-17T15:07:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:168a7b4fc1a3e6286b65270ea4eee0f6edc24a396c5258fffe431368d85ce16e",
+          "at": "2026-07-17T16:05:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:168a7b4fc1a3e6286b65270ea4eee0f6edc24a396c5258fffe431368d85ce16e",
+          "at": "2026-07-17T16:08:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8374d7b4677469f11b44623fa8378534a7c4ce2051190347ce4155c8c52aead0",
+          "at": "2026-07-17T17:26:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8374d7b4677469f11b44623fa8378534a7c4ce2051190347ce4155c8c52aead0",
+          "at": "2026-07-17T17:29:30Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cab4b024d793e5d247e7753c7c982afc37fd0eed6f17978422da6a04c270142d",
+          "at": "2026-07-17T15:00:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cab4b024d793e5d247e7753c7c982afc37fd0eed6f17978422da6a04c270142d",
+          "at": "2026-07-17T15:04:40Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1f73b563536c379b19135a786be676d78e87c242f4b68c3b768894ba15a58ea",
+          "at": "2026-07-17T15:00:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1f73b563536c379b19135a786be676d78e87c242f4b68c3b768894ba15a58ea",
+          "at": "2026-07-17T15:05:24Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad717405f955d95e811c7b9090d60d311f2ce0148f43c1d9e56dbe9cc989e258",
+          "at": "2026-07-17T12:37:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[P1] amendment proposal: review gate の D1 から承認記録規則を分離するか、freeze ADR D6 の supersession を明記してください。ここでは escalation reason に承認の旨と承認 ref を記録すると決めていますが、引用元 ADR の D6 は reason を変更理由に限定し、承認記録とは重複させず front-matter refs が担うと定めています。「check 一箇所の縮小だけ」という narrative のままでは、下流 spec がどちらの reason semantics を実装すべきか決定できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+              "line": 29,
+              "category": "scope leakage into ADR body"
+            }
+          ],
+          "hash": "rvw1:sha256:ad717405f955d95e811c7b9090d60d311f2ce0148f43c1d9e56dbe9cc989e258",
+          "at": "2026-07-17T12:41:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56a9cb4bd73de514cd2fdedcadf47920f1be6dc31934ea8b67dec44e18a24add",
+          "at": "2026-07-17T12:52:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56a9cb4bd73de514cd2fdedcadf47920f1be6dc31934ea8b67dec44e18a24add",
+          "at": "2026-07-17T12:55:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd9adc09df90141b4462501d095dbf1177ed2744b042ceb2853c44b2fb1aac25",
+          "at": "2026-07-17T15:00:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 の追加後も Context が「修理は 1 決定で足りる」と断言しており、front-matter と Decision が記録する D1・D2 の二決定構成と矛盾しています。下流が D2 を正式な決定として導出すべきか判断できるよう、D1 は機構修理の一決定であり、D2 は workflow SSoT の追随義務を記録する別決定だと整合させる amendment proposal が必要です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+              "line": 22,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:dd9adc09df90141b4462501d095dbf1177ed2744b042ceb2853c44b2fb1aac25",
+          "at": "2026-07-17T15:04:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f567f0183f253c0d568bd250dc899072ac116f0320240a41cfa2c67836ff8031",
+          "at": "2026-07-17T15:08:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f567f0183f253c0d568bd250dc899072ac116f0320240a41cfa2c67836ff8031",
+          "at": "2026-07-17T15:10:21Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e55b55dc683dc150b7be6285db95deaaf9d46b3c83dad809da07121d59a6c8d",
+          "at": "2026-07-17T12:37:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e55b55dc683dc150b7be6285db95deaaf9d46b3c83dad809da07121d59a6c8d",
+          "at": "2026-07-17T12:40:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad4d148edc8d0b1b22e3088fc0907fcb7fea14a5f5dbcd950cd70edc2678841b",
+          "at": "2026-07-17T14:15:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad4d148edc8d0b1b22e3088fc0907fcb7fea14a5f5dbcd950cd70edc2678841b",
+          "at": "2026-07-17T14:18:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eca0cd9320d4c9321225ec7889d61910c1bd909f73af1b737c9df3b37167675",
+          "at": "2026-07-17T15:00:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4eca0cd9320d4c9321225ec7889d61910c1bd909f73af1b737c9df3b37167675",
+          "at": "2026-07-17T15:04:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52eaa62a87c01db54cbe9c2c492e167b41634e32c8a0a77fd995941a2ce963ee",
+          "at": "2026-07-17T15:11:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52eaa62a87c01db54cbe9c2c492e167b41634e32c8a0a77fd995941a2ce963ee",
+          "at": "2026-07-17T15:13:29Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf9134aad6b5c7484842c1091707bd7bdad8e80970c53c7ce8c9dcb33e2a2601",
+          "at": "2026-07-17T16:06:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf9134aad6b5c7484842c1091707bd7bdad8e80970c53c7ce8c9dcb33e2a2601",
+          "at": "2026-07-17T16:08:33Z"
+        }
+      ]
+    }
+  }
+}
