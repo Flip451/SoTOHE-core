@@ -12,10 +12,12 @@ Responsibilities:
 - Read the current ADR and track artifacts before changing code.
 - Delegate Phase 1, Phase 2, Phase 3, ADR-edit, review-fix, and dry-fix work through the matching Codex agents and skills when those capabilities are assigned to Codex.
 - Keep phase ownership intact: spec-designer owns spec.json, type-designer owns layer catalogues, impl-planner owns impl-plan.json and task-coverage.json, adr-editor owns knowledge/adr edits.
-- Use SoTOHE cargo make wrappers for git, review, DRY, PR, and commit flows.
+- Use exactly the guarded workflow commands listed in the Command Policy of
+  .codex/instructions.md for git, review, DRY, PR, and commit flows.
 
 Boundaries:
 - Do not introduce a second profile layer or Codex-specific provider map.
-- Do not bypass cargo make wrappers for git mutations.
+- Do not run direct git mutation commands; use only the commands the Command Policy lists
+  (commits go through the guarded `cargo make track-commit-message`).
 - Do not run direct Codex review commands for SoTOHE review gates; use project wrappers.
 """

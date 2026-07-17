@@ -59,7 +59,7 @@ Derived read-only views — never hand-edit, regenerate via `bin/sotp track view
 ## Hard invariants
 
 - Public UI is `/track:*`; never use legacy aliases.
-- No direct `git add` / `commit` / `merge` / `rebase` / `switch` — hooks block them; go through `cargo make` wrappers and `/track:commit` (`.claude/rules/10-guardrails.md`).
+- No direct `git add` / `commit` / `merge` / `rebase` / `switch` — use `/track:*` or the guarded `bin/sotp git`, `bin/sotp track branch`, and `bin/sotp pr` workflow commands (`.claude/rules/10-guardrails.md`).
 - The orchestrator never edits SoT files directly (1 file = 1 writer): ADR → `adr-editor`, `spec.json` → `spec-designer`, catalogues → `type-designer`, `impl-plan.json` → `impl-planner`. Task state transitions go through `bin/sotp track transition`.
 - Every commit (plan artifacts included) is preceded by a reviewer-capability cycle to `zero_findings`; inline self-review is never a substitute (`knowledge/conventions/review-protocol.md`).
 - Do not manually copy, edit, or remove ADR baseline records. A missing init snapshot or a byte mismatch blocks review and commit; use the sanctioned snapshot, restore, and diagnoser routes.
@@ -81,7 +81,7 @@ Six crates, hexagonal (`knowledge/conventions/hexagonal-architecture.md`, enforc
 - `bin/sotp track views sync` — regenerate `plan.md` + `registry.md`
 - `cargo make ci` — full pre-commit gate (`ci-rust` = inner Rust-only loop)
 - `cargo make ci-track` — active-track gates, including ADR-baseline `check-commit`
-- `cargo make help` — task catalogue (details: `.claude/rules/07-dev-environment.md`)
+- `cargo make --list-all-steps` — task catalogue (details: `.claude/rules/07-dev-environment.md`)
 
 ## Delegation surfaces
 

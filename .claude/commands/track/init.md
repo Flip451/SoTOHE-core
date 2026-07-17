@@ -18,7 +18,7 @@ retained.
 This command runs directly — no subagents. Key Bash wrappers used:
 
 - `git branch --show-current`, `git status --short` (read-only pre-flight)
-- `cargo make track-branch-create '<track-id>'`
+- `bin/sotp track branch create --items-dir track/items '<track-id>'`
 - `bin/sotp track views sync`
 - `bin/sotp adr-baseline snapshot --source '<primary-adr-file>.md' --kind init`
 - `cargo make verify-track-metadata`

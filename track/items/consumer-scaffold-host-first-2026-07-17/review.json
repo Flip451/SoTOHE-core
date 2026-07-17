@@ -1,0 +1,741 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:734204aefc5877342cf30390e9a5c795b5aa18f1ffc6b774c1ae914623b5fc0c",
+          "at": "2026-07-16T16:09:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D6 explicitly retains the cache-directory preparation task in the distributed Docker environment file and retains `CARGO_TARGET_DIR_RELATIVE`, but this consequence says both the preparation and target-directory environment plumbing disappear from the distribution. The downstream spec cannot consistently derive the optional Docker variant from these conflicting requirements. Clarify that they disappear only from the default host path, or revise D6/D8 accordingly.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+              "line": 126,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:734204aefc5877342cf30390e9a5c795b5aa18f1ffc6b774c1ae914623b5fc0c",
+          "at": "2026-07-16T16:13:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6dc29625f9136f6988c8ea10b486d23725f81250720f7dc1d30cf7a6e00bbfda",
+          "at": "2026-07-16T16:17:46Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89233c04555750fcfbdbecb1d373df2c26aa7f0a5679ac48aa29c3d70a8d6513",
+          "at": "2026-07-16T18:32:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89233c04555750fcfbdbecb1d373df2c26aa7f0a5679ac48aa29c3d70a8d6513",
+          "at": "2026-07-16T23:40:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29460a92b98060187f5301ce9a89dc0b95af542f69167eab84c5a5ddc6d10ebd",
+          "at": "2026-07-16T23:59:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29460a92b98060187f5301ce9a89dc0b95af542f69167eab84c5a5ddc6d10ebd",
+          "at": "2026-07-17T00:01:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f76fee48b92e92da058a1f55182a75edddc2bc008a3a898799dd2c6751514216",
+          "at": "2026-07-17T00:20:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f76fee48b92e92da058a1f55182a75edddc2bc008a3a898799dd2c6751514216",
+          "at": "2026-07-17T00:22:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c1920c94c5c5a912834e7543d2978c2d7c95540fedb0e9b6a3500f3dc0f16f37",
+          "at": "2026-07-17T01:52:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c1920c94c5c5a912834e7543d2978c2d7c95540fedb0e9b6a3500f3dc0f16f37",
+          "at": "2026-07-17T01:54:36Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:037db866a474470a47ae88e01ca366b70fad204f8a1956d479b4afb895056eeb",
+          "at": "2026-07-16T16:09:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:037db866a474470a47ae88e01ca366b70fad204f8a1956d479b4afb895056eeb",
+          "at": "2026-07-16T16:11:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2fc9981908f237b1ca7e275c9df1265c3591ce5bac388e8eb90742aadaf290d",
+          "at": "2026-07-16T17:30:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Bash(bin/sotp git:*)` also permits `bin/sotp git commit-from-file`, which creates a commit after only branch validation and bypasses the CI, review, test-obligation, and DRY gates enforced by `cargo make track-commit-message`. This is equivalent to the dangerous commit permission identified in `.claude/rules/10-guardrails.md` §Dangerous to allow. Replace the family wildcard with explicit allows for intended add/sync/note operations, excluding `commit-from-file`.",
+              "severity": "P1",
+              "file": ".claude/settings.json",
+              "line": 123,
+              "category": "permission_posture_drift"
+            },
+            {
+              "message": "The rewritten command passes `$ARGUMENTS` positionally to `bin/sotp pr ensure-pr`, but that CLI accepts no positional track ID; moreover, `pr push` receives no ID and PR resolution rejects `plan/` branches. Consequently the documented `/track:pr <id>` plan-branch path fails. Restrict this command to `track/<id>` branches or provide a supported plan-branch flow.",
+              "severity": "P1",
+              "file": ".claude/commands/track/pr.md",
+              "line": 12,
+              "category": "command_wiring_breakage"
+            },
+            {
+              "message": "The workflow recommends `/track:full-cycle <task>`, while `.claude/commands/track/full-cycle.md` explicitly declares that the command takes no arguments. Update this SSoT recommendation and its mirrored Claude adapter to `/track:full-cycle`.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/done.md",
+              "line": 56,
+              "category": "command_wiring_breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:a2fc9981908f237b1ca7e275c9df1265c3591ce5bac388e8eb90742aadaf290d",
+          "at": "2026-07-16T17:38:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow SSoT now correctly recommends `/track:full-cycle` without arguments, but this Claude adapter still recommends `/track:full-cycle <task>`. Since `.claude/commands/track/full-cycle.md` explicitly accepts no arguments, remove `<task>` to restore adapter/SSoT consistency.",
+              "severity": "P1",
+              "file": ".claude/commands/track/done.md",
+              "line": 24,
+              "category": "command_wiring_breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:abceea1a6aba77a398868e24ee999a5a389ce7eaf2f4291bdcf23db24a67a2b3",
+          "at": "2026-07-16T17:42:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:141c1aea472a3a683640f2f85d755e799b7b1c58c9dd878fb8d0675f72207f21",
+          "at": "2026-07-16T17:45:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5fc934fe3fee565ef1c8771f479547bc8502d46de74c9e68374336a5d16f6b7",
+          "at": "2026-07-16T18:02:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "「以下のコマンドは source/export の両方で動く」とありますが、export 側の task 一覧には `fmt` と `help` がありません。実際に `cargo make --makefile overlay/Makefile.toml help` は `Task \"help\" not found` で失敗し、fresh scaffold では本表の `cargo make fmt` と `cargo make help`（CLAUDE.md の quick command も含む）が利用不能です。overlay 側に両 task を追加するか、共通コマンドとして案内しないでください。",
+              "severity": "P1",
+              "file": ".claude/rules/07-dev-environment.md",
+              "line": 23,
+              "category": "command_wiring_breakage"
+            },
+            {
+              "message": "ここでは Git write enforcement を `reference-transaction` / `pre-push` による process-level enforcement としていますが、同ファイル後半の表と説明は `workspace-write` subprocess では hooks が発火せず、直接 commit/push が guard を迂回すると記載しています。設定済みの Git hooks は外部 subprocess の commit/push にも発火するため、Claude の PreToolUse hook と repository Git hooks を区別し、未保護の `git add`/通常ファイル書き込みと保護される ref update/push を正確に記述してください。",
+              "severity": "P1",
+              "file": ".claude/rules/10-guardrails.md",
+              "line": 68,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "MSRV 1.85 という規約が現在の toolchain contract と同期していません。source と overlay の Cargo.toml はどちらも `rust-version = \"1.91\"`、配布 toolchain は 1.94.0 のため、1.85 では Cargo 自体がビルドを拒否します。MSRV を少なくとも manifest の 1.91 に更新してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/nightly-dev-tool.md",
+              "line": 14,
+              "category": "convention_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e5fc934fe3fee565ef1c8771f479547bc8502d46de74c9e68374336a5d16f6b7",
+          "at": "2026-07-16T18:11:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "リモート共有手順の直接 `git push` は、bootstrap が設定する `.githooks/pre-push` により guarded token がないため拒否されます。また `bin/sotp pr push` は現在の track branch 専用で、notes refspec を受け取る guarded wrapper もありません。このままでは記載された notes 共有フローを実行できないため、notes push 用の guarded 経路を用意して案内してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/git-notes.md",
+              "line": 52,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "`cargo audit` は別途 `cargo-audit` の導入が必要ですが、source/overlay の bootstrap、Dockerfile、前提条件のいずれも導入しておらず、fresh checkout では `no such command: audit` になります。host-first の共通コマンド契約に合わせ、既に導入される `cargo make deny` に一本化するか、`cargo-audit` を明示的に pin・導入してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/security.md",
+              "line": 148,
+              "category": "convention_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b757e4bde87c572db78a990aa96632195c79c01dcc02bbb14d70b8f9e294cec1",
+          "at": "2026-07-16T18:16:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5735d6935f6510c11b59c99e5d621ccbee48c75a3ad948e602d1ed02bdf62995",
+          "at": "2026-07-16T18:19:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:626a3b6e7b87f6d65ac9326fb52572354be319dffd67ec628c44545612f83a1b",
+          "at": "2026-07-17T00:20:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:626a3b6e7b87f6d65ac9326fb52572354be319dffd67ec628c44545612f83a1b",
+          "at": "2026-07-17T00:24:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1be86ef02e5bc02af2c89dc007b98efa50caf165e881c158a17ef11e5fd352b",
+          "at": "2026-07-17T00:37:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1be86ef02e5bc02af2c89dc007b98efa50caf165e881c158a17ef11e5fd352b",
+          "at": "2026-07-17T00:41:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca1635a0ec2b668005a23b8b465e94c37cd9e9f0511edf6632507aa4213dcb63",
+          "at": "2026-07-17T00:53:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca1635a0ec2b668005a23b8b465e94c37cd9e9f0511edf6632507aa4213dcb63",
+          "at": "2026-07-17T00:56:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e66203764946c6de29b8e2f8656adb31dac5991d0035ae757b62f5d90562222a",
+          "at": "2026-07-17T01:27:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new command summary is broader than the Command Policy it cites. `cargo make ci-track` is neither listed in `.codex/instructions.md` nor allowed by `.codex/rules/default.rules`, while the namespace-wide `bin/sotp git` / `pr` / `track` wording includes many subcommands beyond the specifically allowed prefixes. This leaves the root agent instructed to use commands outside its declared Codex policy. Use the exact permitted command forms or defer entirely to the linked Command Policy.",
+              "severity": "P1",
+              "file": ".codex/agents/orchestrator.toml",
+              "line": 16,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:e66203764946c6de29b8e2f8656adb31dac5991d0035ae757b62f5d90562222a",
+          "at": "2026-07-17T01:31:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b39ba4a8c209ff3965d8bf369bacc6349038912d0f4d19ae89ba7e09a361f8f",
+          "at": "2026-07-17T01:37:52Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
+          "at": "2026-07-16T16:47:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
+          "at": "2026-07-16T16:51:00Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description includes upstream design/behavior restatement (for example, “workflow-required orchestration...”, “remove unreferenced...”, and “eliminate... passthrough wrappers”); under the impl-plan policy it should contain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description restates the host-first/Docker execution contract and bin/sotp placement instead of limiting itself to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 14,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description restates the shared workflow contract and prohibited wrapper behavior; this is upstream contract prose rather than executable task scope.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 22,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 description restates the canonical direct-operation/aggregate-gate contract and retired-wrapper behavior; remove the rationale/contract prose and retain target + operation + anchors.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 description restates multiple spec behavior contracts (host-first, optional Docker, removal of stale references and obsolete behavior) instead of only executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 38,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 description restates the pinned-toolchain/host-runner/CI provisioning contract in prose; the task should identify the targets, operations, and anchors without duplicating upstream behavior.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 46,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T007 has no concrete target file or symbol: “Consumer-scaffold validation coverage” leaves the implementation boundary for the executor to invent, despite naming operations and anchors.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 54,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "S1 section description restates the workflow-derived task-selection and host-first/Docker environment contract; section descriptions must not duplicate upstream design rationale or behavior.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 75,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S2 section description restates the canonical call-site and direct bin/sotp contract; it should be a concise execution grouping rather than upstream contract prose.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 87,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S3 section description restates the host-first/optional-Docker documentation behavior contract.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 98,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S4 section description restates the pinned provisioning and host-runner CI contract.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 108,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S5 section description restates the validation contract and expected stale-reference checks rather than merely grouping the task.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 118,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:469303d4caaece24ee3c033821752d5e65d4de8b918bb8a542a3c6d6623b65ff",
+          "at": "2026-07-16T16:48:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:745fcfcc3d2ed9de276fa7baf5c952e9f365a49cb6f40c1e0c6a2b26e7249a6e",
+          "at": "2026-07-16T16:50:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 creates `overlay/Makefile.host.toml` and `overlay/Makefile.docker.toml`, but no task updates `.harness/config/template-boundary.json`. The exporter currently declares only `Makefile.toml` and excludes `overlay/`, so these peer files will not reach the exported scaffold and the configured `extend` target will be missing. Consequently IN-04/AC-04 cannot be satisfied as mapped.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 12,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T006 creates `overlay/rust-toolchain.toml`, but no task adds that path to `.harness/config/template-boundary.json`. Because overlay-only files are emitted only when declared by the boundary manifest, the exported scaffold will lack the pinned toolchain required by IN-05/AC-05.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 36,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T004 does not name the distributed Codex adapters under `.agents/skills/`. Current files such as `track-commit/SKILL.md`, `track-init/SKILL.md`, and `track-pr-review/SKILL.md` still invoke passthrough wrappers that T001 retires. No other task targets these adapters, so the plan would leave live distributed references to removed tasks; explicitly include the affected `.agents/skills/` files in T004's target boundary.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 24,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "AC-02 is mapped only to mutation tasks T001/T003/T004. T007 is the sole validation task but omits IN-02/AC-02, leaving the multi-surface direct-call migration and retired-wrapper removal without any validation step. Add the relevant validation operation and mapping to T007.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/task-coverage.json",
+              "line": 31,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:745fcfcc3d2ed9de276fa7baf5c952e9f365a49cb6f40c1e0c6a2b26e7249a6e",
+          "at": "2026-07-16T16:59:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002/T004 do not provide an executable implementation step for the `CODEX_BIN` portion of IN-08/CN-06/AC-08. The actual `asdf which codex` launchers are `track-local-review`, `track-local-review-fix`, and `track-local-dry-fix` in `overlay/Makefile.toml`; T002 only describes the cargo-gate/environment-file split, while T004 targets provider adapters and permission files. T007 can validate the criterion but cannot implement it, so satisfying these mappings currently requires the executor to invent an unlisted operation. Add the affected Makefile symbols and rewrite operation to T001 or T002.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 12,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:99ca5d0cde861c128bc9ea2790d5bb165f738ade55978c9eddfc6a1e8a7695cd",
+          "at": "2026-07-16T17:04:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 is still attributed to IN-08/CN-06/AC-08, but its targets (`.claude/commands/`, `.claude/settings.json`, `.agents/skills/`, and command-policy files) contain none of the `CODEX_BIN`/`asdf`, `WORKER_ID`, or `CARGO_TARGET_DIR_RELATIVE` behavior governed by those elements. That work is now explicitly owned by T002 (with documentation under T005), so the T004 mappings and corresponding S2 anchors are fabricated. Remove IN-08/CN-06/AC-08 from T004/S2 and from their T004 entries in `task-coverage.json`, unless T004 names a concrete affected target and operation.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/impl-plan.json",
+              "line": 24,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:0a1bd426af3810359d6a7edb6e35554ab861519b672eb80502049949a7b63627",
+          "at": "2026-07-16T17:07:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e65fd6dfcaad5efccdbe74f5f5c0f6093ced038eabdfad66c80c649d5768a0c0",
+          "at": "2026-07-16T17:08:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7351aa567e8c12aea85eea0e69c72e0e91c4442675cbb9b9e683f58a3b2ba3e8",
+          "at": "2026-07-16T17:29:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7351aa567e8c12aea85eea0e69c72e0e91c4442675cbb9b9e683f58a3b2ba3e8",
+          "at": "2026-07-16T17:34:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:399297cee55f291b086e98b5ce892bc89d055abcd6e9b400de6a83767157e784",
+          "at": "2026-07-16T18:02:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:399297cee55f291b086e98b5ce892bc89d055abcd6e9b400de6a83767157e784",
+          "at": "2026-07-16T18:04:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27325ff727269f55cd2e5253352be34314140cabb5e5708a5be6097699050582",
+          "at": "2026-07-16T18:32:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27325ff727269f55cd2e5253352be34314140cabb5e5708a5be6097699050582",
+          "at": "2026-07-16T23:39:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1015b1d4244cbb30606ca0e4aa31e970e8f93303972cdd1c34fcdcf7cffe6f4",
+          "at": "2026-07-16T23:45:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1015b1d4244cbb30606ca0e4aa31e970e8f93303972cdd1c34fcdcf7cffe6f4",
+          "at": "2026-07-16T23:47:11Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `track-commit-message` script uses two literal backslashes (`&& \\\\`) at each continuation line. In the shell, the first escapes the second, so the newline is not continued and the script attempts to execute `\\` as a command (or otherwise fails) instead of chaining the following command. This makes the guarded commit workflow fail before completing.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 300,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:6ecc86be73aef49d5cb0ec364ac42a65be4bb0460baf10589b7e18478c61d3be",
+          "at": "2026-07-16T17:30:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55e9ce76a48e4364f9c7cff91951c82ef05bc93172860f548fc902431ffa9907",
+          "at": "2026-07-16T17:31:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`bootstrap` still fails when Docker/Compose is absent and unconditionally builds the tools image before running host CI. Since bootstrap is the first-run entry point, the default scaffold still requires Docker, contradicting ADR D3 and IN-03/OS-02. Remove this Docker preflight/build from the default bootstrap or make it conditional on explicit Docker selection.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 20,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:55e9ce76a48e4364f9c7cff91951c82ef05bc93172860f548fc902431ffa9907",
+          "at": "2026-07-16T17:36:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd8b0f569570547b5498885a1248aa86c711d68f9404936d82b12f4c1e83c017",
+          "at": "2026-07-16T17:39:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:875173a148d732fa5cf0c5f2bc9ad9d5092ba57c7ee1219c6e0f03b4b300a279",
+          "at": "2026-07-16T18:02:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On a cold cache, `cargo make install-sotp` builds sotp from source, whose LanceDB/prost dependency requires `protoc`. The workflow never installs `protobuf-compiler`, and the current Ubuntu 24.04 runner inventory does not include it, so the first CI run or any cache miss fails before either gate executes. Provision `protobuf-compiler` before this step. See the [official runner inventory](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md).",
+              "severity": "P0",
+              "file": "overlay/.github/workflows/ci.yml",
+              "line": 45,
+              "category": "correctness"
+            },
+            {
+              "message": "The cache reuse condition accepts any executable named `$BINARY` without proving it was installed from the current `$GIT_URL` and `$TAG`. After the pin changes, a local `.cargo-install` silently reuses the previous sotp binary and reports it as the new tag, defeating the pinned-install contract. Store and validate pin metadata, key the install directory by tag, or force installation when provenance cannot be confirmed.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 99,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:875173a148d732fa5cf0c5f2bc9ad9d5092ba57c7ee1219c6e0f03b4b300a279",
+          "at": "2026-07-16T18:08:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f17bdbf185aca6b55a1f6719c6ccbabacea4644593001ef03f24d4f92a4c0446",
+          "at": "2026-07-16T18:12:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b82c8116a57e688236e5ce60dbe038c3f24ab1c4ea12ceb9a2a129910f1a020",
+          "at": "2026-07-16T23:59:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b82c8116a57e688236e5ce60dbe038c3f24ab1c4ea12ceb9a2a129910f1a020",
+          "at": "2026-07-17T00:02:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a266f2f44c9d2c63c1df93df3edacc3fa4f76dee893872abdfd7b5138f6cc083",
+          "at": "2026-07-17T01:09:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a266f2f44c9d2c63c1df93df3edacc3fa4f76dee893872abdfd7b5138f6cc083",
+          "at": "2026-07-17T01:11:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af48700234203a0b99eb9053f80e2c911eb8774db9d14d2390fafa14f62c48da",
+          "at": "2026-07-17T01:52:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af48700234203a0b99eb9053f80e2c911eb8774db9d14d2390fafa14f62c48da",
+          "at": "2026-07-17T01:54:24Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 includes the behavioral promise that the distributed Makefile requires no manual synchronization with the source repository, but no acceptance criterion deterministically verifies that property. AC-01 verifies task-set provenance/exclusions only, not absence of a synchronization obligation or mechanism.",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
+              "line": 10,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:eb703b048c7f7b2e1b8f273d6e3b00394d4d86730aa132900ca161d44d426b73",
+          "at": "2026-07-16T16:48:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0723f02dad8586a7aa034ab35fcd7342abfa0d754bc15d6e7dd8842453836e5",
+          "at": "2026-07-16T16:49:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`coding-principles.md#No Panics in Library Code` は `libs/` / `apps/` の Rust プロダクションコード向け規約だが、この spec の in_scope は配布 Makefile、workflow、CI、bootstrap、設定、文書に限定され、Rust ライブラリコードの変更を含まない。したがって、この `related_conventions` は narrative-level で明確に scope 外であり、下流計画に無関係な実装制約を持ち込む。",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
+              "line": 385,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`prefer-type-safe-abstractions.md#Rule` は Rust の型設計やバグクラス排除を扱う規約だが、この spec には型、domain model、Rust API の設計・変更がない。この参照も本 behavioral contract と無関係で、下流の type design / impl-plan を誤誘導する off-topic な `related_conventions` になっている。",
+              "severity": "P1",
+              "file": "track/items/consumer-scaffold-host-first-2026-07-17/spec.json",
+              "line": 389,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:e0723f02dad8586a7aa034ab35fcd7342abfa0d754bc15d6e7dd8842453836e5",
+          "at": "2026-07-16T16:54:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:016970402214fe947c077bac4642c3d0f2558117e9cf9a7f8ceb1deaf3f409c3",
+          "at": "2026-07-16T16:56:35Z"
+        }
+      ]
+    }
+  }
+}

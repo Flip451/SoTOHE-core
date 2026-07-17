@@ -59,21 +59,20 @@ are thin wrappers that reference it. Read that SSoT when acting as a specialist.
 
 ## Command Policy
 
-Use guarded project wrappers for git, review, DRY, PR, and commit flows:
+Use the gate aggregates via `cargo make` and single workflow operations via guarded `bin/sotp` commands:
 
 - `cargo make ci`
 - `cargo make ci-rust`
-- `cargo make add-all`
-- `cargo make track-add-paths`
 - `cargo make track-commit-message`
-- `cargo make track-note`
-- `cargo make track-pr`
-- `cargo make track-pr-push`
-- `cargo make track-pr-ensure`
-- `cargo make track-pr-review`
 - `cargo make track-local-review-fix`
 - `cargo make track-local-review`
 - `cargo make track-local-dry-fix`
+- `bin/sotp git add-all`
+- `bin/sotp git add-from-file tmp/track-commit/add-paths.txt --cleanup`
+- `bin/sotp git note-from-file tmp/track-commit/note.md --cleanup`
+- `bin/sotp pr push`
+- `bin/sotp pr ensure-pr`
+- `bin/sotp pr review-cycle`
 
 Allowed direct Git usage is read-only inspection such as `git status`, `git diff`, `git log`,
 `git show`, `git rev-parse`, `git ls-files`, and `git notes show/list`.

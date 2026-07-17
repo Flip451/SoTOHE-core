@@ -1,0 +1,44 @@
+# Docker cargo toolchain gates. Select this peer by changing Makefile.toml's
+# single extend target; host-side bin/sotp gates remain in the common file.
+
+[env]
+DOCKER_BUILDKIT = "1"
+COMPOSE_DOCKER_CLI_BUILD = "1"
+
+[tasks.prepare-local-cache-dirs]
+private = true
+description = "[internal] Prepare host-owned cache directories for compose bind mounts"
+script_runner = "@shell"
+script = ['''
+mkdir -p "${CARGO_TARGET_DIR_RELATIVE:-target}" .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home
+''']
+
+[tasks.fmt-check]
+description = "[gate] Check formatting through Docker Compose"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "fmt", "--all", "--", "--check"]
+
+[tasks.clippy]
+description = "[gate] Run clippy through Docker Compose"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "clippy", "--all-targets", "--all-features", "--", "-D", "warnings"]
+
+[tasks.test]
+description = "[gate] Run nextest through Docker Compose"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "-e", "SOTP_TELEMETRY=0", "tools", "cargo", "nextest", "run", "--all-targets", "--all-features", "--no-tests=warn"]
+
+[tasks.test-doc]
+description = "[gate] Run documentation tests through Docker Compose"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "-e", "SOTP_TELEMETRY=0", "tools", "cargo", "test", "--doc", "--all-features"]
+
+[tasks.deny]
+description = "[gate] Run dependency policy checks through Docker Compose"
+dependencies = ["prepare-local-cache-dirs"]
+command = "docker"
+args = ["compose", "run", "--rm", "tools", "cargo", "deny", "check"]

@@ -11,15 +11,16 @@ not be committed to version control and must not be read by Claude Code.
 > `.claude/rules/10-guardrails.md` §Sandbox and Hook Coverage Warning for details. When using Codex with `workspace-write`,
 > instruct it explicitly not to read files under `private/` or `config/secrets/`.
 >
-> **Container-level enforcement**: Docker Compose services enforce these rules at OS level:
+> **Optional container-level enforcement**: A project that selects the Docker environment can
+> additionally use Docker Compose services to enforce these rules at OS level:
 > - `.git` is mounted read-only (`:ro`), preventing `git add/commit` from containers (EROFS).
 >   Note: `git push` may still succeed as it primarily reads `.git`; network-level controls
 >   or hook-based blocking should be used if push prevention is required.
 > - `private/` and `config/secrets/` are masked by empty tmpfs overlays, making them appear empty
 >   inside containers regardless of host contents
 >
-> This covers Codex `workspace-write` subprocesses and `cargo make shell` sessions that bypass
-> Claude Code hooks. See `compose.yml` and `compose.dev.yml` for the mount configuration.
+> This container isolation does not cover host-runner commands or Codex `workspace-write`
+> subprocesses. Those paths must follow the permission and guarded-workflow rules above.
 
 ### `private/`
 
@@ -144,8 +145,7 @@ Err(AppError::Internal("Service unavailable".to_string()))
 ## Dependencies
 
 ```bash
-cargo audit          # セキュリティ脆弱性チェック
-cargo make deny      # ライセンス・禁止クレートチェック
+cargo make deny      # 脆弱性・ライセンス・禁止クレートチェック
 ```
 
 ## Code Review Checklist

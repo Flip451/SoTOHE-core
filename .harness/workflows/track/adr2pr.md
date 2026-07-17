@@ -54,11 +54,11 @@ is complete.
 
 If the track is already initialized (on a `track/<id>` branch with `metadata.json`), skip
 this step and start at Step 2. Otherwise, invoke the `init` workflow
-(`.harness/workflows/track/init.md`) as
-`/track:init <feature> --primary-adr <file>` to create the track directory, write
-`metadata.json`, and materialize the branch. Pass both inputs explicitly: `init` derives the
-track id from the feature and records the ADR's required `--kind init` baseline. Do not ask
-`init` to rediscover either value. On ERROR, stop and report.
+(`.harness/workflows/track/init.md`) to create the track directory, write `metadata.json`, and
+materialize the branch. Pass both its feature-name input and its direct primary-ADR-source
+filename input explicitly: `init` derives the track id from the feature and records the ADR's
+required `--kind init` baseline. Do not ask `init` to rediscover either value. On ERROR, stop
+and report.
 
 **Step 2: review workflow — ADR baseline**
 
@@ -69,7 +69,7 @@ tree. The absence of `spec.md` does not block the review.
 
 **Step 3: Stage**
 
-Run `cargo make add-all` after the final review round (per the canonical staging-order rule in
+Run `bin/sotp git add-all` after the final review round (per the canonical staging-order rule in
 the `commit` workflow: review must complete before staging).
 
 **Step 4: commit workflow — ADR + metadata commit**
@@ -105,7 +105,7 @@ artifacts (`spec.json`, type catalogues, `impl-plan.json`).
 
 **Step 7: Stage**
 
-Run `cargo make add-all` after the final review round.
+Run `bin/sotp git add-all` after the final review round.
 
 **Step 8: commit workflow — plan artifacts commit**
 
