@@ -24,8 +24,9 @@ bin/sotp git note-from-file tmp/track-commit/note.md --cleanup
 
 選択的 staging では `tmp/track-commit/add-paths.txt` に repo-relative path を 1 行ずつ書き、
 `bin/sotp git add-from-file tmp/track-commit/add-paths.txt` を使う。コミット本体の正規経路は
-`tmp/track-commit/commit-message.txt` を用意して
-`bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup` を使うこと。
+`tmp/track-commit/commit-message.txt` を用意して `cargo make track-commit-message` を使うこと
+（CI・track-aware gate・review/ref-verify 承認・DRY gate を通してからコミットする唯一の経路。
+`bin/sotp git commit-from-file` はこの wrapper の内部ステップであり、直接呼ばない）。
 
 ### note フォーマット
 

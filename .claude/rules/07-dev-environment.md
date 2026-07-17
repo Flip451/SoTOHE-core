@@ -43,10 +43,13 @@ Use `bin/sotp` for single workflow operations; use `cargo make` only for aggrega
 This keeps the documentation valid when the source repository and exported scaffold select
 different Makefile execution environments.
 
+Commits are the exception: write the message to `tmp/track-commit/commit-message.txt` and run
+the guarded `cargo make track-commit-message` (CI + track-aware gates + review/ref-verify +
+DRY gate before the commit). Never call the commit subcommand it wraps directly.
+
 ```bash
 bin/sotp git add-from-file tmp/track-commit/add-paths.txt
 bin/sotp git unstage <paths>
-bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup
 bin/sotp git note-from-file tmp/track-commit/note.md --cleanup
 bin/sotp git sync
 bin/sotp track branch create <track-id>
