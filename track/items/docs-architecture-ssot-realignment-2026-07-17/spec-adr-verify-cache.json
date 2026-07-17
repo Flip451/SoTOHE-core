@@ -3,10 +3,10 @@
   "entries": [
     {
       "claim_hash": "19e48c524edc5c3199efcd6b774934fa565f6d55a0618938468233b73d1648a0",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "以後の SSoT は次の 2 つに一本化する:"
+        "citation": "`knowledge/conventions/hexagonal-architecture.md` を削除する。... 以後の SSoS は次の 2 つに一本化する:"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -26,7 +26,7 @@
     },
     {
       "claim_hash": "a2da761b0001097ebb4f19a9cf37a7b14b842b338601e325d8024e3d86d529d9",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "`knowledge/conventions/hexagonal-architecture.md` を削除する。全面改訂（6 crate 化）ではなく廃止を選ぶ。以後の SSoT は次の 2 つに一本化する:"
@@ -49,10 +49,10 @@
     },
     {
       "claim_hash": "a2da761b0001097ebb4f19a9cf37a7b14b842b338601e325d8024e3d86d529d9",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "移設節には強制強度（現状 warning-only であること、error 昇格は採用者判断であること）を consumer 向けの表現で明記する（監査で指摘された、強制強度が内部チケット参照でしか読めない問題の同時解消）。"
+        "citation": "Usecase Layer Purity Rules（std I/O モジュール・暗黙的外部依存・出力マクロの禁止表と rationale、および usecase の Good/Bad コード例）は `knowledge/conventions/coding-principles.md` へ節として移設する。機械強制は従来どおり `sotp verify usecase-purity` が担い、移設節には強制強度（現状 CI blocking であること、緩和は採用者判断であること）を consumer 向けの表現で明記する（監査で指摘された、強制強度が内部チケット参照でしか読めない問題の同時解消）。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -72,7 +72,7 @@
     },
     {
       "claim_hash": "a2da761b0001097ebb4f19a9cf37a7b14b842b338601e325d8024e3d86d529d9",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "再発防止として、`architecture-customizer` スキルの Update Documentation ステップと `.claude/rules/09-maintainer-checklist.md` の更新対象リストを、アーキテクチャ記述を持つ文書の実集合（本 ADR 適用後の集合）と一致させる（監査 F-04 の解消）。以後、層構成の変更時に更新すべき文書がチェックリストから漏れない状態を維持する。"
@@ -95,7 +95,7 @@
     },
     {
       "claim_hash": "a2da761b0001097ebb4f19a9cf37a7b14b842b338601e325d8024e3d86d529d9",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "ポート配置に言及する全ドキュメントを R1 の 2 層配置（永続化・集約ポート → domain / アプリケーションサービスが必要とする機能ポート → usecase）に揃える"
@@ -118,7 +118,7 @@
     },
     {
       "claim_hash": "a2da761b0001097ebb4f19a9cf37a7b14b842b338601e325d8024e3d86d529d9",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "`type-designer-kind-selection.md` R3 の「値以外の何かを計算して返す method は behavior であり ValueObject 違反」という bright-line を改め、禁止対象を「依存や外部リソースを扱う behavior 中心の service 的 struct（`Codec` / `Validator` / `Resolver` / `parse_*` 等）」に限定する。"
@@ -141,10 +141,10 @@
     },
     {
       "claim_hash": "a2da761b0001097ebb4f19a9cf37a7b14b842b338601e325d8024e3d86d529d9",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "「監査 F-11 の解消。`dry-check-workflow.md` への DRY 判断基準の明文化 — 知識の重複とテキスト類似の区別、偶発的類似は違反ではないこと — も同時に行う」"
+        "citation": "監査 F-11 の解消。`dry-check-workflow.md` への DRY 判断基準の明文化 — 知識の重複とテキスト類似の区別、偶発的類似は違反ではないこと — も同時に行う"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -164,10 +164,10 @@
     },
     {
       "claim_hash": "a2da761b0001097ebb4f19a9cf37a7b14b842b338601e325d8024e3d86d529d9",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "CLAUDE.md の Workspace shape 行の凡例なし矢印（`libs/domain` → `libs/usecase` → `libs/infrastructure`）を、依存方向が誤読できない表記へ改める"
+        "citation": "CLAUDE.md の Workspace shape 行の凡例なし矢印（`libs/domain` → `libs/usecase` → `libs/infrastructure`）を、依存方向が誤読できない表記へ改める（依存矢印を内向きに統一するか、「内側→外側の層順であり依存は逆向き」という凡例を付す）。あわせて delivery 3 crate の一言依存（cli-driver は usecase のみ / cli-composition が全層を配線 / cli は bin）を添える（監査 F-12 の解消）。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -187,7 +187,7 @@
     },
     {
       "claim_hash": "a2da761b0001097ebb4f19a9cf37a7b14b842b338601e325d8024e3d86d529d9",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "`overlay/knowledge/adr/README.md` のテンプレートと運用ルール記述を現行規約に一致させる"
@@ -210,10 +210,10 @@
     },
     {
       "claim_hash": "a2da761b0001097ebb4f19a9cf37a7b14b842b338601e325d8024e3d86d529d9",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "文書・テンプレート・CI が現行の規約と fail-closed 方針に整合する状態にする"
+        "citation": "CI の track-aware gate は release PR のみ明示的に免除し、その他の PR では fail-closed を維持する"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -233,10 +233,10 @@
     },
     {
       "claim_hash": "e001f72329f42bbd99fcca65a9c7e94fa092c844d0f4684c645d42d5e996063b",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "`knowledge/conventions/hexagonal-architecture.md` を削除する。全面改訂（6 crate 化）ではなく廃止を選ぶ。以後の SSoT は次の 2 つに一本化する:"
+        "citation": "`knowledge/conventions/hexagonal-architecture.md` を削除する。... 以後の SSoT は次の 2 つに一本化する:"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -256,10 +256,10 @@
     },
     {
       "claim_hash": "2a3bd44577f551d0f592ae1bc284018d4ffdabdcfaf1d2875fc55452cdedf5ec",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "Usecase Layer Purity Rules（std I/O モジュール・暗黙的外部依存・出力マクロの禁止表と rationale、および usecase の Good/Bad コード例）は `knowledge/conventions/coding-principles.md` へ節として移設する。"
+        "citation": "### D2: 残余コンテンツは usecase purity 規則のみ coding-principles.md へ移設し、他は廃棄する"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -279,7 +279,7 @@
     },
     {
       "claim_hash": "dcd13360024eb2167ae028708b2c301a8c851a29f6f5a143ce5c82fa8e5c2de7",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "hexagonal-architecture.md への参照…を、D1 の新 SSoT（`architecture-rules.json` / kind-selection R1）または D2 の移設先（coding-principles.md の purity 節）へ付け替える。…再発防止として、`architecture-customizer` スキルの Update Documentation ステップと `.claude/rules/09-maintainer-checklist.md` の更新対象リストを、アーキテクチャ記述を持つ文書の実集合（本 ADR 適用後の集合）と一致させる"
@@ -302,10 +302,10 @@
     },
     {
       "claim_hash": "5c51ce84912b11e724fb37557700638aef174cddce1f711aec489fbc0434b2c3",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "ポート配置に言及する全ドキュメントを R1 の 2 層配置（永続化・集約ポート → domain / アプリケーションサービスが必要とする機能ポート → usecase）に揃える:"
+        "citation": "ポート配置に言及する全ドキュメントを R1 の 2 層配置（永続化・集約ポート → domain / アプリケーションサービスが必要とする機能ポート → usecase）に揃える"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -325,10 +325,10 @@
     },
     {
       "claim_hash": "d88ac6f14e200c495c7e64b376d50089d0230e403ca77bea1a64eedf2895bc69",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "禁止対象を「依存や外部リソースを扱う behavior 中心の service 的 struct（`Codec` / `Validator` / `Resolver` / `parse_*` 等）」に限定する。値等価で識別される型が自身の値から新しい値・述語を導出する side-effect-free なメソッド（例: `Money::add`、`DateRange::overlaps`）は ValueObject に許容する。"
+        "citation": "値等価で識別される型が自身の値から新しい値・述語を導出する side-effect-free なメソッド（例: `Money::add`、`DateRange::overlaps`）は ValueObject に許容する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -348,10 +348,10 @@
     },
     {
       "claim_hash": "3ca0d157d8dcc19b854efd9b75d97e17e8f3ccae086a1563b72d0bc192cba4b8",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "「関心分離に由来する意図的な構造類似（core 型とその adapter ミラー DTO/enum。type-designer の self-check が規定するミラー設計）は DRY 違反ではなく統合対象外」という除外規定と、「正当な cross-layer 共通化は双方が依存できる、より内側の層へ抽出する」"
+        "citation": "「関心分離に由来する意図的な構造類似（core 型とその adapter ミラー DTO/enum。type-designer の self-check が規定するミラー設計）は DRY 違反ではなく統合対象外」および「正当な cross-layer 共通化は双方が依存できる、より内側の層へ抽出する」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -371,10 +371,10 @@
     },
     {
       "claim_hash": "21d26ec71a0f95b539a355e479d49862019c803c6c7bb5692d735794adca766c",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "CLAUDE.md の Workspace shape 行の凡例なし矢印（`libs/domain` → `libs/usecase` → `libs/infrastructure`）を、依存方向が誤読できない表記へ改める。あわせて delivery 3 crate の一言依存（cli-driver は usecase のみ / cli-composition が全層を配線 / cli は bin）を添える"
+        "citation": "CLAUDE.md の Workspace shape 行の凡例なし矢印（`libs/domain` → `libs/usecase` → `libs/infrastructure`）を、依存方向が誤読できない表記へ改める。…あわせて delivery 3 crate の一言依存（cli-driver は usecase のみ / cli-composition が全層を配線 / cli は bin）を添える"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -394,10 +394,10 @@
     },
     {
       "claim_hash": "14c28d43b880e8eda18dfbcd5e9a478c1aef9b8807ec276588c1a363d28e1297",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "`overlay/knowledge/adr/README.md` のテンプレートと運用ルール記述を現行規約に一致させる: file-level の `## Status` 見出しと「**Status**:」運用ルールを削除し、YAML front-matter（`adr_id` + `decisions[]`、decision 粒度の `status`（5 値小文字）と根拠 ref）を必須として例示する（`knowledge/conventions/adr.md` の例に準拠）。maintainer 側 `knowledge/adr/README.md` のテンプレート節にも同じ陳腐化があるため、同時に是正する。"
+        "citation": "`overlay/knowledge/adr/README.md` のテンプレートと運用ルール記述を現行規約に一致させる: ... YAML front-matter（`adr_id` + `decisions[]`、decision 粒度の `status`（5 値小文字）と根拠 ref）を必須として例示する ... maintainer 側 `knowledge/adr/README.md` のテンプレート節にも同じ陳腐化があるため、同時に是正する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -417,7 +417,7 @@
     },
     {
       "claim_hash": "61e0232a19e11d26c7c9e2a1b21509ee7f21bab422b3a683c3afdc5eea81f1fa",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "### D9: CI の track-aware gate は release PR のみ明示的に免除し、その他の PR では fail-closed を維持する\n\n`.github/workflows/ci.yml` の track-aware gate step（`cargo make ci-track-container` の実行）の条件を、「pull_request であること」から「pull_request のうち `develop` → `main` の release PR を除くすべて」へ改める（head が `develop` かつ base が `main` の組合せのみを免除する否定条件）。"
@@ -440,7 +440,7 @@
     },
     {
       "claim_hash": "80e77156b026b07503f34c6f0cb382e9b98194ffdd73456ad12745688aae0659",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "candidate_selection: from:[structural-fixes-only,all-high-medium-findings,docs-ssot-reorg-only] chose:all-high-medium-findings"
@@ -463,7 +463,7 @@
     },
     {
       "claim_hash": "769536493c8af6fe08662a6762eeb102da927868dba99dd18c067af0574e4bd5",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "Rust ソースの doc comment に残る同規約への参照 — `libs/domain/src/spec_document_loader_port.rs` の port 配置根拠説明等の数箇所）を、D1 の新 SSoT（`architecture-rules.json` / kind-selection R1）または D2 の移設先（coding-principles.md の purity 節）へ付け替える。"
@@ -486,10 +486,10 @@
     },
     {
       "claim_hash": "068c425b56a55370854671e2a288197b0180de58bbfaa5bd1c97770289cc0361",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "機械強制は従来どおり `sotp verify usecase-purity` が担い、移設節には強制強度（現状 warning-only であること、error 昇格は採用者判断であること）を consumer 向けの表現で明記する"
+        "citation": "機械強制は従来どおり `sotp verify usecase-purity` が担い、移設節には強制強度（現状 CI blocking であること、緩和は採用者判断であること）を consumer 向けの表現で明記する"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -509,7 +509,7 @@
     },
     {
       "claim_hash": "7ea498ade18510eaac53c825469dca39f7bebcd0fc67bc13c78e57031d579f97",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "以後の SSoT は次の 2 つに一本化する:"
@@ -532,10 +532,10 @@
     },
     {
       "claim_hash": "4c61cd855ca89aa694b2791b2c7b4c6ddcef95e73422c7a8bc844b02b0e1e4de",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "移設節には強制強度（現状 warning-only であること、error 昇格は採用者判断であること）を consumer 向けの表現で明記する"
+        "citation": "移設節には強制強度（現状 CI blocking であること、緩和は採用者判断であること）を consumer 向けの表現で明記する"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -555,10 +555,10 @@
     },
     {
       "claim_hash": "aa7b3a6bc4619c5d7f03944e70dcf8b2889d86d373d328afc87396afd7d3be1c",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "「CI の track-aware gate は release PR のみ明示的に免除し、その他の PR では fail-closed を維持する」および「head が `develop` かつ base が `main` の組合せのみを免除する否定条件」"
+        "citation": "CI の track-aware gate は release PR のみ明示的に免除し、その他の PR では fail-closed を維持する"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -578,10 +578,10 @@
     },
     {
       "claim_hash": "857b983dd3d1865b6135b710793fa5520251b9d547a55e944027695ab4bfafd6",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "hexagonal-architecture.md への参照（レビュー プロンプト各所の「Cite `hexagonal-architecture.md` §...」、CLAUDE.md / AGENTS.md / README.md / `.claude/rules/` / architecture-customizer スキル等、および Rust ソースの doc comment に残る同規約への参照 — `libs/domain/src/spec_document_loader_port.rs` の port 配置根拠説明等の数箇所）を、D1 の新 SSoT（`architecture-rules.json` / kind-selection R1）または D2 の移設先（coding-principles.md の purity 節）へ付け替える。"
+        "citation": "hexagonal-architecture.md への参照（レビュープロンプト各所の「Cite `hexagonal-architecture.md` §...」、CLAUDE.md / AGENTS.md / README.md / `.claude/rules/` / architecture-customizer スキル等、および Rust ソースの doc comment に残る同規約への参照 — `libs/domain/src/spec_document_loader_port.rs` の port 配置根拠説明等の数箇所）を、D1 の新 SSoT（`architecture-rules.json` / kind-selection R1）または D2 の移設先（coding-principles.md の purity 節）へ付け替える。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -601,10 +601,10 @@
     },
     {
       "claim_hash": "1a5f66a09d0142889b7992834f04b44c0bbe1e381e276df71ff8deb8478faa9a",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "`knowledge/conventions/hexagonal-architecture.md` を削除する。全面改訂（6 crate 化）ではなく廃止を選ぶ。以後の SSoT は次の 2 つに一本化する:\n\n- **crate 間の層依存**: `architecture-rules.json`（`may_depend_on`）+ `deny.toml`。\n- **role × layer の配置（ポート配置を含む）**: `knowledge/conventions/type-designer-kind-selection.md` の R1 マトリクス。"
+        "citation": "`knowledge/conventions/hexagonal-architecture.md` を削除する。... 以後の SSoT は次の 2 つに一本化する:"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -624,10 +624,10 @@
     },
     {
       "claim_hash": "68dfaa3d83800294b883c4ceb64b13904cb308a91242dc878036c519a3fb4ba6",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "**Usecase Layer Purity Rules**（std I/O モジュール・暗黙的外部依存・出力マクロの禁止表と rationale、および usecase の Good/Bad コード例）は `knowledge/conventions/coding-principles.md` へ節として移設する。機械強制は従来どおり `sotp verify usecase-purity` が担い、移設節には強制強度（現状 warning-only であること、error 昇格は採用者判断であること）を consumer 向けの表現で明記する"
+        "citation": "Usecase Layer Purity Rules（std I/O モジュール・暗黙的外部依存・出力マクロの禁止表と rationale、および usecase の Good/Bad コード例）は `knowledge/conventions/coding-principles.md` へ節として移設する。…移設節には強制強度（現状 CI blocking であること、緩和は採用者判断であること）を consumer 向けの表現で明記する"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -647,7 +647,7 @@
     },
     {
       "claim_hash": "54baabd0b8aedb27d807751fbaedf72335b3e8c077b0be6dc0aa7e58e0f2798a",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "hexagonal-architecture.md への参照（レビュープロンプト各所の「Cite `hexagonal-architecture.md` §...」、CLAUDE.md / AGENTS.md / README.md / `.claude/rules/` / architecture-customizer スキル等、および Rust ソースの doc comment に残る同規約への参照 — `libs/domain/src/spec_document_loader_port.rs` の port 配置根拠説明等の数箇所）を、D1 の新 SSoT（`architecture-rules.json` / kind-selection R1）または D2 の移設先（coding-principles.md の purity 節）へ付け替える。"
@@ -670,7 +670,7 @@
     },
     {
       "claim_hash": "26b90de2d3587943e7aac557d4fa7e67d0ab23fdb61fd222b8c37fbeea39ef72",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "再発防止として、`architecture-customizer` スキルの Update Documentation ステップと `.claude/rules/09-maintainer-checklist.md` の更新対象リストを、アーキテクチャ記述を持つ文書の実集合（本 ADR 適用後の集合）と一致させる（監査 F-04 の解消）。"
@@ -693,7 +693,7 @@
     },
     {
       "claim_hash": "04082589234e97e3b29e29e890786ea072bed0a8f1e2bc0d48b35f4e49a24320",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "ポート配置に言及する全ドキュメントを R1 の 2 層配置（永続化・集約ポート → domain / アプリケーションサービスが必要とする機能ポート → usecase）に揃える"
@@ -716,10 +716,10 @@
     },
     {
       "claim_hash": "0086cf597a5fd04e8c4e79bddb8c06886c0147b8513629c833d3b4741654bd97",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "値等価で識別される型が自身の値から新しい値・述語を導出する side-effect-free なメソッド（例: `Money::add`、`DateRange::overlaps`）は ValueObject に許容する。"
+        "citation": "R3（中略）禁止対象を「依存や外部リソースを扱う behavior 中心の service 的 struct（`Codec` / `Validator` / `Resolver` / `parse_*` 等）」に限定する。値等価で識別される型が自身の値から新しい値・述語を導出する side-effect-free なメソッド（例: `Money::add`、`DateRange::overlaps`）は ValueObject に許容する。R6（DomainService 採用条件）には「値等価で識別され導出メソッドのみを持つ型は DomainService ではなく ValueObject」という除外条項を前置し"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -739,7 +739,7 @@
     },
     {
       "claim_hash": "17337a1c8153cc8d70cac4537480f6060ff2b87bd6151a8c265c64f6af5085fb",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "「関心分離に由来する意図的な構造類似（core 型とその adapter ミラー DTO/enum。type-designer の self-check が規定するミラー設計）は DRY 違反ではなく統合対象外」という除外規定と、「正当な cross-layer 共通化は双方が依存できる、より内側の層へ抽出する」"
@@ -762,10 +762,10 @@
     },
     {
       "claim_hash": "1bcefd5520678003185860e49622759d66320691eac3f0003dc47371046f0b78",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "あわせて delivery 3 crate の一言依存（cli-driver は usecase のみ / cli-composition が全層を配線 / cli は bin）を添える"
+        "citation": "あわせて delivery 3 crate の一言依存（cli-driver は usecase のみ / cli-composition が全層を配線 / cli は bin）を添える（監査 F-12 の解消）。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -785,7 +785,7 @@
     },
     {
       "claim_hash": "70f80d175b980a321e24c12a75895fe82d1d9af0df147d8e5094e4c3786105ab",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "`overlay/knowledge/adr/README.md` のテンプレートと運用ルール記述を現行規約に一致させる: file-level の `## Status` 見出しと「**Status**:」運用ルールを削除し、YAML front-matter（`adr_id` + `decisions[]`、decision 粒度の `status`（5 値小文字）と根拠 ref）を必須として例示する（`knowledge/conventions/adr.md` の例に準拠）。maintainer 側 `knowledge/adr/README.md` のテンプレート節にも同じ陳腐化があるため、同時に是正する。"
@@ -808,7 +808,7 @@
     },
     {
       "claim_hash": "05a0514b436bbacb3aef462dc137b14c49ecd47c4ddb5dc5fad43d0f822c9f3e",
-      "evidence_hash": "3af7395396fdb4a1db8aa3c6ae7d0c2a44f4f46377f4797cf6133ec54a70a441",
+      "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
         "citation": "`.github/workflows/ci.yml` の track-aware gate step（`cargo make ci-track-container` の実行）の条件を、「pull_request であること」から「pull_request のうち `develop` → `main` の release PR を除くすべて」へ改める（head が `develop` かつ base が `main` の組合せのみを免除する否定条件）。"
