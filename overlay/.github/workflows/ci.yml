@@ -57,5 +57,7 @@ jobs:
         run: cargo make ci
 
       - name: Run CI suite (track-aware gates)
-        if: github.event_name == 'pull_request'
+        # Track-aware gates fail closed on non-track branches by design; skip
+        # them for PRs from non-track branches (e.g. renovate/..., hotfix/...).
+        if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'track/')
         run: cargo make ci-track
