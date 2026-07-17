@@ -215,15 +215,27 @@ fn test_exported_ci_track_avoids_nightly_refresh_dependency() {
 
 #[test]
 fn test_exported_workflows_call_sotp_directly_without_retired_wrappers() {
-    assert_no_retired_passthrough_calls(&[".harness", ".claude", ".agents"]);
+    assert_no_retired_passthrough_calls(&[".harness", ".claude", ".agents", ".codex"]);
 
     let adr2pr = exported_file(".harness/workflows/track/adr2pr.md");
     let done = exported_file(".harness/workflows/track/done.md");
     let pr = exported_file(".claude/commands/track/pr.md");
+    let codex_instructions = exported_file(".codex/instructions.md");
+    let codex_rules = exported_file(".codex/rules/default.rules");
 
     assert!(adr2pr.contains("bin/sotp git add-all"));
     assert!(done.contains("bin/sotp track switch-base"));
     assert!(pr.contains("bin/sotp pr push") && pr.contains("bin/sotp pr ensure-pr"));
+    assert!(
+        codex_instructions.contains("bin/sotp git add-all")
+            && codex_instructions.contains("bin/sotp pr review-cycle"),
+        "Codex instructions must direct the guarded bin/sotp workflow commands"
+    );
+    assert!(
+        codex_rules.contains(r#"pattern=["bin/sotp", "pr", "review-cycle"]"#)
+            && !codex_rules.contains(r#"pattern=["cargo", "make", "track-pr"#),
+        "Codex rules must allow the bin/sotp workflow commands instead of retired wrappers"
+    );
 }
 
 #[test]
