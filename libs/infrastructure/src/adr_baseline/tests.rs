@@ -1,8 +1,10 @@
 #![allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
 
 use std::fs;
+use std::io::Write;
 use std::path::Path;
 use std::process::Command;
+use std::sync::Arc;
 
 use domain::adr_baseline::{
     AdrBaselineKind, AdrBaselineLedgerEntry, AdrBaselineRecordedCopyStatus, AdrBaselineSourceState,
@@ -11,9 +13,11 @@ use domain::adr_baseline::{
 use domain::{ContentHash, NonEmptyString, Timestamp, TrackId};
 use sha2::{Digest as _, Sha256};
 use usecase::adr_baseline::{
-    AdrBaselineSourcePort, AdrBaselineStorePort, AdrBaselineStoreReadPort,
+    AdrBaselineCheckOutcome, AdrBaselineQuery, AdrBaselineQueryInteractor, AdrBaselineQueryOutput,
+    AdrBaselineQueryService, AdrBaselineSourcePort, AdrBaselineStorePort, AdrBaselineStoreReadPort,
 };
 
+use super::store::write_ledger_record;
 use super::{FsAdrBaselineStore, FsGitAdrBaselineSource, decode_ledger_line, encode_ledger_entry};
 
 const TRACK_ITEMS: &str = "track/items";
@@ -101,6 +105,66 @@ fn test_adr_baseline_ledger_codec_init_record_omits_reason_key() {
         "init ledger records must omit an absent reason"
     );
     assert_eq!(decode_ledger_line(&encoded).unwrap(), entry());
+}
+
+#[test]
+fn test_adr_baseline_check_commit_passes_with_init_baseline_and_no_spec() {
+    let temp = tempfile::tempdir().unwrap();
+    let adr_dir = temp.path().join("knowledge/adr");
+    fs::create_dir_all(&adr_dir).unwrap();
+    fs::write(adr_dir.join(source().as_str()), b"contents").unwrap();
+
+    let store = Arc::new(FsAdrBaselineStore::from(temp.path().to_path_buf()));
+    store
+        .snapshot(
+            &track(),
+            &source(),
+            b"contents".to_vec(),
+            AdrBaselineKind::Init,
+            None,
+            timestamp(),
+        )
+        .unwrap();
+    let source_adapter = Arc::new(FsGitAdrBaselineSource::from(temp.path().to_path_buf()));
+    let query = AdrBaselineQueryInteractor::new(
+        store as Arc<dyn AdrBaselineStoreReadPort>,
+        source_adapter as Arc<dyn AdrBaselineSourcePort>,
+    );
+
+    assert_eq!(
+        query.execute(AdrBaselineQuery::CheckCommit { track_id: track() }).unwrap(),
+        AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Passed)
+    );
+}
+
+#[test]
+fn test_adr_baseline_ledger_append_completes_short_writes() {
+    struct ShortWriter {
+        bytes: Vec<u8>,
+        max_chunk: usize,
+    }
+
+    impl Write for ShortWriter {
+        fn write(&mut self, buffer: &[u8]) -> std::io::Result<usize> {
+            let written = buffer.len().min(self.max_chunk);
+            let chunk = buffer.get(..written).ok_or_else(|| {
+                std::io::Error::new(std::io::ErrorKind::InvalidInput, "invalid short-write size")
+            })?;
+            self.bytes.extend_from_slice(chunk);
+            Ok(written)
+        }
+
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+
+    let record = b"{\"source\":\"decision.md\"}\n";
+    let mut writer = ShortWriter { bytes: Vec::new(), max_chunk: 3 };
+
+    write_ledger_record(&mut writer, record).unwrap();
+
+    assert_eq!(writer.bytes, record);
 }
 
 #[test]

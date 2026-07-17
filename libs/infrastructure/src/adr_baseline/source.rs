@@ -83,8 +83,13 @@ impl FsGitAdrBaselineSource {
     ) -> Result<Vec<AdrSourceFileName>, AdrBaselineSourceError> {
         let path = self.root.join(TRACK_ITEMS).join(track_id.as_ref()).join("spec.json");
         self.reject_symlinks(&path)?;
-        let text = read_utf8_limited(&path, MAX_TRACK_DOCUMENT_BYTES)
-            .map_err(|error| AdrBaselineSourceError::Read(diagnostic(&error.to_string())))?;
+        let text = match read_utf8_limited(&path, MAX_TRACK_DOCUMENT_BYTES) {
+            Ok(text) => text,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
+            Err(error) => {
+                return Err(AdrBaselineSourceError::Read(diagnostic(&error.to_string())));
+            }
+        };
         let spec = crate::spec::codec::decode(&text)
             .map_err(|error| AdrBaselineSourceError::Read(diagnostic(&error.to_string())))?;
         let requirements = spec

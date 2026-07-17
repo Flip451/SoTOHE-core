@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-17T00:32:53Z",
+  "generated_at": "2026-07-17T01:03:45Z",
   "declaration_hash": "12d6ab9fb1970d85a20eafefae7ebd3412da44f04b6d1f4944c04e15e71e5f63",
-  "implementation_input_hash": "aefa44b02659574e92db5a54c412766e6cd3557e5a3b651292822219c8fc538d",
+  "implementation_input_hash": "c88aa295984c32f373973fc3b20ff14fca7dccc8df6012277ccf5674fed75dde",
   "signals": [
     {
       "type_name": "AdrBaselineCodecError",

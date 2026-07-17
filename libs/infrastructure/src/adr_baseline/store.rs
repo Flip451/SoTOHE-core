@@ -428,14 +428,15 @@ fn append_ledger_line(path: &Path, trusted_root: &Path, line: &str) -> std::io::
     let mut file = OpenOptions::new().create(true).append(true).open(path)?;
     let mut record = line.as_bytes().to_vec();
     record.push(b'\n');
-    let written = file.write(&record)?;
-    if written != record.len() {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::WriteZero,
-            "short ADR baseline ledger append",
-        ));
-    }
+    write_ledger_record(&mut file, &record)?;
     file.sync_all()
+}
+
+pub(super) fn write_ledger_record(
+    writer: &mut impl std::io::Write,
+    record: &[u8],
+) -> std::io::Result<()> {
+    writer.write_all(record)
 }
 
 fn validate_ledger_append(path: &Path, trusted_root: &Path, line: &str) -> std::io::Result<()> {
