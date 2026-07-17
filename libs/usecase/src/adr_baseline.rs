@@ -264,9 +264,13 @@ impl AdrBaselineQueryInteractor {
         let mut violations = Vec::new();
         let mut latest = BTreeMap::<AdrSourceFileName, AdrBaselineLedgerEntry>::new();
         let mut stamped = BTreeSet::<AdrSourceFileName>::new();
+        let mut birth_stamped = BTreeSet::<AdrSourceFileName>::new();
 
         for entry in &entries {
             stamped.insert(entry.source().clone());
+            if matches!(entry.kind(), AdrBaselineKind::Init | AdrBaselineKind::NewAdr) {
+                birth_stamped.insert(entry.source().clone());
+            }
             latest.insert(entry.source().clone(), entry.clone());
             match self
                 .store
@@ -310,8 +314,13 @@ impl AdrBaselineQueryInteractor {
                 {
                     AdrBaselineSourceState::TrackBornDraft => {}
                     AdrBaselineSourceState::ExistingAtForkPoint
-                    | AdrBaselineSourceState::TrackBornPromoted
                         if !stamped.contains(&cited_source) =>
+                    {
+                        violations
+                            .push(AdrBaselineCheckViolation::MissingRequiredStamp(cited_source));
+                    }
+                    AdrBaselineSourceState::TrackBornPromoted
+                        if !birth_stamped.contains(&cited_source) =>
                     {
                         violations
                             .push(AdrBaselineCheckViolation::MissingRequiredStamp(cited_source));
@@ -613,6 +622,87 @@ mod tests {
                 state: AdrBaselineSourceState::TrackBornDraft,
             }),
         );
+        assert_eq!(
+            interactor.execute(AdrBaselineQuery::CheckCommit { track_id: track() }).unwrap(),
+            AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Passed)
+        );
+    }
+
+    #[test]
+    fn test_adr_baseline_query_blocks_promoted_track_born_adr_with_only_cite_snapshot() {
+        let store = Arc::new(Store { entries: Mutex::new(vec![entry(AdrBaselineKind::Cite)]) });
+        let interactor = AdrBaselineQueryInteractor::new(
+            store,
+            Arc::new(Source {
+                working: b"current".to_vec(),
+                fork: Vec::new(),
+                cited: vec![source()],
+                state: AdrBaselineSourceState::TrackBornPromoted,
+            }),
+        );
+
+        let result =
+            interactor.execute(AdrBaselineQuery::CheckCommit { track_id: track() }).unwrap();
+
+        assert!(
+            matches!(result, AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Blocked { violations }) if matches!(violations.as_slice(), [AdrBaselineCheckViolation::MissingRequiredStamp(missing)] if missing == &source()))
+        );
+    }
+
+    #[test]
+    fn test_adr_baseline_query_blocks_promoted_track_born_adr_with_only_non_semantic_fix() {
+        let store =
+            Arc::new(Store { entries: Mutex::new(vec![entry(AdrBaselineKind::NonSemanticFix)]) });
+        let interactor = AdrBaselineQueryInteractor::new(
+            store,
+            Arc::new(Source {
+                working: b"current".to_vec(),
+                fork: Vec::new(),
+                cited: vec![source()],
+                state: AdrBaselineSourceState::TrackBornPromoted,
+            }),
+        );
+
+        let result =
+            interactor.execute(AdrBaselineQuery::CheckCommit { track_id: track() }).unwrap();
+
+        assert!(
+            matches!(result, AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Blocked { violations }) if matches!(violations.as_slice(), [AdrBaselineCheckViolation::MissingRequiredStamp(missing)] if missing == &source()))
+        );
+    }
+
+    #[test]
+    fn test_adr_baseline_query_passes_promoted_track_born_adr_with_init_snapshot() {
+        let store = Arc::new(Store { entries: Mutex::new(vec![entry(AdrBaselineKind::Init)]) });
+        let interactor = AdrBaselineQueryInteractor::new(
+            store,
+            Arc::new(Source {
+                working: b"current".to_vec(),
+                fork: Vec::new(),
+                cited: vec![source()],
+                state: AdrBaselineSourceState::TrackBornPromoted,
+            }),
+        );
+
+        assert_eq!(
+            interactor.execute(AdrBaselineQuery::CheckCommit { track_id: track() }).unwrap(),
+            AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Passed)
+        );
+    }
+
+    #[test]
+    fn test_adr_baseline_query_passes_promoted_track_born_adr_with_new_adr_snapshot() {
+        let store = Arc::new(Store { entries: Mutex::new(vec![entry(AdrBaselineKind::NewAdr)]) });
+        let interactor = AdrBaselineQueryInteractor::new(
+            store,
+            Arc::new(Source {
+                working: b"current".to_vec(),
+                fork: Vec::new(),
+                cited: vec![source()],
+                state: AdrBaselineSourceState::TrackBornPromoted,
+            }),
+        );
+
         assert_eq!(
             interactor.execute(AdrBaselineQuery::CheckCommit { track_id: track() }).unwrap(),
             AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Passed)
