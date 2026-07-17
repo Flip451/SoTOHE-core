@@ -1,6 +1,75 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
+          "at": "2026-07-17T18:51:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
+          "at": "2026-07-17T18:54:49Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25dc0b504f4840afa786dc0940927d45a6c18a4a82a75140c72b0735351b9da9",
+          "at": "2026-07-17T19:21:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-01 は依存・配置規則を人間可読文書に再記述せず SSoT 参照だけで表現するよう要求していますが、IN-04／AC-05 は調査プロンプトと architecture guard に domain/usecase の二層配置を示すことを、AC-08 は CLAUDE.md に delivery crate の具体的な依存関係を示すことを要求しています。参照だけでは後者を満たせず、具体的に記述すれば CN-01 に違反するため、契約を同時に充足できません。許容する要約と禁止する再記述の境界を明確化する必要があります。",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/spec.json",
+              "line": 188,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:25dc0b504f4840afa786dc0940927d45a6c18a4a82a75140c72b0735351b9da9",
+          "at": "2026-07-17T19:24:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31e2395e6a0cb34cab34fec57059f13e580d82e7396e0b798f80e7992e5ed9ed",
+          "at": "2026-07-17T19:26:22Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
+          "at": "2026-07-17T19:21:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
+          "at": "2026-07-17T19:25:01Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -19,21 +88,184 @@
         }
       ]
     },
-    "other": {
+    "impl-plan": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 restates upstream behavior/rationale in prose: “preserve only the usecase-purity rule ... discard the superseded abstraction/async guidance.” Keep only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 restates the upstream behavioral contract: “update R1 port-placement criteria ... correct R3/R6 ValueObject guidance, and align DRY guidance on intentional adapter mirrors and inward-layer commonality.” Keep only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 14,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates upstream behavior in “repoint each citation to its applicable new SSoT or the relocated purity rule ... make the layer/dependency presentation unambiguous.” Keep only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 restates the upstream front-matter contract: “adr_id, per-decision status, and rationale references—with no file-level Status field.” Keep only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 22,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 restates the upstream CI behavior contract: “make the track-aware gate exemption apply only to develop-to-main release PRs, retain fail-closed track context for every other PR.” Keep only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 26,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 restates upstream behavior: “Retire the duplicate architecture prose while retaining the narrowly scoped usecase-purity rule and a regenerated convention index.” Keep only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 37,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 restates upstream behavior: “Bring placement, ValueObject, and DRY guidance into the ADR-defined model without changing application behavior.” Keep only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 48,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 restates upstream behavior: “Repoint the complete discovered reference set, synchronize update guidance, and clarify the entry-document layer dependency direction.” Keep only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 59,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S4 restates upstream behavior: “Align overlay and maintainer ADR templates with the decision-level front-matter format.” Keep only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 70,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S5 restates upstream behavior: “Limit the CI exception to develop-to-main release PRs while retaining fail-closed behavior elsewhere.” Keep only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 81,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:0b3563511a90293927525ef5831e051e504c4124db073bf93c58bf2b8533b6b6",
+          "at": "2026-07-17T19:21:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The plan.summary is empty, so GO-01 and GO-02 have no goal-to-task traceability in the impl-plan SSoT.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 31,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T001 restates upstream behavior: “preserve only the usecase-purity rule ... discard the superseded abstraction/async guidance.”",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 restates upstream behavior: “update R1 port-placement criteria ... correct R3/R6 ValueObject guidance, and align DRY guidance...”",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 14,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates upstream behavior: “repoint each citation to its applicable new SSoT ... and make the layer/dependency presentation unambiguous.”",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 restates the front-matter contract: “adr_id, per-decision status, and rationale references—with no file-level Status field.”",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 22,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 restates the CI behavior contract: exemption only for develop-to-main release PRs and fail-closed context elsewhere.",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 26,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 restates upstream behavior: “Retire the duplicate architecture prose while retaining the narrowly scoped usecase-purity rule...”",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 37,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 restates upstream behavior: “Bring placement, ValueObject, and DRY guidance into the ADR-defined model...”",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 48,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 restates upstream behavior: “Repoint the complete discovered reference set ... and clarify the entry-document layer dependency direction.”",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 59,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S4 restates upstream behavior: “Align overlay and maintainer ADR templates with the decision-level front-matter format.”",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 70,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S5 restates upstream behavior: “Limit the CI exception to develop-to-main release PRs while retaining fail-closed behavior elsewhere.”",
+              "severity": "P1",
+              "file": "track/items/docs-architecture-ssot-realignment-2026-07-17/impl-plan.json",
+              "line": 81,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:0b3563511a90293927525ef5831e051e504c4124db073bf93c58bf2b8533b6b6",
+          "at": "2026-07-17T19:22:57Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
-          "at": "2026-07-17T18:51:40Z"
+          "hash": "rvw1:sha256:ea27130e7dcdf5f3671e7a4159850d9614bbc0d8a3bbca657fdda472e271452b",
+          "at": "2026-07-17T19:24:53Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
-          "at": "2026-07-17T18:54:49Z"
+          "hash": "rvw1:sha256:ea27130e7dcdf5f3671e7a4159850d9614bbc0d8a3bbca657fdda472e271452b",
+          "at": "2026-07-17T19:28:33Z"
         }
       ]
     }
