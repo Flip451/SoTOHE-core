@@ -633,100 +633,38 @@
           "findings": [],
           "hash": "rvw1:sha256:168a7b4fc1a3e6286b65270ea4eee0f6edc24a396c5258fffe431368d85ce16e",
           "at": "2026-07-17T16:08:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8374d7b4677469f11b44623fa8378534a7c4ce2051190347ce4155c8c52aead0",
+          "at": "2026-07-17T17:26:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8374d7b4677469f11b44623fa8378534a7c4ce2051190347ce4155c8c52aead0",
+          "at": "2026-07-17T17:29:30Z"
         }
       ]
     },
-    "adr": {
+    "spec": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ad717405f955d95e811c7b9090d60d311f2ce0148f43c1d9e56dbe9cc989e258",
-          "at": "2026-07-17T12:37:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "[P1] amendment proposal: review gate の D1 から承認記録規則を分離するか、freeze ADR D6 の supersession を明記してください。ここでは escalation reason に承認の旨と承認 ref を記録すると決めていますが、引用元 ADR の D6 は reason を変更理由に限定し、承認記録とは重複させず front-matter refs が担うと定めています。「check 一箇所の縮小だけ」という narrative のままでは、下流 spec がどちらの reason semantics を実装すべきか決定できません。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
-              "line": 29,
-              "category": "scope leakage into ADR body"
-            }
-          ],
-          "hash": "rvw1:sha256:ad717405f955d95e811c7b9090d60d311f2ce0148f43c1d9e56dbe9cc989e258",
-          "at": "2026-07-17T12:41:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56a9cb4bd73de514cd2fdedcadf47920f1be6dc31934ea8b67dec44e18a24add",
-          "at": "2026-07-17T12:52:28Z"
+          "hash": "rvw1:sha256:b1f73b563536c379b19135a786be676d78e87c242f4b68c3b768894ba15a58ea",
+          "at": "2026-07-17T15:00:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:56a9cb4bd73de514cd2fdedcadf47920f1be6dc31934ea8b67dec44e18a24add",
-          "at": "2026-07-17T12:55:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dd9adc09df90141b4462501d095dbf1177ed2744b042ceb2853c44b2fb1aac25",
-          "at": "2026-07-17T15:00:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2 の追加後も Context が「修理は 1 決定で足りる」と断言しており、front-matter と Decision が記録する D1・D2 の二決定構成と矛盾しています。下流が D2 を正式な決定として導出すべきか判断できるよう、D1 は機構修理の一決定であり、D2 は workflow SSoT の追随義務を記録する別決定だと整合させる amendment proposal が必要です。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
-              "line": 22,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:dd9adc09df90141b4462501d095dbf1177ed2744b042ceb2853c44b2fb1aac25",
-          "at": "2026-07-17T15:04:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f567f0183f253c0d568bd250dc899072ac116f0320240a41cfa2c67836ff8031",
-          "at": "2026-07-17T15:08:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f567f0183f253c0d568bd250dc899072ac116f0320240a41cfa2c67836ff8031",
-          "at": "2026-07-17T15:10:21Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bf9134aad6b5c7484842c1091707bd7bdad8e80970c53c7ce8c9dcb33e2a2601",
-          "at": "2026-07-17T16:06:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bf9134aad6b5c7484842c1091707bd7bdad8e80970c53c7ce8c9dcb33e2a2601",
-          "at": "2026-07-17T16:08:33Z"
+          "hash": "rvw1:sha256:b1f73b563536c379b19135a786be676d78e87c242f4b68c3b768894ba15a58ea",
+          "at": "2026-07-17T15:05:24Z"
         }
       ]
     },
@@ -808,21 +746,97 @@
         }
       ]
     },
-    "spec": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b1f73b563536c379b19135a786be676d78e87c242f4b68c3b768894ba15a58ea",
-          "at": "2026-07-17T15:00:32Z"
+          "hash": "rvw1:sha256:bf9134aad6b5c7484842c1091707bd7bdad8e80970c53c7ce8c9dcb33e2a2601",
+          "at": "2026-07-17T16:06:01Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b1f73b563536c379b19135a786be676d78e87c242f4b68c3b768894ba15a58ea",
-          "at": "2026-07-17T15:05:24Z"
+          "hash": "rvw1:sha256:bf9134aad6b5c7484842c1091707bd7bdad8e80970c53c7ce8c9dcb33e2a2601",
+          "at": "2026-07-17T16:08:33Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad717405f955d95e811c7b9090d60d311f2ce0148f43c1d9e56dbe9cc989e258",
+          "at": "2026-07-17T12:37:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[P1] amendment proposal: review gate の D1 から承認記録規則を分離するか、freeze ADR D6 の supersession を明記してください。ここでは escalation reason に承認の旨と承認 ref を記録すると決めていますが、引用元 ADR の D6 は reason を変更理由に限定し、承認記録とは重複させず front-matter refs が担うと定めています。「check 一箇所の縮小だけ」という narrative のままでは、下流 spec がどちらの reason semantics を実装すべきか決定できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+              "line": 29,
+              "category": "scope leakage into ADR body"
+            }
+          ],
+          "hash": "rvw1:sha256:ad717405f955d95e811c7b9090d60d311f2ce0148f43c1d9e56dbe9cc989e258",
+          "at": "2026-07-17T12:41:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56a9cb4bd73de514cd2fdedcadf47920f1be6dc31934ea8b67dec44e18a24add",
+          "at": "2026-07-17T12:52:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56a9cb4bd73de514cd2fdedcadf47920f1be6dc31934ea8b67dec44e18a24add",
+          "at": "2026-07-17T12:55:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd9adc09df90141b4462501d095dbf1177ed2744b042ceb2853c44b2fb1aac25",
+          "at": "2026-07-17T15:00:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 の追加後も Context が「修理は 1 決定で足りる」と断言しており、front-matter と Decision が記録する D1・D2 の二決定構成と矛盾しています。下流が D2 を正式な決定として導出すべきか判断できるよう、D1 は機構修理の一決定であり、D2 は workflow SSoT の追随義務を記録する別決定だと整合させる amendment proposal が必要です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+              "line": 22,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:dd9adc09df90141b4462501d095dbf1177ed2744b042ceb2853c44b2fb1aac25",
+          "at": "2026-07-17T15:04:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f567f0183f253c0d568bd250dc899072ac116f0320240a41cfa2c67836ff8031",
+          "at": "2026-07-17T15:08:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f567f0183f253c0d568bd250dc899072ac116f0320240a41cfa2c67836ff8031",
+          "at": "2026-07-17T15:10:21Z"
         }
       ]
     }
