@@ -57,13 +57,13 @@ ADR の意味は user に属する。track が ADR を扱う全期間につい�
 - **正規ループ外からの意味変更提案** (レビュー所見としての選好・別案・scope 論等) に対して、orchestrator は**自律裁定しない**。かつ**走行中の pipeline を user 確認のために止めない** — amendment proposal として記録し、user 裁定は **merge 段階 (PR review での user 監査) へ先送り**する。
 - **不意の変更** (経路不明の baseline 乖離) は byte 照合で検出し、adr-diagnoser が分類する — 守護者のもう一つの持ち場。「意味を変えない」ことの要求がこの検出機構の目的であり、意味を変えない差分のみ再刻印できる。それ以外は restore する。
 
-### 機構追随待ち
+### 機構との整合
 
-本節が規範の正であり、以下の実装は追随を要する (追随完了までは食い違いが存在する):
+本節が規範の正であり、機構は以下の形で追随している:
 
-- `adr-baseline check-review` の縮小 — review 入口の ADR 状態検査を「init 刻印の存在確認」のみとし、byte 照合の発火点を commit gate / CI に限る (決定済み: `knowledge/adr/` の該当 ADR。sotp 実装の追随を要する)。専用の承認 kind は新設しない。承認の記録は、ループで修正した decision 自身の front-matter `user_decision_ref` への承認 ref 追記が担い (chain ⓪ が検証)、その後の escalation 刻印の reason には自己完結の欠落説明だけを記す (承認の ledger 重複記録なし)。編集なしで収束した場合は追加の刻印を行わない。
-- 守護者判定の workflow 配線 — capability 定義 (`.harness/capabilities/adr-diagnoser.md`) は編集判定モード (決定保存 / 決定破壊 + 保全代案または修正不要理由) を定義済み。review / plan / adr2pr の workflow SSoT 側に「編集ごとに守護者判定を挟み、その出力をレビュアーへ還流させる」手順の刻み込みを要する。
-- plan / adr2pr workflow の autonomy 制約 — Phase 0 の user 承認エスカレーションを明示的例外として carve-out する必要がある。
+- `adr-baseline check-review` — review 入口の ADR 状態検査は「init 刻印の存在確認と帳簿完全性」のみであり、byte 照合の発火点は commit gate / CI に限られる (決定: `knowledge/adr/` の該当 ADR)。専用の承認 kind は存在しない。承認の記録は、ループで修正した decision 自身の front-matter `user_decision_ref` への承認 ref 追記が担い (chain ⓪ が検証)、その後の escalation 刻印の reason には自己完結の欠落説明だけを記す (承認の ledger 重複記録なし)。編集なしで収束した場合は追加の刻印を行わない。
+- 守護者判定の workflow 配線 — capability 定義 (`.harness/capabilities/adr-diagnoser.md`) が編集判定モード (決定保存 / 決定破壊 + 保全代案または修正不要理由) を定義し、review / plan / adr2pr の workflow SSoT が「編集ごとに守護者判定を挟み、その出力をレビュアーへ還流させる」手順を刻む。
+- plan / adr2pr workflow の autonomy 制約 — Phase 0 の user 承認エスカレーションが明示的例外として carve-out されている。
 
 ## Examples
 
