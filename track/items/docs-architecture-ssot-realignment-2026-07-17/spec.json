@@ -195,7 +195,7 @@
     },
     {
       "id": "CN-02",
-      "text": "usecase purity 規則の移設は、現状 warning-only の強制強度を consumer 向けに明記するだけで、error への昇格を伴わない",
+      "text": "usecase purity 規則の移設は、現状 CI blocking であり違反を error finding（exit 1）として cargo make ci の verify-usecase-purity-local gate を失敗させる強制強度を consumer 向けに明記する。この track では機械強制の実装または強度を変更せず、緩和は採用者が ADR で判断する",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md",
@@ -237,7 +237,7 @@
     },
     {
       "id": "AC-02",
-      "text": "coding-principles.md に usecase purity 規則、Good / Bad 例、warning-only の強制強度があり、廃止文書由来の trait-based abstraction 例と async Note は存在しない",
+      "text": "coding-principles.md に usecase purity 規則、Good / Bad 例、CI blocking の強制強度（error finding、exit 1、cargo make ci の verify-usecase-purity-local gate）があり、廃止文書由来の trait-based abstraction 例は存在しない。async runtime の採用は ADR の決定事項として一文で示される",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md",

@@ -531,18 +531,18 @@
       }
     },
     {
-      "claim_hash": "4c61cd855ca89aa694b2791b2c7b4c6ddcef95e73422c7a8bc844b02b0e1e4de",
+      "claim_hash": "2fdf6ef8ff697fccd6c25cefb40d8e8d5dcf936de9468af0acc65235b70f55d4",
       "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "移設節には強制強度（現状 CI blocking であること、緩和は採用者判断であること）を consumer 向けの表現で明記する"
+        "citation": "機械強制は従来どおり `sotp verify usecase-purity` が担い、移設節には強制強度（現状 CI blocking であること、緩和は採用者判断であること）を consumer 向けの表現で明記する"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "constraint",
           "element_id": "CN-02",
-          "text_label": "usecase purity 規則の移設は、現状 warning-only の強制強度を consumer 向けに明記するだけで、error への昇格を伴わない"
+          "text_label": "usecase purity 規則の移設は、現状 CI blocking であり違反を error finding（exit 1）として cargo make ci の verify-usecase-purity-local gate を失敗させる強制強度を consumer 向けに明記する。この track では機械強制の実装または強度を変更せず、緩和は採用者が ADR で判断する"
         }
       },
       "evidence_origin": {
@@ -623,18 +623,18 @@
       }
     },
     {
-      "claim_hash": "68dfaa3d83800294b883c4ceb64b13904cb308a91242dc878036c519a3fb4ba6",
+      "claim_hash": "749f45423486f24302b986905ced190e375fe1770a3cb6a3eb0bec82ca64a2f5",
       "evidence_hash": "ce6f0ce167f329484b4430f89666ed8e3d50489eac6a3d9575a32fae50cf80e3",
       "verdict": {
         "kind": "pass",
-        "citation": "Usecase Layer Purity Rules（std I/O モジュール・暗黙的外部依存・出力マクロの禁止表と rationale、および usecase の Good/Bad コード例）は `knowledge/conventions/coding-principles.md` へ節として移設する。…移設節には強制強度（現状 CI blocking であること、緩和は採用者判断であること）を consumer 向けの表現で明記する"
+        "citation": "**Usecase Layer Purity Rules**（std I/O モジュール・暗黙的外部依存・出力マクロの禁止表と rationale、および usecase の Good/Bad コード例）は `knowledge/conventions/coding-principles.md` へ節として移設する。機械強制は従来どおり `sotp verify usecase-purity` が担い、移設節には強制強度（現状 CI blocking であること、緩和は採用者判断であること）を consumer 向けの表現で明記する"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-02",
-          "text_label": "coding-principles.md に usecase purity 規則、Good / Bad 例、warning-only の強制強度があり、廃止文書由来の trait-based abstraction 例と async Note は存在しない"
+          "text_label": "coding-principles.md に usecase purity 規則、Good / Bad 例、CI blocking の強制強度（error finding、exit 1、cargo make ci の verify-usecase-purity-local gate）があり、廃止文書由来の trait-based abstraction 例は存在しない。async runtime の採用は ADR の決定事項として一文で示される"
         }
       },
       "evidence_origin": {

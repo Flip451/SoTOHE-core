@@ -31,13 +31,13 @@ signals: { blue: 28, yellow: 0, red: 0 }
 
 ## Constraints
 - [CN-01] アーキテクチャの依存・配置規則の判別基準・許可関係を人間可読文書で再記述せず、それぞれの権威ある SSoT への参照で表現する。D4 / D7 が要求する入口・guard の短い案内は適用層または依存先を示して当該 SSoT を参照できるが、判別基準・許可関係を追加または置換してはならない [adr: knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md#D1] [tasks: T001, T003]
-- [CN-02] usecase purity 規則の移設は、現状 warning-only の強制強度を consumer 向けに明記するだけで、error への昇格を伴わない [adr: knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md#D2] [tasks: T001]
+- [CN-02] usecase purity 規則の移設は、現状 CI blocking であり違反を error finding（exit 1）として cargo make ci の verify-usecase-purity-local gate を失敗させる強制強度を consumer 向けに明記する。この track では機械強制の実装または強度を変更せず、緩和は採用者が ADR で判断する [adr: knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md#D2] [tasks: T001]
 - [CN-03] release PR 以外の非-track PR に track-aware gate を迂回する経路を設けず、免除を develop → main の一形状に限定する [adr: knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md#D9] [tasks: T005]
 - [CN-04] 実装フットプリントは Markdown 文書と CI 設定を中心とし、Rust への変更は doc comment の引用先付け替えに限定する [adr: knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md#D3] [tasks: T003]
 
 ## Acceptance Criteria
 - [ ] [AC-01] hexagonal-architecture.md が存在せず、crate 間依存は architecture-rules.json と deny.toml、role × layer 配置は type-designer-kind-selection.md の R1 を正本として参照される [adr: knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md#D1] [tasks: T001]
-- [ ] [AC-02] coding-principles.md に usecase purity 規則、Good / Bad 例、warning-only の強制強度があり、廃止文書由来の trait-based abstraction 例と async Note は存在しない [adr: knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md#D2] [tasks: T001]
+- [ ] [AC-02] coding-principles.md に usecase purity 規則、Good / Bad 例、CI blocking の強制強度（error finding、exit 1、cargo make ci の verify-usecase-purity-local gate）があり、廃止文書由来の trait-based abstraction 例は存在しない。async runtime の採用は ADR の決定事項として一文で示される [adr: knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md#D2] [tasks: T001]
 - [ ] [AC-03] 現行のレビュープロンプト、入口文書、rules、skills、Rust doc comment に廃止した architecture convention への引用が残らず、引用は該当する新 SSoT または purity 規則へ向く [adr: knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md#D3] [tasks: T003]
 - [ ] [AC-04] architecture-customizer の更新対象と maintainer checklist が、適用後にアーキテクチャ記述を持つ文書の実集合を網羅する [adr: knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md#D3] [tasks: T003]
 - [ ] [AC-05] ポート配置に言及する調査プロンプトと capability architecture guard が domain / usecase の二層配置を示し、R1 に domain と usecase を選ぶ tie-break 基準および境界例がある [adr: knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md#D4] [tasks: T002]
