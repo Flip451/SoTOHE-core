@@ -12,10 +12,14 @@ reviewer は外部プロバイダー（既定: Codex CLI）であり、self-revi
 
 ## ADR baseline pre-review gate
 
-- Before any reviewer or fixer starts, run `cargo make adr-baseline-check-review`; it derives the
-  primary ADR's direct filename from the active track ledger's init record. The
-  `ADR_BASELINE_PRIMARY_SOURCE` variable is an optional explicit override. The review wrappers
-  enforce the same prelude.
+- Before any reviewer or fixer starts, run `cargo make adr-baseline-check-review`. At Phase 0,
+  the orchestrator designated primary ADR source(s) by init-stamping them, and those ledger init
+  records are the designation records. Its CLI requires a nonempty init-designation set (or an
+  explicit direct-CLI primary source), then verifies every recorded ledger copy and byte-matches
+  every recorded ADR against its latest baseline. It fails closed when no init record exists.
+  Only a direct `bin/sotp adr-baseline check-review --primary-source <file>` invocation may
+  override the derived designation. The review wrappers enforce the same prelude; spec-cited ADR
+  coverage remains a separate commit-gate responsibility.
 - Missing init snapshots and byte mismatches block the review before a fixer can modify the
   worktree. Do not create a baseline by hand or bypass the failure; use the sanctioned snapshot
   or diagnoser/recovery route.

@@ -147,7 +147,7 @@
       }
     },
     {
-      "claim_hash": "8dbaf7a58f63af200333bb1d628abefecd8bc1c3eec0b8b8fd99a59501b17e16",
+      "claim_hash": "bbc2ca31e9fdc27a38fdec1c5d5f654eb30776aee680ba9942a0e0190bf89545",
       "evidence_hash": "50afe1ecde03037ed3153f3259e3081bdfbc8b24596b42b82e2e2d57f876df01",
       "verdict": {
         "kind": "pass",
@@ -171,11 +171,11 @@
       }
     },
     {
-      "claim_hash": "8dbaf7a58f63af200333bb1d628abefecd8bc1c3eec0b8b8fd99a59501b17e16",
+      "claim_hash": "bbc2ca31e9fdc27a38fdec1c5d5f654eb30776aee680ba9942a0e0190bf89545",
       "evidence_hash": "8c8398050fa68067a9da59e73150d743226106200da3bd3b16de321230246ea5",
       "verdict": {
         "kind": "pass",
-        "citation": "保護対象の刻印不足、照合不一致、required reason の欠落、または昇格済み新規 ADR の未刻印は fail-closed とする。一方、分岐点に存在せず user_decision_ref を持たない track 生まれの draft ADR は承認まで刻印要求から除外する。"
+        "citation": "保護対象の刻印不足、照合不一致、required reason の欠落、または昇格済み新規 ADR の未刻印は fail-closed とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -195,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "8dbaf7a58f63af200333bb1d628abefecd8bc1c3eec0b8b8fd99a59501b17e16",
+      "claim_hash": "bbc2ca31e9fdc27a38fdec1c5d5f654eb30776aee680ba9942a0e0190bf89545",
       "evidence_hash": "f13e52e634d5b988d5e2adea0f43c44420c28f3387044a0848335bf142e4045a",
       "verdict": {
         "kind": "pass",
@@ -219,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "8dbaf7a58f63af200333bb1d628abefecd8bc1c3eec0b8b8fd99a59501b17e16",
+      "claim_hash": "bbc2ca31e9fdc27a38fdec1c5d5f654eb30776aee680ba9942a0e0190bf89545",
       "evidence_hash": "a6a33893198fa0423568e5d3e5c9a5ce46bb1d6424c94b752b64948d732e21df",
       "verdict": {
         "kind": "pass",

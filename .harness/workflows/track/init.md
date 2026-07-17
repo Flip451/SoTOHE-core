@@ -18,7 +18,9 @@ proceed until this workflow completes with OK.
 - **Feature name** — a slug-ready phrase or descriptive string; the caller supplies this as the
   primary argument. If absent, the caller must ask the user for a feature name and stop.
 - **Primary ADR source filename** — the orchestrator supplies the direct Markdown filename under
-  `knowledge/adr/` that this track starts from. It is context-dependent and must not be derived.
+  `knowledge/adr/` to create this track's Phase-0 init designation record. It is
+  context-dependent and must not be derived; after the stamp succeeds, the ledger init record is
+  the designation and no separate primary pointer is retained.
 - **Current branch = configured base branch** — the workflow requires the working tree to be on
   the branch named by `.harness/config/branch-strategy.json#base_branch` before branch creation.
   Any other starting branch is a hard prerequisite failure.
@@ -76,17 +78,18 @@ A warning about `contract-map.md` skipping the new track (because the first TDDD
 layer's `<layer>-types.json` — as declared by the first `tddd.enabled` layer in
 `architecture-rules.json` — does not exist yet) is expected at this phase and is not an error.
 
-**Step 5: Record the primary ADR init baseline**
+**Step 5: Create the primary ADR init designation record**
 
-After metadata and views exist, record the orchestrator-supplied primary ADR through the
-dedicated mechanism (never by copying files or editing the ledger):
+After metadata and views exist, create the primary-ADR designation through the dedicated
+mechanism (never by copying files or editing the ledger):
 
 ```
 bin/sotp adr-baseline snapshot --source '<primary-adr-file>.md' --kind init
 ```
 
-This records the working-tree bytes as an append-only init baseline for the active track. A
-missing or invalid filename is an ERROR; do not continue with an unrecorded primary ADR.
+This records the working-tree bytes as an append-only init baseline for the active track; the
+ledger init record itself is the primary designation. A missing or invalid filename is an ERROR;
+do not continue without that designation record.
 
 **Step 6: Verify identity schema**
 

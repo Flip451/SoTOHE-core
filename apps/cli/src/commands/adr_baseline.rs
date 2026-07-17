@@ -68,9 +68,9 @@ pub struct AdrBaselineCheckReviewArgs {
     /// Track ID; defaults to the active `track/<id>` branch.
     #[arg(long)]
     pub track_id: Option<TrackIdInput>,
-    /// Primary ADR filename whose init snapshot is required.
+    /// Optional primary ADR filename override; otherwise derives it from init records.
     #[arg(long)]
-    pub primary_source: AdrSourceFileNameInput,
+    pub primary_source: Option<AdrSourceFileNameInput>,
 }
 
 /// ADR baseline commit-check CLI arguments.
@@ -166,6 +166,32 @@ mod tests {
         assert!(matches!(
             cli.command,
             AdrBaselineCommand::Snapshot(AdrBaselineSnapshotArgs { track_id: None, .. })
+        ));
+    }
+
+    #[test]
+    fn test_adr_baseline_check_review_parses_optional_primary_source() {
+        let derived = TestCli::parse_from(["adr-baseline", "check-review"]);
+        assert!(matches!(
+            derived.command,
+            AdrBaselineCommand::CheckReview(AdrBaselineCheckReviewArgs {
+                primary_source: None,
+                ..
+            })
+        ));
+
+        let explicit = TestCli::parse_from([
+            "adr-baseline",
+            "check-review",
+            "--primary-source",
+            "decision.md",
+        ]);
+        assert!(matches!(
+            explicit.command,
+            AdrBaselineCommand::CheckReview(AdrBaselineCheckReviewArgs {
+                primary_source: Some(_),
+                ..
+            })
         ));
     }
 

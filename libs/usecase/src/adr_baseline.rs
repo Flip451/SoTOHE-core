@@ -1,12 +1,13 @@
 //! Application services and secondary ports for ADR baseline snapshots.
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 use std::sync::Arc;
 
 pub use domain::adr_baseline::{AdrBaselineCheckOutcome, AdrBaselineKind, AdrSourceFileName};
 use domain::adr_baseline::{
     AdrBaselineCheckViolation, AdrBaselineCheckViolations, AdrBaselineLedgerEntry,
     AdrBaselineRecordedCopyStatus, AdrBaselineSourceState, AdrSourceFileNameError,
+    is_required_stamp_satisfied,
 };
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::{ContentHash, NonEmptyString, Timestamp, TrackId};
@@ -41,7 +42,7 @@ pub enum AdrBaselineOutput {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AdrBaselineQuery {
     /// Verify the primary init snapshot before a review cycle.
-    CheckReview { track_id: TrackId, primary_source: AdrSourceFileName },
+    CheckReview { track_id: TrackId, primary_source: Option<AdrSourceFileName> },
     /// Verify every recorded and currently-required ADR before commit.
     CheckCommit { track_id: TrackId },
 }
@@ -263,14 +264,10 @@ impl AdrBaselineQueryInteractor {
         let entries = self.store.read_entries(track_id).map_err(AdrBaselineQueryError::Store)?;
         let mut violations = Vec::new();
         let mut latest = BTreeMap::<AdrSourceFileName, AdrBaselineLedgerEntry>::new();
-        let mut stamped = BTreeSet::<AdrSourceFileName>::new();
-        let mut birth_stamped = BTreeSet::<AdrSourceFileName>::new();
+        let mut recorded_kinds = BTreeMap::<AdrSourceFileName, Vec<AdrBaselineKind>>::new();
 
         for entry in &entries {
-            stamped.insert(entry.source().clone());
-            if matches!(entry.kind(), AdrBaselineKind::Init | AdrBaselineKind::NewAdr) {
-                birth_stamped.insert(entry.source().clone());
-            }
+            recorded_kinds.entry(entry.source().clone()).or_default().push(entry.kind());
             latest.insert(entry.source().clone(), entry.clone());
             match self
                 .store
@@ -294,39 +291,34 @@ impl AdrBaselineQueryInteractor {
             }
         }
 
-        if let Some(primary_source) = primary {
-            let has_init = entries.iter().any(|entry| {
-                entry.source() == primary_source && entry.kind() == AdrBaselineKind::Init
-            });
-            if !has_init {
-                violations
-                    .push(AdrBaselineCheckViolation::MissingPrimaryInit(primary_source.clone()));
+        match primary {
+            Some(primary_source) => {
+                let has_init = entries.iter().any(|entry| {
+                    entry.source() == primary_source && entry.kind() == AdrBaselineKind::Init
+                });
+                if !has_init {
+                    violations.push(AdrBaselineCheckViolation::MissingPrimaryInit(
+                        primary_source.clone(),
+                    ));
+                }
             }
+            None if !require_cited
+                && !entries.iter().any(|entry| entry.kind() == AdrBaselineKind::Init) =>
+            {
+                violations.push(AdrBaselineCheckViolation::PrimaryInitUnavailable);
+            }
+            None => {}
         }
 
         if require_cited {
             let cited = self.source.cited_sources(track_id).map_err(source_read_error)?;
             for cited_source in cited {
-                match self
-                    .source
-                    .source_state(track_id, &cited_source)
-                    .map_err(source_read_error)?
-                {
-                    AdrBaselineSourceState::TrackBornDraft => {}
-                    AdrBaselineSourceState::ExistingAtForkPoint
-                        if !stamped.contains(&cited_source) =>
-                    {
-                        violations
-                            .push(AdrBaselineCheckViolation::MissingRequiredStamp(cited_source));
-                    }
-                    AdrBaselineSourceState::TrackBornPromoted
-                        if !birth_stamped.contains(&cited_source) =>
-                    {
-                        violations
-                            .push(AdrBaselineCheckViolation::MissingRequiredStamp(cited_source));
-                    }
-                    AdrBaselineSourceState::ExistingAtForkPoint
-                    | AdrBaselineSourceState::TrackBornPromoted => {}
+                let source_state =
+                    self.source.source_state(track_id, &cited_source).map_err(source_read_error)?;
+                let source_recorded_kinds =
+                    recorded_kinds.get(&cited_source).map_or(&[][..], Vec::as_slice);
+                if !is_required_stamp_satisfied(&source_state, source_recorded_kinds) {
+                    violations.push(AdrBaselineCheckViolation::MissingRequiredStamp(cited_source));
                 }
             }
         }
@@ -367,7 +359,7 @@ impl AdrBaselineQueryService for AdrBaselineQueryInteractor {
     ) -> Result<AdrBaselineQueryOutput, AdrBaselineQueryError> {
         match query {
             AdrBaselineQuery::CheckReview { track_id, primary_source } => {
-                self.check(&track_id, Some(&primary_source), false)
+                self.check(&track_id, primary_source.as_ref(), false)
             }
             AdrBaselineQuery::CheckCommit { track_id } => self.check(&track_id, None, true),
         }
@@ -603,7 +595,10 @@ mod tests {
             }),
         );
         let result = interactor
-            .execute(AdrBaselineQuery::CheckReview { track_id: track(), primary_source: source() })
+            .execute(AdrBaselineQuery::CheckReview {
+                track_id: track(),
+                primary_source: Some(source()),
+            })
             .unwrap();
         assert!(
             matches!(result, AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Blocked { violations }) if matches!(violations.as_slice(), [AdrBaselineCheckViolation::MissingPrimaryInit(_)]))
@@ -611,25 +606,74 @@ mod tests {
     }
 
     #[test]
-    fn test_adr_baseline_query_exempts_track_born_draft_from_missing_stamp() {
+    fn test_adr_baseline_query_passes_derived_review_check_with_init_record() {
+        let store = Arc::new(Store { entries: Mutex::new(vec![entry(AdrBaselineKind::Init)]) });
+        let interactor = AdrBaselineQueryInteractor::new(
+            store,
+            Arc::new(Source {
+                working: b"current".to_vec(),
+                fork: Vec::new(),
+                cited: Vec::new(),
+                state: AdrBaselineSourceState::ExistingAtForkPoint,
+            }),
+        );
+
+        assert_eq!(
+            interactor
+                .execute(AdrBaselineQuery::CheckReview { track_id: track(), primary_source: None })
+                .unwrap(),
+            AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Passed)
+        );
+    }
+
+    #[test]
+    fn test_adr_baseline_query_passes_explicit_review_check_with_matching_init_record() {
+        let store = Arc::new(Store { entries: Mutex::new(vec![entry(AdrBaselineKind::Init)]) });
+        let interactor = AdrBaselineQueryInteractor::new(
+            store,
+            Arc::new(Source {
+                working: b"current".to_vec(),
+                fork: Vec::new(),
+                cited: Vec::new(),
+                state: AdrBaselineSourceState::ExistingAtForkPoint,
+            }),
+        );
+
+        assert_eq!(
+            interactor
+                .execute(AdrBaselineQuery::CheckReview {
+                    track_id: track(),
+                    primary_source: Some(source()),
+                })
+                .unwrap(),
+            AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Passed)
+        );
+    }
+
+    #[test]
+    fn test_adr_baseline_query_blocks_derived_review_check_without_init_record() {
         let store = Arc::new(Store { entries: Mutex::new(Vec::new()) });
         let interactor = AdrBaselineQueryInteractor::new(
             store,
             Arc::new(Source {
                 working: Vec::new(),
                 fork: Vec::new(),
-                cited: vec![source()],
-                state: AdrBaselineSourceState::TrackBornDraft,
+                cited: Vec::new(),
+                state: AdrBaselineSourceState::ExistingAtForkPoint,
             }),
         );
-        assert_eq!(
-            interactor.execute(AdrBaselineQuery::CheckCommit { track_id: track() }).unwrap(),
-            AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Passed)
+
+        let result = interactor
+            .execute(AdrBaselineQuery::CheckReview { track_id: track(), primary_source: None })
+            .unwrap();
+
+        assert!(
+            matches!(result, AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Blocked { violations }) if matches!(violations.as_slice(), [AdrBaselineCheckViolation::PrimaryInitUnavailable]))
         );
     }
 
     #[test]
-    fn test_adr_baseline_query_blocks_promoted_track_born_adr_with_only_cite_snapshot() {
+    fn test_adr_baseline_query_emits_missing_required_stamp_from_domain_policy() {
         let store = Arc::new(Store { entries: Mutex::new(vec![entry(AdrBaselineKind::Cite)]) });
         let interactor = AdrBaselineQueryInteractor::new(
             store,
@@ -650,56 +694,15 @@ mod tests {
     }
 
     #[test]
-    fn test_adr_baseline_query_blocks_promoted_track_born_adr_with_only_non_semantic_fix() {
-        let store =
-            Arc::new(Store { entries: Mutex::new(vec![entry(AdrBaselineKind::NonSemanticFix)]) });
+    fn test_adr_baseline_query_omits_violation_when_domain_policy_is_satisfied() {
+        let store = Arc::new(Store { entries: Mutex::new(vec![entry(AdrBaselineKind::Cite)]) });
         let interactor = AdrBaselineQueryInteractor::new(
             store,
             Arc::new(Source {
                 working: b"current".to_vec(),
                 fork: Vec::new(),
                 cited: vec![source()],
-                state: AdrBaselineSourceState::TrackBornPromoted,
-            }),
-        );
-
-        let result =
-            interactor.execute(AdrBaselineQuery::CheckCommit { track_id: track() }).unwrap();
-
-        assert!(
-            matches!(result, AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Blocked { violations }) if matches!(violations.as_slice(), [AdrBaselineCheckViolation::MissingRequiredStamp(missing)] if missing == &source()))
-        );
-    }
-
-    #[test]
-    fn test_adr_baseline_query_passes_promoted_track_born_adr_with_init_snapshot() {
-        let store = Arc::new(Store { entries: Mutex::new(vec![entry(AdrBaselineKind::Init)]) });
-        let interactor = AdrBaselineQueryInteractor::new(
-            store,
-            Arc::new(Source {
-                working: b"current".to_vec(),
-                fork: Vec::new(),
-                cited: vec![source()],
-                state: AdrBaselineSourceState::TrackBornPromoted,
-            }),
-        );
-
-        assert_eq!(
-            interactor.execute(AdrBaselineQuery::CheckCommit { track_id: track() }).unwrap(),
-            AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Passed)
-        );
-    }
-
-    #[test]
-    fn test_adr_baseline_query_passes_promoted_track_born_adr_with_new_adr_snapshot() {
-        let store = Arc::new(Store { entries: Mutex::new(vec![entry(AdrBaselineKind::NewAdr)]) });
-        let interactor = AdrBaselineQueryInteractor::new(
-            store,
-            Arc::new(Source {
-                working: b"current".to_vec(),
-                fork: Vec::new(),
-                cited: vec![source()],
-                state: AdrBaselineSourceState::TrackBornPromoted,
+                state: AdrBaselineSourceState::ExistingAtForkPoint,
             }),
         );
 

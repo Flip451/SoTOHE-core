@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-16T18:37:51Z",
-  "declaration_hash": "47cf2ad4a3e0c2938722b894b6f5ccf7b3846c490bd8eee56f16d6b6846b0f87",
-  "implementation_input_hash": "bd9d54b5262e2b4f1e1293df3103e55b9e485401f1f36f3d86638fb8c94f3589",
+  "generated_at": "2026-07-17T04:03:26Z",
+  "declaration_hash": "497edbb797405c646cfbf5829775bb8ad14e16149a2b1b34a6f2c8eb67512849",
+  "implementation_input_hash": "8607879199dff5d30d18a777c90392b599df2d851fa1687b7065032560816a98",
   "signals": [
     {
       "type_name": "AdrBaselineDriver",

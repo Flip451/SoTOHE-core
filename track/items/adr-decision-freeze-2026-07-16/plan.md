@@ -11,7 +11,7 @@ GO-01 → T001, T002, T003, T004, T005, T006, T007.
 
 > Sequence T001 before T002–T007. GO-01.
 
-- [x] **T001**: Implement the T001 domain catalogue entries, including the recorded-copy state and aggregated fail-closed violation responsibilities, in `libs/domain/`; add focused domain tests. IN-01, IN-03, IN-05, CN-01, CN-02, CN-03, CN-04, CN-05, AC-02, AC-03, AC-06, AC-07. (`b530f6aeef2e492e02cd1f2a1476f37bf0199a10`)
+- [x] **T001**: Implement the T001 domain catalogue entries, including the recorded-copy state, stamp-eligibility policy, and aggregated fail-closed violation responsibilities, in `libs/domain/`; add focused domain tests. IN-01, IN-03, IN-05, CN-01, CN-02, CN-03, CN-04, CN-05, AC-02, AC-03, AC-06, AC-07. (`b530f6aeef2e492e02cd1f2a1476f37bf0199a10`)
 
 ### S2 — Application orchestration and durable adapters
 

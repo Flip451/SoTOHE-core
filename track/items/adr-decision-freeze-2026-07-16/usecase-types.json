@@ -882,10 +882,10 @@
                   "name": "track_id",
                   "ty": "domain::TrackId"
                 },
-                {
-                  "name": "primary_source",
-                  "ty": "domain::adr_baseline::AdrSourceFileName"
-                }
+            {
+              "name": "primary_source",
+              "ty": "Option<domain::adr_baseline::AdrSourceFileName>"
+            }
               ],
               "kind": "struct"
             }

@@ -111,7 +111,7 @@ cargo make bootstrap      # Docker イメージビルド + bin/sotp 入手 (経�
    /track:adr2pr <feature> --primary-adr <filename>.md
    ```
 
-   このコマンドは `/track:init`（主 ADR の init baseline 記録を含む）→ ADR baseline の `/track:review` / `/track:commit` → `/track:spec-design` / `/track:type-design` / `/track:impl-plan` → 計画 artifact の review / commit → `/track:full-cycle` → `/track:pr-review` を順に実行し、PR を開いた状態で停止する。baseline 不一致や必要な刻印の欠落は review、commit、PR CI で block される。
+   このコマンドは `/track:init`（主 ADR を designation する init baseline 記録を含む）→ ADR baseline の `/track:review` / `/track:commit` → `/track:spec-design` / `/track:type-design` / `/track:impl-plan` → 計画 artifact の review / commit → `/track:full-cycle` → `/track:pr-review` を順に実行し、PR を開いた状態で停止する。baseline 不一致や必要な刻印の欠落は review、commit、PR CI で block される。
 
 ### コマンドを個別に使う場合
 
@@ -126,9 +126,12 @@ cargo make bootstrap      # Docker イメージビルド + bin/sotp 入手 (経�
 /track:done                   # 設定された base branch に戻り完了サマリー
 ```
 
-個別に review を起動する際、review wrapper は active track の ledger にある init record から
-primary ADR file 名を自動取得する。`ADR_BASELINE_PRIMARY_SOURCE` は必要時の明示 override としてのみ
-使う。baseline は手で編集せず、必要な snapshot / restore は `bin/sotp adr-baseline` の専用コマンドを使う。
+個別に review を起動する際、orchestrator は Phase 0 で init snapshot を刻印することで primary ADR source を
+designation し、その ledger init record 自体が唯一の designation record になる。review wrapper は active track の
+その init record 群が 1 件以上あることを要求した後、記録済みの全 ledger copy と全 recorded ADR の最新 baseline
+との byte match を検証する。`spec.json` が cite した ADR の coverage は commit gate で別途検証する。直接の
+`bin/sotp adr-baseline check-review` 呼び出しだけは `--primary-source <file>.md` を明示 override に使える。
+baseline は手で編集せず、必要な snapshot / restore は `bin/sotp adr-baseline` の専用コマンドを使う。
 
 `/track:status` はどの段階でも呼べる。
 

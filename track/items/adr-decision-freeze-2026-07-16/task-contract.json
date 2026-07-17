@@ -12,7 +12,8 @@
       {"layer": "domain", "entry_key": "AdrBaselineRecordedCopyStatus"},
       {"layer": "domain", "entry_key": "AdrBaselineSourceState"},
       {"layer": "domain", "entry_key": "AdrSourceFileName"},
-      {"layer": "domain", "entry_key": "AdrSourceFileNameError"}
+      {"layer": "domain", "entry_key": "AdrSourceFileNameError"},
+      {"layer": "domain", "entry_key": "domain::adr_baseline::is_required_stamp_satisfied"}
     ],
     "T002": [
       {"layer": "usecase", "entry_key": "AdrBaselineQueryService"},

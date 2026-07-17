@@ -10,7 +10,8 @@ User invokes this command as `/track:init <feature> --primary-adr <filename>.md`
 feature name (or slug-ready phrase) and require the direct primary ADR filename under
 `knowledge/adr/`; if either input is absent, stop and ask for it. The caller selects and passes
 this filename explicitly — do not derive it from the feature name — and the workflow snapshots it
-after track creation.
+after track creation to create the ledger init designation record; no separate primary pointer is
+retained.
 
 ## Claude Code invocation constraints
 

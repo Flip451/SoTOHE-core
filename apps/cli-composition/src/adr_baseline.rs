@@ -210,6 +210,28 @@ mod tests {
     }
 
     #[test]
+    fn test_adr_baseline_check_review_blocks_when_ledger_is_missing() {
+        let project = tempfile::tempdir().unwrap();
+        let items_dir = project.path().join("track/items");
+        std::fs::create_dir_all(items_dir.join("fixture-track")).unwrap();
+        initialize_git_repository(project.path());
+
+        let outcome = AdrBaselineCompositionRoot::new()
+            .execute(AdrBaselineRequest::CheckReview {
+                items_dir,
+                track_id: Some("fixture-track".parse::<TrackIdInput>().unwrap()),
+                primary_source: None,
+            })
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 1, "unexpected outcome: {outcome:?}");
+        assert!(matches!(
+            outcome.stderr.as_deref(),
+            Some(message) if message.contains("PrimaryInitUnavailable")
+        ));
+    }
+
+    #[test]
     fn test_adr_baseline_execute_rejects_noncanonical_items_directory() {
         let error = AdrBaselineCompositionRoot::new().execute(AdrBaselineRequest::CheckCommit {
             items_dir: "fixture/items".into(),

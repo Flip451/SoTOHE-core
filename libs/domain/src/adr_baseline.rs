@@ -189,6 +189,26 @@ pub enum AdrBaselineSourceState {
     TrackBornPromoted,
 }
 
+/// Returns whether the recorded snapshot kinds satisfy this source's stamp requirement.
+///
+/// Existing ADRs require an initial or cited snapshot. Track-born drafts are exempt until
+/// promotion, after which an initial or `new-adr` snapshot is required.
+#[must_use]
+pub fn is_required_stamp_satisfied(
+    source_state: &AdrBaselineSourceState,
+    recorded_kinds: &[AdrBaselineKind],
+) -> bool {
+    match source_state {
+        AdrBaselineSourceState::ExistingAtForkPoint => recorded_kinds
+            .iter()
+            .any(|kind| matches!(kind, AdrBaselineKind::Init | AdrBaselineKind::Cite)),
+        AdrBaselineSourceState::TrackBornDraft => true,
+        AdrBaselineSourceState::TrackBornPromoted => recorded_kinds
+            .iter()
+            .any(|kind| matches!(kind, AdrBaselineKind::Init | AdrBaselineKind::NewAdr)),
+    }
+}
+
 /// Verification status for a recorded baseline-copy file.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AdrBaselineRecordedCopyStatus {
@@ -206,6 +226,8 @@ pub enum AdrBaselineRecordedCopyStatus {
 /// A typed fail-closed reason reported by the ADR baseline check.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AdrBaselineCheckViolation {
+    /// The review check could not derive a primary ADR from an init snapshot.
+    PrimaryInitUnavailable,
     /// The primary ADR has no required initial snapshot.
     MissingPrimaryInit(AdrSourceFileName),
     /// An ADR that must be protected has no snapshot record.
@@ -315,6 +337,31 @@ mod tests {
         assert!(!AdrBaselineKind::Init.requires_reason());
         assert!(AdrBaselineKind::Cite.uses_fork_point());
         assert!(!AdrBaselineKind::NonSemanticFix.uses_fork_point());
+    }
+
+    #[test]
+    fn test_required_stamp_eligibility_applies_state_specific_recorded_kinds() {
+        let cases = [
+            (AdrBaselineSourceState::ExistingAtForkPoint, vec![], false),
+            (AdrBaselineSourceState::ExistingAtForkPoint, vec![AdrBaselineKind::Init], true),
+            (AdrBaselineSourceState::ExistingAtForkPoint, vec![AdrBaselineKind::Cite], true),
+            (AdrBaselineSourceState::ExistingAtForkPoint, vec![AdrBaselineKind::NewAdr], false),
+            (AdrBaselineSourceState::TrackBornDraft, vec![], true),
+            (AdrBaselineSourceState::TrackBornDraft, vec![AdrBaselineKind::NonSemanticFix], true),
+            (AdrBaselineSourceState::TrackBornPromoted, vec![], false),
+            (AdrBaselineSourceState::TrackBornPromoted, vec![AdrBaselineKind::Init], true),
+            (AdrBaselineSourceState::TrackBornPromoted, vec![AdrBaselineKind::NewAdr], true),
+            (AdrBaselineSourceState::TrackBornPromoted, vec![AdrBaselineKind::Cite], false),
+            (
+                AdrBaselineSourceState::TrackBornPromoted,
+                vec![AdrBaselineKind::NonSemanticFix],
+                false,
+            ),
+        ];
+
+        for (source_state, recorded_kinds, expected) in cases {
+            assert_eq!(is_required_stamp_satisfied(&source_state, &recorded_kinds), expected);
+        }
     }
 
     #[test]

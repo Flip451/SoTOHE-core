@@ -255,10 +255,10 @@
               "name": "track_id",
               "ty": "Option<cli_driver::adr_baseline::TrackIdInput>"
             },
-            {
-              "name": "primary_source",
-              "ty": "cli_driver::adr_baseline::AdrSourceFileNameInput"
-            }
+        {
+          "name": "primary_source",
+          "ty": "Option<cli_driver::adr_baseline::AdrSourceFileNameInput>"
+        }
           ],
           "has_stripped_fields": false,
           "kind": "plain"

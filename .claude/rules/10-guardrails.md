@@ -128,11 +128,14 @@ Reference: `knowledge/conventions/shell-parsing.md`
 
 ADR baseline copies and `ledger.jsonl` under `track/items/<id>/adr-baseline/` are machine-owned.
 Only `bin/sotp adr-baseline snapshot` may add them and only `bin/sotp adr-baseline restore` may
-restore an ADR from them. Never hand-edit, copy, delete, or re-create a baseline record. The
-orchestrator supplies the primary ADR filename at init; the pre-review check derives it from the
-ledger's init record. `ADR_BASELINE_PRIMARY_SOURCE` is available only as an explicit override. A
-failed `check-review` or `check-commit` is fail-closed; use the diagnoser/recovery path instead
-of bypassing the gate.
+restore an ADR from them. Never hand-edit, copy, delete, or re-create a baseline record. At Phase
+0, the orchestrator designates primary ADR source(s) by init-stamping them; the ledger init
+records are the designation records, with no separate primary identity. The pre-review CLI
+requires a nonempty init-record designation set, then verifies every recorded ledger copy and
+byte-matches every recorded ADR against its latest baseline. `--primary-source <file>` is
+available only for a direct `bin/sotp adr-baseline check-review` invocation. Spec-cited ADR
+coverage is enforced separately at the commit gate. A failed `check-review` or `check-commit` is
+fail-closed; use the diagnoser/recovery path instead of bypassing the gate.
 
 This is an independent byte-comparison guard. Do not weaken or modify `adr_user` evaluation or
 `.harness/config/signal-gates.json` to accommodate it.

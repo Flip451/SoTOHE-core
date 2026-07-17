@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "b84a7849ced4d700800f387fdecd22f4655b83d5c233a3d373a11bfed1604177",
+  "catalogue_declaration_hash": "e098a881a49a9cea1d77ede31165e7cb7bc24da733f2b0b9049bb4fd6bd888b8",
   "signals": [
     {
       "type_name": "AdrBaselineCheckCommitArgs",
@@ -10,7 +10,7 @@
     {
       "type_name": "AdrBaselineCheckReviewArgs",
       "signal": "blue",
-      "entry_hash": "8dbaf7a58f63af200333bb1d628abefecd8bc1c3eec0b8b8fd99a59501b17e16"
+      "entry_hash": "bbc2ca31e9fdc27a38fdec1c5d5f654eb30776aee680ba9942a0e0190bf89545"
     },
     {
       "type_name": "AdrBaselineCommand",

@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-16T18:37:41Z",
-  "declaration_hash": "a7fd7bc809ab341bef3d1a852274468159aa8062527c3c8d0101a03f2bd4daab",
-  "implementation_input_hash": "cbe6c650521113875b37ab745c35271888ea097fef5a4c914b00d1bdb453ad0c",
+  "generated_at": "2026-07-17T05:43:41Z",
+  "declaration_hash": "fe2a5e31a62a75184f49391b5cda0eba7053cfa59c9f7eca72f621f9aac88ff3",
+  "implementation_input_hash": "f32d02d832c64a5ee957e18b353efd8f48e34be253c3e749292b0057ea2a57e5",
   "signals": [
     {
       "type_name": "AdrBaselineCheckOutcome",
@@ -132,6 +132,12 @@
         "Error",
         "PartialEq"
       ]
+    },
+    {
+      "type_name": "domain::adr_baseline::is_required_stamp_satisfied",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

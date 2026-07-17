@@ -147,7 +147,7 @@
       }
     },
     {
-      "claim_hash": "deccbb94f40e0112da8fa6900c7d5d1390f49cac9ede4c6db8fdbf9fc4e89198",
+      "claim_hash": "ccf283e0ff8e3257a83ee68634f9d914993fe5abf0206dd7701f3f73ae93381d",
       "evidence_hash": "50afe1ecde03037ed3153f3259e3081bdfbc8b24596b42b82e2e2d57f876df01",
       "verdict": {
         "kind": "pass",
@@ -171,7 +171,7 @@
       }
     },
     {
-      "claim_hash": "deccbb94f40e0112da8fa6900c7d5d1390f49cac9ede4c6db8fdbf9fc4e89198",
+      "claim_hash": "ccf283e0ff8e3257a83ee68634f9d914993fe5abf0206dd7701f3f73ae93381d",
       "evidence_hash": "8c8398050fa68067a9da59e73150d743226106200da3bd3b16de321230246ea5",
       "verdict": {
         "kind": "pass",
@@ -195,11 +195,11 @@
       }
     },
     {
-      "claim_hash": "deccbb94f40e0112da8fa6900c7d5d1390f49cac9ede4c6db8fdbf9fc4e89198",
+      "claim_hash": "ccf283e0ff8e3257a83ee68634f9d914993fe5abf0206dd7701f3f73ae93381d",
       "evidence_hash": "f13e52e634d5b988d5e2adea0f43c44420c28f3387044a0848335bf142e4045a",
       "verdict": {
         "kind": "pass",
-        "citation": "it blocks deterministically on a byte mismatch or on a missing required baseline without parsing ADR prose or consulting an LLM."
+        "citation": "The binary check passes when each recorded ADR matches its latest baseline and all required baselines exist; it blocks deterministically on a byte mismatch or on a missing required baseline without parsing ADR prose or consulting an LLM."
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -219,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "deccbb94f40e0112da8fa6900c7d5d1390f49cac9ede4c6db8fdbf9fc4e89198",
+      "claim_hash": "ccf283e0ff8e3257a83ee68634f9d914993fe5abf0206dd7701f3f73ae93381d",
       "evidence_hash": "a6a33893198fa0423568e5d3e5c9a5ce46bb1d6424c94b752b64948d732e21df",
       "verdict": {
         "kind": "pass",
@@ -243,11 +243,11 @@
       }
     },
     {
-      "claim_hash": "deccbb94f40e0112da8fa6900c7d5d1390f49cac9ede4c6db8fdbf9fc4e89198",
+      "claim_hash": "ccf283e0ff8e3257a83ee68634f9d914993fe5abf0206dd7701f3f73ae93381d",
       "evidence_hash": "b72869e035604575bbeea782d3d7e2ac2084ecb4a3f6b42679e50e00fafd8099",
       "verdict": {
         "kind": "pass",
-        "citation": "\"commit validation blocks if that cited ADR was not stamped\""
+        "citation": "\"commit validation blocks if that cited ADR was not stamped\" and \"blocks if it is promoted without its required new-adr snapshot\""
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -743,6 +743,78 @@
           "section": "constraint",
           "element_id": "CN-03",
           "text_label": "初回刻印の対象 ADR は orchestrator が knowledge/adr/ 直下の file 名として明示し、cite 刻印は track 分岐点の committed 文面だけを複製元とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3cf5d0deba758bf38d59cc2aee40a67b913066b2629aebc941d1c1741b38ca2b",
+      "evidence_hash": "0efab8966d9b77c65f37f5191b4f1a487e99e2c41e282632169e15eae27c752c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "spec が後続で cite する既存 ADR を track 分岐点の committed 文面から刻印し、track 中に生まれた ADR は user_decision_ref を得るまで draft として刻印要求から除外し、昇格後は刻印を必須にする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::adr_baseline::is_required_stamp_satisfied"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "spec が後続で cite する既存 ADR を track 分岐点の committed 文面から刻印し、track 中に生まれた ADR は user_decision_ref を得るまで draft として刻印要求から除外し、昇格後は刻印を必須にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3cf5d0deba758bf38d59cc2aee40a67b913066b2629aebc941d1c1741b38ca2b",
+      "evidence_hash": "8c8398050fa68067a9da59e73150d743226106200da3bd3b16de321230246ea5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "保護対象の刻印不足、照合不一致、required reason の欠落、または昇格済み新規 ADR の未刻印は fail-closed とする。一方、分岐点に存在せず user_decision_ref を持たない track 生まれの draft ADR は承認まで刻印要求から除外する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::adr_baseline::is_required_stamp_satisfied"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "保護対象の刻印不足、照合不一致、required reason の欠落、または昇格済み新規 ADR の未刻印は fail-closed とする。一方、分岐点に存在せず user_decision_ref を持たない track 生まれの draft ADR は承認まで刻印要求から除外する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3cf5d0deba758bf38d59cc2aee40a67b913066b2629aebc941d1c1741b38ca2b",
+      "evidence_hash": "b72869e035604575bbeea782d3d7e2ac2084ecb4a3f6b42679e50e00fafd8099",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"A track-created ADR remains exempt while it has no user_decision_ref, then blocks if it is promoted without its required new-adr snapshot.\""
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/adr-decision-freeze-2026-07-16/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::adr_baseline::is_required_stamp_satisfied"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "When a later phase cites an existing ADR, its cited baseline is taken from the track merge-base and commit validation blocks if that cited ADR was not stamped. A track-created ADR remains exempt while it has no user_decision_ref, then blocks if it is promoted without its required new-adr snapshot."
         }
       }
     }

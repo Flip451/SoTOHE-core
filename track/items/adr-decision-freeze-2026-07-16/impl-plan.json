@@ -3,7 +3,7 @@
   "tasks": [
     {
       "id": "T001",
-      "description": "Implement the T001 domain catalogue entries, including the recorded-copy state and aggregated fail-closed violation responsibilities, in `libs/domain/`; add focused domain tests. IN-01, IN-03, IN-05, CN-01, CN-02, CN-03, CN-04, CN-05, AC-02, AC-03, AC-06, AC-07.",
+      "description": "Implement the T001 domain catalogue entries, including the recorded-copy state, stamp-eligibility policy, and aggregated fail-closed violation responsibilities, in `libs/domain/`; add focused domain tests. IN-01, IN-03, IN-05, CN-01, CN-02, CN-03, CN-04, CN-05, AC-02, AC-03, AC-06, AC-07.",
       "status": "done",
       "commit_hash": "b530f6aeef2e492e02cd1f2a1476f37bf0199a10"
     },

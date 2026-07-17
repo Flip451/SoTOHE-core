@@ -31,8 +31,9 @@ Sub-workflows used:
 - **ADR existence** — at least one relevant ADR must exist under `knowledge/adr/`. If none
   exists, stop and ask the user to author one (the `adr:add` command provides this path).
 - **Primary ADR source filename** — before Phase 0, the orchestrator selects the relevant ADR's
-  direct Markdown filename under `knowledge/adr/`. This is a required explicit input to `init`;
-  it must not be inferred from the feature name or stored as a metadata pointer.
+  direct Markdown filename under `knowledge/adr/` to create an init designation record. This is a
+  required explicit input to `init`; it must not be inferred from the feature name or stored as a
+  metadata pointer. After stamping, the ledger init record is the primary designation.
 - **Current branch** — must be compatible with the operation: the configured base branch
   (`.harness/config/branch-strategy.json#base_branch`) for a new track, `track/<id>` for a
   track already initialized.
@@ -86,9 +87,9 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
 ### Phase 0: init workflow
 
 Invoke the `init` workflow (`.harness/workflows/track/init.md`) with the feature name **and** the
-orchestrator-selected primary ADR source filename. `init` records that exact filename through
-its `--kind init` snapshot step. On ERROR, stop and report. On OK, mark Phase 0 `completed` and
-proceed to Phase 1.
+direct ADR source filename to designate. `init` records that exact filename through its `--kind
+init` snapshot step; that ledger record becomes the primary designation. On ERROR, stop and
+report. On OK, mark Phase 0 `completed` and proceed to Phase 1.
 
 ### Phase 1 loop: spec-design workflow
 

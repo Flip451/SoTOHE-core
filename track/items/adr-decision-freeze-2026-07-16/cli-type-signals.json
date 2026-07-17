@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-16T18:37:58Z",
-  "declaration_hash": "b84a7849ced4d700800f387fdecd22f4655b83d5c233a3d373a11bfed1604177",
-  "implementation_input_hash": "ea809419d88bfdfa90df5681a424e6b7e28d77c71c53daaa4452c85070a99ced",
+  "generated_at": "2026-07-17T04:03:35Z",
+  "declaration_hash": "e098a881a49a9cea1d77ede31165e7cb7bc24da733f2b0b9049bb4fd6bd888b8",
+  "implementation_input_hash": "8e857f020cbfe378ba52af40ee151ff7ab3ff5496d77c92cb60a190a1cd2b0f2",
   "signals": [
     {
       "type_name": "AdrBaselineCheckCommitArgs",

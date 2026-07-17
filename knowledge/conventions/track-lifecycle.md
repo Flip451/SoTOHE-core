@@ -33,15 +33,18 @@
 
 ### ADR baseline lifecycle
 
-- `/track:init` completes track initialization and then the orchestrator passes the selected
-  primary ADR's direct filename to `bin/sotp adr-baseline snapshot --source <file> --kind init`.
-  The command alone writes the append-only `adr-baseline/` ledger and verbatim copies; the
-  filename is context-dependent and is never derived or stored as a metadata pointer.
-- Before a review cycle, `cargo make adr-baseline-check-review` derives that filename from the
-  active track ledger's init record and verifies the snapshot before any fixer may write.
-  `ADR_BASELINE_PRIMARY_SOURCE` remains an optional explicit override. `cargo make ci-track` and
-  the guarded commit path run `adr-baseline check-commit` for recorded ADRs and every non-draft
-  ADR cited by `spec.json`.
+- `/track:init` completes track initialization and then the orchestrator designates each primary
+  ADR source by passing its direct filename to `bin/sotp adr-baseline snapshot --source <file>
+  --kind init`. The command alone writes the append-only `adr-baseline/` ledger and verbatim
+  copies; its init records are the designation records. The filename is context-dependent and is
+  never derived or stored as a metadata pointer or other external primary identity.
+- Before a review cycle, `cargo make adr-baseline-check-review` invokes the CLI. It requires a
+  nonempty active-track ledger init-record designation set, then verifies every recorded ledger
+  copy and byte-matches every recorded ADR against its latest baseline before any fixer may
+  write. `--primary-source <file>` is only an override for a direct `bin/sotp adr-baseline
+  check-review` invocation. `cargo make ci-track` and the guarded commit path run
+  `adr-baseline check-commit` for recorded ADRs; coverage for every non-draft ADR cited by
+  `spec.json` is enforced separately at that commit gate.
 - A track-born ADR without `user_decision_ref` remains outside the required-stamp set. Once
   promoted or cited as an existing ADR, the relevant sanctioned snapshot is required; missing
   records and byte mismatches fail closed. These checks are independent from signal-gate policy.

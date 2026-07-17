@@ -327,10 +327,10 @@
                   "name": "track_id",
                   "ty": "TrackIdInput"
                 },
-                {
-                  "name": "primary_source",
-                  "ty": "AdrSourceFileNameInput"
-                }
+            {
+              "name": "primary_source",
+              "ty": "Option<AdrSourceFileNameInput>"
+            }
               ],
               "kind": "struct"
             }
@@ -551,10 +551,10 @@
                   "name": "track_id",
                   "ty": "Option<TrackIdInput>"
                 },
-                {
-                  "name": "primary_source",
-                  "ty": "AdrSourceFileNameInput"
-                }
+            {
+              "name": "primary_source",
+              "ty": "Option<AdrSourceFileNameInput>"
+            }
               ],
               "kind": "struct"
             }

@@ -507,7 +507,7 @@
       }
     },
     {
-      "claim_hash": "d5fb0ef6facb52b5d90f0034015fe1c35bad180ef1d3024cf04f90ca275acbbb",
+      "claim_hash": "c97269a6f7e4db89843b9472e53a27dae9e40491d5a720d3a3d5e27dfced72b8",
       "evidence_hash": "50afe1ecde03037ed3153f3259e3081bdfbc8b24596b42b82e2e2d57f876df01",
       "verdict": {
         "kind": "pass",
@@ -531,7 +531,7 @@
       }
     },
     {
-      "claim_hash": "d5fb0ef6facb52b5d90f0034015fe1c35bad180ef1d3024cf04f90ca275acbbb",
+      "claim_hash": "c97269a6f7e4db89843b9472e53a27dae9e40491d5a720d3a3d5e27dfced72b8",
       "evidence_hash": "f13e52e634d5b988d5e2adea0f43c44420c28f3387044a0848335bf142e4045a",
       "verdict": {
         "kind": "pass",
@@ -555,11 +555,11 @@
       }
     },
     {
-      "claim_hash": "d5fb0ef6facb52b5d90f0034015fe1c35bad180ef1d3024cf04f90ca275acbbb",
+      "claim_hash": "c97269a6f7e4db89843b9472e53a27dae9e40491d5a720d3a3d5e27dfced72b8",
       "evidence_hash": "a6a33893198fa0423568e5d3e5c9a5ce46bb1d6424c94b752b64948d732e21df",
       "verdict": {
         "kind": "pass",
-        "citation": "The same freeze check runs before review work begins, in the guarded commit path, and in the track-aware CI path used both locally and for PR CI."
+        "citation": "The same freeze check runs before review work begins, in the guarded commit path, and in the track-aware CI path used both locally and for PR CI. The review entrance specifically blocks a missing primary-ADR init snapshot before a fixer can modify the worktree."
       },
       "claim_origin": {
         "kind": "catalogue_entry",

@@ -25,9 +25,12 @@ briefing preparation, and capability dispatching.
   `## Related Conventions (Required Reading)` section of `spec.md` (or `plan.md` for legacy
   tracks). For exact type signatures / module trees / Mermaid diagrams, `## Canonical Blocks`
   in `plan.md` is the source of truth.
-- **Primary ADR source filename** — the review prelude derives the init-stamped direct
-  `knowledge/adr/` Markdown filename from this track's ledger. Set
-  `ADR_BASELINE_PRIMARY_SOURCE` only when an explicit override is required.
+- **Primary ADR sources** — Phase-0 init-kind ledger records are the orchestrator's primary-ADR
+  designation records; no separate primary identity exists. The review prelude requires a
+  nonempty init-record designation set, then verifies every recorded ledger copy and byte-matches
+  every recorded ADR against its latest baseline. `--primary-source <file>` is available only for
+  direct `bin/sotp adr-baseline check-review` invocation. Coverage for ADRs cited by `spec.json`
+  is enforced separately at the commit gate.
 
 ## Sequence
 
@@ -45,9 +48,9 @@ Before any reviewer or fixer can modify the worktree, run:
 cargo make adr-baseline-check-review
 ```
 
-This fails closed when the ledger or required init snapshot is absent, or when the current ADR
-differs from that snapshot. `ADR_BASELINE_PRIMARY_SOURCE` is an optional explicit override. The
-same gate is a dependency of both review wrappers. A byte mismatch enters the ADR-baseline recovery route in
+This fails closed when the ledger is missing or empty, has no init record, a required init
+snapshot is absent, or a current ADR differs from its snapshot. The same gate is a dependency of
+both review wrappers. A byte mismatch enters the ADR-baseline recovery route in
 `.harness/workflows/track/diagnose.md` before any reviewer or fixer is dispatched.
 
 Confirm that `bin/sotp review local` and the `review-fix-lead` dispatch wrapper are available.

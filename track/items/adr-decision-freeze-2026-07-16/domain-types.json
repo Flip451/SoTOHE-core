@@ -1,6 +1,39 @@
 {
   "crate_name": "domain",
-  "functions": {},
+  "functions": {
+    "domain::adr_baseline::is_required_stamp_satisfied": {
+      "action": "add",
+      "docs": "Domain predicate for ADR baseline stamp eligibility.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "source_state",
+          "ty": "&AdrBaselineSourceState"
+        },
+        {
+          "name": "recorded_kinds",
+          "ty": "&[AdrBaselineKind]"
+        }
+      ],
+      "returns": "bool",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    }
+  },
   "inherent_impls": [
     {
       "methods": [
@@ -427,6 +460,12 @@
       "kind": {
         "kind": "enum",
         "variants": [
+          {
+            "name": "PrimaryInitUnavailable",
+            "payload": {
+              "kind": "unit"
+            }
+          },
           {
             "name": "MissingPrimaryInit",
             "payload": {

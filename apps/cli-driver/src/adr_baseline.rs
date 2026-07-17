@@ -192,7 +192,7 @@ pub enum AdrBaselineRequest {
     CheckReview {
         items_dir: PathBuf,
         track_id: Option<TrackIdInput>,
-        primary_source: AdrSourceFileNameInput,
+        primary_source: Option<AdrSourceFileNameInput>,
     },
     CheckCommit {
         items_dir: PathBuf,
@@ -229,7 +229,7 @@ pub enum AdrBaselineInput {
     },
     CheckReview {
         track_id: TrackIdInput,
-        primary_source: AdrSourceFileNameInput,
+        primary_source: Option<AdrSourceFileNameInput>,
     },
     CheckCommit {
         track_id: TrackIdInput,
@@ -283,7 +283,7 @@ impl AdrBaselineDriver {
                 .query_service
                 .execute(AdrBaselineQuery::CheckReview {
                     track_id: track_id.value,
-                    primary_source: primary_source.value,
+                    primary_source: primary_source.map(|source| source.value),
                 })
                 .map(render_query_outcome)
                 .unwrap_or_else(|error| CommandOutcome::failure(Some(error.to_string()))),

@@ -5,7 +5,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | AdrBaselineCheckOutcome | enum | add | Passed, Blocked | 🔵 | 🔵 |
-| AdrBaselineCheckViolation | enum | add | MissingPrimaryInit, MissingRequiredStamp, SourceMissing, BaselineCopyMissing, BaselineCopyMismatch, ByteMismatch | 🔵 | 🔵 |
+| AdrBaselineCheckViolation | enum | add | PrimaryInitUnavailable, MissingPrimaryInit, MissingRequiredStamp, SourceMissing, BaselineCopyMissing, BaselineCopyMismatch, ByteMismatch | 🔵 | 🔵 |
 | AdrBaselineKind | enum | add | Init, Cite, NewAdr, NonSemanticFix, Escalation | 🔵 | 🔵 |
 | AdrBaselineLedgerEntry | enum | add | Init, Cite, NewAdr, NonSemanticFix, Escalation | 🔵 | 🔵 |
 | AdrBaselineRecordedCopyStatus | enum | add | Matches, Missing, HashMismatch | 🔵 | 🔵 |
@@ -24,4 +24,10 @@
 |------|------|--------|---------|--------|----------|
 | AdrBaselineCheckOutcomeError | error_type | add | EmptyViolations | 🔵 | 🔵 |
 | AdrSourceFileNameError | error_type | add | InvalidFileName | 🔵 | 🔵 |
+
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| domain::adr_baseline::is_required_stamp_satisfied | free_function | add | fn(source_state: &AdrBaselineSourceState, recorded_kinds: &[AdrBaselineKind]) -> bool | 🔵 | 🔵 |
 

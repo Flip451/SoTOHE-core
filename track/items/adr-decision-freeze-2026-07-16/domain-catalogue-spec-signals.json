@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a7fd7bc809ab341bef3d1a852274468159aa8062527c3c8d0101a03f2bd4daab",
+  "catalogue_declaration_hash": "fe2a5e31a62a75184f49391b5cda0eba7053cfa59c9f7eca72f621f9aac88ff3",
   "signals": [
     {
       "type_name": "AdrBaselineCheckOutcome",
@@ -15,7 +15,7 @@
     {
       "type_name": "AdrBaselineCheckViolation",
       "signal": "blue",
-      "entry_hash": "deccbb94f40e0112da8fa6900c7d5d1390f49cac9ede4c6db8fdbf9fc4e89198"
+      "entry_hash": "ccf283e0ff8e3257a83ee68634f9d914993fe5abf0206dd7701f3f73ae93381d"
     },
     {
       "type_name": "AdrBaselineCheckViolations",
@@ -51,6 +51,11 @@
       "type_name": "AdrSourceFileNameError",
       "signal": "blue",
       "entry_hash": "33bbdcbd8663cf12b7546ae649deba0bbc0dd9c2a3f2e1f218cfebf6aa49ca1e"
+    },
+    {
+      "type_name": "domain::adr_baseline::is_required_stamp_satisfied",
+      "signal": "blue",
+      "entry_hash": "3cf5d0deba758bf38d59cc2aee40a67b913066b2629aebc941d1c1741b38ca2b"
     }
   ]
 }
