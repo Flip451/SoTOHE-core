@@ -63,10 +63,12 @@ bin/sotp capability exec <capability> --host <provider> --briefing-file tmp/capa
 
 ## `bin/sotp` provisioning
 
-`bin/sotp` is gitignored. Template export transplants the running binary when possible;
-otherwise `cargo make install-sotp` retrieves the pinned tag declared in
-`.harness/config/sotp-version.json`. CI follows the latter path and caches `.cargo-install`
-under a key containing that tag.
+`bin/sotp` is gitignored. In an exported scaffold, template export transplants the running
+binary when possible; otherwise `cargo make install-sotp` retrieves the pinned tag declared
+in `.harness/config/sotp-version.json`. The exported scaffold's CI follows the latter path
+and caches `.cargo-install` under a key containing that tag. In the SoTOHE-core source
+repository itself, build the binary from the working tree with `cargo make build-sotp`
+(rebuild it after changing sotp source code).
 
 ## Project Bootstrap (Version Research)
 
