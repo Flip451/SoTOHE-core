@@ -5,6 +5,7 @@ use std::process::ExitCode;
 use cli_composition::{CommandOutcome, CompositionError};
 use cli_driver::CommandOutcome as DriverOutcome;
 
+pub mod adr_baseline;
 pub mod arch;
 pub mod capability;
 pub mod catalog;

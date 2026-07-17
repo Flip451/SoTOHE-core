@@ -11,6 +11,12 @@ User invokes this command as `/track:review`. No arguments.
 ## Claude Code invocation constraints
 
 - **Scope discovery**: `bin/sotp review results`
+- **ADR freeze prelude**: Phase-0 init stamps are the orchestrator's primary-ADR designation
+  records. `cargo make adr-baseline-check-review` requires a nonempty ledger init-record
+  designation set, then verifies every recorded ledger copy and byte-matches every recorded ADR
+  against its latest baseline. Only a direct `bin/sotp adr-baseline check-review
+  --primary-source <file>.md` invocation may override the derived designation. Do not launch a
+  reviewer if this gate fails; spec-cited ADR coverage is checked separately at commit time.
 - **Briefing files**: write to `tmp/reviewer-runtime/briefing-{scope}.md`; use Read + Edit tools for existing files.
 - **Fix loop dispatch** (provider-agnostic wrapper — do NOT branch on `capabilities.review-fix-lead.provider` here):
   ```
@@ -29,5 +35,5 @@ After execution, summarize:
 
 1. Required scopes and their `final` round verdicts.
 2. Findings fixed (with file references).
-3. CI + `check-approved` result.
+3. ADR baseline, CI, and `check-approved` result.
 4. Commit readiness and the recommended next command (`/track:commit <message>`).

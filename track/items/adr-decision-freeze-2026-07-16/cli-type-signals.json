@@ -1,0 +1,92 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-17T04:03:35Z",
+  "declaration_hash": "e098a881a49a9cea1d77ede31165e7cb7bc24da733f2b0b9049bb4fd6bd888b8",
+  "implementation_input_hash": "8e857f020cbfe378ba52af40ee151ff7ab3ff5496d77c92cb60a190a1cd2b0f2",
+  "signals": [
+    {
+      "type_name": "AdrBaselineCheckCommitArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Args",
+        "Clone",
+        "Debug",
+        "FromArgMatches"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineCheckReviewArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Args",
+        "Clone",
+        "Debug",
+        "FromArgMatches"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "FromArgMatches",
+        "Subcommand"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineRestoreArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Args",
+        "Clone",
+        "Debug",
+        "FromArgMatches"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineSnapshotArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Args",
+        "Clone",
+        "Debug",
+        "FromArgMatches"
+      ]
+    },
+    {
+      "type_name": "CliCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::adr_baseline::dispatch",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::adr_baseline::execute",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::adr_baseline::execute_with_error_chain",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

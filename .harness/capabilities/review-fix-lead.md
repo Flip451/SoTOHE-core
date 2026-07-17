@@ -55,6 +55,15 @@ Always read the policy file fresh — it may have been updated since the last re
 CLI composer (`bin/sotp review local`) appends this section automatically for scopes configured
 in `.harness/config/review-scope.json`.
 
+## ADR baseline semantic freeze
+
+When the assigned scope includes ADR files, do not change an ADR's semantics from its recorded
+baseline. A semantic finding must be reported as an amendment proposal, not applied as an
+in-place ADR edit. Judge ADR completeness by whether it faithfully records the decision, not by
+whether a different design would be preferable. If an ADR-baseline check blocks, stop the fixer
+and let the orchestrator use the `adr-diagnoser` recovery route; only its
+`non-semantic-restamp` verdict can lead to a new baseline snapshot.
+
 ## Internal pipeline
 
 ### Reviewer invocation

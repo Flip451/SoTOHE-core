@@ -1,0 +1,179 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "request",
+              "ty": "cli_driver::adr_baseline::AdrBaselineRequest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<cli_driver::CommandOutcome, AdrBaselineResolutionError>"
+        }
+      ],
+      "type_name": "AdrBaselineCompositionRoot"
+    }
+  ],
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "AdrBaselineCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "AdrBaselineResolutionError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineResolutionError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdrBaselineResolutionError",
+      "trait_ref": "core::error::Error"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "AdrBaselineCompositionRoot": {
+      "action": "add",
+      "docs": "ADR baseline composition root; resolves request scope and injects snapshot time.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineResolutionError": {
+      "action": "add",
+      "docs": "Typed failures produced while resolving an ADR baseline request for execution.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ProjectRoot",
+            "payload": {
+              "fields": [
+                "CompositionError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TrackResolution",
+            "payload": {
+              "fields": [
+                "CompositionError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ResolvedTrackInvalid",
+            "payload": {
+              "fields": [
+                "usecase::ValidationError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Timestamp",
+            "payload": {
+              "fields": [
+                "usecase::ValidationError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    }
+  }
+}

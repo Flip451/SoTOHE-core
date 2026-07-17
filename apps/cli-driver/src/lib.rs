@@ -10,6 +10,7 @@
 //! structure (Cargo.toml, dependency graph, deny.toml, architecture-rules.json,
 //! apps/cli main.rs wiring) per CN-06.
 
+pub mod adr_baseline;
 pub mod arch;
 pub mod capability;
 pub mod catalog_gen;

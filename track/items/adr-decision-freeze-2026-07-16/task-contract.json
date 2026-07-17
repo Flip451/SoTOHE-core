@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "track_id": "adr-decision-freeze-2026-07-16",
+  "entries": {
+    "T001": [
+      {"layer": "domain", "entry_key": "AdrBaselineCheckOutcome"},
+      {"layer": "domain", "entry_key": "AdrBaselineCheckOutcomeError"},
+      {"layer": "domain", "entry_key": "AdrBaselineCheckViolation"},
+      {"layer": "domain", "entry_key": "AdrBaselineCheckViolations"},
+      {"layer": "domain", "entry_key": "AdrBaselineKind"},
+      {"layer": "domain", "entry_key": "AdrBaselineLedgerEntry"},
+      {"layer": "domain", "entry_key": "AdrBaselineRecordedCopyStatus"},
+      {"layer": "domain", "entry_key": "AdrBaselineSourceState"},
+      {"layer": "domain", "entry_key": "AdrSourceFileName"},
+      {"layer": "domain", "entry_key": "AdrSourceFileNameError"},
+      {"layer": "domain", "entry_key": "domain::adr_baseline::is_required_stamp_satisfied"}
+    ],
+    "T002": [
+      {"layer": "usecase", "entry_key": "AdrBaselineQueryService"},
+      {"layer": "usecase", "entry_key": "AdrBaselineService"},
+      {"layer": "usecase", "entry_key": "AdrBaselineSourcePort"},
+      {"layer": "usecase", "entry_key": "AdrBaselineStorePort"},
+      {"layer": "usecase", "entry_key": "AdrBaselineStoreReadPort"},
+      {"layer": "usecase", "entry_key": "AdrBaselineCommand"},
+      {"layer": "usecase", "entry_key": "AdrBaselineError"},
+      {"layer": "usecase", "entry_key": "AdrBaselineInteractor"},
+      {"layer": "usecase", "entry_key": "AdrBaselineOutput"},
+      {"layer": "usecase", "entry_key": "AdrBaselineQuery"},
+      {"layer": "usecase", "entry_key": "AdrBaselineQueryError"},
+      {"layer": "usecase", "entry_key": "AdrBaselineQueryInteractor"},
+      {"layer": "usecase", "entry_key": "AdrBaselineQueryOutput"},
+      {"layer": "usecase", "entry_key": "AdrBaselineSourceError"},
+      {"layer": "usecase", "entry_key": "AdrBaselineStoreError"},
+      {"layer": "usecase", "entry_key": "AdrBaselineStoreReadError"},
+      {"layer": "usecase", "entry_key": "AdrBaselineValidationError"}
+    ],
+    "T003": [
+      {"layer": "infrastructure", "entry_key": "infrastructure::adr_baseline::decode_ledger_line"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::adr_baseline::encode_ledger_entry"},
+      {"layer": "infrastructure", "entry_key": "AdrBaselineCodecError"},
+      {"layer": "infrastructure", "entry_key": "AdrBaselineLedgerRecordDto"},
+      {"layer": "infrastructure", "entry_key": "FsAdrBaselineStore"},
+      {"layer": "infrastructure", "entry_key": "FsGitAdrBaselineSource"}
+    ],
+    "T004": [
+      {"layer": "cli_driver", "entry_key": "AdrBaselineDriver"},
+      {"layer": "cli_driver", "entry_key": "AdrBaselineInput"},
+      {"layer": "cli_driver", "entry_key": "AdrBaselineKindInput"},
+      {"layer": "cli_driver", "entry_key": "AdrBaselineReasonInput"},
+      {"layer": "cli_driver", "entry_key": "AdrBaselineRequest"},
+      {"layer": "cli_driver", "entry_key": "AdrSourceFileNameInput"},
+      {"layer": "cli_driver", "entry_key": "TrackIdInput"},
+      {"layer": "cli", "entry_key": "AdrBaselineCheckCommitArgs"},
+      {"layer": "cli", "entry_key": "AdrBaselineCheckReviewArgs"},
+      {"layer": "cli", "entry_key": "AdrBaselineCommand"},
+      {"layer": "cli", "entry_key": "AdrBaselineRestoreArgs"},
+      {"layer": "cli", "entry_key": "AdrBaselineSnapshotArgs"}
+    ],
+    "T005": [
+      {"layer": "cli", "entry_key": "CliCommand"},
+      {"layer": "cli", "entry_key": "cli::commands::adr_baseline::dispatch"},
+      {"layer": "cli", "entry_key": "cli::commands::adr_baseline::execute"},
+      {"layer": "cli", "entry_key": "cli::commands::adr_baseline::execute_with_error_chain"},
+      {"layer": "cli_composition", "entry_key": "AdrBaselineResolutionError"},
+      {"layer": "cli_composition", "entry_key": "AdrBaselineCompositionRoot"}
+    ],
+    "T006": [],
+    "T007": []
+  }
+}

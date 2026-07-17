@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "fe2a5e31a62a75184f49391b5cda0eba7053cfa59c9f7eca72f621f9aac88ff3",
+  "signals": [
+    {
+      "type_name": "AdrBaselineCheckOutcome",
+      "signal": "blue",
+      "entry_hash": "e0876ae1b455ae1f2daf8ff0e856e0cd685c8b67837ce3bb5a7cc4ba06a6df81"
+    },
+    {
+      "type_name": "AdrBaselineCheckOutcomeError",
+      "signal": "blue",
+      "entry_hash": "714e8aaefe3acb8d4e86a967dc7030896acf76c3d1d0c40bfa28fe1255af1236"
+    },
+    {
+      "type_name": "AdrBaselineCheckViolation",
+      "signal": "blue",
+      "entry_hash": "ccf283e0ff8e3257a83ee68634f9d914993fe5abf0206dd7701f3f73ae93381d"
+    },
+    {
+      "type_name": "AdrBaselineCheckViolations",
+      "signal": "blue",
+      "entry_hash": "5806b2935d37a682acba5c3c922116358d63666ffa33fb5d5078e4a114b9b8cc"
+    },
+    {
+      "type_name": "AdrBaselineKind",
+      "signal": "blue",
+      "entry_hash": "b5e2347054bb2720fdf9ec4797a9ab7ddde7fa51f1bfd8c844b01d2e37e976f8"
+    },
+    {
+      "type_name": "AdrBaselineLedgerEntry",
+      "signal": "blue",
+      "entry_hash": "83db05b157fbca552a5236914ae2b6fe9d14cd346d7bfa8c352cf5490bc1b445"
+    },
+    {
+      "type_name": "AdrBaselineRecordedCopyStatus",
+      "signal": "blue",
+      "entry_hash": "e98e905333cdbb8a0246b5fb9a57908cf1a6c8f736622c0363b9749d4052da56"
+    },
+    {
+      "type_name": "AdrBaselineSourceState",
+      "signal": "blue",
+      "entry_hash": "37590709ecddf7b12543965194dddefd4befcad1d70f332f8baf5e507f6fa703"
+    },
+    {
+      "type_name": "AdrSourceFileName",
+      "signal": "blue",
+      "entry_hash": "e53112994b5fc0ca6ed552326b2e128a9f38b866a367259235c53659cfc28933"
+    },
+    {
+      "type_name": "AdrSourceFileNameError",
+      "signal": "blue",
+      "entry_hash": "33bbdcbd8663cf12b7546ae649deba0bbc0dd9c2a3f2e1f218cfebf6aa49ca1e"
+    },
+    {
+      "type_name": "domain::adr_baseline::is_required_stamp_satisfied",
+      "signal": "blue",
+      "entry_hash": "3cf5d0deba758bf38d59cc2aee40a67b913066b2629aebc941d1c1741b38ca2b"
+    }
+  ]
+}

@@ -17,6 +17,10 @@ proceed until this workflow completes with OK.
 
 - **Feature name** — a slug-ready phrase or descriptive string; the caller supplies this as the
   primary argument. If absent, the caller must ask the user for a feature name and stop.
+- **Primary ADR source filename** — the orchestrator supplies the direct Markdown filename under
+  `knowledge/adr/` to create this track's Phase-0 init designation record. It is
+  context-dependent and must not be derived; after the stamp succeeds, the ledger init record is
+  the designation and no separate primary pointer is retained.
 - **Current branch = configured base branch** — the workflow requires the working tree to be on
   the branch named by `.harness/config/branch-strategy.json#base_branch` before branch creation.
   Any other starting branch is a hard prerequisite failure.
@@ -74,7 +78,20 @@ A warning about `contract-map.md` skipping the new track (because the first TDDD
 layer's `<layer>-types.json` — as declared by the first `tddd.enabled` layer in
 `architecture-rules.json` — does not exist yet) is expected at this phase and is not an error.
 
-**Step 5: Verify identity schema**
+**Step 5: Create the primary ADR init designation record**
+
+After metadata and views exist, create the primary-ADR designation through the dedicated
+mechanism (never by copying files or editing the ledger):
+
+```
+bin/sotp adr-baseline snapshot --source '<primary-adr-file>.md' --kind init
+```
+
+This records the working-tree bytes as an append-only init baseline for the active track; the
+ledger init record itself is the primary designation. A missing or invalid filename is an ERROR;
+do not continue without that designation record.
+
+**Step 6: Verify identity schema**
 
 ```
 cargo make verify-track-metadata
@@ -82,7 +99,7 @@ cargo make verify-track-metadata
 
 This gate must pass (exit 0) before the workflow reports success.
 
-**Step 6: (Optional) ADR baseline commit**
+**Step 7: (Optional) ADR baseline commit**
 
 When ADR / convention files prepared for this track are present in the working tree without
 commit history, the recommended flow is to commit them as the first commit of the new track
@@ -96,7 +113,8 @@ Phase 1 and is not required for this first commit.
 | Step | Gate | Verdict |
 |------|------|---------|
 | 1 | Current branch is the configured base branch; no unrelated dirty state | ERROR → stop |
-| 5 | `cargo make verify-track-metadata` exits 0 | OK / ERROR |
+| 5 | `bin/sotp adr-baseline snapshot --source <primary-adr-file> --kind init` exits 0 | OK / ERROR |
+| 6 | `cargo make verify-track-metadata` exits 0 | OK / ERROR |
 
 The workflow completes with **OK** when `verify-track-metadata` passes.
 It completes with **ERROR** on any hard failure (base branch mismatch, branch creation failure,
@@ -111,6 +129,8 @@ metadata write failure, or gate failure). On ERROR, stop and report to the calle
 - **Branch creation failure** (`bin/sotp track branch create` non-zero): report the error.
   A pre-existing branch with the same name is the most common cause; adjust the track-id slug
   or rename the existing branch.
+- **ADR baseline snapshot failure**: report the command error and correct the orchestrator-supplied
+  primary ADR filename; do not create a ledger or copy manually.
 - **verify-track-metadata failure**: report the schema validation errors from the command output.
   Fix `metadata.json` fields accordingly and re-run the gate.
 
@@ -122,5 +142,6 @@ metadata write failure, or gate failure). On ERROR, stop and report to the calle
 - `track/items/<track-id>/plan.md` (rendered view; do not edit directly)
 - `track/registry.md` (regenerated; gitignored, not committed)
 - Branch `track/<track-id>` (created and checked out)
+- `track/items/<track-id>/adr-baseline/` init ledger entry and verbatim baseline copy
 - Gate verdict reported to the caller: **OK** or **ERROR** + error details
-- No commit is created by this workflow (Step 6 is optional and delegates to other workflows)
+- No commit is created by this workflow (Step 7 is optional and delegates to other workflows)

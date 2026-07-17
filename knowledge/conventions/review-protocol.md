@@ -10,6 +10,22 @@ reviewer は外部プロバイダー（既定: Codex CLI）であり、self-revi
 - **すべてのコミット**（コード変更だけでなく計画 artifact 含む）の前にレビューサイクルを実行する
 - レビューなしのコミットは禁止。CI ゲートではなくワークフロー規律として強制
 
+## ADR baseline pre-review gate
+
+- Before any reviewer or fixer starts, run `cargo make adr-baseline-check-review`. At Phase 0,
+  the orchestrator designated primary ADR source(s) by init-stamping them, and those ledger init
+  records are the designation records. Its CLI requires a nonempty init-designation set (or an
+  explicit direct-CLI primary source), then verifies every recorded ledger copy and byte-matches
+  every recorded ADR against its latest baseline. It fails closed when no init record exists.
+  Only a direct `bin/sotp adr-baseline check-review --primary-source <file>` invocation may
+  override the derived designation. The review wrappers enforce the same prelude; spec-cited ADR
+  coverage remains a separate commit-gate responsibility.
+- Missing init snapshots and byte mismatches block the review before a fixer can modify the
+  worktree. Do not create a baseline by hand or bypass the failure; use the sanctioned snapshot
+  or diagnoser/recovery route.
+- This byte-level gate is independent of review verdicts and ADR signal evaluation. Its addition
+  must not change `.harness/config/signal-gates.json` or the adr_user evaluator.
+
 ## zero_findings 完了条件
 
 - reviewer が `zero_findings` を返すまでレビューサイクルを継続する

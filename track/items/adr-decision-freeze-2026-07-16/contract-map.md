@@ -1,0 +1,680 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_adr_baseline["domain::adr_baseline"]
+    direction TB
+  subgraph T37_domain_domain_AdrBaselineCheckOutcome["adr_baseline::AdrBaselineCheckOutcome"]
+    direction TB
+    T37_domain_domain_AdrBaselineCheckOutcome__self[AdrBaselineCheckOutcome]
+    T37_domain_domain_AdrBaselineCheckOutcome_Passed[Passed]
+    T37_domain_domain_AdrBaselineCheckOutcome_Blocked[Blocked]
+    T37_domain_domain_AdrBaselineCheckOutcome_blocked([blocked])
+  end
+  subgraph T42_domain_domain_AdrBaselineCheckOutcomeError["adr_baseline::AdrBaselineCheckOutcomeError"]
+    direction TB
+    T42_domain_domain_AdrBaselineCheckOutcomeError__self[AdrBaselineCheckOutcomeError]
+    T42_domain_domain_AdrBaselineCheckOutcomeError_EmptyViolations[EmptyViolations]
+  end
+  subgraph T39_domain_domain_AdrBaselineCheckViolation["adr_baseline::AdrBaselineCheckViolation"]
+    direction TB
+    T39_domain_domain_AdrBaselineCheckViolation__self[AdrBaselineCheckViolation]
+    T39_domain_domain_AdrBaselineCheckViolation_PrimaryInitUnavailable[PrimaryInitUnavailable]
+    T39_domain_domain_AdrBaselineCheckViolation_MissingPrimaryInit[MissingPrimaryInit]
+    T39_domain_domain_AdrBaselineCheckViolation_MissingRequiredStamp[MissingRequiredStamp]
+    T39_domain_domain_AdrBaselineCheckViolation_SourceMissing[SourceMissing]
+    T39_domain_domain_AdrBaselineCheckViolation_BaselineCopyMissing[BaselineCopyMissing]
+    T39_domain_domain_AdrBaselineCheckViolation_BaselineCopyMismatch[BaselineCopyMismatch]
+    T39_domain_domain_AdrBaselineCheckViolation_ByteMismatch[ByteMismatch]
+  end
+  subgraph T40_domain_domain_AdrBaselineCheckViolations["adr_baseline::AdrBaselineCheckViolations"]
+    direction TB
+    T40_domain_domain_AdrBaselineCheckViolations__self[AdrBaselineCheckViolations]
+    T40_domain_domain_AdrBaselineCheckViolations_try_new([try_new])
+    T40_domain_domain_AdrBaselineCheckViolations_as_slice([as_slice])
+  end
+  subgraph T29_domain_domain_AdrBaselineKind["adr_baseline::AdrBaselineKind"]
+    direction TB
+    T29_domain_domain_AdrBaselineKind__self[AdrBaselineKind]
+    T29_domain_domain_AdrBaselineKind_Init[Init]
+    T29_domain_domain_AdrBaselineKind_Cite[Cite]
+    T29_domain_domain_AdrBaselineKind_NewAdr[NewAdr]
+    T29_domain_domain_AdrBaselineKind_NonSemanticFix[NonSemanticFix]
+    T29_domain_domain_AdrBaselineKind_Escalation[Escalation]
+    T29_domain_domain_AdrBaselineKind_requires_reason([requires_reason])
+    T29_domain_domain_AdrBaselineKind_uses_fork_point([uses_fork_point])
+  end
+  subgraph T36_domain_domain_AdrBaselineLedgerEntry["adr_baseline::AdrBaselineLedgerEntry"]
+    direction TB
+    T36_domain_domain_AdrBaselineLedgerEntry__self[AdrBaselineLedgerEntry]
+    T36_domain_domain_AdrBaselineLedgerEntry_Init[Init]
+    T36_domain_domain_AdrBaselineLedgerEntry_Cite[Cite]
+    T36_domain_domain_AdrBaselineLedgerEntry_NewAdr[NewAdr]
+    T36_domain_domain_AdrBaselineLedgerEntry_NonSemanticFix[NonSemanticFix]
+    T36_domain_domain_AdrBaselineLedgerEntry_Escalation[Escalation]
+    T36_domain_domain_AdrBaselineLedgerEntry_kind([kind])
+    T36_domain_domain_AdrBaselineLedgerEntry_source([source])
+    T36_domain_domain_AdrBaselineLedgerEntry_hash([hash])
+    T36_domain_domain_AdrBaselineLedgerEntry_timestamp([timestamp])
+    T36_domain_domain_AdrBaselineLedgerEntry_reason([reason])
+  end
+  subgraph T43_domain_domain_AdrBaselineRecordedCopyStatus["adr_baseline::AdrBaselineRecordedCopyStatus"]
+    direction TB
+    T43_domain_domain_AdrBaselineRecordedCopyStatus__self[AdrBaselineRecordedCopyStatus]
+    T43_domain_domain_AdrBaselineRecordedCopyStatus_Matches[Matches]
+    T43_domain_domain_AdrBaselineRecordedCopyStatus_Missing[Missing]
+    T43_domain_domain_AdrBaselineRecordedCopyStatus_HashMismatch[HashMismatch]
+  end
+  subgraph T36_domain_domain_AdrBaselineSourceState["adr_baseline::AdrBaselineSourceState"]
+    direction TB
+    T36_domain_domain_AdrBaselineSourceState__self[AdrBaselineSourceState]
+    T36_domain_domain_AdrBaselineSourceState_ExistingAtForkPoint[ExistingAtForkPoint]
+    T36_domain_domain_AdrBaselineSourceState_TrackBornDraft[TrackBornDraft]
+    T36_domain_domain_AdrBaselineSourceState_TrackBornPromoted[TrackBornPromoted]
+  end
+  subgraph T31_domain_domain_AdrSourceFileName["adr_baseline::AdrSourceFileName"]
+    direction TB
+    T31_domain_domain_AdrSourceFileName__self[AdrSourceFileName]
+    T31_domain_domain_AdrSourceFileName_try_new([try_new])
+    T31_domain_domain_AdrSourceFileName_as_str([as_str])
+  end
+  subgraph T36_domain_domain_AdrSourceFileNameError["adr_baseline::AdrSourceFileNameError"]
+    direction TB
+    T36_domain_domain_AdrSourceFileNameError__self[AdrSourceFileNameError]
+    T36_domain_domain_AdrSourceFileNameError_InvalidFileName[InvalidFileName]
+  end
+  F63_domain_domain_domain__adr_baseline__is_required_stamp_satisfied[[is_required_stamp_satisfied]]
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_adr_baseline["usecase::adr_baseline"]
+    direction TB
+  subgraph T34_usecase_usecase_AdrBaselineCommand["adr_baseline::AdrBaselineCommand"]
+    direction TB
+    T34_usecase_usecase_AdrBaselineCommand__self[AdrBaselineCommand]
+    T34_usecase_usecase_AdrBaselineCommand_Snapshot[Snapshot]
+    T34_usecase_usecase_AdrBaselineCommand_Restore[Restore]
+  end
+  subgraph T32_usecase_usecase_AdrBaselineError["adr_baseline::AdrBaselineError"]
+    direction TB
+    T32_usecase_usecase_AdrBaselineError__self[AdrBaselineError]
+    T32_usecase_usecase_AdrBaselineError_Store[Store]
+    T32_usecase_usecase_AdrBaselineError_Source[Source]
+    T32_usecase_usecase_AdrBaselineError_Validation[Validation]
+  end
+  subgraph T37_usecase_usecase_AdrBaselineInteractor["adr_baseline::AdrBaselineInteractor"]
+    direction TB
+    T37_usecase_usecase_AdrBaselineInteractor__self[AdrBaselineInteractor]
+    T37_usecase_usecase_AdrBaselineInteractor_new([new])
+  end
+  subgraph T33_usecase_usecase_AdrBaselineOutput["adr_baseline::AdrBaselineOutput"]
+    direction TB
+    T33_usecase_usecase_AdrBaselineOutput__self[AdrBaselineOutput]
+    T33_usecase_usecase_AdrBaselineOutput_SnapshotRecorded[SnapshotRecorded]
+    T33_usecase_usecase_AdrBaselineOutput_Restored[Restored]
+  end
+  subgraph T32_usecase_usecase_AdrBaselineQuery["adr_baseline::AdrBaselineQuery"]
+    direction TB
+    T32_usecase_usecase_AdrBaselineQuery__self[AdrBaselineQuery]
+    T32_usecase_usecase_AdrBaselineQuery_CheckReview[CheckReview]
+    T32_usecase_usecase_AdrBaselineQuery_CheckCommit[CheckCommit]
+  end
+  subgraph T37_usecase_usecase_AdrBaselineQueryError["adr_baseline::AdrBaselineQueryError"]
+    direction TB
+    T37_usecase_usecase_AdrBaselineQueryError__self[AdrBaselineQueryError]
+    T37_usecase_usecase_AdrBaselineQueryError_SourceRead[SourceRead]
+    T37_usecase_usecase_AdrBaselineQueryError_Store[Store]
+  end
+  subgraph T42_usecase_usecase_AdrBaselineQueryInteractor["adr_baseline::AdrBaselineQueryInteractor"]
+    direction TB
+    T42_usecase_usecase_AdrBaselineQueryInteractor__self[AdrBaselineQueryInteractor]
+    T42_usecase_usecase_AdrBaselineQueryInteractor_new([new])
+  end
+  subgraph T38_usecase_usecase_AdrBaselineQueryOutput["adr_baseline::AdrBaselineQueryOutput"]
+    direction TB
+    T38_usecase_usecase_AdrBaselineQueryOutput__self[AdrBaselineQueryOutput]
+    T38_usecase_usecase_AdrBaselineQueryOutput_Checked[Checked]
+  end
+  subgraph T38_usecase_usecase_AdrBaselineSourceError["adr_baseline::AdrBaselineSourceError"]
+    direction TB
+    T38_usecase_usecase_AdrBaselineSourceError__self[AdrBaselineSourceError]
+    T38_usecase_usecase_AdrBaselineSourceError_Read[Read]
+    T38_usecase_usecase_AdrBaselineSourceError_Unavailable[Unavailable]
+  end
+  subgraph T37_usecase_usecase_AdrBaselineStoreError["adr_baseline::AdrBaselineStoreError"]
+    direction TB
+    T37_usecase_usecase_AdrBaselineStoreError__self[AdrBaselineStoreError]
+    T37_usecase_usecase_AdrBaselineStoreError_Read[Read]
+    T37_usecase_usecase_AdrBaselineStoreError_Write[Write]
+  end
+  subgraph T41_usecase_usecase_AdrBaselineStoreReadError["adr_baseline::AdrBaselineStoreReadError"]
+    direction TB
+    T41_usecase_usecase_AdrBaselineStoreReadError__self[AdrBaselineStoreReadError]
+    T41_usecase_usecase_AdrBaselineStoreReadError_Read[Read]
+  end
+  subgraph T42_usecase_usecase_AdrBaselineValidationError["adr_baseline::AdrBaselineValidationError"]
+    direction TB
+    T42_usecase_usecase_AdrBaselineValidationError__self[AdrBaselineValidationError]
+    T42_usecase_usecase_AdrBaselineValidationError_InvalidReason[InvalidReason]
+    T42_usecase_usecase_AdrBaselineValidationError_InvalidSourceFileName[InvalidSourceFileName]
+  end
+  subgraph R39_usecase_usecase_AdrBaselineQueryService["adr_baseline::AdrBaselineQueryService"]
+    direction TB
+    R39_usecase_usecase_AdrBaselineQueryService__self[AdrBaselineQueryService]
+    R39_usecase_usecase_AdrBaselineQueryService_execute([execute])
+  end
+  subgraph R34_usecase_usecase_AdrBaselineService["adr_baseline::AdrBaselineService"]
+    direction TB
+    R34_usecase_usecase_AdrBaselineService__self[AdrBaselineService]
+    R34_usecase_usecase_AdrBaselineService_execute([execute])
+  end
+  subgraph R37_usecase_usecase_AdrBaselineSourcePort["adr_baseline::AdrBaselineSourcePort"]
+    direction TB
+    R37_usecase_usecase_AdrBaselineSourcePort__self[AdrBaselineSourcePort]
+    R37_usecase_usecase_AdrBaselineSourcePort_working_bytes([working_bytes])
+    R37_usecase_usecase_AdrBaselineSourcePort_fork_point_bytes([fork_point_bytes])
+    R37_usecase_usecase_AdrBaselineSourcePort_cited_sources([cited_sources])
+    R37_usecase_usecase_AdrBaselineSourcePort_source_state([source_state])
+  end
+  subgraph R36_usecase_usecase_AdrBaselineStorePort["adr_baseline::AdrBaselineStorePort"]
+    direction TB
+    R36_usecase_usecase_AdrBaselineStorePort__self[AdrBaselineStorePort]
+    R36_usecase_usecase_AdrBaselineStorePort_snapshot([snapshot])
+    R36_usecase_usecase_AdrBaselineStorePort_restore([restore])
+  end
+  subgraph R40_usecase_usecase_AdrBaselineStoreReadPort["adr_baseline::AdrBaselineStoreReadPort"]
+    direction TB
+    R40_usecase_usecase_AdrBaselineStoreReadPort__self[AdrBaselineStoreReadPort]
+    R40_usecase_usecase_AdrBaselineStoreReadPort_read_entries([read_entries])
+    R40_usecase_usecase_AdrBaselineStoreReadPort_verify_recorded_copy([verify_recorded_copy])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_adr_baseline["infrastructure::adr_baseline"]
+    direction TB
+  subgraph T51_infrastructure_infrastructure_AdrBaselineCodecError["adr_baseline::AdrBaselineCodecError"]
+    direction TB
+    T51_infrastructure_infrastructure_AdrBaselineCodecError__self[AdrBaselineCodecError]
+    T51_infrastructure_infrastructure_AdrBaselineCodecError_Json[Json]
+    T51_infrastructure_infrastructure_AdrBaselineCodecError_Domain[Domain]
+  end
+  subgraph T56_infrastructure_infrastructure_AdrBaselineLedgerRecordDto["adr_baseline::AdrBaselineLedgerRecordDto"]
+    direction TB
+    T56_infrastructure_infrastructure_AdrBaselineLedgerRecordDto__self[AdrBaselineLedgerRecordDto]
+  end
+  subgraph T48_infrastructure_infrastructure_FsAdrBaselineStore["adr_baseline::FsAdrBaselineStore"]
+    direction TB
+    T48_infrastructure_infrastructure_FsAdrBaselineStore__self[FsAdrBaselineStore]
+  end
+  subgraph T52_infrastructure_infrastructure_FsGitAdrBaselineSource["adr_baseline::FsGitAdrBaselineSource"]
+    direction TB
+    T52_infrastructure_infrastructure_FsGitAdrBaselineSource__self[FsGitAdrBaselineSource]
+  end
+  F78_infrastructure_infrastructure_infrastructure__adr_baseline__decode_ledger_line[[decode_ledger_line]]
+  F79_infrastructure_infrastructure_infrastructure__adr_baseline__encode_ledger_entry[[encode_ledger_entry]]
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+  subgraph cli_driver_cli_driver_module_adr_baseline["cli_driver::adr_baseline"]
+    direction TB
+  subgraph T39_cli_driver_cli_driver_AdrBaselineDriver["adr_baseline::AdrBaselineDriver"]
+    direction TB
+    T39_cli_driver_cli_driver_AdrBaselineDriver__self[AdrBaselineDriver]
+    T39_cli_driver_cli_driver_AdrBaselineDriver_new([new])
+    T39_cli_driver_cli_driver_AdrBaselineDriver_handle([handle])
+  end
+  subgraph T38_cli_driver_cli_driver_AdrBaselineInput["adr_baseline::AdrBaselineInput"]
+    direction TB
+    T38_cli_driver_cli_driver_AdrBaselineInput__self[AdrBaselineInput]
+    T38_cli_driver_cli_driver_AdrBaselineInput_Snapshot[Snapshot]
+    T38_cli_driver_cli_driver_AdrBaselineInput_Restore[Restore]
+    T38_cli_driver_cli_driver_AdrBaselineInput_CheckReview[CheckReview]
+    T38_cli_driver_cli_driver_AdrBaselineInput_CheckCommit[CheckCommit]
+  end
+  subgraph T42_cli_driver_cli_driver_AdrBaselineKindInput["adr_baseline::AdrBaselineKindInput"]
+    direction TB
+    T42_cli_driver_cli_driver_AdrBaselineKindInput__self[AdrBaselineKindInput]
+    T42_cli_driver_cli_driver_AdrBaselineKindInput_Init[Init]
+    T42_cli_driver_cli_driver_AdrBaselineKindInput_Cite[Cite]
+    T42_cli_driver_cli_driver_AdrBaselineKindInput_NewAdr[NewAdr]
+    T42_cli_driver_cli_driver_AdrBaselineKindInput_NonSemanticFix[NonSemanticFix]
+    T42_cli_driver_cli_driver_AdrBaselineKindInput_Escalation[Escalation]
+  end
+  subgraph T44_cli_driver_cli_driver_AdrBaselineReasonInput["adr_baseline::AdrBaselineReasonInput"]
+    direction TB
+    T44_cli_driver_cli_driver_AdrBaselineReasonInput__self[AdrBaselineReasonInput]
+  end
+  subgraph T40_cli_driver_cli_driver_AdrBaselineRequest["adr_baseline::AdrBaselineRequest"]
+    direction TB
+    T40_cli_driver_cli_driver_AdrBaselineRequest__self[AdrBaselineRequest]
+    T40_cli_driver_cli_driver_AdrBaselineRequest_Snapshot[Snapshot]
+    T40_cli_driver_cli_driver_AdrBaselineRequest_Restore[Restore]
+    T40_cli_driver_cli_driver_AdrBaselineRequest_CheckReview[CheckReview]
+    T40_cli_driver_cli_driver_AdrBaselineRequest_CheckCommit[CheckCommit]
+    T40_cli_driver_cli_driver_AdrBaselineRequest_items_dir([items_dir])
+  end
+  subgraph T44_cli_driver_cli_driver_AdrSourceFileNameInput["adr_baseline::AdrSourceFileNameInput"]
+    direction TB
+    T44_cli_driver_cli_driver_AdrSourceFileNameInput__self[AdrSourceFileNameInput]
+  end
+  subgraph T34_cli_driver_cli_driver_TrackIdInput["adr_baseline::TrackIdInput"]
+    direction TB
+    T34_cli_driver_cli_driver_TrackIdInput__self[TrackIdInput]
+  end
+  end
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+  subgraph cli_composition_cli_composition_module_adr_baseline["cli_composition::adr_baseline"]
+    direction TB
+  subgraph T58_cli_composition_cli_composition_AdrBaselineCompositionRoot["adr_baseline::AdrBaselineCompositionRoot"]
+    direction TB
+    T58_cli_composition_cli_composition_AdrBaselineCompositionRoot__self[AdrBaselineCompositionRoot]
+    T58_cli_composition_cli_composition_AdrBaselineCompositionRoot_new([new])
+    T58_cli_composition_cli_composition_AdrBaselineCompositionRoot_execute([execute])
+  end
+  subgraph T58_cli_composition_cli_composition_AdrBaselineResolutionError["adr_baseline::AdrBaselineResolutionError"]
+    direction TB
+    T58_cli_composition_cli_composition_AdrBaselineResolutionError__self[AdrBaselineResolutionError]
+    T58_cli_composition_cli_composition_AdrBaselineResolutionError_ProjectRoot[ProjectRoot]
+    T58_cli_composition_cli_composition_AdrBaselineResolutionError_TrackResolution[TrackResolution]
+    T58_cli_composition_cli_composition_AdrBaselineResolutionError_ResolvedTrackInvalid[ResolvedTrackInvalid]
+    T58_cli_composition_cli_composition_AdrBaselineResolutionError_Timestamp[Timestamp]
+  end
+  end
+end
+subgraph cli["cli"]
+  direction TB
+  subgraph T18_cli_cli_CliCommand["CliCommand"]
+    direction TB
+    T18_cli_cli_CliCommand__self[CliCommand]
+    T18_cli_cli_CliCommand_Arch[Arch]
+    T18_cli_cli_CliCommand_AdrBaseline[AdrBaseline]
+    T18_cli_cli_CliCommand_Conventions[Conventions]
+    T18_cli_cli_CliCommand_Domain[Domain]
+    T18_cli_cli_CliCommand_Guard[Guard]
+    T18_cli_cli_CliCommand_Hook[Hook]
+    T18_cli_cli_CliCommand_Track[Track]
+    T18_cli_cli_CliCommand_Git[Git]
+    T18_cli_cli_CliCommand_Pr[Pr]
+    T18_cli_cli_CliCommand_Capability[Capability]
+    T18_cli_cli_CliCommand_Review[Review]
+    T18_cli_cli_CliCommand_File[File]
+    T18_cli_cli_CliCommand_Verify[Verify]
+    T18_cli_cli_CliCommand_FindSimilar[FindSimilar]
+    T18_cli_cli_CliCommand_DupIndex[DupIndex]
+    T18_cli_cli_CliCommand_DupCheck[DupCheck]
+    T18_cli_cli_CliCommand_Telemetry[Telemetry]
+    T18_cli_cli_CliCommand_Dry[Dry]
+    T18_cli_cli_CliCommand_RefVerify[RefVerify]
+    T18_cli_cli_CliCommand_TestObligation[TestObligation]
+    T18_cli_cli_CliCommand_Signal[Signal]
+    T18_cli_cli_CliCommand_TaskContract[TaskContract]
+    T18_cli_cli_CliCommand_Catalog[Catalog]
+    T18_cli_cli_CliCommand_CatalogueLint[CatalogueLint]
+    T18_cli_cli_CliCommand_Template[Template]
+  end
+  subgraph cli_cli_module_commands["cli::commands"]
+    direction TB
+  subgraph T34_cli_cli_AdrBaselineCheckCommitArgs["commands::adr_baseline::AdrBaselineCheckCommitArgs"]
+    direction TB
+    T34_cli_cli_AdrBaselineCheckCommitArgs__self[AdrBaselineCheckCommitArgs]
+  end
+  subgraph T34_cli_cli_AdrBaselineCheckReviewArgs["commands::adr_baseline::AdrBaselineCheckReviewArgs"]
+    direction TB
+    T34_cli_cli_AdrBaselineCheckReviewArgs__self[AdrBaselineCheckReviewArgs]
+  end
+  subgraph T26_cli_cli_AdrBaselineCommand["commands::adr_baseline::AdrBaselineCommand"]
+    direction TB
+    T26_cli_cli_AdrBaselineCommand__self[AdrBaselineCommand]
+    T26_cli_cli_AdrBaselineCommand_Snapshot[Snapshot]
+    T26_cli_cli_AdrBaselineCommand_Restore[Restore]
+    T26_cli_cli_AdrBaselineCommand_CheckReview[CheckReview]
+    T26_cli_cli_AdrBaselineCommand_CheckCommit[CheckCommit]
+  end
+  subgraph T30_cli_cli_AdrBaselineRestoreArgs["commands::adr_baseline::AdrBaselineRestoreArgs"]
+    direction TB
+    T30_cli_cli_AdrBaselineRestoreArgs__self[AdrBaselineRestoreArgs]
+  end
+  subgraph T31_cli_cli_AdrBaselineSnapshotArgs["commands::adr_baseline::AdrBaselineSnapshotArgs"]
+    direction TB
+    T31_cli_cli_AdrBaselineSnapshotArgs__self[AdrBaselineSnapshotArgs]
+  end
+  F45_cli_cli_cli__commands__adr_baseline__dispatch[[dispatch]]
+  F44_cli_cli_cli__commands__adr_baseline__execute[[execute]]
+  F61_cli_cli_cli__commands__adr_baseline__execute_with_error_chain[[execute_with_error_chain]]
+  end
+end
+T37_domain_domain_AdrBaselineCheckOutcome_Blocked --o|violations| T40_domain_domain_AdrBaselineCheckViolations__self
+T37_domain_domain_AdrBaselineCheckOutcome_blocked --o T40_domain_domain_AdrBaselineCheckViolations__self
+T37_domain_domain_AdrBaselineCheckOutcome_blocked --> T37_domain_domain_AdrBaselineCheckOutcome__self
+T39_domain_domain_AdrBaselineCheckViolation_MissingPrimaryInit --o T31_domain_domain_AdrSourceFileName__self
+T39_domain_domain_AdrBaselineCheckViolation_MissingRequiredStamp --o T31_domain_domain_AdrSourceFileName__self
+T39_domain_domain_AdrBaselineCheckViolation_SourceMissing --o T31_domain_domain_AdrSourceFileName__self
+T39_domain_domain_AdrBaselineCheckViolation_BaselineCopyMissing --o|source| T31_domain_domain_AdrSourceFileName__self
+T39_domain_domain_AdrBaselineCheckViolation_BaselineCopyMismatch --o|source| T31_domain_domain_AdrSourceFileName__self
+T39_domain_domain_AdrBaselineCheckViolation_ByteMismatch --o|source| T31_domain_domain_AdrSourceFileName__self
+T40_domain_domain_AdrBaselineCheckViolations_try_new --o T39_domain_domain_AdrBaselineCheckViolation__self
+T40_domain_domain_AdrBaselineCheckViolations_try_new --> T42_domain_domain_AdrBaselineCheckOutcomeError__self
+T40_domain_domain_AdrBaselineCheckViolations_try_new --> T40_domain_domain_AdrBaselineCheckViolations__self
+T40_domain_domain_AdrBaselineCheckViolations_as_slice --> T39_domain_domain_AdrBaselineCheckViolation__self
+T36_domain_domain_AdrBaselineLedgerEntry_Init --o|source| T31_domain_domain_AdrSourceFileName__self
+T36_domain_domain_AdrBaselineLedgerEntry_Cite --o|source| T31_domain_domain_AdrSourceFileName__self
+T36_domain_domain_AdrBaselineLedgerEntry_NewAdr --o|source| T31_domain_domain_AdrSourceFileName__self
+T36_domain_domain_AdrBaselineLedgerEntry_NonSemanticFix --o|source| T31_domain_domain_AdrSourceFileName__self
+T36_domain_domain_AdrBaselineLedgerEntry_Escalation --o|source| T31_domain_domain_AdrSourceFileName__self
+T36_domain_domain_AdrBaselineLedgerEntry_kind --> T29_domain_domain_AdrBaselineKind__self
+T36_domain_domain_AdrBaselineLedgerEntry_source --> T31_domain_domain_AdrSourceFileName__self
+T31_domain_domain_AdrSourceFileName_try_new --> T36_domain_domain_AdrSourceFileNameError__self
+T31_domain_domain_AdrSourceFileName_try_new --> T31_domain_domain_AdrSourceFileName__self
+F63_domain_domain_domain__adr_baseline__is_required_stamp_satisfied --o T36_domain_domain_AdrBaselineSourceState__self
+F63_domain_domain_domain__adr_baseline__is_required_stamp_satisfied --o T29_domain_domain_AdrBaselineKind__self
+T34_usecase_usecase_AdrBaselineCommand_Snapshot --o|source| T31_domain_domain_AdrSourceFileName__self
+T34_usecase_usecase_AdrBaselineCommand_Snapshot --o|kind| T29_domain_domain_AdrBaselineKind__self
+T34_usecase_usecase_AdrBaselineCommand_Restore --o|source| T31_domain_domain_AdrSourceFileName__self
+T32_usecase_usecase_AdrBaselineError_Store --o T37_usecase_usecase_AdrBaselineStoreError__self
+T32_usecase_usecase_AdrBaselineError_Source --o T38_usecase_usecase_AdrBaselineSourceError__self
+T32_usecase_usecase_AdrBaselineError_Validation --o T42_usecase_usecase_AdrBaselineValidationError__self
+T37_usecase_usecase_AdrBaselineInteractor_new --o R36_usecase_usecase_AdrBaselineStorePort__self
+T37_usecase_usecase_AdrBaselineInteractor_new --o R37_usecase_usecase_AdrBaselineSourcePort__self
+T37_usecase_usecase_AdrBaselineInteractor_new --> T37_usecase_usecase_AdrBaselineInteractor__self
+T33_usecase_usecase_AdrBaselineOutput_SnapshotRecorded --o T36_domain_domain_AdrBaselineLedgerEntry__self
+T33_usecase_usecase_AdrBaselineOutput_Restored --o T31_domain_domain_AdrSourceFileName__self
+T32_usecase_usecase_AdrBaselineQuery_CheckReview --o|primary_source| T31_domain_domain_AdrSourceFileName__self
+T37_usecase_usecase_AdrBaselineQueryError_Store --o T41_usecase_usecase_AdrBaselineStoreReadError__self
+T42_usecase_usecase_AdrBaselineQueryInteractor_new --o R40_usecase_usecase_AdrBaselineStoreReadPort__self
+T42_usecase_usecase_AdrBaselineQueryInteractor_new --o R37_usecase_usecase_AdrBaselineSourcePort__self
+T42_usecase_usecase_AdrBaselineQueryInteractor_new --> T42_usecase_usecase_AdrBaselineQueryInteractor__self
+T38_usecase_usecase_AdrBaselineQueryOutput_Checked --o T37_domain_domain_AdrBaselineCheckOutcome__self
+T38_usecase_usecase_AdrBaselineSourceError_Unavailable --o T31_domain_domain_AdrSourceFileName__self
+T42_usecase_usecase_AdrBaselineValidationError_InvalidSourceFileName --o T36_domain_domain_AdrSourceFileNameError__self
+R39_usecase_usecase_AdrBaselineQueryService_execute --o T32_usecase_usecase_AdrBaselineQuery__self
+R39_usecase_usecase_AdrBaselineQueryService_execute --> T37_usecase_usecase_AdrBaselineQueryError__self
+R39_usecase_usecase_AdrBaselineQueryService_execute --> T38_usecase_usecase_AdrBaselineQueryOutput__self
+R34_usecase_usecase_AdrBaselineService_execute --o T34_usecase_usecase_AdrBaselineCommand__self
+R34_usecase_usecase_AdrBaselineService_execute --> T32_usecase_usecase_AdrBaselineError__self
+R34_usecase_usecase_AdrBaselineService_execute --> T33_usecase_usecase_AdrBaselineOutput__self
+R37_usecase_usecase_AdrBaselineSourcePort_working_bytes --o T31_domain_domain_AdrSourceFileName__self
+R37_usecase_usecase_AdrBaselineSourcePort_working_bytes --> T38_usecase_usecase_AdrBaselineSourceError__self
+R37_usecase_usecase_AdrBaselineSourcePort_fork_point_bytes --o T31_domain_domain_AdrSourceFileName__self
+R37_usecase_usecase_AdrBaselineSourcePort_fork_point_bytes --> T38_usecase_usecase_AdrBaselineSourceError__self
+R37_usecase_usecase_AdrBaselineSourcePort_cited_sources --> T38_usecase_usecase_AdrBaselineSourceError__self
+R37_usecase_usecase_AdrBaselineSourcePort_cited_sources --> T31_domain_domain_AdrSourceFileName__self
+R37_usecase_usecase_AdrBaselineSourcePort_source_state --o T31_domain_domain_AdrSourceFileName__self
+R37_usecase_usecase_AdrBaselineSourcePort_source_state --> T38_usecase_usecase_AdrBaselineSourceError__self
+R37_usecase_usecase_AdrBaselineSourcePort_source_state --> T36_domain_domain_AdrBaselineSourceState__self
+R36_usecase_usecase_AdrBaselineStorePort_snapshot --o T31_domain_domain_AdrSourceFileName__self
+R36_usecase_usecase_AdrBaselineStorePort_snapshot --o T29_domain_domain_AdrBaselineKind__self
+R36_usecase_usecase_AdrBaselineStorePort_snapshot --> T37_usecase_usecase_AdrBaselineStoreError__self
+R36_usecase_usecase_AdrBaselineStorePort_snapshot --> T36_domain_domain_AdrBaselineLedgerEntry__self
+R36_usecase_usecase_AdrBaselineStorePort_restore --o T31_domain_domain_AdrSourceFileName__self
+R36_usecase_usecase_AdrBaselineStorePort_restore --> T37_usecase_usecase_AdrBaselineStoreError__self
+R40_usecase_usecase_AdrBaselineStoreReadPort_read_entries --> T41_usecase_usecase_AdrBaselineStoreReadError__self
+R40_usecase_usecase_AdrBaselineStoreReadPort_read_entries --> T36_domain_domain_AdrBaselineLedgerEntry__self
+R40_usecase_usecase_AdrBaselineStoreReadPort_verify_recorded_copy --o T36_domain_domain_AdrBaselineLedgerEntry__self
+R40_usecase_usecase_AdrBaselineStoreReadPort_verify_recorded_copy --> T41_usecase_usecase_AdrBaselineStoreReadError__self
+R40_usecase_usecase_AdrBaselineStoreReadPort_verify_recorded_copy --> T43_domain_domain_AdrBaselineRecordedCopyStatus__self
+T37_usecase_usecase_AdrBaselineInteractor__self -.impl.-> R34_usecase_usecase_AdrBaselineService__self
+T42_usecase_usecase_AdrBaselineQueryInteractor__self -.impl.-> R39_usecase_usecase_AdrBaselineQueryService__self
+T56_infrastructure_infrastructure_AdrBaselineLedgerRecordDto__self --o|source| T31_domain_domain_AdrSourceFileName__self
+T56_infrastructure_infrastructure_AdrBaselineLedgerRecordDto__self --o|kind| T29_domain_domain_AdrBaselineKind__self
+F78_infrastructure_infrastructure_infrastructure__adr_baseline__decode_ledger_line --> T51_infrastructure_infrastructure_AdrBaselineCodecError__self
+F78_infrastructure_infrastructure_infrastructure__adr_baseline__decode_ledger_line --> T36_domain_domain_AdrBaselineLedgerEntry__self
+F79_infrastructure_infrastructure_infrastructure__adr_baseline__encode_ledger_entry --o T36_domain_domain_AdrBaselineLedgerEntry__self
+F79_infrastructure_infrastructure_infrastructure__adr_baseline__encode_ledger_entry --> T51_infrastructure_infrastructure_AdrBaselineCodecError__self
+T48_infrastructure_infrastructure_FsAdrBaselineStore__self -.impl.-> R36_usecase_usecase_AdrBaselineStorePort__self
+T48_infrastructure_infrastructure_FsAdrBaselineStore__self -.impl.-> R40_usecase_usecase_AdrBaselineStoreReadPort__self
+T52_infrastructure_infrastructure_FsGitAdrBaselineSource__self -.impl.-> R37_usecase_usecase_AdrBaselineSourcePort__self
+T39_cli_driver_cli_driver_AdrBaselineDriver_new --o R34_usecase_usecase_AdrBaselineService__self
+T39_cli_driver_cli_driver_AdrBaselineDriver_new --o R39_usecase_usecase_AdrBaselineQueryService__self
+T39_cli_driver_cli_driver_AdrBaselineDriver_new --> T39_cli_driver_cli_driver_AdrBaselineDriver__self
+T39_cli_driver_cli_driver_AdrBaselineDriver_handle --o T38_cli_driver_cli_driver_AdrBaselineInput__self
+T38_cli_driver_cli_driver_AdrBaselineInput_Snapshot --o|track_id| T34_cli_driver_cli_driver_TrackIdInput__self
+T38_cli_driver_cli_driver_AdrBaselineInput_Snapshot --o|source| T44_cli_driver_cli_driver_AdrSourceFileNameInput__self
+T38_cli_driver_cli_driver_AdrBaselineInput_Snapshot --o|kind| T42_cli_driver_cli_driver_AdrBaselineKindInput__self
+T38_cli_driver_cli_driver_AdrBaselineInput_Snapshot --o|reason| T44_cli_driver_cli_driver_AdrBaselineReasonInput__self
+T38_cli_driver_cli_driver_AdrBaselineInput_Restore --o|track_id| T34_cli_driver_cli_driver_TrackIdInput__self
+T38_cli_driver_cli_driver_AdrBaselineInput_Restore --o|source| T44_cli_driver_cli_driver_AdrSourceFileNameInput__self
+T38_cli_driver_cli_driver_AdrBaselineInput_CheckReview --o|track_id| T34_cli_driver_cli_driver_TrackIdInput__self
+T38_cli_driver_cli_driver_AdrBaselineInput_CheckReview --o|primary_source| T44_cli_driver_cli_driver_AdrSourceFileNameInput__self
+T38_cli_driver_cli_driver_AdrBaselineInput_CheckCommit --o|track_id| T34_cli_driver_cli_driver_TrackIdInput__self
+T40_cli_driver_cli_driver_AdrBaselineRequest_Snapshot --o|track_id| T34_cli_driver_cli_driver_TrackIdInput__self
+T40_cli_driver_cli_driver_AdrBaselineRequest_Snapshot --o|source| T44_cli_driver_cli_driver_AdrSourceFileNameInput__self
+T40_cli_driver_cli_driver_AdrBaselineRequest_Snapshot --o|kind| T42_cli_driver_cli_driver_AdrBaselineKindInput__self
+T40_cli_driver_cli_driver_AdrBaselineRequest_Snapshot --o|reason| T44_cli_driver_cli_driver_AdrBaselineReasonInput__self
+T40_cli_driver_cli_driver_AdrBaselineRequest_Restore --o|track_id| T34_cli_driver_cli_driver_TrackIdInput__self
+T40_cli_driver_cli_driver_AdrBaselineRequest_Restore --o|source| T44_cli_driver_cli_driver_AdrSourceFileNameInput__self
+T40_cli_driver_cli_driver_AdrBaselineRequest_CheckReview --o|track_id| T34_cli_driver_cli_driver_TrackIdInput__self
+T40_cli_driver_cli_driver_AdrBaselineRequest_CheckReview --o|primary_source| T44_cli_driver_cli_driver_AdrSourceFileNameInput__self
+T40_cli_driver_cli_driver_AdrBaselineRequest_CheckCommit --o|track_id| T34_cli_driver_cli_driver_TrackIdInput__self
+T58_cli_composition_cli_composition_AdrBaselineCompositionRoot_new --> T58_cli_composition_cli_composition_AdrBaselineCompositionRoot__self
+T58_cli_composition_cli_composition_AdrBaselineCompositionRoot_execute --o T40_cli_driver_cli_driver_AdrBaselineRequest__self
+T58_cli_composition_cli_composition_AdrBaselineCompositionRoot_execute --> T58_cli_composition_cli_composition_AdrBaselineResolutionError__self
+T18_cli_cli_CliCommand_AdrBaseline --o|cmd| T26_cli_cli_AdrBaselineCommand__self
+T34_cli_cli_AdrBaselineCheckCommitArgs__self --o|track_id| T34_cli_driver_cli_driver_TrackIdInput__self
+T34_cli_cli_AdrBaselineCheckReviewArgs__self --o|track_id| T34_cli_driver_cli_driver_TrackIdInput__self
+T34_cli_cli_AdrBaselineCheckReviewArgs__self --o|primary_source| T44_cli_driver_cli_driver_AdrSourceFileNameInput__self
+T26_cli_cli_AdrBaselineCommand_Snapshot --o T31_cli_cli_AdrBaselineSnapshotArgs__self
+T26_cli_cli_AdrBaselineCommand_Restore --o T30_cli_cli_AdrBaselineRestoreArgs__self
+T26_cli_cli_AdrBaselineCommand_CheckReview --o T34_cli_cli_AdrBaselineCheckReviewArgs__self
+T26_cli_cli_AdrBaselineCommand_CheckCommit --o T34_cli_cli_AdrBaselineCheckCommitArgs__self
+T30_cli_cli_AdrBaselineRestoreArgs__self --o|track_id| T34_cli_driver_cli_driver_TrackIdInput__self
+T30_cli_cli_AdrBaselineRestoreArgs__self --o|source| T44_cli_driver_cli_driver_AdrSourceFileNameInput__self
+T31_cli_cli_AdrBaselineSnapshotArgs__self --o|track_id| T34_cli_driver_cli_driver_TrackIdInput__self
+T31_cli_cli_AdrBaselineSnapshotArgs__self --o|source| T44_cli_driver_cli_driver_AdrSourceFileNameInput__self
+T31_cli_cli_AdrBaselineSnapshotArgs__self --o|kind| T42_cli_driver_cli_driver_AdrBaselineKindInput__self
+T31_cli_cli_AdrBaselineSnapshotArgs__self --o|reason| T44_cli_driver_cli_driver_AdrBaselineReasonInput__self
+F45_cli_cli_cli__commands__adr_baseline__dispatch --o T26_cli_cli_AdrBaselineCommand__self
+F44_cli_cli_cli__commands__adr_baseline__execute --o T26_cli_cli_AdrBaselineCommand__self
+F61_cli_cli_cli__commands__adr_baseline__execute_with_error_chain --o T26_cli_cli_AdrBaselineCommand__self
+class T37_domain_domain_AdrBaselineCheckOutcome_Passed variant_node
+class T37_domain_domain_AdrBaselineCheckOutcome_Blocked variant_node
+class T37_domain_domain_AdrBaselineCheckOutcome_blocked method_node
+class T37_domain_domain_AdrBaselineCheckOutcome__self value_object
+class T42_domain_domain_AdrBaselineCheckOutcomeError_EmptyViolations variant_node
+class T42_domain_domain_AdrBaselineCheckOutcomeError__self error_type
+class T39_domain_domain_AdrBaselineCheckViolation_PrimaryInitUnavailable variant_node
+class T39_domain_domain_AdrBaselineCheckViolation_MissingPrimaryInit variant_node
+class T39_domain_domain_AdrBaselineCheckViolation_MissingRequiredStamp variant_node
+class T39_domain_domain_AdrBaselineCheckViolation_SourceMissing variant_node
+class T39_domain_domain_AdrBaselineCheckViolation_BaselineCopyMissing variant_node
+class T39_domain_domain_AdrBaselineCheckViolation_BaselineCopyMismatch variant_node
+class T39_domain_domain_AdrBaselineCheckViolation_ByteMismatch variant_node
+class T39_domain_domain_AdrBaselineCheckViolation__self value_object
+class T40_domain_domain_AdrBaselineCheckViolations_try_new method_node
+class T40_domain_domain_AdrBaselineCheckViolations_as_slice method_node
+class T40_domain_domain_AdrBaselineCheckViolations__self value_object
+class T29_domain_domain_AdrBaselineKind_Init variant_node
+class T29_domain_domain_AdrBaselineKind_Cite variant_node
+class T29_domain_domain_AdrBaselineKind_NewAdr variant_node
+class T29_domain_domain_AdrBaselineKind_NonSemanticFix variant_node
+class T29_domain_domain_AdrBaselineKind_Escalation variant_node
+class T29_domain_domain_AdrBaselineKind_requires_reason method_node
+class T29_domain_domain_AdrBaselineKind_uses_fork_point method_node
+class T29_domain_domain_AdrBaselineKind__self value_object
+class T36_domain_domain_AdrBaselineLedgerEntry_Init variant_node
+class T36_domain_domain_AdrBaselineLedgerEntry_Cite variant_node
+class T36_domain_domain_AdrBaselineLedgerEntry_NewAdr variant_node
+class T36_domain_domain_AdrBaselineLedgerEntry_NonSemanticFix variant_node
+class T36_domain_domain_AdrBaselineLedgerEntry_Escalation variant_node
+class T36_domain_domain_AdrBaselineLedgerEntry_kind method_node
+class T36_domain_domain_AdrBaselineLedgerEntry_source method_node
+class T36_domain_domain_AdrBaselineLedgerEntry_hash method_node
+class T36_domain_domain_AdrBaselineLedgerEntry_timestamp method_node
+class T36_domain_domain_AdrBaselineLedgerEntry_reason method_node
+class T36_domain_domain_AdrBaselineLedgerEntry__self value_object
+class T43_domain_domain_AdrBaselineRecordedCopyStatus_Matches variant_node
+class T43_domain_domain_AdrBaselineRecordedCopyStatus_Missing variant_node
+class T43_domain_domain_AdrBaselineRecordedCopyStatus_HashMismatch variant_node
+class T43_domain_domain_AdrBaselineRecordedCopyStatus__self value_object
+class T36_domain_domain_AdrBaselineSourceState_ExistingAtForkPoint variant_node
+class T36_domain_domain_AdrBaselineSourceState_TrackBornDraft variant_node
+class T36_domain_domain_AdrBaselineSourceState_TrackBornPromoted variant_node
+class T36_domain_domain_AdrBaselineSourceState__self value_object
+class T31_domain_domain_AdrSourceFileName_try_new method_node
+class T31_domain_domain_AdrSourceFileName_as_str method_node
+class T31_domain_domain_AdrSourceFileName__self value_object
+class T36_domain_domain_AdrSourceFileNameError_InvalidFileName variant_node
+class T36_domain_domain_AdrSourceFileNameError__self error_type
+class F63_domain_domain_domain__adr_baseline__is_required_stamp_satisfied free_function
+class F63_domain_domain_domain__adr_baseline__is_required_stamp_satisfied function_node
+class T34_usecase_usecase_AdrBaselineCommand_Snapshot variant_node
+class T34_usecase_usecase_AdrBaselineCommand_Restore variant_node
+class T34_usecase_usecase_AdrBaselineCommand__self command
+class T32_usecase_usecase_AdrBaselineError_Store variant_node
+class T32_usecase_usecase_AdrBaselineError_Source variant_node
+class T32_usecase_usecase_AdrBaselineError_Validation variant_node
+class T32_usecase_usecase_AdrBaselineError__self error_type
+class T37_usecase_usecase_AdrBaselineInteractor_new method_node
+class T37_usecase_usecase_AdrBaselineInteractor__self interactor
+class T33_usecase_usecase_AdrBaselineOutput_SnapshotRecorded variant_node
+class T33_usecase_usecase_AdrBaselineOutput_Restored variant_node
+class T33_usecase_usecase_AdrBaselineOutput__self dto
+class T32_usecase_usecase_AdrBaselineQuery_CheckReview variant_node
+class T32_usecase_usecase_AdrBaselineQuery_CheckCommit variant_node
+class T32_usecase_usecase_AdrBaselineQuery__self query
+class T37_usecase_usecase_AdrBaselineQueryError_SourceRead variant_node
+class T37_usecase_usecase_AdrBaselineQueryError_Store variant_node
+class T37_usecase_usecase_AdrBaselineQueryError__self error_type
+class T42_usecase_usecase_AdrBaselineQueryInteractor_new method_node
+class T42_usecase_usecase_AdrBaselineQueryInteractor__self interactor
+class T38_usecase_usecase_AdrBaselineQueryOutput_Checked variant_node
+class T38_usecase_usecase_AdrBaselineQueryOutput__self dto
+class T38_usecase_usecase_AdrBaselineSourceError_Read variant_node
+class T38_usecase_usecase_AdrBaselineSourceError_Unavailable variant_node
+class T38_usecase_usecase_AdrBaselineSourceError__self error_type
+class T37_usecase_usecase_AdrBaselineStoreError_Read variant_node
+class T37_usecase_usecase_AdrBaselineStoreError_Write variant_node
+class T37_usecase_usecase_AdrBaselineStoreError__self error_type
+class T41_usecase_usecase_AdrBaselineStoreReadError_Read variant_node
+class T41_usecase_usecase_AdrBaselineStoreReadError__self error_type
+class T42_usecase_usecase_AdrBaselineValidationError_InvalidReason variant_node
+class T42_usecase_usecase_AdrBaselineValidationError_InvalidSourceFileName variant_node
+class T42_usecase_usecase_AdrBaselineValidationError__self error_type
+class R39_usecase_usecase_AdrBaselineQueryService_execute method_node
+class R39_usecase_usecase_AdrBaselineQueryService__self app_service
+class R34_usecase_usecase_AdrBaselineService_execute method_node
+class R34_usecase_usecase_AdrBaselineService__self app_service
+class R37_usecase_usecase_AdrBaselineSourcePort_working_bytes method_node
+class R37_usecase_usecase_AdrBaselineSourcePort_fork_point_bytes method_node
+class R37_usecase_usecase_AdrBaselineSourcePort_cited_sources method_node
+class R37_usecase_usecase_AdrBaselineSourcePort_source_state method_node
+class R37_usecase_usecase_AdrBaselineSourcePort__self secondary_port
+class R36_usecase_usecase_AdrBaselineStorePort_snapshot method_node
+class R36_usecase_usecase_AdrBaselineStorePort_restore method_node
+class R36_usecase_usecase_AdrBaselineStorePort__self secondary_port
+class R40_usecase_usecase_AdrBaselineStoreReadPort_read_entries method_node
+class R40_usecase_usecase_AdrBaselineStoreReadPort_verify_recorded_copy method_node
+class R40_usecase_usecase_AdrBaselineStoreReadPort__self secondary_port
+class T51_infrastructure_infrastructure_AdrBaselineCodecError_Json variant_node
+class T51_infrastructure_infrastructure_AdrBaselineCodecError_Domain variant_node
+class T51_infrastructure_infrastructure_AdrBaselineCodecError__self error_type
+class T56_infrastructure_infrastructure_AdrBaselineLedgerRecordDto__self dto
+class T48_infrastructure_infrastructure_FsAdrBaselineStore__self secondary_adapter
+class T52_infrastructure_infrastructure_FsGitAdrBaselineSource__self secondary_adapter
+class F78_infrastructure_infrastructure_infrastructure__adr_baseline__decode_ledger_line free_function
+class F78_infrastructure_infrastructure_infrastructure__adr_baseline__decode_ledger_line function_node
+class F79_infrastructure_infrastructure_infrastructure__adr_baseline__encode_ledger_entry free_function
+class F79_infrastructure_infrastructure_infrastructure__adr_baseline__encode_ledger_entry function_node
+class T39_cli_driver_cli_driver_AdrBaselineDriver_new method_node
+class T39_cli_driver_cli_driver_AdrBaselineDriver_handle method_node
+class T38_cli_driver_cli_driver_AdrBaselineInput_Snapshot variant_node
+class T38_cli_driver_cli_driver_AdrBaselineInput_Restore variant_node
+class T38_cli_driver_cli_driver_AdrBaselineInput_CheckReview variant_node
+class T38_cli_driver_cli_driver_AdrBaselineInput_CheckCommit variant_node
+class T38_cli_driver_cli_driver_AdrBaselineInput__self dto
+class T42_cli_driver_cli_driver_AdrBaselineKindInput_Init variant_node
+class T42_cli_driver_cli_driver_AdrBaselineKindInput_Cite variant_node
+class T42_cli_driver_cli_driver_AdrBaselineKindInput_NewAdr variant_node
+class T42_cli_driver_cli_driver_AdrBaselineKindInput_NonSemanticFix variant_node
+class T42_cli_driver_cli_driver_AdrBaselineKindInput_Escalation variant_node
+class T42_cli_driver_cli_driver_AdrBaselineKindInput__self dto
+class T44_cli_driver_cli_driver_AdrBaselineReasonInput__self dto
+class T40_cli_driver_cli_driver_AdrBaselineRequest_Snapshot variant_node
+class T40_cli_driver_cli_driver_AdrBaselineRequest_Restore variant_node
+class T40_cli_driver_cli_driver_AdrBaselineRequest_CheckReview variant_node
+class T40_cli_driver_cli_driver_AdrBaselineRequest_CheckCommit variant_node
+class T40_cli_driver_cli_driver_AdrBaselineRequest_items_dir method_node
+class T40_cli_driver_cli_driver_AdrBaselineRequest__self dto
+class T44_cli_driver_cli_driver_AdrSourceFileNameInput__self dto
+class T34_cli_driver_cli_driver_TrackIdInput__self dto
+class T58_cli_composition_cli_composition_AdrBaselineCompositionRoot_new method_node
+class T58_cli_composition_cli_composition_AdrBaselineCompositionRoot_execute method_node
+class T58_cli_composition_cli_composition_AdrBaselineResolutionError_ProjectRoot variant_node
+class T58_cli_composition_cli_composition_AdrBaselineResolutionError_TrackResolution variant_node
+class T58_cli_composition_cli_composition_AdrBaselineResolutionError_ResolvedTrackInvalid variant_node
+class T58_cli_composition_cli_composition_AdrBaselineResolutionError_Timestamp variant_node
+class T58_cli_composition_cli_composition_AdrBaselineResolutionError__self error_type
+class T18_cli_cli_CliCommand_Arch variant_node
+class T18_cli_cli_CliCommand_AdrBaseline variant_node
+class T18_cli_cli_CliCommand_Conventions variant_node
+class T18_cli_cli_CliCommand_Domain variant_node
+class T18_cli_cli_CliCommand_Guard variant_node
+class T18_cli_cli_CliCommand_Hook variant_node
+class T18_cli_cli_CliCommand_Track variant_node
+class T18_cli_cli_CliCommand_Git variant_node
+class T18_cli_cli_CliCommand_Pr variant_node
+class T18_cli_cli_CliCommand_Capability variant_node
+class T18_cli_cli_CliCommand_Review variant_node
+class T18_cli_cli_CliCommand_File variant_node
+class T18_cli_cli_CliCommand_Verify variant_node
+class T18_cli_cli_CliCommand_FindSimilar variant_node
+class T18_cli_cli_CliCommand_DupIndex variant_node
+class T18_cli_cli_CliCommand_DupCheck variant_node
+class T18_cli_cli_CliCommand_Telemetry variant_node
+class T18_cli_cli_CliCommand_Dry variant_node
+class T18_cli_cli_CliCommand_RefVerify variant_node
+class T18_cli_cli_CliCommand_TestObligation variant_node
+class T18_cli_cli_CliCommand_Signal variant_node
+class T18_cli_cli_CliCommand_TaskContract variant_node
+class T18_cli_cli_CliCommand_Catalog variant_node
+class T18_cli_cli_CliCommand_CatalogueLint variant_node
+class T18_cli_cli_CliCommand_Template variant_node
+class T18_cli_cli_CliCommand__self dto
+class T34_cli_cli_AdrBaselineCheckCommitArgs__self dto
+class T34_cli_cli_AdrBaselineCheckReviewArgs__self dto
+class T26_cli_cli_AdrBaselineCommand_Snapshot variant_node
+class T26_cli_cli_AdrBaselineCommand_Restore variant_node
+class T26_cli_cli_AdrBaselineCommand_CheckReview variant_node
+class T26_cli_cli_AdrBaselineCommand_CheckCommit variant_node
+class T26_cli_cli_AdrBaselineCommand__self dto
+class T30_cli_cli_AdrBaselineRestoreArgs__self dto
+class T31_cli_cli_AdrBaselineSnapshotArgs__self dto
+class F45_cli_cli_cli__commands__adr_baseline__dispatch free_function
+class F45_cli_cli_cli__commands__adr_baseline__dispatch function_node
+class F44_cli_cli_cli__commands__adr_baseline__execute free_function
+class F44_cli_cli_cli__commands__adr_baseline__execute function_node
+class F61_cli_cli_cli__commands__adr_baseline__execute_with_error_chain free_function
+class F61_cli_cli_cli__commands__adr_baseline__execute_with_error_chain function_node
+```

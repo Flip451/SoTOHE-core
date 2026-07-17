@@ -31,6 +31,27 @@
 
 これらのコマンドは `bin/sotp` ネイティブサブコマンドとして直接呼び出す（`--items-dir` のデフォルトは `track/items`）。対応する `cargo make` ラッパータスクは廃止済み。
 
+### ADR baseline lifecycle
+
+- `/track:init` completes track initialization and then the orchestrator designates each primary
+  ADR source by passing its direct filename to `bin/sotp adr-baseline snapshot --source <file>
+  --kind init`. The command alone writes the append-only `adr-baseline/` ledger and verbatim
+  copies; its init records are the designation records. The filename is context-dependent and is
+  never derived or stored as a metadata pointer or other external primary identity.
+- Before a review cycle, `cargo make adr-baseline-check-review` invokes the CLI. It requires a
+  nonempty active-track ledger init-record designation set, then verifies every recorded ledger
+  copy and byte-matches every recorded ADR against its latest baseline before any fixer may
+  write. `--primary-source <file>` is only an override for a direct `bin/sotp adr-baseline
+  check-review` invocation. `cargo make ci-track` and the guarded commit path run
+  `adr-baseline check-commit` for recorded ADRs; coverage for every non-draft ADR cited by
+  `spec.json` is enforced separately at that commit gate.
+- A track-born ADR without `user_decision_ref` remains outside the required-stamp set. Once
+  promoted or cited as an existing ADR, the relevant sanctioned snapshot is required; missing
+  records and byte mismatches fail closed. These checks are independent from signal-gate policy.
+- Baseline records are not lifecycle state and do not belong in `metadata.json`. Never edit,
+  remove, or manually recreate the ledger or copies; diagnose mismatch and use the snapshot or
+  restore command as appropriate.
+
 ### observations.md（optional）
 
 各トラックは `observations.md` を **必要に応じて** 作成する。AC 充足判定は `spec.json` の signals + `review.json` の zero_findings + `impl-plan.json` の task done / commit_hash で機械的に行うため、`observations.md` は「機械検証不能な手動観測ログ」専用とする。
@@ -81,6 +102,8 @@
 - [ ] `observations.md` の追記が AC の「機械検証不能観測」に該当するか
 - [ ] タイムスタンプが `date -u +%Y-%m-%dT%H:%M:%SZ` 由来か（手入力 / 推測がないか）
 - [ ] `track/registry.md` の更新タイミングが上表 3 行のいずれかに対応しているか
+- [ ] primary ADR の init snapshot が workflow 経由で作られ、review / commit / ci-track の
+  freeze checks が維持されているか
 
 ## Decision Reference
 
