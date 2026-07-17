@@ -572,7 +572,7 @@ per-layer 反復（`for LAYER in domain usecase infrastructure; do ... done`）�
 - strictness が現在の 2 値（strict / interim）では表現できないというフィードバックが来たとき
 - fail-closed の既定 strict が TDDD 以外のワークフローでも過剰に厳しいというフィードバックが蓄積したとき
 - merge gate の strict モード判定を Rust の型システムで保証する（config を読まない設計に戻す）価値が生じたとき
-- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） が adapter 層でのループ保持を許容するよう改訂されたとき（D8 の根拠が失われる）
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） が adapter 層でのループ保持を許容するよう改訂されたとき（D8 の根拠が失われる）。同 convention の廃止後の後継観測条件は `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md` §Reassess When に記録されている（現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1）。
 - `signal` 名前空間に引数必須（argful）の動詞が追加され、呼び出し側がレイヤー名を渡さざるを得ない設計上の理由が生じたとき（D8-1 の「argless dispatch」前提が崩れる）
 
 ## Related ADRs
