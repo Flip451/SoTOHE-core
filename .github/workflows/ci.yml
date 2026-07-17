@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Derive sccache host directory
         run: echo "SCCACHE_HOST_DIR=$HOME/.cache/sccache" >> "$GITHUB_ENV"

@@ -730,6 +730,46 @@ fn test_fs_git_adr_baseline_source_reads_cite_bytes_from_fork_point() {
     assert_eq!(adapter.fork_point_bytes(&track(), &source()).unwrap(), b"fork-point bytes");
 }
 
+#[test]
+fn test_fs_git_adr_baseline_source_reads_cite_bytes_from_remote_tracking_fork_point() {
+    let temp = tempfile::tempdir().unwrap();
+    run_git(temp.path(), &["init", "-q"]);
+    run_git(temp.path(), &["config", "user.email", "test@example.invalid"]);
+    run_git(temp.path(), &["config", "user.name", "Test User"]);
+    let adr_dir = temp.path().join("knowledge/adr");
+    fs::create_dir_all(&adr_dir).unwrap();
+    fs::write(adr_dir.join(source().as_str()), b"fork-point bytes").unwrap();
+    run_git(temp.path(), &["add", "."]);
+    run_git(temp.path(), &["commit", "-qm", "baseline"]);
+    run_git(temp.path(), &["branch", "develop"]);
+    run_git(temp.path(), &["update-ref", "refs/remotes/origin/develop", "develop"]);
+    run_git(temp.path(), &["checkout", "-qb", "feature"]);
+    run_git(temp.path(), &["branch", "-D", "develop"]);
+    fs::write(adr_dir.join(source().as_str()), b"working-tree bytes").unwrap();
+
+    let track_dir = temp.path().join(TRACK_ITEMS).join(track().as_ref());
+    fs::create_dir_all(&track_dir).unwrap();
+    fs::write(
+        track_dir.join("metadata.json"),
+        r#"{
+  "schema_version": 6,
+  "id": "adapter-test",
+  "title": "Adapter test",
+  "created_at": "2026-07-16T00:00:00Z",
+  "updated_at": "2026-07-16T00:00:00Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "squash"
+  }
+}"#,
+    )
+    .unwrap();
+
+    let adapter = FsGitAdrBaselineSource::from(temp.path().to_path_buf());
+    assert_eq!(adapter.fork_point_bytes(&track(), &source()).unwrap(), b"fork-point bytes");
+}
+
 fn run_git(root: &Path, args: &[&str]) {
     let status = Command::new("git").args(args).current_dir(root).status().unwrap();
     assert!(status.success(), "git command failed: git {}", args.join(" "));

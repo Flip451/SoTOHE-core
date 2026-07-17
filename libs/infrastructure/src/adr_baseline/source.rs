@@ -57,24 +57,28 @@ impl FsGitAdrBaselineSource {
             .map_err(|error| AdrBaselineSourceError::Read(diagnostic(&error.to_string())))?;
         let (metadata, _) = crate::track::codec::decode(&text)
             .map_err(|error| AdrBaselineSourceError::Read(diagnostic(&error.to_string())))?;
-        let output = crate::git_cli::guarded_git_command()
-            .args(["merge-base", "HEAD", metadata.branch_strategy_snapshot().base_branch()])
-            .current_dir(&self.root)
-            .output()
-            .map_err(|error| AdrBaselineSourceError::Read(diagnostic(&error.to_string())))?;
-        if !output.status.success() {
-            return Err(AdrBaselineSourceError::Read(diagnostic(&String::from_utf8_lossy(
-                &output.stderr,
-            ))));
+        let local_base_ref = metadata.branch_strategy_snapshot().base_branch();
+        let remote_base_ref = format!("origin/{local_base_ref}");
+        for base_ref in [local_base_ref, remote_base_ref.as_str()] {
+            let output = crate::git_cli::guarded_git_command()
+                .args(["merge-base", "HEAD", base_ref])
+                .current_dir(&self.root)
+                .output()
+                .map_err(|error| AdrBaselineSourceError::Read(diagnostic(&error.to_string())))?;
+            if !output.status.success() {
+                continue;
+            }
+            let hash = String::from_utf8(output.stdout)
+                .map_err(|error| AdrBaselineSourceError::Read(diagnostic(&error.to_string())))?;
+            let hash = hash.trim();
+            if !hash.is_empty() {
+                return Ok(hash.to_owned());
+            }
         }
-        let hash = String::from_utf8(output.stdout)
-            .map_err(|error| AdrBaselineSourceError::Read(diagnostic(&error.to_string())))?;
-        let hash = hash.trim();
-        if hash.is_empty() {
-            Err(AdrBaselineSourceError::Read(diagnostic("git merge-base returned no commit")))
-        } else {
-            Ok(hash.to_owned())
-        }
+
+        Err(AdrBaselineSourceError::Read(diagnostic(&format!(
+            "git merge-base could not resolve local base ref `{local_base_ref}` or remote-tracking base ref `{remote_base_ref}`"
+        ))))
     }
 
     fn cited_from_spec(

@@ -1,155 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f03ac0992576ba29f896eb60db46a4cf0f809508e1acc8b24ac5d0190cf59a5a",
-          "at": "2026-07-17T00:19:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `init` record contains `\"reason\":null`, but the ledger contract and briefing require `reason` to be absent for kinds other than `new-adr` and `escalation`. Fix the machine serializer to omit a missing reason and regenerate this ledger entry.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/adr-baseline/ledger.jsonl",
-              "line": 1,
-              "category": "schema_contract"
-            }
-          ],
-          "hash": "rvw1:sha256:f03ac0992576ba29f896eb60db46a4cf0f809508e1acc8b24ac5d0190cf59a5a",
-          "at": "2026-07-17T00:22:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2b979c896403094b03936c7574007efc8524de9fb969170e50f02e2ffdf3d144",
-          "at": "2026-07-17T00:33:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The snapshot command left an unignored runtime lock file in the current diff, although the baseline artifact contract contains only the snapshot copy and `ledger.jsonl`. Do not commit this coordination sidecar; ignore `*.jsonl.lock` or place the lock outside the tracked baseline directory.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/adr-baseline/ledger.jsonl.lock",
-              "line": null,
-              "category": "artifact_contract"
-            }
-          ],
-          "hash": "rvw1:sha256:2b979c896403094b03936c7574007efc8524de9fb969170e50f02e2ffdf3d144",
-          "at": "2026-07-17T00:36:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9733df3a38f7457f9fe2a86f30f7b714709945edd63d2d69a24b88c6c1755f5c",
-          "at": "2026-07-17T00:37:49Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 の「可視化できる」という明示的な目標意図を、完了時に決定論的に証明する AC がありません。AC-02/AC-05 は累積記録と復元・briefing を定めていますが、init 版と最終版などの baseline 差分を review/PR で可視化できることを検証していないため、目標の一部が未カバーです。",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/spec.json",
-              "line": 6,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:4087c4ed8b1000824bf71fef0f5fdbeccf3c8cad07cdfac51e6866e281197de6",
-          "at": "2026-07-16T14:02:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4cc606df76ca85a0d58701ab50d9180f52d183ccbb7ab216f71d3285a2456b92",
-          "at": "2026-07-16T14:03:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4cc606df76ca85a0d58701ab50d9180f52d183ccbb7ab216f71d3285a2456b92",
-          "at": "2026-07-16T14:06:26Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d8c7706400707f5ff64485a112e7e772476c1a78d0dde221f72089abd3ba0f8f",
-          "at": "2026-07-16T17:33:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Snapshot/Restore では write 用、CheckReview/CheckCommit では read 用の track-id 解決を選択し、別の TrackCompositionRoot 呼び出しと再パースまで CLI 内で行っています。これは単一の typed Input を Driver に渡す範囲を超えた分岐・多段オーケストレーションです。`knowledge/conventions/hexagonal-architecture.md` §CLI as Composition Root の境界に従い、未解決の track-id と操作種別を driver/usecase 側へ渡してください。",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/adr_baseline.rs",
-              "line": 116,
-              "category": "business logic in bin"
-            },
-            {
-              "message": "`project_root_from_items_dir` が `items_dir` の構造を解釈・検証し、adapter 用 project root を算出しています。このアプリケーション固有のパス変換と分岐は thin-bin の責務外です。`items_dir` をそのまま composition/driver 境界へ渡し、`knowledge/conventions/hexagonal-architecture.md` §CLI as Composition Root に沿って request-scoped wiring 側で解決してください。",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/adr_baseline.rs",
-              "line": 184,
-              "category": "business logic in bin"
-            }
-          ],
-          "hash": "rvw1:sha256:d8c7706400707f5ff64485a112e7e772476c1a78d0dde221f72089abd3ba0f8f",
-          "at": "2026-07-16T17:36:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4d799aece9a1c84d90bda8c1263235111880b4196eb3debef6d787b123545e9c",
-          "at": "2026-07-16T18:10:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4d799aece9a1c84d90bda8c1263235111880b4196eb3debef6d787b123545e9c",
-          "at": "2026-07-16T18:12:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b73eecbcc863b6b175e7b749101441b09654e232344a547e319926f218790078",
-          "at": "2026-07-16T18:40:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b73eecbcc863b6b175e7b749101441b09654e232344a547e319926f218790078",
-          "at": "2026-07-16T18:41:52Z"
-        }
-      ]
-    },
     "infrastructure": {
       "rounds": [
         {
@@ -380,60 +231,99 @@
           "findings": [],
           "hash": "rvw1:sha256:8e8a79a91d96cc7f4c083869d5ad91d3046c3b197b183f48352e7e954c9d582d",
           "at": "2026-07-17T01:09:54Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a997565405b37111634003216facf15dcc1cd113fef5438b034f6159d863b8fc",
-          "at": "2026-07-16T17:32:51Z"
+          "hash": "rvw1:sha256:d65543dd9ffbdddc6395cdd132a2a4d1ca0a039b87790801939cc8d7a95d30d2",
+          "at": "2026-07-17T01:54:46Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a997565405b37111634003216facf15dcc1cd113fef5438b034f6159d863b8fc",
-          "at": "2026-07-16T17:35:57Z"
-        },
+          "hash": "rvw1:sha256:d65543dd9ffbdddc6395cdd132a2a4d1ca0a039b87790801939cc8d7a95d30d2",
+          "at": "2026-07-17T01:58:35Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:493ae95354f89d151f1e5abe5d7b9b903a530e21f8e403eda707b521e08934cc",
-          "at": "2026-07-16T18:10:40Z"
+          "hash": "rvw1:sha256:d8c7706400707f5ff64485a112e7e772476c1a78d0dde221f72089abd3ba0f8f",
+          "at": "2026-07-16T17:33:07Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`execute` converts project-root and track-resolution failures directly into `CommandOutcome::failure` (here and at line 37), placing user-facing stderr rendering in the composition root. Keep these failures typed and let `cli_driver`/the CLI boundary map them to output.",
+              "message": "Snapshot/Restore では write 用、CheckReview/CheckCommit では read 用の track-id 解決を選択し、別の TrackCompositionRoot 呼び出しと再パースまで CLI 内で行っています。これは単一の typed Input を Driver に渡す範囲を超えた分岐・多段オーケストレーションです。`knowledge/conventions/hexagonal-architecture.md` §CLI as Composition Root の境界に従い、未解決の track-id と操作種別を driver/usecase 側へ渡してください。",
               "severity": "P1",
-              "file": "apps/cli-composition/src/adr_baseline.rs",
-              "line": 33,
-              "category": "render leak"
+              "file": "apps/cli/src/commands/adr_baseline.rs",
+              "line": 116,
+              "category": "business logic in bin"
+            },
+            {
+              "message": "`project_root_from_items_dir` が `items_dir` の構造を解釈・検証し、adapter 用 project root を算出しています。このアプリケーション固有のパス変換と分岐は thin-bin の責務外です。`items_dir` をそのまま composition/driver 境界へ渡し、`knowledge/conventions/hexagonal-architecture.md` §CLI as Composition Root に沿って request-scoped wiring 側で解決してください。",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/adr_baseline.rs",
+              "line": 184,
+              "category": "business logic in bin"
             }
           ],
-          "hash": "rvw1:sha256:493ae95354f89d151f1e5abe5d7b9b903a530e21f8e403eda707b521e08934cc",
-          "at": "2026-07-16T18:13:20Z"
+          "hash": "rvw1:sha256:d8c7706400707f5ff64485a112e7e772476c1a78d0dde221f72089abd3ba0f8f",
+          "at": "2026-07-16T17:36:31Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:beae3c836bf890d609edd3f6864c26ec0b6351f802a4c2a202608c985c5e31ec",
-          "at": "2026-07-16T18:40:18Z"
+          "hash": "rvw1:sha256:4d799aece9a1c84d90bda8c1263235111880b4196eb3debef6d787b123545e9c",
+          "at": "2026-07-16T18:10:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:beae3c836bf890d609edd3f6864c26ec0b6351f802a4c2a202608c985c5e31ec",
-          "at": "2026-07-16T18:41:56Z"
+          "hash": "rvw1:sha256:4d799aece9a1c84d90bda8c1263235111880b4196eb3debef6d787b123545e9c",
+          "at": "2026-07-16T18:12:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b73eecbcc863b6b175e7b749101441b09654e232344a547e319926f218790078",
+          "at": "2026-07-16T18:40:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b73eecbcc863b6b175e7b749101441b09654e232344a547e319926f218790078",
+          "at": "2026-07-16T18:41:52Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ff1cac9946731548246e11785f423ae9785c35590de0c40ce695a96ab86fe93",
+          "at": "2026-07-16T17:32:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3ff1cac9946731548246e11785f423ae9785c35590de0c40ce695a96ab86fe93",
+          "at": "2026-07-16T17:37:12Z"
         }
       ]
     },
@@ -525,6 +415,498 @@
           "findings": [],
           "hash": "rvw1:sha256:4e177313d4302259b641602368364964ac9d1e1cbe39a2fe6c1bbbd9915353dc",
           "at": "2026-07-16T12:36:56Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f03ac0992576ba29f896eb60db46a4cf0f809508e1acc8b24ac5d0190cf59a5a",
+          "at": "2026-07-17T00:19:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `init` record contains `\"reason\":null`, but the ledger contract and briefing require `reason` to be absent for kinds other than `new-adr` and `escalation`. Fix the machine serializer to omit a missing reason and regenerate this ledger entry.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/adr-baseline/ledger.jsonl",
+              "line": 1,
+              "category": "schema_contract"
+            }
+          ],
+          "hash": "rvw1:sha256:f03ac0992576ba29f896eb60db46a4cf0f809508e1acc8b24ac5d0190cf59a5a",
+          "at": "2026-07-17T00:22:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b979c896403094b03936c7574007efc8524de9fb969170e50f02e2ffdf3d144",
+          "at": "2026-07-17T00:33:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The snapshot command left an unignored runtime lock file in the current diff, although the baseline artifact contract contains only the snapshot copy and `ledger.jsonl`. Do not commit this coordination sidecar; ignore `*.jsonl.lock` or place the lock outside the tracked baseline directory.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/adr-baseline/ledger.jsonl.lock",
+              "line": null,
+              "category": "artifact_contract"
+            }
+          ],
+          "hash": "rvw1:sha256:2b979c896403094b03936c7574007efc8524de9fb969170e50f02e2ffdf3d144",
+          "at": "2026-07-17T00:36:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9733df3a38f7457f9fe2a86f30f7b714709945edd63d2d69a24b88c6c1755f5c",
+          "at": "2026-07-17T00:37:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b178d4fe397abc147de9d93b67ebab5a84287fad574299d4422f50ef8f72bd9",
+          "at": "2026-07-17T01:54:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1b178d4fe397abc147de9d93b67ebab5a84287fad574299d4422f50ef8f72bd9",
+          "at": "2026-07-17T01:56:34Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 の「可視化できる」という明示的な目標意図を、完了時に決定論的に証明する AC がありません。AC-02/AC-05 は累積記録と復元・briefing を定めていますが、init 版と最終版などの baseline 差分を review/PR で可視化できることを検証していないため、目標の一部が未カバーです。",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/spec.json",
+              "line": 6,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:4087c4ed8b1000824bf71fef0f5fdbeccf3c8cad07cdfac51e6866e281197de6",
+          "at": "2026-07-16T14:02:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cc606df76ca85a0d58701ab50d9180f52d183ccbb7ab216f71d3285a2456b92",
+          "at": "2026-07-16T14:03:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cc606df76ca85a0d58701ab50d9180f52d183ccbb7ab216f71d3285a2456b92",
+          "at": "2026-07-16T14:06:26Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrBaselineDriver::handle` duplicates the kind/reason semantic legality check (`requires_reason` versus `reason.is_some()`) in the primary adapter. This is business logic that the briefing states is owned by the use-case interactor; the driver should only map the typed input, invoke the single service, and render its result.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 228,
+              "category": "business logic in adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:ac9961cd6cce471be01fef90ce4675cbe38e25f342a0679b9614cef465c59917",
+          "at": "2026-07-16T17:32:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8dde79ab6cd51bf97f43d82102fad2deeafc1110ddd064a962ebb7e9c57bb22",
+          "at": "2026-07-16T17:34:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`handle` routes `Snapshot`/`Restore` to `command_service` and `CheckReview`/`CheckCommit` to the separate `query_service`, so this primary adapter branches between interactors based on the request variant. Inject one aggregate application service and delegate each request through that single boundary, as required by `hexagonal-architecture.md` §Usecase Layer Purity Rules.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 223,
+              "category": "handle not delegating to single use case"
+            }
+          ],
+          "hash": "rvw1:sha256:a8dde79ab6cd51bf97f43d82102fad2deeafc1110ddd064a962ebb7e9c57bb22",
+          "at": "2026-07-16T17:39:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c10242255161d6a4f4e8e0ae9868b43a277664103f677526dd29fabee13f8b8f",
+          "at": "2026-07-16T18:10:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The wildcard arm makes `handle` validate composition state instead of performing only input → invoke → render. It also misreports `Snapshot { track_id: Some(_), timestamp: None, .. }` as a missing track ID. Since composition owns resolving both optional fields, pass a resolved-only input to the driver so this state is unrepresentable, per `hexagonal-architecture.md` §Usecase Layer Purity Rules.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 284,
+              "category": "business logic in adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:c10242255161d6a4f4e8e0ae9868b43a277664103f677526dd29fabee13f8b8f",
+          "at": "2026-07-16T18:13:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4c3c60306a6708a149b467a97682a22be2b154fc22ec9f6505373bd59c8ebb1",
+          "at": "2026-07-16T18:40:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d4c3c60306a6708a149b467a97682a22be2b154fc22ec9f6505373bd59c8ebb1",
+          "at": "2026-07-16T18:42:14Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:06f2686b1090a4afacd627c6d055f499b04a26929c3b7db25b34f142f1aa45e1",
+          "at": "2026-07-16T14:03:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::AdrBaselineCheckOutcome::Blocked` exposes `violations: Vec<AdrBaselineCheckViolation>` publicly, so callers can construct `Blocked { violations: vec![] }` directly. The `blocked()` constructor therefore cannot enforce the documented non-empty invariant; use a non-empty collection type or a private wrapper.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/domain-types.json",
+              "line": 298,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "`usecase::AdrBaselineService::execute` combines mutating `Snapshot`/`Restore` commands with non-mutating `CheckReview`/`CheckCommit` queries returning a check read model. Split the command and query contracts/interactors so callers and implementations do not depend on both sides.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 100,
+              "category": "CQRS: command/query mixing"
+            },
+            {
+              "message": "All four CLI argument DTOs carry `items_dir`, but `cli_driver::AdrBaselineInput` has no corresponding field and `AdrBaselineCompositionRoot` accepts only `project_root`. A custom items directory therefore cannot cross the CLI→driver→composition boundary. Preserve it in the mirror chain or document and type an explicit lossless conversion.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli-types.json",
+              "line": 104,
+              "category": "mirror chain divergence"
+            },
+            {
+              "message": "`usecase::AdrBaselineStorePort` exposes ledger entries but no operation or documented guarantee for verifying that each referenced verbatim baseline copy still exists and matches its ledger hash. Consequently the check contract cannot enforce AC-03 against a deleted or modified copy; `MissingBaseline` merely declares vocabulary without naming an enforcement owner.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 255,
+              "category": "enforcement-owner contradiction"
+            },
+            {
+              "message": "`working_bytes` and `fork_point_bytes` return `Result<Option<Vec<u8>>, AdrBaselineError>`, while `AdrBaselineError::SourceUnavailable(AdrSourceFileName)` also represents unavailable source bytes. With no documented distinction, `None` and `Err(SourceUnavailable)` overlap and adapters can encode the same state inconsistently.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 162,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "`AdrBaselineSourcePort` performs filesystem/Git reads and `AdrBaselineStorePort` performs filesystem persistence, but every method is synchronous and neither entry acknowledges the blocking execution choice. The port contract should explicitly justify synchronous I/O or declare the appropriate async color.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 153,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "Both secondary ports return the shared six-variant `AdrBaselineError` without documenting producible subsets. Source reads cannot structurally produce `Store`, `InvalidReason`, or primary-adapter filename-validation failures; store operations likewise cannot produce source-reader and primary-adapter variants. Use port-specific errors or document precise per-method subsets.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 162,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`decode_ledger_line` and `encode_ledger_entry` return `AdrBaselineCodecError`, whose `Io` and `Transaction` variants cannot be produced by these pure string codecs. The entry docs do not declare a producible subset, forcing callers to handle structurally unreachable failures.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/infrastructure-types.json",
+              "line": 15,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`cli_driver::TrackIdInput::try_new`, `AdrSourceFileNameInput::try_new`, and `AdrBaselineReasonInput::try_new` return broad shared errors. Each constructor can produce only its own validation subset, but the declarations neither use precise errors nor document those subsets.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+              "line": 17,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "The docs for `domain::AdrBaselineKind`, `domain::AdrBaselineLedgerEntry`, `domain::AdrBaselineSourceState`, and `domain::AdrSourceFileName` restate CN-01–CN-04/AC-06–AC-07 behavior such as reason requirements, fork-point selection, draft exemption, and path restrictions. Replace these restatements with short identifying phrases and anchor references.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/domain-types.json",
+              "line": 452,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `usecase::AdrBaselineSourcePort`, `usecase::AdrBaselineStorePort`, and `usecase::AdrBaselineInteractor` reproduce upstream behavior including fork-point reads, atomic append, mechanical restore, reason legality, and draft exemption. Keep the behavior in spec.json and cite its anchors instead.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 148,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `infrastructure::adr_baseline::{decode_ledger_line,encode_ledger_entry}`, `infrastructure::FsAdrBaselineStore`, and `infrastructure::FsGitAdrBaselineSource` restate CN-01–CN-04/AC-02/AC-07 behavior, including append-only encoding, collision handling, merge-base reads, and draft classification.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/infrastructure-types.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `cli_driver::AdrBaselineInput`, `AdrBaselineReasonInput`, and `AdrSourceFileNameInput` restate upstream reason-permission, non-empty-reason, and ADR-path validation behavior instead of referring to CN-02/CN-03/AC-06.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+              "line": 300,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `cli::AdrBaselineCheckCommitArgs`, `AdrBaselineCheckReviewArgs`, `AdrBaselineCommand`, `AdrBaselineRestoreArgs`, and `AdrBaselineSnapshotArgs` reproduce AC-04/CN-02/CN-05 behavior such as fail-closed entry checks, atomic snapshots, and latest-copy restoration. Replace the prose restatements with anchor-based identification.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli-types.json",
+              "line": 97,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:06f2686b1090a4afacd627c6d055f499b04a26929c3b7db25b34f142f1aa45e1",
+          "at": "2026-07-16T14:15:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:85200fba7b213a589f785ebf07835684ebf5ef7233626ba74db8e690de2c289b",
+          "at": "2026-07-16T14:33:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_composition::AdrBaselineCompositionRoot::new` returns the broad `CompositionError`, but the declared construction chain uses only infallible adapter, interactor, and driver constructors. Variants such as `ConfigLoad`, `Usecase`, and `Infrastructure` therefore have no structural origin, and the docs specify no reachable subset. Return `Self` or declare the actual fallible step and precise error subset.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli_composition-types.json",
+              "line": 10,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "The `as_str(&self) -> &str` signature is duplicated across `TrackIdInput`, `AdrSourceFileNameInput`, `AdrBaselineKindInput`, and `AdrBaselineReasonInput`; `try_new(String) -> Result<Self, AdrBaselineValidationError>` is also duplicated across the source-name and reason inputs. These sibling `add` entries should share contracts such as `AsRef<str>` and `TryFrom<String>` or a local trait.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+              "line": 22,
+              "category": "duplicated method signature across sibling types"
+            },
+            {
+              "message": "`FsAdrBaselineStore` and `FsGitAdrBaselineSource` duplicate the exact sibling constructor `new(PathBuf) -> Self`. Declare a shared construction contract such as `From<PathBuf>` instead of repeating the public signature.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/infrastructure-types.json",
+              "line": 67,
+              "category": "duplicated method signature across sibling types"
+            },
+            {
+              "message": "`AdrBaselineLedgerRecordDto.docs` restates the upstream ledger wire contract by enumerating `source/hash/kind/reason/timestamp`. The catalogue field shape and `spec_refs` already carry that information; retain only a short role phrase and anchor references to avoid a second behavioral SoT.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/infrastructure-types.json",
+              "line": 220,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`AdrBaselineInteractor` and `AdrBaselineQueryInteractor` duplicate the exact constructor taking `Arc<dyn AdrBaselineStorePort>` and `Arc<dyn AdrBaselineSourcePort>`. These sibling `add` entries should share a dependency value or constructor trait rather than repeat the same contract.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 10,
+              "category": "duplicated method signature across sibling types"
+            },
+            {
+              "message": "`AdrBaselineQueryService::execute` exposes the full `AdrBaselineQueryError`: a valid query cannot produce `AdrBaselineStoreError::Write`, and source unavailability is already modeled as the fail-closed `AdrBaselineCheckViolation::SourceMissing` rather than an operational query error. The docs specify no subset, so callers must handle unreachable leaves. Use a query-specific read error or document and enforce the exact mapping.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 261,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`AdrBaselineStorePort` combines the query-only `read_entries`/`verify_recorded_copy` group with the command-only `snapshot`/`restore` group. The separate command and query interactors consequently depend on methods they must not use. Split read/verification and mutation ports; the filesystem adapter may implement both.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 434,
+              "category": "Interface Segregation violation"
+            },
+            {
+              "message": "`AdrBaselineCommand::Snapshot` and `AdrBaselineStorePort::snapshot` both admit every `kind + Option<reason>` combination, but no entry names the sole AC-06 enforcement owner. `AdrBaselineReasonInput` cannot enforce the rule because it cannot see `kind`, while the store port cannot return `AdrBaselineValidationError`. Assign the interactor or another capable layer as the exactly-one owner of required/forbidden-reason rejection.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
+              "line": 589,
+              "category": "enforcement-owner contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:85200fba7b213a589f785ebf07835684ebf5ef7233626ba74db8e690de2c289b",
+          "at": "2026-07-16T14:53:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76d42b289840e41b3f566f5fb13ad1fa73fbac5a1585870ecde4465147fcd3eb",
+          "at": "2026-07-16T15:08:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76d42b289840e41b3f566f5fb13ad1fa73fbac5a1585870ecde4465147fcd3eb",
+          "at": "2026-07-16T15:12:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f79e5eb7184ef80a8356a9fa54d0c1bc922b276d77593b1815509f13638aa57",
+          "at": "2026-07-16T15:17:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0f79e5eb7184ef80a8356a9fa54d0c1bc922b276d77593b1815509f13638aa57",
+          "at": "2026-07-16T15:20:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29306981ee51677e7a2ec04c4b6d85a35c64ece56ce0e7d14a5c0be4dc7b1d7b",
+          "at": "2026-07-16T17:32:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29306981ee51677e7a2ec04c4b6d85a35c64ece56ce0e7d14a5c0be4dc7b1d7b",
+          "at": "2026-07-16T17:36:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e3e8d972bf28cf187555ea3878a1a1839d9095defaa5a4de24516bc492837b6",
+          "at": "2026-07-16T18:10:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::commands::adr_baseline::dispatch` declares `Result<cli_driver::CommandOutcome, CliError>`, but input construction is infallible and `AdrBaselineCompositionRoot::execute` already returns a plain `CommandOutcome`; consequently every `CliError` variant is structurally unreachable. Return `CommandOutcome` directly or add a genuine typed failure path.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli-types.json",
+              "line": 15,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "`cli_driver::AdrBaselineInput` represents both pre-composition and post-composition states: every variant permits `track_id: None`, and `Snapshot` also permits `timestamp: None`, while `AdrBaselineDriver::handle` accepts this same type even though the use-case command requires resolved values. Thus unresolved requests are valid driver inputs and require runtime rejection. Split the unresolved composition request from a resolved driver input with required `TrackIdInput`/`Timestamp` fields.",
+              "severity": "P1",
+              "file": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
+              "line": 272,
+              "category": "state-shape smell"
+            }
+          ],
+          "hash": "rvw1:sha256:4e3e8d972bf28cf187555ea3878a1a1839d9095defaa5a4de24516bc492837b6",
+          "at": "2026-07-16T18:18:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0c89fb121b4a0359974cf9fb53ef0ac57dae17979f9daa27becf747321cd6ee",
+          "at": "2026-07-16T18:40:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0c89fb121b4a0359974cf9fb53ef0ac57dae17979f9daa27becf747321cd6ee",
+          "at": "2026-07-16T18:44:33Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:348a53c61162134bebd0e9bf69d384e36972bbea007ed0a268a65e4cc2a339cd",
+          "at": "2026-07-16T17:32:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Snapshot` 入力と `AdrBaselineStorePort::snapshot` に timestamp がなく、唯一の production adapter が内部で `timestamp_now()` → `chrono::Utc::now()` を呼んでいます。同一の usecase 入力が暗黙の時計に依存し、Usecase Layer Purity Rules の「時刻は entrypoint の引数として渡す」に違反します。`Timestamp` を command／port 引数へ追加し、composition root で取得してください。",
+              "severity": "P1",
+              "file": "libs/usecase/src/adr_baseline.rs",
+              "line": 20,
+              "category": "implicit time / env / process dependency"
+            }
+          ],
+          "hash": "rvw1:sha256:348a53c61162134bebd0e9bf69d384e36972bbea007ed0a268a65e4cc2a339cd",
+          "at": "2026-07-16T17:40:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9d157288de0812d5b81b09c9c589f4ecaa7c2c1ea3748d2ab39eca8ff5713fb",
+          "at": "2026-07-16T18:10:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f9d157288de0812d5b81b09c9c589f4ecaa7c2c1ea3748d2ab39eca8ff5713fb",
+          "at": "2026-07-16T18:13:10Z"
         }
       ]
     },
@@ -900,411 +1282,57 @@
         }
       ]
     },
-    "types": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:06f2686b1090a4afacd627c6d055f499b04a26929c3b7db25b34f142f1aa45e1",
-          "at": "2026-07-16T14:03:03Z"
+          "hash": "rvw1:sha256:a997565405b37111634003216facf15dcc1cd113fef5438b034f6159d863b8fc",
+          "at": "2026-07-16T17:32:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a997565405b37111634003216facf15dcc1cd113fef5438b034f6159d863b8fc",
+          "at": "2026-07-16T17:35:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:493ae95354f89d151f1e5abe5d7b9b903a530e21f8e403eda707b521e08934cc",
+          "at": "2026-07-16T18:10:40Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`domain::AdrBaselineCheckOutcome::Blocked` exposes `violations: Vec<AdrBaselineCheckViolation>` publicly, so callers can construct `Blocked { violations: vec![] }` directly. The `blocked()` constructor therefore cannot enforce the documented non-empty invariant; use a non-empty collection type or a private wrapper.",
+              "message": "`execute` converts project-root and track-resolution failures directly into `CommandOutcome::failure` (here and at line 37), placing user-facing stderr rendering in the composition root. Keep these failures typed and let `cli_driver`/the CLI boundary map them to output.",
               "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/domain-types.json",
-              "line": 298,
-              "category": "state-shape smell"
-            },
-            {
-              "message": "`usecase::AdrBaselineService::execute` combines mutating `Snapshot`/`Restore` commands with non-mutating `CheckReview`/`CheckCommit` queries returning a check read model. Split the command and query contracts/interactors so callers and implementations do not depend on both sides.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
-              "line": 100,
-              "category": "CQRS: command/query mixing"
-            },
-            {
-              "message": "All four CLI argument DTOs carry `items_dir`, but `cli_driver::AdrBaselineInput` has no corresponding field and `AdrBaselineCompositionRoot` accepts only `project_root`. A custom items directory therefore cannot cross the CLI→driver→composition boundary. Preserve it in the mirror chain or document and type an explicit lossless conversion.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/cli-types.json",
-              "line": 104,
-              "category": "mirror chain divergence"
-            },
-            {
-              "message": "`usecase::AdrBaselineStorePort` exposes ledger entries but no operation or documented guarantee for verifying that each referenced verbatim baseline copy still exists and matches its ledger hash. Consequently the check contract cannot enforce AC-03 against a deleted or modified copy; `MissingBaseline` merely declares vocabulary without naming an enforcement owner.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
-              "line": 255,
-              "category": "enforcement-owner contradiction"
-            },
-            {
-              "message": "`working_bytes` and `fork_point_bytes` return `Result<Option<Vec<u8>>, AdrBaselineError>`, while `AdrBaselineError::SourceUnavailable(AdrSourceFileName)` also represents unavailable source bytes. With no documented distinction, `None` and `Err(SourceUnavailable)` overlap and adapters can encode the same state inconsistently.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
-              "line": 162,
-              "category": "state-shape smell"
-            },
-            {
-              "message": "`AdrBaselineSourcePort` performs filesystem/Git reads and `AdrBaselineStorePort` performs filesystem persistence, but every method is synchronous and neither entry acknowledges the blocking execution choice. The port contract should explicitly justify synchronous I/O or declare the appropriate async color.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
-              "line": 153,
-              "category": "sync/async color mismatch"
-            },
-            {
-              "message": "Both secondary ports return the shared six-variant `AdrBaselineError` without documenting producible subsets. Source reads cannot structurally produce `Store`, `InvalidReason`, or primary-adapter filename-validation failures; store operations likewise cannot produce source-reader and primary-adapter variants. Use port-specific errors or document precise per-method subsets.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
-              "line": 162,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "`decode_ledger_line` and `encode_ledger_entry` return `AdrBaselineCodecError`, whose `Io` and `Transaction` variants cannot be produced by these pure string codecs. The entry docs do not declare a producible subset, forcing callers to handle structurally unreachable failures.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/infrastructure-types.json",
-              "line": 15,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "`cli_driver::TrackIdInput::try_new`, `AdrSourceFileNameInput::try_new`, and `AdrBaselineReasonInput::try_new` return broad shared errors. Each constructor can produce only its own validation subset, but the declarations neither use precise errors nor document those subsets.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
-              "line": 17,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "The docs for `domain::AdrBaselineKind`, `domain::AdrBaselineLedgerEntry`, `domain::AdrBaselineSourceState`, and `domain::AdrSourceFileName` restate CN-01–CN-04/AC-06–AC-07 behavior such as reason requirements, fork-point selection, draft exemption, and path restrictions. Replace these restatements with short identifying phrases and anchor references.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/domain-types.json",
-              "line": 452,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The docs for `usecase::AdrBaselineSourcePort`, `usecase::AdrBaselineStorePort`, and `usecase::AdrBaselineInteractor` reproduce upstream behavior including fork-point reads, atomic append, mechanical restore, reason legality, and draft exemption. Keep the behavior in spec.json and cite its anchors instead.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
-              "line": 148,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The docs for `infrastructure::adr_baseline::{decode_ledger_line,encode_ledger_entry}`, `infrastructure::FsAdrBaselineStore`, and `infrastructure::FsGitAdrBaselineSource` restate CN-01–CN-04/AC-02/AC-07 behavior, including append-only encoding, collision handling, merge-base reads, and draft classification.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/infrastructure-types.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The docs for `cli_driver::AdrBaselineInput`, `AdrBaselineReasonInput`, and `AdrSourceFileNameInput` restate upstream reason-permission, non-empty-reason, and ADR-path validation behavior instead of referring to CN-02/CN-03/AC-06.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
-              "line": 300,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The docs for `cli::AdrBaselineCheckCommitArgs`, `AdrBaselineCheckReviewArgs`, `AdrBaselineCommand`, `AdrBaselineRestoreArgs`, and `AdrBaselineSnapshotArgs` reproduce AC-04/CN-02/CN-05 behavior such as fail-closed entry checks, atomic snapshots, and latest-copy restoration. Replace the prose restatements with anchor-based identification.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/cli-types.json",
-              "line": 97,
-              "category": "upstream restatement"
+              "file": "apps/cli-composition/src/adr_baseline.rs",
+              "line": 33,
+              "category": "render leak"
             }
           ],
-          "hash": "rvw1:sha256:06f2686b1090a4afacd627c6d055f499b04a26929c3b7db25b34f142f1aa45e1",
-          "at": "2026-07-16T14:15:33Z"
+          "hash": "rvw1:sha256:493ae95354f89d151f1e5abe5d7b9b903a530e21f8e403eda707b521e08934cc",
+          "at": "2026-07-16T18:13:20Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:85200fba7b213a589f785ebf07835684ebf5ef7233626ba74db8e690de2c289b",
-          "at": "2026-07-16T14:33:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cli_composition::AdrBaselineCompositionRoot::new` returns the broad `CompositionError`, but the declared construction chain uses only infallible adapter, interactor, and driver constructors. Variants such as `ConfigLoad`, `Usecase`, and `Infrastructure` therefore have no structural origin, and the docs specify no reachable subset. Return `Self` or declare the actual fallible step and precise error subset.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/cli_composition-types.json",
-              "line": 10,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "The `as_str(&self) -> &str` signature is duplicated across `TrackIdInput`, `AdrSourceFileNameInput`, `AdrBaselineKindInput`, and `AdrBaselineReasonInput`; `try_new(String) -> Result<Self, AdrBaselineValidationError>` is also duplicated across the source-name and reason inputs. These sibling `add` entries should share contracts such as `AsRef<str>` and `TryFrom<String>` or a local trait.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
-              "line": 22,
-              "category": "duplicated method signature across sibling types"
-            },
-            {
-              "message": "`FsAdrBaselineStore` and `FsGitAdrBaselineSource` duplicate the exact sibling constructor `new(PathBuf) -> Self`. Declare a shared construction contract such as `From<PathBuf>` instead of repeating the public signature.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/infrastructure-types.json",
-              "line": 67,
-              "category": "duplicated method signature across sibling types"
-            },
-            {
-              "message": "`AdrBaselineLedgerRecordDto.docs` restates the upstream ledger wire contract by enumerating `source/hash/kind/reason/timestamp`. The catalogue field shape and `spec_refs` already carry that information; retain only a short role phrase and anchor references to avoid a second behavioral SoT.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/infrastructure-types.json",
-              "line": 220,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`AdrBaselineInteractor` and `AdrBaselineQueryInteractor` duplicate the exact constructor taking `Arc<dyn AdrBaselineStorePort>` and `Arc<dyn AdrBaselineSourcePort>`. These sibling `add` entries should share a dependency value or constructor trait rather than repeat the same contract.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
-              "line": 10,
-              "category": "duplicated method signature across sibling types"
-            },
-            {
-              "message": "`AdrBaselineQueryService::execute` exposes the full `AdrBaselineQueryError`: a valid query cannot produce `AdrBaselineStoreError::Write`, and source unavailability is already modeled as the fail-closed `AdrBaselineCheckViolation::SourceMissing` rather than an operational query error. The docs specify no subset, so callers must handle unreachable leaves. Use a query-specific read error or document and enforce the exact mapping.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
-              "line": 261,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "`AdrBaselineStorePort` combines the query-only `read_entries`/`verify_recorded_copy` group with the command-only `snapshot`/`restore` group. The separate command and query interactors consequently depend on methods they must not use. Split read/verification and mutation ports; the filesystem adapter may implement both.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
-              "line": 434,
-              "category": "Interface Segregation violation"
-            },
-            {
-              "message": "`AdrBaselineCommand::Snapshot` and `AdrBaselineStorePort::snapshot` both admit every `kind + Option<reason>` combination, but no entry names the sole AC-06 enforcement owner. `AdrBaselineReasonInput` cannot enforce the rule because it cannot see `kind`, while the store port cannot return `AdrBaselineValidationError`. Assign the interactor or another capable layer as the exactly-one owner of required/forbidden-reason rejection.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/usecase-types.json",
-              "line": 589,
-              "category": "enforcement-owner contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:85200fba7b213a589f785ebf07835684ebf5ef7233626ba74db8e690de2c289b",
-          "at": "2026-07-16T14:53:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:76d42b289840e41b3f566f5fb13ad1fa73fbac5a1585870ecde4465147fcd3eb",
-          "at": "2026-07-16T15:08:38Z"
+          "hash": "rvw1:sha256:beae3c836bf890d609edd3f6864c26ec0b6351f802a4c2a202608c985c5e31ec",
+          "at": "2026-07-16T18:40:18Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:76d42b289840e41b3f566f5fb13ad1fa73fbac5a1585870ecde4465147fcd3eb",
-          "at": "2026-07-16T15:12:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0f79e5eb7184ef80a8356a9fa54d0c1bc922b276d77593b1815509f13638aa57",
-          "at": "2026-07-16T15:17:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0f79e5eb7184ef80a8356a9fa54d0c1bc922b276d77593b1815509f13638aa57",
-          "at": "2026-07-16T15:20:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:29306981ee51677e7a2ec04c4b6d85a35c64ece56ce0e7d14a5c0be4dc7b1d7b",
-          "at": "2026-07-16T17:32:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:29306981ee51677e7a2ec04c4b6d85a35c64ece56ce0e7d14a5c0be4dc7b1d7b",
-          "at": "2026-07-16T17:36:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e3e8d972bf28cf187555ea3878a1a1839d9095defaa5a4de24516bc492837b6",
-          "at": "2026-07-16T18:10:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cli::commands::adr_baseline::dispatch` declares `Result<cli_driver::CommandOutcome, CliError>`, but input construction is infallible and `AdrBaselineCompositionRoot::execute` already returns a plain `CommandOutcome`; consequently every `CliError` variant is structurally unreachable. Return `CommandOutcome` directly or add a genuine typed failure path.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/cli-types.json",
-              "line": 15,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "`cli_driver::AdrBaselineInput` represents both pre-composition and post-composition states: every variant permits `track_id: None`, and `Snapshot` also permits `timestamp: None`, while `AdrBaselineDriver::handle` accepts this same type even though the use-case command requires resolved values. Thus unresolved requests are valid driver inputs and require runtime rejection. Split the unresolved composition request from a resolved driver input with required `TrackIdInput`/`Timestamp` fields.",
-              "severity": "P1",
-              "file": "track/items/adr-decision-freeze-2026-07-16/cli_driver-types.json",
-              "line": 272,
-              "category": "state-shape smell"
-            }
-          ],
-          "hash": "rvw1:sha256:4e3e8d972bf28cf187555ea3878a1a1839d9095defaa5a4de24516bc492837b6",
-          "at": "2026-07-16T18:18:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b0c89fb121b4a0359974cf9fb53ef0ac57dae17979f9daa27becf747321cd6ee",
-          "at": "2026-07-16T18:40:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b0c89fb121b4a0359974cf9fb53ef0ac57dae17979f9daa27becf747321cd6ee",
-          "at": "2026-07-16T18:44:33Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:348a53c61162134bebd0e9bf69d384e36972bbea007ed0a268a65e4cc2a339cd",
-          "at": "2026-07-16T17:32:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Snapshot` 入力と `AdrBaselineStorePort::snapshot` に timestamp がなく、唯一の production adapter が内部で `timestamp_now()` → `chrono::Utc::now()` を呼んでいます。同一の usecase 入力が暗黙の時計に依存し、Usecase Layer Purity Rules の「時刻は entrypoint の引数として渡す」に違反します。`Timestamp` を command／port 引数へ追加し、composition root で取得してください。",
-              "severity": "P1",
-              "file": "libs/usecase/src/adr_baseline.rs",
-              "line": 20,
-              "category": "implicit time / env / process dependency"
-            }
-          ],
-          "hash": "rvw1:sha256:348a53c61162134bebd0e9bf69d384e36972bbea007ed0a268a65e4cc2a339cd",
-          "at": "2026-07-16T17:40:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9d157288de0812d5b81b09c9c589f4ecaa7c2c1ea3748d2ab39eca8ff5713fb",
-          "at": "2026-07-16T18:10:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f9d157288de0812d5b81b09c9c589f4ecaa7c2c1ea3748d2ab39eca8ff5713fb",
-          "at": "2026-07-16T18:13:10Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AdrBaselineDriver::handle` duplicates the kind/reason semantic legality check (`requires_reason` versus `reason.is_some()`) in the primary adapter. This is business logic that the briefing states is owned by the use-case interactor; the driver should only map the typed input, invoke the single service, and render its result.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/adr_baseline.rs",
-              "line": 228,
-              "category": "business logic in adapter"
-            }
-          ],
-          "hash": "rvw1:sha256:ac9961cd6cce471be01fef90ce4675cbe38e25f342a0679b9614cef465c59917",
-          "at": "2026-07-16T17:32:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a8dde79ab6cd51bf97f43d82102fad2deeafc1110ddd064a962ebb7e9c57bb22",
-          "at": "2026-07-16T17:34:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`handle` routes `Snapshot`/`Restore` to `command_service` and `CheckReview`/`CheckCommit` to the separate `query_service`, so this primary adapter branches between interactors based on the request variant. Inject one aggregate application service and delegate each request through that single boundary, as required by `hexagonal-architecture.md` §Usecase Layer Purity Rules.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/adr_baseline.rs",
-              "line": 223,
-              "category": "handle not delegating to single use case"
-            }
-          ],
-          "hash": "rvw1:sha256:a8dde79ab6cd51bf97f43d82102fad2deeafc1110ddd064a962ebb7e9c57bb22",
-          "at": "2026-07-16T17:39:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c10242255161d6a4f4e8e0ae9868b43a277664103f677526dd29fabee13f8b8f",
-          "at": "2026-07-16T18:10:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The wildcard arm makes `handle` validate composition state instead of performing only input → invoke → render. It also misreports `Snapshot { track_id: Some(_), timestamp: None, .. }` as a missing track ID. Since composition owns resolving both optional fields, pass a resolved-only input to the driver so this state is unrepresentable, per `hexagonal-architecture.md` §Usecase Layer Purity Rules.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/adr_baseline.rs",
-              "line": 284,
-              "category": "business logic in adapter"
-            }
-          ],
-          "hash": "rvw1:sha256:c10242255161d6a4f4e8e0ae9868b43a277664103f677526dd29fabee13f8b8f",
-          "at": "2026-07-16T18:13:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d4c3c60306a6708a149b467a97682a22be2b154fc22ec9f6505373bd59c8ebb1",
-          "at": "2026-07-16T18:40:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d4c3c60306a6708a149b467a97682a22be2b154fc22ec9f6505373bd59c8ebb1",
-          "at": "2026-07-16T18:42:14Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3ff1cac9946731548246e11785f423ae9785c35590de0c40ce695a96ab86fe93",
-          "at": "2026-07-16T17:32:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3ff1cac9946731548246e11785f423ae9785c35590de0c40ce695a96ab86fe93",
-          "at": "2026-07-16T17:37:12Z"
+          "hash": "rvw1:sha256:beae3c836bf890d609edd3f6864c26ec0b6351f802a4c2a202608c985c5e31ec",
+          "at": "2026-07-16T18:41:56Z"
         }
       ]
     }
