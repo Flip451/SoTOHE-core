@@ -1,21 +1,89 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ab9ae42a419132aa39ac291dc31350237351b4049d5d5ea5ab47930afeed1b86",
-          "at": "2026-07-17T19:48:00Z"
+          "hash": "rvw1:sha256:38d4042fd185260e3d183bca503f9b287c7006c3a466b2fbecfdef9a05f6dc2f",
+          "at": "2026-07-17T18:51:43Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ab9ae42a419132aa39ac291dc31350237351b4049d5d5ea5ab47930afeed1b86",
-          "at": "2026-07-17T19:50:24Z"
+          "hash": "rvw1:sha256:38d4042fd185260e3d183bca503f9b287c7006c3a466b2fbecfdef9a05f6dc2f",
+          "at": "2026-07-17T18:55:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc7eed4fd28a321c713a7ed2278982136472ed400d718cf0330648068bc8ab77",
+          "at": "2026-07-17T19:48:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc7eed4fd28a321c713a7ed2278982136472ed400d718cf0330648068bc8ab77",
+          "at": "2026-07-17T19:49:39Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
+          "at": "2026-07-17T18:51:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
+          "at": "2026-07-17T18:54:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c06351cab606ce73bfa0933662cc45d248edda4b0e4d4c9448d4d2e2502a0cdf",
+          "at": "2026-07-17T19:47:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The gate-step comment still claims that PR runs acquire a local `track/<id>` branch, which is false for the newly exempt develop → main release PR and for non-track PRs that intentionally reach this gate without track context. D9/AC-10 requires the condition relationship to be documented on both steps; update this comment to state that only release PRs are skipped, track heads are recreated above, and other non-track PRs run the gate and fail closed.",
+              "severity": "P1",
+              "file": ".github/workflows/ci.yml",
+              "line": 111,
+              "category": "requirements"
+            }
+          ],
+          "hash": "rvw1:sha256:c06351cab606ce73bfa0933662cc45d248edda4b0e4d4c9448d4d2e2502a0cdf",
+          "at": "2026-07-17T19:51:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:95888b9be332a8c53603a8a344b9ae77a3387d7710206ff56f16f0366c456e42",
+          "at": "2026-07-17T19:52:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4d4707a538ec97f00a7c0a656021390bdae3af5fbe3b6be6b906419efcf9daa",
+          "at": "2026-07-17T20:01:46Z"
         }
       ]
     },
@@ -255,56 +323,38 @@
           "findings": [],
           "hash": "rvw1:sha256:49ba20b25e719bd14781ef5875def02a1c7805146c2ed254c44a63fd68560331",
           "at": "2026-07-17T19:57:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:469d9716f9a26e5af9718f25fb0c648aa8cae5f8a095e77f743456faf06477af",
+          "at": "2026-07-17T20:13:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:469d9716f9a26e5af9718f25fb0c648aa8cae5f8a095e77f743456faf06477af",
+          "at": "2026-07-17T20:15:24Z"
         }
       ]
     },
-    "usecase": {
+    "domain": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0b5bb72f14d715458ec608df81362e4dafca7dace65c09b40cfd03a015b6fdd6",
-          "at": "2026-07-17T19:48:05Z"
+          "hash": "rvw1:sha256:ab9ae42a419132aa39ac291dc31350237351b4049d5d5ea5ab47930afeed1b86",
+          "at": "2026-07-17T19:48:00Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0b5bb72f14d715458ec608df81362e4dafca7dace65c09b40cfd03a015b6fdd6",
-          "at": "2026-07-17T19:50:38Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:38d4042fd185260e3d183bca503f9b287c7006c3a466b2fbecfdef9a05f6dc2f",
-          "at": "2026-07-17T18:51:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:38d4042fd185260e3d183bca503f9b287c7006c3a466b2fbecfdef9a05f6dc2f",
-          "at": "2026-07-17T18:55:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc7eed4fd28a321c713a7ed2278982136472ed400d718cf0330648068bc8ab77",
-          "at": "2026-07-17T19:48:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bc7eed4fd28a321c713a7ed2278982136472ed400d718cf0330648068bc8ab77",
-          "at": "2026-07-17T19:49:39Z"
+          "hash": "rvw1:sha256:ab9ae42a419132aa39ac291dc31350237351b4049d5d5ea5ab47930afeed1b86",
+          "at": "2026-07-17T19:50:24Z"
         }
       ]
     },
@@ -406,57 +456,39 @@
         }
       ]
     },
-    "other": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
-          "at": "2026-07-17T18:51:40Z"
+          "hash": "rvw1:sha256:0b5bb72f14d715458ec608df81362e4dafca7dace65c09b40cfd03a015b6fdd6",
+          "at": "2026-07-17T19:48:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:367600bb80d75106ea71475a115b6227830f84f4561fc74b8a34eb8c061c0164",
-          "at": "2026-07-17T18:54:49Z"
-        },
+          "hash": "rvw1:sha256:0b5bb72f14d715458ec608df81362e4dafca7dace65c09b40cfd03a015b6fdd6",
+          "at": "2026-07-17T19:50:38Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c06351cab606ce73bfa0933662cc45d248edda4b0e4d4c9448d4d2e2502a0cdf",
-          "at": "2026-07-17T19:47:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The gate-step comment still claims that PR runs acquire a local `track/<id>` branch, which is false for the newly exempt develop → main release PR and for non-track PRs that intentionally reach this gate without track context. D9/AC-10 requires the condition relationship to be documented on both steps; update this comment to state that only release PRs are skipped, track heads are recreated above, and other non-track PRs run the gate and fail closed.",
-              "severity": "P1",
-              "file": ".github/workflows/ci.yml",
-              "line": 111,
-              "category": "requirements"
-            }
-          ],
-          "hash": "rvw1:sha256:c06351cab606ce73bfa0933662cc45d248edda4b0e4d4c9448d4d2e2502a0cdf",
-          "at": "2026-07-17T19:51:07Z"
+          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
+          "at": "2026-07-17T19:21:20Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:95888b9be332a8c53603a8a344b9ae77a3387d7710206ff56f16f0366c456e42",
-          "at": "2026-07-17T19:52:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c4d4707a538ec97f00a7c0a656021390bdae3af5fbe3b6be6b906419efcf9daa",
-          "at": "2026-07-17T20:01:46Z"
+          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
+          "at": "2026-07-17T19:25:01Z"
         }
       ]
     },
@@ -490,24 +522,6 @@
           "findings": [],
           "hash": "rvw1:sha256:31e2395e6a0cb34cab34fec57059f13e580d82e7396e0b798f80e7992e5ed9ed",
           "at": "2026-07-17T19:26:22Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
-          "at": "2026-07-17T19:21:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a39403717620b0090983cbcbfe04c966a306f3f2d60eb1d2b29356cdfdba90ea",
-          "at": "2026-07-17T19:25:01Z"
         }
       ]
     }
