@@ -24,13 +24,20 @@ or failure-recovery procedures here.
 ### (3) Sub-workflow and capability invocation
 
 - Phase 0 is delegated to `$track-init`.
-- Phase 1 is delegated to `$track-spec-design` (which internally uses the `spec-designer`
-  capability via `.codex/agents/spec-designer.toml`).
-- Phase 2 is delegated to `$track-type-design` (which internally uses the `type-designer`
-  capability via `.codex/agents/type-designer.toml`).
-- Phase 3 is delegated to `$track-impl-plan` (which internally uses the `impl-planner`
-  capability via `.codex/agents/impl-planner.toml`).
-- Back-and-forth escalation re-invokes the upstream phase skill when a downstream signal fails.
+- Phase 1 is delegated to `$track-spec-design` (which dispatches the `spec-designer`
+  capability through `bin/sotp capability exec`, provider resolved from
+  `.harness/config/agent-profiles.json`).
+- Phase 2 is delegated to `$track-type-design` (which dispatches the `type-designer`
+  capability the same way).
+- Phase 3 is delegated to `$track-impl-plan` (which dispatches the `impl-planner`
+  capability the same way).
+- Back-and-forth escalation is owned by this skill per the plan workflow SSoT (retry counters
+  included). When Phase 1 returns a red spec → ADR signal whose fix belongs to the ADR side,
+  dispatch the `adr-editor` capability through
+  `bin/sotp capability exec adr-editor --host codex --briefing-file <path>` (invoke
+  `.codex/agents/adr-editor.toml` in-host only on `CAPABILITY_EXEC_OUTCOME: delegate-in-host`),
+  then re-invoke `$track-spec-design`. Other red signals re-invoke the appropriate upstream
+  phase skill per the SSoT loop rules.
 
 ### (4) Reporting format
 

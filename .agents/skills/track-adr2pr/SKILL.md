@@ -25,10 +25,25 @@ or failure-recovery procedures here.
 ### (3) Sub-workflow and capability invocation
 
 - Sub-workflows are invoked by their Codex skill name (e.g. `$track-init`, `$track-review`, etc.).
-- Capabilities (spec-designer, type-designer, impl-planner, adr-editor, review-fix-lead) are
-  invoked via their `.codex/agents/<name>.toml` agent definitions.
+- Capabilities (spec-designer, type-designer, impl-planner, adr-editor) are dispatched through
+  `bin/sotp capability exec <capability> --host codex --briefing-file <path>`; the dispatcher
+  resolves `capabilities.<name>.provider` from `.harness/config/agent-profiles.json`. Only when
+  it returns `CAPABILITY_EXEC_OUTCOME: delegate-in-host` invoke the matching
+  `.codex/agents/<name>.toml` agent in-host. Never invoke a `.toml` agent without that
+  delegation outcome; this skill must not resolve or assume the provider itself.
+  `review-fix-lead` keeps its typed-pipeline route (`cargo make track-local-review-fix`), which
+  resolves the provider internally.
 
-### (4) Reporting format
+### (4) Autonomy boundary (Phase 0 user approval)
+
+- The workflow SSoT's fully-autonomous constraint carries one mandated exception per
+  `knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権: when the
+  Phase 0 ADR-baseline review reaches `zero_findings`, STOP and escalate to the user with the
+  init-stamp diff and any guardian-withheld proposals for approval. Only after the user
+  approves may the post-approval stamp and the ADR-baseline commit proceed. No other step
+  pauses for user confirmation.
+
+### (5) Reporting format
 
 - On successful completion (only when the final `$track-pr-review` step reaches its
   zero-findings terminal state per `.harness/workflows/track/adr2pr.md`), print:

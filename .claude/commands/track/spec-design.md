@@ -10,13 +10,21 @@ User invokes this command as `/track:spec-design`. No arguments.
 
 ## Claude Code invocation constraints
 
-Invoke the spec-designer via the Agent tool (`subagent_type: "spec-designer"`, `run_in_background: true`). Briefing must include:
+Write a briefing to `tmp/spec-designer-briefing.md` containing:
 
 - Track id and `track/items/<track-id>/metadata.json` path
 - Paths to the referenced ADR(s) under `knowledge/adr/`
 - Paths to the related conventions under `knowledge/conventions/`
 
-The subagent owns: writing `spec.json`, rendering `spec.md`, and evaluating the spec → ADR signal (🔵🟡🔴). No direct CLI calls from this adapter body.
+Then run `bin/sotp capability exec spec-designer --host claude --briefing-file tmp/spec-designer-briefing.md`.
+The dispatcher resolves `capabilities.spec-designer` internally from
+`.harness/config/agent-profiles.json` and either completes the provider dispatch or returns
+`CAPABILITY_EXEC_OUTCOME: delegate-in-host`; only on that outcome invoke the Agent tool
+(`subagent_type: "spec-designer"`, `run_in_background: true`) with the briefing path and
+discipline body as the task prompt. Never invoke the Agent-tool subagent without that
+delegation outcome; this adapter must not resolve or assume the provider itself.
+
+The capability owns: writing `spec.json`, rendering `spec.md`, and evaluating the spec → ADR signal (🔵🟡🔴).
 
 ## Report format
 

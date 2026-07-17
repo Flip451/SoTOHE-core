@@ -24,11 +24,14 @@ or failure-recovery procedures here.
 
 ### (3) Sub-workflow and capability invocation
 
-- Implementation work is delegated to the `implementer` capability per the routing in
-  `.harness/config/agent-profiles.json` (default: Claude main-session / ad-hoc delegation
-  per `.claude/agents/README.md`).
-- The DRY fix phase is delegated to the `dry-fix-lead` capability via
-  `$dry-fix-lead` (`.codex/agents/dry-fix-lead.toml`).
+- Implementation work is delegated to `$track-implement` (which owns task-state transitions,
+  the test-obligation gate, and CI validation per the implement workflow SSoT, and dispatches
+  the `implementer` capability with profile-resolved provider routing internally). Do not
+  dispatch the `implementer` capability directly from this skill.
+- The DRY fix phase is delegated to `$track-dry-check` (which owns the opt-out pre-check and
+  terminal-state verification per the dry-check workflow SSoT, and routes `dry-fix-lead`
+  through its provider-resolving wrapper internally). Do not invoke the wrapper or
+  `$dry-fix-lead` directly from this skill.
 - The review loop is delegated to `$track-review`.
 - Commit creation is delegated to `$track-commit`.
 

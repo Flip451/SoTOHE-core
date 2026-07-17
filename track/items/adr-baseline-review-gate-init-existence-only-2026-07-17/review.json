@@ -1,0 +1,298 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad717405f955d95e811c7b9090d60d311f2ce0148f43c1d9e56dbe9cc989e258",
+          "at": "2026-07-17T12:37:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "[P1] amendment proposal: review gate の D1 から承認記録規則を分離するか、freeze ADR D6 の supersession を明記してください。ここでは escalation reason に承認の旨と承認 ref を記録すると決めていますが、引用元 ADR の D6 は reason を変更理由に限定し、承認記録とは重複させず front-matter refs が担うと定めています。「check 一箇所の縮小だけ」という narrative のままでは、下流 spec がどちらの reason semantics を実装すべきか決定できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+              "line": 29,
+              "category": "scope leakage into ADR body"
+            }
+          ],
+          "hash": "rvw1:sha256:ad717405f955d95e811c7b9090d60d311f2ce0148f43c1d9e56dbe9cc989e258",
+          "at": "2026-07-17T12:41:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56a9cb4bd73de514cd2fdedcadf47920f1be6dc31934ea8b67dec44e18a24add",
+          "at": "2026-07-17T12:52:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56a9cb4bd73de514cd2fdedcadf47920f1be6dc31934ea8b67dec44e18a24add",
+          "at": "2026-07-17T12:55:03Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:654731a8e3004a5184c628027913ef5b88c8421993d6d471e9c6e6eeb1294fa8",
+          "at": "2026-07-17T12:37:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "edit-judgment モードでも `recommended_next_action` だけを含む出力を要求していますが、Capability SSoT は `verdict` / `reason` と、`decision-breaking` 時の `alternative` または `no_change_rationale` を要求します。このままでは Codex adapter が無効な guardian verdict を返すため、モード別契約を参照する記述へ更新してください。",
+              "severity": "P1",
+              "file": ".agents/skills/adr-diagnoser/SKILL.md",
+              "line": 17,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "`spec-design` workflow SSoT は single-shot で、赤信号後の adr-editor escalation を caller (`plan`) の責務としています。この skill が escalation を直接 dispatch すると retry/state ownership が二重化するため、赤信号は caller へ返すだけにしてください。",
+              "severity": "P1",
+              "file": ".agents/skills/track-spec-design/SKILL.md",
+              "line": 31,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "`type-design` workflow SSoT は single-shot で、spec-designer / adr-editor への escalation は caller の責務です。この adapter が直接 dispatch すると plan 側の独立 retry counter と状態遷移を迂回するため、signal detail の返却だけに限定してください。",
+              "severity": "P1",
+              "file": ".agents/skills/track-type-design/SKILL.md",
+              "line": 31,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "`impl-plan` workflow SSoT は task-coverage ERROR 後の再実行を caller (`plan`) の責務としています。skill 内で `--resume` 再 dispatch すると plan の `max_retry` 管理外でループするため、この再実行指示を caller 側へ戻してください。",
+              "severity": "P1",
+              "file": ".agents/skills/track-impl-plan/SKILL.md",
+              "line": 31,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "`pre-track` は `pre-merge` と同義ではありません。既に merge target に入った ADR も新しい track の前段で選択できますが、この規則はその既存 ADR の大きな決定変更まで直接編集可能にします。これは `knowledge/conventions/adr.md` の post-merge ADR 不変規則と矛盾するため、effective merge-target 上の lifecycle 判定を追加し、post-merge の semantic change は新 ADR に限定してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 18,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "手順2は reviewer が finding を維持した未解消対立を手順3へ送る一方、手順3は全 required scope の `zero_findings` を前提とします。維持された finding がある限り `review-protocol.md` 上 zero_findings には到達できず、user 裁定点が到達不能になります。zero_findings 前の明示的な裁定経路か、所見を正当に disposition する手順が必要です。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 43,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "全 scope が zero_findings になった後で、user が差し止め proposal を採用すると ADR を再編集し、そのまま刻印・commit へ進みます。この編集は承認済み review hash を stale にし、`review-protocol.md` の「修正後は confirmation round 必須」にも反します。proposal 適用後に guardian 判定と review を再実行して再収束する back-edge を定義してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 44,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:654731a8e3004a5184c628027913ef5b88c8421993d6d471e9c6e6eeb1294fa8",
+          "at": "2026-07-17T12:47:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc0018af13d4e714a7e3059521e9d45592e56d93bad3d7ca0ac5ec675e843933",
+          "at": "2026-07-17T13:02:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Codex plan adapter leaves the Phase 1 red-signal path without an owner. `track-spec-design` now explicitly returns red findings to `$track-plan`, and the plan SSoT requires the caller to dispatch `adr-editor`; however, this adapter only says to re-invoke an upstream phase skill and never routes `adr-editor` through `bin/sotp capability exec ... --host codex`. A red result can therefore retry an unchanged spec until `max_retry`. Add the profile-routed `adr-editor` dispatch and delegate-in-host condition before re-running spec-design.",
+              "severity": "P1",
+              "file": ".agents/skills/track-plan/SKILL.md",
+              "line": 34,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "The new post-merge immutability rule is not propagated through this convention. Later rules auto-edit any ADR with commit history and allow decision-preserving semantic refinements during Phase 0/1+ without checking effective merge status. Thus a reused ADR already on the merge target may be edited in place, contradicting `knowledge/conventions/adr.md` §Lifecycle, which permits only typo/reference/back-reference edits post-merge and requires a new ADR for semantic refinement. Gate all in-track edit lanes on effective merge status or route post-merge refinements to a new ADR.",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 18,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bc0018af13d4e714a7e3059521e9d45592e56d93bad3d7ca0ac5ec675e843933",
+          "at": "2026-07-17T13:11:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c506d7f809f56043e23841c208b276d7f6ffe738bbd2a4c4c656d9159b4d6e63",
+          "at": "2026-07-17T13:19:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Post-merge 不変則を guardian が実行できません。edit-judgment briefing には effective merge target／pre-merge 判定がなく、`decision-preserved` は常に既存 ADR へ採用されます。一方、convention は merge 済み ADR への decision-preserving refinement も禁止し、新 ADR 起草へ送るよう要求しています。lifecycle 判定を入力に加え、post-merge では新 ADR へ routing してください。",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 62,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "Phase 0 の user 裁定で decision-breaking な変更を採用できません。guardian は Phase 0 中ずっと init record を比較基準とし、decision-breaking edit を必ず revert しますが、convention は未解消対立を user が裁定して変更を適用後、同じ guardian を再度通すよう定めています。その変更は再び init record に対して breaking と判定され、fresh review に戻れません。user 承認文面を新しい比較基準にする明示的な rebase／override 経路が必要です。",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 37,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "ここでは ADR の存在・可読性を運用上の「承認」と定義していますが、同じ convention の Phase 0 は zero_findings 後の明示的 user 承認を刻印・commit の必須条件としています。存在確認だけで承認済みと解釈すると新しい裁定点を迂回できます。存在は `/track:plan` の開始条件にすぎず、Phase 0 承認の代替ではないことを明記してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 17,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:c506d7f809f56043e23841c208b276d7f6ffe738bbd2a4c4c656d9159b4d6e63",
+          "at": "2026-07-17T13:29:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The full-cycle SSoT requires invoking the `implement` and `dry-check` sub-workflows, but this adapter dispatches their inner capability/wrapper directly. That bypasses implement’s task-state, obligation, and full-CI orchestration and dry-check’s opt-out precheck and terminal verification. Delegate through `$track-implement` and `$track-dry-check`; keep provider routing in those adapters.",
+              "severity": "P1",
+              "file": ".agents/skills/track-full-cycle/SKILL.md",
+              "line": 27,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "The table restricts `decision-preserved` to pre-merge ADRs, although the preceding rule and `knowledge/conventions/adr.md` explicitly allow post-merge typo, reference-path, and back-reference edits. Such an edit fits neither verdict despite the contract requiring exactly one. Permit `decision-preserved` for these allowed non-semantic post-merge edits or define an equivalent valid verdict.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 79,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fdc07091cfcf9278b5684999c15c1170e52825dda1a2039c84abc44c52ba0f7b",
+          "at": "2026-07-17T13:40:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "出力契約内で、`decision-breaking` 時に `alternative` / `no_change_rationale` のどちらか1つを必須と明記している一方、JSON例では `alternative` を「任意採用」と記載しており、両フィールドを省略した不正な verdict を許す矛盾があります。必須制約と一致する表現に修正してください。",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 126,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9eb98a1f2b2295f481d150b483b9faf15e7a5b7f1b637b58c9d7181fc5dc28b0",
+          "at": "2026-07-17T13:44:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 0 の `zero_findings` 後には user 承認エスカレーションが必須ですが、この adapter は「fully autonomous」「no user confirmation is required for any step」と定義しており、`knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権の承認境界と矛盾します。Phase 0 の user 承認を明示的な例外として扱う必要があります。",
+              "severity": "P1",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 44,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2dfd253d5ffc48ae44b6d626e7702e4de3f0f3f658812fa90d8b5a13c5c2904d",
+          "at": "2026-07-17T13:45:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa2d223d3a59837346f453602d88cd5e8530a774dfeea0800ac6481bae9ad48a",
+          "at": "2026-07-17T13:50:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The post-merge handoff has no valid writer. Post-merge semantic proposals must be returned as new-ADR drafts, but this rule says an adopted `alternative` is applied by `adr-editor`. That capability only edits existing ADRs and explicitly refuses new ADR creation, which the convention assigns to the pre-track user/main path. Split the handoff: existing pre-merge edit alternatives may go to `adr-editor`; new-ADR drafts must go through the new-ADR authoring and approval path.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 84,
+              "category": "responsibility-boundary cross"
+            },
+            {
+              "message": "Mismatch classification can bypass the new post-merge immutability rule. Edit judgment permits only typo, reference-path, or back-reference corrections after merge, while `non-semantic-restamp` still permits any formatting-only change and its briefing supplies no lifecycle judgment. A post-merge formatting diff can therefore be restamped through mismatch mode even though `knowledge/conventions/adr.md` limits post-merge edits to the three enumerated cases. Apply the lifecycle restriction in mismatch mode or reconcile the allowed edit set explicitly.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 96,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:aa2d223d3a59837346f453602d88cd5e8530a774dfeea0800ac6481bae9ad48a",
+          "at": "2026-07-17T14:02:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c377f209d2c21fe0bcf51d886e1d1b89e61f560c00e83288a34853891391f7c",
+          "at": "2026-07-17T14:13:32Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e55b55dc683dc150b7be6285db95deaaf9d46b3c83dad809da07121d59a6c8d",
+          "at": "2026-07-17T12:37:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e55b55dc683dc150b7be6285db95deaaf9d46b3c83dad809da07121d59a6c8d",
+          "at": "2026-07-17T12:40:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad4d148edc8d0b1b22e3088fc0907fcb7fea14a5f5dbcd950cd70edc2678841b",
+          "at": "2026-07-17T14:15:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ad4d148edc8d0b1b22e3088fc0907fcb7fea14a5f5dbcd950cd70edc2678841b",
+          "at": "2026-07-17T14:18:38Z"
+        }
+      ]
+    }
+  }
+}
