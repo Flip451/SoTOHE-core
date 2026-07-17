@@ -253,6 +253,10 @@ fn test_exported_environment_overlays_are_symmetric_and_personal_environment_fre
     assert!(host.contains("command = \"cargo\"") && !host.contains("docker compose"));
     assert!(docker.contains("docker") && docker.contains("CARGO_TARGET_DIR_RELATIVE"));
     assert!(common.contains("CODEX_BIN=\"${CODEX_BIN:-$(command -v codex)}\""));
+    assert!(
+        common.contains("bin/sotp test-obligation check"),
+        "the guarded commit chain must keep the test-obligation gate"
+    );
     for content in [&common, &host, &docker] {
         assert!(!content.contains("asdf"));
         assert!(!content.contains("WORKER_ID"));

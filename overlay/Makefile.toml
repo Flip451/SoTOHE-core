@@ -324,7 +324,7 @@ script_runner = "@shell"
 script = ['case "${1:-}" in --) shift ;; esac; CODEX_BIN="${CODEX_BIN:-$(command -v codex)}" bin/sotp dry fix-local "$@"']
 
 [tasks.track-commit-message]
-description = "[wrapper] Refresh active-track artifacts, run CI and approval gates, then commit from tmp/track-commit/commit-message.txt"
+description = "[wrapper] Refresh active-track artifacts, run CI and approval gates (review, semantic refs, test-obligation, DRY), then commit from tmp/track-commit/commit-message.txt"
 dependencies = ["track-active-gate"]
 script_runner = "@shell"
 script = ['''
@@ -335,6 +335,7 @@ bin/sotp review check-approved && \
 bin/sotp ref-verify run && \
 bin/sotp git add-all && \
 bin/sotp ref-verify check-approved && \
+bin/sotp test-obligation check && \
 bin/sotp dry check-approved && \
 bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup && \
 bin/sotp track set-commit-hash

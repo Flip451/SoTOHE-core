@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
-          "at": "2026-07-16T16:47:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
-          "at": "2026-07-16T16:51:00Z"
-        }
-      ]
-    },
     "adr": {
       "rounds": [
         {
@@ -49,6 +31,296 @@
           "findings": [],
           "hash": "rvw1:sha256:6dc29625f9136f6988c8ea10b486d23725f81250720f7dc1d30cf7a6e00bbfda",
           "at": "2026-07-16T16:17:46Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89233c04555750fcfbdbecb1d373df2c26aa7f0a5679ac48aa29c3d70a8d6513",
+          "at": "2026-07-16T18:32:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89233c04555750fcfbdbecb1d373df2c26aa7f0a5679ac48aa29c3d70a8d6513",
+          "at": "2026-07-16T23:40:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29460a92b98060187f5301ce9a89dc0b95af542f69167eab84c5a5ddc6d10ebd",
+          "at": "2026-07-16T23:59:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29460a92b98060187f5301ce9a89dc0b95af542f69167eab84c5a5ddc6d10ebd",
+          "at": "2026-07-17T00:01:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f76fee48b92e92da058a1f55182a75edddc2bc008a3a898799dd2c6751514216",
+          "at": "2026-07-17T00:20:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f76fee48b92e92da058a1f55182a75edddc2bc008a3a898799dd2c6751514216",
+          "at": "2026-07-17T00:22:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c1920c94c5c5a912834e7543d2978c2d7c95540fedb0e9b6a3500f3dc0f16f37",
+          "at": "2026-07-17T01:52:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c1920c94c5c5a912834e7543d2978c2d7c95540fedb0e9b6a3500f3dc0f16f37",
+          "at": "2026-07-17T01:54:36Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:037db866a474470a47ae88e01ca366b70fad204f8a1956d479b4afb895056eeb",
+          "at": "2026-07-16T16:09:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:037db866a474470a47ae88e01ca366b70fad204f8a1956d479b4afb895056eeb",
+          "at": "2026-07-16T16:11:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2fc9981908f237b1ca7e275c9df1265c3591ce5bac388e8eb90742aadaf290d",
+          "at": "2026-07-16T17:30:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Bash(bin/sotp git:*)` also permits `bin/sotp git commit-from-file`, which creates a commit after only branch validation and bypasses the CI, review, test-obligation, and DRY gates enforced by `cargo make track-commit-message`. This is equivalent to the dangerous commit permission identified in `.claude/rules/10-guardrails.md` §Dangerous to allow. Replace the family wildcard with explicit allows for intended add/sync/note operations, excluding `commit-from-file`.",
+              "severity": "P1",
+              "file": ".claude/settings.json",
+              "line": 123,
+              "category": "permission_posture_drift"
+            },
+            {
+              "message": "The rewritten command passes `$ARGUMENTS` positionally to `bin/sotp pr ensure-pr`, but that CLI accepts no positional track ID; moreover, `pr push` receives no ID and PR resolution rejects `plan/` branches. Consequently the documented `/track:pr <id>` plan-branch path fails. Restrict this command to `track/<id>` branches or provide a supported plan-branch flow.",
+              "severity": "P1",
+              "file": ".claude/commands/track/pr.md",
+              "line": 12,
+              "category": "command_wiring_breakage"
+            },
+            {
+              "message": "The workflow recommends `/track:full-cycle <task>`, while `.claude/commands/track/full-cycle.md` explicitly declares that the command takes no arguments. Update this SSoT recommendation and its mirrored Claude adapter to `/track:full-cycle`.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/done.md",
+              "line": 56,
+              "category": "command_wiring_breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:a2fc9981908f237b1ca7e275c9df1265c3591ce5bac388e8eb90742aadaf290d",
+          "at": "2026-07-16T17:38:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow SSoT now correctly recommends `/track:full-cycle` without arguments, but this Claude adapter still recommends `/track:full-cycle <task>`. Since `.claude/commands/track/full-cycle.md` explicitly accepts no arguments, remove `<task>` to restore adapter/SSoT consistency.",
+              "severity": "P1",
+              "file": ".claude/commands/track/done.md",
+              "line": 24,
+              "category": "command_wiring_breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:abceea1a6aba77a398868e24ee999a5a389ce7eaf2f4291bdcf23db24a67a2b3",
+          "at": "2026-07-16T17:42:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:141c1aea472a3a683640f2f85d755e799b7b1c58c9dd878fb8d0675f72207f21",
+          "at": "2026-07-16T17:45:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5fc934fe3fee565ef1c8771f479547bc8502d46de74c9e68374336a5d16f6b7",
+          "at": "2026-07-16T18:02:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "「以下のコマンドは source/export の両方で動く」とありますが、export 側の task 一覧には `fmt` と `help` がありません。実際に `cargo make --makefile overlay/Makefile.toml help` は `Task \"help\" not found` で失敗し、fresh scaffold では本表の `cargo make fmt` と `cargo make help`（CLAUDE.md の quick command も含む）が利用不能です。overlay 側に両 task を追加するか、共通コマンドとして案内しないでください。",
+              "severity": "P1",
+              "file": ".claude/rules/07-dev-environment.md",
+              "line": 23,
+              "category": "command_wiring_breakage"
+            },
+            {
+              "message": "ここでは Git write enforcement を `reference-transaction` / `pre-push` による process-level enforcement としていますが、同ファイル後半の表と説明は `workspace-write` subprocess では hooks が発火せず、直接 commit/push が guard を迂回すると記載しています。設定済みの Git hooks は外部 subprocess の commit/push にも発火するため、Claude の PreToolUse hook と repository Git hooks を区別し、未保護の `git add`/通常ファイル書き込みと保護される ref update/push を正確に記述してください。",
+              "severity": "P1",
+              "file": ".claude/rules/10-guardrails.md",
+              "line": 68,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "MSRV 1.85 という規約が現在の toolchain contract と同期していません。source と overlay の Cargo.toml はどちらも `rust-version = \"1.91\"`、配布 toolchain は 1.94.0 のため、1.85 では Cargo 自体がビルドを拒否します。MSRV を少なくとも manifest の 1.91 に更新してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/nightly-dev-tool.md",
+              "line": 14,
+              "category": "convention_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e5fc934fe3fee565ef1c8771f479547bc8502d46de74c9e68374336a5d16f6b7",
+          "at": "2026-07-16T18:11:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "リモート共有手順の直接 `git push` は、bootstrap が設定する `.githooks/pre-push` により guarded token がないため拒否されます。また `bin/sotp pr push` は現在の track branch 専用で、notes refspec を受け取る guarded wrapper もありません。このままでは記載された notes 共有フローを実行できないため、notes push 用の guarded 経路を用意して案内してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/git-notes.md",
+              "line": 52,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "`cargo audit` は別途 `cargo-audit` の導入が必要ですが、source/overlay の bootstrap、Dockerfile、前提条件のいずれも導入しておらず、fresh checkout では `no such command: audit` になります。host-first の共通コマンド契約に合わせ、既に導入される `cargo make deny` に一本化するか、`cargo-audit` を明示的に pin・導入してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/security.md",
+              "line": 148,
+              "category": "convention_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b757e4bde87c572db78a990aa96632195c79c01dcc02bbb14d70b8f9e294cec1",
+          "at": "2026-07-16T18:16:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5735d6935f6510c11b59c99e5d621ccbee48c75a3ad948e602d1ed02bdf62995",
+          "at": "2026-07-16T18:19:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:626a3b6e7b87f6d65ac9326fb52572354be319dffd67ec628c44545612f83a1b",
+          "at": "2026-07-17T00:20:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:626a3b6e7b87f6d65ac9326fb52572354be319dffd67ec628c44545612f83a1b",
+          "at": "2026-07-17T00:24:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1be86ef02e5bc02af2c89dc007b98efa50caf165e881c158a17ef11e5fd352b",
+          "at": "2026-07-17T00:37:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1be86ef02e5bc02af2c89dc007b98efa50caf165e881c158a17ef11e5fd352b",
+          "at": "2026-07-17T00:41:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca1635a0ec2b668005a23b8b465e94c37cd9e9f0511edf6632507aa4213dcb63",
+          "at": "2026-07-17T00:53:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca1635a0ec2b668005a23b8b465e94c37cd9e9f0511edf6632507aa4213dcb63",
+          "at": "2026-07-17T00:56:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e66203764946c6de29b8e2f8656adb31dac5991d0035ae757b62f5d90562222a",
+          "at": "2026-07-17T01:27:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new command summary is broader than the Command Policy it cites. `cargo make ci-track` is neither listed in `.codex/instructions.md` nor allowed by `.codex/rules/default.rules`, while the namespace-wide `bin/sotp git` / `pr` / `track` wording includes many subcommands beyond the specifically allowed prefixes. This leaves the root agent instructed to use commands outside its declared Codex policy. Use the exact permitted command forms or defer entirely to the linked Command Policy.",
+              "severity": "P1",
+              "file": ".codex/agents/orchestrator.toml",
+              "line": 16,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:e66203764946c6de29b8e2f8656adb31dac5991d0035ae757b62f5d90562222a",
+          "at": "2026-07-17T01:31:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b39ba4a8c209ff3965d8bf369bacc6349038912d0f4d19ae89ba7e09a361f8f",
+          "at": "2026-07-17T01:37:52Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
+          "at": "2026-07-16T16:47:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:69cb922c51f164a55c5c9e01a1bbf7fb9908f99632408b6b62531d0dfccc667f",
+          "at": "2026-07-16T16:51:00Z"
         }
       ]
     },
@@ -284,218 +556,6 @@
         }
       ]
     },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:037db866a474470a47ae88e01ca366b70fad204f8a1956d479b4afb895056eeb",
-          "at": "2026-07-16T16:09:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:037db866a474470a47ae88e01ca366b70fad204f8a1956d479b4afb895056eeb",
-          "at": "2026-07-16T16:11:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2fc9981908f237b1ca7e275c9df1265c3591ce5bac388e8eb90742aadaf290d",
-          "at": "2026-07-16T17:30:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`Bash(bin/sotp git:*)` also permits `bin/sotp git commit-from-file`, which creates a commit after only branch validation and bypasses the CI, review, test-obligation, and DRY gates enforced by `cargo make track-commit-message`. This is equivalent to the dangerous commit permission identified in `.claude/rules/10-guardrails.md` §Dangerous to allow. Replace the family wildcard with explicit allows for intended add/sync/note operations, excluding `commit-from-file`.",
-              "severity": "P1",
-              "file": ".claude/settings.json",
-              "line": 123,
-              "category": "permission_posture_drift"
-            },
-            {
-              "message": "The rewritten command passes `$ARGUMENTS` positionally to `bin/sotp pr ensure-pr`, but that CLI accepts no positional track ID; moreover, `pr push` receives no ID and PR resolution rejects `plan/` branches. Consequently the documented `/track:pr <id>` plan-branch path fails. Restrict this command to `track/<id>` branches or provide a supported plan-branch flow.",
-              "severity": "P1",
-              "file": ".claude/commands/track/pr.md",
-              "line": 12,
-              "category": "command_wiring_breakage"
-            },
-            {
-              "message": "The workflow recommends `/track:full-cycle <task>`, while `.claude/commands/track/full-cycle.md` explicitly declares that the command takes no arguments. Update this SSoT recommendation and its mirrored Claude adapter to `/track:full-cycle`.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/done.md",
-              "line": 56,
-              "category": "command_wiring_breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:a2fc9981908f237b1ca7e275c9df1265c3591ce5bac388e8eb90742aadaf290d",
-          "at": "2026-07-16T17:38:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The workflow SSoT now correctly recommends `/track:full-cycle` without arguments, but this Claude adapter still recommends `/track:full-cycle <task>`. Since `.claude/commands/track/full-cycle.md` explicitly accepts no arguments, remove `<task>` to restore adapter/SSoT consistency.",
-              "severity": "P1",
-              "file": ".claude/commands/track/done.md",
-              "line": 24,
-              "category": "command_wiring_breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:abceea1a6aba77a398868e24ee999a5a389ce7eaf2f4291bdcf23db24a67a2b3",
-          "at": "2026-07-16T17:42:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:141c1aea472a3a683640f2f85d755e799b7b1c58c9dd878fb8d0675f72207f21",
-          "at": "2026-07-16T17:45:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e5fc934fe3fee565ef1c8771f479547bc8502d46de74c9e68374336a5d16f6b7",
-          "at": "2026-07-16T18:02:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "「以下のコマンドは source/export の両方で動く」とありますが、export 側の task 一覧には `fmt` と `help` がありません。実際に `cargo make --makefile overlay/Makefile.toml help` は `Task \"help\" not found` で失敗し、fresh scaffold では本表の `cargo make fmt` と `cargo make help`（CLAUDE.md の quick command も含む）が利用不能です。overlay 側に両 task を追加するか、共通コマンドとして案内しないでください。",
-              "severity": "P1",
-              "file": ".claude/rules/07-dev-environment.md",
-              "line": 23,
-              "category": "command_wiring_breakage"
-            },
-            {
-              "message": "ここでは Git write enforcement を `reference-transaction` / `pre-push` による process-level enforcement としていますが、同ファイル後半の表と説明は `workspace-write` subprocess では hooks が発火せず、直接 commit/push が guard を迂回すると記載しています。設定済みの Git hooks は外部 subprocess の commit/push にも発火するため、Claude の PreToolUse hook と repository Git hooks を区別し、未保護の `git add`/通常ファイル書き込みと保護される ref update/push を正確に記述してください。",
-              "severity": "P1",
-              "file": ".claude/rules/10-guardrails.md",
-              "line": 68,
-              "category": "convention_contradiction"
-            },
-            {
-              "message": "MSRV 1.85 という規約が現在の toolchain contract と同期していません。source と overlay の Cargo.toml はどちらも `rust-version = \"1.91\"`、配布 toolchain は 1.94.0 のため、1.85 では Cargo 自体がビルドを拒否します。MSRV を少なくとも manifest の 1.91 に更新してください。",
-              "severity": "P1",
-              "file": "knowledge/conventions/nightly-dev-tool.md",
-              "line": 14,
-              "category": "convention_contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:e5fc934fe3fee565ef1c8771f479547bc8502d46de74c9e68374336a5d16f6b7",
-          "at": "2026-07-16T18:11:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "リモート共有手順の直接 `git push` は、bootstrap が設定する `.githooks/pre-push` により guarded token がないため拒否されます。また `bin/sotp pr push` は現在の track branch 専用で、notes refspec を受け取る guarded wrapper もありません。このままでは記載された notes 共有フローを実行できないため、notes push 用の guarded 経路を用意して案内してください。",
-              "severity": "P1",
-              "file": "knowledge/conventions/git-notes.md",
-              "line": 52,
-              "category": "convention_contradiction"
-            },
-            {
-              "message": "`cargo audit` は別途 `cargo-audit` の導入が必要ですが、source/overlay の bootstrap、Dockerfile、前提条件のいずれも導入しておらず、fresh checkout では `no such command: audit` になります。host-first の共通コマンド契約に合わせ、既に導入される `cargo make deny` に一本化するか、`cargo-audit` を明示的に pin・導入してください。",
-              "severity": "P1",
-              "file": "knowledge/conventions/security.md",
-              "line": 148,
-              "category": "convention_contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b757e4bde87c572db78a990aa96632195c79c01dcc02bbb14d70b8f9e294cec1",
-          "at": "2026-07-16T18:16:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5735d6935f6510c11b59c99e5d621ccbee48c75a3ad948e602d1ed02bdf62995",
-          "at": "2026-07-16T18:19:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:626a3b6e7b87f6d65ac9326fb52572354be319dffd67ec628c44545612f83a1b",
-          "at": "2026-07-17T00:20:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:626a3b6e7b87f6d65ac9326fb52572354be319dffd67ec628c44545612f83a1b",
-          "at": "2026-07-17T00:24:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e1be86ef02e5bc02af2c89dc007b98efa50caf165e881c158a17ef11e5fd352b",
-          "at": "2026-07-17T00:37:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e1be86ef02e5bc02af2c89dc007b98efa50caf165e881c158a17ef11e5fd352b",
-          "at": "2026-07-17T00:41:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca1635a0ec2b668005a23b8b465e94c37cd9e9f0511edf6632507aa4213dcb63",
-          "at": "2026-07-17T00:53:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca1635a0ec2b668005a23b8b465e94c37cd9e9f0511edf6632507aa4213dcb63",
-          "at": "2026-07-17T00:56:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e66203764946c6de29b8e2f8656adb31dac5991d0035ae757b62f5d90562222a",
-          "at": "2026-07-17T01:27:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new command summary is broader than the Command Policy it cites. `cargo make ci-track` is neither listed in `.codex/instructions.md` nor allowed by `.codex/rules/default.rules`, while the namespace-wide `bin/sotp git` / `pr` / `track` wording includes many subcommands beyond the specifically allowed prefixes. This leaves the root agent instructed to use commands outside its declared Codex policy. Use the exact permitted command forms or defer entirely to the linked Command Policy.",
-              "severity": "P1",
-              "file": ".codex/agents/orchestrator.toml",
-              "line": 16,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:e66203764946c6de29b8e2f8656adb31dac5991d0035ae757b62f5d90562222a",
-          "at": "2026-07-17T01:31:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2b39ba4a8c209ff3965d8bf369bacc6349038912d0f4d19ae89ba7e09a361f8f",
-          "at": "2026-07-17T01:37:52Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -605,52 +665,20 @@
           "findings": [],
           "hash": "rvw1:sha256:a266f2f44c9d2c63c1df93df3edacc3fa4f76dee893872abdfd7b5138f6cc083",
           "at": "2026-07-17T01:11:06Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:89233c04555750fcfbdbecb1d373df2c26aa7f0a5679ac48aa29c3d70a8d6513",
-          "at": "2026-07-16T18:32:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:89233c04555750fcfbdbecb1d373df2c26aa7f0a5679ac48aa29c3d70a8d6513",
-          "at": "2026-07-16T23:40:14Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:29460a92b98060187f5301ce9a89dc0b95af542f69167eab84c5a5ddc6d10ebd",
-          "at": "2026-07-16T23:59:28Z"
+          "hash": "rvw1:sha256:af48700234203a0b99eb9053f80e2c911eb8774db9d14d2390fafa14f62c48da",
+          "at": "2026-07-17T01:52:48Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:29460a92b98060187f5301ce9a89dc0b95af542f69167eab84c5a5ddc6d10ebd",
-          "at": "2026-07-17T00:01:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f76fee48b92e92da058a1f55182a75edddc2bc008a3a898799dd2c6751514216",
-          "at": "2026-07-17T00:20:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f76fee48b92e92da058a1f55182a75edddc2bc008a3a898799dd2c6751514216",
-          "at": "2026-07-17T00:22:27Z"
+          "hash": "rvw1:sha256:af48700234203a0b99eb9053f80e2c911eb8774db9d14d2390fafa14f62c48da",
+          "at": "2026-07-17T01:54:24Z"
         }
       ]
     },
