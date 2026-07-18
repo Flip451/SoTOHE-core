@@ -1,225 +1,21 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cc221f6599a16c2027d1c34dd526522ecf4f90679d5fe71e231d023442cb7e5a",
-          "at": "2026-07-18T05:37:31Z"
+          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
+          "at": "2026-07-18T09:37:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cc221f6599a16c2027d1c34dd526522ecf4f90679d5fe71e231d023442cb7e5a",
-          "at": "2026-07-18T05:40:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5c5869091b45fd6d626f1ab9d30e35e765b27529be2b260e698a9e633c821bae",
-          "at": "2026-07-18T09:36:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5c5869091b45fd6d626f1ab9d30e35e765b27529be2b260e698a9e633c821bae",
-          "at": "2026-07-18T09:39:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bf35d50165f64b3a58b0aba34a5f24b4a8d546836b834dcd9d2036ceb2d96126",
-          "at": "2026-07-18T10:31:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bf35d50165f64b3a58b0aba34a5f24b4a8d546836b834dcd9d2036ceb2d96126",
-          "at": "2026-07-18T10:32:38Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71b3db4a1c44e54048039ed353e5194fd13cb7262fce45a603ff95ae7025b4fa",
-          "at": "2026-07-18T09:37:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71b3db4a1c44e54048039ed353e5194fd13cb7262fce45a603ff95ae7025b4fa",
-          "at": "2026-07-18T09:39:32Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 description restates behavioral rationale: “so bootstrap callers receive actionable provisioning failures through the existing layered boundary.” Keep only target, operation, and anchor cite.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T002 description restates the resolver behavior contract, including link preference, PATH fallback, probing, logging, recovery guidance, and environment inheritance. Keep only target, operation, and anchor cite.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 12,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T003 description restates the provisioning behavior contract, including probe sequencing, npm fallback restrictions, atomic linking, and prohibited state changes. Keep only target, operation, and anchor cite.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 18,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T004 description restates upstream bootstrap constraints and behavior: generic Makefile wiring, removal of inline resolution, and the integrated regression contract. Keep only target, operation, and anchor cite.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 24,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S1 description restates the design rationale and behavior contract for typed errors, hexagonal direction, and Makefile-side resolution. Section descriptions should not restate upstream design prose.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 36,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S2 description restates the resolver behavior contract and enumerates its downstream execution paths. Section descriptions should not restate upstream design prose.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 47,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S3 description restates the symlink provisioning behavior and prohibited implementation details. Section descriptions should not restate upstream design prose.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 58,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S4 description restates bootstrap wiring and consumer-test behavior rather than limiting itself to plan organization. Section descriptions should not restate upstream design prose.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 69,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:f2e870740a7bffa7677262b1b4321d1658a4bf1ed73d37f7ca845c82c50da262",
-          "at": "2026-07-18T07:14:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `plan.summary` array is empty even though the upstream spec defines GO-01 and GO-02. Goal mappings are intentionally excluded from `task-coverage.json`, so `impl-plan.json#plan.summary` must provide goal-to-task traceability; currently neither goal is mapped.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 30,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:670acb76c8c048017706828334f79c96ca2d22a085caec51721e3571446b75d2",
-          "at": "2026-07-18T07:16:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fff3ccd32e5989988be2f163d350e58e44ed93c3419d950a607f434268632a48",
-          "at": "2026-07-18T07:17:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 は `CodexRuntimeCompositionRoot` を実装対象に含みますが、この root が配線する `FsCodexRuntimeProvisioner` は後続の T003 に帰属しています。一方、T003 は T001 が追加する `CodexRuntimeProvisionPort` に依存するため、現状は相互依存となり、どちらも個別にコンパイル可能な commit にできません。composition root とその task-contract attribution を T003、または T003 後の新規 task へ移してください。",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 6,
-              "category": "dependency cycle or wrong ordering"
-            }
-          ],
-          "hash": "rvw1:sha256:fff3ccd32e5989988be2f163d350e58e44ed93c3419d950a607f434268632a48",
-          "at": "2026-07-18T07:24:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9dfb00a73d310fc0d5845159a8f837c9e0643e16538a71bc264418ac2694ec7",
-          "at": "2026-07-18T07:28:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68c532657c656bd02ecf25a5152efb5649ce6f6e86c1c72dc91f4bf0735071d0",
-          "at": "2026-07-18T09:36:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68c532657c656bd02ecf25a5152efb5649ce6f6e86c1c72dc91f4bf0735071d0",
-          "at": "2026-07-18T09:41:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ac53a3c863ea58080c8c09dccca94582754649a64e5c0acd5d76a7eae332e054",
-          "at": "2026-07-18T10:37:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ac53a3c863ea58080c8c09dccca94582754649a64e5c0acd5d76a7eae332e054",
-          "at": "2026-07-18T10:40:01Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7dce0bdfa2de1b2fe2a78509d64d317899d7bc21848e8b685eec4a112cd00b11",
-          "at": "2026-07-18T05:37:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7dce0bdfa2de1b2fe2a78509d64d317899d7bc21848e8b685eec4a112cd00b11",
-          "at": "2026-07-18T05:43:17Z"
+          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
+          "at": "2026-07-18T09:41:57Z"
         }
       ]
     },
@@ -354,6 +150,70 @@
           "findings": [],
           "hash": "rvw1:sha256:97397f5c554974a93727d89340d79ea6cda3534ac779ea9cb92a6d5114b0102b",
           "at": "2026-07-18T10:20:34Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc221f6599a16c2027d1c34dd526522ecf4f90679d5fe71e231d023442cb7e5a",
+          "at": "2026-07-18T05:37:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc221f6599a16c2027d1c34dd526522ecf4f90679d5fe71e231d023442cb7e5a",
+          "at": "2026-07-18T05:40:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5c5869091b45fd6d626f1ab9d30e35e765b27529be2b260e698a9e633c821bae",
+          "at": "2026-07-18T09:36:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5c5869091b45fd6d626f1ab9d30e35e765b27529be2b260e698a9e633c821bae",
+          "at": "2026-07-18T09:39:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf35d50165f64b3a58b0aba34a5f24b4a8d546836b834dcd9d2036ceb2d96126",
+          "at": "2026-07-18T10:31:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf35d50165f64b3a58b0aba34a5f24b4a8d546836b834dcd9d2036ceb2d96126",
+          "at": "2026-07-18T10:32:38Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b254af5672d3ab0df682a6313c43290fd522aa1437a1470ebadefcc8c73cc10",
+          "at": "2026-07-18T09:37:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b254af5672d3ab0df682a6313c43290fd522aa1437a1470ebadefcc8c73cc10",
+          "at": "2026-07-18T09:39:39Z"
         }
       ]
     },
@@ -598,56 +458,134 @@
           "findings": [],
           "hash": "rvw1:sha256:95eb29a1f3e2f5620869f2b4ebb1c56a4b7ba4221d589f8094ffdef86a77382a",
           "at": "2026-07-18T12:46:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_dry_fix_last_message_tail` checks the path with `reject_symlinks_below`/`symlink_metadata`, then reopens it by pathname. An attacker can replace the regular file with a symlink between the check and `File::open`, causing the adapter to follow the symlink and read outside the intended runtime path. Use directory-handle-relative/openat-style operations (or equivalent no-follow semantics) for the final open.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/mod.rs",
+              "line": 238,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:6858153d15473877b53ef675fe0538b86529df19aea63f640de735f7729f5ce2",
+          "at": "2026-07-18T13:05:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:193944fb2e2f3f72910853a1067283282ab72a6cf526114df0017ecc5b0c10d8",
+          "at": "2026-07-18T13:08:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`O_NOFOLLOW` on this `openat(CWD, parent, ...)` rejects only a symlink in the final component. After `reject_symlinks_below` returns, the spawned fixer can replace an earlier component such as `tmp` with a symlink; this call follows it, and the subsequent dirfd-relative leaf open can read outside the intended runtime directory. Pin the trusted repository root and walk every parent component with dirfd-relative `openat(..., O_NOFOLLOW | O_DIRECTORY)`, as `prepare_runtime_dir` does.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/mod.rs",
+              "line": 233,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:193944fb2e2f3f72910853a1067283282ab72a6cf526114df0017ecc5b0c10d8",
+          "at": "2026-07-18T13:14:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The fixer can replace its output-last-message file with a FIFO before exiting. This blocking `openat(..., RDONLY)` then waits indefinitely for a writer, so the later `metadata().is_file()` rejection is never reached and `dry fix-local` hangs. Open the leaf with `NONBLOCK` (and preferably `CLOEXEC`) before validating its type, matching `capability_exec/process/runtime_dir.rs`, and add a FIFO regression test.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/mod.rs",
+              "line": 231,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:82b4c005d12d53dd3169e89f41d0e175f69c67d30f051b3738cba1f9d90c97e4",
+          "at": "2026-07-18T13:22:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`canonicalize` plus lexical `join` does not make the runtime directory safe: `create_dir_all` follows an existing symlink in `tmp` or `tmp/reviewer-runtime`, and the returned path is immediately opened by `std::fs::write` at mod.rs:156. Consequently, last-message initialization and the child output can occur outside `trusted_root` before the new safe read detects anything, contrary to the fail-closed symlink policy exercised by `scope_config_loader.rs`. Walk/create each runtime-directory component from a pinned root dirfd using `mkdirat`/`openat(..., NOFOLLOW)`, and create the leaf relative to that handle.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/spawn.rs",
+              "line": 39,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:38a70c9c76a378d30acd8f725d3ede1bb879c924b6cbca1cbcc96639271affd4",
+          "at": "2026-07-18T13:27:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The verified `log_file` dirfd is retained but discarded for the actual post-child write: `write_dry_fix_log(&log_path, ...)` reopens the pathname with `std::fs::write`. While running, the sandboxed fixer can replace the pre-created log leaf with a symlink to any file writable by the unsandboxed parent; this call then overwrites that file outside `trusted_root` with child-influenced output. Keep and write through the original leaf handle, or reopen via `log_file.parent`/`name` using `openat(..., NOFOLLOW)` and verify it remains a regular file.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/spawn.rs",
+              "line": 196,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:bfefac199ca77467ff45f547006ab6cf41ec65dfcaa9df7bc0cc36d3d68ccaba",
+          "at": "2026-07-18T13:34:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d2b387c7a79e9f50014dc502d40d41a5a6bada0dfffbdadea7f6bdb21576b7f",
+          "at": "2026-07-18T13:37:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d2b387c7a79e9f50014dc502d40d41a5a6bada0dfffbdadea7f6bdb21576b7f",
+          "at": "2026-07-18T13:39:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:323a88e3a25c0a1a8c71ff9261145511e76126317508ebfc367b567f657fb625",
+          "at": "2026-07-18T13:44:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:323a88e3a25c0a1a8c71ff9261145511e76126317508ebfc367b567f657fb625",
+          "at": "2026-07-18T13:46:47Z"
         }
       ]
     },
-    "cli": {
+    "cli_driver": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
-          "at": "2026-07-18T09:36:59Z"
+          "hash": "rvw1:sha256:71b3db4a1c44e54048039ed353e5194fd13cb7262fce45a603ff95ae7025b4fa",
+          "at": "2026-07-18T09:37:02Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
-          "at": "2026-07-18T09:41:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
-          "at": "2026-07-18T09:55:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
-          "at": "2026-07-18T10:10:43Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b254af5672d3ab0df682a6313c43290fd522aa1437a1470ebadefcc8c73cc10",
-          "at": "2026-07-18T09:37:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9b254af5672d3ab0df682a6313c43290fd522aa1437a1470ebadefcc8c73cc10",
-          "at": "2026-07-18T09:39:39Z"
+          "hash": "rvw1:sha256:71b3db4a1c44e54048039ed353e5194fd13cb7262fce45a603ff95ae7025b4fa",
+          "at": "2026-07-18T09:39:32Z"
         }
       ]
     },
@@ -731,6 +669,160 @@
           "findings": [],
           "hash": "rvw1:sha256:795be5aeae103d525722cddf17d1038aa20dd260c00326b70b5a03b4a705a522",
           "at": "2026-07-18T12:38:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbbf1237efefb402629683a29c2965315c776d878f2883d55685638bbe308568",
+          "at": "2026-07-18T13:05:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbbf1237efefb402629683a29c2965315c776d878f2883d55685638bbe308568",
+          "at": "2026-07-18T13:07:41Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description restates behavioral rationale: “so bootstrap callers receive actionable provisioning failures through the existing layered boundary.” Keep only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description restates the resolver behavior contract, including link preference, PATH fallback, probing, logging, recovery guidance, and environment inheritance. Keep only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description restates the provisioning behavior contract, including probe sequencing, npm fallback restrictions, atomic linking, and prohibited state changes. Keep only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 description restates upstream bootstrap constraints and behavior: generic Makefile wiring, removal of inline resolution, and the integrated regression contract. Keep only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 description restates the design rationale and behavior contract for typed errors, hexagonal direction, and Makefile-side resolution. Section descriptions should not restate upstream design prose.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 description restates the resolver behavior contract and enumerates its downstream execution paths. Section descriptions should not restate upstream design prose.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 47,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 description restates the symlink provisioning behavior and prohibited implementation details. Section descriptions should not restate upstream design prose.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 58,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S4 description restates bootstrap wiring and consumer-test behavior rather than limiting itself to plan organization. Section descriptions should not restate upstream design prose.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 69,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:f2e870740a7bffa7677262b1b4321d1658a4bf1ed73d37f7ca845c82c50da262",
+          "at": "2026-07-18T07:14:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `plan.summary` array is empty even though the upstream spec defines GO-01 and GO-02. Goal mappings are intentionally excluded from `task-coverage.json`, so `impl-plan.json#plan.summary` must provide goal-to-task traceability; currently neither goal is mapped.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 30,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:670acb76c8c048017706828334f79c96ca2d22a085caec51721e3571446b75d2",
+          "at": "2026-07-18T07:16:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fff3ccd32e5989988be2f163d350e58e44ed93c3419d950a607f434268632a48",
+          "at": "2026-07-18T07:17:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 は `CodexRuntimeCompositionRoot` を実装対象に含みますが、この root が配線する `FsCodexRuntimeProvisioner` は後続の T003 に帰属しています。一方、T003 は T001 が追加する `CodexRuntimeProvisionPort` に依存するため、現状は相互依存となり、どちらも個別にコンパイル可能な commit にできません。composition root とその task-contract attribution を T003、または T003 後の新規 task へ移してください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 6,
+              "category": "dependency cycle or wrong ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:fff3ccd32e5989988be2f163d350e58e44ed93c3419d950a607f434268632a48",
+          "at": "2026-07-18T07:24:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9dfb00a73d310fc0d5845159a8f837c9e0643e16538a71bc264418ac2694ec7",
+          "at": "2026-07-18T07:28:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68c532657c656bd02ecf25a5152efb5649ce6f6e86c1c72dc91f4bf0735071d0",
+          "at": "2026-07-18T09:36:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68c532657c656bd02ecf25a5152efb5649ce6f6e86c1c72dc91f4bf0735071d0",
+          "at": "2026-07-18T09:41:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac53a3c863ea58080c8c09dccca94582754649a64e5c0acd5d76a7eae332e054",
+          "at": "2026-07-18T10:37:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac53a3c863ea58080c8c09dccca94582754649a64e5c0acd5d76a7eae332e054",
+          "at": "2026-07-18T10:40:01Z"
         }
       ]
     },
@@ -767,21 +859,53 @@
         }
       ]
     },
-    "harness-policy": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
-          "at": "2026-07-18T09:37:11Z"
+          "hash": "rvw1:sha256:7dce0bdfa2de1b2fe2a78509d64d317899d7bc21848e8b685eec4a112cd00b11",
+          "at": "2026-07-18T05:37:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
-          "at": "2026-07-18T09:41:57Z"
+          "hash": "rvw1:sha256:7dce0bdfa2de1b2fe2a78509d64d317899d7bc21848e8b685eec4a112cd00b11",
+          "at": "2026-07-18T05:43:17Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
+          "at": "2026-07-18T09:36:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
+          "at": "2026-07-18T09:41:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
+          "at": "2026-07-18T09:55:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
+          "at": "2026-07-18T10:10:43Z"
         }
       ]
     }

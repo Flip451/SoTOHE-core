@@ -121,8 +121,8 @@ fn map_codex_fix_runner_error(error: ReviewFixRunnerError) -> RunReviewFixError 
         ReviewFixRunnerError::SmokeTestFailed(message) => {
             RunReviewFixError::SmokeTestFailed(diagnostic_message(message))
         }
-        ReviewFixRunnerError::SpawnFailed(_) => {
-            RunReviewFixError::FixRunnerFailed(diagnostic_message("fix runner process failed"))
+        ReviewFixRunnerError::SpawnFailed(message) => {
+            RunReviewFixError::FixRunnerFailed(diagnostic_message(message))
         }
         ReviewFixRunnerError::SentinelNotFound(message) => {
             RunReviewFixError::FixRunnerFailed(diagnostic_message(message))
@@ -172,6 +172,17 @@ mod tests {
         let rendered = error.to_string();
         assert!(rendered.contains("Codex runtime unavailable"));
         assert!(rendered.contains("cargo make bootstrap"));
+    }
+
+    #[test]
+    fn test_map_codex_fix_runner_error_preserves_spawn_diagnostics() {
+        let error = map_codex_fix_runner_error(ReviewFixRunnerError::SpawnFailed(
+            "failed to write prompt; session log: tmp/reviewer-runtime/session.log".to_owned(),
+        ));
+
+        let rendered = error.to_string();
+        assert!(rendered.contains("failed to write prompt"));
+        assert!(rendered.contains("session log:"));
     }
 }
 

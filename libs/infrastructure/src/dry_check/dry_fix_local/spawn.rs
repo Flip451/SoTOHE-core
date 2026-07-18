@@ -1,35 +1,136 @@
-use std::ffi::OsString;
+use std::ffi::{OsStr, OsString};
+use std::fs::File;
 use std::io::Write as _;
-use std::path::PathBuf;
-use std::process::{Command, Stdio};
+use std::path::{Path, PathBuf};
+use std::process::{Command, ExitStatus, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::codex_common::REVIEW_RUNTIME_DIR;
 
-use super::session_log::{
-    dry_fix_redaction_values, redact_dry_fix_sensitive_text, write_dry_fix_log,
-};
+use super::dry_fix_exit_detail;
+use super::session_log::{dry_fix_redaction_values, redact_dry_fix_sensitive_text};
 
 const DRY_FIX_PIPE_READ_BUF_BYTES: usize = 8192;
 const DRY_FIX_CAPTURE_LIMIT_BYTES: usize = 1024 * 1024;
 
-pub(super) fn dry_fix_runtime_path(prefix: &str, ext: &str) -> Result<PathBuf, String> {
+pub(super) struct DryFixRuntimeFile {
+    path: PathBuf,
+    parent: File,
+    name: OsString,
+}
+
+impl DryFixRuntimeFile {
+    pub(super) fn path(&self) -> &Path {
+        &self.path
+    }
+}
+
+pub(super) fn dry_fix_runtime_file(
+    trusted_root: &Path,
+    prefix: &str,
+    ext: &str,
+) -> Result<DryFixRuntimeFile, String> {
     static COUNTER: AtomicU64 = AtomicU64::new(0);
     let timestamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_err(|e| format!("failed to compute timestamp: {e}"))?
         .as_nanos();
     let seq = COUNTER.fetch_add(1, Ordering::Relaxed);
-    let path = PathBuf::from(REVIEW_RUNTIME_DIR)
-        .join(format!("{prefix}-{}-{timestamp}-{seq}.{ext}", std::process::id()));
-    let parent = path
-        .parent()
-        .ok_or_else(|| format!("runtime path must have a parent: {}", path.display()))?;
-    std::fs::create_dir_all(parent)
-        .map_err(|e| format!("failed to create {}: {e}", parent.display()))?;
-    Ok(path)
+    let root = trusted_root.canonicalize().map_err(|e| {
+        format!("failed to canonicalize trusted repository root {}: {e}", trusted_root.display())
+    })?;
+    let parent = open_or_create_dry_fix_runtime_directory(&root)?;
+    let name = OsString::from(format!("{prefix}-{}-{timestamp}-{seq}.{ext}", std::process::id()));
+    Ok(DryFixRuntimeFile { path: root.join(REVIEW_RUNTIME_DIR).join(&name), parent, name })
+}
+
+pub(super) fn dry_fix_initialize_runtime_file(file: &DryFixRuntimeFile) -> Result<(), String> {
+    let mut leaf = rustix::fs::openat(
+        &file.parent,
+        &file.name,
+        rustix::fs::OFlags::WRONLY
+            | rustix::fs::OFlags::CREATE
+            | rustix::fs::OFlags::EXCL
+            | rustix::fs::OFlags::NOFOLLOW
+            | rustix::fs::OFlags::CLOEXEC,
+        rustix::fs::Mode::from_raw_mode(0o600),
+    )
+    .map(File::from)
+    .map_err(|e| format!("failed to initialize runtime file {}: {e}", file.path.display()))?;
+    leaf.write_all(b"")
+        .map_err(|e| format!("failed to initialize runtime file {}: {e}", file.path.display()))
+}
+
+fn open_or_create_dry_fix_runtime_directory(root: &Path) -> Result<File, String> {
+    let mut directory = open_dry_fix_directory_nofollow(root)
+        .map_err(|e| format!("failed to open trusted repository root {}: {e}", root.display()))?;
+    for component in Path::new(REVIEW_RUNTIME_DIR).components() {
+        let std::path::Component::Normal(name) = component else {
+            return Err("runtime directory contains an invalid component".to_owned());
+        };
+        directory = open_or_create_dry_fix_directory_at(&directory, name).map_err(|error| {
+            let detail =
+                match rustix::fs::statat(&directory, name, rustix::fs::AtFlags::SYMLINK_NOFOLLOW) {
+                    Ok(metadata)
+                        if rustix::fs::FileType::from_raw_mode(metadata.st_mode).is_symlink() =>
+                    {
+                        "refusing to follow symlink".to_owned()
+                    }
+                    _ => error.to_string(),
+                };
+            format!(
+                "failed to open runtime directory component {}: {detail}",
+                name.to_string_lossy()
+            )
+        })?;
+    }
+    Ok(directory)
+}
+
+fn open_or_create_dry_fix_directory_at(
+    parent: &File,
+    name: &OsStr,
+) -> Result<File, std::io::Error> {
+    match open_dry_fix_directory_at_nofollow(parent, name) {
+        Ok(directory) => Ok(directory),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+            match rustix::fs::mkdirat(parent, name, rustix::fs::Mode::from_raw_mode(0o700)) {
+                Ok(()) | Err(rustix::io::Errno::EXIST) => {}
+                Err(error) => return Err(error.into()),
+            }
+            open_dry_fix_directory_at_nofollow(parent, name)
+        }
+        Err(error) => Err(error),
+    }
+}
+
+fn open_dry_fix_directory_nofollow(path: &Path) -> Result<File, std::io::Error> {
+    rustix::fs::open(
+        path,
+        rustix::fs::OFlags::RDONLY
+            | rustix::fs::OFlags::DIRECTORY
+            | rustix::fs::OFlags::NOFOLLOW
+            | rustix::fs::OFlags::CLOEXEC,
+        rustix::fs::Mode::empty(),
+    )
+    .map(File::from)
+    .map_err(Into::into)
+}
+
+fn open_dry_fix_directory_at_nofollow(parent: &File, name: &OsStr) -> Result<File, std::io::Error> {
+    rustix::fs::openat(
+        parent,
+        name,
+        rustix::fs::OFlags::RDONLY
+            | rustix::fs::OFlags::DIRECTORY
+            | rustix::fs::OFlags::NOFOLLOW
+            | rustix::fs::OFlags::CLOEXEC,
+        rustix::fs::Mode::empty(),
+    )
+    .map(File::from)
+    .map_err(Into::into)
 }
 
 pub(super) fn dry_fix_spawn_and_collect(
@@ -37,9 +138,12 @@ pub(super) fn dry_fix_spawn_and_collect(
     args: &[OsString],
     safe_env: &[(OsString, OsString)],
     prompt: &str,
+    trusted_root: &Path,
     runtime: Option<&crate::codex_common::ResolvedCodexRuntime>,
-) -> Result<(String, PathBuf), String> {
-    let log_path = dry_fix_runtime_path("dry-fix-codex-session", "log")?;
+) -> Result<(String, ExitStatus, PathBuf), String> {
+    let log_file = dry_fix_runtime_file(trusted_root, "dry-fix-codex-session", "log")?;
+    dry_fix_initialize_runtime_file(&log_file)?;
+    let log_path = log_file.path().to_path_buf();
     let mut command = Command::new(bin);
     command.args(args);
     command.env_clear();
@@ -64,11 +168,22 @@ pub(super) fn dry_fix_spawn_and_collect(
     };
     if let Err(msg) = prompt_result {
         let _ = child.kill();
-        let _ = child.wait();
         let stdout = stdout_handle.join().ok().and_then(|r| r.ok()).unwrap_or_default();
         let stderr = stderr_handle.join().ok().and_then(|r| r.ok()).unwrap_or_default();
-        write_dry_fix_log(&log_path, bin, "killed", &stdout, &stderr, runtime);
-        return Err(format!("{msg}; log: {}", log_path.display()));
+        let exit_status = match child.wait() {
+            Ok(status) => status,
+            Err(error) => {
+                let detail = format!("failed to wait after prompt write error: {error}");
+                write_dry_fix_log_at(&log_file, bin, &detail, &stdout, &stderr, runtime);
+                return Err(format!("{msg}; {detail}; log: {}", log_path.display()));
+            }
+        };
+        write_dry_fix_log_at(&log_file, bin, &exit_status.to_string(), &stdout, &stderr, runtime);
+        return Err(format!(
+            "{msg}; Codex fixer {}; log: {}",
+            dry_fix_exit_detail(exit_status),
+            log_path.display()
+        ));
     }
     let exit_status = child.wait().map_err(|e| format!("failed to wait for Codex fixer: {e}"))?;
     let status_str = exit_status.to_string();
@@ -76,11 +191,55 @@ pub(super) fn dry_fix_spawn_and_collect(
         dry_fix_collector_result_for_log(join_dry_fix_collector(stdout_handle, "stdout"), "stdout");
     let (stderr, stderr_error) =
         dry_fix_collector_result_for_log(join_dry_fix_collector(stderr_handle, "stderr"), "stderr");
-    write_dry_fix_log(&log_path, bin, &status_str, &stdout, &stderr, runtime);
+    write_dry_fix_log_at(&log_file, bin, &status_str, &stdout, &stderr, runtime);
     if let Some(error) = stdout_error.or(stderr_error) {
-        return Err(format!("{error}; log: {}", log_path.display()));
+        return Err(format!(
+            "{error}; Codex fixer {}; log: {}",
+            dry_fix_exit_detail(exit_status),
+            log_path.display()
+        ));
     }
-    Ok((stdout, log_path))
+    Ok((stdout, exit_status, log_path))
+}
+
+fn write_dry_fix_log_at(
+    log_file: &DryFixRuntimeFile,
+    bin: &OsString,
+    status: &str,
+    stdout: &str,
+    stderr: &str,
+    runtime: Option<&crate::codex_common::ResolvedCodexRuntime>,
+) {
+    let file = rustix::fs::openat(
+        &log_file.parent,
+        &log_file.name,
+        rustix::fs::OFlags::WRONLY
+            | rustix::fs::OFlags::TRUNC
+            | rustix::fs::OFlags::NOFOLLOW
+            | rustix::fs::OFlags::NONBLOCK
+            | rustix::fs::OFlags::CLOEXEC,
+        rustix::fs::Mode::empty(),
+    )
+    .map(File::from);
+    let Ok(mut file) = file else {
+        return;
+    };
+    let Ok(metadata) = file.metadata() else {
+        return;
+    };
+    if !metadata.is_file() {
+        return;
+    }
+    let runtime_header = runtime.map(crate::codex_common::runtime_log_header).unwrap_or_default();
+    let content = format!(
+        "bin: {}\n{}status: {}\n--- stdout ---\n{}\n--- stderr ---\n{}",
+        bin.to_string_lossy(),
+        runtime_header,
+        status,
+        stdout,
+        stderr
+    );
+    let _ = file.write_all(content.as_bytes());
 }
 
 fn dry_fix_collector_result_for_log(
@@ -353,15 +512,18 @@ mod tests {
             (OsString::from("OPENAI_BASE_URL"), OsString::from(base_url)),
         ];
 
-        let (stdout, log_path) = dry_fix_spawn_and_collect(
+        let (stdout, status, log_path) = dry_fix_spawn_and_collect(
             &fake_codex.as_os_str().to_os_string(),
             &[],
             &safe_env,
             "prompt",
+            dir.path(),
             None,
         )
         .unwrap();
         let log = std::fs::read_to_string(log_path).unwrap();
+
+        assert!(status.success());
 
         for secret in [short_secret, long_secret, org_id, base_url] {
             assert!(!stdout.contains(secret), "stdout must redact {secret}");
@@ -377,6 +539,45 @@ mod tests {
         assert!(log.contains("[REDACTED:CODEX_API_KEY]"));
         assert!(log.contains("[REDACTED:OPENAI_ORG_ID]"));
         assert!(log.contains("[REDACTED:OPENAI_BASE_URL]"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_dry_fix_runtime_file_rejects_symlinked_runtime_parent() {
+        let repository = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        std::os::unix::fs::symlink(outside.path(), repository.path().join("tmp")).unwrap();
+
+        let error = match dry_fix_runtime_file(repository.path(), "last-message", "txt") {
+            Ok(_) => panic!("a symlinked runtime parent must be rejected"),
+            Err(error) => error,
+        };
+
+        assert!(error.contains("refusing to follow symlink"), "got: {error}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_write_dry_fix_log_at_does_not_follow_replaced_symlink() {
+        let repository = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let log_file = dry_fix_runtime_file(repository.path(), "session", "log").unwrap();
+        dry_fix_initialize_runtime_file(&log_file).unwrap();
+        let outside_file = outside.path().join("outside.log");
+        std::fs::write(&outside_file, "outside content").unwrap();
+        std::fs::remove_file(log_file.path()).unwrap();
+        std::os::unix::fs::symlink(&outside_file, log_file.path()).unwrap();
+
+        write_dry_fix_log_at(
+            &log_file,
+            &OsString::from("codex"),
+            "exit status: 1",
+            "child output",
+            "child error",
+            None,
+        );
+
+        assert_eq!(std::fs::read_to_string(&outside_file).unwrap(), "outside content");
     }
 
     #[test]
