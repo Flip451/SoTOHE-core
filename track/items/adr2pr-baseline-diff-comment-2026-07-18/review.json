@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:48979f08611acb56023d2ed25552ffba05c9fe25b3ee1e8343b748a40030165e",
+          "at": "2026-07-18T05:39:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:48979f08611acb56023d2ed25552ffba05c9fe25b3ee1e8343b748a40030165e",
+          "at": "2026-07-18T05:41:52Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -91,6 +109,39 @@
         }
       ]
     },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7271a0019d555cb07301d9f17208f5cc97291db6323bb6f497bd39bef6d672c6",
+          "at": "2026-07-18T05:38:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-lifecycle.md` の「Generated Views」は `metadata.json` / `impl-plan.json` から生成される `track/registry.md` の規則であり、同 convention は `spec.json` の生成パイプラインを適用外と明記しています。この docs-only feature や `spec.md` の扱いを支えないため、`related_conventions[]` の narrative-level cross-reference として不適切です。関連する規範へ差し替えるか、この参照を除外してください。",
+              "severity": "P1",
+              "file": "track/items/adr2pr-baseline-diff-comment-2026-07-18/spec.json",
+              "line": 239,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:7271a0019d555cb07301d9f17208f5cc97291db6323bb6f497bd39bef6d672c6",
+          "at": "2026-07-18T05:42:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7e7eb0a3fd1a51a369939502636071367d893545eb40490346c8b417493f66a",
+          "at": "2026-07-18T05:44:09Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -106,6 +157,54 @@
           "findings": [],
           "hash": "rvw1:sha256:d8b3a3fa208f61f668dc10de59d193ed38549df80cf8bdb1d5a71287e6c2c69b",
           "at": "2026-07-18T05:21:48Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` is empty and therefore provides no task traceability for the required goal `GO-01`, despite the review policy explicitly assigning goal-to-task traceability to `impl-plan.json` rather than `task-coverage.json`. Add a summary entry linking the goal to the implementing task(s), likely T001/T002.",
+              "severity": "P1",
+              "file": "track/items/adr2pr-baseline-diff-comment-2026-07-18/impl-plan.json",
+              "line": 26,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:b4cde885a636fc798f88462c6bcec503b9be2e9e36b94a700e1d31b1adc109bd",
+          "at": "2026-07-18T05:39:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4410ea3168de2da17cf832231fb5cd73362394e29a6d9a3b094d440728777d9",
+          "at": "2026-07-18T05:40:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` の GO-01 traceability が T001/T002 のみを列挙し、IN-03/AC-07 を実装してコメント来歴の入力を成立させる T003 を欠落させています。GO-01 は diff と来歴の監査可能な提示を目的としているため、T003 も carrier task として含めてください。",
+              "severity": "P1",
+              "file": "track/items/adr2pr-baseline-diff-comment-2026-07-18/impl-plan.json",
+              "line": 25,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:a4410ea3168de2da17cf832231fb5cd73362394e29a6d9a3b094d440728777d9",
+          "at": "2026-07-18T05:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dec011d07c97f95f3337554c62dc317664437fd1a1dccc523b09019cd1f5912",
+          "at": "2026-07-18T05:48:22Z"
         }
       ]
     },
