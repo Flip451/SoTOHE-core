@@ -54,6 +54,18 @@ Rust コードベース全体に適用する実装規約。エラーハンドリ
 
 `unsafe` は最小限かつ Safety コメント必須。使用前に `reviewer` capability のレビューを受けること。
 
+### Usecase Layer Purity
+
+usecase 層は純粋なオーケストレーターであり、実行環境へ直接到達しない。I/O と実行時依存は境界で受け取り、必要な外部機能は domain / usecase の port を通じて扱う。
+
+| 禁止 | 正しい対処 |
+|---|---|
+| `std::fs::*` / `std::net::*` / `std::process::*` / `std::io::*` / `std::env::*` | CLI または infrastructure adapter が扱い、typed input / port 経由で渡す |
+| `chrono::Utc::now()` / `std::time::SystemTime` / `std::time::Instant` | 時刻を usecase entrypoint の引数として受け取る |
+| `println!` / `eprintln!` / `print!` / `eprint!` | `Result<T, E>` を返し、CLI が表示と exit code を担う |
+
+`sotp verify usecase-purity` は syn AST により上記のパターンを検査する。現行の強制強度は CI blocking である — 違反は error finding として検出され (exit 1)、`cargo make ci` の依存 gate (`verify-usecase-purity-local`) を失敗させる。強制の緩和 (gate からの除外等) は採用者が ADR で判断する。async runtime の採用も ADR の決定事項である。
+
 ---
 
 ## Examples
@@ -109,6 +121,19 @@ pub fn divide(a: i32, b: i32) -> Result<i32, MathError> {
 unsafe { Box::from_raw(ptr) }
 ```
 
+### Usecase Purity
+
+```rust
+// Good: external capability is supplied through a port.
+pub fn load<R: SpecDocumentLoaderPort>(reader: &R, path: &Path) -> Result<SpecDocument, LoadError> {
+    reader.load(path).map_err(LoadError::from)
+}
+
+// Bad: usecase reaches directly into the runtime and presents output.
+let content = std::fs::read_to_string(path)?;
+println!("loaded");
+```
+
 ---
 
 ## Exceptions
@@ -124,9 +149,11 @@ unsafe { Box::from_raw(ptr) }
 - [ ] モジュールが 700 行以内か（プロダクションコードのみ）
 - [ ] 命名が PascalCase / snake_case 規則に従っているか
 - [ ] `unsafe` ブロックに Safety コメントがあるか
+- [ ] usecase が I/O、暗黙的な時刻、環境、プロセス、出力を直接扱っていないか
 
 ## Decision Reference
 
 - `knowledge/conventions/prefer-type-safe-abstractions.md`: 型安全パターン（Newtype / Enum-first / Typestate）
-- `knowledge/conventions/hexagonal-architecture.md`: ヘキサゴナルアーキテクチャ（Trait-Based Abstraction を含む）
+- `architecture-rules.json`: crate 間依存の機械可読 SSoT
+- `knowledge/conventions/type-designer-kind-selection.md` R1: role × layer 配置の SSoT
 - `knowledge/conventions/security.md`: シークレット管理・SQL インジェクション対策

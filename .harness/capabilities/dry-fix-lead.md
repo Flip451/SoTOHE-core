@@ -29,8 +29,13 @@ edit any file in the workspace (see Scope Ownership).
 ## Scope ownership
 
 Unlike `review-fix-lead`, which is bounded to one review scope, **this capability may edit any
-file in the workspace** for DRY refactoring (whole-codebase single scope). DRY violations cross
-layer boundaries by definition, so cross-layer edits are expected and permitted.
+file in the workspace** for DRY refactoring (whole-codebase single scope). Some DRY violations
+span layers, so a finding can require whole-workspace analysis.
+
+Intentional structural similarity caused by separation of concerns is not a DRY violation:
+core types and their adapter mirror DTOs / enums remain separate. For a genuine cross-layer
+common abstraction, extract it into the innermost layer both consumers may depend on; never
+move it outward in a way that reverses dependency direction.
 
 Files this capability must NOT edit, regardless of DRY findings:
 
@@ -44,9 +49,8 @@ Files this capability must NOT edit, regardless of DRY findings:
 If a genuine violation can only be resolved by editing an out-of-boundary file, return `blocked`
 with the file list and rationale.
 
-Architecture-layer rules still apply: do not move domain types to infrastructure, etc. When
-refactoring across layers, ensure the edit respects hexagonal architecture boundaries per
-`knowledge/conventions/impl-delegation-arch-guard.md`.
+Architecture-layer rules still apply. When refactoring across layers, ensure the edit respects
+`architecture-rules.json` and `knowledge/conventions/impl-delegation-arch-guard.md`.
 
 ## Internal pipeline
 
@@ -132,9 +136,11 @@ must escalate.
 Before modifying any file, verify it belongs to the correct architecture layer per
 `knowledge/conventions/impl-delegation-arch-guard.md`:
 
-- Domain types stay in `libs/domain/`
+- Domain types and domain ports stay in `libs/domain/`
+- Usecase interactors and usecase ports stay in `libs/usecase/`
 - Infrastructure adapters stay in `libs/infrastructure/`
 - CLI composition-root wiring stays in `apps/cli-composition/` (the `apps/cli` crate is the bin entry point only)
+- `apps/cli-driver` is the primary adapter layer
 - Cross-layer DRY refactoring is permitted but must not move types between layers without
   explicit ADR authorization.
 
@@ -156,7 +162,7 @@ with `failed` (tooling error).
 | aspect | dry-fix-lead (this capability) | review-fix-lead |
 |---|---|---|
 | output | DRY refactors across workspace + status report | fixes within one review scope + status report |
-| scope | whole workspace (DRY violations cross layers) | single review scope, bounded to `bin/sotp review files --scope <scope>` result |
+| scope | whole workspace (some DRY violations span layers) | single review scope, bounded to `bin/sotp review files --scope <scope>` result |
 | trigger | orchestrator assigns track-id for DFP | orchestrator assigns scope + `round_type` |
 | artifact written | source files across workspace; `dry-check.json` via `sotp dry write` only | source files within scope boundary |
 | verdict source | `bin/sotp dry check-approved` (reads `dry-check.json`) | `bin/sotp review results` (reads `review.json`) |

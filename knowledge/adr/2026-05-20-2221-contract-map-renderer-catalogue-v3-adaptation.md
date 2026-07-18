@@ -389,7 +389,7 @@ mermaid syntax 注: subgraph には inline `:::className` が使えない (parse
 ### E: renderer の配置層
 
 - **E-1+: light-weight `extract_type_names` 拡張** — syn 精密 parse を採用するため domain のみでは対応できない
-- **E-3a: syn を domain crate に追加 + renderer を domain 配置** — ADR 2026-05-08-0258 D9 が syn を codec (infrastructure 層) に置く設計を前提とするため、syn を domain crate に追加することは hexagonal 分離原則 (`knowledge/conventions/hexagonal-architecture.md`) に反する
+- **E-3a: syn を domain crate に追加 + renderer を domain 配置** — ADR 2026-05-08-0258 D9 が syn を codec (infrastructure 層) に置く設計を前提とするため、syn を domain crate に追加することは hexagonal 分離原則 (`knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`）) に反する
 - **E-3b: renderer を infrastructure に移動 (port なし)** — usecase → infrastructure 直接依存で hexagonal 違反
 - **E-3d: renderer 入力を `ExtendedCrate` に変更** — ADR 2026-04-17-1528 §D1 の「catalogue 単独完結」契約を破る
 
@@ -471,7 +471,7 @@ mermaid syntax 注: subgraph には inline `:::className` が使えない (parse
 
 ### P: port method 署名・Adapter 構造・RenderContractMapInteractor との関係
 
-- **Option B: domain 層に styled render ヘルパーを持つ案** — domain に serde / TOML 読み込み依存が入り込み、hexagonal architecture の domain purity 原則 (`knowledge/conventions/hexagonal-architecture.md`) に反する。スタイル設定型が公開 API に漏れるため、TOML schema の変更が公開コントラクトに影響する。さらに、`ContractMapRenderOptions` しか受け取れない domain 層の関数がスタイル設定ファイルを適用できないという構造的矛盾が解消されない。
+- **Option B: domain 層に styled render ヘルパーを持つ案** — domain に serde / TOML 読み込み依存が入り込み、hexagonal architecture の domain purity 原則 (`knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`）) に反する。スタイル設定型が公開 API に漏れるため、TOML schema の変更が公開コントラクトに影響する。さらに、`ContractMapRenderOptions` しか受け取れない domain 層の関数がスタイル設定ファイルを適用できないという構造的矛盾が解消されない。
 
 ## Consequences
 
@@ -523,5 +523,5 @@ mermaid syntax 注: subgraph には inline `:::className` が使えない (parse
 - `knowledge/adr/2026-04-29-0241-typestate-transition-edge-rendering.md` — typestate transition edge rendering。本 ADR Decision G で `transition_methods` 経由の遷移先導出 + 専用 style edge として継承
 - `knowledge/adr/2026-05-18-1223-make-catalogue-schema-permissive.md` — inherent_impls (InherentImplDeclV2) + where 句 (WherePredicateDecl) の導入。本 ADR Decision F で inherent_impls.methods を method ソースとして扱う根拠
 - `knowledge/adr/2026-05-20-0048-tddd-trait-impl-top-level-promotion.md` — TraitImplDeclV2 top-level 化 + TypeEntry.trait_impls 削除。本 ADR Decision J / O の trait impl edge 導出源の変更根拠
-- `knowledge/conventions/hexagonal-architecture.md` — hexagonal 配置 (Decision E-3c の port + adapter pattern の根拠)
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — hexagonal 配置 (Decision E-3c の port + adapter pattern の根拠)
 - `knowledge/conventions/no-backward-compat.md` — 旧 contract map renderer との非互換 (skip migration、新規 v3 専用設計)

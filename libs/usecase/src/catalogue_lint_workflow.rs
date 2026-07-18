@@ -11,7 +11,7 @@
 //!   It implements [`RunCatalogueLint`].
 //!
 //! The usecase layer stays pure-orchestrator per
-//! `knowledge/conventions/hexagonal-architecture.md` §Usecase Purity:
+//! `knowledge/conventions/coding-principles.md` §Usecase Layer Purity:
 //! no `std::fs`, no `println!`, no `chrono`, no env access.
 //! All I/O flows through the domain ports.
 

@@ -117,7 +117,7 @@ per-task を既定にし密結合時のみ batch する現状。却下: feature 
 ## Related
 
 - `knowledge/adr/` — ADR 索引
-- `knowledge/conventions/hexagonal-architecture.md` — レイヤー素集合・port 配置の前提
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — レイヤー素集合・port 配置の前提
 - `knowledge/conventions/track-lifecycle.md` — タスク状態遷移・commit_hash・トレーサビリティ
 - `architecture-rules.json` — レイヤー依存方向の SSoT
 - `.harness/config/review-scope.json` — D3 の review コスト天井の設定場所（既存の per-group 設定を拡張）

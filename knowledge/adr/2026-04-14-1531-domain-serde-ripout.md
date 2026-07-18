@@ -15,7 +15,7 @@ Accepted (track: `domain-serde-ripout-2026-04-15`, planning approval 2026-04-14T
 
 ### §1 プロセス違反の発見
 
-2026-04-07 の bridge01 commit `a5e4c6b` (track `bridge01-export-schema-2026-04-06` の T005) で、ADR を書かずに `libs/domain/Cargo.toml` に `serde = { version = "1", features = ["derive"] }` 依存が追加された。これは hexagonal architecture の domain purity 原則 (`knowledge/conventions/hexagonal-architecture.md`) に違反する:
+2026-04-07 の bridge01 commit `a5e4c6b` (track `bridge01-export-schema-2026-04-06` の T005) で、ADR を書かずに `libs/domain/Cargo.toml` に `serde = { version = "1", features = ["derive"] }` 依存が追加された。これは hexagonal architecture の domain purity 原則 (`knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`）) に違反する:
 
 - domain 層は wire format / serialization 形式を知るべきではない
 - DTO は infrastructure or usecase 層に置く
@@ -93,7 +93,7 @@ researcher capability 調査 (`knowledge/research/2026-04-14-1510-researcher-dom
 
 **判断根拠**:
 
-1. **hexagonal 原則との整合**: §1 で述べた通り domain 層は wire format 形式 (serde) を知るべきではない。`Serialize` derive は serde という具体的な serialization library への依存であり、domain 型がこれを持つと「validated newtype (domain)」と「wire format carrier (DTO)」の境界が溶ける。DTO と変換関数を外層 (infrastructure) に置くことで、domain 型を serialization library から完全に切り離す (`knowledge/conventions/hexagonal-architecture.md`)。
+1. **hexagonal 原則との整合**: §1 で述べた通り domain 層は wire format 形式 (serde) を知るべきではない。`Serialize` derive は serde という具体的な serialization library への依存であり、domain 型がこれを持つと「validated newtype (domain)」と「wire format carrier (DTO)」の境界が溶ける。DTO と変換関数を外層 (infrastructure) に置くことで、domain 型を serialization library から完全に切り離す (`knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`）)。
 
 2. **依存方向の制約**: `architecture-rules.json` により domain → infrastructure の依存は **禁止** されている (一方 infrastructure → domain は許可)。したがって domain 型を変換する DTO を定義できるのは infrastructure 側のみで、`impl From<&domain::T> for TDto` も infrastructure 側に置くのが hexagonal の依存方向に自然に沿う。CLI 側で変換する代替案 (`impl From` を CLI 内で呼ぶ) は D5 で却下する (CLI が DTO の存在を知ることになり、DTO は infrastructure の実装詳細であるという原則に反する)。
 
@@ -178,7 +178,7 @@ SchemaExportCodecError   (Json variant wrapping serde_json::Error via #[from])
 
 1. **CLI が DTO の存在を知ることになる**: `impl From<&SchemaExport> for SchemaExportDto` を CLI 内で呼ぶには、CLI が `infrastructure::schema_export_codec::SchemaExportDto` 型を import する必要がある。DTO は infrastructure の実装詳細であり、CLI 側から見えるのは encode 関数の入力 (domain 型) と出力 (JSON 文字列) だけであるべき。
 
-2. **`knowledge/conventions/hexagonal-architecture.md` の CLI 責務定義違反**: 同 convention では CLI の責務を「(1) clap で引数パース, (2) infrastructure adapter 構築, (3) usecase 関数呼び出し, (4) 結果出力 + ExitCode mapping」と定義している。`SchemaExport` → JSON の変換は「(4) 結果出力」の一部だが、serialization 形式の知識は infrastructure 層に閉じるべきで、CLI が serde_json や DTO 型を直接扱うのは原則違反。
+2. **`knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） の CLI 責務定義違反**: 同 convention では CLI の責務を「(1) clap で引数パース, (2) infrastructure adapter 構築, (3) usecase 関数呼び出し, (4) 結果出力 + ExitCode mapping」と定義している。`SchemaExport` → JSON の変換は「(4) 結果出力」の一部だが、serialization 形式の知識は infrastructure 層に閉じるべきで、CLI が serde_json や DTO 型を直接扱うのは原則違反。
 
 3. **既存 codec パターンとの非対称性**: `catalogue_codec::encode(doc: &TypeCatalogueDocument) -> Result<String, _>` などの既存 API は CLI からは `codec::encode(&domain_value)` という 1 関数呼び出しで完結しており、CLI は DTO の存在を一切知らない。本 ADR で C1 を採用すると schema_export だけが例外になり一貫性が崩れる。
 
@@ -308,7 +308,7 @@ verify modules / review_v2 adapters / git wrappers / hook handlers などの 40-
 
 ### A1: serde を残して許容 (継続違反)
 
-却下理由: bridge01 commit a5e4c6b は ADR なしで domain に serde を追加しており、これを許容すると hexagonal 純粋性原則 (`knowledge/conventions/hexagonal-architecture.md`) が将来の同種違反を防げなくなる。プロセス違反の回復が本トラックの主目的。
+却下理由: bridge01 commit a5e4c6b は ADR なしで domain に serde を追加しており、これを許容すると hexagonal 純粋性原則 (`knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`）) が将来の同種違反を防げなくなる。プロセス違反の回復が本トラックの主目的。
 
 ### A2: catalogue_codec の private DTO を共有
 
@@ -319,11 +319,11 @@ verify modules / review_v2 adapters / git wrappers / hook handlers などの 40-
 
 ### A3: CLI 内で `From<&SchemaExport> for SchemaExportDto` を呼ぶ
 
-却下理由 (D5 と同じ): CLI が DTO の存在を知ることになり、DTO は infrastructure の実装詳細であるという原則に反する。`knowledge/conventions/hexagonal-architecture.md` の CLI 責務定義に違反。
+却下理由 (D5 と同じ): CLI が DTO の存在を知ることになり、DTO は infrastructure の実装詳細であるという原則に反する。`knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） の CLI 責務定義に違反。
 
 ### A4: usecase 層に DTO を置く
 
-却下理由: usecase 層は純粋なオーケストレーターであり (`knowledge/conventions/hexagonal-architecture.md` Usecase Layer Purity Rules)、wire format DTO は infrastructure 層が担うのが正しい配置。usecase はすでに別の serde DTO を保持しているが (Clean Architecture スタイル)、schema_export の DTO は infrastructure 配置が自然。
+却下理由: usecase 層は純粋なオーケストレーターであり (`knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） Usecase Layer Purity Rules)、wire format DTO は infrastructure 層が担うのが正しい配置。usecase はすでに別の serde DTO を保持しているが (Clean Architecture スタイル)、schema_export の DTO は infrastructure 配置が自然。
 
 ### A5: tddd/codec/dto/ サブディレクトリ案
 
@@ -366,7 +366,7 @@ verify modules / review_v2 adapters / git wrappers / hook handlers などの 40-
 - ADR `knowledge/adr/2026-04-11-0002-tddd-multilayer-extension.md` §D1 / §3.E: TDDD multilayer の SSoT、infrastructure 設定と CI cache 戦略
 - ADR `knowledge/adr/2026-04-13-1813-tddd-taxonomy-expansion.md`: `TypeDefinitionKind::Dto` variant の追加 ADR
 - ADR `knowledge/adr/2026-04-14-0625-finding-taxonomy-cleanup.md` D6: domain serde 依存「本 track 範囲外」記述の追補対象
-- Convention `knowledge/conventions/hexagonal-architecture.md`: hexagonal 純粋性原則の SSoT
+- Convention `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`）: hexagonal 純粋性原則の SSoT
 - Convention `.claude/rules/04-coding-principles.md` §Enum-first / §No Panics: DTO 設計の原則
 - Convention `.claude/rules/10-guardrails.md` §Small task commits: <500 行 per commit guideline
 - Planner output `knowledge/research/2026-04-14-1510-planner-domain-serde-ripout.md`: Q1-Q7 設計判断と Canonical Blocks (DTO スケルトン, Mermaid graph, infrastructure-types.json seed)

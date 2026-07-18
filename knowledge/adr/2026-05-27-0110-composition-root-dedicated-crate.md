@@ -35,7 +35,7 @@ ADR `2026-04-30-0848-cli-via-usecase-only.md` の Rejected Alternative C は、�
 
 ### 現状の問題
 
-- `apps/cli` が公式 composition root（`knowledge/conventions/hexagonal-architecture.md`
+- `apps/cli` が公式 composition root（`knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`）
   の "CLI as Composition Root" 節）。責務は clap パース → infra adapter 構築（DI）→ usecase 呼び出し
   → 出力 + ExitCode とされているが、実際の DI 配線は `apps/cli/src/commands/*.rs` の execute 関数に
   分散しており、`main.rs` はディスパッチャに過ぎない。
@@ -236,5 +236,5 @@ usecase 経由の identity 構築責務が bin 側に残り続ける。依存を
 ## Related
 
 - `knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md` — 本 ADR の直接の前提。Rejected Alternative C と Reassess When で composition root 再設計を「別判断」として明示的に先送りした ADR。
-- `knowledge/conventions/hexagonal-architecture.md` — CLI as Composition Root の現行定義。本 ADR の実装後にこの節を更新して composition crate の責務を記述する。
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — CLI as Composition Root の現行定義。本 ADR の実装後にこの節を更新して composition crate の責務を記述する。
 - `knowledge/adr/README.md` — ADR 索引。

@@ -14,13 +14,13 @@ Report findings ONLY for the following categories:
   instantiates adapters / constructs use-case interactors itself, rather than
   receiving them via constructor injection. `cli_driver` is the _injected_ side;
   object-graph construction belongs in `cli_composition`. Cite
-  `hexagonal-architecture.md` §Adapter Rules.
+  `type-designer-kind-selection.md` R1 (`PrimaryAdapter`).
 - **business logic in adapter**: a `handle` method (or helper it calls) that
   contains validation rules, domain decisions, multi-step orchestration beyond
   `input → invoke → render`, or any calculation that belongs in `usecase` or
   `domain`. Orchestrating multiple use cases is a composition/usecase concern;
   a Driver calls exactly one interactor per request. Cite
-  `hexagonal-architecture.md` §Usecase Layer Purity Rules.
+  `coding-principles.md` §Usecase Layer Purity.
 - **non-CommandOutcome return**: a public `handle` or equivalent method whose
   return type is anything other than `CommandOutcome`. Errors are part of the
   rendered output — map them to `CommandOutcome.stderr` with an appropriate

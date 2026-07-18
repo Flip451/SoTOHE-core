@@ -234,7 +234,7 @@ md ファイル (spec.md / plan.md) を authoritative source として直接編�
 
 - `knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md` — 本 ADR の起因となった上流決定 (track 直下文書廃止 + ADR 昇格経路)
 - `knowledge/conventions/adr.md` — front-matter schema と `grandfathered: true` 用途
-- `knowledge/conventions/hexagonal-architecture.md` — D2 の層構成規範
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — D2 の層構成規範
 - `knowledge/conventions/coding-principles.md` — D3 / D13 / D16 の日常規範
 - `knowledge/conventions/enforce-by-mechanism.md` — D11 の機構強制方針
 - `knowledge/conventions/nightly-dev-tool.md` — D8 の nightly dev-tool 規範

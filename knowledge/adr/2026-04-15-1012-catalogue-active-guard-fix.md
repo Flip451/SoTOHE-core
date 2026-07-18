@@ -279,7 +279,7 @@ D4 の SKILL.md structural fix を別 ADR で処理する案。
 - `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md` §問題 2 / §Reassess When — feedback=Yellow 降格の根拠
 - `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md` §D8 — per-layer opt-out pattern
 - `knowledge/conventions/source-attribution.md` §Source Tag Types Table / §Upgrading Yellow to Blue — source tag SSoT
-- `knowledge/conventions/hexagonal-architecture.md` — layer 依存方向制約
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — layer 依存方向制約
 - `apps/cli/src/commands/track/tddd/signals.rs::execute_type_signals` (line 96-128) — D1 の修正対象
 - `apps/cli/src/commands/track/tddd/signals.rs::resolve_layers` (line 15, 28) — `parse_tddd_layers` の既存 caller
 - `libs/infrastructure/src/track/render.rs::sync_rendered_views` (line 568-606) — D3 の修正対象 (domain-only loop)

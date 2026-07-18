@@ -7,7 +7,7 @@ track ワークフローの形式的手順 (ceremony) を最小化し、WIP コ�
 ## Scope
 
 - 適用対象: `/track:*` コマンド (planning / design / implementation / review / commit)、それらのライフサイクルを記述する SKILL / command / agent ドキュメント、track artifacts を検査する CI ゲート。
-- 適用外: プロジェクト固有のコーディング規約 (hexagonal-architecture、source-attribution など) や、明示的な人間承認を要求するセキュリティ境界。
+- 適用外: プロジェクト固有のコーディング規約 (type-designer-kind-selection、source-attribution など) や、明示的な人間承認を要求するセキュリティ境界。
 
 ## Rules
 

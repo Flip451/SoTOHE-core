@@ -25,8 +25,8 @@ ADR または plan.md の Canonical Blocks から、以下を抽出して指示�
 |------|-----|
 | 新規 trait / struct の配置層 | `CodexReviewer` → infrastructure |
 | trait impl の配置層 | `impl Reviewer for CodexReviewer` → infrastructure |
-| 呼び出しフロー | CLI → `ReviewCycle::review()` → `CodexReviewer::review()` |
-| CLI の責務制限 | 「CLI は composition root + 結果表示のみ」 |
+| 呼び出しフロー | `apps/cli` → `cli_composition`（配線）→ `cli_driver` → `ReviewCycle::review()` → `CodexReviewer::review()` |
+| delivery crate の責務制限 | `apps/cli` は args パースと委譲のみ、`cli_composition` は composition root、`cli_driver` は usecase 呼び出し・結果表示・ExitCode |
 
 ### テンプレート
 
@@ -39,13 +39,12 @@ ADR または plan.md の Canonical Blocks から、以下を抽出して指示�
 |----------|-----|------|
 | {Type} | {layer} | ADR §{section} |
 
-CLI 層の責務:
-- args パース
-- adapter 構築 (composition root)
-- usecase 呼び出し
-- 結果表示 + ExitCode
+delivery 3 crate の責務分割 (`architecture-rules.json` が依存を機械強制):
+- `apps/cli` (bin): args パースと `cli_composition` / `cli_driver` への委譲のみ (他層への直接依存は forbidden)
+- `apps/cli-composition` (composition root): adapter 構築と object graph 配線
+- `apps/cli-driver` (primary adapter): usecase 呼び出しと結果表示 + ExitCode
 
-CLI 層で usecase ロジック（hash 計算、scope 判定、verdict 変換等）を
+delivery 層で usecase ロジック（hash 計算、scope 判定、verdict 変換等）を
 再実装してはならない。
 ```
 
@@ -83,8 +82,8 @@ CLI 層に以下が増えていないか確認:
 ## Architecture Verification Checklist
 
 - ADR で指定された型が正しい層に配置されているか
-- CLI が composition root パターンに従っているか（usecase 呼び出しのみ）
-- usecase ロジックが CLI に漏れていないか
+- delivery 3 crate の責務分割に従っているか（`apps/cli` は委譲のみ / adapter 構築は `cli_composition` / usecase 呼び出しと表示は `cli_driver`）
+- usecase ロジックが delivery 層に漏れていないか
 - NullXxx による usecase bypass がないか（status/check-approved 用途を除く）
 ```
 
@@ -110,7 +109,6 @@ TODO: `/track:implement` と `/track:review` skill に Architecture Constraints 
 
 ## Related Documents
 
-- `hexagonal-architecture.md`: Layer boundaries and port placement
 - `architecture-rules.json`: Machine-readable layer dependencies
 - `.claude/rules/08-orchestration.md`: Delegation rules
-- `knowledge/conventions/hexagonal-architecture.md`: Trait-Based Abstraction
+- `knowledge/conventions/type-designer-kind-selection.md` R1: role × layer placement

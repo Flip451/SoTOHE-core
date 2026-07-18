@@ -27,7 +27,7 @@ Report findings ONLY for the following categories:
   §No Panics in Library Code.
 - **port misplaced**: a trait that abstracts an infrastructure capability
   (git hash, two-phase commit, HTTP client) placed in domain instead of
-  usecase. Cite `hexagonal-architecture.md` §Port Placement Rules.
+  usecase. Cite `type-designer-kind-selection.md` R1.
 - **purity violation**: `std::fs::*`, `std::net::*`, `std::process::*`,
   `std::io::*`, `std::env::*`, `chrono::Utc::now()`, `std::time::SystemTime`,
   `std::time::Instant`, `println!` / `eprintln!` reaching domain (these are

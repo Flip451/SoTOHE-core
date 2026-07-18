@@ -1162,7 +1162,7 @@ track に含めて一括対応する案。
   新 rule 適用 (本 ADR の D5.1 / Rejected §H の根拠)
 - `knowledge/conventions/enforce-by-mechanism.md` — 機構による強制 (本 ADR の CI gate / pre-commit /
   merge gate 経由の機械的強制の上位原則)
-- `knowledge/conventions/hexagonal-architecture.md` — 層依存方向の原則 (本 ADR の D3.7 / D6.1 層配置の
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — 層依存方向の原則 (本 ADR の D3.7 / D6.1 層配置の
   根拠)
 - `.claude/rules/04-coding-principles.md` — enum-first / typestate / newtype (本 ADR の
   `SpecRefFinding` enum kind 分離等で適用)

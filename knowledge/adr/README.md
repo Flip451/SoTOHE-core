@@ -11,21 +11,21 @@ decisions: []
 - **フォーマット**: Nygard 式 + Rejected Alternatives + Reassess When
 - **言語**: 日本語
 - **採番**: `YYYY-MM-DD-HHMM-slug.md`（例: `2026-03-11-1430-track-status-derived.md`）
-- **Status**: `Proposed` / `Accepted` / `Superseded` / `Deprecated`
-  - `Proposed`: ADR is authored and under review / pending activation of the associated track
-  - `Accepted`: Decision is accepted and implementation may proceed
-  - `Superseded`: Replaced by a newer ADR (reference the superseding ADR)
-  - `Deprecated`: Decision is withdrawn without replacement
-- **Superseded の場合**: 新 ADR を作成し、旧 ADR の Status を `Superseded by YYYY-MM-DD-HHMM-slug.md` に変更
+- **front-matter**: MD body の前に `adr_id` と `decisions[]` を必須で置く。各 decision は根拠 ref と decision 単位の `status` を持つ。
+- **decision status**: `proposed` / `accepted` / `implemented` / `superseded` / `deprecated`。`implemented` には `implemented_in`、`superseded` には `superseded_by` が必須。
+- **根拠**: 新規 decision には `user_decision_ref` または `review_finding_ref` を入れる。file-level の `## Status` は使用しない。
 
 ## ADR テンプレート
 
 ```markdown
+---
+adr_id: "<YYYY-MM-DD-HHMM>-<slug>"
+decisions:
+  - id: decision-1
+    user_decision_ref: "chat_segment:<session>:<date>"
+    status: proposed
+---
 # {タイトル}
-
-## Status
-
-Proposed / Accepted / Superseded / Deprecated
 
 ## Context
 
@@ -167,6 +167,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [運用ドキュメント断捨離方針 — SoT 一本化と narrative 重複の解消](2026-04-27-0554-doc-reorganization.md) | — | 2026-04-27 |
 | [運用ドキュメント再編（統合版）— ルート文書一本化・track/workflow.md 分散・工学規約の conventions 移管](2026-06-15-0025-operational-docs-restructure-unified.md) | — | 2026-06-15 |
 | [knowledge/strategy ディレクトリの整理方針](2026-06-17-1321-knowledge-strategy-cleanup.md) | — | 2026-06-17 |
+| [同梱運用ドキュメントのアーキテクチャ記述 SSoT 再編](2026-07-17-0247-docs-architecture-ssot-realignment.md) | Proposed | 2026-07-17 |
 
 ### ドメインモデル・型設計 (DESIGN.md 由来)
 

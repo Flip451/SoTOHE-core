@@ -56,7 +56,7 @@ repomix --ignore "*.lock,*.toml" \
 gemini -p "Analyze this Rust codebase comprehensively:
 - Cargo workspace structure and crate boundaries
 - Domain model: key types, value objects, aggregates
-- Port definitions (traits in domain layer)
+- Port definitions (traits in the domain and usecase layers)
 - Adapter implementations (infra layer)
 - Async patterns and Tokio usage
 - Error handling strategy
@@ -92,7 +92,7 @@ repomix --output tmp/repomix-snapshot.md --style markdown 2>/dev/null
 gemini -p "Analyze this Rust codebase for feature planning:
 - Cargo workspace: member crates and their roles
 - Existing domain types, value objects, aggregates
-- Traits (ports) defined in domain layer
+- Traits (ports) defined in the domain and usecase layers
 - Infrastructure adapters and their implementations
 - Error type hierarchy
 - Test patterns (unit, integration, mock strategy)

@@ -138,5 +138,5 @@ render を `cli_presentation` 層として分離し cli 系を 4 層にする案
 - `knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md` — usecase 出力 DTO（cli_driver が扱う）と cli→usecase 境界の前提。
 - `knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md` — 型カタログ linter framework の確立（`KindLayerConstraint` を含む opt-in ルール機構 / config 解決）。本 ADR はその既存機能を cli 系 3 層に適用する。
 - `knowledge/conventions/type-designer-kind-selection.md` — R1 役割-層マトリクス。本 ADR 確定後、cli 系 3 列と `CompositionRoot` / `PrimaryAdapter` 行を追加して同期する。
-- `knowledge/conventions/hexagonal-architecture.md` — composition root（wire）と primary adapter（invoke+render）の区別、`SecondaryAdapter`（driven）との対比の根拠。
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — composition root（wire）と primary adapter（invoke+render）の区別、`SecondaryAdapter`（driven）との対比の根拠。
 - `architecture-rules.json` — 層定義と `tddd` ブロックの SSoT。D1 はここの `tddd.enabled` を直接書き換える形で実体化される。

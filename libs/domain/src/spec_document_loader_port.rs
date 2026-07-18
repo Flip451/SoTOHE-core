@@ -1,6 +1,6 @@
 //! `SpecDocumentLoaderPort` — domain loader port for the persisted `spec.json`.
 //!
-//! Placed in the domain per the hexagonal-architecture persistence-/aggregate-port
+//! Placed in the domain per `type-designer-kind-selection.md` R1's persistence-/aggregate-port
 //! bucket, symmetric with `CatalogueDocumentLoaderPort` and the `TrackReader` /
 //! `WorktreeReader` family — not the application-service port bucket. Its error
 //! type [`SpecDocumentLoadError`] lives here too.
@@ -58,8 +58,8 @@ pub enum SpecDocumentLoadError {
 
 /// Loader port for the persisted domain document `spec.json`.
 ///
-/// Placed in the domain per hexagonal-architecture.md §「永続化・集約に関するポート
-/// → domain」バケット (symmetric with `CatalogueDocumentLoaderPort` at
+/// Placed in the domain per `type-designer-kind-selection.md` R1's
+/// persistence-/aggregate-port bucket (symmetric with `CatalogueDocumentLoaderPort` at
 /// `tddd::catalogue_v2::catalogue_impl_signals_ports` and with the `TrackReader` /
 /// `WorktreeReader` family), not the application-service port bucket. Unlike the
 /// minimal [`SpecFileLoaderPort`](crate::SpecFileLoaderPort) which returns raw

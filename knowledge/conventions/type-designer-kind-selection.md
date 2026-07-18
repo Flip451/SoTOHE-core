@@ -57,16 +57,20 @@
 | `SecondaryAdapter` (DataRole) | ✗ | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | secondary port の実装は infrastructure に置く |
 | `CompositionRoot` (DataRole) | ✗ | ✗ | ✗ | ✗ | **✓ ONLY** | ✗ | object graph を組む純 DI の住所。cli_composition 層のみ。`KindLayerConstraint` がこの配置を強制する |
 | `PrimaryAdapter` (DataRole) | ✗ | ✗ | ✗ | ✗ | ✗ | **✓ ONLY** | driving adapter (invoke+render)。cli_driver 層のみ。domain/usecase 固有ロールをメソッドシグネチャに出さない (`NoRoleInMethodSignature` で強制) |
-| `SpecificationPort` (ContractRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | driven port は domain (hexagonal) |
-| `SecondaryPort` (ContractRole) | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | hexagonal: driven port は domain または usecase（usecase port 例: `Reviewer`, `DiffGetter`） |
-| `ApplicationService` (ContractRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | hexagonal: driving port (use-case interface) は usecase layer |
-| `Repository` (ContractRole) | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | aggregate root の永続化 port (data-carrying: payload に `aggregate: TypeRef` を持ち、 参照先は AggregateRoot 役で宣言)。 domain または usecase に置く |
+| `SpecificationPort` (ContractRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | domain の仕様を表す port |
+| `SecondaryPort` (ContractRole) | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | domain / usecase のいずれにも置ける driven port |
+| `ApplicationService` (ContractRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | usecase interface |
+| `Repository` (ContractRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | aggregate root の永続化 port (data-carrying: payload に `aggregate: TypeRef` を持ち、 参照先は AggregateRoot 役で宣言)。 aggregate の語彙で説明されるため domain に置く |
 | `FreeFunction` (FunctionRole) | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | layer-flexible (top-level pub fn)。cli_composition は配線を CompositionRoot のメソッドとして書くため pub free function が生じない |
 | `UseCaseFunction` (FunctionRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | use-case entrypoint function。usecase 層 |
 
 凡例: `✓` = OK, `△` = 要根拠 (default ではない、docs フィールドに根拠を記録)、`✗` = forbidden, `**ONLY**` = この層以外で使うことを禁止
 
 `✗` または **ONLY** を破る role × layer 選択は、`bin/sotp signal calc-impl-catalog` の signal 評価以前に **role 違反** として draft 段階で却下する。
+
+#### Port placement tie-break
+
+port が domain の不変条件または aggregate の語彙で説明できるなら domain に置く。アプリケーションのオーケストレーションが必要とする技術的能力なら usecase に置く。たとえば aggregate の永続化は domain の `Repository`、レビュー実行や差分取得の能力は usecase の `SecondaryPort` として分類する。
 
 R7 (Cross-Track Port Reference) も参照すること: top-level `trait_impls` のうち `for_type` が `SecondaryAdapter` 型を指す entry の `trait_ref` が参照する port が当該 track の catalogue に未 declare の場合、`-.impl.->` edge が silently skip される。
 
@@ -87,17 +91,18 @@ R7 (Cross-Track Port Reference) も参照すること: top-level `trait_impls` �
 
 例外: トレイト境界に組み込む必要がある (`Arc<dyn Service>` で渡したい等) 場合は `role: Interactor` + `role: ApplicationService` ペアを使う。`FreeFunction` は trait 境界に組み込めない。
 
-### R3. ValueObject Semantic Restriction (validated value のみ)
+### R3. ValueObject Semantic Restriction
 
-`role: ValueObject` は「validated value (検証済み値)」の意味に厳格に限定する。**behavior を持つ struct は ValueObject ではない**。
+`role: ValueObject` は値等価で識別される値を表す。自身の値から新しい値または述語を導出する side-effect-free な method は許容する。一方、依存または外部リソースを扱う behavior 中心の service 的 struct は ValueObject ではない。
 
 | OK (ValueObject) | NG (ValueObject 違反) |
 |---|---|
-| `Email(String)` newtype + `new()` で形式検証 | `parse_*` / `evaluate_*` / `compute_*` などの計算 method を持つ struct |
+| `Email(String)` newtype + `new()` で形式検証 | `parse_*` のように外部表現を解釈する service 的 struct |
+| `Money::add` / `DateRange::overlaps` のように値から値・述語を導出する method | `Codec` / `Validator` / `Resolver` のように依存または外部 resource を扱う struct |
 | `AdrDecisionCommon { id, refs, ... }` 検証付き shared payload | `Codec` / `Validator` / `Resolver` のような behavior 中心の struct |
 | 複合 primitive を集めた読み取り専用の record | trait 実装を意図する struct (→ `role: Interactor` / `role: SecondaryAdapter`) |
 
-「validated value」の判定基準: `new()` (またはコンストラクタ) で field に格納される値の不変条件 (invariant) を確立し、その後は read-only として参照されるか。値そのものを返す getter / accessor は OK。**値以外の何かを計算して返す method は behavior** であり `ValueObject` 違反。
+判定は構造条件より意味論を優先する。値等価で識別され、method がその値だけから値または述語を導出するなら ValueObject である。依存、外部 resource、または service の責務を中心にするなら ValueObject ではない。
 
 behavior を持つ struct は以下のいずれかに振り分ける:
 
@@ -105,7 +110,7 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 - 依存あり (port を呼び出す) → `role: Interactor` (usecase) または `role: SecondaryAdapter` (infrastructure)
 - 集約構築 → `role: Factory`
 - 状態遷移あり → typestate cluster (`role: ValueObject` で各 state を typestate marker 付き `struct` として表現し、遷移メソッドを `methods` に宣言。wire format は `knowledge/conventions/catalogue-schema-reference.md`「The `kind` field」節を参照)
-- field を持つ domain behavior (状態遷移なし、依存なし) → `role: DomainService` (R6)
+- 値の同一性ではなく domain behavior を中心にする struct → `role: DomainService` (R6)
 
 ### R4. Kind Distribution Reconnaissance (起草前の偵察義務)
 
@@ -136,15 +141,15 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 
 `role: ValueObject` で迷ったときの最も多い真の答えは `role: FreeFunction` (R2) である。次に多いのは `role: Interactor` (依存あり) / `role: SecondaryAdapter` (port 実装) / `role: DomainService` (R6: field を持つ domain behavior)。`role: ValueObject` を選ぶ前に、これらの候補を必ず検討する。
 
-### R6. DomainService Selection Criteria (S1: field を持つ domain behavior の住所)
+### R6. DomainService Selection Criteria (domain behavior の住所)
 
-`role: DomainService` は **field を持ち behavior method を持つ domain struct** の正しい住所である。`role: ValueObject` (R3 違反) や `role: Interactor` (依存ありの usecase 層) との混同を防ぐため、以下の全条件を満たす場合に採用する。
+値等価で識別され、side-effect-free な導出 method だけを持つ型は DomainService ではなく ValueObject (R3) である。`role: DomainService` は値ではなく domain behavior を中心にする struct の住所であり、`role: Interactor` (依存ありの usecase 層) との混同を防ぐため、以下の全条件を満たす場合に採用する。
 
 採用条件 (AND):
 
 - struct (enum / typestate cluster ではない)
 - `kind.shape.fields` >= 1 field (state を保持する; ゼロフィールドは R2 の `FreeFunction` 候補)
-- `methods` >= 1 entry (behavior を持つ; ゼロメソッドは R3 の `ValueObject` 候補)
+- `methods` >= 1 entry (domain behavior を持つ; 導出 method だけなら R3 の `ValueObject` 候補)
 - 状態遷移なし (ある場合は typestate pattern — R3 の振り分け)
 - `ApplicationService` / `SecondaryPort` の実装ではない (実装する場合は `role: Interactor` / `role: SecondaryAdapter`)
 - 配置層は domain (default) / usecase (要根拠 — trans-domain な application logic で domain knowledge を集約する場合のみ、`docs` フィールドに根拠を記録) / infrastructure (forbidden)
@@ -152,7 +157,7 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 判定例:
 
 - `PolicyEvaluator { rules: Vec<Rule> }` + `evaluate(&self, ctx: &Context) -> Decision` → `role: DomainService` (state あり、behavior あり、依存なし)
-- `Email(String)` + `new()` のみ → `role: ValueObject` (R3: 検証済み値、behavior なし)
+- `Email(String)` + `new()` / `normalized()` → `role: ValueObject` (R3: 値からの side-effect-free な導出)
 - `parse_yaml(input: &str) -> Result<...>` → `role: FreeFunction` (R2: state なし、依存なし)
 - `RegisterUserInteractor { repo: Arc<dyn UserRepository> }` + `execute(&self, cmd) -> ...` → `role: Interactor` (R1: 依存あり、usecase 層)
 
@@ -259,7 +264,7 @@ draft が本ルールに違反する (制約ある概念を生 primitive で宣�
 - 「許可された種別の有限集合」という概念 → domain に `role: ValueObject` の `enum` を定義。外部設定から読むなら infrastructure に `role: Dto` を置いて変換。`Vec<String>` を infra に持つのは R9 + R10 違反
 - 検証付き識別子の概念 → domain に `role: ValueObject` newtype。infra DTO フィールドも生 `String` にはしない — `deserialize_with` カスタムデシリアライザで受けてフィールド型を domain VO にするか、serde-free な domain enum を持つ場合はinfra 側に deserializable な mirror newtype を定義して変換する
 
-**根拠**: hexagonal — ドメインモデル (概念) は最内核の domain 層に属する (`architecture-rules.json` で domain は `may_depend_on: []`、`knowledge/conventions/hexagonal-architecture.md`)。本ルールは当プロジェクト固有 convention (hexagonal 前提) であり、agent 定義でなく本 convention に置く (横断性のため)。
+**根拠**: domain は `architecture-rules.json` の `may_depend_on: []` で定義される最内層である。本ルールは当プロジェクト固有 convention であり、agent 定義でなく本 convention に置く (横断性のため)。
 
 ## Examples
 
@@ -295,8 +300,8 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 
 - [ ] 各 entry の `role` × layer の組合せが R1 マトリクスで OK か (✗ / ONLY 違反がないか、`DomainService` は infrastructure 層に置かれていないか)
 - [ ] zero-field struct + 1 method の entry がないか (あれば R2: `role: FreeFunction` に折り畳めないか確認)
-- [ ] `role: ValueObject` の entry がすべて R3 を満たすか (validated value のみで behavior を持たないか、`methods` が空か — ただし typestate state の entry は遷移メソッドを `methods` に持つため例外)
-- [ ] field + behavior を持つ domain struct が `role: DomainService` (R6) で起草されているか (`role: ValueObject` / `role: Interactor` への誤分類がないか)
+- [ ] `role: ValueObject` の entry がすべて R3 を満たすか (値等価で識別され、`methods` が生成時に不変条件を確立する constructor / validation、または自身の値から値または述語を導出する side-effect-free なものに限られるか。依存や外部リソースを扱う service 的 behavior がないか。typestate state の entry は遷移メソッドを `methods` に持つ)
+- [ ] R6 の採用条件を満たし、値等価で識別される ValueObject (R3) ではない service 中心の field + behavior を持つ domain struct が `role: DomainService` で起草されているか (`role: ValueObject` / `role: Interactor` への誤分類がないか)
 - [ ] role 起草前に偵察 (R4) を実施したか (近接 track の role 分布を確認したか)
 - [ ] catch-all として `role: ValueObject` / `role: UseCase` を選んでいないか (R5)
 - [ ] top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の型を指す entry の `trait_ref` で参照するすべての trait (port) が当該 track の catalogue に `traits` エントリ (role は `SecondaryPort` または `Repository`) として declare されているか (R7)。baseline 由来の port は `action: "reference"` で declare されているか
@@ -316,7 +321,6 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 ## Related Documents
 
 - `knowledge/conventions/prefer-type-safe-abstractions.md` — enum-first / typestate / newtype の design principle (本 convention は role 選定への適用)
-- `knowledge/conventions/hexagonal-architecture.md` — layer 境界と port placement (R1 の根拠)
 - `knowledge/conventions/pre-track-adr-authoring.md` — ADR 配置規則 (catalogue の上流 SSoT)
 - `architecture-rules.json` — TDDD 対応層の SSoT (R1 layer 列挙の根拠)
 - `libs/domain/src/tddd/catalogue_v2/roles.rs` — `DataRole` / `ContractRole` / `FunctionRole` enum 定義 (現行 schema の role 正本; v2 の `TypeDefinitionKind` に相当)

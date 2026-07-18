@@ -34,7 +34,7 @@ Check `.harness/config/agent-profiles.json` first. Use this skill only when the 
 gemini -p "Analyze this Rust codebase comprehensively:
 - Cargo workspace structure and crate boundaries
 - Domain model: key types, value objects, aggregates
-- Port definitions (traits in domain layer)
+- Port definitions (traits in the domain and usecase layers)
 - Adapter implementations (infra layer)
 - Async patterns and Tokio usage
 - Error handling strategy

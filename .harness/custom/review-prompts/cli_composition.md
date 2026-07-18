@@ -17,8 +17,8 @@ Report findings ONLY for the following categories:
   calls a use-case interactor method (e.g., `.run(...)` / `.dispatch(...)` /
   `.execute(...)`) instead of constructing it and injecting it into a Driver.
   Composition root wires object graphs at startup; invoking a use case at
-  wiring time is an invoke leak. Cite `hexagonal-architecture.md` §CLI as
-  Composition Root.
+  wiring time is an invoke leak. Cite `type-designer-kind-selection.md` R1
+  (`CompositionRoot`).
 - **render leak**: a module in `cli_composition` that assembles user-facing
   strings, formats tables, or performs output templating. Rendering is the
   `cli_driver` layer's responsibility; string construction in the composition
@@ -35,14 +35,14 @@ Report findings ONLY for the following categories:
   in `libs/infrastructure`; `cli_composition` only constructs and wires them.
 - **port-adapter pairing mistake**: a wiring function that constructs adapter `A`
   but binds it to a port that `A` does NOT implement (code may compile via a
-  separate impl block). Cite `hexagonal-architecture.md` §Adapter Rules and
+  separate impl block). Cite `type-designer-kind-selection.md` R1 and
   `architecture-rules.json`.
 - **panic in wiring**: `unwrap()` / `expect()` on a config-load or constructor
   call in production wiring. Wiring errors must propagate as `Result<_, CompositionError>`
   to the CLI caller. Cite `coding-principles.md` §No Panics in Library Code.
 - **double-instantiation of stateful adapter**: a builder that creates two
   instances of an adapter holding shared mutable state (file handle, DB pool, lock)
-  where one was intended. Cite `hexagonal-architecture.md` §Adapter Rules.
+  where one was intended. Cite `type-designer-kind-selection.md` R1.
 - **leaked test fixture in production wiring**: a `pub fn` reachable from real CLI
   commands that returns an adapter with a hard-coded test profile, fake path, or
   in-memory store. Cite `coding-principles.md` test-code exclusions.
