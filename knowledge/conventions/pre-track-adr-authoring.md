@@ -61,7 +61,7 @@ ADR の意味は user に属する。track が ADR を扱う全期間につい�
 
 本節が規範の正であり、機構は以下の形で追随している:
 
-- `adr-baseline check-review` — review 入口の ADR 状態検査は「init 刻印の存在確認と帳簿完全性」のみであり、byte 照合の発火点は commit gate / CI に限られる (決定: `knowledge/adr/` の該当 ADR)。専用の承認 kind は存在しない。承認の記録は、ループで修正した decision 自身の front-matter `user_decision_ref` への承認 ref 追記が担い (chain ⓪ が検証)、その後の escalation 刻印の reason には自己完結の欠落説明だけを記す (承認の ledger 重複記録なし)。編集なしで収束した場合は追加の刻印を行わない。
+- `adr-baseline check-review` — review 入口の ADR 状態検査は「init 刻印の存在確認と帳簿完全性」のみであり、byte 照合の発火点は commit gate / CI に限られる (決定: `knowledge/adr/` の該当 ADR)。専用の承認 kind は存在しない。承認の記録は、ループで修正した decision 自身の front-matter `user_decision_ref` への承認 ref 追記が担い (chain ⓪ が検証)、その後の escalation 刻印の reason には自己完結の欠落説明だけを記す (承認の ledger 重複記録なし)。primary ADR の escalation 刻印では、この reason に origin-input の由来と要旨（少なくとも local review round / 外部 PR review round / spec→ADR の 🔴 signal / diagnose routing を区別）および adr-diagnoser verdict の要旨を含める。これは自己完結の欠落説明を具体化するものであり、user 承認の ledger 重複ではない。編集なしで収束した場合は追加の刻印を行わない。
 - 守護者判定の workflow 配線 — capability 定義 (`.harness/capabilities/adr-diagnoser.md`) が編集判定モード (決定保存 / 決定破壊 + 保全代案または修正不要理由) を定義し、review / plan / adr2pr の workflow SSoT が「編集ごとに守護者判定を挟み、その出力をレビュアーへ還流させる」手順を刻む。
 - plan / adr2pr workflow の autonomy 制約 — Phase 0 の user 承認エスカレーションが明示的例外として carve-out されている。
 

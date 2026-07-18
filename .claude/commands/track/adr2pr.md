@@ -46,3 +46,5 @@ After execution, summarize:
 2. PR URL and the final `/track:pr-review` result (confirming no merge was performed).
 3. Any per-scope ceiling batch split decisions made during full-cycle.
 4. Confirmation that all 🔴/🟡 signals are resolved.
+5. The terminal primary-ADR diff-comment result: posted URL, or its empty-diff/provenance
+   fallback outcome, or the reported non-fatal posting failure.

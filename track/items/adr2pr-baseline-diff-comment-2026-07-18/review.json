@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:48979f08611acb56023d2ed25552ffba05c9fe25b3ee1e8343b748a40030165e",
-          "at": "2026-07-18T05:39:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:48979f08611acb56023d2ed25552ffba05c9fe25b3ee1e8343b748a40030165e",
-          "at": "2026-07-18T05:41:52Z"
-        }
-      ]
-    },
     "adr": {
       "rounds": [
         {
@@ -109,54 +91,21 @@
         }
       ]
     },
-    "spec": {
+    "types": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7271a0019d555cb07301d9f17208f5cc97291db6323bb6f497bd39bef6d672c6",
-          "at": "2026-07-18T05:38:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track-lifecycle.md` の「Generated Views」は `metadata.json` / `impl-plan.json` から生成される `track/registry.md` の規則であり、同 convention は `spec.json` の生成パイプラインを適用外と明記しています。この docs-only feature や `spec.md` の扱いを支えないため、`related_conventions[]` の narrative-level cross-reference として不適切です。関連する規範へ差し替えるか、この参照を除外してください。",
-              "severity": "P1",
-              "file": "track/items/adr2pr-baseline-diff-comment-2026-07-18/spec.json",
-              "line": 239,
-              "category": "broken cross-reference at narrative level"
-            }
-          ],
-          "hash": "rvw1:sha256:7271a0019d555cb07301d9f17208f5cc97291db6323bb6f497bd39bef6d672c6",
-          "at": "2026-07-18T05:42:39Z"
+          "hash": "rvw1:sha256:48979f08611acb56023d2ed25552ffba05c9fe25b3ee1e8343b748a40030165e",
+          "at": "2026-07-18T05:39:01Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c7e7eb0a3fd1a51a369939502636071367d893545eb40490346c8b417493f66a",
-          "at": "2026-07-18T05:44:09Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d8b3a3fa208f61f668dc10de59d193ed38549df80cf8bdb1d5a71287e6c2c69b",
-          "at": "2026-07-18T05:18:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d8b3a3fa208f61f668dc10de59d193ed38549df80cf8bdb1d5a71287e6c2c69b",
-          "at": "2026-07-18T05:21:48Z"
+          "hash": "rvw1:sha256:48979f08611acb56023d2ed25552ffba05c9fe25b3ee1e8343b748a40030165e",
+          "at": "2026-07-18T05:41:52Z"
         }
       ]
     },
@@ -205,6 +154,52 @@
           "findings": [],
           "hash": "rvw1:sha256:4dec011d07c97f95f3337554c62dc317664437fd1a1dccc523b09019cd1f5912",
           "at": "2026-07-18T05:48:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:576b4fa0dba305902307a3b458018980cd352cfea3d20050a1cca1d1986f7f76",
+          "at": "2026-07-18T06:01:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:576b4fa0dba305902307a3b458018980cd352cfea3d20050a1cca1d1986f7f76",
+          "at": "2026-07-18T06:05:01Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8b3a3fa208f61f668dc10de59d193ed38549df80cf8bdb1d5a71287e6c2c69b",
+          "at": "2026-07-18T05:18:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8b3a3fa208f61f668dc10de59d193ed38549df80cf8bdb1d5a71287e6c2c69b",
+          "at": "2026-07-18T05:21:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd1035f5142b1ad3bab17f66dc89c978bbd3f66eddf53c449a5006947ffb1e96",
+          "at": "2026-07-18T06:01:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd1035f5142b1ad3bab17f66dc89c978bbd3f66eddf53c449a5006947ffb1e96",
+          "at": "2026-07-18T06:06:33Z"
         }
       ]
     },
@@ -237,6 +232,39 @@
           "findings": [],
           "hash": "rvw1:sha256:289d0e2f7e7f2a8a3bbc8b39bd3a7f060bf434f4a8004e71908947812ab5290a",
           "at": "2026-07-18T05:21:22Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7271a0019d555cb07301d9f17208f5cc97291db6323bb6f497bd39bef6d672c6",
+          "at": "2026-07-18T05:38:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-lifecycle.md` の「Generated Views」は `metadata.json` / `impl-plan.json` から生成される `track/registry.md` の規則であり、同 convention は `spec.json` の生成パイプラインを適用外と明記しています。この docs-only feature や `spec.md` の扱いを支えないため、`related_conventions[]` の narrative-level cross-reference として不適切です。関連する規範へ差し替えるか、この参照を除外してください。",
+              "severity": "P1",
+              "file": "track/items/adr2pr-baseline-diff-comment-2026-07-18/spec.json",
+              "line": 239,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:7271a0019d555cb07301d9f17208f5cc97291db6323bb6f497bd39bef6d672c6",
+          "at": "2026-07-18T05:42:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7e7eb0a3fd1a51a369939502636071367d893545eb40490346c8b417493f66a",
+          "at": "2026-07-18T05:44:09Z"
         }
       ]
     }

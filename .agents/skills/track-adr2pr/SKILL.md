@@ -48,4 +48,7 @@ or failure-recovery procedures here.
 - On successful completion (only when the final `$track-pr-review` step reaches its
   zero-findings terminal state per `.harness/workflows/track/adr2pr.md`), print:
   `ADR2PR_STATUS: completed — PR <url> reviewed, no merge performed`
+- After that line, report the terminal primary-ADR diff-comment result on one line: the posted
+  comment URL, or its empty-diff/provenance-fallback outcome, or the reported non-fatal
+  posting failure.
 - On failure or block, print: `ADR2PR_STATUS: blocked — <reason>`
