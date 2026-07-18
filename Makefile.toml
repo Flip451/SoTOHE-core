@@ -33,7 +33,7 @@ echo "=== Bootstrap: development environment setup ==="
 
 # 1. Check prerequisites
 echo ""
-echo "--- Step 1/6: Check prerequisites ---"
+echo "--- Step 1/7: Check prerequisites ---"
 if ! command -v docker >/dev/null 2>&1; then
   echo "[FAIL] docker not found. Install Docker first."
   exit 1
@@ -52,20 +52,26 @@ echo "[OK] cargo available"
 
 # 2. Docker images
 echo ""
-echo "--- Step 2/6: Build Docker images ---"
+echo "--- Step 2/7: Build Docker images ---"
 mkdir -p target .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home
 docker compose build tools
 echo "[OK] Docker tools image built"
 
 # 3. Build sotp CLI binary
 echo ""
-echo "--- Step 3/6: Build sotp CLI binary ---"
+echo "--- Step 3/7: Build sotp CLI binary ---"
 cargo make build-sotp
 echo "[OK] bin/sotp built and installed"
 
-# 4. Git hooks path
+# 4. Provision Codex runtime link
 echo ""
-echo "--- Step 4/6: Configure git hooks path ---"
+echo "--- Step 4/7: Provision Codex runtime link ---"
+bin/sotp codex-runtime provision --project-root .
+echo "[OK] Codex runtime link provisioned"
+
+# 5. Git hooks path
+echo ""
+echo "--- Step 5/7: Configure git hooks path ---"
 if [ "$(git config --local core.hooksPath 2>/dev/null || true)" = ".githooks" ]; then
   echo "[OK] core.hooksPath already set"
 else
@@ -74,15 +80,15 @@ else
 fi
 chmod +x .githooks/reference-transaction .githooks/pre-push 2>/dev/null || true
 
-# 5. CI
+# 6. CI
 echo ""
-echo "--- Step 5/6: Run CI ---"
+echo "--- Step 6/7: Run CI ---"
 docker compose run --rm tools cargo make --allow-private ci-local
 echo "[OK] CI passed"
 
-# 6. Git notes fetch refspec
+# 7. Git notes fetch refspec
 echo ""
-echo "--- Step 6/6: Configure git notes fetch refspec ---"
+echo "--- Step 7/7: Configure git notes fetch refspec ---"
 if git remote get-url origin >/dev/null 2>&1; then
   if git config --get-all remote.origin.fetch | grep -q 'refs/notes'; then
     echo "[OK] git notes refspec already configured"
@@ -796,24 +802,18 @@ args = ["run", "--quiet", "-p", "cli", "--", "adr-baseline", "check-commit"]
 description = "[wrapper] Require an active-track init designation and verify every recorded ADR baseline, fire attribution-completeness + liveness gates (via task-contract-check), refresh signals + rendered views (via track-active-gate), then invoke a single reviewer round via bin/sotp review local. --primary-source is only for direct CLI invocations. Running track-active-gate after task-contract-check ensures the reviewer sees view artifacts rendered from the latest signal state (the fixer's between-rounds code edits would otherwise leave *-types.md stale)."
 dependencies = ["adr-baseline-check-review", "task-contract-check", "track-active-gate"]
 script_runner = "@shell"
-script = ['''
-case "${1:-}" in --) shift ;; esac
-CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp review local "$@"
-''']
+script = ['case "${1:-}" in --) shift ;; esac; bin/sotp review local "$@"']
 
 [tasks.track-local-review-fix]
 description = "[wrapper] Same as track-local-review but invokes bin/sotp review fix-local instead of review local. It first requires an active-track init designation and verifies every recorded ADR baseline, runs task-contract gates, then refreshes signals + rendered views before delegation. --primary-source is only for direct CLI invocations. Provider-agnostic: bin/sotp resolves provider/model from .harness/config/agent-profiles.json. Active track auto-resolved from current git branch (--track-id is intentionally not accepted at the cargo-make layer)."
 dependencies = ["adr-baseline-check-review", "task-contract-check", "track-active-gate"]
 script_runner = "@shell"
-script = ['''
-case "${1:-}" in --) shift ;; esac
-CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp review fix-local "$@"
-''']
+script = ['case "${1:-}" in --) shift ;; esac; bin/sotp review fix-local "$@"']
 
 [tasks.track-local-dry-fix]
-description = "[wrapper] Resolve CODEX_BIN for toolchain-manager shims, then launch the Codex dry-fix-lead fixer via bin/sotp dry fix-local"
+description = "[wrapper] Launch the Codex dry-fix-lead fixer via bin/sotp dry fix-local"
 script_runner = "@shell"
-script = ['case "${1:-}" in --) shift ;; esac; CODEX_BIN="${CODEX_BIN:-$(asdf which codex 2>/dev/null || command -v codex)}" bin/sotp dry fix-local "$@"']
+script = ['case "${1:-}" in --) shift ;; esac; bin/sotp dry fix-local "$@"']
 
 [tasks.track-add-paths]
 description = "[wrapper] Stage paths listed in tmp/track-commit/add-paths.txt and delete the scratch file"

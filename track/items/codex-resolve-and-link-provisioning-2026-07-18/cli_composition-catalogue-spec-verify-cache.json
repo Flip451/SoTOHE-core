@@ -3,11 +3,11 @@
   "layer": "cli_composition",
   "entries": [
     {
-      "claim_hash": "eb4d7d239fcca171589f1773da6fb88295a8672b40e6c247f9080616f5f1ca6a",
+      "claim_hash": "4f96709578d791c0c19b73c3b5166b47a93ad36ed0af585b33eaace602009853",
       "evidence_hash": "4962bd783441ab4fc6f505d289f478034f5f6db810f2bc4613b77a7f447a2bca",
       "verdict": {
         "kind": "pass",
-        "citation": "`cargo make bootstrap` に、通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。"
+        "citation": "通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "eb4d7d239fcca171589f1773da6fb88295a8672b40e6c247f9080616f5f1ca6a",
+      "claim_hash": "4f96709578d791c0c19b73c3b5166b47a93ad36ed0af585b33eaace602009853",
       "evidence_hash": "a5dfe453fd3a72f783343e1b7c3b3dcb08e6f50f1a568c3c9fd610dc02e80bf0",
       "verdict": {
         "kind": "pass",

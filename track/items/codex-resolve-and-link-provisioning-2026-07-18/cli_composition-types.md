@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CodexRuntimeCompositionRoot | composition_root | add | — | 🟡 | 🔵 |
+| CodexRuntimeCompositionRoot | composition_root | add | — | 🔵 | 🔵 |
 

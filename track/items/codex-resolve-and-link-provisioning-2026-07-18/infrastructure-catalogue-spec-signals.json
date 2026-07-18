@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "8429affe14ce0f336c87249150e7986f3320727ece7c6e9b41829a6105ad2886",
+  "catalogue_declaration_hash": "5bc1659f701cc1d6bd4169d182dc14bd9f1969e6752ffb82d97fac4c70dd20f1",
   "signals": [
     {
       "type_name": "CodexCapabilityAdapter",
@@ -10,7 +10,7 @@
     {
       "type_name": "CodexDryChecker",
       "signal": "blue",
-      "entry_hash": "fbeae0faec9263c9fdc4a85fa28d1dd483c60a900528ef8944fe48644048db96"
+      "entry_hash": "3f0ea98fa18e73447fa4376a483d4e396da876664af5c07280b93eb7500a4934"
     },
     {
       "type_name": "CodexDryFixLocalRunner",

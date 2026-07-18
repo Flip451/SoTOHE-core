@@ -1,89 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b12859626adb3a1e6c8d1747b9b38794c392266475b444265bcdeac4b2c6ca41",
-          "at": "2026-07-18T07:14:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`infrastructure::codex_common::resolve_codex_runtime` の `docs` が「repo-local を先に probe し、その後 PATH fallback」という IN-03/CN-02/CN-03 の挙動を再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、変更対象と anchor 参照だけにしてください。",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
-              "line": 6,
-              "category": "SoT integrity"
-            },
-            {
-              "message": "`infrastructure::codex_common::resolve_codex_runtime` は保持しない `project_root` を `PathBuf` で所有権移動させるため、呼び出し側に不要な clone を強制します。read-only resolver の引数は `&std::path::Path` にしてください。",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
-              "line": 12,
-              "category": "API shape"
-            },
-            {
-              "message": "`infrastructure::ResolvedCodexRuntime` の `&self` accessor 4件が `OsString`、`Option<PathBuf>`、`PathBuf`、`String` を所有値で返し、参照だけで足りる利用にも clone/allocation を強制します。各戻り値を `&OsStr`、`Option<&Path>`、`&Path`、`&str` として宣言してください。",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
-              "line": 66,
-              "category": "API shape"
-            },
-            {
-              "message": "`infrastructure::FsCodexRuntimeProvisioner` の `docs` が「解決・probe 後に link を作る」という IN-01/AC-01 の順序契約を再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、変更対象と anchor 参照だけにしてください。",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
-              "line": 547,
-              "category": "SoT integrity"
-            },
-            {
-              "message": "`usecase::CodexRuntimeProvisionPort::provision` は filesystem、npm、subprocess I/O を担う port なのに同期メソッドとして宣言され、`docs` に blocking を選ぶ理由もありません。async 境界にするか、同期実行を意図した契約として明記し、`CodexRuntimeProvisionService` 側も同じ実行色に揃えてください。",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
-              "line": 101,
-              "category": "API shape"
-            }
-          ],
-          "hash": "rvw1:sha256:b12859626adb3a1e6c8d1747b9b38794c392266475b444265bcdeac4b2c6ca41",
-          "at": "2026-07-18T07:25:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `CodexRuntimeProvisionPort::provision` and `CodexRuntimeProvisionService::provision` declarations take `project_root: std::path::PathBuf` by value even though the operation only needs to use the repository path as a location and the infrastructure resolver already accepts `&std::path::Path`. This needlessly transfers ownership across the usecase boundary and forces callers to clone or relinquish a path; declare a borrowed path (`&std::path::Path`) unless the contract explicitly requires ownership.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
-              "line": 106,
-              "category": "ownership signature smell"
-            }
-          ],
-          "hash": "rvw1:sha256:9f98a58921eae558a18b72b337fe0f78b12db9d572cd1495e9029b6bb93b7bc7",
-          "at": "2026-07-18T07:37:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9a68bf5e26398d230ecbb096d4a6fb0130cee98a3b20fcc57b0a27bb1737b222",
-          "at": "2026-07-18T07:46:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9a68bf5e26398d230ecbb096d4a6fb0130cee98a3b20fcc57b0a27bb1737b222",
-          "at": "2026-07-18T07:48:55Z"
-        }
-      ]
-    },
     "adr": {
       "rounds": [
         {
@@ -102,6 +19,42 @@
         }
       ]
     },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
+          "at": "2026-07-18T09:37:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
+          "at": "2026-07-18T09:41:57Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71b3db4a1c44e54048039ed353e5194fd13cb7262fce45a603ff95ae7025b4fa",
+          "at": "2026-07-18T09:37:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71b3db4a1c44e54048039ed353e5194fd13cb7262fce45a603ff95ae7025b4fa",
+          "at": "2026-07-18T09:39:32Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -117,6 +70,52 @@
           "findings": [],
           "hash": "rvw1:sha256:cc221f6599a16c2027d1c34dd526522ecf4f90679d5fe71e231d023442cb7e5a",
           "at": "2026-07-18T05:40:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5c5869091b45fd6d626f1ab9d30e35e765b27529be2b260e698a9e633c821bae",
+          "at": "2026-07-18T09:36:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5c5869091b45fd6d626f1ab9d30e35e765b27529be2b260e698a9e633c821bae",
+          "at": "2026-07-18T09:39:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf35d50165f64b3a58b0aba34a5f24b4a8d546836b834dcd9d2036ceb2d96126",
+          "at": "2026-07-18T10:31:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf35d50165f64b3a58b0aba34a5f24b4a8d546836b834dcd9d2036ceb2d96126",
+          "at": "2026-07-18T10:32:38Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b254af5672d3ab0df682a6313c43290fd522aa1437a1470ebadefcc8c73cc10",
+          "at": "2026-07-18T09:37:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b254af5672d3ab0df682a6313c43290fd522aa1437a1470ebadefcc8c73cc10",
+          "at": "2026-07-18T09:39:39Z"
         }
       ]
     },
@@ -262,6 +261,362 @@
           "findings": [],
           "hash": "rvw1:sha256:d9dfb00a73d310fc0d5845159a8f837c9e0643e16538a71bc264418ac2694ec7",
           "at": "2026-07-18T07:28:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68c532657c656bd02ecf25a5152efb5649ce6f6e86c1c72dc91f4bf0735071d0",
+          "at": "2026-07-18T09:36:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68c532657c656bd02ecf25a5152efb5649ce6f6e86c1c72dc91f4bf0735071d0",
+          "at": "2026-07-18T09:41:32Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
+          "at": "2026-07-18T09:36:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
+          "at": "2026-07-18T09:41:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
+          "at": "2026-07-18T09:55:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
+          "at": "2026-07-18T10:10:43Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcf7ca8baf02fca80fe94f1b172726a889c31c7520af359a182e2e3847de4702",
+          "at": "2026-07-18T09:36:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodexRuntimeCompositionRoot::provision` immediately calls `CodexRuntimeDriver::handle(input)` and returns its `CommandOutcome`. This starts the invoke/render flow inside `cli_composition`, although `CompositionRoot` is pure DI and should return the wired driver for `apps/cli` to invoke. Return `CodexRuntimeDriver` from the composition root and move `.handle(input)` to the CLI command handler.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/codex_runtime.rs",
+              "line": 30,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:fcf7ca8baf02fca80fe94f1b172726a889c31c7520af359a182e2e3847de4702",
+          "at": "2026-07-18T09:40:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodexRuntimeCompositionRoot` no longer implements the catalogue-defined public `provision(input: CodexRuntimeInput) -> CommandOutcome` method; it exposes `codex_runtime_driver()` instead. This breaks the declared composition-root API and any callers generated or wired against the catalogue signature.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/codex_runtime.rs",
+              "line": 15,
+              "category": "wiring/API signature mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
+          "at": "2026-07-18T09:55:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
+          "at": "2026-07-18T09:56:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
+          "at": "2026-07-18T09:57:45Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`refresh_link` constructs `.harness/tools/bin/codex` and calls `create_dir_all`/`rename` without canonicalizing the parent and verifying it remains under `project_root`. If `.harness`, `tools`, or `bin` is a symlink to an external directory, bootstrap writes the runtime link outside the trusted repository root. Add a fail-closed trusted-root check before creating or replacing the link.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/codex_runtime.rs",
+              "line": 171,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:3ab7762aa91935d82de587c0cc9417c00282b6b0b8bf49eb95335ca828259628",
+          "at": "2026-07-18T09:37:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`refresh_link` joins the repository root with `.harness/tools/bin/codex` and writes via `create_dir_all`/`rename` without verifying the resolved parent remains under the trusted project root. A symlinked `.harness`, `tools`, or `bin` directory can redirect provisioning outside the repository. Add a fail-closed trusted-root check before writing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/codex_runtime.rs",
+              "line": 171,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:ec015948aa50080aa7f0c057112b15ae6fbc3af0aa34151d0754884cfc553a7b",
+          "at": "2026-07-18T09:42:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The trusted-root checks precede `rename`, but the parent path is resolved again only before the final filesystem operation. An attacker able to replace a checked ancestor directory with a symlink in the intervening window can still redirect the atomic rename outside `trusted_root`; use directory-handle-relative operations or otherwise close this TOCTOU gap.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/codex_runtime.rs",
+              "line": 201,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:7a98adae070673910c15157ec8f1030bf234892e1af14aac65759facd36f6289",
+          "at": "2026-07-18T09:45:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d5266ae4848d5840d4054c5cf2da04c8ad19dccc5fa289deb92c69e42bcf54b",
+          "at": "2026-07-18T10:01:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9120c24fc0aa2578cc55928e927fd6278bec45093259087072cf74231d7e235",
+          "at": "2026-07-18T10:07:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`resolve_codex_runtime` runs every candidate's `--version` probe with `Command::output()`, which has neither a deadline nor stdout/stderr limits. A broken or malicious repository-link/PATH executable can therefore hang every Codex workflow indefinitely or exhaust memory before the adapter's configured child timeout begins. Run this short probe through a bounded-output helper with a fixed deadline and map failures to `ProbeFailed`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/codex_common.rs",
+              "line": 159,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "The `npm prefix -g` fallback uses unbounded `Command::output()`. A stalled or noisy npm executable can hang bootstrap or consume unbounded memory instead of returning `NpmQueryFailed`; apply a short timeout and strict stdout/stderr caps.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/codex_runtime.rs",
+              "line": 98,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "The sanitized candidate probe also uses unbounded `Command::output()`. A candidate that never exits or emits unlimited output can block/OOM bootstrap before it reaches the typed failure path. Use the bounded subprocess runner with a short probe deadline and output limit.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/codex_runtime.rs",
+              "line": 139,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "Capability execution performs a second unbounded `codex --version` call solely to populate the session-log header. This happens before the provider process and outside its request timeout, so a changed or stalled executable can prevent dispatch indefinitely. Reuse the already-resolved runtime metadata or run the logging probe with bounded output and a deadline.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/process.rs",
+              "line": 292,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:e9120c24fc0aa2578cc55928e927fd6278bec45093259087072cf74231d7e235",
+          "at": "2026-07-18T10:18:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new ref-verifier session log writes all of `stderr_text`, which is populated by the unbounded `spawn_read_to_string` collector. A noisy or malicious Codex process can therefore grow memory and the persistent log without limit. Drain stderr with a fixed-size retained buffer and cap the session log, as the other Codex adapters do.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/ref_verify/process_runner.rs",
+              "line": 458,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:8c0fba0511e286494ec7a2e65e3877382adc6f139304452ffa0e50a571a42828",
+          "at": "2026-07-18T10:25:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e85920be11cf13996f8644691a2ef7501defb9bc1eb8d091188b66e2550c532",
+          "at": "2026-07-18T10:30:06Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b12859626adb3a1e6c8d1747b9b38794c392266475b444265bcdeac4b2c6ca41",
+          "at": "2026-07-18T07:14:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::codex_common::resolve_codex_runtime` の `docs` が「repo-local を先に probe し、その後 PATH fallback」という IN-03/CN-02/CN-03 の挙動を再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、変更対象と anchor 参照だけにしてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
+              "line": 6,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`infrastructure::codex_common::resolve_codex_runtime` は保持しない `project_root` を `PathBuf` で所有権移動させるため、呼び出し側に不要な clone を強制します。read-only resolver の引数は `&std::path::Path` にしてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
+              "line": 12,
+              "category": "API shape"
+            },
+            {
+              "message": "`infrastructure::ResolvedCodexRuntime` の `&self` accessor 4件が `OsString`、`Option<PathBuf>`、`PathBuf`、`String` を所有値で返し、参照だけで足りる利用にも clone/allocation を強制します。各戻り値を `&OsStr`、`Option<&Path>`、`&Path`、`&str` として宣言してください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
+              "line": 66,
+              "category": "API shape"
+            },
+            {
+              "message": "`infrastructure::FsCodexRuntimeProvisioner` の `docs` が「解決・probe 後に link を作る」という IN-01/AC-01 の順序契約を再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、変更対象と anchor 参照だけにしてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
+              "line": 547,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`usecase::CodexRuntimeProvisionPort::provision` は filesystem、npm、subprocess I/O を担う port なのに同期メソッドとして宣言され、`docs` に blocking を選ぶ理由もありません。async 境界にするか、同期実行を意図した契約として明記し、`CodexRuntimeProvisionService` 側も同じ実行色に揃えてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+              "line": 101,
+              "category": "API shape"
+            }
+          ],
+          "hash": "rvw1:sha256:b12859626adb3a1e6c8d1747b9b38794c392266475b444265bcdeac4b2c6ca41",
+          "at": "2026-07-18T07:25:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `CodexRuntimeProvisionPort::provision` and `CodexRuntimeProvisionService::provision` declarations take `project_root: std::path::PathBuf` by value even though the operation only needs to use the repository path as a location and the infrastructure resolver already accepts `&std::path::Path`. This needlessly transfers ownership across the usecase boundary and forces callers to clone or relinquish a path; declare a borrowed path (`&std::path::Path`) unless the contract explicitly requires ownership.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+              "line": 106,
+              "category": "ownership signature smell"
+            }
+          ],
+          "hash": "rvw1:sha256:9f98a58921eae558a18b72b337fe0f78b12db9d572cd1495e9029b6bb93b7bc7",
+          "at": "2026-07-18T07:37:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a68bf5e26398d230ecbb096d4a6fb0130cee98a3b20fcc57b0a27bb1737b222",
+          "at": "2026-07-18T07:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a68bf5e26398d230ecbb096d4a6fb0130cee98a3b20fcc57b0a27bb1737b222",
+          "at": "2026-07-18T07:48:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::CodexDryChecker` restates upstream design rationale and behavior in `docs` (opaque provider strings, pass-through semantics, and prompt-label treatment) instead of referring to the governing spec anchors. Keep this field as an anchor-based summary only, per `no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
+              "line": 244,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:9c973a83db9d438a390d95ab17facf51fd433934de4994671bd3eee3d9a9b7ff",
+          "at": "2026-07-18T09:56:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5315bfa32c7303b12795715c1c2a580bb88847e9513e86afceaf7503df43d2ee",
+          "at": "2026-07-18T10:06:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::commands::codex_runtime::execute` is declared as `UseCaseFunction`, but `type-designer-kind-selection.md` R1 permits that role only in the usecase layer. This function is a stateless CLI delivery handler that obtains and invokes a driver, so declare it as the CLI-compatible `FreeFunction` role.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli-types.json",
+              "line": 16,
+              "category": "SoT integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:5315bfa32c7303b12795715c1c2a580bb88847e9513e86afceaf7503df43d2ee",
+          "at": "2026-07-18T10:12:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:97397f5c554974a93727d89340d79ea6cda3534ac779ea9cb92a6d5114b0102b",
+          "at": "2026-07-18T10:19:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:97397f5c554974a93727d89340d79ea6cda3534ac779ea9cb92a6d5114b0102b",
+          "at": "2026-07-18T10:20:34Z"
         }
       ]
     }

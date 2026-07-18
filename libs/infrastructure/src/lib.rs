@@ -12,6 +12,7 @@ pub mod arch;
 pub mod capability_exec;
 pub mod code_profile_builder;
 pub mod codex_common;
+pub mod codex_runtime;
 pub mod conventions;
 pub mod demo;
 pub mod dry_check;

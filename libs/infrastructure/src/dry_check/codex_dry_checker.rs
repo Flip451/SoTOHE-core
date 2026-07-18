@@ -24,7 +24,7 @@ use usecase::dry_check::{
 };
 
 use crate::codex_common::{
-    POLL_INTERVAL, REVIEW_RUNTIME_DIR, codex_bin, runtime_path, spawn_codex,
+    POLL_INTERVAL, REVIEW_RUNTIME_DIR, resolve_codex_runtime, runtime_path, spawn_codex,
 };
 
 // ── Output schema ─────────────────────────────────────────────────────────────
@@ -218,9 +218,35 @@ impl CodexDryChecker {
         })?;
 
         #[cfg(test)]
-        let bin = self.bin_override.clone().unwrap_or_else(codex_bin);
+        let runtime = if self.bin_override.is_none() {
+            Some(
+                resolve_codex_runtime(&std::env::current_dir().map_err(|error| {
+                    DryCheckAgentError::Unexpected(format!(
+                        "failed to determine project root: {error}"
+                    ))
+                })?)
+                .map_err(|error| DryCheckAgentError::Unexpected(error.to_string()))?,
+            )
+        } else {
+            None
+        };
+        #[cfg(test)]
+        let (bin, runtime_for_spawn) = match (&self.bin_override, runtime.as_ref()) {
+            (Some(bin), _) => (bin.clone(), None),
+            (None, Some(runtime)) => (runtime.executable().to_os_string(), Some(runtime)),
+            (None, None) => {
+                return Err(DryCheckAgentError::Unexpected(
+                    "test Codex runtime missing".to_owned(),
+                ));
+            }
+        };
         #[cfg(not(test))]
-        let bin = codex_bin();
+        let runtime = resolve_codex_runtime(&std::env::current_dir().map_err(|error| {
+            DryCheckAgentError::Unexpected(format!("failed to determine project root: {error}"))
+        })?)
+        .map_err(|error| DryCheckAgentError::Unexpected(error.to_string()))?;
+        #[cfg(not(test))]
+        let (bin, runtime_for_spawn) = (runtime.executable().to_os_string(), Some(&runtime));
 
         let invocation = crate::codex_common::build_codex_read_only_invocation(
             model,
@@ -230,8 +256,8 @@ impl CodexDryChecker {
             &output_schema,
         );
 
-        let (child, io_handles) =
-            spawn_codex(&bin, &invocation, &session_log).map_err(DryCheckAgentError::Unexpected)?;
+        let (child, io_handles) = spawn_codex(&bin, &invocation, &session_log, runtime_for_spawn)
+            .map_err(DryCheckAgentError::Unexpected)?;
 
         run_codex_child(child, io_handles, self.timeout, output_last_message)
     }

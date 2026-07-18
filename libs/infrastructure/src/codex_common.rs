@@ -12,12 +12,236 @@
 //! ADR D3: `drain_pipe`, `tee_stderr_to_file`, `spawn_codex`, and
 //! `runtime_path`.
 
-use std::ffi::OsString;
+use std::ffi::{OsStr, OsString};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
+
+use domain::tddd::test_obligation::ids::DiagnosticMessage;
+
+const REPO_LOCAL_CODEX_LINK: &str = ".harness/tools/bin/codex";
+const CODEX_RUNTIME_PROBE_TIMEOUT: Duration = Duration::from_secs(5);
+const CODEX_RUNTIME_PROBE_MAX_OUTPUT_BYTES: usize = 64 * 1024;
+
+/// A Codex command resolved for one repository spawn.
+///
+/// The path prefix intentionally records the public launcher directory, rather
+/// than the canonical package-internal executable directory.  The launcher
+/// needs its colocated runtime to be discoverable by the sanitized child.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ResolvedCodexRuntime {
+    executable: OsString,
+    path_prefix: Option<PathBuf>,
+    real_path: PathBuf,
+    version: String,
+}
+
+impl ResolvedCodexRuntime {
+    #[must_use]
+    pub fn executable(&self) -> &OsStr {
+        &self.executable
+    }
+
+    #[must_use]
+    pub fn path_prefix(&self) -> Option<&Path> {
+        self.path_prefix.as_deref()
+    }
+
+    #[must_use]
+    pub fn real_path(&self) -> &Path {
+        &self.real_path
+    }
+
+    #[must_use]
+    pub fn version(&self) -> &str {
+        &self.version
+    }
+}
+
+/// Explains why Codex cannot be resolved for a repository spawn.
+#[derive(Debug)]
+pub enum CodexRuntimeResolveError {
+    ProjectRootInvalid(DiagnosticMessage),
+    RepoLocalLinkInvalid(DiagnosticMessage),
+    PathFallbackUnavailable(DiagnosticMessage),
+    ProbeFailed(DiagnosticMessage),
+}
+
+impl std::fmt::Display for CodexRuntimeResolveError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let detail = match self {
+            Self::ProjectRootInvalid(detail)
+            | Self::RepoLocalLinkInvalid(detail)
+            | Self::PathFallbackUnavailable(detail)
+            | Self::ProbeFailed(detail) => detail,
+        };
+        write!(formatter, "{}", detail.as_str())
+    }
+}
+
+impl std::error::Error for CodexRuntimeResolveError {}
+
+/// Resolves the Codex runtime using the repository-local bootstrap link first.
+///
+/// A dangling or non-executable link is treated exactly like an absent link:
+/// resolution falls back to the process PATH.  When neither source is usable,
+/// the diagnostic tells the caller how to repair the repository-local runtime.
+pub fn resolve_codex_runtime(
+    project_root: &Path,
+) -> Result<ResolvedCodexRuntime, CodexRuntimeResolveError> {
+    if !project_root.is_dir() {
+        return Err(CodexRuntimeResolveError::ProjectRootInvalid(diagnostic(format!(
+            "project root is not a directory: {}",
+            project_root.display()
+        ))));
+    }
+
+    #[cfg(test)]
+    if let Some(override_bin) = std::env::var_os(CODEX_BIN_ENV).filter(|value| !value.is_empty()) {
+        return resolve_runtime_candidate(override_bin, None, "test override");
+    }
+
+    let link = project_root.join(REPO_LOCAL_CODEX_LINK);
+    if let Ok(metadata) = std::fs::symlink_metadata(&link) {
+        if metadata.file_type().is_symlink() {
+            if let Ok(real_path) = link.canonicalize() {
+                if is_executable(&real_path) {
+                    let public_entry = std::fs::read_link(&link).map_err(|error| {
+                        CodexRuntimeResolveError::RepoLocalLinkInvalid(diagnostic(format!(
+                            "cannot read repository Codex link {}: {error}",
+                            link.display()
+                        )))
+                    })?;
+                    let public_entry = if public_entry.is_absolute() {
+                        public_entry
+                    } else {
+                        link.parent().unwrap_or(project_root).join(public_entry)
+                    };
+                    let prefix = public_entry.parent().map(PathBuf::from);
+                    return resolve_runtime_candidate(
+                        link.into_os_string(),
+                        prefix,
+                        "repository link",
+                    );
+                }
+            }
+        }
+    }
+
+    let fallback = find_on_path(Path::new("codex")).ok_or_else(|| {
+        CodexRuntimeResolveError::PathFallbackUnavailable(diagnostic(
+            "no usable repository Codex link or PATH fallback was found; rerun `cargo make bootstrap` to provision Codex".to_owned(),
+        ))
+    })?;
+    resolve_runtime_candidate(fallback.into_os_string(), None, "PATH fallback")
+}
+
+fn resolve_runtime_candidate(
+    executable: OsString,
+    path_prefix: Option<PathBuf>,
+    source: &str,
+) -> Result<ResolvedCodexRuntime, CodexRuntimeResolveError> {
+    let real_path = Path::new(&executable).canonicalize().map_err(|error| {
+        CodexRuntimeResolveError::RepoLocalLinkInvalid(diagnostic(format!(
+            "cannot canonicalize Codex {source} {}: {error}",
+            Path::new(&executable).display()
+        )))
+    })?;
+    let mut command = Command::new(&executable);
+    command.arg("--version");
+    if let Some(prefix) = path_prefix.as_deref() {
+        command.env(
+            "PATH",
+            prepend_dir_to_current_path(prefix)
+                .map_err(|error| CodexRuntimeResolveError::ProbeFailed(diagnostic(error)))?,
+        );
+    }
+    let output = crate::capability_exec::process::run_command_with_bounded_output(
+        &mut command,
+        CODEX_RUNTIME_PROBE_MAX_OUTPUT_BYTES,
+        CODEX_RUNTIME_PROBE_TIMEOUT,
+        "Codex runtime probe",
+    )
+    .map_err(|error| {
+        CodexRuntimeResolveError::ProbeFailed(diagnostic(format!(
+            "Codex {source} probe could not complete: {error}; rerun `cargo make bootstrap`"
+        )))
+    })?;
+    if !output.status.success() {
+        return Err(CodexRuntimeResolveError::ProbeFailed(diagnostic(format!(
+            "Codex {source} probe exited with {}; rerun `cargo make bootstrap`",
+            output.status
+        ))));
+    }
+    let mut version = String::from_utf8_lossy(&output.stdout).into_owned();
+    version.push_str(&String::from_utf8_lossy(&output.stderr));
+    Ok(ResolvedCodexRuntime { executable, path_prefix, real_path, version })
+}
+
+fn find_on_path(executable: &Path) -> Option<PathBuf> {
+    let path = std::env::var_os("PATH")?;
+    std::env::split_paths(&path)
+        .map(|directory| directory.join(executable))
+        .find(|candidate| is_executable(candidate))
+}
+
+#[cfg(unix)]
+fn is_executable(path: &Path) -> bool {
+    use std::os::unix::fs::PermissionsExt as _;
+    path.is_file()
+        && std::fs::metadata(path)
+            .map(|metadata| metadata.permissions().mode() & 0o111 != 0)
+            .unwrap_or(false)
+}
+
+#[cfg(not(unix))]
+fn is_executable(path: &Path) -> bool {
+    path.is_file()
+}
+
+fn diagnostic(message: String) -> DiagnosticMessage {
+    let mut candidate = format!("Codex runtime: {message}");
+    loop {
+        match DiagnosticMessage::try_new(candidate) {
+            Ok(diagnostic) => return diagnostic,
+            Err(_) => candidate = "Codex runtime resolution failed".to_owned(),
+        }
+    }
+}
+
+pub(crate) fn prepend_dir_to_current_path(dir: &Path) -> Result<OsString, String> {
+    let mut paths = vec![dir.to_path_buf()];
+    if let Some(existing) = std::env::var_os("PATH") {
+        if !existing.is_empty() {
+            paths.extend(std::env::split_paths(&existing));
+        }
+    }
+    std::env::join_paths(paths).map_err(|error| {
+        format!("failed to prepend {} to Codex child PATH: {error}", dir.display())
+    })
+}
+
+pub(crate) fn configure_codex_command(
+    command: &mut Command,
+    runtime: &ResolvedCodexRuntime,
+) -> Result<(), String> {
+    if let Some(prefix) = runtime.path_prefix() {
+        command.env("PATH", prepend_dir_to_current_path(prefix)?);
+    }
+    Ok(())
+}
+
+/// Renders resolution diagnostics for persistent Codex session logs.
+#[must_use]
+pub(crate) fn runtime_log_header(runtime: &ResolvedCodexRuntime) -> String {
+    format!(
+        "resolved_real_path: {}\ncodex_version: {}\n",
+        runtime.real_path().display(),
+        runtime.version().trim_end()
+    )
+}
 
 /// Polling interval for subprocess completion checks across all infrastructure adapters.
 ///
@@ -89,18 +313,6 @@ pub fn build_codex_read_only_invocation(
 #[cfg(test)]
 pub(crate) const CODEX_BIN_ENV: &str = "SOTP_CODEX_BIN";
 
-/// Returns the path to the `codex` binary.
-///
-/// In test builds, the `SOTP_CODEX_BIN` environment variable may override
-/// the default `"codex"` to allow injecting a fake executable.
-pub(crate) fn codex_bin() -> OsString {
-    #[cfg(test)]
-    if let Some(value) = std::env::var_os(CODEX_BIN_ENV).filter(|v| !v.is_empty()) {
-        return value;
-    }
-    OsString::from("codex")
-}
-
 /// Builds a timestamped, process-unique path inside `base_dir`.
 ///
 /// Creates `base_dir` (and any missing ancestors) before returning.
@@ -143,6 +355,7 @@ pub(crate) fn spawn_codex(
     bin: &std::ffi::OsStr,
     args: &[OsString],
     session_log_path: &Path,
+    runtime: Option<&ResolvedCodexRuntime>,
 ) -> Result<(Child, Vec<thread::JoinHandle<()>>), String> {
     let mut command = Command::new(bin);
     // Capture stdout instead of inheriting: the wrapper is the sole code path
@@ -150,9 +363,17 @@ pub(crate) fn spawn_codex(
     // reviewer child leak verdict-like content before persistence succeeds,
     // breaking the fail-closed contract for unrecorded rounds.
     command.args(args).stdin(Stdio::null()).stdout(Stdio::piped());
+    if let Some(runtime) = runtime {
+        configure_codex_command(&mut command, runtime)?;
+    }
 
-    let log_file = std::fs::File::create(session_log_path)
+    let mut log_file = std::fs::File::create(session_log_path)
         .map_err(|e| format!("failed to create session log {}: {e}", session_log_path.display()))?;
+    if let Some(runtime) = runtime {
+        log_file.write_all(runtime_log_header(runtime).as_bytes()).map_err(|e| {
+            format!("failed to write session log {}: {e}", session_log_path.display())
+        })?;
+    }
 
     command.stderr(Stdio::piped());
 
@@ -235,8 +456,38 @@ fn tee_stderr_to_writer_with_limit<R: Read, W: Write>(
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
+
+    #[cfg(unix)]
+    #[test]
+    fn test_resolve_codex_runtime_prefers_repository_link_and_public_entry_parent() {
+        use std::os::unix::fs::{PermissionsExt as _, symlink};
+
+        let workspace = tempfile::tempdir().expect("workspace is created");
+        let public_bin = workspace.path().join("public-bin");
+        std::fs::create_dir_all(&public_bin).expect("public bin is created");
+        let launcher = public_bin.join("codex");
+        std::fs::write(&launcher, "#!/bin/sh\nprintf 'codex test-version\\n'\n")
+            .expect("launcher is written");
+        let mut permissions =
+            std::fs::metadata(&launcher).expect("launcher metadata").permissions();
+        permissions.set_mode(0o755);
+        std::fs::set_permissions(&launcher, permissions).expect("launcher is executable");
+
+        let link = workspace.path().join(REPO_LOCAL_CODEX_LINK);
+        std::fs::create_dir_all(link.parent().expect("link has parent"))
+            .expect("link dir is created");
+        symlink(&launcher, &link).expect("repository link is created");
+
+        let runtime = resolve_codex_runtime(workspace.path()).expect("runtime resolves from link");
+
+        assert_eq!(runtime.executable(), link.as_os_str());
+        assert_eq!(runtime.path_prefix(), Some(public_bin.as_path()));
+        assert_eq!(runtime.real_path(), launcher.canonicalize().expect("launcher canonical path"));
+        assert!(runtime.version().contains("codex test-version"));
+    }
 
     struct CountingReader {
         inner: std::io::Cursor<Vec<u8>>,

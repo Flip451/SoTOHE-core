@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "b07d0cb976f10d2f17d501d8e6050c26c532e9cc694e72783ee2b415d94d35ba",
+  "catalogue_declaration_hash": "0d1fc8a0c372afbb7555394635aa6c6e39cc31a1923869076ec899122eaa9959",
   "signals": [
+    {
+      "type_name": "CliCommand",
+      "signal": "blue",
+      "entry_hash": "93eb1eb820ca13f254cf147079d6e8c8b0711bca91420b338bc6467b49cceb43"
+    },
     {
       "type_name": "CodexRuntimeCommand",
       "signal": "blue",
@@ -10,7 +15,12 @@
     {
       "type_name": "CodexRuntimeProvisionArgs",
       "signal": "blue",
-      "entry_hash": "c10e921386f7e8d7555c21237c06c4578b3bc97fe6b56ac01608ad80ce3dc2e7"
+      "entry_hash": "55733214ab98423f85cf84bf58f649cfa35bac83074f2c7b05d009ff708e3cb9"
+    },
+    {
+      "type_name": "cli::commands::codex_runtime::execute",
+      "signal": "blue",
+      "entry_hash": "fc985c8b215b8fafefa35f205aa410e6e504a7f0eed6627902d6a4e981ebbe2f"
     }
   ]
 }

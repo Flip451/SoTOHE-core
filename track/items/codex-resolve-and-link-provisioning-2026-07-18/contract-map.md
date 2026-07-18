@@ -185,12 +185,42 @@ subgraph cli_composition["cli_composition"]
     direction TB
     T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot__self[CodexRuntimeCompositionRoot]
     T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_new([new])
-    T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_provision([provision])
+    T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_codex_runtime_driver([codex_runtime_driver])
   end
   end
 end
 subgraph cli["cli"]
   direction TB
+  subgraph T18_cli_cli_CliCommand["CliCommand"]
+    direction TB
+    T18_cli_cli_CliCommand__self[CliCommand]
+    T18_cli_cli_CliCommand_Arch[Arch]
+    T18_cli_cli_CliCommand_AdrBaseline[AdrBaseline]
+    T18_cli_cli_CliCommand_Conventions[Conventions]
+    T18_cli_cli_CliCommand_Domain[Domain]
+    T18_cli_cli_CliCommand_Guard[Guard]
+    T18_cli_cli_CliCommand_Hook[Hook]
+    T18_cli_cli_CliCommand_Track[Track]
+    T18_cli_cli_CliCommand_Git[Git]
+    T18_cli_cli_CliCommand_Pr[Pr]
+    T18_cli_cli_CliCommand_Capability[Capability]
+    T18_cli_cli_CliCommand_Review[Review]
+    T18_cli_cli_CliCommand_File[File]
+    T18_cli_cli_CliCommand_Verify[Verify]
+    T18_cli_cli_CliCommand_FindSimilar[FindSimilar]
+    T18_cli_cli_CliCommand_DupIndex[DupIndex]
+    T18_cli_cli_CliCommand_DupCheck[DupCheck]
+    T18_cli_cli_CliCommand_Telemetry[Telemetry]
+    T18_cli_cli_CliCommand_Dry[Dry]
+    T18_cli_cli_CliCommand_RefVerify[RefVerify]
+    T18_cli_cli_CliCommand_TestObligation[TestObligation]
+    T18_cli_cli_CliCommand_Signal[Signal]
+    T18_cli_cli_CliCommand_TaskContract[TaskContract]
+    T18_cli_cli_CliCommand_Catalog[Catalog]
+    T18_cli_cli_CliCommand_CatalogueLint[CatalogueLint]
+    T18_cli_cli_CliCommand_Template[Template]
+    T18_cli_cli_CliCommand_CodexRuntime[CodexRuntime]
+  end
   subgraph cli_cli_module_commands["cli::commands"]
     direction TB
   subgraph T27_cli_cli_CodexRuntimeCommand["commands::codex_runtime::CodexRuntimeCommand"]
@@ -202,6 +232,7 @@ subgraph cli["cli"]
     direction TB
     T33_cli_cli_CodexRuntimeProvisionArgs__self[CodexRuntimeProvisionArgs]
   end
+  F45_cli_cli_cli__commands__codex_runtime__execute[[execute]]
   end
 end
 T47_usecase_usecase_CodexRuntimeProvisionInteractor_new --o R41_usecase_usecase_CodexRuntimeProvisionPort__self
@@ -227,8 +258,10 @@ T40_cli_driver_cli_driver_CodexRuntimeDriver_new --o R44_usecase_usecase_CodexRu
 T40_cli_driver_cli_driver_CodexRuntimeDriver_new --> T40_cli_driver_cli_driver_CodexRuntimeDriver__self
 T40_cli_driver_cli_driver_CodexRuntimeDriver_handle --o T39_cli_driver_cli_driver_CodexRuntimeInput__self
 T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_new --> T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot__self
-T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_provision --o T39_cli_driver_cli_driver_CodexRuntimeInput__self
+T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_codex_runtime_driver --> T40_cli_driver_cli_driver_CodexRuntimeDriver__self
+T18_cli_cli_CliCommand_CodexRuntime --o|cmd| T27_cli_cli_CodexRuntimeCommand__self
 T27_cli_cli_CodexRuntimeCommand_Provision --o T33_cli_cli_CodexRuntimeProvisionArgs__self
+F45_cli_cli_cli__commands__codex_runtime__execute --o T27_cli_cli_CodexRuntimeCommand__self
 class R38_usecase_usecase_CapabilityProviderPort_provider method_node
 class R38_usecase_usecase_CapabilityProviderPort_dispatch method_node
 class R38_usecase_usecase_CapabilityProviderPort__self secondary_port
@@ -282,8 +315,37 @@ class T40_cli_driver_cli_driver_CodexRuntimeDriver_new method_node
 class T40_cli_driver_cli_driver_CodexRuntimeDriver_handle method_node
 class T39_cli_driver_cli_driver_CodexRuntimeInput__self dto
 class T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_new method_node
-class T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_provision method_node
+class T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_codex_runtime_driver method_node
+class T18_cli_cli_CliCommand_Arch variant_node
+class T18_cli_cli_CliCommand_AdrBaseline variant_node
+class T18_cli_cli_CliCommand_Conventions variant_node
+class T18_cli_cli_CliCommand_Domain variant_node
+class T18_cli_cli_CliCommand_Guard variant_node
+class T18_cli_cli_CliCommand_Hook variant_node
+class T18_cli_cli_CliCommand_Track variant_node
+class T18_cli_cli_CliCommand_Git variant_node
+class T18_cli_cli_CliCommand_Pr variant_node
+class T18_cli_cli_CliCommand_Capability variant_node
+class T18_cli_cli_CliCommand_Review variant_node
+class T18_cli_cli_CliCommand_File variant_node
+class T18_cli_cli_CliCommand_Verify variant_node
+class T18_cli_cli_CliCommand_FindSimilar variant_node
+class T18_cli_cli_CliCommand_DupIndex variant_node
+class T18_cli_cli_CliCommand_DupCheck variant_node
+class T18_cli_cli_CliCommand_Telemetry variant_node
+class T18_cli_cli_CliCommand_Dry variant_node
+class T18_cli_cli_CliCommand_RefVerify variant_node
+class T18_cli_cli_CliCommand_TestObligation variant_node
+class T18_cli_cli_CliCommand_Signal variant_node
+class T18_cli_cli_CliCommand_TaskContract variant_node
+class T18_cli_cli_CliCommand_Catalog variant_node
+class T18_cli_cli_CliCommand_CatalogueLint variant_node
+class T18_cli_cli_CliCommand_Template variant_node
+class T18_cli_cli_CliCommand_CodexRuntime variant_node
+class T18_cli_cli_CliCommand__self dto
 class T27_cli_cli_CodexRuntimeCommand_Provision variant_node
 class T27_cli_cli_CodexRuntimeCommand__self dto
 class T33_cli_cli_CodexRuntimeProvisionArgs__self dto
+class F45_cli_cli_cli__commands__codex_runtime__execute free_function
+class F45_cli_cli_cli__commands__codex_runtime__execute function_node
 ```

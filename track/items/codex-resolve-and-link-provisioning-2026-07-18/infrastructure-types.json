@@ -149,6 +149,11 @@
       "trait_ref": "usecase::codex_runtime::CodexRuntimeProvisionPort"
     },
     {
+      "action": "add",
+      "for_type": "FsCodexRuntimeProvisioner",
+      "trait_ref": "core::default::Default"
+    },
+    {
       "action": "modify",
       "for_type": "CodexCapabilityAdapter",
       "trait_ref": "usecase::capability_exec::CapabilityProviderPort"
@@ -236,7 +241,7 @@
     },
     "CodexDryChecker": {
       "action": "modify",
-      "docs": "Runs DRY-check capability judgments through the repository-first resolved Codex runtime.",
+      "docs": "Updates `infrastructure::dry_check::codex_dry_checker::CodexDryChecker`; IN-03, IN-05.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -254,23 +259,23 @@
           "params": [
             {
               "name": "fast_model",
-              "ty": "usecase::capability_exec::ModelName"
+              "ty": "String"
             },
             {
               "name": "fast_reasoning_effort",
-              "ty": "usecase::capability_exec::ReasoningEffort"
+              "ty": "String"
             },
             {
               "name": "final_model",
-              "ty": "usecase::capability_exec::ModelName"
+              "ty": "String"
             },
             {
               "name": "final_reasoning_effort",
-              "ty": "usecase::capability_exec::ReasoningEffort"
+              "ty": "String"
             },
             {
               "name": "capability_name",
-              "ty": "domain::NonEmptyString"
+              "ty": "String"
             }
           ],
           "returns": "CodexDryChecker"

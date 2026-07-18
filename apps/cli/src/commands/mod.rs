@@ -10,6 +10,7 @@ pub mod arch;
 pub mod capability;
 pub mod catalog;
 pub mod catalogue_lint;
+pub mod codex_runtime;
 pub mod conventions;
 pub mod domain;
 pub mod dry;

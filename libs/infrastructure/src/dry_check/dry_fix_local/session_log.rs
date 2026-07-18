@@ -34,10 +34,13 @@ pub(super) fn write_dry_fix_log(
     status: &str,
     stdout: &str,
     stderr: &str,
+    runtime: Option<&crate::codex_common::ResolvedCodexRuntime>,
 ) {
+    let runtime_header = runtime.map(crate::codex_common::runtime_log_header).unwrap_or_default();
     let content = format!(
-        "bin: {}\nstatus: {}\n--- stdout ---\n{}\n--- stderr ---\n{}",
+        "bin: {}\n{}status: {}\n--- stdout ---\n{}\n--- stderr ---\n{}",
         bin.to_string_lossy(),
+        runtime_header,
         status,
         stdout,
         stderr

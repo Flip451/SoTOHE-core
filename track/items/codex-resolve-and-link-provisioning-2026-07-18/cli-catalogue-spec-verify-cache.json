@@ -3,6 +3,54 @@
   "layer": "cli",
   "entries": [
     {
+      "claim_hash": "93eb1eb820ca13f254cf147079d6e8c8b0711bca91420b338bc6467b49cceb43",
+      "evidence_hash": "4962bd783441ab4fc6f505d289f478034f5f6db810f2bc4613b77a7f447a2bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cargo make bootstrap` に、通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CliCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`cargo make bootstrap` に、通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。処理は再実行可能で、既存リンクを最新の解決結果へ張り直す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "93eb1eb820ca13f254cf147079d6e8c8b0711bca91420b338bc6467b49cceb43",
+      "evidence_hash": "a5dfe453fd3a72f783343e1b7c3b3dcb08e6f50f1a568c3c9fd610dc02e80bf0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex の解決不能・リンク劣化・子プロセス失敗を、利用者が exit code、session log、bootstrap 再実行案内から診断して回復できるものにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CliCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "codex の解決不能・リンク劣化・子プロセス失敗を、利用者が exit code、session log、bootstrap 再実行案内から診断して回復できるものにする。"
+        }
+      }
+    },
+    {
       "claim_hash": "b2681c3a0464362c84deedabf9a03e82beced14d3cdb95e9476dfd727b95a56f",
       "evidence_hash": "4962bd783441ab4fc6f505d289f478034f5f6db810f2bc4613b77a7f447a2bca",
       "verdict": {
@@ -51,11 +99,11 @@
       }
     },
     {
-      "claim_hash": "c10e921386f7e8d7555c21237c06c4578b3bc97fe6b56ac01608ad80ce3dc2e7",
+      "claim_hash": "55733214ab98423f85cf84bf58f649cfa35bac83074f2c7b05d009ff708e3cb9",
       "evidence_hash": "4962bd783441ab4fc6f505d289f478034f5f6db810f2bc4613b77a7f447a2bca",
       "verdict": {
         "kind": "pass",
-        "citation": "`cargo make bootstrap` に、通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。処理は再実行可能で、既存リンクを最新の解決結果へ張り直す。"
+        "citation": "`cargo make bootstrap` に、通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -75,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "c10e921386f7e8d7555c21237c06c4578b3bc97fe6b56ac01608ad80ce3dc2e7",
+      "claim_hash": "55733214ab98423f85cf84bf58f649cfa35bac83074f2c7b05d009ff708e3cb9",
       "evidence_hash": "cb1ebe21f52caa9dd5db8b0016120778db6e7ae991c2653a73a5d25b26b3fc2e",
       "verdict": {
         "kind": "pass",
@@ -99,7 +147,7 @@
       }
     },
     {
-      "claim_hash": "c10e921386f7e8d7555c21237c06c4578b3bc97fe6b56ac01608ad80ce3dc2e7",
+      "claim_hash": "55733214ab98423f85cf84bf58f649cfa35bac83074f2c7b05d009ff708e3cb9",
       "evidence_hash": "0e91149840eb2c0608435a477743725eca0997507e540abf72c22966e65c073d",
       "verdict": {
         "kind": "pass",
@@ -111,6 +159,78 @@
           "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli-types.json",
           "section_key": "types",
           "entry_key": "CodexRuntimeProvisionArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "bootstrap fails when neither the PATH candidate nor the public npm fallback passes the sanitized-simulated probe; its diagnostic identifies each attempted source (PATH candidate and public npm fallback), states the failing probe result for each attempted source, and directs the user to repair or install a codex entry before rerunning `cargo make bootstrap`. It does not create a link to an unverified candidate."
+        }
+      }
+    },
+    {
+      "claim_hash": "fc985c8b215b8fafefa35f205aa410e6e504a7f0eed6627902d6a4e981ebbe2f",
+      "evidence_hash": "4962bd783441ab4fc6f505d289f478034f5f6db810f2bc4613b77a7f447a2bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cargo make bootstrap` に、通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。処理は再実行可能で、既存リンクを最新の解決結果へ張り直す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::codex_runtime::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`cargo make bootstrap` に、通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。処理は再実行可能で、既存リンクを最新の解決結果へ張り直す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fc985c8b215b8fafefa35f205aa410e6e504a7f0eed6627902d6a4e981ebbe2f",
+      "evidence_hash": "cb1ebe21f52caa9dd5db8b0016120778db6e7ae991c2653a73a5d25b26b3fc2e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bootstrap succeeds for a codex entry that only becomes runnable after the public npm global `bin/codex` entry and its colocated runtime directory are selected; it creates or refreshes the repo-local symlink after the sanitized-simulated `--version` probe succeeds."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::codex_runtime::execute"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "bootstrap succeeds for a codex entry that only becomes runnable after the public npm global `bin/codex` entry and its colocated runtime directory are selected; it creates or refreshes the repo-local symlink after the sanitized-simulated `--version` probe succeeds."
+        }
+      }
+    },
+    {
+      "claim_hash": "fc985c8b215b8fafefa35f205aa410e6e504a7f0eed6627902d6a4e981ebbe2f",
+      "evidence_hash": "0e91149840eb2c0608435a477743725eca0997507e540abf72c22966e65c073d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "bootstrap fails when neither the PATH candidate nor the public npm fallback passes the sanitized-simulated probe; its diagnostic identifies each attempted source (PATH candidate and public npm fallback), states the failing probe result for each attempted source, and directs the user to repair or install a codex entry before rerunning `cargo make bootstrap`. It does not create a link to an unverified candidate."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::codex_runtime::execute"
         }
       },
       "evidence_origin": {

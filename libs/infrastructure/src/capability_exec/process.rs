@@ -19,6 +19,8 @@ const PROVIDER_PROCESS_POLL_INTERVAL: Duration = Duration::from_millis(50);
 const PROVIDER_LOG_DRAIN_TIMEOUT: Duration = Duration::from_secs(1);
 const BOUNDED_COMMAND_POLL_INTERVAL: Duration = Duration::from_millis(50);
 const BOUNDED_COMMAND_DRAIN_TIMEOUT: Duration = Duration::from_secs(1);
+const CODEX_VERSION_PROBE_TIMEOUT: Duration = Duration::from_secs(5);
+const CODEX_VERSION_PROBE_MAX_OUTPUT_BYTES: usize = 64 * 1024;
 const LOG_TRUNCATION_NOTICE: &[u8] = b"\n[provider stderr truncated]\n";
 static PROVIDER_LOG_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
@@ -275,13 +277,44 @@ fn run_provider_process_with_timeout_inner(
         std::process::id(),
         PROVIDER_LOG_SEQUENCE.fetch_add(1, Ordering::Relaxed),
     ));
-    let log_file =
+    let mut log_file =
         OpenOptions::new().write(true).create_new(true).open(&log_path).map_err(|error| {
             dispatch_error(
                 provider,
                 format!("cannot create session log {}: {error}", log_path.display()),
             )
         })?;
+    if provider.as_str() == "codex" {
+        let real_path = std::path::Path::new(binary)
+            .canonicalize()
+            .map(|path| path.display().to_string())
+            .unwrap_or_else(|_| binary.to_owned());
+        let mut version_command = Command::new(binary);
+        version_command.arg("--version");
+        let version = run_command_with_bounded_output(
+            &mut version_command,
+            CODEX_VERSION_PROBE_MAX_OUTPUT_BYTES,
+            CODEX_VERSION_PROBE_TIMEOUT,
+            "Codex version probe",
+        )
+        .map(|output| {
+            let mut text = String::from_utf8_lossy(&output.stdout).into_owned();
+            text.push_str(&String::from_utf8_lossy(&output.stderr));
+            text
+        })
+        .unwrap_or_else(|error| format!("probe failed: {error}"));
+        writeln!(
+            log_file,
+            "resolved_real_path: {real_path}\ncodex_version: {}",
+            version.trim_end()
+        )
+        .map_err(|error| {
+            dispatch_error(
+                provider,
+                format!("cannot write session log {}: {error}", log_path.display()),
+            )
+        })?;
+    }
 
     let mut command = Command::new(binary);
     command

@@ -1,14 +1,17 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-18T06:41:15Z",
-  "declaration_hash": "56b0409940f1b6886865338fd69a7e2f4caa533bd34084b645fe7bc6dddade02",
-  "implementation_input_hash": "f3cb4f101a0848f06637f5a9e3812d755dcbd430cc2727b49b47786eeede2f3f",
+  "generated_at": "2026-07-18T10:01:02Z",
+  "declaration_hash": "1592641767ddaa0d6172dabb15ef1850b807a2fe78e3fcb438ff65b3b9b2f94d",
+  "implementation_input_hash": "06acd8316e4f75bbb0c7ca290716d0dc51db6b9d2de790b31c4fdefaaac80261",
   "signals": [
     {
       "type_name": "CodexRuntimeCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Default"
+      ]
     }
   ]
 }

@@ -1,15 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-18T07:41:00Z",
+  "generated_at": "2026-07-18T10:00:40Z",
   "declaration_hash": "0952e0969c5e9d6a21b00c01095d0c4231a85a7aea0984ac0f3b47408be1a201",
-  "implementation_input_hash": "fa585097fcc39fae702574e2160c280fcf5f7f0cdb3a61ec088f2de4bd96676e",
+  "implementation_input_hash": "a5928ef8cb44616971dd2fa37e6de6a9538bee6ac93d6bb912bd0efcf67a9797",
   "signals": [
     {
       "type_name": "CodexRuntimeProvisionError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -18,23 +18,23 @@
     {
       "type_name": "CodexRuntimeProvisionInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "CodexRuntimeProvisionService"
       ]
     },
     {
       "type_name": "CodexRuntimeProvisionPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CodexRuntimeProvisionService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CapabilityProviderPort",

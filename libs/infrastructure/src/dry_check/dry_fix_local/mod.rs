@@ -30,12 +30,13 @@ use usecase::dry_driver::{DryDriverOutcome, DryDriverPort, DryFixLocalDriverInpu
 use usecase::dry_write_driver::CapabilityName;
 
 use crate::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, ResolvedExecution, RoundType};
+use crate::codex_common::resolve_codex_runtime;
 use crate::git_cli::SystemGitRepo;
 use crate::track::symlink_guard::reject_symlinks_below;
 
 use env::{
-    bin_parent_dir, build_dry_fix_invocation, dry_fix_build_safe_env, dry_fix_build_smoke_env,
-    dry_fix_create_safe_home, dry_fix_resolve_codex_home, resolve_codex_bin,
+    build_dry_fix_invocation, dry_fix_build_safe_env, dry_fix_build_smoke_env,
+    dry_fix_create_safe_home, dry_fix_resolve_codex_home,
 };
 use prompt::build_dry_fix_prompt;
 use sentinel::{dry_fix_sentinel_to_exit_code, parse_dry_fix_sentinel};
@@ -60,7 +61,7 @@ pub struct CodexDryFixLocalRunner;
 
 impl CodexDryFixLocalRunner {
     /// Create a new `CodexDryFixLocalRunner`.
-    pub fn new() -> Self {
+    pub fn new() -> CodexDryFixLocalRunner {
         Self
     }
 }
@@ -140,13 +141,13 @@ fn run_dry_fix_codex(
     briefing_file: &Path,
     trusted_root: &Path,
 ) -> Result<DryDriverOutcome, String> {
-    let codex_bin = resolve_codex_bin();
-    let extra_path = bin_parent_dir(&codex_bin);
+    let runtime = resolve_codex_runtime(trusted_root).map_err(|error| error.to_string())?;
+    let codex_bin = runtime.executable().to_os_string();
     dry_fix_smoke_test_forbidden_sandbox()?;
     let codex_home = dry_fix_resolve_codex_home()?;
     let safe_home = dry_fix_create_safe_home()?;
     let _home_cleanup = DryFixSafeHomeCleanup(safe_home.clone());
-    let safe_env = dry_fix_build_safe_env(&safe_home, &codex_home, extra_path.as_deref())?;
+    let safe_env = dry_fix_build_safe_env(&safe_home, &codex_home, runtime.path_prefix())?;
     let smoke_env = dry_fix_build_smoke_env(&safe_env);
     dry_fix_smoke_test_codex_version(&codex_bin, &smoke_env)?;
     let prompt = build_dry_fix_prompt(track_id, briefing_file, trusted_root)?;
@@ -156,7 +157,8 @@ fn run_dry_fix_codex(
     let _last_message_cleanup = DryFixLastMessageCleanup(output_last_message.clone());
     let mut args = build_dry_fix_invocation(model, &codex_home, &safe_home, &output_last_message);
     args.extend([OsString::from("--config"), codex_reasoning_effort_config(effort)]);
-    let (stdout, log_path) = dry_fix_spawn_and_collect(&codex_bin, &args, &safe_env, &prompt)?;
+    let (stdout, log_path) =
+        dry_fix_spawn_and_collect(&codex_bin, &args, &safe_env, &prompt, Some(&runtime))?;
     let log_cleanup = DryFixSessionLogCleanup::new(log_path.clone());
     let last_message_content = match read_dry_fix_last_message_tail(&output_last_message) {
         Ok(content) => content,
@@ -556,7 +558,7 @@ mod tests {
         }
 
         /// Installs the fake codex script and calls `dry_run_fix_local` with the given
-        /// input `model`, scoping `PATH`/`CODEX_BIN`/`CODEX_HOME` to the fixture for the
+        /// input `model`, scoping `PATH`/`SOTP_CODEX_BIN`/`CODEX_HOME` to the fixture for the
         /// duration of the call.
         fn run(&self, codex_script: &str, model: Option<&str>) -> DryDriverOutcome {
             let fake_codex = write_fake_codex_runner(&self.fake_bin_dir, codex_script);
@@ -565,7 +567,7 @@ mod tests {
             temp_env::with_vars(
                 [
                     ("PATH", Some(path_val.as_os_str())),
-                    ("CODEX_BIN", Some(fake_codex.as_os_str())),
+                    ("SOTP_CODEX_BIN", Some(fake_codex.as_os_str())),
                     ("CODEX_HOME", Some(self.codex_home.as_os_str())),
                 ],
                 || {
@@ -720,7 +722,7 @@ exit 0
         assert_eq!(captured_effort, "model_reasoning_effort=\"low\"");
     }
 
-    /// Shared helper: write a fake codex runner with `script` body, scope `CODEX_BIN` and
+    /// Shared helper: write a fake codex runner with `script` body, scope `SOTP_CODEX_BIN` and
     /// `CODEX_HOME` to it, write a briefing file, and call `run_dry_fix_codex`. Returns the
     /// result so each test can assert its own success or error path.
     #[cfg(unix)]
@@ -733,7 +735,7 @@ exit 0
 
         temp_env::with_vars(
             [
-                ("CODEX_BIN", Some(fake_codex.as_os_str())),
+                ("SOTP_CODEX_BIN", Some(fake_codex.as_os_str())),
                 ("CODEX_HOME", Some(codex_home.as_os_str())),
             ],
             || {

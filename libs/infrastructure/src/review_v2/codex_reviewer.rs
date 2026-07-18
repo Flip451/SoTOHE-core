@@ -27,7 +27,8 @@ use usecase::review_workflow::{
 
 use super::session::{ReviewerSession, effort_value};
 use crate::codex_common::{
-    POLL_INTERVAL, REVIEW_RUNTIME_DIR, codex_bin, runtime_path, tee_stderr_to_file,
+    POLL_INTERVAL, REVIEW_RUNTIME_DIR, configure_codex_command, resolve_codex_runtime,
+    runtime_path, tee_stderr_to_file,
 };
 use crate::track::symlink_guard::reject_symlinks_up_to_root;
 
@@ -73,7 +74,7 @@ impl CodexReviewer {
         timeout: Duration,
         base_prompt: ReviewerPrompt,
         session_cache: Arc<dyn ProviderSessionCachePort>,
-    ) -> Self {
+    ) -> CodexReviewer {
         Self {
             session: ReviewerSession::new(
                 track_id,
@@ -95,7 +96,7 @@ impl CodexReviewer {
     }
 
     /// Sets the scope label injected into the review prompt.
-    pub fn with_scope_label(mut self, label: impl Into<String>) -> Self {
+    pub fn with_scope_label(mut self, label: impl Into<String>) -> CodexReviewer {
         self.scope_label = label.into();
         self
     }
@@ -157,9 +158,31 @@ impl CodexReviewer {
         })?;
 
         #[cfg(test)]
-        let bin = self.bin_override.clone().unwrap_or_else(codex_bin);
+        let runtime = if self.bin_override.is_none() {
+            Some(
+                resolve_codex_runtime(&std::env::current_dir().map_err(|error| {
+                    ReviewerError::Unexpected(format!("failed to determine project root: {error}"))
+                })?)
+                .map_err(|error| ReviewerError::Unexpected(error.to_string()))?,
+            )
+        } else {
+            None
+        };
+        #[cfg(test)]
+        let (bin, runtime_for_spawn) = match (&self.bin_override, runtime.as_ref()) {
+            (Some(bin), _) => (bin.clone(), None),
+            (None, Some(runtime)) => (runtime.executable().to_os_string(), Some(runtime)),
+            (None, None) => {
+                return Err(ReviewerError::Unexpected("test Codex runtime missing".to_owned()));
+            }
+        };
         #[cfg(not(test))]
-        let bin = codex_bin();
+        let runtime = resolve_codex_runtime(&std::env::current_dir().map_err(|error| {
+            ReviewerError::Unexpected(format!("failed to determine project root: {error}"))
+        })?)
+        .map_err(|error| ReviewerError::Unexpected(error.to_string()))?;
+        #[cfg(not(test))]
+        let (bin, runtime_for_spawn) = (runtime.executable().to_os_string(), Some(&runtime));
 
         let resume_id = self.session.resumable_id();
         let run = |resume_id: Option<&str>| {
@@ -177,8 +200,9 @@ impl CodexReviewer {
                 &output_last_message,
                 &output_schema,
             );
-            let (child, stderr, stdout) = spawn_codex_reviewer(&bin, &invocation, &session_log)
-                .map_err(ReviewerError::Unexpected)?;
+            let (child, stderr, stdout) =
+                spawn_codex_reviewer(&bin, &invocation, &session_log, runtime_for_spawn)
+                    .map_err(ReviewerError::Unexpected)?;
             run_codex_child(
                 child,
                 stderr,
@@ -548,15 +572,25 @@ fn spawn_codex_reviewer(
     bin: &std::ffi::OsStr,
     args: &[std::ffi::OsString],
     session_log_path: &Path,
+    runtime: Option<&crate::codex_common::ResolvedCodexRuntime>,
 ) -> SpawnCodexReviewerResult {
     let mut command = Command::new(bin);
     command.args(args).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
+    if let Some(runtime) = runtime {
+        configure_codex_command(&mut command, runtime)?;
+    }
+    let mut log = std::fs::File::create(session_log_path).map_err(|error| {
+        format!("failed to create session log {}: {error}", session_log_path.display())
+    })?;
+    if let Some(runtime) = runtime {
+        use std::io::Write as _;
+        log.write_all(crate::codex_common::runtime_log_header(runtime).as_bytes()).map_err(
+            |error| format!("failed to write session log {}: {error}", session_log_path.display()),
+        )?;
+    }
     let mut child = command
         .spawn()
         .map_err(|error| format!("failed to spawn {}: {error}", bin.to_string_lossy()))?;
-    let log = std::fs::File::create(session_log_path).map_err(|error| {
-        format!("failed to create session log {}: {error}", session_log_path.display())
-    })?;
     let stderr = child
         .stderr
         .take()

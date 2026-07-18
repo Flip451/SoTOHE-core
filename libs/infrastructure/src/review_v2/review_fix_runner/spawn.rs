@@ -37,6 +37,7 @@ pub(super) fn spawn_and_collect_codex(
     args: &[OsString],
     safe_env: &[(OsString, OsString)],
     prompt: &str,
+    runtime: Option<&crate::codex_common::ResolvedCodexRuntime>,
 ) -> Result<(String, PathBuf), ReviewFixRunnerError> {
     let log_path = fixer_runtime_path("review-fix-codex-session", "log")?;
     let mut command = Command::new(bin);
@@ -71,7 +72,7 @@ pub(super) fn spawn_and_collect_codex(
             collector_result_for_log(join_output_collector(stdout_handle, "stdout"), "stdout");
         let (stderr, _) =
             collector_result_for_log(join_output_collector(stderr_handle, "stderr"), "stderr");
-        write_session_log(&log_path, bin, &exit_status, &stdout, &stderr);
+        write_session_log(&log_path, bin, &exit_status, &stdout, &stderr, runtime);
         return Err(ReviewFixRunnerError::SpawnFailed(format!(
             "{message}; session log: {}",
             log_path.display()
@@ -85,7 +86,7 @@ pub(super) fn spawn_and_collect_codex(
         collector_result_for_log(join_output_collector(stdout_handle, "stdout"), "stdout");
     let (stderr, stderr_error) =
         collector_result_for_log(join_output_collector(stderr_handle, "stderr"), "stderr");
-    write_session_log(&log_path, bin, &exit_status, &stdout, &stderr);
+    write_session_log(&log_path, bin, &exit_status, &stdout, &stderr, runtime);
     if let Some(error) = stdout_error.or(stderr_error) {
         return Err(ReviewFixRunnerError::Unexpected(format!(
             "{error}; session log: {}",

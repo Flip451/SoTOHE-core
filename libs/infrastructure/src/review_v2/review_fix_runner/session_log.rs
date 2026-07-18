@@ -39,12 +39,14 @@ pub(super) fn write_session_log(
     exit_status: &str,
     stdout: &str,
     stderr: &str,
+    runtime: Option<&crate::codex_common::ResolvedCodexRuntime>,
 ) {
     let bin_display = bin.to_string_lossy();
     let redacted_stdout = redact_credentials(stdout);
     let redacted_stderr = redact_credentials(stderr);
+    let runtime_header = runtime.map(crate::codex_common::runtime_log_header).unwrap_or_default();
     let log_content = format!(
-        "=== codex fixer session log ===\nbin: {bin_display}\nexit_status: {exit_status}\n\n\
+        "=== codex fixer session log ===\nbin: {bin_display}\n{runtime_header}exit_status: {exit_status}\n\n\
          === STDOUT ===\n{redacted_stdout}\n\
          === STDERR ===\n{redacted_stderr}"
     );

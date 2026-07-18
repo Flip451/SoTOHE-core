@@ -5,6 +5,7 @@ mod session_log;
 mod smoke_test;
 mod spawn;
 
+#[cfg(test)]
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -13,15 +14,13 @@ use usecase::review_v2::run_review_fix::{
     ReviewFixRunner, ReviewFixRunnerError, RunReviewFixCommand, RunReviewFixOutput,
 };
 
+use crate::codex_common::resolve_codex_runtime;
 use env::{build_codex_fixer_invocation, build_safe_env, create_safe_home, resolve_codex_home};
 use prompt::build_prompt;
 use sentinel::{parse_sentinel, sentinel_to_exit_code};
 use session_log::SessionLogCleanup;
 use smoke_test::{is_forbidden_sandbox_value, parse_major_minor, parse_semver_from_text};
 use spawn::{fixer_runtime_path, spawn_and_collect_codex};
-
-#[cfg(test)]
-pub(crate) const CODEX_BIN_ENV: &str = "SOTP_CODEX_BIN";
 
 pub struct CodexReviewFixRunner {
     model: ModelName,
@@ -32,7 +31,7 @@ pub struct CodexReviewFixRunner {
 
 impl CodexReviewFixRunner {
     #[must_use]
-    pub fn new(model: ModelName, effort: ReasoningEffort) -> Self {
+    pub fn new(model: ModelName, effort: ReasoningEffort) -> CodexReviewFixRunner {
         Self {
             model,
             effort,
@@ -106,37 +105,6 @@ impl CodexReviewFixRunner {
     }
 }
 
-/// Resolve the codex binary from an optional env-var value.
-///
-/// Resolution order:
-///   (test-only) `SOTP_CODEX_BIN` env var  →  `codex_bin_var` (`CODEX_BIN`)  →  `"codex"`.
-///
-/// `CODEX_BIN` lets the environment inject the real codex binary path (e.g.
-/// when `codex` on PATH is a toolchain-manager shim that breaks under the
-/// sanitized env). Non-absolute values are resolved before credential
-/// isolation in `run_fix`.
-fn resolve_codex_bin_from(codex_bin_var: Option<OsString>) -> OsString {
-    if let Some(value) = codex_bin_var.filter(|v| !v.is_empty()) {
-        return value;
-    }
-    OsString::from("codex")
-}
-
-fn codex_bin() -> OsString {
-    #[cfg(test)]
-    if let Some(value) = std::env::var_os(CODEX_BIN_ENV).filter(|v| !v.is_empty()) {
-        return value;
-    }
-    resolve_codex_bin_from(std::env::var_os("CODEX_BIN"))
-}
-
-/// Return the parent directory of `bin` if `bin` is an absolute path, or
-/// `None` when `bin` is a bare name (will be resolved via PATH as-is).
-fn bin_parent_dir(bin: &OsString) -> Option<PathBuf> {
-    let p = Path::new(bin);
-    if p.is_absolute() { p.parent().map(PathBuf::from) } else { None }
-}
-
 impl ReviewFixRunner for CodexReviewFixRunner {
     fn run_fix(
         &self,
@@ -144,12 +112,40 @@ impl ReviewFixRunner for CodexReviewFixRunner {
     ) -> Result<RunReviewFixOutput, ReviewFixRunnerError> {
         let codex_home = resolve_codex_home()?;
         #[cfg(test)]
-        let bin = self.bin_override.clone().unwrap_or_else(codex_bin);
+        let runtime = if self.bin_override.is_none() {
+            Some(
+                resolve_codex_runtime(&std::env::current_dir().map_err(|error| {
+                    ReviewFixRunnerError::Unexpected(format!(
+                        "failed to determine project root: {error}"
+                    ))
+                })?)
+                .map_err(|error| ReviewFixRunnerError::Unexpected(error.to_string()))?,
+            )
+        } else {
+            None
+        };
+        #[cfg(test)]
+        let (bin, path_prefix, runtime_for_log) = match (&self.bin_override, runtime.as_ref()) {
+            (Some(bin), _) => (bin.clone(), None, None),
+            (None, Some(runtime)) => {
+                (runtime.executable().to_os_string(), runtime.path_prefix(), Some(runtime))
+            }
+            (None, None) => {
+                return Err(ReviewFixRunnerError::Unexpected(
+                    "test Codex runtime missing".to_owned(),
+                ));
+            }
+        };
         #[cfg(not(test))]
-        let bin = codex_bin();
-        let extra_path = bin_parent_dir(&bin);
+        let runtime = resolve_codex_runtime(&std::env::current_dir().map_err(|error| {
+            ReviewFixRunnerError::Unexpected(format!("failed to determine project root: {error}"))
+        })?)
+        .map_err(|error| ReviewFixRunnerError::Unexpected(error.to_string()))?;
+        #[cfg(not(test))]
+        let (bin, path_prefix, runtime_for_log) =
+            (runtime.executable().to_os_string(), runtime.path_prefix(), Some(&runtime));
         self.smoke_test_forbidden_sandbox()?;
-        self.smoke_test_codex_version(&bin, extra_path.as_deref())?;
+        self.smoke_test_codex_version(&bin, path_prefix)?;
         let prompt = build_prompt(&command.scope, &command.briefing_file, &command)?;
         let output_last_message = fixer_runtime_path("review-fix-codex-last-message", "txt")?;
         std::fs::write(&output_last_message, "").map_err(|e| {
@@ -161,14 +157,15 @@ impl ReviewFixRunner for CodexReviewFixRunner {
         let _last_message_cleanup = OutputLastMessageCleanup(output_last_message.clone());
         let safe_home = create_safe_home()?;
         let _home_cleanup = SafeHomeCleanup(safe_home.clone());
-        let safe_env = build_safe_env(&safe_home, &codex_home, extra_path.as_deref())?;
+        let safe_env = build_safe_env(&safe_home, &codex_home, path_prefix)?;
         let args = build_codex_fixer_invocation(
             self.model.as_str(),
             self.effort,
             &codex_home,
             &output_last_message,
         );
-        let (stdout, log_path) = spawn_and_collect_codex(&bin, &args, &safe_env, &prompt)?;
+        let (stdout, log_path) =
+            spawn_and_collect_codex(&bin, &args, &safe_env, &prompt, runtime_for_log)?;
         // By default the guard removes the log on drop. Disarm it on failure
         // paths so the log is retained for diagnosis.
         let log_cleanup = SessionLogCleanup::new(log_path.clone());
@@ -220,7 +217,6 @@ impl Drop for OutputLastMessageCleanup {
 mod tests {
     use super::*;
     use crate::codex_common::REVIEW_RUNTIME_DIR;
-    use std::path::Path;
 
     fn make_command() -> RunReviewFixCommand {
         RunReviewFixCommand {
@@ -532,43 +528,6 @@ exit 0
         let log_path = retained_session_log_containing(&marker)
             .expect("read error must retain the session log for diagnosis");
         std::fs::remove_file(log_path).unwrap();
-    }
-
-    // ── resolve_codex_bin_from ────────────────────────────────────────────────
-
-    #[test]
-    fn test_resolve_codex_bin_from_none_returns_codex() {
-        let result = resolve_codex_bin_from(None);
-        assert_eq!(result, OsString::from("codex"));
-    }
-
-    #[test]
-    fn test_resolve_codex_bin_from_empty_returns_codex() {
-        let result = resolve_codex_bin_from(Some(OsString::from("")));
-        assert_eq!(result, OsString::from("codex"));
-    }
-
-    #[test]
-    fn test_resolve_codex_bin_from_absolute_path_returns_that_path() {
-        let abs = OsString::from("/usr/local/bin/codex");
-        let result = resolve_codex_bin_from(Some(abs.clone()));
-        assert_eq!(result, abs);
-    }
-
-    // ── bin_parent_dir ────────────────────────────────────────────────────────
-
-    #[test]
-    fn test_bin_parent_dir_absolute_returns_parent() {
-        let bin = OsString::from("/usr/local/bin/codex");
-        let parent = bin_parent_dir(&bin);
-        assert_eq!(parent.as_deref(), Some(Path::new("/usr/local/bin")));
-    }
-
-    #[test]
-    fn test_bin_parent_dir_bare_name_returns_none() {
-        let bin = OsString::from("codex");
-        let parent = bin_parent_dir(&bin);
-        assert!(parent.is_none(), "bare name must return None");
     }
 
     // ── make_command and make_runner are needed for unused-variable lint ──────

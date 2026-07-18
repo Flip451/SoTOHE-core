@@ -37,6 +37,7 @@ pub(super) fn dry_fix_spawn_and_collect(
     args: &[OsString],
     safe_env: &[(OsString, OsString)],
     prompt: &str,
+    runtime: Option<&crate::codex_common::ResolvedCodexRuntime>,
 ) -> Result<(String, PathBuf), String> {
     let log_path = dry_fix_runtime_path("dry-fix-codex-session", "log")?;
     let mut command = Command::new(bin);
@@ -66,7 +67,7 @@ pub(super) fn dry_fix_spawn_and_collect(
         let _ = child.wait();
         let stdout = stdout_handle.join().ok().and_then(|r| r.ok()).unwrap_or_default();
         let stderr = stderr_handle.join().ok().and_then(|r| r.ok()).unwrap_or_default();
-        write_dry_fix_log(&log_path, bin, "killed", &stdout, &stderr);
+        write_dry_fix_log(&log_path, bin, "killed", &stdout, &stderr, runtime);
         return Err(format!("{msg}; log: {}", log_path.display()));
     }
     let exit_status = child.wait().map_err(|e| format!("failed to wait for Codex fixer: {e}"))?;
@@ -75,7 +76,7 @@ pub(super) fn dry_fix_spawn_and_collect(
         dry_fix_collector_result_for_log(join_dry_fix_collector(stdout_handle, "stdout"), "stdout");
     let (stderr, stderr_error) =
         dry_fix_collector_result_for_log(join_dry_fix_collector(stderr_handle, "stderr"), "stderr");
-    write_dry_fix_log(&log_path, bin, &status_str, &stdout, &stderr);
+    write_dry_fix_log(&log_path, bin, &status_str, &stdout, &stderr, runtime);
     if let Some(error) = stdout_error.or(stderr_error) {
         return Err(format!("{error}; log: {}", log_path.display()));
     }
@@ -357,6 +358,7 @@ mod tests {
             &[],
             &safe_env,
             "prompt",
+            None,
         )
         .unwrap();
         let log = std::fs::read_to_string(log_path).unwrap();

@@ -71,7 +71,7 @@ impl CodexCapabilityAdapter {
         runtime_dir: PathBuf,
         session_cache: Arc<dyn ProviderSessionCachePort>,
         track_id: Option<TrackId>,
-    ) -> Self {
+    ) -> CodexCapabilityAdapter {
         Self {
             repo_root,
             runtime_dir,
@@ -165,6 +165,14 @@ impl CodexCapabilityAdapter {
         passthrough: &mut impl Write,
     ) -> Result<CapabilityDispatchOutcome, CapabilityExecError> {
         let sandbox = self.sandbox_mode(request)?;
+        #[cfg(test)]
+        let binary = "codex".to_owned();
+        #[cfg(not(test))]
+        let binary = crate::codex_common::resolve_codex_runtime(&self.repo_root)
+            .map_err(|error| dispatch_error(&self.provider, error.to_string()))?
+            .executable()
+            .to_string_lossy()
+            .into_owned();
         let prompt = capability_prompt(request);
         let session =
             CapabilitySession::new(request, self.track_id.as_ref(), self.session_cache.clone());
@@ -182,7 +190,7 @@ impl CodexCapabilityAdapter {
         let result = self
             .process_runner
             .run(
-                "codex",
+                &binary,
                 &args,
                 &self.repo_root,
                 &self.runtime_dir,
@@ -196,7 +204,7 @@ impl CodexCapabilityAdapter {
             });
         let output = match (resume_id, result) {
             (Some(_), Ok(output)) if output.exit_code != 0 => self.process_runner.run(
-                "codex",
+                &binary,
                 &build_codex_args(
                     request.profile.model.as_str(),
                     request.profile.effort,
@@ -211,7 +219,7 @@ impl CodexCapabilityAdapter {
                 Some(&output_last_message),
             )?,
             (Some(_), Err(_)) => self.process_runner.run(
-                "codex",
+                &binary,
                 &build_codex_args(
                     request.profile.model.as_str(),
                     request.profile.effort,

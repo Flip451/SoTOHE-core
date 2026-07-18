@@ -240,6 +240,8 @@ fn test_exported_workflows_call_sotp_directly_without_retired_wrappers() {
 
 #[test]
 fn test_exported_environment_overlays_are_symmetric_and_personal_environment_free() {
+    let source = fs::read_to_string(workspace_root().join("Makefile.toml"))
+        .expect("source Makefile.toml must be readable");
     let common = exported_file("Makefile.toml");
     let host = exported_file("Makefile.host.toml");
     let docker = exported_file("Makefile.docker.toml");
@@ -252,7 +254,13 @@ fn test_exported_environment_overlays_are_symmetric_and_personal_environment_fre
     assert_eq!(host_gate_tasks, docker_gate_tasks);
     assert!(host.contains("command = \"cargo\"") && !host.contains("docker compose"));
     assert!(docker.contains("docker") && docker.contains("CARGO_TARGET_DIR_RELATIVE"));
-    assert!(common.contains("CODEX_BIN=\"${CODEX_BIN:-$(command -v codex)}\""));
+    for makefile in [&source, &common] {
+        assert!(
+            makefile.contains("bin/sotp codex-runtime provision --project-root ."),
+            "bootstrap must provision the repository-local Codex runtime link"
+        );
+        assert!(!makefile.contains("CODEX_BIN"));
+    }
     assert!(
         common.contains("bin/sotp test-obligation check"),
         "the guarded commit chain must keep the test-obligation gate"

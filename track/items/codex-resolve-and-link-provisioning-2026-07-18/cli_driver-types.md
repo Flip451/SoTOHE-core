@@ -4,11 +4,11 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CodexRuntimeInput | dto | add | — | 🟡 | 🔵 |
+| CodexRuntimeInput | dto | add | — | 🔵 | 🔵 |
 
 ## Primary Adapters
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CodexRuntimeDriver | primary_adapter | add | — | 🟡 | 🔵 |
+| CodexRuntimeDriver | primary_adapter | add | — | 🔵 | 🔵 |
 
