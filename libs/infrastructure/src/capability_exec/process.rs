@@ -1,9 +1,9 @@
 //! Provider subprocess execution, bounded logging, and process-tree cleanup.
 
 use std::ffi::OsString;
-use std::fs::{File, OpenOptions};
+use std::fs::File;
 use std::io::{Error, ErrorKind, Read, Write};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process::{Child, Command, ExitStatus, Stdio};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -184,6 +184,7 @@ pub(crate) trait ProviderProcessRunner: Send + Sync {
     fn run(
         &self,
         binary: &str,
+        path_prefix: Option<&Path>,
         args: &[OsString],
         repo_root: &Path,
         runtime_dir: &Path,
@@ -208,6 +209,7 @@ impl ProviderProcessRunner for SystemProviderProcessRunner {
     fn run(
         &self,
         binary: &str,
+        path_prefix: Option<&Path>,
         args: &[OsString],
         repo_root: &Path,
         runtime_dir: &Path,
@@ -217,6 +219,7 @@ impl ProviderProcessRunner for SystemProviderProcessRunner {
     ) -> Result<ProviderProcessOutput, CapabilityExecError> {
         run_provider_process_with_timeout(
             binary,
+            path_prefix,
             args,
             repo_root,
             runtime_dir,
@@ -231,8 +234,10 @@ pub(crate) fn system_process_runner() -> Arc<dyn ProviderProcessRunner> {
     Arc::new(SystemProviderProcessRunner)
 }
 
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn run_provider_process_with_timeout(
     binary: &str,
+    path_prefix: Option<&Path>,
     args: &[OsString],
     repo_root: &Path,
     runtime_dir: &Path,
@@ -242,6 +247,7 @@ pub(crate) fn run_provider_process_with_timeout(
 ) -> Result<ProviderProcessOutput, CapabilityExecError> {
     run_provider_process_with_timeout_inner(
         binary,
+        path_prefix,
         args,
         repo_root,
         runtime_dir,
@@ -254,6 +260,7 @@ pub(crate) fn run_provider_process_with_timeout(
 #[allow(clippy::too_many_arguments)]
 fn run_provider_process_with_timeout_inner(
     binary: &str,
+    path_prefix: Option<&Path>,
     args: &[OsString],
     repo_root: &Path,
     runtime_dir: &Path,
@@ -263,7 +270,7 @@ fn run_provider_process_with_timeout_inner(
 ) -> Result<ProviderProcessOutput, CapabilityExecError> {
     let runtime_dir = prepare_runtime_dir(repo_root, runtime_dir, provider)?;
     let output_last_message = output_last_message
-        .map(|path| initialize_output_last_message(path, &runtime_dir, provider))
+        .map(|path| prepare_output_last_message(path, &runtime_dir, provider))
         .transpose()?;
     let timestamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -271,19 +278,25 @@ fn run_provider_process_with_timeout_inner(
             dispatch_error(provider, format!("cannot create session log timestamp: {error}"))
         })?
         .as_nanos();
-    let log_path = runtime_dir.join(format!(
+    let log_name = OsString::from(format!(
         "capability-exec-{}-{}-{timestamp}-{}.log",
         provider.as_str(),
         std::process::id(),
         PROVIDER_LOG_SEQUENCE.fetch_add(1, Ordering::Relaxed),
     ));
-    let mut log_file =
-        OpenOptions::new().write(true).create_new(true).open(&log_path).map_err(|error| {
-            dispatch_error(
-                provider,
-                format!("cannot create session log {}: {error}", log_path.display()),
-            )
-        })?;
+    let log_path = runtime_dir.path.join(&log_name);
+    let mut log_file = open_runtime_file(
+        &runtime_dir.directory,
+        &log_name,
+        rustix::fs::OFlags::WRONLY
+            | rustix::fs::OFlags::CREATE
+            | rustix::fs::OFlags::EXCL
+            | rustix::fs::OFlags::NOFOLLOW
+            | rustix::fs::OFlags::CLOEXEC,
+        provider,
+        &log_path,
+        "create session log",
+    )?;
     if provider.as_str() == "codex" {
         let real_path = std::path::Path::new(binary)
             .canonicalize()
@@ -291,6 +304,7 @@ fn run_provider_process_with_timeout_inner(
             .unwrap_or_else(|_| binary.to_owned());
         let mut version_command = Command::new(binary);
         version_command.arg("--version");
+        apply_path_prefix(&mut version_command, path_prefix, provider)?;
         let version = run_command_with_bounded_output(
             &mut version_command,
             CODEX_VERSION_PROBE_MAX_OUTPUT_BYTES,
@@ -323,6 +337,7 @@ fn run_provider_process_with_timeout_inner(
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
+    apply_path_prefix(&mut command, path_prefix, provider)?;
     configure_process_group(&mut command);
     let mut child = command
         .spawn()
@@ -339,15 +354,12 @@ fn run_provider_process_with_timeout_inner(
     let status = wait_for_provider_process(&mut child, provider, binary, timeout)?;
     wait_for_bounded_log_writer(log_writer, process_id, provider, binary, &log_path)?;
     let collected = receive_provider_output(session_collector, process_id, provider, binary)?;
-    // The provider may mutate its writable runtime directory while it runs. Re-check every
-    // component after it exits before opening provider-controlled output so a replaced parent
-    // cannot redirect the leaf read outside the repository runtime.
-    let runtime_dir = prepare_runtime_dir(repo_root, &runtime_dir, provider)?;
+    // The provider may mutate its writable runtime directory while it runs. Re-open every
+    // component relative to a pinned repository handle before opening provider-controlled
+    // output, so a replaced parent cannot redirect the leaf read outside the repository runtime.
+    let runtime_dir = prepare_runtime_dir(repo_root, &runtime_dir.path, provider)?;
     let final_message = match output_last_message {
-        Some(path) => {
-            validate_output_last_message_parent(&path, &runtime_dir, provider)?;
-            read_output_last_message(&path, provider)?
-        }
+        Some(output) => read_output_last_message_at(&runtime_dir, &output, provider)?,
         None => collected.final_message,
     };
     Ok(ProviderProcessOutput {
@@ -355,6 +367,31 @@ fn run_provider_process_with_timeout_inner(
         session_id: collected.session_id,
         final_message,
     })
+}
+
+fn apply_path_prefix(
+    command: &mut Command,
+    path_prefix: Option<&Path>,
+    provider: &ProviderName,
+) -> Result<(), CapabilityExecError> {
+    let Some(prefix) = path_prefix else {
+        return Ok(());
+    };
+
+    let mut paths = vec![prefix.to_path_buf()];
+    if let Some(existing) = std::env::var_os("PATH") {
+        if !existing.is_empty() {
+            paths.extend(std::env::split_paths(&existing));
+        }
+    }
+    let path = std::env::join_paths(paths).map_err(|error| {
+        dispatch_error(
+            provider,
+            format!("cannot prepend {} to provider PATH: {error}", prefix.display()),
+        )
+    })?;
+    command.env("PATH", path);
+    Ok(())
 }
 
 /// Emits the final message of an attempt the adapter has selected for adoption.
@@ -376,12 +413,21 @@ pub(crate) fn emit_provider_final_message(
 }
 
 #[path = "process/output_collector.rs"]
+#[allow(dead_code)]
 mod output_collector;
 
-use output_collector::{
-    initialize_output_last_message, read_output_last_message, receive_provider_output,
-    spawn_provider_session_collector, validate_output_last_message_parent,
+use output_collector::{receive_provider_output, spawn_provider_session_collector};
+
+#[path = "process/runtime_dir.rs"]
+mod runtime_dir;
+
+use runtime_dir::{
+    open_runtime_file, prepare_output_last_message, prepare_runtime_dir,
+    read_output_last_message_at,
 };
+
+#[cfg(test)]
+use runtime_dir::RuntimeOutputLastMessage;
 fn wait_for_bounded_log_writer(
     log_writer: Receiver<Result<(), std::io::Error>>,
     process_id: u32,
@@ -425,147 +471,6 @@ fn wait_for_bounded_log_writer(
             Err(dispatch_error(provider, format!("stderr logger thread disconnected for {binary}")))
         }
     }
-}
-
-fn prepare_runtime_dir(
-    repo_root: &Path,
-    runtime_dir: &Path,
-    provider: &ProviderName,
-) -> Result<PathBuf, CapabilityExecError> {
-    let normalized_root = path_guard::lexically_normalize(repo_root);
-    let normalized_runtime =
-        path_guard::normalize_path_rejecting_symlinked_components(runtime_dir, repo_root).map_err(
-            |error| {
-                dispatch_error(
-                    provider,
-                    format!(
-                        "refusing to follow symlink while resolving runtime directory {}: {error}",
-                        runtime_dir.display()
-                    ),
-                )
-            },
-        )?;
-    if !normalized_runtime.starts_with(&normalized_root) {
-        return Err(dispatch_error(
-            provider,
-            format!(
-                "runtime directory {} escapes repository root {}",
-                runtime_dir.display(),
-                normalized_root.display()
-            ),
-        ));
-    }
-    let canonical_root = normalized_root.canonicalize().map_err(|error| {
-        dispatch_error(
-            provider,
-            format!("cannot canonicalize repository root {}: {error}", repo_root.display()),
-        )
-    })?;
-    let root_metadata = canonical_root.metadata().map_err(|error| {
-        dispatch_error(
-            provider,
-            format!("cannot inspect repository root {}: {error}", canonical_root.display()),
-        )
-    })?;
-    if !root_metadata.is_dir() {
-        return Err(dispatch_error(
-            provider,
-            format!("repository root {} is not a directory", canonical_root.display()),
-        ));
-    }
-    let relative_runtime = normalized_runtime.strip_prefix(&normalized_root).map_err(|error| {
-        dispatch_error(
-            provider,
-            format!(
-                "cannot resolve runtime directory {} below repository root {}: {error}",
-                normalized_runtime.display(),
-                normalized_root.display()
-            ),
-        )
-    })?;
-    let mut current = canonical_root.clone();
-    for component in relative_runtime.components() {
-        let std::path::Component::Normal(name) = component else {
-            return Err(dispatch_error(
-                provider,
-                format!(
-                    "runtime directory {} contains an invalid normalized component",
-                    normalized_runtime.display()
-                ),
-            ));
-        };
-        let next = current.join(name);
-        match next.symlink_metadata() {
-            Ok(metadata) if metadata.file_type().is_symlink() => {
-                return Err(dispatch_error(
-                    provider,
-                    format!("refusing to follow symlink: {}", next.display()),
-                ));
-            }
-            Ok(metadata) if !metadata.is_dir() => {
-                return Err(dispatch_error(
-                    provider,
-                    format!("runtime path component {} is not a directory", next.display()),
-                ));
-            }
-            Ok(_) => {}
-            Err(error) if error.kind() == ErrorKind::NotFound => {
-                if let Err(error) = std::fs::create_dir(&next)
-                    && error.kind() != ErrorKind::AlreadyExists
-                {
-                    return Err(dispatch_error(
-                        provider,
-                        format!("cannot create runtime directory {}: {error}", next.display()),
-                    ));
-                }
-                let metadata = next.symlink_metadata().map_err(|error| {
-                    dispatch_error(
-                        provider,
-                        format!(
-                            "cannot inspect created runtime directory {}: {error}",
-                            next.display()
-                        ),
-                    )
-                })?;
-                if metadata.file_type().is_symlink() {
-                    return Err(dispatch_error(
-                        provider,
-                        format!("refusing to follow symlink: {}", next.display()),
-                    ));
-                }
-                if !metadata.is_dir() {
-                    return Err(dispatch_error(
-                        provider,
-                        format!("runtime path component {} is not a directory", next.display()),
-                    ));
-                }
-            }
-            Err(error) => {
-                return Err(dispatch_error(
-                    provider,
-                    format!("cannot inspect runtime path component {}: {error}", next.display()),
-                ));
-            }
-        }
-        current = next;
-    }
-    let canonical_runtime = current.canonicalize().map_err(|error| {
-        dispatch_error(
-            provider,
-            format!("cannot canonicalize runtime directory {}: {error}", current.display()),
-        )
-    })?;
-    if !canonical_runtime.starts_with(&canonical_root) {
-        return Err(dispatch_error(
-            provider,
-            format!(
-                "runtime directory {} escapes repository root {}",
-                canonical_runtime.display(),
-                canonical_root.display()
-            ),
-        ));
-    }
-    Ok(canonical_runtime)
 }
 
 pub(crate) fn spawn_bounded_log_writer(
@@ -685,7 +590,10 @@ mod tests {
         collect_provider_output, initialize_output_last_message, read_bounded_output_last_message,
         read_output_last_message,
     };
-    use super::{collect_bounded_pipe, run_provider_process_with_timeout_inner};
+    use super::{
+        RuntimeOutputLastMessage, collect_bounded_pipe, prepare_runtime_dir,
+        read_output_last_message_at, run_provider_process_with_timeout_inner,
+    };
     use usecase::capability_exec::ProviderName;
 
     #[test]
@@ -731,6 +639,7 @@ mod tests {
 
         let result = run_provider_process_with_timeout_inner(
             "sh",
+            None,
             &args,
             directory.path(),
             &directory.path().join("tmp/runtime"),
@@ -753,6 +662,7 @@ mod tests {
         let output_last_message = directory.path().join("tmp/runtime/final-message.txt");
         let result = run_provider_process_with_timeout_inner(
             "sh",
+            None,
             &[OsString::from("-c"), OsString::from("printf '{\"event\":\"envelope\"}\\n'")],
             directory.path(),
             &directory.path().join("tmp/runtime"),
@@ -788,6 +698,7 @@ mod tests {
 
         let result = run_provider_process_with_timeout_inner(
             "sh",
+            None,
             &args,
             directory.path(),
             &runtime_dir,
@@ -805,6 +716,89 @@ mod tests {
         };
 
         assert!(error.to_string().contains("refusing to follow symlink"));
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_prepare_runtime_dir_rejects_parent_component_before_normalization()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let provider = ProviderName::try_new("codex".to_owned())?;
+
+        let error = match prepare_runtime_dir(
+            directory.path(),
+            &directory.path().join("ordinary/../runtime"),
+            &provider,
+        ) {
+            Ok(_) => return Err("runtime path must reject a parent component".into()),
+            Err(error) => error,
+        };
+
+        assert!(error.to_string().contains("parent traversal"));
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_read_output_last_message_fifo_returns_error_without_blocking()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let provider = ProviderName::try_new("codex".to_owned())?;
+        let runtime_dir = directory.path().join("runtime");
+        let output_path = runtime_dir.join("final-message.txt");
+        let runtime = prepare_runtime_dir(directory.path(), &runtime_dir, &provider)?;
+        rustix::fs::mkfifoat(
+            &runtime.directory,
+            "final-message.txt",
+            rustix::fs::Mode::from_raw_mode(0o600),
+        )?;
+        let output = RuntimeOutputLastMessage {
+            name: OsString::from("final-message.txt"),
+            path: output_path,
+        };
+
+        let error = match read_output_last_message_at(&runtime, &output, &provider) {
+            Ok(_) => return Err("a provider-created FIFO must be rejected".into()),
+            Err(error) => error,
+        };
+
+        assert!(error.to_string().contains("not a regular file"));
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_provider_process_path_prefix_reaches_codex_child()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        let provider = ProviderName::try_new("codex".to_owned())?;
+        let prefix = directory.path().join("public-npm-bin");
+        let output_last_message = directory.path().join("tmp/runtime/final-message.txt");
+        std::fs::create_dir_all(&prefix)?;
+        let args = [
+            OsString::from("-c"),
+            OsString::from("printf '%s' \"$PATH\" > \"$1\""),
+            OsString::from("sh"),
+            output_last_message.as_os_str().to_owned(),
+        ];
+
+        let result = run_provider_process_with_timeout_inner(
+            "sh",
+            Some(&prefix),
+            &args,
+            directory.path(),
+            &directory.path().join("tmp/runtime"),
+            &provider,
+            None,
+            Some(&output_last_message),
+        )?;
+
+        let path = std::ffi::OsString::from(String::from_utf8(
+            result.final_message.ok_or("provider child must write its PATH")?,
+        )?);
+        let first = std::env::split_paths(&path).next();
+        assert_eq!(first.as_deref(), Some(prefix.as_path()));
         Ok(())
     }
 

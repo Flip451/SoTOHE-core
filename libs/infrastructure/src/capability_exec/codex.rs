@@ -166,13 +166,16 @@ impl CodexCapabilityAdapter {
     ) -> Result<CapabilityDispatchOutcome, CapabilityExecError> {
         let sandbox = self.sandbox_mode(request)?;
         #[cfg(test)]
-        let binary = "codex".to_owned();
+        let (binary, path_prefix) = ("codex".to_owned(), None::<PathBuf>);
         #[cfg(not(test))]
-        let binary = crate::codex_common::resolve_codex_runtime(&self.repo_root)
-            .map_err(|error| dispatch_error(&self.provider, error.to_string()))?
-            .executable()
-            .to_string_lossy()
-            .into_owned();
+        let (binary, path_prefix) = {
+            let runtime = crate::codex_common::resolve_codex_runtime(&self.repo_root)
+                .map_err(|error| dispatch_error(&self.provider, error.to_string()))?;
+            (
+                runtime.executable().to_string_lossy().into_owned(),
+                runtime.path_prefix().map(std::path::Path::to_path_buf),
+            )
+        };
         let prompt = capability_prompt(request);
         let session =
             CapabilitySession::new(request, self.track_id.as_ref(), self.session_cache.clone());
@@ -191,6 +194,7 @@ impl CodexCapabilityAdapter {
             .process_runner
             .run(
                 &binary,
+                path_prefix.as_deref(),
                 &args,
                 &self.repo_root,
                 &self.runtime_dir,
@@ -205,6 +209,7 @@ impl CodexCapabilityAdapter {
         let output = match (resume_id, result) {
             (Some(_), Ok(output)) if output.exit_code != 0 => self.process_runner.run(
                 &binary,
+                path_prefix.as_deref(),
                 &build_codex_args(
                     request.profile.model.as_str(),
                     request.profile.effort,
@@ -220,6 +225,7 @@ impl CodexCapabilityAdapter {
             )?,
             (Some(_), Err(_)) => self.process_runner.run(
                 &binary,
+                path_prefix.as_deref(),
                 &build_codex_args(
                     request.profile.model.as_str(),
                     request.profile.effort,
@@ -349,6 +355,7 @@ mod tests {
         fn run(
             &self,
             binary: &str,
+            _path_prefix: Option<&Path>,
             args: &[OsString],
             _repo_root: &Path,
             _runtime_dir: &Path,

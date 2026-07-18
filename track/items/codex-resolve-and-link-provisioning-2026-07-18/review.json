@@ -19,6 +19,24 @@
         }
       ]
     },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71b3db4a1c44e54048039ed353e5194fd13cb7262fce45a603ff95ae7025b4fa",
+          "at": "2026-07-18T09:37:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71b3db4a1c44e54048039ed353e5194fd13cb7262fce45a603ff95ae7025b4fa",
+          "at": "2026-07-18T09:39:32Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -65,54 +83,108 @@
         }
       ]
     },
-    "cli_driver": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:71b3db4a1c44e54048039ed353e5194fd13cb7262fce45a603ff95ae7025b4fa",
-          "at": "2026-07-18T09:37:02Z"
+          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
+          "at": "2026-07-18T09:36:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:71b3db4a1c44e54048039ed353e5194fd13cb7262fce45a603ff95ae7025b4fa",
-          "at": "2026-07-18T09:39:32Z"
+          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
+          "at": "2026-07-18T09:41:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
+          "at": "2026-07-18T09:55:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
+          "at": "2026-07-18T10:10:43Z"
         }
       ]
     },
-    "spec": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e3b3b030697c860bee185cbe3d950f8b3078fe5f97fd91b674954807385d2fd3",
-          "at": "2026-07-18T07:13:59Z"
+          "hash": "rvw1:sha256:fcf7ca8baf02fca80fe94f1b172726a889c31c7520af359a182e2e3847de4702",
+          "at": "2026-07-18T09:36:58Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "AC-02 の「actionable diagnostic」は判定条件が定義されておらず、決定論的に検証できません。D1 が要求する「何をプローブしたか」「なぜ失敗したか」「利用者が取れる選択肢」が AC 本文に含まれないため、汎用エラーを表示してリンク作成を避けるだけの実装でも合格し得ます。",
+              "message": "`CodexRuntimeCompositionRoot::provision` immediately calls `CodexRuntimeDriver::handle(input)` and returns its `CommandOutcome`. This starts the invoke/render flow inside `cli_composition`, although `CompositionRoot` is pure DI and should return the wired driver for `apps/cli` to invoke. Return `CodexRuntimeDriver` from the composition root and move `.handle(input)` to the CLI command handler.",
               "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json",
-              "line": 176,
-              "category": "acceptance criterion non-observable"
+              "file": "apps/cli-composition/src/codex_runtime.rs",
+              "line": 30,
+              "category": "invoke leak"
             }
           ],
-          "hash": "rvw1:sha256:e3b3b030697c860bee185cbe3d950f8b3078fe5f97fd91b674954807385d2fd3",
-          "at": "2026-07-18T07:18:14Z"
+          "hash": "rvw1:sha256:fcf7ca8baf02fca80fe94f1b172726a889c31c7520af359a182e2e3847de4702",
+          "at": "2026-07-18T09:40:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodexRuntimeCompositionRoot` no longer implements the catalogue-defined public `provision(input: CodexRuntimeInput) -> CommandOutcome` method; it exposes `codex_runtime_driver()` instead. This breaks the declared composition-root API and any callers generated or wired against the catalogue signature.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/codex_runtime.rs",
+              "line": 15,
+              "category": "wiring/API signature mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
+          "at": "2026-07-18T09:55:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
+          "at": "2026-07-18T09:56:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9fe41c734e9640c6861c7addc7dac3f47734619eecf14a177b69c4f6f6f22b12",
-          "at": "2026-07-18T07:20:09Z"
+          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
+          "at": "2026-07-18T09:57:45Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
+          "at": "2026-07-18T09:37:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
+          "at": "2026-07-18T09:41:57Z"
         }
       ]
     },
@@ -234,111 +306,86 @@
           "findings": [],
           "hash": "rvw1:sha256:5e85920be11cf13996f8644691a2ef7501defb9bc1eb8d091188b66e2550c532",
           "at": "2026-07-18T10:30:06Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
-          "at": "2026-07-18T09:36:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
-          "at": "2026-07-18T09:41:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
-          "at": "2026-07-18T09:55:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
-          "at": "2026-07-18T10:10:43Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fcf7ca8baf02fca80fe94f1b172726a889c31c7520af359a182e2e3847de4702",
-          "at": "2026-07-18T09:36:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CodexRuntimeCompositionRoot::provision` immediately calls `CodexRuntimeDriver::handle(input)` and returns its `CommandOutcome`. This starts the invoke/render flow inside `cli_composition`, although `CompositionRoot` is pure DI and should return the wired driver for `apps/cli` to invoke. Return `CodexRuntimeDriver` from the composition root and move `.handle(input)` to the CLI command handler.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/codex_runtime.rs",
-              "line": 30,
-              "category": "invoke leak"
-            }
-          ],
-          "hash": "rvw1:sha256:fcf7ca8baf02fca80fe94f1b172726a889c31c7520af359a182e2e3847de4702",
-          "at": "2026-07-18T09:40:25Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`CodexRuntimeCompositionRoot` no longer implements the catalogue-defined public `provision(input: CodexRuntimeInput) -> CommandOutcome` method; it exposes `codex_runtime_driver()` instead. This breaks the declared composition-root API and any callers generated or wired against the catalogue signature.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/codex_runtime.rs",
-              "line": 15,
-              "category": "wiring/API signature mismatch"
+              "message": "`prepare_runtime_dir` validates each component with `symlink_metadata`, then performs `current.join(name)`/`create_dir` and later `canonicalize` by pathname. An attacker can replace a checked parent directory with a symlink between these operations, causing runtime creation or log/output access to escape `repo_root`; use directory-handle-relative operations (`openat`/`mkdirat`/`symlinkat`/`renameat` style) and fail closed.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/process.rs",
+              "line": 530,
+              "category": "trusted-root violation"
             }
           ],
-          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
-          "at": "2026-07-18T09:55:35Z"
+          "hash": "rvw1:sha256:f1189b53054d054e5cb193caba924c53870dc988d0f54a2daaaa59ac4199cf2c",
+          "at": "2026-07-18T10:55:10Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
-          "at": "2026-07-18T09:56:11Z"
+          "hash": "rvw1:sha256:9ccfa44bc863b5b0a2cf71cfc9f47971165e03c9f89245131676a89b41498216",
+          "at": "2026-07-18T11:04:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`prepare_runtime_dir` lexically removes `..` components before its handle-relative walk. A runtime path such as `repo/link/../runtime`, where `link` is a symlink, therefore bypasses symlink rejection; the Codex adapter still passes the original joined output path to the child, which can resolve it outside the trusted repository and write there. Preserve fail-closed raw-component validation before normalization (as in `normalize_path_rejecting_symlinked_components` and the `is_safe_briefing_path` traversal policy), then perform the openat walk.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/process.rs",
+              "line": 483,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "The provider-controlled output leaf is opened with blocking `RDONLY` before its file type is checked. If the child replaces the initialized file with a FIFO, `openat` waits indefinitely after the child has exited, outside the provider timeout. Open with `O_NONBLOCK` and then reject non-regular files via the handle metadata.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/process.rs",
+              "line": 690,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:9ccfa44bc863b5b0a2cf71cfc9f47971165e03c9f89245131676a89b41498216",
+          "at": "2026-07-18T11:12:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The raw traversal check still permits `ordinary/../runtime` when `ordinary` is not a symlink at validation time. That component can be replaced with a symlink immediately afterward; normalization erases it from the handle-relative walk, while Codex still receives the original path in `--output-last-message`, allowing the output write to resolve outside `repo_root`. Follow the fail-closed `is_safe_briefing_path` precedent by rejecting every `ParentDir` component before normalization, rather than relying on a raceable `symlink_metadata` snapshot.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/capability_exec/process.rs",
+              "line": 486,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:01b6d2042a645ddc013a9c7324dd4e2951caf76a27909dd6da4e8c2748b5ffe6",
+          "at": "2026-07-18T11:20:20Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
-          "at": "2026-07-18T09:57:45Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
+          "hash": "rvw1:sha256:1325154728a7e15b38ba8e4cb5c0c5181b23b3724e8a48e64c34632801c2bf0e",
+          "at": "2026-07-18T11:24:07Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
-          "at": "2026-07-18T09:37:11Z"
+          "hash": "rvw1:sha256:225a9a6f598130f3fde8ba18db8db8ae041759a0d8351f0082cbc435e532cab5",
+          "at": "2026-07-18T11:33:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
-          "at": "2026-07-18T09:41:57Z"
+          "hash": "rvw1:sha256:225a9a6f598130f3fde8ba18db8db8ae041759a0d8351f0082cbc435e532cab5",
+          "at": "2026-07-18T11:37:01Z"
         }
       ]
     },
@@ -473,6 +520,39 @@
           "findings": [],
           "hash": "rvw1:sha256:97397f5c554974a93727d89340d79ea6cda3534ac779ea9cb92a6d5114b0102b",
           "at": "2026-07-18T10:20:34Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3b3b030697c860bee185cbe3d950f8b3078fe5f97fd91b674954807385d2fd3",
+          "at": "2026-07-18T07:13:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-02 の「actionable diagnostic」は判定条件が定義されておらず、決定論的に検証できません。D1 が要求する「何をプローブしたか」「なぜ失敗したか」「利用者が取れる選択肢」が AC 本文に含まれないため、汎用エラーを表示してリンク作成を避けるだけの実装でも合格し得ます。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json",
+              "line": 176,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:e3b3b030697c860bee185cbe3d950f8b3078fe5f97fd91b674954807385d2fd3",
+          "at": "2026-07-18T07:18:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9fe41c734e9640c6861c7addc7dac3f47734619eecf14a177b69c4f6f6f22b12",
+          "at": "2026-07-18T07:20:09Z"
         }
       ]
     },

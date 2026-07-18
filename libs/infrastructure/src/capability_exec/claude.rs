@@ -132,6 +132,7 @@ impl ClaudeCapabilityAdapter {
         let timeout = request.request.timeout.map(|timeout| Duration::from_secs(timeout.as_secs()));
         let result = self.process_runner.run(
             "claude",
+            None,
             &args,
             &self.repo_root,
             &self.runtime_dir,
@@ -142,6 +143,7 @@ impl ClaudeCapabilityAdapter {
         let output = match (resume_id, result) {
             (Some(_), Ok(output)) if output.exit_code != 0 => self.process_runner.run(
                 "claude",
+                None,
                 &build_claude_args(
                     request.request.capability.as_str(),
                     request.profile.model.as_str(),
@@ -157,6 +159,7 @@ impl ClaudeCapabilityAdapter {
             )?,
             (Some(_), Err(_)) => self.process_runner.run(
                 "claude",
+                None,
                 &build_claude_args(
                     request.request.capability.as_str(),
                     request.profile.model.as_str(),
@@ -294,6 +297,7 @@ mod tests {
         fn run(
             &self,
             binary: &str,
+            _path_prefix: Option<&Path>,
             args: &[OsString],
             _repo_root: &Path,
             _runtime_dir: &Path,

@@ -146,6 +146,7 @@ mod tests {
 
         let error = run_provider_process_with_timeout(
             "unreachable-provider-binary",
+            None,
             &[],
             &repository,
             &repository.join("tmp/capability-runtime"),
@@ -169,6 +170,7 @@ mod tests {
 
         let error = run_provider_process_with_timeout(
             "sh",
+            None,
             &args,
             repository.path(),
             &repository.path().join("tmp/capability-runtime"),
@@ -192,6 +194,7 @@ mod tests {
 
         let output = run_provider_process_with_timeout(
             "sh",
+            None,
             &args,
             repository.path(),
             &repository.path().join("tmp/capability-runtime"),
@@ -215,6 +218,7 @@ mod tests {
         let started = Instant::now();
         let error = run_provider_process_with_timeout(
             "sh",
+            None,
             &args,
             repository.path(),
             &repository.path().join("tmp/capability-runtime"),
