@@ -167,15 +167,19 @@ for only the unrecoverable field and retain all remaining recorded information. 
 turn that fallback into a posting failure. Derive each introducing commit from repository history
 for the ledger row; if it cannot be recovered, show `記録なし` for that field as well.
 
-Always prepare and post the comment, including when the terminal diff is empty. With no selected
-post-init record, state: `terminal text byte-matches the init stamp; no post-init change-history
-records`. With selected records, state: `terminal text byte-matches the init stamp; intermediate
-change history is recorded`, and include the complete provenance table. An empty diff must never
-be treated as proof that no in-track edit occurred.
+Always prepare and post the comment, including when the terminal diff is empty. When the
+terminal diff is non-empty, present the diff and the provenance table without any byte-match
+claim. The following two status strings apply only when the terminal diff is empty: with no
+selected post-init record, state `terminal text byte-matches the init stamp; no post-init
+change-history records`; with selected records, state `terminal text byte-matches the init
+stamp; intermediate change history is recorded` and include the complete provenance table. An
+empty diff must never be treated as proof that no in-track edit occurred.
 
 Resolve the PR author at runtime with `gh pr view --json author` and begin the comment with that
-author's `@login`; do not hardcode a handle. Submit exactly one independent comment using
-`gh pr comment` (for example, with the prepared body file). This is an audit comment, not a
+author's `@login`; do not hardcode a handle. Submit exactly one independent comment with the
+exact invocation form `gh pr comment --body-file <path>` against the current branch's PR — this
+is the only permitted `gh pr comment` form; never pass `--edit-last`, `--delete-last`, or
+repo/PR-targeting flags. This is an audit comment, not a
 `bin/sotp pr review-cycle` trigger and must not request another automated review. Record the
 posting result and returned URL. A `gh` lookup, diff preparation, or comment-posting failure is
 non-fatal after Step 10: report it and preserve the reviewed-PR outcome; do not add a user pause

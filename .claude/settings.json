@@ -126,7 +126,7 @@
       "Bash(bin/sotp git note-from-file:*)",
       "Bash(bin/sotp pr:*)",
       "Bash(gh pr view:*)",
-      "Bash(gh pr comment:*)",
+      "Bash(gh pr comment --body-file:*)",
       "Bash(cargo make verify-plan-artifact-refs)",
       "Bash(cargo make track-local-review)",
       "Bash(cargo make track-local-review:*)",

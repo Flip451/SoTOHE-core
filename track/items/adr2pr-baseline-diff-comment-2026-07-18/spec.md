@@ -26,7 +26,7 @@ signals: { blue: 18, yellow: 0, red: 0 }
 - [CN-01] 来歴表は primary ADR の filename と一致する source の記録だけを、当該 source の init 記録より後の append 順で扱い、他 source の記録を含めない。 [adr: knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md#D1] [tasks: T001]
 - [CN-02] コメント先頭の宛先は実行時に解決した PR author の login とし、特定の GitHub ユーザー名をハードコードしない。 [adr: knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md#D2] [tasks: T001]
 - [CN-03] 投稿は `gh pr comment` による 1 コメントで完結させ、pr-review の review-request 経路や自動レビューの再依頼として扱わない。 [adr: knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md#D1] [tasks: T001]
-- [CN-04] コメント投稿フェーズは自律実行し、投稿失敗または過去 escalation 記録の欠落は、復元できない事項を「記録なし」と明示して報告する非致命の扱いにする。 [adr: knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md#D1, knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md#D3] [tasks: T001, T002]
+- [CN-04] コメント投稿フェーズは自律実行し、投稿失敗または過去 escalation 記録の欠落は、復元できない事項を「記録なし」と明示して報告する非致命の扱いにする。 [adr: knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md#D1] [tasks: T001, T002]
 
 ## Acceptance Criteria
 - [ ] [AC-01] adr2pr が machine PASS または user 承認済み Accepted Deviations で pr-review を終えた場合、primary ADR の init baseline と終端文面の diff を含むコメント投稿フェーズへ進む。 [adr: knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md#D1] [tasks: T001, T002]

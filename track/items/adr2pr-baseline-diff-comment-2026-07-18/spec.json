@@ -128,10 +128,6 @@
         {
           "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
           "anchor": "D1"
-        },
-        {
-          "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
-          "anchor": "D3"
         }
       ]
     }
