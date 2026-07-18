@@ -176,10 +176,11 @@ stamp; intermediate change history is recorded` and include the complete provena
 empty diff must never be treated as proof that no in-track edit occurred.
 
 Resolve the PR author at runtime with `gh pr view --json author` and begin the comment with that
-author's `@login`; do not hardcode a handle. Submit exactly one independent comment with the
-exact invocation form `gh pr comment --body-file <path>` against the current branch's PR — this
-is the only permitted `gh pr comment` form; never pass `--edit-last`, `--delete-last`, or
-repo/PR-targeting flags. This is an audit comment, not a
+author's `@login`; do not hardcode a handle. Submit exactly one independent comment through the
+argv-validating wrapper `cargo make pr-audit-comment -- <body-file>` (which executes
+`gh pr comment --body-file <path>` against the current branch's PR and rejects any flag —
+`--edit-last`, `--delete-last`, repo/PR-targeting — before execution). Never invoke
+`gh pr comment` directly for this step. This is an audit comment, not a
 `bin/sotp pr review-cycle` trigger and must not request another automated review. Record the
 posting result and returned URL. A `gh` lookup, diff preparation, or comment-posting failure is
 non-fatal after Step 10: report it and preserve the reviewed-PR outcome; do not add a user pause

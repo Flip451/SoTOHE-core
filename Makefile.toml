@@ -820,6 +820,25 @@ description = "[wrapper] Stage paths listed in tmp/track-commit/add-paths.txt an
 command = "bin/sotp"
 args = ["git", "add-from-file", "tmp/track-commit/add-paths.txt", "--cleanup"]
 
+[tasks.pr-audit-comment]
+description = "[wrapper] Post the adr2pr terminal audit comment: exactly one `gh pr comment --body-file <path>` on the current branch's PR. Validates argv — a single existing body-file path, no flags — so edit/delete/repo-targeting submodes (--edit-last, --delete-last, --repo, ...) can never ride along. This wrapper is the only sanctioned autonomous `gh pr comment` route."
+script_runner = "@shell"
+script = ['''
+case "${1:-}" in --) shift ;; esac
+if [ "$#" -ne 1 ]; then
+  echo "usage: cargo make pr-audit-comment -- <body-file>" >&2
+  exit 2
+fi
+case "$1" in
+  -*) echo "error: argument must be a body-file path, not a flag: $1" >&2; exit 2 ;;
+esac
+if [ ! -f "$1" ]; then
+  echo "error: body file not found: $1" >&2
+  exit 2
+fi
+exec gh pr comment --body-file "$1"
+''']
+
 [tasks.track-commit-message]
 description = "[wrapper] Regenerate signals + views (via track-active-gate; that gate runs no ref-verify call), then run the strict commit gate: stage working tree, full cargo make ci, track-aware cargo make ci-track (including ADR-baseline check-commit), code-review gate (review not approved → BLOCK), semantic review refresh (`sotp ref-verify run` — the scope derives from track artifact existence, so pre-Phase-1 tracks pass with zero pairs; the only writing step, positioned after the code-review gate per CN-02 / IN-02), re-stage to capture verify-cache artifact writes, `sotp ref-verify check-approved` (non-Pass pairs → BLOCK; same existence-derived scope), test-obligation fulfillment gate (`sotp test-obligation check`; missing bindings / unresolved edges / stale verdicts → BLOCK), DRY gate (`sotp dry check-approved`; unresolved DRY violations → BLOCK), commit from tmp/track-commit/commit-message.txt, persist HEAD SHA to .commit_hash. The regen sequence is shared with review invocations via track-active-gate (CN-11 DRY, AC-12). The strict checks (ci + ci-track + check-approved + semantic review + test-obligation + DRY gate) are NOT weakened by the bare-chain refactor (CN-12)."
 dependencies = ["track-active-gate"]

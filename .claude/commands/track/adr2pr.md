@@ -39,10 +39,11 @@ is recorded as that track's init baseline.
   requires that workflow's explicit user approval. No other step pauses for confirmation.
 - **Staging**: `bin/sotp git add-all`
 - **Commit**: write to `tmp/track-commit/commit-message.txt`, then `cargo make track-commit-message`
-- **Terminal diff comment**: the workflow's terminal step posts via direct
-  `gh pr view --json author` and `gh pr comment --body-file <path>` (the only allowlisted
-  `gh pr comment` form in `.claude/settings.json`; edit/delete/targeting flags are not
-  permitted); do not route it through `bin/sotp pr review-cycle`.
+- **Terminal diff comment**: the workflow's terminal step resolves the author via
+  `gh pr view --json author` and posts via the argv-validating wrapper
+  `cargo make pr-audit-comment -- <body-file>` (both allowlisted in `.claude/settings.json`;
+  direct `gh pr comment` is not allowlisted); do not route it through
+  `bin/sotp pr review-cycle`.
 
 ## Report format
 
