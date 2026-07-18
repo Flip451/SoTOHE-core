@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7dce0bdfa2de1b2fe2a78509d64d317899d7bc21848e8b685eec4a112cd00b11",
-          "at": "2026-07-18T05:37:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7dce0bdfa2de1b2fe2a78509d64d317899d7bc21848e8b685eec4a112cd00b11",
-          "at": "2026-07-18T05:43:17Z"
-        }
-      ]
-    },
     "cli_driver": {
       "rounds": [
         {
@@ -83,108 +65,36 @@
         }
       ]
     },
-    "cli": {
+    "spec": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
-          "at": "2026-07-18T09:36:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
-          "at": "2026-07-18T09:41:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
-          "at": "2026-07-18T09:55:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
-          "at": "2026-07-18T10:10:43Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fcf7ca8baf02fca80fe94f1b172726a889c31c7520af359a182e2e3847de4702",
-          "at": "2026-07-18T09:36:58Z"
+          "hash": "rvw1:sha256:e3b3b030697c860bee185cbe3d950f8b3078fe5f97fd91b674954807385d2fd3",
+          "at": "2026-07-18T07:13:59Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`CodexRuntimeCompositionRoot::provision` immediately calls `CodexRuntimeDriver::handle(input)` and returns its `CommandOutcome`. This starts the invoke/render flow inside `cli_composition`, although `CompositionRoot` is pure DI and should return the wired driver for `apps/cli` to invoke. Return `CodexRuntimeDriver` from the composition root and move `.handle(input)` to the CLI command handler.",
+              "message": "AC-02 の「actionable diagnostic」は判定条件が定義されておらず、決定論的に検証できません。D1 が要求する「何をプローブしたか」「なぜ失敗したか」「利用者が取れる選択肢」が AC 本文に含まれないため、汎用エラーを表示してリンク作成を避けるだけの実装でも合格し得ます。",
               "severity": "P1",
-              "file": "apps/cli-composition/src/codex_runtime.rs",
-              "line": 30,
-              "category": "invoke leak"
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json",
+              "line": 176,
+              "category": "acceptance criterion non-observable"
             }
           ],
-          "hash": "rvw1:sha256:fcf7ca8baf02fca80fe94f1b172726a889c31c7520af359a182e2e3847de4702",
-          "at": "2026-07-18T09:40:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CodexRuntimeCompositionRoot` no longer implements the catalogue-defined public `provision(input: CodexRuntimeInput) -> CommandOutcome` method; it exposes `codex_runtime_driver()` instead. This breaks the declared composition-root API and any callers generated or wired against the catalogue signature.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/codex_runtime.rs",
-              "line": 15,
-              "category": "wiring/API signature mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
-          "at": "2026-07-18T09:55:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
-          "at": "2026-07-18T09:56:11Z"
+          "hash": "rvw1:sha256:e3b3b030697c860bee185cbe3d950f8b3078fe5f97fd91b674954807385d2fd3",
+          "at": "2026-07-18T07:18:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
-          "at": "2026-07-18T09:57:45Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
-          "at": "2026-07-18T09:37:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
-          "at": "2026-07-18T09:41:57Z"
+          "hash": "rvw1:sha256:9fe41c734e9640c6861c7addc7dac3f47734619eecf14a177b69c4f6f6f22b12",
+          "at": "2026-07-18T07:20:09Z"
         }
       ]
     },
@@ -386,6 +296,56 @@
           "findings": [],
           "hash": "rvw1:sha256:225a9a6f598130f3fde8ba18db8db8ae041759a0d8351f0082cbc435e532cab5",
           "at": "2026-07-18T11:37:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19a06376686b5aa3b30aa69a90852c1788c0186dc719d87925a6e3736d70c112",
+          "at": "2026-07-18T11:56:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19a06376686b5aa3b30aa69a90852c1788c0186dc719d87925a6e3736d70c112",
+          "at": "2026-07-18T12:02:56Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7dce0bdfa2de1b2fe2a78509d64d317899d7bc21848e8b685eec4a112cd00b11",
+          "at": "2026-07-18T05:37:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7dce0bdfa2de1b2fe2a78509d64d317899d7bc21848e8b685eec4a112cd00b11",
+          "at": "2026-07-18T05:43:17Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
+          "at": "2026-07-18T09:37:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
+          "at": "2026-07-18T09:41:57Z"
         }
       ]
     },
@@ -523,39 +483,6 @@
         }
       ]
     },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e3b3b030697c860bee185cbe3d950f8b3078fe5f97fd91b674954807385d2fd3",
-          "at": "2026-07-18T07:13:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-02 の「actionable diagnostic」は判定条件が定義されておらず、決定論的に検証できません。D1 が要求する「何をプローブしたか」「なぜ失敗したか」「利用者が取れる選択肢」が AC 本文に含まれないため、汎用エラーを表示してリンク作成を避けるだけの実装でも合格し得ます。",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json",
-              "line": 176,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:e3b3b030697c860bee185cbe3d950f8b3078fe5f97fd91b674954807385d2fd3",
-          "at": "2026-07-18T07:18:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9fe41c734e9640c6861c7addc7dac3f47734619eecf14a177b69c4f6f6f22b12",
-          "at": "2026-07-18T07:20:09Z"
-        }
-      ]
-    },
     "usecase": {
       "rounds": [
         {
@@ -571,6 +498,75 @@
           "findings": [],
           "hash": "rvw1:sha256:9b254af5672d3ab0df682a6313c43290fd522aa1437a1470ebadefcc8c73cc10",
           "at": "2026-07-18T09:39:39Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcf7ca8baf02fca80fe94f1b172726a889c31c7520af359a182e2e3847de4702",
+          "at": "2026-07-18T09:36:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodexRuntimeCompositionRoot::provision` immediately calls `CodexRuntimeDriver::handle(input)` and returns its `CommandOutcome`. This starts the invoke/render flow inside `cli_composition`, although `CompositionRoot` is pure DI and should return the wired driver for `apps/cli` to invoke. Return `CodexRuntimeDriver` from the composition root and move `.handle(input)` to the CLI command handler.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/codex_runtime.rs",
+              "line": 30,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:fcf7ca8baf02fca80fe94f1b172726a889c31c7520af359a182e2e3847de4702",
+          "at": "2026-07-18T09:40:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodexRuntimeCompositionRoot` no longer implements the catalogue-defined public `provision(input: CodexRuntimeInput) -> CommandOutcome` method; it exposes `codex_runtime_driver()` instead. This breaks the declared composition-root API and any callers generated or wired against the catalogue signature.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/codex_runtime.rs",
+              "line": 15,
+              "category": "wiring/API signature mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
+          "at": "2026-07-18T09:55:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
+          "at": "2026-07-18T09:56:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
+          "at": "2026-07-18T09:57:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:053d08c72e53e5e1d2ef83b9c43d35eb128ba50184483bf341f7a450417dd043",
+          "at": "2026-07-18T12:04:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:053d08c72e53e5e1d2ef83b9c43d35eb128ba50184483bf341f7a450417dd043",
+          "at": "2026-07-18T12:07:10Z"
         }
       ]
     },
@@ -711,6 +707,38 @@
           "findings": [],
           "hash": "rvw1:sha256:ac53a3c863ea58080c8c09dccca94582754649a64e5c0acd5d76a7eae332e054",
           "at": "2026-07-18T10:40:01Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
+          "at": "2026-07-18T09:36:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
+          "at": "2026-07-18T09:41:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
+          "at": "2026-07-18T09:55:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
+          "at": "2026-07-18T10:10:43Z"
         }
       ]
     }

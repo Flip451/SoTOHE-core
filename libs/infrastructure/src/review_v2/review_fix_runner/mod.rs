@@ -164,7 +164,7 @@ impl ReviewFixRunner for CodexReviewFixRunner {
             &codex_home,
             &output_last_message,
         );
-        let (stdout, log_path) =
+        let (stdout, child_status, log_path) =
             spawn_and_collect_codex(&bin, &args, &safe_env, &prompt, runtime_for_log)?;
         // By default the guard removes the log on drop. Disarm it on failure
         // paths so the log is retained for diagnosis.
@@ -186,8 +186,12 @@ impl ReviewFixRunner for CodexReviewFixRunner {
             None => {
                 // Disarm the cleanup guard: log must persist so the caller can diagnose.
                 log_cleanup.keep_for_diagnosis();
+                let child_exit = child_status.code().map_or_else(
+                    || format!("exit status {child_status}"),
+                    |code| format!("exit code {code}"),
+                );
                 return Err(ReviewFixRunnerError::SentinelNotFound(format!(
-                    "no REVIEW_FIX_STATUS sentinel found; session log: {}",
+                    "no REVIEW_FIX_STATUS sentinel found; codex fixer {child_exit}; session log: {}",
                     log_path.display()
                 )));
             }
@@ -296,9 +300,10 @@ exit 0
     }
 
     #[cfg(unix)]
-    fn write_fake_codex_runner_without_sentinel(dir: &std::path::Path) -> PathBuf {
+    fn write_fake_codex_runner_without_sentinel(dir: &std::path::Path, exit_code: i32) -> PathBuf {
         let script = dir.join("fake-codex-no-sentinel.sh");
-        let script_content = r#"#!/bin/sh
+        let script_content = format!(
+            r#"#!/bin/sh
 if [ "$1" = "--version" ]; then
   echo "codex 0.125.0"
   exit 0
@@ -315,8 +320,9 @@ done
 cat >/dev/null
 printf 'not a sentinel\n' > "$out"
 printf 'fake stdout without sentinel\n'
-exit 0
-"#;
+exit {exit_code}
+"#
+        );
         std::fs::write(&script, script_content).unwrap();
         make_executable(&script);
         script
@@ -463,7 +469,7 @@ exit 0
     #[test]
     fn test_run_fix_fake_codex_without_sentinel_returns_sentinel_not_found() {
         let dir = tempfile::tempdir().unwrap();
-        let fake = write_fake_codex_runner_without_sentinel(dir.path());
+        let fake = write_fake_codex_runner_without_sentinel(dir.path(), 0);
         let briefing = dir.path().join("briefing.md");
         std::fs::write(&briefing, "# Briefing\n").unwrap();
         let mut command = make_command();
@@ -474,6 +480,29 @@ exit 0
 
         match result {
             Err(ReviewFixRunnerError::SentinelNotFound(_)) => {}
+            Err(other) => panic!("expected SentinelNotFound, got error: {other:?}"),
+            Ok(output) => panic!("expected SentinelNotFound, got status: {}", output.status),
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_run_fix_without_sentinel_reports_child_exit_code_and_session_log() {
+        let dir = tempfile::tempdir().unwrap();
+        let fake = write_fake_codex_runner_without_sentinel(dir.path(), 126);
+        let briefing = dir.path().join("briefing.md");
+        std::fs::write(&briefing, "# Briefing\n").unwrap();
+        let mut command = make_command();
+        command.briefing_file = briefing;
+        let runner = make_runner().with_bin(&fake);
+
+        let result = runner.run_fix(command);
+
+        match result {
+            Err(ReviewFixRunnerError::SentinelNotFound(message)) => {
+                assert!(message.contains("exit code 126"));
+                assert!(message.contains("session log:"));
+            }
             Err(other) => panic!("expected SentinelNotFound, got error: {other:?}"),
             Ok(output) => panic!("expected SentinelNotFound, got status: {}", output.status),
         }

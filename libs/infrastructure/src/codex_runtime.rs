@@ -39,7 +39,7 @@ impl FsCodexRuntimeProvisioner {
         }
 
         let mut attempts = Vec::new();
-        if let Some(candidate) = find_on_path(CODEX_NAME, path.as_deref()) {
+        if let Some(candidate) = find_codex_on_path(project_root, path.as_deref()) {
             match probe(&candidate, path.as_deref(), None) {
                 Ok(()) => return refresh_link(project_root, &candidate),
                 Err(reason) => attempts.push(format!(
@@ -395,6 +395,37 @@ fn find_on_path(name: &str, path: Option<&std::ffi::OsStr>) -> Option<PathBuf> {
     })
 }
 
+fn find_codex_on_path(project_root: &Path, path: Option<&std::ffi::OsStr>) -> Option<PathBuf> {
+    path.and_then(|path| {
+        std::env::split_paths(path).map(|directory| directory.join(CODEX_NAME)).find(|candidate| {
+            is_executable(candidate) && !is_repo_local_runtime_link(project_root, candidate)
+        })
+    })
+}
+
+fn is_repo_local_runtime_link(project_root: &Path, candidate: &Path) -> bool {
+    let expected = absolute_lexical_path(&project_root.join(RUNTIME_LINK));
+    let candidate = absolute_lexical_path(candidate);
+    matches!((expected, candidate), (Ok(expected), Ok(candidate)) if expected == candidate)
+}
+
+fn absolute_lexical_path(path: &Path) -> Result<PathBuf, std::io::Error> {
+    let absolute = absolute_link_target(path)?;
+    let mut normalized = PathBuf::new();
+    for component in absolute.components() {
+        match component {
+            std::path::Component::Prefix(prefix) => normalized.push(prefix.as_os_str()),
+            std::path::Component::RootDir => normalized.push(component.as_os_str()),
+            std::path::Component::CurDir => {}
+            std::path::Component::ParentDir => {
+                normalized.pop();
+            }
+            std::path::Component::Normal(name) => normalized.push(name),
+        }
+    }
+    Ok(normalized)
+}
+
 #[cfg(unix)]
 fn is_executable(path: &Path) -> bool {
     use std::os::unix::fs::PermissionsExt as _;
@@ -477,6 +508,34 @@ mod tests {
             .provision_with_path(&project, Some(path_of(&[bin])))
             .expect("repeat provisioning must refresh link");
         assert_eq!(fs::read_link(&link).expect("refreshed link must exist"), first);
+    }
+
+    #[test]
+    fn test_provision_repo_local_path_entry_skips_link_and_remains_idempotent() {
+        let fixture = tempfile::tempdir().expect("fixture must be created");
+        let project = fixture.path().join("project");
+        let external_bin = fixture.path().join("external-bin");
+        fs::create_dir_all(&project).expect("project must be created");
+        fs::create_dir_all(&external_bin).expect("external bin must be created");
+        let external_codex = external_bin.join("codex");
+        executable(&external_codex, "#!/bin/sh\necho codex-external\n");
+        let provisioner = FsCodexRuntimeProvisioner::new();
+
+        provisioner
+            .provision_with_path(&project, Some(path_of(std::slice::from_ref(&external_bin))))
+            .expect("external PATH candidate must provision");
+        let runtime_bin = project.join(".harness/tools/bin");
+        let link = runtime_bin.join("codex");
+
+        provisioner
+            .provision_with_path(&project, Some(path_of(&[runtime_bin, external_bin])))
+            .expect("repo-local PATH entry must be skipped in favor of the external candidate");
+
+        assert_eq!(fs::read_link(&link).expect("runtime link must remain healthy"), external_codex);
+        assert_eq!(
+            link.canonicalize().expect("runtime link must resolve"),
+            external_codex.canonicalize().expect("external candidate must resolve")
+        );
     }
 
     #[test]

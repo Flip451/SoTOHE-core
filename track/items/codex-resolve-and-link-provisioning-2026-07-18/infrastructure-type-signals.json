@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-18T11:33:11Z",
+  "generated_at": "2026-07-18T11:55:38Z",
   "declaration_hash": "5bc1659f701cc1d6bd4169d182dc14bd9f1969e6752ffb82d97fac4c70dd20f1",
-  "implementation_input_hash": "ba2f91481b35053b47e689b55d5aba39a7638e377e2e30c28f5da83c373bb77b",
+  "implementation_input_hash": "d56f7c2315d5102ef11a13ce9ddb7c6a8415bd5acc149337dca710ac25749936",
   "signals": [
     {
       "type_name": "CodexCapabilityAdapter",

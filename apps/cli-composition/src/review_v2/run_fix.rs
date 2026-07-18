@@ -101,22 +101,7 @@ pub(crate) fn review_fix_driver(
                     usecase::review_v2::run_review_fix::RunReviewFixOutput,
                     RunReviewFixError,
                 > {
-                    runner_arc.as_ref().run_fix(cmd).map_err(|e| match e {
-                        ReviewFixRunnerError::SmokeTestFailed(message) => {
-                            RunReviewFixError::SmokeTestFailed(diagnostic_message(message))
-                        }
-                        ReviewFixRunnerError::SpawnFailed(_) => RunReviewFixError::FixRunnerFailed(
-                            diagnostic_message("fix runner process failed"),
-                        ),
-                        ReviewFixRunnerError::SentinelNotFound(_) => {
-                            RunReviewFixError::FixRunnerFailed(diagnostic_message(
-                                "fix runner did not report a completion status",
-                            ))
-                        }
-                        ReviewFixRunnerError::Unexpected(_) => RunReviewFixError::FixRunnerFailed(
-                            diagnostic_message("fix runner failed unexpectedly"),
-                        ),
-                    })
+                    runner_arc.as_ref().run_fix(cmd).map_err(map_codex_fix_runner_error)
                 },
             );
             Arc::new(RunReviewFixInteractor::new(run_fn))
@@ -131,6 +116,23 @@ pub(crate) fn review_fix_driver(
     Ok(ReviewFixDriver::new(service, command, resolved.provider))
 }
 
+fn map_codex_fix_runner_error(error: ReviewFixRunnerError) -> RunReviewFixError {
+    match error {
+        ReviewFixRunnerError::SmokeTestFailed(message) => {
+            RunReviewFixError::SmokeTestFailed(diagnostic_message(message))
+        }
+        ReviewFixRunnerError::SpawnFailed(_) => {
+            RunReviewFixError::FixRunnerFailed(diagnostic_message("fix runner process failed"))
+        }
+        ReviewFixRunnerError::SentinelNotFound(message) => {
+            RunReviewFixError::FixRunnerFailed(diagnostic_message(message))
+        }
+        ReviewFixRunnerError::Unexpected(_) => {
+            RunReviewFixError::FixRunnerFailed(diagnostic_message("fix runner failed unexpectedly"))
+        }
+    }
+}
+
 /// Builds a non-empty diagnostic payload for `RunReviewFixError`.
 fn diagnostic_message(value: impl Into<String>) -> DiagnosticMessage {
     let mut value = value.into();
@@ -142,6 +144,23 @@ fn diagnostic_message(value: impl Into<String>) -> DiagnosticMessage {
             Ok(message) => return message,
             Err(_) => value = "review-fix diagnostic detail unavailable".to_owned(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::map_codex_fix_runner_error;
+    use usecase::review_v2::run_review_fix::ReviewFixRunnerError;
+
+    #[test]
+    fn test_map_codex_fix_runner_error_preserves_sentinel_diagnostics() {
+        let error = map_codex_fix_runner_error(ReviewFixRunnerError::SentinelNotFound(
+            "codex fixer exit code 126; session log: tmp/reviewer-runtime/session.log".to_owned(),
+        ));
+
+        let rendered = error.to_string();
+        assert!(rendered.contains("exit code 126"));
+        assert!(rendered.contains("session log:"));
     }
 }
 

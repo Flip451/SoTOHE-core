@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-18T10:01:02Z",
+  "generated_at": "2026-07-18T11:55:44Z",
   "declaration_hash": "1592641767ddaa0d6172dabb15ef1850b807a2fe78e3fcb438ff65b3b9b2f94d",
-  "implementation_input_hash": "06acd8316e4f75bbb0c7ca290716d0dc51db6b9d2de790b31c4fdefaaac80261",
+  "implementation_input_hash": "b785fcfeedd76280d020d65cfbf925756869f101faa174c4bb6708d957a454c8",
   "signals": [
     {
       "type_name": "CodexRuntimeCompositionRoot",
