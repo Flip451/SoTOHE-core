@@ -1,6 +1,53 @@
 {
   "schema_version": 2,
   "scopes": {
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7271a0019d555cb07301d9f17208f5cc97291db6323bb6f497bd39bef6d672c6",
+          "at": "2026-07-18T05:38:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-lifecycle.md` の「Generated Views」は `metadata.json` / `impl-plan.json` から生成される `track/registry.md` の規則であり、同 convention は `spec.json` の生成パイプラインを適用外と明記しています。この docs-only feature や `spec.md` の扱いを支えないため、`related_conventions[]` の narrative-level cross-reference として不適切です。関連する規範へ差し替えるか、この参照を除外してください。",
+              "severity": "P1",
+              "file": "track/items/adr2pr-baseline-diff-comment-2026-07-18/spec.json",
+              "line": 239,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:7271a0019d555cb07301d9f17208f5cc97291db6323bb6f497bd39bef6d672c6",
+          "at": "2026-07-18T05:42:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7e7eb0a3fd1a51a369939502636071367d893545eb40490346c8b417493f66a",
+          "at": "2026-07-18T05:44:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:821a4beaa3ccd9609bcf71805d981833508f39594c72c8425b6dbee6a3926d6a",
+          "at": "2026-07-18T07:11:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:821a4beaa3ccd9609bcf71805d981833508f39594c72c8425b6dbee6a3926d6a",
+          "at": "2026-07-18T07:14:27Z"
+        }
+      ]
+    },
     "types": {
       "rounds": [
         {
@@ -16,6 +63,384 @@
           "findings": [],
           "hash": "rvw1:sha256:48979f08611acb56023d2ed25552ffba05c9fe25b3ee1e8343b748a40030165e",
           "at": "2026-07-18T05:41:52Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7275b77633416993d4c0677caf3b5bbcbb1191c1f1be587a34a38a0d075818c",
+          "at": "2026-07-18T04:29:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7275b77633416993d4c0677caf3b5bbcbb1191c1f1be587a34a38a0d075818c",
+          "at": "2026-07-18T04:31:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:289d0e2f7e7f2a8a3bbc8b39bd3a7f060bf434f4a8004e71908947812ab5290a",
+          "at": "2026-07-18T05:18:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:289d0e2f7e7f2a8a3bbc8b39bd3a7f060bf434f4a8004e71908947812ab5290a",
+          "at": "2026-07-18T05:21:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be5b4589a021cdf1cc03129895b8d6fa5ce09573cea7eee92c3c17cb23db5b46",
+          "at": "2026-07-18T06:34:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be5b4589a021cdf1cc03129895b8d6fa5ce09573cea7eee92c3c17cb23db5b46",
+          "at": "2026-07-18T06:37:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ecdb9c1111eefe948e47e82d3348e4d55dca2b7be83c485a6b9ab259ea9fcfd",
+          "at": "2026-07-18T07:01:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ecdb9c1111eefe948e47e82d3348e4d55dca2b7be83c485a6b9ab259ea9fcfd",
+          "at": "2026-07-18T07:04:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50e532640914df0d01e04addfc3186162d4813f7b2ebf01e0628a4012693c088",
+          "at": "2026-07-18T07:25:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50e532640914df0d01e04addfc3186162d4813f7b2ebf01e0628a4012693c088",
+          "at": "2026-07-18T07:28:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aaaa8d63aeeee8abbc8840a28fb7dcecf346f62ca30103a514c73adc1b2eb149",
+          "at": "2026-07-18T08:14:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The exported `pr-audit-comment` wrapper is a security-sensitive public task with numerous validation branches, but the accompanying scaffold test only checks that its task name exists. There is no behavioral coverage proving one valid invocation reaches a fake `gh` exactly once or that extra arguments, traversal/absolute paths, and symlinks are rejected. A validation regression or drift from the root task would therefore pass CI while potentially breaking every consumer audit comment or exposing unintended files.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 326,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:aaaa8d63aeeee8abbc8840a28fb7dcecf346f62ca30103a514c73adc1b2eb149",
+          "at": "2026-07-18T08:19:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f68335657a71be356c9bb4ac711671c6dfbcd9e06dea5d9f999e77d9a45fb6f6",
+          "at": "2026-07-18T08:26:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f68335657a71be356c9bb4ac711671c6dfbcd9e06dea5d9f999e77d9a45fb6f6",
+          "at": "2026-07-18T08:28:27Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` is empty and therefore provides no task traceability for the required goal `GO-01`, despite the review policy explicitly assigning goal-to-task traceability to `impl-plan.json` rather than `task-coverage.json`. Add a summary entry linking the goal to the implementing task(s), likely T001/T002.",
+              "severity": "P1",
+              "file": "track/items/adr2pr-baseline-diff-comment-2026-07-18/impl-plan.json",
+              "line": 26,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:b4cde885a636fc798f88462c6bcec503b9be2e9e36b94a700e1d31b1adc109bd",
+          "at": "2026-07-18T05:39:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4410ea3168de2da17cf832231fb5cd73362394e29a6d9a3b094d440728777d9",
+          "at": "2026-07-18T05:40:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` の GO-01 traceability が T001/T002 のみを列挙し、IN-03/AC-07 を実装してコメント来歴の入力を成立させる T003 を欠落させています。GO-01 は diff と来歴の監査可能な提示を目的としているため、T003 も carrier task として含めてください。",
+              "severity": "P1",
+              "file": "track/items/adr2pr-baseline-diff-comment-2026-07-18/impl-plan.json",
+              "line": 25,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:a4410ea3168de2da17cf832231fb5cd73362394e29a6d9a3b094d440728777d9",
+          "at": "2026-07-18T05:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4dec011d07c97f95f3337554c62dc317664437fd1a1dccc523b09019cd1f5912",
+          "at": "2026-07-18T05:48:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:576b4fa0dba305902307a3b458018980cd352cfea3d20050a1cca1d1986f7f76",
+          "at": "2026-07-18T06:01:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:576b4fa0dba305902307a3b458018980cd352cfea3d20050a1cca1d1986f7f76",
+          "at": "2026-07-18T06:05:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0743cc280cb15c5876f16cb27c38833e3526aa13c423b4cf06be24462548d40d",
+          "at": "2026-07-18T06:09:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0743cc280cb15c5876f16cb27c38833e3526aa13c423b4cf06be24462548d40d",
+          "at": "2026-07-18T06:11:37Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5172bc8b6ffad9f59999ee06fb0bbcdf97ca1b904e0d4de43c10b24d4fb6811",
+          "at": "2026-07-18T04:29:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は全 escalation 刻印を対象にしながら、起点の由来を local review round / 外部 PR review round の二系統でしか定義していません。adr2pr の Phase 1+ には spec→ADR の赤信号や diagnose routing を起点とする正規 escalation があり、review finding は存在しません。このままでは downstream の convention/workflow が正しい reason を導出できないため、guardian lane で非 review 起点の記録要件を明文化する必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+              "line": 46,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D1 は各変更に「対応する escalation 刻印」を要求していますが、正規の `non-semantic-fix` 刻印も init からの byte diff を生成し得ます。この記録は escalation でも D3 以前・記録欠落でもないため、workflow はその hash/commit を来歴として載せるのか「記録なし」とするのか決定から導出できません。非 semantic 修正の来歴表現を明確化してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+              "line": 34,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "最終文面が init と byte 一致しても「in-track 編集なし」とは限りません。append-only ledger では中間 escalation を経て最終的に init と同じ hash へ戻る履歴を保持でき、その場合 D1 の各変更来歴要件とこの一行確認が矛盾します。downstream spec が虚偽の監査コメントを生成しないよう、net diff が空の場合の中間履歴の扱いを定める必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+              "line": 36,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:f5172bc8b6ffad9f59999ee06fb0bbcdf97ca1b904e0d4de43c10b24d4fb6811",
+          "at": "2026-07-18T04:36:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a500ff1323d2780083974c7cf7a83bd52bb0d09d348cbdadd5bbeaf5cbed2fc",
+          "at": "2026-07-18T04:45:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 は「init 後の ledger 記録」を来歴表に載せるとしていますが、ADR baseline ledger は track 全体で共有され、他 ADR の `cite` / `new-adr` / `escalation` も含み得ます。primary ADR と同じ `source` の記録だけを対象にするのか、全 ADR の記録を含めるのかが未定義で、後者なら `cite` / `new-adr` 行の表現もありません。このままでは downstream の spec.json が来歴表の行集合を観測可能な受入条件として一意に導出できないため、対象を primary ADR の ledger entries に限定するなど明記してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+              "line": 34,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:2a500ff1323d2780083974c7cf7a83bd52bb0d09d348cbdadd5bbeaf5cbed2fc",
+          "at": "2026-07-18T04:50:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5f9a61034f36fe101f0e8e71e97f92cd4ae4f0c8c7f04a9f8d348bfb50fe320",
+          "at": "2026-07-18T04:54:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5f9a61034f36fe101f0e8e71e97f92cd4ae4f0c8c7f04a9f8d348bfb50fe320",
+          "at": "2026-07-18T04:59:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:271c14302e591b3e6ca990020ebf15597320a19a8889fee694f661546b1c224e",
+          "at": "2026-07-18T05:18:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:271c14302e591b3e6ca990020ebf15597320a19a8889fee694f661546b1c224e",
+          "at": "2026-07-18T05:21:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdfdb09447a7d13720c2965b95914f001d2b2c5c5a9934fdf496ee7f14ab1447",
+          "at": "2026-07-18T06:35:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdfdb09447a7d13720c2965b95914f001d2b2c5c5a9934fdf496ee7f14ab1447",
+          "at": "2026-07-18T06:37:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:37d4219a9164312aaf630db34af1c17a132e88c4390e07e6a385b36cb8ec9c4b",
+          "at": "2026-07-18T07:01:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:37d4219a9164312aaf630db34af1c17a132e88c4390e07e6a385b36cb8ec9c4b",
+          "at": "2026-07-18T07:04:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff9cb7a7b75e10d3d74ec6107b372281b34df7e3931b0dcdfd250a0f0c497969",
+          "at": "2026-07-18T07:25:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff9cb7a7b75e10d3d74ec6107b372281b34df7e3931b0dcdfd250a0f0c497969",
+          "at": "2026-07-18T07:28:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:582e6e3c6ce2d88847809d2275599587e03cb31b45905412a234b3e3db55afd6",
+          "at": "2026-07-18T08:14:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:582e6e3c6ce2d88847809d2275599587e03cb31b45905412a234b3e3db55afd6",
+          "at": "2026-07-18T08:17:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b48fb6b675f603e326db29893f626694a539bd90ffbe9443b9cf3ab051ac79b3",
+          "at": "2026-07-18T08:26:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b48fb6b675f603e326db29893f626694a539bd90ffbe9443b9cf3ab051ac79b3",
+          "at": "2026-07-18T08:28:53Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ded544ee0fb4060d08cae4f3dc328436685b680f82f4d6c7a6da55174d1bdeb",
+          "at": "2026-07-18T08:13:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ded544ee0fb4060d08cae4f3dc328436685b680f82f4d6c7a6da55174d1bdeb",
+          "at": "2026-07-18T08:15:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:02f0e92ace4cbba04f4712dfdbe871dee3c82cd7e39072c857e79b74bb9c60f2",
+          "at": "2026-07-18T08:26:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:02f0e92ace4cbba04f4712dfdbe871dee3c82cd7e39072c857e79b74bb9c60f2",
+          "at": "2026-07-18T08:28:02Z"
         }
       ]
     },
@@ -191,335 +616,20 @@
           "findings": [],
           "hash": "rvw1:sha256:667a47ced4478c55aa331c9b01604dad492d04776f300527de95e7e908f5b4e4",
           "at": "2026-07-18T07:56:09Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f5172bc8b6ffad9f59999ee06fb0bbcdf97ca1b904e0d4de43c10b24d4fb6811",
-          "at": "2026-07-18T04:29:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 は全 escalation 刻印を対象にしながら、起点の由来を local review round / 外部 PR review round の二系統でしか定義していません。adr2pr の Phase 1+ には spec→ADR の赤信号や diagnose routing を起点とする正規 escalation があり、review finding は存在しません。このままでは downstream の convention/workflow が正しい reason を導出できないため、guardian lane で非 review 起点の記録要件を明文化する必要があります。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
-              "line": 46,
-              "category": "decision underspecified for downstream consumption"
-            },
-            {
-              "message": "D1 は各変更に「対応する escalation 刻印」を要求していますが、正規の `non-semantic-fix` 刻印も init からの byte diff を生成し得ます。この記録は escalation でも D3 以前・記録欠落でもないため、workflow はその hash/commit を来歴として載せるのか「記録なし」とするのか決定から導出できません。非 semantic 修正の来歴表現を明確化してください。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
-              "line": 34,
-              "category": "decision underspecified for downstream consumption"
-            },
-            {
-              "message": "最終文面が init と byte 一致しても「in-track 編集なし」とは限りません。append-only ledger では中間 escalation を経て最終的に init と同じ hash へ戻る履歴を保持でき、その場合 D1 の各変更来歴要件とこの一行確認が矛盾します。downstream spec が虚偽の監査コメントを生成しないよう、net diff が空の場合の中間履歴の扱いを定める必要があります。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
-              "line": 36,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:f5172bc8b6ffad9f59999ee06fb0bbcdf97ca1b904e0d4de43c10b24d4fb6811",
-          "at": "2026-07-18T04:36:37Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2a500ff1323d2780083974c7cf7a83bd52bb0d09d348cbdadd5bbeaf5cbed2fc",
-          "at": "2026-07-18T04:45:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1 は「init 後の ledger 記録」を来歴表に載せるとしていますが、ADR baseline ledger は track 全体で共有され、他 ADR の `cite` / `new-adr` / `escalation` も含み得ます。primary ADR と同じ `source` の記録だけを対象にするのか、全 ADR の記録を含めるのかが未定義で、後者なら `cite` / `new-adr` 行の表現もありません。このままでは downstream の spec.json が来歴表の行集合を観測可能な受入条件として一意に導出できないため、対象を primary ADR の ledger entries に限定するなど明記してください。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
-              "line": 34,
-              "category": "decision underspecified for downstream consumption"
-            }
-          ],
-          "hash": "rvw1:sha256:2a500ff1323d2780083974c7cf7a83bd52bb0d09d348cbdadd5bbeaf5cbed2fc",
-          "at": "2026-07-18T04:50:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a5f9a61034f36fe101f0e8e71e97f92cd4ae4f0c8c7f04a9f8d348bfb50fe320",
-          "at": "2026-07-18T04:54:16Z"
+          "hash": "rvw1:sha256:5e5b907179348c077d9fb4c3495760808a9a5bc967c3030d74f506fe2d9b62cf",
+          "at": "2026-07-18T08:13:57Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a5f9a61034f36fe101f0e8e71e97f92cd4ae4f0c8c7f04a9f8d348bfb50fe320",
-          "at": "2026-07-18T04:59:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:271c14302e591b3e6ca990020ebf15597320a19a8889fee694f661546b1c224e",
-          "at": "2026-07-18T05:18:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:271c14302e591b3e6ca990020ebf15597320a19a8889fee694f661546b1c224e",
-          "at": "2026-07-18T05:21:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fdfdb09447a7d13720c2965b95914f001d2b2c5c5a9934fdf496ee7f14ab1447",
-          "at": "2026-07-18T06:35:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fdfdb09447a7d13720c2965b95914f001d2b2c5c5a9934fdf496ee7f14ab1447",
-          "at": "2026-07-18T06:37:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:37d4219a9164312aaf630db34af1c17a132e88c4390e07e6a385b36cb8ec9c4b",
-          "at": "2026-07-18T07:01:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:37d4219a9164312aaf630db34af1c17a132e88c4390e07e6a385b36cb8ec9c4b",
-          "at": "2026-07-18T07:04:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ff9cb7a7b75e10d3d74ec6107b372281b34df7e3931b0dcdfd250a0f0c497969",
-          "at": "2026-07-18T07:25:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ff9cb7a7b75e10d3d74ec6107b372281b34df7e3931b0dcdfd250a0f0c497969",
-          "at": "2026-07-18T07:28:13Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`plan.summary` is empty and therefore provides no task traceability for the required goal `GO-01`, despite the review policy explicitly assigning goal-to-task traceability to `impl-plan.json` rather than `task-coverage.json`. Add a summary entry linking the goal to the implementing task(s), likely T001/T002.",
-              "severity": "P1",
-              "file": "track/items/adr2pr-baseline-diff-comment-2026-07-18/impl-plan.json",
-              "line": 26,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:b4cde885a636fc798f88462c6bcec503b9be2e9e36b94a700e1d31b1adc109bd",
-          "at": "2026-07-18T05:39:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a4410ea3168de2da17cf832231fb5cd73362394e29a6d9a3b094d440728777d9",
-          "at": "2026-07-18T05:40:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`plan.summary` の GO-01 traceability が T001/T002 のみを列挙し、IN-03/AC-07 を実装してコメント来歴の入力を成立させる T003 を欠落させています。GO-01 は diff と来歴の監査可能な提示を目的としているため、T003 も carrier task として含めてください。",
-              "severity": "P1",
-              "file": "track/items/adr2pr-baseline-diff-comment-2026-07-18/impl-plan.json",
-              "line": 25,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:a4410ea3168de2da17cf832231fb5cd73362394e29a6d9a3b094d440728777d9",
-          "at": "2026-07-18T05:46:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4dec011d07c97f95f3337554c62dc317664437fd1a1dccc523b09019cd1f5912",
-          "at": "2026-07-18T05:48:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:576b4fa0dba305902307a3b458018980cd352cfea3d20050a1cca1d1986f7f76",
-          "at": "2026-07-18T06:01:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:576b4fa0dba305902307a3b458018980cd352cfea3d20050a1cca1d1986f7f76",
-          "at": "2026-07-18T06:05:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0743cc280cb15c5876f16cb27c38833e3526aa13c423b4cf06be24462548d40d",
-          "at": "2026-07-18T06:09:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0743cc280cb15c5876f16cb27c38833e3526aa13c423b4cf06be24462548d40d",
-          "at": "2026-07-18T06:11:37Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7271a0019d555cb07301d9f17208f5cc97291db6323bb6f497bd39bef6d672c6",
-          "at": "2026-07-18T05:38:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track-lifecycle.md` の「Generated Views」は `metadata.json` / `impl-plan.json` から生成される `track/registry.md` の規則であり、同 convention は `spec.json` の生成パイプラインを適用外と明記しています。この docs-only feature や `spec.md` の扱いを支えないため、`related_conventions[]` の narrative-level cross-reference として不適切です。関連する規範へ差し替えるか、この参照を除外してください。",
-              "severity": "P1",
-              "file": "track/items/adr2pr-baseline-diff-comment-2026-07-18/spec.json",
-              "line": 239,
-              "category": "broken cross-reference at narrative level"
-            }
-          ],
-          "hash": "rvw1:sha256:7271a0019d555cb07301d9f17208f5cc97291db6323bb6f497bd39bef6d672c6",
-          "at": "2026-07-18T05:42:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c7e7eb0a3fd1a51a369939502636071367d893545eb40490346c8b417493f66a",
-          "at": "2026-07-18T05:44:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:821a4beaa3ccd9609bcf71805d981833508f39594c72c8425b6dbee6a3926d6a",
-          "at": "2026-07-18T07:11:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:821a4beaa3ccd9609bcf71805d981833508f39594c72c8425b6dbee6a3926d6a",
-          "at": "2026-07-18T07:14:27Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7275b77633416993d4c0677caf3b5bbcbb1191c1f1be587a34a38a0d075818c",
-          "at": "2026-07-18T04:29:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7275b77633416993d4c0677caf3b5bbcbb1191c1f1be587a34a38a0d075818c",
-          "at": "2026-07-18T04:31:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:289d0e2f7e7f2a8a3bbc8b39bd3a7f060bf434f4a8004e71908947812ab5290a",
-          "at": "2026-07-18T05:18:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:289d0e2f7e7f2a8a3bbc8b39bd3a7f060bf434f4a8004e71908947812ab5290a",
-          "at": "2026-07-18T05:21:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:be5b4589a021cdf1cc03129895b8d6fa5ce09573cea7eee92c3c17cb23db5b46",
-          "at": "2026-07-18T06:34:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:be5b4589a021cdf1cc03129895b8d6fa5ce09573cea7eee92c3c17cb23db5b46",
-          "at": "2026-07-18T06:37:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4ecdb9c1111eefe948e47e82d3348e4d55dca2b7be83c485a6b9ab259ea9fcfd",
-          "at": "2026-07-18T07:01:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4ecdb9c1111eefe948e47e82d3348e4d55dca2b7be83c485a6b9ab259ea9fcfd",
-          "at": "2026-07-18T07:04:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:50e532640914df0d01e04addfc3186162d4813f7b2ebf01e0628a4012693c088",
-          "at": "2026-07-18T07:25:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:50e532640914df0d01e04addfc3186162d4813f7b2ebf01e0628a4012693c088",
-          "at": "2026-07-18T07:28:53Z"
+          "hash": "rvw1:sha256:5e5b907179348c077d9fb4c3495760808a9a5bc967c3030d74f506fe2d9b62cf",
+          "at": "2026-07-18T08:17:11Z"
         }
       ]
     }
