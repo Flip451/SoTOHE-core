@@ -365,6 +365,7 @@ case "$abs" in
   "$base"/*) ;;
   *) echo "error: body file resolves outside tmp/pr-audit/: $abs" >&2; exit 2 ;;
 esac
+unset GH_REPO GH_HOST
 exec gh pr comment --body-file "$1"
 ''']
 

@@ -323,7 +323,11 @@ fn test_exported_pr_audit_comment_wrapper_validates_argv_and_reaches_gh_once() {
     fs::create_dir_all(&shim_dir).unwrap();
     let gh_log = shim_dir.join("gh.log");
     let gh_shim = shim_dir.join("gh");
-    fs::write(&gh_shim, "#!/bin/sh\nprintf '%s\\n' \"$*\" >> \"$GH_LOG\"\nexit 0\n").unwrap();
+    fs::write(
+        &gh_shim,
+        "#!/bin/sh\nprintf '%s|%s|%s\\n' \"${GH_REPO:-unset}\" \"${GH_HOST:-unset}\" \"$*\" >> \"$GH_LOG\"\nexit 0\n",
+    )
+    .unwrap();
     fs::set_permissions(&gh_shim, fs::Permissions::from_mode(0o755)).unwrap();
     let wrapper = shim_dir.join("wrapper.sh");
     fs::write(&wrapper, &script).unwrap();
@@ -342,6 +346,8 @@ fn test_exported_pr_audit_comment_wrapper_validates_argv_and_reaches_gh_once() {
             .args(args)
             .env("PATH", shimmed_path)
             .env("GH_LOG", &gh_log)
+            .env("GH_REPO", "attacker/elsewhere")
+            .env("GH_HOST", "github.evil.example")
             .current_dir(&scaffold)
             .output()
             .unwrap()
@@ -372,7 +378,7 @@ fn test_exported_pr_audit_comment_wrapper_validates_argv_and_reaches_gh_once() {
         assert!(gh_invocations().is_empty(), "rejected argv {args:?} must never reach gh");
     }
 
-    let expected_call = "pr comment --body-file tmp/pr-audit/body.md";
+    let expected_call = "unset|unset|pr comment --body-file tmp/pr-audit/body.md";
     let plain = run(&["tmp/pr-audit/body.md"]);
     assert!(
         plain.status.success(),
