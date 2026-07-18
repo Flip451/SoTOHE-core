@@ -73,8 +73,11 @@ finding's origin, following
 `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`.
 
 When all required scopes reach `zero_findings`, stop and escalate to the user with the init-stamp
-diff and every guardian-withheld proposal. This Phase 0 escalation is the single mandated
-exception to Constraint 2. Only after user approval may the approved ADR text be stamped and the
+diff and every guardian-withheld proposal. The escalation message must present the diff content
+itself in the user-visible chat body — the changed hunks verbatim or a faithful hunk-by-hunk
+summary — before asking for the decision; tool output, file-path references, or attachments the
+user may not see do not satisfy this presentation requirement. This Phase 0 escalation is the
+single mandated exception to Constraint 2. Only after user approval may the approved ADR text be stamped and the
 ADR-baseline commit proceed. If adjudication changes the ADR text, send it through guardian
 judgment and start a fresh review; do not stamp an intermediate draft. Skip the additional stamp
 only when no review-loop edit occurred and the approved ADR remains byte-identical to the init

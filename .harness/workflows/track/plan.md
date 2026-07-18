@@ -95,7 +95,10 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
    stop and report.
 2. Invoke the `review` workflow for the ADR baseline. On `zero_findings`, present the init-stamp
    diff and any guardian-withheld proposals to the user for the Phase 0 adjudication required by
-   `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`.
+   `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`. Present the
+   diff content itself in the user-visible chat body (changed hunks verbatim or faithfully
+   summarized hunk by hunk); tool output or file references alone do not satisfy the
+   presentation requirement.
 3. Do not stamp during the review loop. After approval, stamp the approved ADR text only when it
    differs from the init record. If the adjudication changes the text, route that edit through
    the guardian path and restart the ADR-baseline review before stamping or proceeding.

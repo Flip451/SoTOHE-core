@@ -1,0 +1,145 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5172bc8b6ffad9f59999ee06fb0bbcdf97ca1b904e0d4de43c10b24d4fb6811",
+          "at": "2026-07-18T04:29:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は全 escalation 刻印を対象にしながら、起点の由来を local review round / 外部 PR review round の二系統でしか定義していません。adr2pr の Phase 1+ には spec→ADR の赤信号や diagnose routing を起点とする正規 escalation があり、review finding は存在しません。このままでは downstream の convention/workflow が正しい reason を導出できないため、guardian lane で非 review 起点の記録要件を明文化する必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+              "line": 46,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D1 は各変更に「対応する escalation 刻印」を要求していますが、正規の `non-semantic-fix` 刻印も init からの byte diff を生成し得ます。この記録は escalation でも D3 以前・記録欠落でもないため、workflow はその hash/commit を来歴として載せるのか「記録なし」とするのか決定から導出できません。非 semantic 修正の来歴表現を明確化してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+              "line": 34,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "最終文面が init と byte 一致しても「in-track 編集なし」とは限りません。append-only ledger では中間 escalation を経て最終的に init と同じ hash へ戻る履歴を保持でき、その場合 D1 の各変更来歴要件とこの一行確認が矛盾します。downstream spec が虚偽の監査コメントを生成しないよう、net diff が空の場合の中間履歴の扱いを定める必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+              "line": 36,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:f5172bc8b6ffad9f59999ee06fb0bbcdf97ca1b904e0d4de43c10b24d4fb6811",
+          "at": "2026-07-18T04:36:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a500ff1323d2780083974c7cf7a83bd52bb0d09d348cbdadd5bbeaf5cbed2fc",
+          "at": "2026-07-18T04:45:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 は「init 後の ledger 記録」を来歴表に載せるとしていますが、ADR baseline ledger は track 全体で共有され、他 ADR の `cite` / `new-adr` / `escalation` も含み得ます。primary ADR と同じ `source` の記録だけを対象にするのか、全 ADR の記録を含めるのかが未定義で、後者なら `cite` / `new-adr` 行の表現もありません。このままでは downstream の spec.json が来歴表の行集合を観測可能な受入条件として一意に導出できないため、対象を primary ADR の ledger entries に限定するなど明記してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+              "line": 34,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:2a500ff1323d2780083974c7cf7a83bd52bb0d09d348cbdadd5bbeaf5cbed2fc",
+          "at": "2026-07-18T04:50:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5f9a61034f36fe101f0e8e71e97f92cd4ae4f0c8c7f04a9f8d348bfb50fe320",
+          "at": "2026-07-18T04:54:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5f9a61034f36fe101f0e8e71e97f92cd4ae4f0c8c7f04a9f8d348bfb50fe320",
+          "at": "2026-07-18T04:59:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:271c14302e591b3e6ca990020ebf15597320a19a8889fee694f661546b1c224e",
+          "at": "2026-07-18T05:18:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:271c14302e591b3e6ca990020ebf15597320a19a8889fee694f661546b1c224e",
+          "at": "2026-07-18T05:21:33Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8b3a3fa208f61f668dc10de59d193ed38549df80cf8bdb1d5a71287e6c2c69b",
+          "at": "2026-07-18T05:18:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8b3a3fa208f61f668dc10de59d193ed38549df80cf8bdb1d5a71287e6c2c69b",
+          "at": "2026-07-18T05:21:48Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7275b77633416993d4c0677caf3b5bbcbb1191c1f1be587a34a38a0d075818c",
+          "at": "2026-07-18T04:29:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7275b77633416993d4c0677caf3b5bbcbb1191c1f1be587a34a38a0d075818c",
+          "at": "2026-07-18T04:31:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:289d0e2f7e7f2a8a3bbc8b39bd3a7f060bf434f4a8004e71908947812ab5290a",
+          "at": "2026-07-18T05:18:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:289d0e2f7e7f2a8a3bbc8b39bd3a7f060bf434f4a8004e71908947812ab5290a",
+          "at": "2026-07-18T05:21:22Z"
+        }
+      ]
+    }
+  }
+}
