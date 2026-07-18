@@ -40,9 +40,10 @@ is recorded as that track's init baseline.
 - **Staging**: `bin/sotp git add-all`
 - **Commit**: write to `tmp/track-commit/commit-message.txt`, then `cargo make track-commit-message`
 - **Terminal diff comment**: the workflow's terminal step resolves the author via
-  `gh pr view --json author` and posts via the argv-validating wrapper
-  `cargo make pr-audit-comment -- <body-file>` (both allowlisted in `.claude/settings.json`;
-  direct `gh pr comment` is not allowlisted); do not route it through
+  `gh pr view --json author`, writes the comment body under `tmp/pr-audit/`, and posts via the
+  argv-validating wrapper `cargo make pr-audit-comment -- tmp/pr-audit/<body-file>` (both
+  commands allowlisted in `.claude/settings.json`; direct `gh pr comment` is not allowlisted,
+  and the wrapper rejects paths outside `tmp/pr-audit/`); do not route it through
   `bin/sotp pr review-cycle`.
 
 ## Report format

@@ -23,8 +23,9 @@ or failure-recovery procedures here.
 - Do not run `git push` under any circumstance. PR operations are handled via `bin/sotp pr` wrappers,
   with one exception: the workflow SSoT's terminal primary-ADR diff-comment step calls
   `gh pr view --json author` (read-only lookup) directly and posts through the argv-validating
-  `cargo make pr-audit-comment -- <body-file>` wrapper (never direct `gh pr comment`). Branch
-  pushes, PR creation, and review-cycle triggers remain `bin/sotp pr` wrapper-only.
+  `cargo make pr-audit-comment -- tmp/pr-audit/<body-file>` wrapper (body file must live under
+  `tmp/pr-audit/`; never direct `gh pr comment`). Branch pushes, PR creation, and review-cycle
+  triggers remain `bin/sotp pr` wrapper-only.
 
 ### (3) Sub-workflow and capability invocation
 
