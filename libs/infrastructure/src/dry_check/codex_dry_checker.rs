@@ -24,7 +24,8 @@ use usecase::dry_check::{
 };
 
 use crate::codex_common::{
-    POLL_INTERVAL, REVIEW_RUNTIME_DIR, resolve_codex_runtime, runtime_path, spawn_codex,
+    POLL_INTERVAL, REVIEW_RUNTIME_DIR, resolve_codex_runtime_for_current_repository, runtime_path,
+    spawn_codex,
 };
 
 // ── Output schema ─────────────────────────────────────────────────────────────
@@ -220,12 +221,8 @@ impl CodexDryChecker {
         #[cfg(test)]
         let runtime = if self.bin_override.is_none() {
             Some(
-                resolve_codex_runtime(&std::env::current_dir().map_err(|error| {
-                    DryCheckAgentError::Unexpected(format!(
-                        "failed to determine project root: {error}"
-                    ))
-                })?)
-                .map_err(|error| DryCheckAgentError::Unexpected(error.to_string()))?,
+                resolve_codex_runtime_for_current_repository()
+                    .map_err(DryCheckAgentError::Unexpected)?,
             )
         } else {
             None
@@ -241,10 +238,8 @@ impl CodexDryChecker {
             }
         };
         #[cfg(not(test))]
-        let runtime = resolve_codex_runtime(&std::env::current_dir().map_err(|error| {
-            DryCheckAgentError::Unexpected(format!("failed to determine project root: {error}"))
-        })?)
-        .map_err(|error| DryCheckAgentError::Unexpected(error.to_string()))?;
+        let runtime = resolve_codex_runtime_for_current_repository()
+            .map_err(DryCheckAgentError::Unexpected)?;
         #[cfg(not(test))]
         let (bin, runtime_for_spawn) = (runtime.executable().to_os_string(), Some(&runtime));
 

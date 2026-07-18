@@ -14,7 +14,7 @@ use usecase::review_v2::run_review_fix::{
     ReviewFixRunner, ReviewFixRunnerError, RunReviewFixCommand, RunReviewFixOutput,
 };
 
-use crate::codex_common::resolve_codex_runtime;
+use crate::codex_common::resolve_codex_runtime_for_current_repository;
 use env::{build_codex_fixer_invocation, build_safe_env, create_safe_home, resolve_codex_home};
 use prompt::build_prompt;
 use sentinel::{parse_sentinel, sentinel_to_exit_code};
@@ -114,12 +114,8 @@ impl ReviewFixRunner for CodexReviewFixRunner {
         #[cfg(test)]
         let runtime = if self.bin_override.is_none() {
             Some(
-                resolve_codex_runtime(&std::env::current_dir().map_err(|error| {
-                    ReviewFixRunnerError::Unexpected(format!(
-                        "failed to determine project root: {error}"
-                    ))
-                })?)
-                .map_err(|error| ReviewFixRunnerError::Unexpected(error.to_string()))?,
+                resolve_codex_runtime_for_current_repository()
+                    .map_err(ReviewFixRunnerError::Unexpected)?,
             )
         } else {
             None
@@ -137,10 +133,8 @@ impl ReviewFixRunner for CodexReviewFixRunner {
             }
         };
         #[cfg(not(test))]
-        let runtime = resolve_codex_runtime(&std::env::current_dir().map_err(|error| {
-            ReviewFixRunnerError::Unexpected(format!("failed to determine project root: {error}"))
-        })?)
-        .map_err(|error| ReviewFixRunnerError::Unexpected(error.to_string()))?;
+        let runtime = resolve_codex_runtime_for_current_repository()
+            .map_err(ReviewFixRunnerError::Unexpected)?;
         #[cfg(not(test))]
         let (bin, path_prefix, runtime_for_log) =
             (runtime.executable().to_os_string(), runtime.path_prefix(), Some(&runtime));
@@ -220,7 +214,7 @@ impl Drop for OutputLastMessageCleanup {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
-    use crate::codex_common::REVIEW_RUNTIME_DIR;
+    use crate::codex_common::{REVIEW_RUNTIME_DIR, resolve_codex_runtime_for_repository_start};
 
     fn make_command() -> RunReviewFixCommand {
         RunReviewFixCommand {
@@ -446,6 +440,32 @@ exit 0
             matches!(result, Err(ReviewFixRunnerError::SmokeTestFailed(_))),
             "expected SmokeTestFailed for major version 1.0.0, got: {result:?}"
         );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_runtime_resolution_from_subdirectory_uses_git_root() {
+        use std::os::unix::fs::symlink;
+
+        let directory = tempfile::tempdir().unwrap();
+        let repository_root = directory.path().join("repository");
+        let git_init =
+            Command::new("git").args(["init", "--quiet"]).arg(&repository_root).output().unwrap();
+        assert!(git_init.status.success(), "git init must create the fixture repository");
+
+        let subdirectory = repository_root.join("nested/command");
+        std::fs::create_dir_all(&subdirectory).unwrap();
+        let runtime_binary = repository_root.join("fixture-codex.sh");
+        std::fs::write(&runtime_binary, "#!/bin/sh\necho 'codex 0.125.0'\n").unwrap();
+        make_executable(&runtime_binary);
+        let runtime_link = repository_root.join(".harness/tools/bin/codex");
+        std::fs::create_dir_all(runtime_link.parent().unwrap()).unwrap();
+        symlink(&runtime_binary, &runtime_link).unwrap();
+
+        let runtime = resolve_codex_runtime_for_repository_start(&subdirectory)
+            .expect("subdirectory invocation must resolve the repository-local runtime");
+
+        assert_eq!(runtime.real_path(), runtime_binary.canonicalize().unwrap());
     }
 
     #[cfg(unix)]

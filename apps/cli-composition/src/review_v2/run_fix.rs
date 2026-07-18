@@ -127,8 +127,8 @@ fn map_codex_fix_runner_error(error: ReviewFixRunnerError) -> RunReviewFixError 
         ReviewFixRunnerError::SentinelNotFound(message) => {
             RunReviewFixError::FixRunnerFailed(diagnostic_message(message))
         }
-        ReviewFixRunnerError::Unexpected(_) => {
-            RunReviewFixError::FixRunnerFailed(diagnostic_message("fix runner failed unexpectedly"))
+        ReviewFixRunnerError::Unexpected(message) => {
+            RunReviewFixError::FixRunnerFailed(diagnostic_message(message))
         }
     }
 }
@@ -161,6 +161,17 @@ mod tests {
         let rendered = error.to_string();
         assert!(rendered.contains("exit code 126"));
         assert!(rendered.contains("session log:"));
+    }
+
+    #[test]
+    fn test_map_codex_fix_runner_error_preserves_runtime_resolution_diagnostics() {
+        let error = map_codex_fix_runner_error(ReviewFixRunnerError::Unexpected(
+            "Codex runtime unavailable; rerun `cargo make bootstrap` to repair it".to_owned(),
+        ));
+
+        let rendered = error.to_string();
+        assert!(rendered.contains("Codex runtime unavailable"));
+        assert!(rendered.contains("cargo make bootstrap"));
     }
 }
 

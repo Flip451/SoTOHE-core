@@ -27,8 +27,8 @@ use usecase::review_workflow::{
 
 use super::session::{ReviewerSession, effort_value};
 use crate::codex_common::{
-    POLL_INTERVAL, REVIEW_RUNTIME_DIR, configure_codex_command, resolve_codex_runtime,
-    runtime_path, tee_stderr_to_file,
+    POLL_INTERVAL, REVIEW_RUNTIME_DIR, configure_codex_command,
+    resolve_codex_runtime_for_current_repository, runtime_path, tee_stderr_to_file,
 };
 use crate::track::symlink_guard::reject_symlinks_up_to_root;
 
@@ -160,10 +160,8 @@ impl CodexReviewer {
         #[cfg(test)]
         let runtime = if self.bin_override.is_none() {
             Some(
-                resolve_codex_runtime(&std::env::current_dir().map_err(|error| {
-                    ReviewerError::Unexpected(format!("failed to determine project root: {error}"))
-                })?)
-                .map_err(|error| ReviewerError::Unexpected(error.to_string()))?,
+                resolve_codex_runtime_for_current_repository()
+                    .map_err(ReviewerError::Unexpected)?,
             )
         } else {
             None
@@ -177,10 +175,8 @@ impl CodexReviewer {
             }
         };
         #[cfg(not(test))]
-        let runtime = resolve_codex_runtime(&std::env::current_dir().map_err(|error| {
-            ReviewerError::Unexpected(format!("failed to determine project root: {error}"))
-        })?)
-        .map_err(|error| ReviewerError::Unexpected(error.to_string()))?;
+        let runtime =
+            resolve_codex_runtime_for_current_repository().map_err(ReviewerError::Unexpected)?;
         #[cfg(not(test))]
         let (bin, runtime_for_spawn) = (runtime.executable().to_os_string(), Some(&runtime));
 

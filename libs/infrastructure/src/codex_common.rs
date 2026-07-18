@@ -21,6 +21,8 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 
+use crate::git_cli::SystemGitRepo;
+
 const REPO_LOCAL_CODEX_LINK: &str = ".harness/tools/bin/codex";
 const CODEX_RUNTIME_PROBE_TIMEOUT: Duration = Duration::from_secs(5);
 const CODEX_RUNTIME_PROBE_MAX_OUTPUT_BYTES: usize = 64 * 1024;
@@ -120,8 +122,12 @@ pub fn resolve_codex_runtime(
                         link.parent().unwrap_or(project_root).join(public_entry)
                     };
                     let prefix = public_entry.parent().map(PathBuf::from);
+                    // Execute the verified canonical target, never the mutable
+                    // repository symlink. The public entry's parent remains the
+                    // PATH prefix so launcher-side runtime discovery keeps its
+                    // documented layout.
                     return resolve_runtime_candidate(
-                        link.into_os_string(),
+                        real_path.into_os_string(),
                         prefix,
                         "repository link",
                     );
@@ -136,6 +142,30 @@ pub fn resolve_codex_runtime(
         ))
     })?;
     resolve_runtime_candidate(fallback.into_os_string(), None, "PATH fallback")
+}
+
+/// Resolves Codex after discovering the repository root from the caller's
+/// current working directory.
+///
+/// Codex's repository-local runtime link belongs at the git root, not at an
+/// arbitrary subdirectory from which a CLI command was invoked.
+pub(crate) fn resolve_codex_runtime_for_current_repository() -> Result<ResolvedCodexRuntime, String>
+{
+    let current_dir = std::env::current_dir()
+        .map_err(|error| format!("failed to determine current directory: {error}"))?;
+    resolve_codex_runtime_for_repository_start(&current_dir)
+}
+
+/// Resolves Codex after locating the git root that contains `start_dir`.
+///
+/// This is shared by Codex spawn paths and mirrors the dry-fix runner's
+/// `SystemGitRepo`-based root discovery.
+pub(crate) fn resolve_codex_runtime_for_repository_start(
+    start_dir: &Path,
+) -> Result<ResolvedCodexRuntime, String> {
+    let repo = SystemGitRepo::discover_from(start_dir)
+        .map_err(|error| format!("failed to discover git repository root: {error}"))?;
+    resolve_codex_runtime(repo.root()).map_err(|error| error.to_string())
 }
 
 fn resolve_runtime_candidate(
@@ -483,10 +513,48 @@ mod tests {
 
         let runtime = resolve_codex_runtime(workspace.path()).expect("runtime resolves from link");
 
-        assert_eq!(runtime.executable(), link.as_os_str());
+        assert_eq!(runtime.executable(), launcher.canonicalize().expect("launcher canonical path"));
         assert_eq!(runtime.path_prefix(), Some(public_bin.as_path()));
         assert_eq!(runtime.real_path(), launcher.canonicalize().expect("launcher canonical path"));
         assert!(runtime.version().contains("codex test-version"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_resolve_codex_runtime_executes_verified_target_after_link_is_replaced() {
+        use std::os::unix::fs::{PermissionsExt as _, symlink};
+
+        let workspace = tempfile::tempdir().expect("workspace is created");
+        let public_bin = workspace.path().join("public-bin");
+        std::fs::create_dir_all(&public_bin).expect("public bin is created");
+        let verified_launcher = public_bin.join("verified-codex");
+        let replacement_launcher = public_bin.join("replacement-codex");
+        std::fs::write(&verified_launcher, "#!/bin/sh\nprintf 'verified\\n'\n")
+            .expect("verified launcher is written");
+        std::fs::write(&replacement_launcher, "#!/bin/sh\nprintf 'replacement\\n'\n")
+            .expect("replacement launcher is written");
+        for launcher in [&verified_launcher, &replacement_launcher] {
+            let mut permissions =
+                std::fs::metadata(launcher).expect("launcher metadata").permissions();
+            permissions.set_mode(0o755);
+            std::fs::set_permissions(launcher, permissions).expect("launcher is executable");
+        }
+
+        let link = workspace.path().join(REPO_LOCAL_CODEX_LINK);
+        std::fs::create_dir_all(link.parent().expect("link has parent"))
+            .expect("link dir is created");
+        symlink(&verified_launcher, &link).expect("verified link is created");
+        let runtime = resolve_codex_runtime(workspace.path()).expect("runtime resolves from link");
+
+        std::fs::remove_file(&link).expect("verified link is removed");
+        symlink(&replacement_launcher, &link).expect("replacement link is created");
+        let output = Command::new(runtime.executable())
+            .arg("--version")
+            .output()
+            .expect("verified target executes");
+
+        assert!(output.status.success());
+        assert_eq!(String::from_utf8_lossy(&output.stdout), "verified\n");
     }
 
     struct CountingReader {
