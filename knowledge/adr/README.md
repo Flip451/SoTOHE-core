@@ -159,6 +159,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [ADR decision 根拠信号機: review grounding を一件でも持てば 🟡 とする優先規則修正](2026-06-16-0042-adr-signal-review-grounding-precedence.md) | — | 2026-06-16 |
 | [ADR baseline の累積刻印とバイト照合 binary check による無断改変検出](2026-07-16-2001-adr-decision-freeze.md) | Proposed | 2026-07-16 |
 | [ADR-baseline の review 入口検査を init 刻印の存在確認のみに縮小する](2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md) | Proposed | 2026-07-17 |
+| [adr2pr 終端に ADR baseline diff の PR コメント投稿フェーズを追加](2026-07-18-0340-adr2pr-baseline-diff-comment.md) | Proposed | 2026-07-18 |
 
 ### ドキュメント運用
 

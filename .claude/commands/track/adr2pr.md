@@ -34,9 +34,17 @@ is recorded as that track's init baseline.
   `knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権 — when the
   Phase 0 ADR-baseline review reaches `zero_findings`, stop and escalate to the user with the
   init-stamp diff and any guardian-withheld proposals; only after user approval may the
-  post-approval stamp and ADR-baseline commit proceed. No other step pauses for confirmation.
+  post-approval stamp and ADR-baseline commit proceed. The only other pause is inherited from
+  the delegated pr-review workflow: recording Accepted Deviations at its terminal state
+  requires that workflow's explicit user approval. No other step pauses for confirmation.
 - **Staging**: `bin/sotp git add-all`
 - **Commit**: write to `tmp/track-commit/commit-message.txt`, then `cargo make track-commit-message`
+- **Terminal diff comment**: the workflow's terminal step resolves the author via
+  `gh pr view --json author`, writes the comment body under `tmp/pr-audit/`, and posts via the
+  argv-validating wrapper `cargo make pr-audit-comment -- tmp/pr-audit/<body-file>` (both
+  commands allowlisted in `.claude/settings.json`; direct `gh pr comment` is not allowlisted,
+  and the wrapper rejects paths outside `tmp/pr-audit/`); do not route it through
+  `bin/sotp pr review-cycle`.
 
 ## Report format
 
@@ -46,3 +54,5 @@ After execution, summarize:
 2. PR URL and the final `/track:pr-review` result (confirming no merge was performed).
 3. Any per-scope ceiling batch split decisions made during full-cycle.
 4. Confirmation that all 🔴/🟡 signals are resolved.
+5. The terminal primary-ADR diff-comment result: posted URL, or its empty-diff/provenance
+   fallback outcome, or the reported non-fatal posting failure.

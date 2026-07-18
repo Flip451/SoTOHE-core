@@ -323,6 +323,52 @@ description = "[wrapper] Resolve CODEX_BIN, then launch the Codex dry-fix-lead f
 script_runner = "@shell"
 script = ['case "${1:-}" in --) shift ;; esac; CODEX_BIN="${CODEX_BIN:-$(command -v codex)}" bin/sotp dry fix-local "$@"']
 
+[tasks.pr-audit-comment]
+description = "[wrapper] Post the adr2pr terminal audit comment: exactly one `gh pr comment --body-file <path>` on the current branch's PR. Validates argv — a single non-flag path that lives under the workspace-controlled tmp/pr-audit/ directory, is a regular non-symlink file, and resolves inside that directory — so edit/delete/repo-targeting submodes (--edit-last, --delete-last, --repo, ...) can never ride along and arbitrary files (e.g. local secrets) can never be posted. This wrapper is the only sanctioned autonomous `gh pr comment` route."
+script_runner = "@shell"
+script = ['''
+case "${1:-}" in --) shift ;; esac
+if [ "$#" -ne 1 ]; then
+  echo "usage: cargo make pr-audit-comment -- tmp/pr-audit/<body-file>" >&2
+  exit 2
+fi
+case "$1" in
+  -*) echo "error: argument must be a body-file path, not a flag: $1" >&2; exit 2 ;;
+esac
+case "$1" in
+  tmp/pr-audit/*) ;;
+  *) echo "error: body file must be a relative path under tmp/pr-audit/: $1" >&2; exit 2 ;;
+esac
+case "$1" in
+  *..*) echo "error: body file path must not contain '..': $1" >&2; exit 2 ;;
+esac
+if [ -L "$1" ]; then
+  echo "error: body file must not be a symlink: $1" >&2
+  exit 2
+fi
+if [ ! -f "$1" ]; then
+  echo "error: body file not found: $1" >&2
+  exit 2
+fi
+workspace=$(realpath .) || exit 2
+if [ -L tmp ] || [ -L tmp/pr-audit ]; then
+  echo "error: tmp/pr-audit and its tmp parent must not be symlinks" >&2
+  exit 2
+fi
+if [ ! -d tmp/pr-audit ]; then
+  echo "error: body file directory tmp/pr-audit/ not found" >&2
+  exit 2
+fi
+base="$workspace/tmp/pr-audit"
+abs=$(realpath "$1") || exit 2
+case "$abs" in
+  "$base"/*) ;;
+  *) echo "error: body file resolves outside tmp/pr-audit/: $abs" >&2; exit 2 ;;
+esac
+unset GH_REPO GH_HOST
+exec gh pr comment --body-file "$1"
+''']
+
 [tasks.track-commit-message]
 description = "[wrapper] Refresh active-track artifacts, run CI and approval gates (review, semantic refs, test-obligation, DRY), then commit from tmp/track-commit/commit-message.txt"
 dependencies = ["track-active-gate"]

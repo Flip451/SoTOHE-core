@@ -186,6 +186,7 @@ fn test_exported_scaffold_makefile_has_only_host_first_workflow_tasks() {
         "track-local-review",
         "track-local-review-fix",
         "track-local-dry-fix",
+        "pr-audit-comment",
         "track-commit-message",
     ]);
 
@@ -291,4 +292,110 @@ fn test_exported_toolchain_ci_and_consumer_guidance_are_host_first() {
         ".claude/rules",
         "knowledge/conventions",
     ]);
+}
+
+fn pr_audit_comment_script(makefile: &str) -> String {
+    let section_start =
+        makefile.find("[tasks.pr-audit-comment]").expect("pr-audit-comment task missing");
+    let section = &makefile[section_start..];
+    let marker = "script = ['''";
+    let script_start =
+        section.find(marker).expect("pr-audit-comment script missing") + marker.len();
+    let script_len =
+        section[script_start..].find("''']").expect("pr-audit-comment script unterminated");
+    section[script_start..script_start + script_len].to_string()
+}
+
+#[test]
+fn test_exported_pr_audit_comment_wrapper_validates_argv_and_reaches_gh_once() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let scaffold = exported_scaffold();
+    let script = pr_audit_comment_script(&exported_file("Makefile.toml"));
+    let root_makefile = fs::read_to_string(workspace_root().join("Makefile.toml")).unwrap();
+    assert_eq!(
+        script,
+        pr_audit_comment_script(&root_makefile),
+        "exported pr-audit-comment wrapper drifted from the root Makefile task"
+    );
+
+    let shim_dir = scaffold.join("tmp/test-shim");
+    fs::create_dir_all(&shim_dir).unwrap();
+    let gh_log = shim_dir.join("gh.log");
+    let gh_shim = shim_dir.join("gh");
+    fs::write(
+        &gh_shim,
+        "#!/bin/sh\nprintf '%s|%s|%s\\n' \"${GH_REPO:-unset}\" \"${GH_HOST:-unset}\" \"$*\" >> \"$GH_LOG\"\nexit 0\n",
+    )
+    .unwrap();
+    fs::set_permissions(&gh_shim, fs::Permissions::from_mode(0o755)).unwrap();
+    let wrapper = shim_dir.join("wrapper.sh");
+    fs::write(&wrapper, &script).unwrap();
+
+    fs::create_dir_all(scaffold.join("tmp/pr-audit")).unwrap();
+    fs::write(scaffold.join("tmp/pr-audit/body.md"), "audit body\n").unwrap();
+    let outside_secret = scaffold.join("outside-secret.txt");
+    fs::write(&outside_secret, "secret\n").unwrap();
+    std::os::unix::fs::symlink(&outside_secret, scaffold.join("tmp/pr-audit/link.md")).unwrap();
+
+    let run = |args: &[&str]| {
+        let shimmed_path =
+            format!("{}:{}", shim_dir.display(), std::env::var("PATH").unwrap_or_default());
+        Command::new("sh")
+            .arg(&wrapper)
+            .args(args)
+            .env("PATH", shimmed_path)
+            .env("GH_LOG", &gh_log)
+            .env("GH_REPO", "attacker/elsewhere")
+            .env("GH_HOST", "github.evil.example")
+            .current_dir(&scaffold)
+            .output()
+            .unwrap()
+    };
+    let gh_invocations = || {
+        fs::read_to_string(&gh_log)
+            .map(|log| log.lines().map(str::to_owned).collect::<Vec<_>>())
+            .unwrap_or_default()
+    };
+
+    let rejected: &[&[&str]] = &[
+        &[],
+        &["--edit-last"],
+        &["/etc/hostname"],
+        &["tmp/pr-audit/../body.md"],
+        &["tmp/pr-audit/body.md", "extra-arg"],
+        &["tmp/pr-audit/link.md"],
+        &["tmp/pr-audit/missing.md"],
+    ];
+    for args in rejected {
+        let output = run(args);
+        assert!(
+            !output.status.success(),
+            "wrapper must reject argv {args:?}\nstdout: {}\nstderr: {}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr),
+        );
+        assert!(gh_invocations().is_empty(), "rejected argv {args:?} must never reach gh");
+    }
+
+    let expected_call = "unset|unset|pr comment --body-file tmp/pr-audit/body.md";
+    let plain = run(&["tmp/pr-audit/body.md"]);
+    assert!(
+        plain.status.success(),
+        "valid invocation must succeed\nstderr: {}",
+        String::from_utf8_lossy(&plain.stderr),
+    );
+    assert_eq!(gh_invocations(), vec![expected_call.to_owned()], "gh must be reached exactly once");
+
+    let cargo_make_style = run(&["--", "tmp/pr-audit/body.md"]);
+    assert!(
+        cargo_make_style.status.success(),
+        "`--`-prefixed invocation (cargo-make arg passthrough) must succeed\nstderr: {}",
+        String::from_utf8_lossy(&cargo_make_style.stderr),
+    );
+    assert_eq!(
+        gh_invocations(),
+        vec![expected_call.to_owned(), expected_call.to_owned()],
+        "each valid invocation must reach gh exactly once with the fixed posting form"
+    );
 }

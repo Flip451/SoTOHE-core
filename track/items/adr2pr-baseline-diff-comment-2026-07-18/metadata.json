@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "adr2pr-baseline-diff-comment-2026-07-18",
+  "title": "adr2pr 終端に ADR baseline diff の PR コメント投稿フェーズを追加",
+  "branch": "track/adr2pr-baseline-diff-comment-2026-07-18",
+  "created_at": "2026-07-18T04:27:11Z",
+  "updated_at": "2026-07-18T04:27:11Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

@@ -20,7 +20,12 @@ or failure-recovery procedures here.
 
 - Requires `--sandbox workspace-write`: the workflow orchestrates commits, PR creation, and
   file writes across multiple sub-workflows.
-- Do not run `git push` under any circumstance. PR operations are handled via `bin/sotp pr` wrappers.
+- Do not run `git push` under any circumstance. PR operations are handled via `bin/sotp pr` wrappers,
+  with one exception: the workflow SSoT's terminal primary-ADR diff-comment step calls
+  `gh pr view --json author` (read-only lookup) directly and posts through the argv-validating
+  `cargo make pr-audit-comment -- tmp/pr-audit/<body-file>` wrapper (body file must live under
+  `tmp/pr-audit/`; never direct `gh pr comment`). Branch pushes, PR creation, and review-cycle
+  triggers remain `bin/sotp pr` wrapper-only.
 
 ### (3) Sub-workflow and capability invocation
 
@@ -40,12 +45,18 @@ or failure-recovery procedures here.
   `knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権: when the
   Phase 0 ADR-baseline review reaches `zero_findings`, STOP and escalate to the user with the
   init-stamp diff and any guardian-withheld proposals for approval. Only after the user
-  approves may the post-approval stamp and the ADR-baseline commit proceed. No other step
-  pauses for user confirmation.
+  approves may the post-approval stamp and the ADR-baseline commit proceed. The only other
+  pause is inherited from the delegated `$track-pr-review` workflow: recording Accepted
+  Deviations at its terminal state requires that workflow's explicit user approval. No other
+  step pauses for user confirmation.
 
 ### (5) Reporting format
 
-- On successful completion (only when the final `$track-pr-review` step reaches its
-  zero-findings terminal state per `.harness/workflows/track/adr2pr.md`), print:
+- On successful completion (only when the final `$track-pr-review` step reaches a terminal
+  state per `.harness/workflows/track/adr2pr.md` — machine PASS, or Accepted Deviations
+  recorded with the user approval that workflow requires), print:
   `ADR2PR_STATUS: completed — PR <url> reviewed, no merge performed`
+- After that line, report the terminal primary-ADR diff-comment result on one line: the posted
+  comment URL, or its empty-diff/provenance-fallback outcome, or the reported non-fatal
+  posting failure.
 - On failure or block, print: `ADR2PR_STATUS: blocked — <reason>`

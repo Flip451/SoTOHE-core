@@ -1,0 +1,248 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "adr2pr 終端に primary ADR baseline diff の PR コメント投稿フェーズを追加する",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "`/track:adr2pr` の終端で、Phase 0 の init 刻印から primary ADR がどう変化したかとその来歴を PR 上の 1 コメントとして提示し、merge 裁定者が監査できるようにする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "adr2pr の pr-review 終端状態の直後に、primary ADR の init baseline 複製と終端時点の ADR を比較するコメント投稿フェーズを追加する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "コメントに終端 diff と、primary ADR source の init 記録以後の ledger 記録から構成した来歴表を含める。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "primary ADR の escalation 刻印 reason に、起点入力の由来・要旨と adr-diagnoser 判定要旨を残す要件を規範へ反映する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+            "anchor": "D3"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": "knowledge/conventions/pre-track-adr-authoring.md",
+            "anchor": "機構との整合"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "単発の `/track:pr-review` 実行に同じコメント投稿フェーズを適用すること。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "Rust 実装、CI 設定、または ADR-baseline ledger の record 形式を変更すること。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "escalation reason に構造化 schema または固定書式を導入すること。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+            "anchor": "D3"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "来歴表は primary ADR の filename と一致する source の記録だけを、当該 source の init 記録より後の append 順で扱い、他 source の記録を含めない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "コメント先頭の宛先は実行時に解決した PR author の login とし、特定の GitHub ユーザー名をハードコードしない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "投稿は `gh pr comment` による 1 コメントで完結させ、pr-review の review-request 経路や自動レビューの再依頼として扱わない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "コメント投稿フェーズは自律実行し、投稿失敗または過去 escalation 記録の欠落は、復元できない事項を「記録なし」と明示して報告する非致命の扱いにする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "adr2pr が machine PASS または user 承認済み Accepted Deviations で pr-review を終えた場合、primary ADR の init baseline と終端文面の diff を含むコメント投稿フェーズへ進む。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "来歴表には、選択された escalation 記録ごとの起点入力・adr-diagnoser 判定要旨・刻印 hash・timestamp・刻印導入コミット、および non-semantic-fix 記録の再刻印である旨・hash・timestamp・導入コミットが示される。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "終端 diff が空でもコメントを投稿し、init 後の primary-source 記録がない場合と中間変更記録がある場合を区別して示す。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "コメントは実行時に取得した PR author への `@mention` で始まり、単一の `gh pr comment` 投稿として作成される。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "過去の escalation 記録で必要な来歴情報を復元できない場合、残る情報で投稿を継続し、推測せず復元不能な要素だけを「記録なし」と示す。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "コメント投稿に失敗しても、完了済みの adr2pr 成果を失敗扱いにせず、投稿失敗を報告する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "primary ADR の escalation 刻印では、local review、外部 PR review、spec→ADR signal、または diagnose routing を識別できる起点入力の由来・要旨と、adr-diagnoser 判定要旨を自由記述 reason に含める。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-18-0340-adr2pr-baseline-diff-comment.md",
+          "anchor": "D3"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/pre-track-adr-authoring.md",
+          "anchor": "機構との整合"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/adr.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "In-track 意味変更の裁定権"
+    },
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "機構との整合"
+    },
+    {
+      "file": "knowledge/conventions/no-upstream-restatement.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    }
+  ],
+  "signals": {
+    "blue": 18,
+    "yellow": 0,
+    "red": 0
+  }
+}
