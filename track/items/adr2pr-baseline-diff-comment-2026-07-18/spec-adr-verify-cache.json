@@ -3,10 +3,10 @@
   "entries": [
     {
       "claim_hash": "9e6db6d1ea06511283ed11beb25e507149ba367b4e088f16fbca631affab7ad2",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
-        "citation": "adr2pr の終了処理に primary ADR の初稿（init 刻印）と最終文面の diff を PR コメントとして投稿するフェーズを追加する裁定"
+        "citation": "「adr2pr の終了処理に primary ADR の初稿（init 刻印）と最終文面の diff を PR コメントとして投稿するフェーズを追加する裁定」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -26,10 +26,10 @@
     },
     {
       "claim_hash": "a65f30d0648165d3d7cbc7317df6487a501cbc447f4e60ec2a3e981cccd3cf3f",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
-        "citation": "ADR decision [D1]: \"adr2pr の終端に ADR baseline diff コメント投稿フェーズを追加する\""
+        "citation": "### D1: adr2pr の終端に ADR baseline diff コメント投稿フェーズを追加する"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -49,7 +49,7 @@
     },
     {
       "claim_hash": "aec80ed3769053aded92cf01639dd5a54e5b01c212fb7749703b7d3e71c57e39",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
         "citation": "コメントには終端 diff に加え、track 共有 ledger から `source` が primary ADR の filename と一致する記録だけを選び、その source の init 記録より後を append 順にたどる来歴表を含める。"
@@ -72,10 +72,10 @@
     },
     {
       "claim_hash": "ed83582facdea7e5b845a2714b1788bfd614711be046e02b831b6f97af6cffa2",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
-        "citation": "primary ADR への in-track 編集で escalation 刻印を打つとき、reason には (a) 起点入力の由来と要旨、(b) adr-diagnoser の判定結果の要旨を含めることを要件とする。"
+        "citation": "reason には (a) 起点入力の由来と要旨、(b) adr-diagnoser の判定結果の要旨を含めることを要件とする。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -95,7 +95,7 @@
     },
     {
       "claim_hash": "8132f9a5015167e0af01be7c0195efb805bad370166dc81f5129a49b7a62f744",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
         "citation": "投稿は `gh pr comment` による 1 コメントとし、pr-review の review-request 経路（`bin/sotp pr review-cycle`）とは独立させる。"
@@ -118,10 +118,10 @@
     },
     {
       "claim_hash": "683bec48fe0198c46658da9cd52c550708c5841b05af872a7924ea579040a327",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
-        "citation": "「このフェーズは自律実行される（Constraint 2 の例外を増やさない）。投稿失敗は commit 済み成果を損なわない非致命エラーとして報告のみ行う。」"
+        "citation": "このフェーズは自律実行される（Constraint 2 の例外を増やさない）。投稿失敗は commit 済み成果を損なわない非致命エラーとして報告のみ行う。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -141,10 +141,10 @@
     },
     {
       "claim_hash": "683bec48fe0198c46658da9cd52c550708c5841b05af872a7924ea579040a327",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
-        "citation": "これは reason の規範「自己完結の欠落説明」の具体化である — 何が欠けていたか（起点入力）と、その修正が決定を保存すると判定された事実（守護者判定）は、欠落説明を自己完結させる構成要素であり、禁止されている user 承認記録の ledger 重複には当たらない。この一文の明確化を `knowledge/conventions/pre-track-adr-authoring.md` の機構整合節に追記する。"
+        "citation": "この一文の明確化を `knowledge/conventions/pre-track-adr-authoring.md` の機構整合節に追記する。判定「全文」の保存は要件にしない — 全文はセッション成果物であり、要旨が ledger に残れば終端フェーズの来歴表は機械的に再構成できる。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -164,10 +164,10 @@
     },
     {
       "claim_hash": "8682400374370bd020231b4a91a66fad80bf392cff287af301bf149344609040",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
-        "citation": "reason には (a) 起点入力の由来と要旨、(b) adr-diagnoser の判定結果の要旨を含めることを要件とする。"
+        "citation": "判定「全文」の保存は要件にしない — 全文はセッション成果物であり、要旨が ledger に残れば終端フェーズの来歴表は機械的に再構成できる。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -187,7 +187,7 @@
     },
     {
       "claim_hash": "311c266f0c66b24d368a58dcfeb8db8e321155a94b46d82bd959bf9e9224df4f",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
         "citation": "コメントには終端 diff に加え、track 共有 ledger から `source` が primary ADR の filename と一致する記録だけを選び、その source の init 記録より後を append 順にたどる来歴表を含める。他の ADR source に属する記録は kind が `cite` / `new-adr` / `escalation` のいずれであっても行集合から除外する。"
@@ -210,10 +210,10 @@
     },
     {
       "claim_hash": "67634893d0b4d5f8961c9cc04db2734af954bc7b5d9d3a14121b6999f003ca00",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
-        "citation": "特定ユーザー名はハードコードしない — テンプレート出力先でもそのまま機能させるため、宛先は実行時解決のみとする。"
+        "citation": "実行時に解決した PR author（`gh pr view --json author` の login）への `@mention` を置く。特定ユーザー名はハードコードしない"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -233,7 +233,7 @@
     },
     {
       "claim_hash": "176c7458abb2623821ce9c874b1162e87eaec4ee981cbd2241f73d8d505094a6",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
         "citation": "投稿は `gh pr comment` による 1 コメントとし、pr-review の review-request 経路（`bin/sotp pr review-cycle`）とは独立させる。自動レビュアーへの再レビュー依頼ではないため、trigger コメントの形式を流用しない。"
@@ -256,7 +256,7 @@
     },
     {
       "claim_hash": "8d402a0b18b804b888ae92789420285f6eb3472df30110690cd930d1021c2067",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
         "citation": "このフェーズは自律実行される（Constraint 2 の例外を増やさない）。投稿失敗は commit 済み成果を損なわない非致命エラーとして報告のみ行う。"
@@ -279,7 +279,7 @@
     },
     {
       "claim_hash": "8d402a0b18b804b888ae92789420285f6eb3472df30110690cd930d1021c2067",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
         "citation": "candidate_selection: from:[reason-requirement-plus-fallback,reason-requirement-only,weaken-to-surviving-records] chose:reason-requirement-plus-fallback"
@@ -302,10 +302,10 @@
     },
     {
       "claim_hash": "1139d4bbd9326bf7f3efee4f29701ad3472841aacbe9065459b90b441a617a3d",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
-        "citation": "`.harness/workflows/track/adr2pr.md` に、Step 10（pr-review）が終端状態（machine PASS または user 承認済み Accepted Deviations）に到達した直後の新しいステップとして「primary ADR baseline diff コメント投稿」を追加する"
+        "citation": "`.harness/workflows/track/adr2pr.md` に、Step 10（pr-review）が終端状態（machine PASS または user 承認済み Accepted Deviations）に到達した直後の新しいステップとして「primary ADR baseline diff コメント投稿」を追加する:"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -325,7 +325,7 @@
     },
     {
       "claim_hash": "f06886cfd2624f509fe2437019ac99748b1f7698815508bc80e7a4fca7df75b5",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
         "citation": "選択した `escalation` 行には D3 を満たす reason から得た起点入力と adr-diagnoser 判定の要旨、刻印 hash・timestamp、および刻印を導入したコミットを載せる。選択した `non-semantic-fix` 行には kind、刻印 hash・timestamp、および刻印を導入したコミットを載せ、「非意味的な baseline 不一致の再刻印」と明示する。"
@@ -348,7 +348,7 @@
     },
     {
       "claim_hash": "f06886cfd2624f509fe2437019ac99748b1f7698815508bc80e7a4fca7df75b5",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
         "citation": "「reason には (a) 起点入力の由来と要旨、(b) adr-diagnoser の判定結果の要旨を含めることを要件とする。」および「判定『全文』の保存は要件にしない — 全文はセッション成果物であり、要旨が ledger に残れば終端フェーズの来歴表は機械的に再構成できる。」"
@@ -371,10 +371,10 @@
     },
     {
       "claim_hash": "71a52a8479f54e869d64d05fc6fe3871dd8e2606602759b7fca3f8ce85929d8e",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
-        "citation": "「終端 diff が空の場合も投稿を省略しない。上記 source 選択後に init より後の ledger 記録がなければ『終端文面は init 刻印と byte 一致、init 後の変更来歴記録なし』と確認する。記録があれば『終端文面は init 刻印と byte 一致。ただし中間変更の記録あり』と確認し、同じ来歴表で終端文面が init と再一致するまでの全記録を示す。」"
+        "citation": "終端 diff が空の場合も投稿を省略しない。上記 source 選択後に init より後の ledger 記録がなければ「終端文面は init 刻印と byte 一致、init 後の変更来歴記録なし」と確認する。記録があれば「終端文面は init 刻印と byte 一致。ただし中間変更の記録あり」と確認し"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -394,7 +394,7 @@
     },
     {
       "claim_hash": "e88250757aaa67ad2fcc190b678526557b3f6c0d90ec273d828877c6298fa1b9",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
         "citation": "diff コメントの先頭に、実行時に解決した PR author（`gh pr view --json author` の login）への `@mention` を置く。"
@@ -417,7 +417,7 @@
     },
     {
       "claim_hash": "7767b320cd460435ab016e158db27b6fcd54b2eeb806ff016af3250f9f3ceed2",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
         "citation": "**fallback**: D3 要件以前の escalation 記録や欠落のある記録に対しては、残る記録の範囲で来歴を組み立て、適用される要件上の要素で復元できないものだけを推測で補わず「記録なし」と明示する。fallback の発動は投稿の失敗事由にしない。"
@@ -440,7 +440,7 @@
     },
     {
       "claim_hash": "723c8d5ac704868e832837a16dd6a1221c3f0287d7eb7b4ae10a2517b9410fd8",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
         "citation": "投稿失敗は commit 済み成果を損なわない非致命エラーとして報告のみ行う。"
@@ -463,10 +463,10 @@
     },
     {
       "claim_hash": "c5debe1b11e3aa09c29e28304c054cd34946f11fb51b4b299e2b10d0d4980c43",
-      "evidence_hash": "78fcd57bab5d4786affadfb33055c3783af4a1c4b083fe9c36082993758b25d4",
+      "evidence_hash": "77c4a3e26f29b9d3e5949a1f8114ce760c94916317ab4aefaeb904dfbc116480",
       "verdict": {
         "kind": "pass",
-        "citation": "primary ADR への in-track 編集で escalation 刻印を打つとき、reason には (a) 起点入力の由来と要旨、(b) adr-diagnoser の判定結果の要旨を含めることを要件とする。"
+        "citation": "primary ADR への in-track 編集で escalation 刻印を打つとき、reason には (a) 起点入力の由来と要旨、(b) adr-diagnoser の判定結果の要旨を含めることを要件とする。起点入力の由来は review finding に限定せず、少なくとも local review round、外部 PR review round、spec→ADR の 🔴 signal（該当 spec element と参照）、および diagnose routing（診断入力と ADR へ戻した理由）を区別できなければならない。"
       },
       "claim_origin": {
         "kind": "spec_element",

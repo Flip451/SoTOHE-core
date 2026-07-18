@@ -1,6 +1,57 @@
 {
   "schema_version": 2,
   "scopes": {
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7271a0019d555cb07301d9f17208f5cc97291db6323bb6f497bd39bef6d672c6",
+          "at": "2026-07-18T05:38:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-lifecycle.md` の「Generated Views」は `metadata.json` / `impl-plan.json` から生成される `track/registry.md` の規則であり、同 convention は `spec.json` の生成パイプラインを適用外と明記しています。この docs-only feature や `spec.md` の扱いを支えないため、`related_conventions[]` の narrative-level cross-reference として不適切です。関連する規範へ差し替えるか、この参照を除外してください。",
+              "severity": "P1",
+              "file": "track/items/adr2pr-baseline-diff-comment-2026-07-18/spec.json",
+              "line": 239,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:7271a0019d555cb07301d9f17208f5cc97291db6323bb6f497bd39bef6d672c6",
+          "at": "2026-07-18T05:42:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7e7eb0a3fd1a51a369939502636071367d893545eb40490346c8b417493f66a",
+          "at": "2026-07-18T05:44:09Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:48979f08611acb56023d2ed25552ffba05c9fe25b3ee1e8343b748a40030165e",
+          "at": "2026-07-18T05:39:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:48979f08611acb56023d2ed25552ffba05c9fe25b3ee1e8343b748a40030165e",
+          "at": "2026-07-18T05:41:52Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -88,84 +139,20 @@
           "findings": [],
           "hash": "rvw1:sha256:271c14302e591b3e6ca990020ebf15597320a19a8889fee694f661546b1c224e",
           "at": "2026-07-18T05:21:33Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d8b3a3fa208f61f668dc10de59d193ed38549df80cf8bdb1d5a71287e6c2c69b",
-          "at": "2026-07-18T05:18:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d8b3a3fa208f61f668dc10de59d193ed38549df80cf8bdb1d5a71287e6c2c69b",
-          "at": "2026-07-18T05:21:48Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cd1035f5142b1ad3bab17f66dc89c978bbd3f66eddf53c449a5006947ffb1e96",
-          "at": "2026-07-18T06:01:30Z"
+          "hash": "rvw1:sha256:fdfdb09447a7d13720c2965b95914f001d2b2c5c5a9934fdf496ee7f14ab1447",
+          "at": "2026-07-18T06:35:02Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cd1035f5142b1ad3bab17f66dc89c978bbd3f66eddf53c449a5006947ffb1e96",
-          "at": "2026-07-18T06:06:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:abc3fe391a124bad399113e7e62630c66ffd8666e61abc1aa12fda9b96a79aa4",
-          "at": "2026-07-18T06:19:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:abc3fe391a124bad399113e7e62630c66ffd8666e61abc1aa12fda9b96a79aa4",
-          "at": "2026-07-18T06:21:48Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7275b77633416993d4c0677caf3b5bbcbb1191c1f1be587a34a38a0d075818c",
-          "at": "2026-07-18T04:29:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7275b77633416993d4c0677caf3b5bbcbb1191c1f1be587a34a38a0d075818c",
-          "at": "2026-07-18T04:31:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:289d0e2f7e7f2a8a3bbc8b39bd3a7f060bf434f4a8004e71908947812ab5290a",
-          "at": "2026-07-18T05:18:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:289d0e2f7e7f2a8a3bbc8b39bd3a7f060bf434f4a8004e71908947812ab5290a",
-          "at": "2026-07-18T05:21:22Z"
+          "hash": "rvw1:sha256:fdfdb09447a7d13720c2965b95914f001d2b2c5c5a9934fdf496ee7f14ab1447",
+          "at": "2026-07-18T06:37:05Z"
         }
       ]
     },
@@ -245,54 +232,153 @@
         }
       ]
     },
-    "types": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:48979f08611acb56023d2ed25552ffba05c9fe25b3ee1e8343b748a40030165e",
-          "at": "2026-07-18T05:39:01Z"
+          "hash": "rvw1:sha256:f7275b77633416993d4c0677caf3b5bbcbb1191c1f1be587a34a38a0d075818c",
+          "at": "2026-07-18T04:29:57Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:48979f08611acb56023d2ed25552ffba05c9fe25b3ee1e8343b748a40030165e",
-          "at": "2026-07-18T05:41:52Z"
+          "hash": "rvw1:sha256:f7275b77633416993d4c0677caf3b5bbcbb1191c1f1be587a34a38a0d075818c",
+          "at": "2026-07-18T04:31:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:289d0e2f7e7f2a8a3bbc8b39bd3a7f060bf434f4a8004e71908947812ab5290a",
+          "at": "2026-07-18T05:18:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:289d0e2f7e7f2a8a3bbc8b39bd3a7f060bf434f4a8004e71908947812ab5290a",
+          "at": "2026-07-18T05:21:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be5b4589a021cdf1cc03129895b8d6fa5ce09573cea7eee92c3c17cb23db5b46",
+          "at": "2026-07-18T06:34:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be5b4589a021cdf1cc03129895b8d6fa5ce09573cea7eee92c3c17cb23db5b46",
+          "at": "2026-07-18T06:37:09Z"
         }
       ]
     },
-    "spec": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7271a0019d555cb07301d9f17208f5cc97291db6323bb6f497bd39bef6d672c6",
-          "at": "2026-07-18T05:38:34Z"
+          "hash": "rvw1:sha256:d8b3a3fa208f61f668dc10de59d193ed38549df80cf8bdb1d5a71287e6c2c69b",
+          "at": "2026-07-18T05:18:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8b3a3fa208f61f668dc10de59d193ed38549df80cf8bdb1d5a71287e6c2c69b",
+          "at": "2026-07-18T05:21:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd1035f5142b1ad3bab17f66dc89c978bbd3f66eddf53c449a5006947ffb1e96",
+          "at": "2026-07-18T06:01:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd1035f5142b1ad3bab17f66dc89c978bbd3f66eddf53c449a5006947ffb1e96",
+          "at": "2026-07-18T06:06:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abc3fe391a124bad399113e7e62630c66ffd8666e61abc1aa12fda9b96a79aa4",
+          "at": "2026-07-18T06:19:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abc3fe391a124bad399113e7e62630c66ffd8666e61abc1aa12fda9b96a79aa4",
+          "at": "2026-07-18T06:21:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc0458a263097904553831e122a12a48b422da376d5fc6cad0247560435d5ed",
+          "at": "2026-07-18T06:34:41Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`track-lifecycle.md` の「Generated Views」は `metadata.json` / `impl-plan.json` から生成される `track/registry.md` の規則であり、同 convention は `spec.json` の生成パイプラインを適用外と明記しています。この docs-only feature や `spec.md` の扱いを支えないため、`related_conventions[]` の narrative-level cross-reference として不適切です。関連する規範へ差し替えるか、この参照を除外してください。",
+              "message": "Gate 10 now permits user-approved Accepted Deviations, but this workflow and the Claude adapter still state that Phase 0 is the only user-confirmation pause. The delegated `pr-review` workflow explicitly waits for user approval before accepting deviations, so the new terminal branch contradicts adr2pr's autonomy contract. Either retain machine PASS as the only adr2pr terminal state or consistently declare Accepted Deviations as another approval exception.",
               "severity": "P1",
-              "file": "track/items/adr2pr-baseline-diff-comment-2026-07-18/spec.json",
-              "line": 239,
-              "category": "broken cross-reference at narrative level"
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 194,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The broadened terminal contract was not propagated to the Codex adapter: `.agents/skills/track-adr2pr/SKILL.md:52` still permits successful completion only for a zero-findings terminal state. A user-approved Accepted Deviations result is therefore terminal in the workflow SSoT but not in its adapter. Remove the duplicated gate condition from the adapter or align it with the SSoT.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 194,
+              "category": "adapter-SSoT synchronization"
             }
           ],
-          "hash": "rvw1:sha256:7271a0019d555cb07301d9f17208f5cc97291db6323bb6f497bd39bef6d672c6",
-          "at": "2026-07-18T05:42:39Z"
+          "hash": "rvw1:sha256:2cc0458a263097904553831e122a12a48b422da376d5fc6cad0247560435d5ed",
+          "at": "2026-07-18T06:38:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4ce86faab00f27e5304475e2a37d834260c293c08cfd6f7e8cca4493892b804",
+          "at": "2026-07-18T06:41:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The two-state terminal contract is still not propagated through this SSoT. Step 11 calls the condition an “explicit zero-findings terminal state” even though Accepted Deviations are not zero findings, and lines 209–210 still require repeating until explicit zero findings. After user-approved deviations, an executor could therefore continue the review loop or skip the required audit comment despite Gate 10 declaring the state terminal. Update both zero-only clauses to recognize machine PASS or user-approved Accepted Deviations.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 147,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:c4ce86faab00f27e5304475e2a37d834260c293c08cfd6f7e8cca4493892b804",
+          "at": "2026-07-18T06:45:20Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c7e7eb0a3fd1a51a369939502636071367d893545eb40490346c8b417493f66a",
-          "at": "2026-07-18T05:44:09Z"
+          "hash": "rvw1:sha256:1dc45a4bf6f27939b314724ac9d4452e15c778454e9726a5591ed7c956dafa41",
+          "at": "2026-07-18T06:47:22Z"
         }
       ]
     }

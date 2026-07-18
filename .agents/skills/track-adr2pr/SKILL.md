@@ -44,13 +44,16 @@ or failure-recovery procedures here.
   `knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権: when the
   Phase 0 ADR-baseline review reaches `zero_findings`, STOP and escalate to the user with the
   init-stamp diff and any guardian-withheld proposals for approval. Only after the user
-  approves may the post-approval stamp and the ADR-baseline commit proceed. No other step
-  pauses for user confirmation.
+  approves may the post-approval stamp and the ADR-baseline commit proceed. The only other
+  pause is inherited from the delegated `$track-pr-review` workflow: recording Accepted
+  Deviations at its terminal state requires that workflow's explicit user approval. No other
+  step pauses for user confirmation.
 
 ### (5) Reporting format
 
-- On successful completion (only when the final `$track-pr-review` step reaches its
-  zero-findings terminal state per `.harness/workflows/track/adr2pr.md`), print:
+- On successful completion (only when the final `$track-pr-review` step reaches a terminal
+  state per `.harness/workflows/track/adr2pr.md` — machine PASS, or Accepted Deviations
+  recorded with the user approval that workflow requires), print:
   `ADR2PR_STATUS: completed — PR <url> reviewed, no merge performed`
 - After that line, report the terminal primary-ADR diff-comment result on one line: the posted
   comment URL, or its empty-diff/provenance-fallback outcome, or the reported non-fatal

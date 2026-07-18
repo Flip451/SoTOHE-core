@@ -34,9 +34,14 @@ is recorded as that track's init baseline.
   `knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権 — when the
   Phase 0 ADR-baseline review reaches `zero_findings`, stop and escalate to the user with the
   init-stamp diff and any guardian-withheld proposals; only after user approval may the
-  post-approval stamp and ADR-baseline commit proceed. No other step pauses for confirmation.
+  post-approval stamp and ADR-baseline commit proceed. The only other pause is inherited from
+  the delegated pr-review workflow: recording Accepted Deviations at its terminal state
+  requires that workflow's explicit user approval. No other step pauses for confirmation.
 - **Staging**: `bin/sotp git add-all`
 - **Commit**: write to `tmp/track-commit/commit-message.txt`, then `cargo make track-commit-message`
+- **Terminal diff comment**: the workflow's terminal step posts via direct
+  `gh pr view --json author` / `gh pr comment` (allowlisted in `.claude/settings.json`); do
+  not route it through `bin/sotp pr review-cycle`.
 
 ## Report format
 
