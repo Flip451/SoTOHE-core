@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "layer": "cli_composition",
+  "entries": [
+    {
+      "claim_hash": "eb4d7d239fcca171589f1773da6fb88295a8672b40e6c247f9080616f5f1ca6a",
+      "evidence_hash": "4962bd783441ab4fc6f505d289f478034f5f6db810f2bc4613b77a7f447a2bca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cargo make bootstrap` に、通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "CodexRuntimeCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`cargo make bootstrap` に、通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。処理は再実行可能で、既存リンクを最新の解決結果へ張り直す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "eb4d7d239fcca171589f1773da6fb88295a8672b40e6c247f9080616f5f1ca6a",
+      "evidence_hash": "a5dfe453fd3a72f783343e1b7c3b3dcb08e6f50f1a568c3c9fd610dc02e80bf0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex の解決不能・リンク劣化・子プロセス失敗を、利用者が exit code、session log、bootstrap 再実行案内から診断して回復できるものにする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "CodexRuntimeCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "codex の解決不能・リンク劣化・子プロセス失敗を、利用者が exit code、session log、bootstrap 再実行案内から診断して回復できるものにする。"
+        }
+      }
+    }
+  ]
+}

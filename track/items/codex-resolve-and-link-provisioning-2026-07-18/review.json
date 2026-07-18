@@ -1,6 +1,89 @@
 {
   "schema_version": 2,
   "scopes": {
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b12859626adb3a1e6c8d1747b9b38794c392266475b444265bcdeac4b2c6ca41",
+          "at": "2026-07-18T07:14:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::codex_common::resolve_codex_runtime` の `docs` が「repo-local を先に probe し、その後 PATH fallback」という IN-03/CN-02/CN-03 の挙動を再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、変更対象と anchor 参照だけにしてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
+              "line": 6,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`infrastructure::codex_common::resolve_codex_runtime` は保持しない `project_root` を `PathBuf` で所有権移動させるため、呼び出し側に不要な clone を強制します。read-only resolver の引数は `&std::path::Path` にしてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
+              "line": 12,
+              "category": "API shape"
+            },
+            {
+              "message": "`infrastructure::ResolvedCodexRuntime` の `&self` accessor 4件が `OsString`、`Option<PathBuf>`、`PathBuf`、`String` を所有値で返し、参照だけで足りる利用にも clone/allocation を強制します。各戻り値を `&OsStr`、`Option<&Path>`、`&Path`、`&str` として宣言してください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
+              "line": 66,
+              "category": "API shape"
+            },
+            {
+              "message": "`infrastructure::FsCodexRuntimeProvisioner` の `docs` が「解決・probe 後に link を作る」という IN-01/AC-01 の順序契約を再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、変更対象と anchor 参照だけにしてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
+              "line": 547,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`usecase::CodexRuntimeProvisionPort::provision` は filesystem、npm、subprocess I/O を担う port なのに同期メソッドとして宣言され、`docs` に blocking を選ぶ理由もありません。async 境界にするか、同期実行を意図した契約として明記し、`CodexRuntimeProvisionService` 側も同じ実行色に揃えてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+              "line": 101,
+              "category": "API shape"
+            }
+          ],
+          "hash": "rvw1:sha256:b12859626adb3a1e6c8d1747b9b38794c392266475b444265bcdeac4b2c6ca41",
+          "at": "2026-07-18T07:25:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `CodexRuntimeProvisionPort::provision` and `CodexRuntimeProvisionService::provision` declarations take `project_root: std::path::PathBuf` by value even though the operation only needs to use the repository path as a location and the infrastructure resolver already accepts `&std::path::Path`. This needlessly transfers ownership across the usecase boundary and forces callers to clone or relinquish a path; declare a borrowed path (`&std::path::Path`) unless the contract explicitly requires ownership.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+              "line": 106,
+              "category": "ownership signature smell"
+            }
+          ],
+          "hash": "rvw1:sha256:9f98a58921eae558a18b72b337fe0f78b12db9d572cd1495e9029b6bb93b7bc7",
+          "at": "2026-07-18T07:37:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a68bf5e26398d230ecbb096d4a6fb0130cee98a3b20fcc57b0a27bb1737b222",
+          "at": "2026-07-18T07:46:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a68bf5e26398d230ecbb096d4a6fb0130cee98a3b20fcc57b0a27bb1737b222",
+          "at": "2026-07-18T07:48:55Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -34,6 +117,151 @@
           "findings": [],
           "hash": "rvw1:sha256:cc221f6599a16c2027d1c34dd526522ecf4f90679d5fe71e231d023442cb7e5a",
           "at": "2026-07-18T05:40:00Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3b3b030697c860bee185cbe3d950f8b3078fe5f97fd91b674954807385d2fd3",
+          "at": "2026-07-18T07:13:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-02 の「actionable diagnostic」は判定条件が定義されておらず、決定論的に検証できません。D1 が要求する「何をプローブしたか」「なぜ失敗したか」「利用者が取れる選択肢」が AC 本文に含まれないため、汎用エラーを表示してリンク作成を避けるだけの実装でも合格し得ます。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json",
+              "line": 176,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:e3b3b030697c860bee185cbe3d950f8b3078fe5f97fd91b674954807385d2fd3",
+          "at": "2026-07-18T07:18:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9fe41c734e9640c6861c7addc7dac3f47734619eecf14a177b69c4f6f6f22b12",
+          "at": "2026-07-18T07:20:09Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description restates behavioral rationale: “so bootstrap callers receive actionable provisioning failures through the existing layered boundary.” Keep only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description restates the resolver behavior contract, including link preference, PATH fallback, probing, logging, recovery guidance, and environment inheritance. Keep only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description restates the provisioning behavior contract, including probe sequencing, npm fallback restrictions, atomic linking, and prohibited state changes. Keep only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 description restates upstream bootstrap constraints and behavior: generic Makefile wiring, removal of inline resolution, and the integrated regression contract. Keep only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 description restates the design rationale and behavior contract for typed errors, hexagonal direction, and Makefile-side resolution. Section descriptions should not restate upstream design prose.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 description restates the resolver behavior contract and enumerates its downstream execution paths. Section descriptions should not restate upstream design prose.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 47,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 description restates the symlink provisioning behavior and prohibited implementation details. Section descriptions should not restate upstream design prose.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 58,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S4 description restates bootstrap wiring and consumer-test behavior rather than limiting itself to plan organization. Section descriptions should not restate upstream design prose.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 69,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:f2e870740a7bffa7677262b1b4321d1658a4bf1ed73d37f7ca845c82c50da262",
+          "at": "2026-07-18T07:14:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `plan.summary` array is empty even though the upstream spec defines GO-01 and GO-02. Goal mappings are intentionally excluded from `task-coverage.json`, so `impl-plan.json#plan.summary` must provide goal-to-task traceability; currently neither goal is mapped.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 30,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:670acb76c8c048017706828334f79c96ca2d22a085caec51721e3571446b75d2",
+          "at": "2026-07-18T07:16:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fff3ccd32e5989988be2f163d350e58e44ed93c3419d950a607f434268632a48",
+          "at": "2026-07-18T07:17:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 は `CodexRuntimeCompositionRoot` を実装対象に含みますが、この root が配線する `FsCodexRuntimeProvisioner` は後続の T003 に帰属しています。一方、T003 は T001 が追加する `CodexRuntimeProvisionPort` に依存するため、現状は相互依存となり、どちらも個別にコンパイル可能な commit にできません。composition root とその task-contract attribution を T003、または T003 後の新規 task へ移してください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 6,
+              "category": "dependency cycle or wrong ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:fff3ccd32e5989988be2f163d350e58e44ed93c3419d950a607f434268632a48",
+          "at": "2026-07-18T07:24:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9dfb00a73d310fc0d5845159a8f837c9e0643e16538a71bc264418ac2694ec7",
+          "at": "2026-07-18T07:28:32Z"
         }
       ]
     }

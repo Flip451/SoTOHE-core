@@ -1,0 +1,128 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::codex_runtime::CodexRuntimeProvisionService>"
+            }
+          ],
+          "returns": "CodexRuntimeDriver"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "CodexRuntimeInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "CodexRuntimeDriver"
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeInput",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CodexRuntimeDriver": {
+      "action": "add",
+      "docs": "Adapts a validated CLI provisioning request to the Codex runtime provisioning service.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "codex_runtime",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "GO-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    },
+    "CodexRuntimeInput": {
+      "action": "add",
+      "docs": "Carries the typed repository root from the CLI boundary into the provisioning driver.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "codex_runtime",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    }
+  }
+}

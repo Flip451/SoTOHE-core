@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "0952e0969c5e9d6a21b00c01095d0c4231a85a7aea0984ac0f3b47408be1a201",
+  "signals": [
+    {
+      "type_name": "CodexRuntimeProvisionError",
+      "signal": "blue",
+      "entry_hash": "0f688527df945b5826edb5694cb4d0c4ff33961c2a0def89c8ebc3eaa51c1686"
+    },
+    {
+      "type_name": "CodexRuntimeProvisionInteractor",
+      "signal": "blue",
+      "entry_hash": "3c5d7297d003e66e409ad982687b03cd7ed91578610af2ab877fc8570483e30a"
+    },
+    {
+      "type_name": "CapabilityProviderPort",
+      "signal": "blue",
+      "entry_hash": "fdcdc9c8771c6d7dcf5475375c5be37f9e36c379977e221e21efa821bf24ea67"
+    },
+    {
+      "type_name": "CodexRuntimeProvisionPort",
+      "signal": "blue",
+      "entry_hash": "4770f1508533cf01793d9f74d1b9b2784031203a5d4b80062978993290dee2b7"
+    },
+    {
+      "type_name": "CodexRuntimeProvisionService",
+      "signal": "blue",
+      "entry_hash": "456703613cf5ee2825d83ea9bbff558f536809dd16d27dbacadbedf8a462a633"
+    },
+    {
+      "type_name": "DryCheckAgentPort",
+      "signal": "blue",
+      "entry_hash": "783dab548aece6be5ff4e166c652e94d13836e0f1a73c2c57db27d10284d5e0f"
+    },
+    {
+      "type_name": "ReviewFixRunner",
+      "signal": "blue",
+      "entry_hash": "4b02dd86812f4c923f979801c78cd26e7c3de7afaa2a98d4e1672913c4555d13"
+    },
+    {
+      "type_name": "Reviewer",
+      "signal": "blue",
+      "entry_hash": "7b766ab2049153284fa33579e1b54350754872d95d9c35b6544ed6e65ef45ee4"
+    }
+  ]
+}

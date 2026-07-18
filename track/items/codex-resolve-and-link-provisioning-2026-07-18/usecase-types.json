@@ -1,0 +1,410 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "provisioner",
+              "ty": "std::sync::Arc<dyn CodexRuntimeProvisionPort>"
+            }
+          ],
+          "returns": "CodexRuntimeProvisionInteractor"
+        }
+      ],
+      "type_name": "CodexRuntimeProvisionInteractor"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeProvisionError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeProvisionError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeProvisionError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeProvisionInteractor",
+      "trait_ref": "CodexRuntimeProvisionService"
+    }
+  ],
+  "traits": {
+    "CapabilityProviderPort": {
+      "action": "reference",
+      "docs": "Baseline-identical provider dispatch port, carried so the modified Codex capability adapter has an explicit trait boundary.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provider",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ProviderName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "dispatch",
+          "params": [
+            {
+              "name": "request",
+              "ty": "&CapabilityDispatchRequest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CapabilityDispatchOutcome, CapabilityExecError>"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "CodexRuntimeProvisionPort": {
+      "action": "add",
+      "docs": "Adds a synchronous `CodexRuntimeProvisionPort` for the one-shot bootstrap command; blocking filesystem, npm, and subprocess work completes before return. IN-01, IN-02, CN-01.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provision",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), CodexRuntimeProvisionError>"
+        }
+      ],
+      "module_path": "codex_runtime",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "CodexRuntimeProvisionService": {
+      "action": "add",
+      "docs": "Adds a synchronous `CodexRuntimeProvisionService` aligned with `CodexRuntimeProvisionPort`; the one-shot CLI call completes before return. IN-01, AC-01, AC-02.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provision",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), CodexRuntimeProvisionError>"
+        }
+      ],
+      "module_path": "codex_runtime",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "DryCheckAgentPort": {
+      "action": "reference",
+      "docs": "Baseline-identical port referenced solely to expose the R7 edge from the modified CodexDryChecker adapter; IN-03 grounds that adapter's repository-first Codex spawn-resolution change, not any change to DRY judgment semantics.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "judge",
+          "params": [
+            {
+              "name": "changed_fragment",
+              "ty": "&domain::semantic_dup::CodeFragment"
+            },
+            {
+              "name": "candidate_fragment",
+              "ty": "&domain::semantic_dup::CodeFragment"
+            },
+            {
+              "name": "tier",
+              "ty": "DryCheckJudgeTier"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<DryCheckAgentJudgment, DryCheckAgentError>"
+        }
+      ],
+      "module_path": "dry_check",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ReviewFixRunner": {
+      "action": "reference",
+      "docs": "Baseline-identical review-fix execution port, carried so the modified Codex fix runner has an explicit trait boundary.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run_fix",
+          "params": [
+            {
+              "name": "command",
+              "ty": "RunReviewFixCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<RunReviewFixOutput, ReviewFixRunnerError>"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "Reviewer": {
+      "action": "reference",
+      "docs": "Baseline-identical review provider port, carried so the modified Codex reviewer has an explicit trait boundary.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&domain::review_v2::ReviewTarget"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(domain::review_v2::Verdict, domain::review_v2::LogInfo), ReviewerError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_review",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&domain::review_v2::ReviewTarget"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(domain::review_v2::FastVerdict, domain::review_v2::LogInfo), ReviewerError>"
+        }
+      ],
+      "module_path": "review_v2::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ],
+      "supertrait_bounds": []
+    }
+  },
+  "types": {
+    "CodexRuntimeProvisionError": {
+      "action": "add",
+      "docs": "Reports an observable failure while resolving or updating the repository-local Codex runtime link.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ProjectRootInvalid",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NoUsableCandidate",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NpmQueryFailed",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "LinkUpdateFailed",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "codex_runtime",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "GO-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    },
+    "CodexRuntimeProvisionInteractor": {
+      "action": "add",
+      "docs": "Implements the provisioning use case by delegating link materialization to the secondary port.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "codex_runtime",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    }
+  }
+}

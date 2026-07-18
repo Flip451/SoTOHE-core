@@ -1,0 +1,64 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-18T07:41:00Z",
+  "declaration_hash": "0952e0969c5e9d6a21b00c01095d0c4231a85a7aea0984ac0f3b47408be1a201",
+  "implementation_input_hash": "fa585097fcc39fae702574e2160c280fcf5f7f0cdb3a61ec088f2de4bd96676e",
+  "signals": [
+    {
+      "type_name": "CodexRuntimeProvisionError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "CodexRuntimeProvisionInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "CodexRuntimeProvisionService"
+      ]
+    },
+    {
+      "type_name": "CodexRuntimeProvisionPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CodexRuntimeProvisionService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CapabilityProviderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryCheckAgentPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewFixRunner",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "Reviewer",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

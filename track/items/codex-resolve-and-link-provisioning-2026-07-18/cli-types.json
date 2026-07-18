@@ -1,0 +1,97 @@
+{
+  "crate_name": "cli",
+  "functions": {},
+  "layer": "cli",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeProvisionArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeProvisionArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CodexRuntimeCommand": {
+      "action": "add",
+      "docs": "Selects an explicit Codex runtime maintenance operation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Provision",
+            "payload": {
+              "fields": [
+                "CodexRuntimeProvisionArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::codex_runtime",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "GO-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    },
+    "CodexRuntimeProvisionArgs": {
+      "action": "add",
+      "docs": "Captures the repository root for explicit Codex runtime provisioning.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::codex_runtime",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    }
+  }
+}

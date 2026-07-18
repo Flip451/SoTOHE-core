@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "b07d0cb976f10d2f17d501d8e6050c26c532e9cc694e72783ee2b415d94d35ba",
+  "signals": [
+    {
+      "type_name": "CodexRuntimeCommand",
+      "signal": "blue",
+      "entry_hash": "b2681c3a0464362c84deedabf9a03e82beced14d3cdb95e9476dfd727b95a56f"
+    },
+    {
+      "type_name": "CodexRuntimeProvisionArgs",
+      "signal": "blue",
+      "entry_hash": "c10e921386f7e8d7555c21237c06c4578b3bc97fe6b56ac01608ad80ce3dc2e7"
+    }
+  ]
+}

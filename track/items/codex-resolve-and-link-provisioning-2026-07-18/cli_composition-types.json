@@ -1,0 +1,64 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "CodexRuntimeCompositionRoot"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provision",
+          "params": [
+            {
+              "name": "input",
+              "ty": "cli_driver::codex_runtime::CodexRuntimeInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "cli_driver::CommandOutcome"
+        }
+      ],
+      "type_name": "CodexRuntimeCompositionRoot"
+    }
+  ],
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "CodexRuntimeCompositionRoot": {
+      "action": "add",
+      "docs": "Wires filesystem provisioning infrastructure into the Codex runtime CLI driver.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "codex_runtime",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "GO-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    }
+  }
+}

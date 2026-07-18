@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "8429affe14ce0f336c87249150e7986f3320727ece7c6e9b41829a6105ad2886",
+  "signals": [
+    {
+      "type_name": "CodexCapabilityAdapter",
+      "signal": "blue",
+      "entry_hash": "3efee488cef2dfe77c448920099a7339021f921e02db3935fa605c3aeffb0c4f"
+    },
+    {
+      "type_name": "CodexDryChecker",
+      "signal": "blue",
+      "entry_hash": "fbeae0faec9263c9fdc4a85fa28d1dd483c60a900528ef8944fe48644048db96"
+    },
+    {
+      "type_name": "CodexDryFixLocalRunner",
+      "signal": "blue",
+      "entry_hash": "05538fa0079f1138ecbb34fee27ef82a381f24e42a339e0c659d98a5acd4ab05"
+    },
+    {
+      "type_name": "CodexReviewFixRunner",
+      "signal": "blue",
+      "entry_hash": "4e8f00402b685221a4738f6c0e3f4ad951cbf8251b326c26bf687afffdef31f5"
+    },
+    {
+      "type_name": "CodexReviewer",
+      "signal": "blue",
+      "entry_hash": "b5590a1ff0a1e85cf10c01a1a9a50049c2569c28bab0f02fecc7d11945670547"
+    },
+    {
+      "type_name": "CodexRuntimeResolveError",
+      "signal": "blue",
+      "entry_hash": "1485799e27c9c152fdd08aa764a60c7aac0fda6a5db4ebf5c09af9a1328d8fd2"
+    },
+    {
+      "type_name": "FsCodexRuntimeProvisioner",
+      "signal": "blue",
+      "entry_hash": "663a03e54e2c8f89722136e7f32a9fd0c60fb3d160b78c6ca9d6b07a0834c1d6"
+    },
+    {
+      "type_name": "ResolvedCodexRuntime",
+      "signal": "blue",
+      "entry_hash": "5e294ce422585486743bd472c325ba14f773e650dfe4d6e332a829edcd3023d4"
+    },
+    {
+      "type_name": "infrastructure::codex_common::resolve_codex_runtime",
+      "signal": "blue",
+      "entry_hash": "a86f721c38fcad300d49e715068e7db1c5b7de086101e5551a12dc2366c569cf"
+    },
+    {
+      "type_name": "infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner",
+      "signal": "blue",
+      "entry_hash": "3fb6597cdce991183f43114c012279b92ca88ee04b888e343c736b1fc277dd5d"
+    }
+  ]
+}

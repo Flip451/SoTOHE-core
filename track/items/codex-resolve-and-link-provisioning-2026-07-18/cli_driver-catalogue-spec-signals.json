@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "0cbf7ab336da5141f89050a1b9c3159d5baa72eadc097514e877f1a02adb37ac",
+  "signals": [
+    {
+      "type_name": "CodexRuntimeDriver",
+      "signal": "blue",
+      "entry_hash": "88b6cac94c4db4c66b388ef91135359f2576b4231d6dded947387f2735e75bf2"
+    },
+    {
+      "type_name": "CodexRuntimeInput",
+      "signal": "blue",
+      "entry_hash": "e0b6915205ef1a7f6ee61e44f4cc1eeeaa26623d168fcb514c0b466c1c02210f"
+    }
+  ]
+}

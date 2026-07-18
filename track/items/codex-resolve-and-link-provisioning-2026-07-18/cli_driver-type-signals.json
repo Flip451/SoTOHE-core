@@ -1,0 +1,26 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-18T06:41:09Z",
+  "declaration_hash": "0cbf7ab336da5141f89050a1b9c3159d5baa72eadc097514e877f1a02adb37ac",
+  "implementation_input_hash": "8607879199dff5d30d18a777c90392b599df2d851fa1687b7065032560816a98",
+  "signals": [
+    {
+      "type_name": "CodexRuntimeDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CodexRuntimeInput",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    }
+  ]
+}

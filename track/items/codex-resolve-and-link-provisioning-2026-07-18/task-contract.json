@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "track_id": "codex-resolve-and-link-provisioning-2026-07-18",
+  "entries": {
+    "T001": [
+      {
+        "layer": "usecase",
+        "entry_key": "CodexRuntimeProvisionError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "CodexRuntimeProvisionInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "CodexRuntimeProvisionPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "CodexRuntimeProvisionService"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "CodexRuntimeDriver"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "CodexRuntimeInput"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "CodexRuntimeCommand"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "CodexRuntimeProvisionArgs"
+      }
+    ],
+    "T002": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "CodexRuntimeResolveError"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "ResolvedCodexRuntime"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::codex_common::resolve_codex_runtime"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "CapabilityProviderPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckAgentPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ReviewFixRunner"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "Reviewer"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "CodexCapabilityAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "CodexDryChecker"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "CodexDryFixLocalRunner"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "CodexReviewFixRunner"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "CodexReviewer"
+      }
+    ],
+    "T003": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "FsCodexRuntimeProvisioner"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "CodexRuntimeCompositionRoot"
+      }
+    ],
+    "T004": []
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Add the catalogue-defined Codex runtime provisioning service, port, interactor, error type, cli_driver input/driver, CLI command/arguments, and focused command-path tests (IN-01, IN-02, CN-01, AC-01, AC-02).",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Add the shared infrastructure Codex runtime resolver; migrate the review, review-fix, dry-check, dry-fix, and nested capability adapters; remove production CODEX_BIN/asdf resolution; retain the test-only SOTP_CODEX_BIN seam; and add focused resolver and adapter tests (IN-03, IN-04, IN-05, CN-02, CN-03, AC-03, AC-04, AC-05, AC-06).",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "Add the filesystem Codex runtime provisioner implementation for the usecase port, wire it through the catalogue-defined composition root after the command path is available, and add focused provisioner/composition tests (IN-01, IN-02, CN-01, AC-01, AC-02).",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "Update source and overlay Makefile bootstrap tasks to invoke the CLI provisioning operation; remove inline CODEX_BIN resolution; add the runtime-link directory to .gitignore; align apps/cli/tests/consumer_scaffold_host_first.rs; and add bootstrap regression coverage (IN-01, IN-04, AC-01, AC-05).",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "GO-01: T001, T002, T003, T004.",
+      "GO-02: T001, T002, T003."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Provisioning command boundary",
+        "description": [
+          "Implement the CLI, cli_driver, and usecase provisioning command path and its focused tests (IN-01, IN-02, CN-01, AC-01, AC-02)."
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Repository-first runtime resolution for all Codex spawns",
+        "description": [
+          "Implement the infrastructure runtime resolver and migrate its Codex spawn-adapter consumers (IN-03, IN-04, IN-05, CN-02, CN-03, AC-03, AC-04, AC-05, AC-06)."
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Verified filesystem link provisioning",
+        "description": [
+          "Implement the filesystem provisioner behind its usecase port, then wire it through the composition root and add focused provisioner/composition tests (IN-01, IN-02, CN-01, AC-01, AC-02)."
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Bootstrap configuration and consumer regression alignment",
+        "description": [
+          "Update bootstrap Makefile wiring, .gitignore, and the host-first consumer scaffold test (IN-01, IN-04, AC-01, AC-05)."
+        ],
+        "task_ids": [
+          "T004"
+        ]
+      }
+    ]
+  }
+}

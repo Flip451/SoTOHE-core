@@ -1,0 +1,28 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-18T06:41:12Z",
+  "declaration_hash": "b07d0cb976f10d2f17d501d8e6050c26c532e9cc694e72783ee2b415d94d35ba",
+  "implementation_input_hash": "8e857f020cbfe378ba52af40ee151ff7ab3ff5496d77c92cb60a190a1cd2b0f2",
+  "signals": [
+    {
+      "type_name": "CodexRuntimeCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "FromArgMatches",
+        "Subcommand"
+      ]
+    },
+    {
+      "type_name": "CodexRuntimeProvisionArgs",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Args",
+        "FromArgMatches"
+      ]
+    }
+  ]
+}
