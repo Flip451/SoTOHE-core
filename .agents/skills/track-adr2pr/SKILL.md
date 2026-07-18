@@ -20,7 +20,11 @@ or failure-recovery procedures here.
 
 - Requires `--sandbox workspace-write`: the workflow orchestrates commits, PR creation, and
   file writes across multiple sub-workflows.
-- Do not run `git push` under any circumstance. PR operations are handled via `bin/sotp pr` wrappers.
+- Do not run `git push` under any circumstance. PR operations are handled via `bin/sotp pr` wrappers,
+  with one exception: the workflow SSoT's terminal primary-ADR diff-comment step calls
+  `gh pr view --json author` (read-only lookup) and `gh pr comment` (single audit-comment
+  posting) directly. Branch pushes, PR creation, and review-cycle triggers remain
+  `bin/sotp pr` wrapper-only.
 
 ### (3) Sub-workflow and capability invocation
 
