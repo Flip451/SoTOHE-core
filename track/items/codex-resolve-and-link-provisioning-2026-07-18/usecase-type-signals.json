@@ -1,0 +1,81 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-18T16:59:28Z",
+  "declaration_hash": "7cccd79861a7b25f95cb2a434ce343db9f93e511505cf5650d6f2ea7ff2377f5",
+  "implementation_input_hash": "00be805a825c646ad05034ff907c3347e897fabceecc4acb1db77c33fd436787",
+  "signals": [
+    {
+      "type_name": "CodexRuntimeProjectRootDiscoveryError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "CodexRuntimeProjectRootDiscoveryPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CodexRuntimeProvisionError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "CodexRuntimeProvisionInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CodexRuntimeProvisionService"
+      ]
+    },
+    {
+      "type_name": "CodexRuntimeProvisionPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CodexRuntimeProvisionService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CapabilityProviderPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DryCheckAgentPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewFixRunner",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "Reviewer",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

@@ -16,7 +16,7 @@ set -e
 echo "=== Bootstrap: development environment setup ==="
 
 echo ""
-echo "--- Step 1/6: Check prerequisites ---"
+echo "--- Step 1/7: Check prerequisites ---"
 if ! command -v cargo >/dev/null 2>&1; then
   echo "[FAIL] cargo not found. Install Rust: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
   exit 1
@@ -24,11 +24,11 @@ fi
 echo "[OK] cargo available"
 
 echo ""
-echo "--- Step 2/6: Install pinned auxiliary tools ---"
+echo "--- Step 2/7: Install pinned auxiliary tools ---"
 cargo make install-aux-tools
 
 echo ""
-echo "--- Step 3/6: Install sotp CLI binary (pinned tag) ---"
+echo "--- Step 3/7: Install sotp CLI binary (pinned tag) ---"
 if [ -x bin/sotp ] && bin/sotp --help >/dev/null 2>&1; then
   echo "[OK] bin/sotp already present (transplanted by sotp template export); skipping install-sotp"
 else
@@ -37,7 +37,12 @@ else
 fi
 
 echo ""
-echo "--- Step 4/6: Configure git hooks path ---"
+echo "--- Step 4/7: Provision Codex runtime link ---"
+bin/sotp codex-runtime provision --project-root .
+echo "[OK] Codex runtime link provisioned"
+
+echo ""
+echo "--- Step 5/7: Configure git hooks path ---"
 if [ "$(git config --local core.hooksPath 2>/dev/null || true)" = ".githooks" ]; then
   echo "[OK] core.hooksPath already set"
 else
@@ -47,12 +52,12 @@ fi
 chmod +x .githooks/reference-transaction .githooks/pre-push 2>/dev/null || true
 
 echo ""
-echo "--- Step 5/6: Run CI ---"
+echo "--- Step 6/7: Run CI ---"
 cargo make ci
 echo "[OK] CI passed"
 
 echo ""
-echo "--- Step 6/6: Configure git notes fetch refspec ---"
+echo "--- Step 7/7: Configure git notes fetch refspec ---"
 if git remote get-url origin >/dev/null 2>&1; then
   if git config --get-all remote.origin.fetch | grep -q 'refs/notes'; then
     echo "[OK] git notes refspec already configured"
@@ -304,24 +309,18 @@ bin/sotp track views sync
 description = "[wrapper] Run task-contract gates, refresh track artifacts, then invoke one local reviewer round"
 dependencies = ["task-contract-check", "track-active-gate"]
 script_runner = "@shell"
-script = ['''
-case "${1:-}" in --) shift ;; esac
-CODEX_BIN="${CODEX_BIN:-$(command -v codex)}" bin/sotp review local "$@"
-''']
+script = ['case "${1:-}" in --) shift ;; esac; bin/sotp review local "$@"']
 
 [tasks.track-local-review-fix]
 description = "[wrapper] Run task-contract gates, refresh track artifacts, then invoke the local review fixer"
 dependencies = ["task-contract-check", "track-active-gate"]
 script_runner = "@shell"
-script = ['''
-case "${1:-}" in --) shift ;; esac
-CODEX_BIN="${CODEX_BIN:-$(command -v codex)}" bin/sotp review fix-local "$@"
-''']
+script = ['case "${1:-}" in --) shift ;; esac; bin/sotp review fix-local "$@"']
 
 [tasks.track-local-dry-fix]
-description = "[wrapper] Resolve CODEX_BIN, then launch the Codex dry-fix-lead fixer"
+description = "[wrapper] Launch the Codex dry-fix-lead fixer"
 script_runner = "@shell"
-script = ['case "${1:-}" in --) shift ;; esac; CODEX_BIN="${CODEX_BIN:-$(command -v codex)}" bin/sotp dry fix-local "$@"']
+script = ['case "${1:-}" in --) shift ;; esac; bin/sotp dry fix-local "$@"']
 
 [tasks.pr-audit-comment]
 description = "[wrapper] Post the adr2pr terminal audit comment: exactly one `gh pr comment --body-file <path>` on the current branch's PR. Validates argv — a single non-flag path that lives under the workspace-controlled tmp/pr-audit/ directory, is a regular non-symlink file, and resolves inside that directory — so edit/delete/repo-targeting submodes (--edit-last, --delete-last, --repo, ...) can never ride along and arbitrary files (e.g. local secrets) can never be posted. This wrapper is the only sanctioned autonomous `gh pr comment` route."

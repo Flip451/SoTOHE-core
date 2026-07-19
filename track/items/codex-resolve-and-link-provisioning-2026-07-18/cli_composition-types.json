@@ -1,0 +1,64 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "CodexRuntimeCompositionRoot"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "codex_runtime_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::codex_runtime::CodexRuntimeDriver"
+        }
+      ],
+      "type_name": "CodexRuntimeCompositionRoot"
+    }
+  ],
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeCompositionRoot",
+      "trait_ref": "core::default::Default"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CodexRuntimeCompositionRoot": {
+      "action": "add",
+      "docs": "Change `CodexRuntimeCompositionRoot` to wire the Codex runtime command graph. IN-06, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "codex_runtime",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    }
+  }
+}

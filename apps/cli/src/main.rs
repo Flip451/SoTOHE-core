@@ -144,6 +144,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::template::TemplateCommand,
     },
+    /// Resolve, verify, and provision the repository-local Codex runtime link.
+    CodexRuntime {
+        #[command(subcommand)]
+        cmd: commands::codex_runtime::CodexRuntimeCommand,
+    },
     /// Run the example track state machine demo.
     #[cfg(not(doc))]
     Demo,
@@ -194,6 +199,7 @@ fn run_cli_with(
         Some(CliCommand::Catalog { cmd }) => commands::catalog::execute(cmd),
         Some(CliCommand::CatalogueLint { cmd }) => commands::catalogue_lint::execute(cmd),
         Some(CliCommand::Template { cmd }) => commands::template::execute(cmd),
+        Some(CliCommand::CodexRuntime { cmd }) => commands::codex_runtime::execute(cmd),
         #[cfg(not(doc))]
         Some(CliCommand::Demo) | None => {
             let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
@@ -619,6 +625,20 @@ mod tests {
             matches!(cli.command, Some(CliCommand::Capability { .. })),
             "capability exec must select the Capability variant"
         );
+    }
+
+    #[test]
+    fn test_cli_command_codex_runtime_provision_parses_to_runtime_variant() {
+        let cli = Cli::try_parse_from([
+            "sotp",
+            "codex-runtime",
+            "provision",
+            "--project-root",
+            "/workspace/project",
+        ])
+        .expect("codex-runtime provision must parse at the top-level command boundary");
+
+        assert!(matches!(cli.command, Some(CliCommand::CodexRuntime { .. })));
     }
 
     #[test]

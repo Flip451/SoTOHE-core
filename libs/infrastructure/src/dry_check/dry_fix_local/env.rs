@@ -1,77 +1,6 @@
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
-// ── Codex binary resolution ────────────────────────────────────────────────
-
-pub(super) fn resolve_codex_bin() -> OsString {
-    if let Some(val) = std::env::var_os("CODEX_BIN").filter(|val| !val.is_empty()) {
-        return resolve_codex_bin_candidate(val);
-    }
-    resolve_codex_bin_candidate(OsString::from("codex"))
-}
-
-fn resolve_codex_bin_candidate(candidate: OsString) -> OsString {
-    let path = Path::new(&candidate);
-    if path.is_absolute() || path.components().count() > 1 {
-        return candidate;
-    }
-    resolve_codex_via_asdf()
-        .or_else(|| resolve_executable_on_path(path))
-        .map(|path| path.into_os_string())
-        .unwrap_or(candidate)
-}
-
-fn resolve_codex_via_asdf() -> Option<PathBuf> {
-    use std::process::{Command, Stdio};
-    let asdf_bin = resolve_executable_on_path(Path::new("asdf"))?;
-    let mut command = Command::new(asdf_bin);
-    command.args(["which", "codex"]);
-    command.stdin(Stdio::null());
-    command.stdout(Stdio::piped());
-    command.stderr(Stdio::null());
-    command.env_clear();
-    for (key, value) in dry_fix_asdf_lookup_env() {
-        command.env(key, value);
-    }
-    let output = command.output().ok()?;
-    if !output.status.success() {
-        return None;
-    }
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let path = stdout.lines().next()?.trim();
-    if path.is_empty() { None } else { Some(PathBuf::from(path)) }
-}
-
-fn dry_fix_asdf_lookup_env() -> Vec<(OsString, OsString)> {
-    const SAFE_VARS: &[&str] =
-        &["PATH", "ASDF_DATA_DIR", "ASDF_CONFIG_FILE", "ASDF_DIR", "TMPDIR", "TEMP", "TMP"];
-    SAFE_VARS
-        .iter()
-        .filter_map(|var| {
-            let value = std::env::var_os(var).filter(|value| !value.is_empty())?;
-            Some((OsString::from(*var), value))
-        })
-        .collect()
-}
-
-fn resolve_executable_on_path(executable: &Path) -> Option<PathBuf> {
-    let path = std::env::var_os("PATH")?;
-    for dir in std::env::split_paths(&path) {
-        let candidate = dir.join(executable);
-        if candidate.is_file() {
-            return Some(candidate);
-        }
-    }
-    None
-}
-
-/// Return the parent directory of `bin` if `bin` is an absolute path, or
-/// `None` when `bin` is a bare name (will be resolved via PATH as-is).
-pub(super) fn bin_parent_dir(bin: &OsString) -> Option<PathBuf> {
-    let p = Path::new(bin);
-    if p.is_absolute() { p.parent().map(PathBuf::from) } else { None }
-}
-
 // ── Safe HOME / CODEX_HOME resolution ──────────────────────────────────────
 
 fn prepend_dir_to_path(dir: &Path) -> Result<OsString, String> {
@@ -247,56 +176,6 @@ fn dry_fix_escape_config_string(raw: &str) -> String {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use super::*;
-
-    #[cfg(unix)]
-    fn make_executable(script: &Path) {
-        use std::os::unix::fs::PermissionsExt;
-        let mut perms = std::fs::metadata(script).unwrap().permissions();
-        perms.set_mode(0o755);
-        std::fs::set_permissions(script, perms).unwrap();
-    }
-
-    #[cfg(unix)]
-    fn write_executable_script(dir: &Path, name: &str, script_content: &str) -> PathBuf {
-        let script = dir.join(name);
-        std::fs::write(&script, script_content).unwrap();
-        make_executable(&script);
-        script
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn test_resolve_codex_bin_uses_asdf_which_when_env_missing() {
-        let dir = tempfile::tempdir().unwrap();
-        let real_codex = dir.path().join("real-codex");
-        std::fs::write(&real_codex, "#!/bin/sh\nexit 0\n").unwrap();
-        make_executable(&real_codex);
-        let fake_asdf = format!(
-            "#!/bin/sh\nif [ -n \"$GITHUB_TOKEN\" ] || [ -n \"$SSH_AUTH_SOCK\" ] || [ -n \"$HOME\" ] || [ -n \"$CODEX_HOME\" ]; then exit 7; fi\nif [ \"$1\" = \"which\" ] && [ \"$2\" = \"codex\" ]; then printf '%s\\n' '{}'; exit 0; fi\nexit 1\n",
-            real_codex.display()
-        );
-        write_executable_script(dir.path(), "asdf", &fake_asdf);
-        let existing_path = std::env::var_os("PATH").unwrap_or_default();
-        let mut paths = vec![dir.path().to_path_buf()];
-        if !existing_path.is_empty() {
-            paths.extend(std::env::split_paths(&existing_path));
-        }
-        let new_path = std::env::join_paths(paths).unwrap();
-
-        temp_env::with_vars(
-            [
-                ("PATH", Some(new_path.as_os_str())),
-                ("CODEX_BIN", None),
-                ("GITHUB_TOKEN", Some(std::ffi::OsStr::new("ghp-secret"))),
-                ("SSH_AUTH_SOCK", Some(std::ffi::OsStr::new("/tmp/ssh-agent.sock"))),
-                ("HOME", Some(std::ffi::OsStr::new("/real-home"))),
-                ("CODEX_HOME", Some(std::ffi::OsStr::new("/real-codex-home"))),
-            ],
-            || {
-                assert_eq!(resolve_codex_bin(), real_codex.as_os_str().to_os_string());
-            },
-        );
-    }
 
     #[test]
     fn test_dry_fix_build_safe_env_strips_repository_credentials() {

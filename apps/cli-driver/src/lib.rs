@@ -14,6 +14,7 @@ pub mod adr_baseline;
 pub mod arch;
 pub mod capability;
 pub mod catalog_gen;
+pub mod codex_runtime;
 pub mod conventions;
 pub mod demo;
 pub mod domain;

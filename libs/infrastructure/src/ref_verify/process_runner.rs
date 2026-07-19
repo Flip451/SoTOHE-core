@@ -46,15 +46,21 @@ use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::sync::Arc;
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{SystemTime, UNIX_EPOCH};
 
 use usecase::capability_exec::ReasoningEffort;
 use usecase::ref_verify::RefVerifyError;
 
 use crate::agent_profiles::ResolvedExecution;
-use crate::codex_common::REVIEW_RUNTIME_DIR;
+use crate::codex_common::{REVIEW_RUNTIME_DIR, runtime_path};
 use crate::ref_verify::AgentExecutionRunner;
+
+mod transient_files;
+
+use transient_files::AutoCleanupFile;
+
+const MAX_REF_VERIFY_SESSION_LOG_BYTES: usize = 4 * 1024 * 1024;
+const STDERR_SESSION_LOG_HEADING: &[u8] = b"=== STDERR ===\n";
+const STDERR_SESSION_LOG_TRUNCATED_NOTICE: &[u8] = b"\n[stderr truncated]\n";
 
 /// Codex structured-output JSON schema for the ref-verify [`VerdictResponseDto`].
 ///
@@ -197,7 +203,7 @@ fn run_claude_ref_verifier(
 ) -> Result<String, RefVerifyError> {
     let bin: OsString = "claude".into();
     let args = build_claude_ref_verifier_args(model, effort, prompt);
-    let outcome = run_process_retryable(&bin, &args, project_root, "claude ref-verifier")?;
+    let outcome = run_process_retryable(&bin, &args, project_root, "claude ref-verifier", None)?;
     extract_claude_ref_verifier_output(&outcome.stdout)
         .or_else(|| nonempty_trimmed(&outcome.stdout))
         .ok_or_else(|| ref_verify_runner_error("claude ref-verifier produced no output"))
@@ -258,10 +264,17 @@ fn run_codex_ref_verifier(
     )?;
     let last_message = AutoCleanupFile::create(project_root, "codex-ref-verify-last", "txt", &[])?;
 
-    let bin: OsString = "codex".into();
+    let runtime = crate::codex_common::resolve_codex_runtime(project_root)
+        .map_err(|error| ref_verify_runner_error(error.to_string()))?;
     let args =
         build_codex_ref_verifier_args(model, effort, prompt, schema.path(), last_message.path());
-    run_process_retryable(&bin, &args, project_root, "codex ref-verifier")?;
+    run_process_retryable(
+        runtime.executable(),
+        &args,
+        project_root,
+        "codex ref-verifier",
+        Some(&runtime),
+    )?;
 
     // Codex writes the final structured message to `--output-last-message`.
     // Fail closed if the authoritative output file is absent or empty — do NOT fall back to
@@ -324,7 +337,7 @@ fn run_gemini_ref_verifier(
 ) -> Result<String, RefVerifyError> {
     let bin: OsString = "gemini".into();
     let args = build_gemini_ref_verifier_args(model, effort, prompt)?;
-    let outcome = run_process_retryable(&bin, &args, project_root, "gemini ref-verifier")?;
+    let outcome = run_process_retryable(&bin, &args, project_root, "gemini ref-verifier", None)?;
     nonempty_trimmed(&outcome.stdout)
         .ok_or_else(|| ref_verify_runner_error("gemini ref-verifier produced no output"))
 }
@@ -367,6 +380,16 @@ struct ProcessOutcome {
     stdout: String,
 }
 
+struct RefVerifySessionLog {
+    path: PathBuf,
+    written_bytes: usize,
+}
+
+struct BoundedStderr {
+    bytes: Vec<u8>,
+    truncated: bool,
+}
+
 /// Spawn `bin args …` with `current_dir = project_root`, wait without timeout,
 /// and return stdout. On non-zero exit, attach the **tail** of stderr (up to
 /// 4 KB / 20 lines) to the error so a long verbose header cannot bury the
@@ -376,7 +399,26 @@ fn run_process(
     args: &[OsString],
     current_dir: &Path,
     label: &str,
+    runtime: Option<&crate::codex_common::ResolvedCodexRuntime>,
 ) -> Result<ProcessOutcome, RefVerifyError> {
+    let mut session_log = runtime
+        .map(|runtime| {
+            let path = runtime_path(REVIEW_RUNTIME_DIR, "ref-verify-codex-session", "log")
+                .map_err(ref_verify_runner_error)?;
+            std::fs::File::create(&path).map_err(|error| {
+                ref_verify_runner_error(format!(
+                    "failed to create ref-verify session log {}: {error}",
+                    path.display()
+                ))
+            })?;
+            let mut session_log = RefVerifySessionLog { path, written_bytes: 0 };
+            append_session_log(
+                &mut session_log,
+                crate::codex_common::runtime_log_header(runtime).as_bytes(),
+            )?;
+            Ok(session_log)
+        })
+        .transpose()?;
     let mut command = Command::new(bin);
     command
         .args(args)
@@ -384,6 +426,10 @@ fn run_process(
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
+    if let Some(runtime) = runtime {
+        crate::codex_common::configure_codex_command(&mut command, runtime)
+            .map_err(ref_verify_runner_error)?;
+    }
     configure_verifier_process_group(&mut command);
     let mut child = command.spawn().map_err(|e| {
         ref_verify_runner_error(format!("failed to spawn {label} '{}': {e}", bin.to_string_lossy()))
@@ -398,7 +444,7 @@ fn run_process(
         .take()
         .ok_or_else(|| ref_verify_runner_error(format!("{label} stderr was not captured")))?;
     let stdout_handle = spawn_read_to_string(stdout);
-    let stderr_handle = spawn_read_to_string(stderr);
+    let stderr_handle = spawn_bounded_stderr_reader(stderr, MAX_REF_VERIFY_SESSION_LOG_BYTES);
 
     let status = child.wait().map_err(|e| {
         ref_verify_runner_error(format!("failed to wait on {label} subprocess: {e}"))
@@ -408,10 +454,18 @@ fn run_process(
         .join()
         .map_err(|_| ref_verify_runner_error(format!("{label} stdout reader thread panicked")))?
         .map_err(|e| ref_verify_runner_error(format!("failed to read {label} stdout: {e}")))?;
-    let stderr_text = stderr_handle
+    let stderr = stderr_handle
         .join()
         .map_err(|_| ref_verify_runner_error(format!("{label} stderr reader thread panicked")))?
         .map_err(|e| ref_verify_runner_error(format!("failed to read {label} stderr: {e}")))?;
+    if let Some(session_log) = session_log.as_mut() {
+        append_session_log(session_log, STDERR_SESSION_LOG_HEADING)?;
+        append_session_log(session_log, &stderr.bytes)?;
+        if stderr.truncated {
+            append_session_log(session_log, STDERR_SESSION_LOG_TRUNCATED_NOTICE)?;
+        }
+    }
+    let stderr_text = String::from_utf8_lossy(&stderr.bytes).into_owned();
 
     if !status.success() {
         let tail = stderr_tail(&stderr_text, 20, 4096);
@@ -436,10 +490,11 @@ fn run_process_retryable(
     args: &[OsString],
     current_dir: &Path,
     label: &str,
+    runtime: Option<&crate::codex_common::ResolvedCodexRuntime>,
 ) -> Result<ProcessOutcome, RefVerifyError> {
     super::retry::retry_transient(
         super::retry::DEFAULT_TRANSIENT_BACKOFFS,
-        || run_process(bin, args, current_dir, label),
+        || run_process(bin, args, current_dir, label, runtime),
         std::thread::sleep,
     )
 }
@@ -452,6 +507,75 @@ where
         let mut buf = String::new();
         pipe.read_to_string(&mut buf).map(|_| buf)
     })
+}
+
+fn spawn_bounded_stderr_reader<R>(
+    pipe: R,
+    maximum_bytes: usize,
+) -> std::thread::JoinHandle<std::io::Result<BoundedStderr>>
+where
+    R: Read + Send + 'static,
+{
+    std::thread::spawn(move || collect_bounded_stderr(pipe, maximum_bytes))
+}
+
+fn collect_bounded_stderr<R>(mut pipe: R, maximum_bytes: usize) -> std::io::Result<BoundedStderr>
+where
+    R: Read,
+{
+    let mut buffer = [0_u8; 8192];
+    let mut retained = Vec::new();
+    let mut truncated = false;
+    loop {
+        let read = pipe.read(&mut buffer)?;
+        if read == 0 {
+            break;
+        }
+        let bytes = buffer.get(..read).ok_or_else(|| {
+            std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid stderr read count")
+        })?;
+        if bytes.len() >= maximum_bytes {
+            retained.clear();
+            retained.extend_from_slice(
+                bytes.get(bytes.len().saturating_sub(maximum_bytes)..).unwrap_or_default(),
+            );
+            truncated = true;
+            continue;
+        }
+        let overflow = retained.len().saturating_add(bytes.len()).saturating_sub(maximum_bytes);
+        if overflow > 0 {
+            retained.drain(..overflow);
+            truncated = true;
+        }
+        retained.extend_from_slice(bytes);
+    }
+    Ok(BoundedStderr { bytes: retained, truncated })
+}
+
+fn append_session_log(
+    session_log: &mut RefVerifySessionLog,
+    bytes: &[u8],
+) -> Result<(), RefVerifyError> {
+    let remaining = MAX_REF_VERIFY_SESSION_LOG_BYTES.saturating_sub(session_log.written_bytes);
+    let retained = bytes.get(..bytes.len().min(remaining)).unwrap_or_default();
+    if retained.is_empty() {
+        return Ok(());
+    }
+    let mut file =
+        std::fs::OpenOptions::new().append(true).open(&session_log.path).map_err(|error| {
+            ref_verify_runner_error(format!(
+                "failed to open ref-verify session log {}: {error}",
+                session_log.path.display()
+            ))
+        })?;
+    file.write_all(retained).map_err(|error| {
+        ref_verify_runner_error(format!(
+            "failed to write ref-verify session log {}: {error}",
+            session_log.path.display()
+        ))
+    })?;
+    session_log.written_bytes = session_log.written_bytes.saturating_add(retained.len());
+    Ok(())
 }
 
 fn stderr_tail(text: &str, max_lines: usize, max_bytes: usize) -> String {
@@ -567,129 +691,6 @@ fn ref_verify_runner_error(message: impl Into<String>) -> RefVerifyError {
     RefVerifyError::VerifierPort { message: message.into() }
 }
 
-// ── transient files (codex --output-schema / --output-last-message) ─────────
-
-/// RAII handle for a transient file under `tmp/reviewer-runtime/`.
-///
-/// On drop, the file is removed best-effort. Errors during removal are
-/// swallowed because the dropper has no way to surface them and a stale
-/// transient file is harmless.
-struct AutoCleanupFile {
-    path: PathBuf,
-}
-
-impl AutoCleanupFile {
-    fn create(
-        project_root: &Path,
-        prefix: &str,
-        ext: &str,
-        content: &[u8],
-    ) -> Result<Self, RefVerifyError> {
-        let canon_root = project_root.canonicalize().map_err(|e| {
-            ref_verify_runner_error(format!(
-                "cannot canonicalize project root '{}': {e}",
-                project_root.display()
-            ))
-        })?;
-        let path = ref_verify_runtime_path(project_root, prefix, ext)?;
-        // Use `create_new` so a raced symlink planted after the directory guard cannot redirect
-        // the file write to an existing path outside the tree.
-        let mut f =
-            std::fs::OpenOptions::new().write(true).create_new(true).open(&path).map_err(|e| {
-                ref_verify_runner_error(format!(
-                    "failed to create transient file '{}': {e}",
-                    path.display()
-                ))
-            })?;
-        // Post-creation guard: verify the opened file resolves within the project root.
-        // `canonicalize` on the newly-created path cannot follow a symlink placed after
-        // `create_new` succeeded (the file now exists at the inode we created), but it does
-        // resolve any symlink in the parent-directory ancestry.
-        let canon_path = path.canonicalize().map_err(|e| {
-            ref_verify_runner_error(format!(
-                "cannot canonicalize transient file '{}': {e}",
-                path.display()
-            ))
-        })?;
-        if !canon_path.starts_with(&canon_root) {
-            let _ = std::fs::remove_file(&path);
-            return Err(ref_verify_runner_error(format!(
-                "transient file '{}' resolves to '{}' which escapes project root '{}'",
-                path.display(),
-                canon_path.display(),
-                canon_root.display()
-            )));
-        }
-        if !content.is_empty() {
-            f.write_all(content).map_err(|e| {
-                ref_verify_runner_error(format!(
-                    "failed to write transient file '{}': {e}",
-                    path.display()
-                ))
-            })?;
-        }
-        Ok(Self { path })
-    }
-
-    fn path(&self) -> &Path {
-        &self.path
-    }
-}
-
-impl Drop for AutoCleanupFile {
-    fn drop(&mut self) {
-        let _ = std::fs::remove_file(&self.path);
-    }
-}
-
-fn ref_verify_runtime_path(
-    project_root: &Path,
-    prefix: &str,
-    ext: &str,
-) -> Result<PathBuf, RefVerifyError> {
-    static COUNTER: AtomicU64 = AtomicU64::new(0);
-
-    let canon_root = project_root.canonicalize().map_err(|e| {
-        ref_verify_runner_error(format!(
-            "cannot canonicalize project root '{}': {e}",
-            project_root.display()
-        ))
-    })?;
-
-    let timestamp = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_err(|e| ref_verify_runner_error(format!("failed to compute timestamp: {e}")))?
-        .as_nanos();
-    let seq = COUNTER.fetch_add(1, Ordering::Relaxed);
-    let path = project_root
-        .join(REVIEW_RUNTIME_DIR)
-        .join(format!("{prefix}-{}-{timestamp}-{seq}.{ext}", std::process::id()));
-    let parent = path.parent().ok_or_else(|| {
-        ref_verify_runner_error(format!("runtime path has no parent: '{}'", path.display()))
-    })?;
-    std::fs::create_dir_all(parent).map_err(|e| {
-        ref_verify_runner_error(format!("failed to create '{}': {e}", parent.display()))
-    })?;
-    // Guard: verify the created directory resolves within the canonical project root.
-    // This catches pre-existing symlinks on `tmp` or `reviewer-runtime` that would redirect
-    // writes outside the trusted tree.
-    let canon_parent = parent.canonicalize().map_err(|e| {
-        ref_verify_runner_error(format!(
-            "cannot canonicalize runtime dir '{}': {e}",
-            parent.display()
-        ))
-    })?;
-    if !canon_parent.starts_with(&canon_root) {
-        return Err(ref_verify_runner_error(format!(
-            "runtime dir '{}' resolves to '{}' which escapes project root '{}'",
-            parent.display(),
-            canon_parent.display(),
-            canon_root.display()
-        )));
-    }
-    Ok(path)
-}
-
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
@@ -756,6 +757,31 @@ mod tests {
         let tail = stderr_tail(&text, 50, 64);
         assert!(tail.len() <= 64);
         assert!(tail.contains("line0999"), "tail must include last line, got '{tail}'");
+    }
+
+    #[test]
+    fn test_collect_bounded_stderr_retains_tail_and_marks_truncation() {
+        let output = collect_bounded_stderr(std::io::Cursor::new(b"0123456789"), 4)
+            .expect("stderr collector succeeds");
+
+        assert_eq!(output.bytes, b"6789");
+        assert!(output.truncated);
+    }
+
+    #[test]
+    fn test_append_session_log_caps_persistent_log() {
+        let directory = tempfile::tempdir().expect("temporary directory is created");
+        let path = directory.path().join("session.log");
+        std::fs::File::create(&path).expect("session log is created");
+        let mut session_log = RefVerifySessionLog { path: path.clone(), written_bytes: 0 };
+
+        append_session_log(&mut session_log, &vec![b'x'; MAX_REF_VERIFY_SESSION_LOG_BYTES + 1])
+            .expect("bounded log append succeeds");
+
+        assert_eq!(
+            std::fs::metadata(path).expect("session log metadata is read").len(),
+            MAX_REF_VERIFY_SESSION_LOG_BYTES as u64
+        );
     }
 
     #[test]
@@ -878,6 +904,7 @@ mod tests {
             &[OsString::from("hello subprocess")],
             dir.path(),
             "echo",
+            None,
         )
         .unwrap();
         assert!(outcome.stdout.contains("hello subprocess"));
@@ -895,6 +922,7 @@ mod tests {
             &[OsString::from("-c"), OsString::from("echo failure-detail >&2; exit 1")],
             dir.path(),
             "sh-test",
+            None,
         )
         .unwrap_err();
         let RefVerifyError::VerifierPort { message } = err else {

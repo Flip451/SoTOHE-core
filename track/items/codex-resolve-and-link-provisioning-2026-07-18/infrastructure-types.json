@@ -1,0 +1,667 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::codex_common::resolve_codex_runtime": {
+      "action": "add",
+      "docs": "Updates `infrastructure::codex_common::resolve_codex_runtime`; IN-03, CN-02, CN-03.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "project_root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "Result<ResolvedCodexRuntime, CodexRuntimeResolveError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    },
+    "infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner": {
+      "action": "modify",
+      "docs": "Builds the reference-verifier process runner with repository-first Codex runtime resolution.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "project_root",
+          "ty": "std::path::PathBuf"
+        }
+      ],
+      "returns": "std::sync::Arc<AgentExecutionRunner>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "executable",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::ffi::OsStr"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "path_prefix",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&std::path::Path>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "real_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::path::Path"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "version",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "ResolvedCodexRuntime"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "FsCodexRuntimeProvisioner"
+        }
+      ],
+      "type_name": "FsCodexRuntimeProvisioner"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "GitCodexRuntimeProjectRootDiscoveryAdapter"
+        }
+      ],
+      "type_name": "GitCodexRuntimeProjectRootDiscoveryAdapter"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeResolveError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeResolveError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "CodexRuntimeResolveError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "ResolvedCodexRuntime",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ResolvedCodexRuntime",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ResolvedCodexRuntime",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ResolvedCodexRuntime",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "FsCodexRuntimeProvisioner",
+      "trait_ref": "usecase::codex_runtime::CodexRuntimeProvisionPort"
+    },
+    {
+      "action": "add",
+      "for_type": "FsCodexRuntimeProvisioner",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "CodexCapabilityAdapter",
+      "trait_ref": "usecase::capability_exec::CapabilityProviderPort"
+    },
+    {
+      "action": "modify",
+      "for_type": "CodexDryChecker",
+      "trait_ref": "usecase::dry_check::DryCheckAgentPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "CodexDryChecker",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CodexDryFixLocalRunner",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "CodexReviewer",
+      "trait_ref": "usecase::review_v2::ports::Reviewer"
+    },
+    {
+      "action": "modify",
+      "for_type": "CodexReviewFixRunner",
+      "trait_ref": "usecase::review_v2::run_review_fix::ReviewFixRunner"
+    },
+    {
+      "for_type": "GitCodexRuntimeProjectRootDiscoveryAdapter",
+      "trait_ref": "usecase::codex_runtime::CodexRuntimeProjectRootDiscoveryPort"
+    },
+    {
+      "for_type": "GitCodexRuntimeProjectRootDiscoveryAdapter",
+      "trait_ref": "core::default::Default"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CodexCapabilityAdapter": {
+      "action": "modify",
+      "docs": "Dispatches Codex capabilities through the repository-first resolved runtime.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "runtime_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "session_cache",
+              "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<domain::TrackId>"
+            }
+          ],
+          "returns": "CodexCapabilityAdapter"
+        }
+      ],
+      "module_path": "capability_exec::codex",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    },
+    "CodexDryChecker": {
+      "action": "modify",
+      "docs": "Updates `infrastructure::dry_check::codex_dry_checker::CodexDryChecker`; IN-03, IN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "fast_model",
+              "ty": "String"
+            },
+            {
+              "name": "fast_reasoning_effort",
+              "ty": "String"
+            },
+            {
+              "name": "final_model",
+              "ty": "String"
+            },
+            {
+              "name": "final_reasoning_effort",
+              "ty": "String"
+            },
+            {
+              "name": "capability_name",
+              "ty": "String"
+            }
+          ],
+          "returns": "CodexDryChecker"
+        }
+      ],
+      "module_path": "dry_check::codex_dry_checker",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    },
+    "CodexDryFixLocalRunner": {
+      "action": "modify",
+      "docs": "Executes local DRY fixes through the repository-first resolved Codex runtime.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "dry_run_fix_local",
+          "params": [
+            {
+              "name": "input",
+              "ty": "usecase::dry_driver::DryFixLocalDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "usecase::dry_driver::DryDriverOutcome"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "CodexDryFixLocalRunner"
+        }
+      ],
+      "module_path": "dry_check::dry_fix_local",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    },
+    "CodexReviewFixRunner": {
+      "action": "modify",
+      "docs": "Runs review-fix sessions through the repository-first resolved Codex runtime.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "model",
+              "ty": "usecase::capability_exec::ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "usecase::capability_exec::ReasoningEffort"
+            }
+          ],
+          "returns": "CodexReviewFixRunner"
+        }
+      ],
+      "module_path": "review_v2::review_fix_runner",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    },
+    "CodexReviewer": {
+      "action": "modify",
+      "docs": "Runs review sessions through the repository-first resolved Codex runtime; scope labels remain presentation-only free-form text.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "scope",
+              "ty": "domain::review_v2::ScopeName"
+            },
+            {
+              "name": "round_type",
+              "ty": "domain::review_v2::RoundType"
+            },
+            {
+              "name": "diff_base",
+              "ty": "Option<domain::git_ref::CommitHash>"
+            },
+            {
+              "name": "model",
+              "ty": "usecase::capability_exec::ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "usecase::capability_exec::ReasoningEffort"
+            },
+            {
+              "name": "timeout",
+              "ty": "std::time::Duration"
+            },
+            {
+              "name": "base_prompt",
+              "ty": "usecase::provider_session::ReviewerPrompt"
+            },
+            {
+              "name": "session_cache",
+              "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
+            }
+          ],
+          "returns": "CodexReviewer"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_scope_label",
+          "params": [
+            {
+              "name": "label",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "receiver": "self",
+          "returns": "CodexReviewer"
+        }
+      ],
+      "module_path": "review_v2::codex_reviewer",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    },
+    "CodexRuntimeResolveError": {
+      "action": "add",
+      "docs": "Classifies repository-local and sanitized-PATH Codex resolution and probe failures without hiding diagnostics.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ProjectRootInvalid",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "RepoLocalLinkInvalid",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "PathFallbackUnavailable",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ProbeFailed",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "codex_common",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "GO-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    },
+    "FsCodexRuntimeProvisioner": {
+      "action": "add",
+      "docs": "Adds `infrastructure::codex_runtime::FsCodexRuntimeProvisioner`; IN-01, IN-02, CN-01, AC-01, AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "codex_runtime",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    },
+    "GitCodexRuntimeProjectRootDiscoveryAdapter": {
+      "action": "add",
+      "docs": "Change `GitCodexRuntimeProjectRootDiscoveryAdapter` to discover from the port-supplied start directory. IN-06, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "codex_runtime",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    },
+    "ResolvedCodexRuntime": {
+      "action": "add",
+      "docs": "Validated infrastructure value containing the spawn executable, optional PATH prefix, canonical real path, and the exact opaque `codex --version` output; the version string is diagnostic text rather than a domain concept.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "codex_common",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -2993,6 +2993,7 @@ dependencies = [
  "regex",
  "rstest",
  "rustdoc-types",
+ "rustix",
  "serde",
  "serde_json",
  "serde_yaml",

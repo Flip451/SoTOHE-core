@@ -20,7 +20,7 @@ mod session_log;
 mod smoke_test;
 mod spawn;
 
-use std::ffi::OsString;
+use std::ffi::{OsStr, OsString};
 use std::io::{Read as _, Seek as _};
 use std::path::{Path, PathBuf};
 
@@ -30,18 +30,19 @@ use usecase::dry_driver::{DryDriverOutcome, DryDriverPort, DryFixLocalDriverInpu
 use usecase::dry_write_driver::CapabilityName;
 
 use crate::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, ResolvedExecution, RoundType};
+use crate::codex_common::resolve_codex_runtime;
 use crate::git_cli::SystemGitRepo;
 use crate::track::symlink_guard::reject_symlinks_below;
 
 use env::{
-    bin_parent_dir, build_dry_fix_invocation, dry_fix_build_safe_env, dry_fix_build_smoke_env,
-    dry_fix_create_safe_home, dry_fix_resolve_codex_home, resolve_codex_bin,
+    build_dry_fix_invocation, dry_fix_build_safe_env, dry_fix_build_smoke_env,
+    dry_fix_create_safe_home, dry_fix_resolve_codex_home,
 };
 use prompt::build_dry_fix_prompt;
 use sentinel::{dry_fix_sentinel_to_exit_code, parse_dry_fix_sentinel};
 use session_log::DryFixSessionLogCleanup;
 use smoke_test::{dry_fix_smoke_test_codex_version, dry_fix_smoke_test_forbidden_sandbox};
-use spawn::{dry_fix_runtime_path, dry_fix_spawn_and_collect};
+use spawn::{dry_fix_initialize_runtime_file, dry_fix_runtime_file, dry_fix_spawn_and_collect};
 
 /// Names of environment variables carrying authentication credentials that
 /// [`env::dry_fix_build_safe_env`] forwards to the sandboxed Codex subprocess.
@@ -60,7 +61,7 @@ pub struct CodexDryFixLocalRunner;
 
 impl CodexDryFixLocalRunner {
     /// Create a new `CodexDryFixLocalRunner`.
-    pub fn new() -> Self {
+    pub fn new() -> CodexDryFixLocalRunner {
         Self
     }
 }
@@ -140,34 +141,44 @@ fn run_dry_fix_codex(
     briefing_file: &Path,
     trusted_root: &Path,
 ) -> Result<DryDriverOutcome, String> {
-    let codex_bin = resolve_codex_bin();
-    let extra_path = bin_parent_dir(&codex_bin);
+    let runtime = resolve_codex_runtime(trusted_root).map_err(|error| error.to_string())?;
+    let codex_bin = runtime.executable().to_os_string();
     dry_fix_smoke_test_forbidden_sandbox()?;
     let codex_home = dry_fix_resolve_codex_home()?;
     let safe_home = dry_fix_create_safe_home()?;
     let _home_cleanup = DryFixSafeHomeCleanup(safe_home.clone());
-    let safe_env = dry_fix_build_safe_env(&safe_home, &codex_home, extra_path.as_deref())?;
+    let safe_env = dry_fix_build_safe_env(&safe_home, &codex_home, runtime.path_prefix())?;
     let smoke_env = dry_fix_build_smoke_env(&safe_env);
     dry_fix_smoke_test_codex_version(&codex_bin, &smoke_env)?;
     let prompt = build_dry_fix_prompt(track_id, briefing_file, trusted_root)?;
-    let output_last_message = dry_fix_runtime_path("dry-fix-codex-last-message", "txt")?;
-    std::fs::write(&output_last_message, "")
-        .map_err(|e| format!("failed to initialize last-message file: {e}"))?;
+    let output_last_message_file =
+        dry_fix_runtime_file(trusted_root, "dry-fix-codex-last-message", "txt")?;
+    dry_fix_initialize_runtime_file(&output_last_message_file)?;
+    let output_last_message = output_last_message_file.path().to_path_buf();
     let _last_message_cleanup = DryFixLastMessageCleanup(output_last_message.clone());
     let mut args = build_dry_fix_invocation(model, &codex_home, &safe_home, &output_last_message);
     args.extend([OsString::from("--config"), codex_reasoning_effort_config(effort)]);
-    let (stdout, log_path) = dry_fix_spawn_and_collect(&codex_bin, &args, &safe_env, &prompt)?;
+    let (stdout, child_status, log_path) = dry_fix_spawn_and_collect(
+        &codex_bin,
+        &args,
+        &safe_env,
+        &prompt,
+        trusted_root,
+        Some(&runtime),
+    )?;
     let log_cleanup = DryFixSessionLogCleanup::new(log_path.clone());
-    let last_message_content = match read_dry_fix_last_message_tail(&output_last_message) {
-        Ok(content) => content,
-        Err(e) => {
-            log_cleanup.keep_for_diagnosis();
-            return Err(format!(
-                "failed to read last-message file: {e}; log: {}",
-                log_path.display()
-            ));
-        }
-    };
+    let last_message_content =
+        match read_dry_fix_last_message_tail(trusted_root, &output_last_message) {
+            Ok(content) => content,
+            Err(e) => {
+                log_cleanup.keep_for_diagnosis();
+                return Err(format!(
+                    "failed to read last-message file: {e}; Codex fixer {}; log: {}",
+                    dry_fix_exit_detail(child_status),
+                    log_path.display()
+                ));
+            }
+        };
     let status =
         parse_dry_fix_sentinel(&last_message_content).or_else(|| parse_dry_fix_sentinel(&stdout));
     let status = match status {
@@ -175,7 +186,8 @@ fn run_dry_fix_codex(
         None => {
             log_cleanup.keep_for_diagnosis();
             return Err(format!(
-                "no DRY_FIX_STATUS sentinel found in fixer output; log: {}",
+                "no DRY_FIX_STATUS sentinel found in fixer output; Codex fixer {}; log: {}",
+                dry_fix_exit_detail(child_status),
                 log_path.display()
             ));
         }
@@ -202,21 +214,45 @@ fn codex_reasoning_effort_config(effort: ReasoningEffort) -> OsString {
     OsString::from(format!("model_reasoning_effort=\"{effort}\""))
 }
 
-fn dry_fix_path_trusted_root(path: &Path) -> &Path {
-    if path.is_absolute() {
-        path.ancestors().last().unwrap_or_else(|| Path::new("/"))
-    } else {
-        Path::new("")
-    }
+fn dry_fix_exit_detail(status: std::process::ExitStatus) -> String {
+    status
+        .code()
+        .map_or_else(|| format!("exit status {status}"), |code| format!("exit code {code}"))
 }
 
-fn read_dry_fix_last_message_tail(path: &Path) -> Result<String, String> {
-    let exists = reject_symlinks_below(path, dry_fix_path_trusted_root(path))
-        .map_err(|e| format!("symlink guard last-message file {}: {e}", path.display()))?;
-    if !exists {
-        return Err(format!("last-message file {} not found", path.display()));
-    }
-    let metadata = std::fs::symlink_metadata(path)
+fn read_dry_fix_last_message_tail(trusted_root: &Path, path: &Path) -> Result<String, String> {
+    let file_name = path
+        .file_name()
+        .ok_or_else(|| format!("last-message path {} does not name a file", path.display()))?;
+    let parent_dir = open_dry_fix_last_message_parent(trusted_root, path)?;
+    // The parent was opened by walking each component from the pinned repository
+    // root. Open the leaf relative to that handle so a replacement cannot redirect
+    // this read outside the repository runtime directory.
+    let file_fd = rustix::fs::openat(
+        &parent_dir,
+        file_name,
+        rustix::fs::OFlags::RDONLY
+            | rustix::fs::OFlags::NONBLOCK
+            | rustix::fs::OFlags::NOFOLLOW
+            | rustix::fs::OFlags::CLOEXEC,
+        rustix::fs::Mode::empty(),
+    )
+    .map_err(|error| {
+        let detail =
+            match rustix::fs::statat(&parent_dir, file_name, rustix::fs::AtFlags::SYMLINK_NOFOLLOW)
+            {
+                Ok(metadata)
+                    if rustix::fs::FileType::from_raw_mode(metadata.st_mode).is_symlink() =>
+                {
+                    "refusing to follow symlink".to_owned()
+                }
+                _ => error.to_string(),
+            };
+        format!("failed to open last-message file {}: {detail}", path.display())
+    })?;
+    let mut file = std::fs::File::from(file_fd);
+    let metadata = file
+        .metadata()
         .map_err(|e| format!("failed to inspect last-message file {}: {e}", path.display()))?;
     if !metadata.is_file() {
         return Err(format!("last-message path {} is not a regular file", path.display()));
@@ -224,8 +260,6 @@ fn read_dry_fix_last_message_tail(path: &Path) -> Result<String, String> {
 
     let len = metadata.len();
     let start = len.saturating_sub(DRY_FIX_LAST_MESSAGE_READ_LIMIT_BYTES);
-    let mut file = std::fs::File::open(path)
-        .map_err(|e| format!("failed to open last-message file {}: {e}", path.display()))?;
     file.seek(std::io::SeekFrom::Start(start))
         .map_err(|e| format!("failed to seek last-message file {}: {e}", path.display()))?;
 
@@ -234,6 +268,84 @@ fn read_dry_fix_last_message_tail(path: &Path) -> Result<String, String> {
         .read_to_end(&mut bytes)
         .map_err(|e| format!("failed to read last-message file {}: {e}", path.display()))?;
     Ok(String::from_utf8_lossy(&bytes).into_owned())
+}
+
+fn open_dry_fix_last_message_parent(
+    trusted_root: &Path,
+    path: &Path,
+) -> Result<std::fs::File, String> {
+    let root = trusted_root.canonicalize().map_err(|e| {
+        format!("failed to canonicalize trusted repository root {}: {e}", trusted_root.display())
+    })?;
+    let relative = path.strip_prefix(&root).map_err(|_| {
+        format!(
+            "last-message path {} is outside trusted repository root {}",
+            path.display(),
+            root.display()
+        )
+    })?;
+    let parent = relative.parent().ok_or_else(|| {
+        format!(
+            "last-message path {} does not have a parent below the repository root",
+            path.display()
+        )
+    })?;
+    let mut directory = open_dry_fix_directory_nofollow(&root)
+        .map_err(|e| format!("failed to open trusted repository root {}: {e}", root.display()))?;
+    for component in parent.components() {
+        let std::path::Component::Normal(name) = component else {
+            return Err(format!(
+                "last-message path {} contains an invalid component",
+                path.display()
+            ));
+        };
+        directory = open_dry_fix_directory_at_nofollow(&directory, name).map_err(|error| {
+            let detail =
+                match rustix::fs::statat(&directory, name, rustix::fs::AtFlags::SYMLINK_NOFOLLOW) {
+                    Ok(metadata)
+                        if rustix::fs::FileType::from_raw_mode(metadata.st_mode).is_symlink() =>
+                    {
+                        "refusing to follow symlink".to_owned()
+                    }
+                    _ => error.to_string(),
+                };
+            format!(
+                "failed to open last-message directory component {}: {detail}",
+                name.to_string_lossy()
+            )
+        })?;
+    }
+    Ok(directory)
+}
+
+fn open_dry_fix_directory_nofollow(path: &Path) -> Result<std::fs::File, std::io::Error> {
+    rustix::fs::open(
+        path,
+        rustix::fs::OFlags::RDONLY
+            | rustix::fs::OFlags::DIRECTORY
+            | rustix::fs::OFlags::NOFOLLOW
+            | rustix::fs::OFlags::CLOEXEC,
+        rustix::fs::Mode::empty(),
+    )
+    .map(std::fs::File::from)
+    .map_err(Into::into)
+}
+
+fn open_dry_fix_directory_at_nofollow(
+    parent: &std::fs::File,
+    name: &OsStr,
+) -> Result<std::fs::File, std::io::Error> {
+    rustix::fs::openat(
+        parent,
+        name,
+        rustix::fs::OFlags::RDONLY
+            | rustix::fs::OFlags::DIRECTORY
+            | rustix::fs::OFlags::NOFOLLOW
+            | rustix::fs::OFlags::CLOEXEC,
+        rustix::fs::Mode::empty(),
+    )
+    .map(std::fs::File::from)
+    .map_err(Into::into)
 }
 
 struct DryFixSafeHomeCleanup(PathBuf);
@@ -556,7 +668,7 @@ mod tests {
         }
 
         /// Installs the fake codex script and calls `dry_run_fix_local` with the given
-        /// input `model`, scoping `PATH`/`CODEX_BIN`/`CODEX_HOME` to the fixture for the
+        /// input `model`, scoping `PATH`/`SOTP_CODEX_BIN`/`CODEX_HOME` to the fixture for the
         /// duration of the call.
         fn run(&self, codex_script: &str, model: Option<&str>) -> DryDriverOutcome {
             let fake_codex = write_fake_codex_runner(&self.fake_bin_dir, codex_script);
@@ -565,7 +677,7 @@ mod tests {
             temp_env::with_vars(
                 [
                     ("PATH", Some(path_val.as_os_str())),
-                    ("CODEX_BIN", Some(fake_codex.as_os_str())),
+                    ("SOTP_CODEX_BIN", Some(fake_codex.as_os_str())),
                     ("CODEX_HOME", Some(self.codex_home.as_os_str())),
                 ],
                 || {
@@ -720,7 +832,7 @@ exit 0
         assert_eq!(captured_effort, "model_reasoning_effort=\"low\"");
     }
 
-    /// Shared helper: write a fake codex runner with `script` body, scope `CODEX_BIN` and
+    /// Shared helper: write a fake codex runner with `script` body, scope `SOTP_CODEX_BIN` and
     /// `CODEX_HOME` to it, write a briefing file, and call `run_dry_fix_codex`. Returns the
     /// result so each test can assert its own success or error path.
     #[cfg(unix)]
@@ -733,7 +845,7 @@ exit 0
 
         temp_env::with_vars(
             [
-                ("CODEX_BIN", Some(fake_codex.as_os_str())),
+                ("SOTP_CODEX_BIN", Some(fake_codex.as_os_str())),
                 ("CODEX_HOME", Some(codex_home.as_os_str())),
             ],
             || {
@@ -807,6 +919,30 @@ exit 0
         );
     }
 
+    #[cfg(unix)]
+    #[test]
+    fn test_run_dry_fix_codex_missing_sentinel_reports_child_exit_and_log() {
+        let result = run_dry_fix_with_fake_codex(
+            r#"out=""
+while [ "$#" -gt 0 ]; do
+  if [ "$1" = "--output-last-message" ]; then
+    out="$2"
+    shift 2
+  else
+    shift
+  fi
+done
+while IFS= read -r _line; do :; done
+printf 'not a sentinel\n' > "$out"
+exit 126
+"#,
+        );
+
+        let message = result.unwrap_err();
+        assert!(message.contains("exit code 126"), "got: {message}");
+        assert!(message.contains("log:"), "got: {message}");
+    }
+
     #[test]
     fn test_read_dry_fix_last_message_tail_bounds_large_file_and_keeps_sentinel() {
         let dir = tempfile::tempdir().unwrap();
@@ -815,7 +951,7 @@ exit 0
         content.extend_from_slice(b"\nDRY_FIX_STATUS: completed\n");
         std::fs::write(&last_message, content).unwrap();
 
-        let read = read_dry_fix_last_message_tail(&last_message).unwrap();
+        let read = read_dry_fix_last_message_tail(dir.path(), &last_message).unwrap();
 
         assert!(read.len() <= DRY_FIX_LAST_MESSAGE_READ_LIMIT_BYTES as usize);
         assert_eq!(parse_dry_fix_sentinel(&read), Some("completed"));
@@ -831,8 +967,47 @@ exit 0
         let link = dir.path().join("last-message.txt");
         std::os::unix::fs::symlink(&outside_file, &link).unwrap();
 
-        let err = read_dry_fix_last_message_tail(&link).unwrap_err();
+        let err = read_dry_fix_last_message_tail(dir.path(), &link).unwrap_err();
 
         assert!(err.contains("symlink"), "got: {err}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_read_dry_fix_last_message_tail_rejects_symlinked_parent_component() {
+        let repository = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let runtime_dir = outside.path().join("reviewer-runtime");
+        std::fs::create_dir(&runtime_dir).unwrap();
+        let last_message = runtime_dir.join("last-message.txt");
+        std::fs::write(&last_message, "DRY_FIX_STATUS: completed\n").unwrap();
+        std::os::unix::fs::symlink(outside.path(), repository.path().join("tmp")).unwrap();
+
+        let err = read_dry_fix_last_message_tail(
+            repository.path(),
+            &repository.path().join("tmp/reviewer-runtime/last-message.txt"),
+        )
+        .unwrap_err();
+
+        assert!(err.contains("refusing to follow symlink"), "got: {err}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_read_dry_fix_last_message_tail_fifo_fails_without_blocking() {
+        let repository = tempfile::tempdir().unwrap();
+        let runtime_dir = repository.path().join("tmp/reviewer-runtime");
+        std::fs::create_dir_all(&runtime_dir).unwrap();
+        let last_message = runtime_dir.join("last-message.txt");
+        rustix::fs::mkfifoat(
+            rustix::fs::CWD,
+            &last_message,
+            rustix::fs::Mode::from_raw_mode(0o600),
+        )
+        .unwrap();
+
+        let err = read_dry_fix_last_message_tail(repository.path(), &last_message).unwrap_err();
+
+        assert!(err.contains("not a regular file"), "got: {err}");
     }
 }
