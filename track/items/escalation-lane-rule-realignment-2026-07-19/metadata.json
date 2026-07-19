@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "escalation-lane-rule-realignment-2026-07-19",
+  "title": "escalation lane の規約・guardian 挙動を decision-freeze ADR D6/D7 に整合させる",
+  "branch": "track/escalation-lane-rule-realignment-2026-07-19",
+  "created_at": "2026-07-19T01:27:46Z",
+  "updated_at": "2026-07-19T01:27:46Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}
