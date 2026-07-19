@@ -12,7 +12,8 @@ decisions:
   - id: D3
     user_decision_ref: "chat_segment:session-01GX77vvFEu6Z5fapa3jur12:2026-07-18 来歴の記録性指摘（守護者判定全文はセッション揮発）を受け、reason 要件の明文化と欠落時 fallback の両方を取り込む裁定 + chat_segment:session-01GX77vvFEu6Z5fapa3jur12:2026-07-18 Phase 0 baseline review の init 刻印 diff（起点入力を local review・外部 PR review・spec→ADR の 🔴 signal・diagnose routing に一般化）と guardian の decision-preserved 判定を確認し、loop 精緻化後の D3 文面を承認する裁定"
     candidate_selection: "from:[reason-requirement-plus-fallback,reason-requirement-only,weaken-to-surviving-records] chose:reason-requirement-plus-fallback"
-    status: proposed
+    status: superseded
+    superseded_by: "2026-07-19-0333-escalation-reason-verdict-provenance.md#D1"
 ---
 # adr2pr 終端に ADR baseline diff の PR コメント投稿フェーズを追加
 
@@ -83,3 +84,4 @@ primary ADR への in-track 編集で escalation 刻印を打つとき、reason 
 - `knowledge/conventions/pre-track-adr-authoring.md` — init 刻印・escalation 刻印・守護者判定の規範（来歴の情報源）
 - `.harness/workflows/track/adr2pr.md` — 追加先の workflow SSoT
 - `.harness/workflows/track/pr-review.md` — 先行する Step 10 の終端条件
+- `2026-07-19-0333-escalation-reason-verdict-provenance.md#D1` — D3 の一律要件を guardian verdict の存在時に限定して置き換える後続 decision
