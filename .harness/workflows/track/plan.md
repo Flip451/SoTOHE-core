@@ -134,8 +134,12 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
         `adr-diagnoser` in edit-judgment mode. Instead dispatch `adr-editor` trigger 3 to author
         the separate new-ADR draft required by
         `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`, with
-        non-user grounds so chain ⓪ remains 🟡 until merge-stage adjudication. Do not re-invoke
-        `spec-design` against the unchanged merged ADR.
+        non-user grounds so chain ⓪ remains 🟡 until merge-stage adjudication. Once the draft
+        exists, re-invoke `spec-design` so the failing element(s) re-ground on it — retrying
+        against the unchanged merged ADR cannot clear the signal, and a Chain ① 🔴 must never
+        be handed off to merge-stage recovery: the strict merge gate evaluates the committed
+        `spec.json` Chain ① signals, so promoting and stamping the draft alone can never make
+        the PR mergeable while a spec-side red stands.
      f. A pre-merge ADR edit produced by this escalation is an **expected edit** per
         `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`: adopt it
         and stamp it directly through the escalation snapshot (kind: escalation, self-contained
@@ -144,13 +148,18 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
         calls for a NEW decision (not a preserving refinement of the recorded ones), do not
         pause the pipeline for a synchronous adjudication: dispatch `adr-editor` trigger 3 to
         author a draft with non-user grounds so chain ⓪ evaluates 🟡 and the strict merge gate
-        forces the asynchronous user adjudication before merge; after that adjudication, dispatch
-        `adr-editor` to promote the grounds to `user_decision_ref`, then stamp the track-born ADR
-        with kind: new-adr and its required reason.
+        forces the asynchronous user adjudication before merge; then re-invoke `spec-design` so
+        the 🔴 element(s) cite the draft and the Chain ① signal regenerates — what rides to the
+        merge gate is the draft's chain ⓪ 🟡, never a standing Chain ① 🔴. After the merge-stage
+        adjudication, dispatch `adr-editor` to promote the grounds to `user_decision_ref`, then
+        stamp the track-born ADR with kind: new-adr and its required reason.
      g. After a pre-merge in-place escalation edit is stamped, re-invoke `spec-design`. Count
-        against `max_retry`; on overflow, stop. A trigger 3 amendment/new-decision draft does
-        not change the existing ADR that produced the signal, so record the proposal for
-        asynchronous merge-stage adjudication and do not retry that unchanged signal.
+        against `max_retry`; on overflow, stop. A trigger 3 new-decision draft is retried the
+        same way — the re-invoked `spec-design` re-grounds the failing element(s) on the new
+        draft (not on the unchanged ADR that produced the signal) and counts against
+        `max_retry`; what is recorded for asynchronous merge-stage adjudication is the draft's
+        chain ⓪ 🟡. Only an amendment proposal that owns no failing Chain ① signal is recorded
+        without a `spec-design` retry.
 
 ### Phase 2 loop: type-design workflow
 
@@ -238,8 +247,10 @@ operations, environment-breaking changes. Artifact generation uses post-hoc revi
   the ADR first, then resume. An unstamped non-user-grounded track-born draft remains editable
   without history or a synchronous pause.
 - **Post-merge Phase 1 ADR proposal**: record it through the new-ADR draft path specified by
-  `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`; do not retry the
-  unchanged signal.
+  `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`. When the
+  proposal resolves a failing Chain ① signal, re-invoke `spec-design` to re-ground the
+  element(s) on the draft instead of retrying the unchanged signal; an amendment proposal with
+  no failing signal is recorded without a retry.
 - **`[ESCALATE]` from `ref-verify`**: report to user and stop. Do not retry.
 
 ## Outputs
