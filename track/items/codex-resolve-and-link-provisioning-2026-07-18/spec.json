@@ -79,6 +79,16 @@
             "anchor": "D4"
           }
         ]
+      },
+      {
+        "id": "IN-06",
+        "text": "`sotp codex-runtime provision` は `--project-root` が明示された場合にその値を配備先の project root として使い、省略された場合は任意の repository subdirectory を current working directory として Git root を発見し、その root 配下の repo-local link に配備する。Git root を発見できない場合は typed `CommandOutcome` failure として報告する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-18-1359-codex-resolve-and-link-provisioning.md",
+            "anchor": "D6"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -220,6 +230,16 @@
           "anchor": "D4"
         }
       ]
+    },
+    {
+      "id": "AC-07",
+      "text": "From any subdirectory of a Git repository, invoking `sotp codex-runtime provision` without `--project-root` discovers that repository's Git root and provisions the repo-local codex link under it. An explicit `--project-root` takes precedence over discovery. Invoking without the option outside a discoverable Git repository reports a typed `CommandOutcome` failure and does not provision a link.",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-18-1359-codex-resolve-and-link-provisioning.md",
+          "anchor": "D6"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -238,14 +258,10 @@
     {
       "file": "knowledge/conventions/responsibility-boundary.md",
       "anchor": "Rules"
-    },
-    {
-      "file": "knowledge/conventions/no-upstream-restatement.md",
-      "anchor": "Rules"
     }
   ],
   "signals": {
-    "blue": 19,
+    "blue": 21,
     "yellow": 0,
     "red": 0
   }

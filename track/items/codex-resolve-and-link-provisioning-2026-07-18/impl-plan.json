@@ -3,7 +3,7 @@
   "tasks": [
     {
       "id": "T001",
-      "description": "Add the catalogue-defined Codex runtime provisioning service, port, interactor, error type, cli_driver input/driver, CLI command/arguments, and focused command-path tests (IN-01, IN-02, CN-01, AC-01, AC-02).",
+      "description": "Implement CodexRuntimeProvisionError, CodexRuntimeProjectRootDiscoveryError, CodexRuntimeProvisionPort, CodexRuntimeProjectRootDiscoveryPort, CodexRuntimeProvisionService, and CodexRuntimeProvisionInteractor; CodexRuntimeDriver and CodexRuntimeInput; and the public CLI entries CliCommand, CodexRuntimeCommand, CodexRuntimeProvisionArgs, and cli::commands::codex_runtime::execute, with focused tests (IN-01, IN-02, IN-06, CN-01, AC-01, AC-02, AC-07).",
       "status": "done",
       "commit_hash": "574821fdd5711a301db5b21a0c4f6d2ecec499d3"
     },
@@ -15,7 +15,7 @@
     },
     {
       "id": "T003",
-      "description": "Add the filesystem Codex runtime provisioner implementation for the usecase port, wire it through the catalogue-defined composition root after the command path is available, and add focused provisioner/composition tests (IN-01, IN-02, CN-01, AC-01, AC-02).",
+      "description": "Add the filesystem Codex runtime provisioner and Git project-root discovery adapter implementations for their usecase ports, wire both through the catalogue-defined composition root after the command path is available, and add focused provisioner/composition tests (IN-01, IN-02, IN-06, CN-01, AC-01, AC-02, AC-07).",
       "status": "done",
       "commit_hash": "574821fdd5711a301db5b21a0c4f6d2ecec499d3"
     },
@@ -36,7 +36,7 @@
         "id": "S1",
         "title": "Provisioning command boundary",
         "description": [
-          "Implement the CLI, cli_driver, and usecase provisioning command path and its focused tests (IN-01, IN-02, CN-01, AC-01, AC-02)."
+          "Implement the CLI, cli_driver, and usecase provisioning command path with focused tests (IN-01, IN-02, IN-06, CN-01, AC-01, AC-02, AC-07)."
         ],
         "task_ids": [
           "T001"
@@ -56,7 +56,7 @@
         "id": "S3",
         "title": "Verified filesystem link provisioning",
         "description": [
-          "Implement the filesystem provisioner behind its usecase port, then wire it through the composition root and add focused provisioner/composition tests (IN-01, IN-02, CN-01, AC-01, AC-02)."
+          "Implement the filesystem provisioner and Git-root discovery adapter behind their usecase ports, then wire both through the composition root and add focused provisioner/composition tests (IN-01, IN-02, IN-06, CN-01, AC-01, AC-02, AC-07)."
         ],
         "task_ids": [
           "T003"

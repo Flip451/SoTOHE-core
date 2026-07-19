@@ -3,11 +3,11 @@
   "layer": "cli_composition",
   "entries": [
     {
-      "claim_hash": "4f96709578d791c0c19b73c3b5166b47a93ad36ed0af585b33eaace602009853",
-      "evidence_hash": "4962bd783441ab4fc6f505d289f478034f5f6db810f2bc4613b77a7f447a2bca",
+      "claim_hash": "333ee0a393f240d09674785c4547ddced4d5fd075e3abc836ba386f8345372de",
+      "evidence_hash": "b0717c13788ff61718f4f864dfaf71b9c34b1fd3bd38fd42e626eeb882082ad8",
       "verdict": {
         "kind": "pass",
-        "citation": "通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。"
+        "citation": "`sotp codex-runtime provision` は `--project-root` が明示された場合にその値を配備先の project root として使い、省略された場合は任意の repository subdirectory を current working directory として Git root を発見し、その root 配下の repo-local link に配備する。Git root を発見できない場合は typed `CommandOutcome` failure として報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -21,17 +21,17 @@
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
-          "element_id": "IN-01",
-          "text_label": "`cargo make bootstrap` に、通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。処理は再実行可能で、既存リンクを最新の解決結果へ張り直す。"
+          "element_id": "IN-06",
+          "text_label": "`sotp codex-runtime provision` は `--project-root` が明示された場合にその値を配備先の project root として使い、省略された場合は任意の repository subdirectory を current working directory として Git root を発見し、その root 配下の repo-local link に配備する。Git root を発見できない場合は typed `CommandOutcome` failure として報告する。"
         }
       }
     },
     {
-      "claim_hash": "4f96709578d791c0c19b73c3b5166b47a93ad36ed0af585b33eaace602009853",
-      "evidence_hash": "a5dfe453fd3a72f783343e1b7c3b3dcb08e6f50f1a568c3c9fd610dc02e80bf0",
+      "claim_hash": "333ee0a393f240d09674785c4547ddced4d5fd075e3abc836ba386f8345372de",
+      "evidence_hash": "eaf0cb5be3014bb561f1a1d257512f579c1b3bb0f5d21637384c5a7f5f2091a6",
       "verdict": {
         "kind": "pass",
-        "citation": "codex の解決不能・リンク劣化・子プロセス失敗を、利用者が exit code、session log、bootstrap 再実行案内から診断して回復できるものにする。"
+        "citation": "From any subdirectory of a Git repository, invoking `sotp codex-runtime provision` without `--project-root` discovers that repository's Git root and provisions the repo-local codex link under it."
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -44,9 +44,9 @@
       "evidence_origin": {
         "kind": "spec_element",
         "data": {
-          "section": "goal",
-          "element_id": "GO-02",
-          "text_label": "codex の解決不能・リンク劣化・子プロセス失敗を、利用者が exit code、session log、bootstrap 再実行案内から診断して回復できるものにする。"
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "From any subdirectory of a Git repository, invoking `sotp codex-runtime provision` without `--project-root` discovers that repository's Git root and provisions the repo-local codex link under it. An explicit `--project-root` takes precedence over discovery. Invoking without the option outside a discoverable Git repository reports a typed `CommandOutcome` failure and does not provision a link."
         }
       }
     }

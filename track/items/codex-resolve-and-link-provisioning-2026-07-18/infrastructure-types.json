@@ -103,6 +103,18 @@
         }
       ],
       "type_name": "FsCodexRuntimeProvisioner"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "GitCodexRuntimeProjectRootDiscoveryAdapter"
+        }
+      ],
+      "type_name": "GitCodexRuntimeProjectRootDiscoveryAdapter"
     }
   ],
   "layer": "infrastructure",
@@ -182,6 +194,14 @@
       "action": "modify",
       "for_type": "CodexReviewFixRunner",
       "trait_ref": "usecase::review_v2::run_review_fix::ReviewFixRunner"
+    },
+    {
+      "for_type": "GitCodexRuntimeProjectRootDiscoveryAdapter",
+      "trait_ref": "usecase::codex_runtime::CodexRuntimeProjectRootDiscoveryPort"
+    },
+    {
+      "for_type": "GitCodexRuntimeProjectRootDiscoveryAdapter",
+      "trait_ref": "core::default::Default"
     }
   ],
   "traits": {},
@@ -581,6 +601,32 @@
         },
         {
           "anchor": "AC-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    },
+    "GitCodexRuntimeProjectRootDiscoveryAdapter": {
+      "action": "add",
+      "docs": "Change `GitCodexRuntimeProjectRootDiscoveryAdapter` to discover from the port-supplied start directory. IN-06, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "codex_runtime",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-07",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         }
       ]

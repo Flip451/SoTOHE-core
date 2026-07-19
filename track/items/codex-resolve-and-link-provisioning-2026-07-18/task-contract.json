@@ -20,6 +20,14 @@
         "entry_key": "CodexRuntimeProvisionService"
       },
       {
+        "layer": "usecase",
+        "entry_key": "CodexRuntimeProjectRootDiscoveryError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "CodexRuntimeProjectRootDiscoveryPort"
+      },
+      {
         "layer": "cli_driver",
         "entry_key": "CodexRuntimeDriver"
       },
@@ -102,6 +110,10 @@
       {
         "layer": "infrastructure",
         "entry_key": "FsCodexRuntimeProvisioner"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "GitCodexRuntimeProjectRootDiscoveryAdapter"
       },
       {
         "layer": "cli_composition",

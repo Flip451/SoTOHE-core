@@ -12,6 +12,10 @@
             {
               "name": "provisioner",
               "ty": "std::sync::Arc<dyn CodexRuntimeProvisionPort>"
+            },
+            {
+              "name": "project_root_discovery",
+              "ty": "std::sync::Arc<dyn CodexRuntimeProjectRootDiscoveryPort>"
             }
           ],
           "returns": "CodexRuntimeProvisionInteractor"
@@ -42,6 +46,18 @@
       "action": "add",
       "for_type": "CodexRuntimeProvisionInteractor",
       "trait_ref": "CodexRuntimeProvisionService"
+    },
+    {
+      "for_type": "CodexRuntimeProjectRootDiscoveryError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CodexRuntimeProjectRootDiscoveryError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "CodexRuntimeProjectRootDiscoveryError",
+      "trait_ref": "core::error::Error"
     }
   ],
   "traits": {
@@ -83,6 +99,44 @@
         },
         {
           "anchor": "IN-05",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "CodexRuntimeProjectRootDiscoveryPort": {
+      "action": "add",
+      "docs": "Change `CodexRuntimeProjectRootDiscoveryPort` to accept an explicit start directory and perform one bounded blocking discovery call for the one-shot bootstrap operation. IN-06, AC-07.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "discover_from",
+          "params": [
+            {
+              "name": "start_directory",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<std::path::PathBuf, CodexRuntimeProjectRootDiscoveryError>"
+        }
+      ],
+      "module_path": "codex_runtime",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-07",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         }
       ],
@@ -135,7 +189,7 @@
     },
     "CodexRuntimeProvisionService": {
       "action": "add",
-      "docs": "Adds a synchronous `CodexRuntimeProvisionService` aligned with `CodexRuntimeProvisionPort`; the one-shot CLI call completes before return. IN-01, AC-01, AC-02.",
+      "docs": "Change `CodexRuntimeProvisionService::provision` to accept the optional requested root and explicit invocation directory. IN-01, IN-06, AC-01, AC-02, AC-07.",
       "informal_grounds": [],
       "methods": [
         {
@@ -145,6 +199,10 @@
           "params": [
             {
               "name": "project_root",
+              "ty": "Option<&std::path::Path>"
+            },
+            {
+              "name": "invocation_directory",
               "ty": "&std::path::Path"
             }
           ],
@@ -167,6 +225,14 @@
         },
         {
           "anchor": "AC-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-07",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         }
       ],
@@ -309,6 +375,40 @@
     }
   },
   "types": {
+    "CodexRuntimeProjectRootDiscoveryError": {
+      "action": "add",
+      "docs": "Add `CodexRuntimeProjectRootDiscoveryError` for the discovery-port failure boundary. IN-06, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "GitRootDiscoveryFailed",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "codex_runtime",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        }
+      ]
+    },
     "CodexRuntimeProvisionError": {
       "action": "add",
       "docs": "Reports an observable failure while resolving or updating the repository-local Codex runtime link.",
@@ -351,6 +451,15 @@
               ],
               "kind": "tuple"
             }
+          },
+          {
+            "name": "ProjectRootDiscoveryFailed",
+            "payload": {
+              "fields": [
+                "CodexRuntimeProjectRootDiscoveryError"
+              ],
+              "kind": "tuple"
+            }
           }
         ]
       },
@@ -371,12 +480,20 @@
         {
           "anchor": "GO-02",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         }
       ]
     },
     "CodexRuntimeProvisionInteractor": {
       "action": "add",
-      "docs": "Implements the provisioning use case by delegating link materialization to the secondary port.",
+      "docs": "Change `CodexRuntimeProvisionInteractor` to coordinate root discovery and provisioning behind one application-service invocation. IN-01, IN-06, AC-01, AC-02, AC-07.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -402,6 +519,14 @@
         },
         {
           "anchor": "AC-02",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
+        },
+        {
+          "anchor": "AC-07",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         }
       ]

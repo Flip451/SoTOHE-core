@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "1592641767ddaa0d6172dabb15ef1850b807a2fe78e3fcb438ff65b3b9b2f94d",
+  "catalogue_declaration_hash": "5637e60354f56ed6f6bbab57e0ef4b992a06ca752220c455d1ab01cc61bdeaa1",
   "signals": [
     {
       "type_name": "CodexRuntimeCompositionRoot",
       "signal": "blue",
-      "entry_hash": "4f96709578d791c0c19b73c3b5166b47a93ad36ed0af585b33eaace602009853"
+      "entry_hash": "333ee0a393f240d09674785c4547ddced4d5fd075e3abc836ba386f8345372de"
     }
   ]
 }

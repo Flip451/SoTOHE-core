@@ -7,7 +7,10 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
-use usecase::codex_runtime::{CodexRuntimeProvisionError, CodexRuntimeProvisionPort};
+use usecase::codex_runtime::{
+    CodexRuntimeProjectRootDiscoveryError, CodexRuntimeProjectRootDiscoveryPort,
+    CodexRuntimeProvisionError, CodexRuntimeProvisionPort,
+};
 
 const CODEX_NAME: &str = "codex";
 const NPM_NAME: &str = "npm";
@@ -15,6 +18,62 @@ const RUNTIME_LINK: &str = ".harness/tools/bin/codex";
 const RUNTIME_PROBE_TIMEOUT: Duration = Duration::from_secs(5);
 const RUNTIME_PROBE_MAX_OUTPUT_BYTES: usize = 64 * 1024;
 static NEXT_TEMPORARY_ID: AtomicU64 = AtomicU64::new(0);
+
+/// Git-backed discovery adapter for implicit Codex runtime provisioning roots.
+pub struct GitCodexRuntimeProjectRootDiscoveryAdapter;
+
+impl GitCodexRuntimeProjectRootDiscoveryAdapter {
+    /// Create the Git-backed project-root discovery adapter.
+    #[must_use]
+    pub fn new() -> GitCodexRuntimeProjectRootDiscoveryAdapter {
+        GitCodexRuntimeProjectRootDiscoveryAdapter
+    }
+}
+
+impl Default for GitCodexRuntimeProjectRootDiscoveryAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl CodexRuntimeProjectRootDiscoveryPort for GitCodexRuntimeProjectRootDiscoveryAdapter {
+    fn discover_from(
+        &self,
+        start_directory: &Path,
+    ) -> Result<PathBuf, CodexRuntimeProjectRootDiscoveryError> {
+        let mut command = Command::new("git");
+        command.args(["rev-parse", "--show-toplevel"]);
+        command.current_dir(start_directory);
+        let output = crate::capability_exec::process::run_command_with_bounded_output(
+            &mut command,
+            RUNTIME_PROBE_MAX_OUTPUT_BYTES,
+            RUNTIME_PROBE_TIMEOUT,
+            "git rev-parse --show-toplevel",
+        )
+        .map_err(|error| {
+            CodexRuntimeProjectRootDiscoveryError::GitRootDiscoveryFailed(diagnostic(format!(
+                "failed to discover Git project root: {error}"
+            )))
+        })?;
+        if !output.status.success() {
+            return Err(CodexRuntimeProjectRootDiscoveryError::GitRootDiscoveryFailed(diagnostic(
+                format!(
+                    "Git root discovery exited with {}{}",
+                    output.status,
+                    stderr_detail(&output.stderr)
+                ),
+            )));
+        }
+
+        let root = String::from_utf8_lossy(&output.stdout).trim().to_owned();
+        if root.is_empty() {
+            return Err(CodexRuntimeProjectRootDiscoveryError::GitRootDiscoveryFailed(diagnostic(
+                "Git root discovery returned an empty project root".to_owned(),
+            )));
+        }
+        Ok(PathBuf::from(root))
+    }
+}
 
 /// Filesystem adapter that verifies and links the Codex runtime for one repository.
 pub struct FsCodexRuntimeProvisioner;
@@ -467,10 +526,13 @@ mod tests {
     use std::fs;
     use std::os::unix::fs::PermissionsExt as _;
     use std::path::{Path, PathBuf};
+    use std::process::Command;
 
-    use usecase::codex_runtime::{CodexRuntimeProvisionError, CodexRuntimeProvisionPort};
+    use usecase::codex_runtime::{
+        CodexRuntimeProjectRootDiscoveryPort, CodexRuntimeProvisionError, CodexRuntimeProvisionPort,
+    };
 
-    use super::FsCodexRuntimeProvisioner;
+    use super::{FsCodexRuntimeProvisioner, GitCodexRuntimeProjectRootDiscoveryAdapter};
 
     fn executable(path: &Path, body: &str) {
         fs::write(path, body).expect("test executable must be written");
@@ -482,6 +544,25 @@ mod tests {
 
     fn path_of(paths: &[PathBuf]) -> OsString {
         std::env::join_paths(paths).expect("test PATH must be valid")
+    }
+
+    #[test]
+    fn test_git_project_root_discovery_returns_root_from_subdirectory() {
+        let fixture = tempfile::tempdir().expect("fixture must be created");
+        let repository_root = fixture.path().join("repository");
+        let git_init = Command::new("git")
+            .args(["init", "--quiet"])
+            .arg(&repository_root)
+            .output()
+            .expect("git init must run");
+        assert!(git_init.status.success(), "git init must create fixture repository");
+        let subdirectory = repository_root.join("nested/command");
+        fs::create_dir_all(&subdirectory).expect("fixture subdirectory must be created");
+        let root = GitCodexRuntimeProjectRootDiscoveryAdapter::new()
+            .discover_from(&subdirectory)
+            .expect("discovery must return the fixture repository root");
+
+        assert_eq!(root, repository_root);
     }
 
     #[test]

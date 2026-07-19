@@ -3,7 +3,7 @@
   "entries": [
     {
       "claim_hash": "a802a1702d6ad8f3596dba2af9e15632232ade4546ef751f2e545c26aef96854",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
         "citation": "`cargo make bootstrap` に codex 配備ステップを追加する。"
@@ -26,10 +26,10 @@
     },
     {
       "claim_hash": "a802a1702d6ad8f3596dba2af9e15632232ade4546ef751f2e545c26aef96854",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
-        "citation": "codex を spawn する全経路は、project root 相対の配備リンクが存在し実行可能ならそれを使い、なければ従来どおり OS PATH へ委譲する。この規約は入れ子（外側 fixer 内で起動される内側 reviewer の解決）でも同一に成立する — 配備リンクは project root 相対であり、実 HOME にも呼び出し元の PATH にも依存しないため、サニタイズ環境・外側 sandbox の下でも解決できる。"
+        "citation": "codex を spawn する全経路は、project root 相対の配備リンクが存在し実行可能ならそれを使い、なければ従来どおり OS PATH へ委譲する。この規約は入れ子（外側 fixer 内で起動される内側 reviewer の解決）でも同一に成立する"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -49,7 +49,7 @@
     },
     {
       "claim_hash": "a5dfe453fd3a72f783343e1b7c3b3dcb08e6f50f1a568c3c9fd610dc02e80bf0",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
         "citation": "サニタイズ環境で起動した codex 子プロセスが失敗した場合、利用者向けエラーに最低限 (a) 子プロセスの exit code、(b) セッションログのパス、を含める。配備リンクが存在しない または dangling で、PATH fallback も失敗した場合は、`cargo make bootstrap` の（再）実行による再解決を案内する。"
@@ -72,7 +72,7 @@
     },
     {
       "claim_hash": "4962bd783441ab4fc6f505d289f478034f5f6db810f2bc4613b77a7f447a2bca",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
         "citation": "`cargo make bootstrap` に codex 配備ステップを追加する。ステップは**通常環境**（shim が正常に機能する環境）で次を行う:"
@@ -95,10 +95,10 @@
     },
     {
       "claim_hash": "032232e8e137e32021342a868c9a95937cf0bde1a45b4f7c56821403881225d3",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
-        "citation": "2. プローブが失敗する候補（shim 等の環境依存エントリ）しか無い場合、codex の公式配布チャネルである npm に通常環境で問い合わせ、**公開インターフェースのみ**を使ってエントリを特定する: `npm prefix -g`（documented なコマンド）が返す prefix の `bin/codex`（パッケージが `bin` として宣言し npm が配置する公開エントリ）。パッケージ内部（`node_modules` 配下の vendored バイナリ等、`bin` 宣言外のファイル）には触れない。"
+        "citation": "パッケージ内部（`node_modules` 配下の vendored バイナリ等、`bin` 宣言外のファイル）には触れない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -118,7 +118,7 @@
     },
     {
       "claim_hash": "a7200526d3440201e47c980c79c40df291f19f0b8fd4577e2a5686be5bb452c8",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
         "citation": "codex を spawn する全経路は、project root 相対の配備リンクが存在し実行可能ならそれを使い、なければ従来どおり OS PATH へ委譲する。この規約は入れ子（外側 fixer 内で起動される内側 reviewer の解決）でも同一に成立する"
@@ -141,10 +141,10 @@
     },
     {
       "claim_hash": "a3968baeec4add674888fa21e049b5d34c8469e3d67c26073c84affbc5d4b2d5",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
-        "citation": "`review_fix_runner` の実行時 `CODEX_BIN` 参照を削除する。… テスト専用 `SOTP_CODEX_BIN`（`#[cfg(test)]）は維持する。」「`dry_fix_local/env.rs` の `resolve_codex_via_asdf` と asdf 用 env 引き継ぎを削除し、…逸脱を解消する。」「ソース `Makefile.toml` と配布 `overlay/Makefile.toml` の `CODEX_BIN=\"${CODEX_BIN:-…}\"` インライン解決行を撤去し"
+        "citation": "「review_fix_runner」の実行時 `CODEX_BIN` 参照を削除する。… テスト専用 `SOTP_CODEX_BIN`（`#[cfg(test)]`）は維持する。\\n- `dry_fix_local/env.rs` の `resolve_codex_via_asdf` と asdf 用 env 引き継ぎを削除し、…\\n- ソース `Makefile.toml` と配布 `overlay/Makefile.toml` の `CODEX_BIN=\"${CODEX_BIN:-…}\"` インライン解決行を撤去し"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -164,7 +164,7 @@
     },
     {
       "claim_hash": "c81d8e4ef129559c7f7332968128c1784012f8798cf4dc06a4e94bc96af65a43",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
         "citation": "また、spawn の成否によらず、セッションログに**解決に使った実体パス（リンクの場合は canonicalize 後）と `codex --version` の結果**を記録する。"
@@ -186,8 +186,31 @@
       }
     },
     {
+      "claim_hash": "b0717c13788ff61718f4f864dfaf71b9c34b1fd3bd38fd42e626eeb882082ad8",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
+      "verdict": {
+        "kind": "pass",
+        "citation": "明示的な `--project-root` があればその値を優先する。指定がなければ invocation directory から Git root を探索し、発見した root を配備先の project root とする。Git repository 外で探索に失敗した場合は、成功として扱わず、`CommandOutcome` を通じて typed failure を報告する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`sotp codex-runtime provision` は `--project-root` が明示された場合にその値を配備先の project root として使い、省略された場合は任意の repository subdirectory を current working directory として Git root を発見し、その root 配下の repo-local link に配備する。Git root を発見できない場合は typed `CommandOutcome` failure として報告する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-18-1359-codex-resolve-and-link-provisioning.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
       "claim_hash": "f0cd474db753d12fc9188e561f55408aadddfcda73647a190b023ce22f4c0ad4",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
         "citation": "初版は実障害が確認された Linux を対象とし、symlink 前提で実装する。他プラットフォーム（symlink 制約のある環境ではコピー配備等の代替）、バージョン再現性が必要になった場合の pin モード（checksum つき固定配備）の追加はスコープ外とし、Reassess When に送る。"
@@ -210,10 +233,10 @@
     },
     {
       "claim_hash": "c0b52aa4ec2e53889d62b817c121f5aa395e30be46b20ba3b676a115b82ccac5",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
-        "citation": "実体の複製・ダウンロード・checksum 固定は行わない。"
+        "citation": "配備先は repo-local（例: `.harness/tools/bin/codex`、gitignored）の**シンボリックリンク**とする。実体の複製・ダウンロード・checksum 固定は行わない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -233,7 +256,7 @@
     },
     {
       "claim_hash": "c0b52aa4ec2e53889d62b817c121f5aa395e30be46b20ba3b676a115b82ccac5",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
         "citation": "他プラットフォーム（symlink 制約のある環境ではコピー配備等の代替）、バージョン再現性が必要になった場合の pin モード（checksum つき固定配備）の追加はスコープ外とし、Reassess When に送る。"
@@ -256,7 +279,7 @@
     },
     {
       "claim_hash": "6f46ba8c8ba0419a09de23d5d15aaa2c9d29e460052d28305d560a34e36f7d9b",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
         "citation": "実 HOME にも呼び出し元の PATH にも依存しないため、サニタイズ環境・外側 sandbox の下でも解決できる。"
@@ -279,10 +302,10 @@
     },
     {
       "claim_hash": "9dc7df3df2503fe6bd3d2538a1303eda91df5e6c06dd8862ac298244cbbd3643",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
-        "citation": "「配備先は repo-local（例: `.harness/tools/bin/codex`、gitignored）の**シンボリックリンク**とする。実体の複製・ダウンロード・checksum 固定は行わない。」"
+        "citation": "配備先は repo-local（例: `.harness/tools/bin/codex`、gitignored）の**シンボリックリンク**とする。実体の複製・ダウンロード・checksum 固定は行わない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -302,7 +325,7 @@
     },
     {
       "claim_hash": "57dc7969f726c54fb7356a1d62f6ddeb24218265896fdcc577d3387e5267473c",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
         "citation": "child PATH への親ディレクトリ前置（colocated runtime の発見用）は、**リンクが指す 解決エントリ（bootstrap が記録した公開エントリパス）の親ディレクトリ**に対して行う。... エントリを最終実体まで canonicalize した親（パッケージ内部の `bin/` ディレクトリ）を使ってはならない"
@@ -325,10 +348,10 @@
     },
     {
       "claim_hash": "53facdbd08c3581170ef4a052bd776af54fe1a73167c7765a450fee9a2778e66",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
-        "citation": "「リンクが dangling（リンク先消失 — 例: マネージャ側の runtime バージョン更新でパスが変わった）の場合は『配備なし』と同義に扱い、PATH fallback を試した上で D4 の案内へつなげる。黙って壊れた状態で spawn しない。」"
+        "citation": "リンクが dangling（リンク先消失 — 例: マネージャ側の runtime バージョン更新でパスが変わった）の場合は「配備なし」と同義に扱い、PATH fallback を試した上で D4 の案内へつなげる。黙って壊れた状態で spawn しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -348,7 +371,7 @@
     },
     {
       "claim_hash": "53facdbd08c3581170ef4a052bd776af54fe1a73167c7765a450fee9a2778e66",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
         "citation": "配備リンクが存在しない または dangling で、PATH fallback も失敗した場合は、`cargo make bootstrap` の（再）実行による再解決を案内する。"
@@ -371,7 +394,7 @@
     },
     {
       "claim_hash": "cb1ebe21f52caa9dd5db8b0016120778db6e7ae991c2653a73a5d25b26b3fc2e",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
         "citation": "`npm prefix -g`（documented なコマンド）が返す prefix の `bin/codex`（パッケージが `bin` として宣言し npm が配置する公開エントリ）。特定したエントリを D2 の前置規則込みで同じプローブに通し、通った場合のみリンクする。"
@@ -394,7 +417,7 @@
     },
     {
       "claim_hash": "0e91149840eb2c0608435a477743725eca0997507e540abf72c22966e65c073d",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
         "citation": "3. いずれも成立しない場合は、actionable なエラー（何をプローブしてなぜ失敗したか、利用者が取れる選択肢）で停止する。"
@@ -417,10 +440,10 @@
     },
     {
       "claim_hash": "5d862bdc31c414499fcb0bbfa2e15c808b6f63f015ab5be6c547329dcdd5d921",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
-        "citation": "codex を spawn する全経路は、project root 相対の配備リンクが存在し実行可能ならそれを使い、なければ従来どおり OS PATH へ委譲する。"
+        "citation": "codex を spawn する全経路は、project root 相対の配備リンクが存在し実行可能ならそれを使い、なければ従来どおり OS PATH へ委譲する。この規約は入れ子（外側 fixer 内で起動される内側 reviewer の解決）でも同一に成立する"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -440,7 +463,7 @@
     },
     {
       "claim_hash": "c471384c0703ad5ae3a9555a488f81bf6b0238ac2e8152de8e971af96a137cee",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
         "citation": "child PATH への親ディレクトリ前置（colocated runtime の発見用）は、リンクが指す解決エントリ（bootstrap が記録した公開エントリパス）の親ディレクトリに対して行う。"
@@ -463,10 +486,10 @@
     },
     {
       "claim_hash": "c25fcdfd04e1f211c57b75c593c3d953642bb49af3958dd8361b92d9e0e96080",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
-        "citation": "`review_fix_runner` の実行時 `CODEX_BIN` 参照を削除する... テスト専用 `SOTP_CODEX_BIN`（`#[cfg(test)]`）は維持する。"
+        "citation": "- `review_fix_runner` の実行時 `CODEX_BIN` 参照を削除する（`8a981fe` が設けた外部注入契約は D1/D2 により不要になる）。ref-verify で確立済みの「env var によるバイナリ解決はアンチパターン」制約を fixer 系にも一般化する。テスト専用 `SOTP_CODEX_BIN`（`#[cfg(test)]`）は維持する。\n- `dry_fix_local/env.rs` の `resolve_codex_via_asdf` と asdf 用 env 引き継ぎを削除し、2026-06-01 の toolchain-manager-agnostic 決定への逸脱を解消する。\n- ソース `Makefile.toml` と配布 `overlay/Makefile.toml` の `CODEX_BIN=\"${CODEX_BIN:-…}\"` インライン解決行を撤去し、素の `bin/sotp …` 呼び出しへ戻す。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -486,10 +509,10 @@
     },
     {
       "claim_hash": "00abe7a43e0cb3407f11091b8d4af0c1e62d0dcc5d4f13441276a00e9a5d8df4",
-      "evidence_hash": "52c1325ee4b3b1429fc0d1a1bc4d2db20698656fe486f5e586782cbc9d235451",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
       "verdict": {
         "kind": "pass",
-        "citation": "サニタイズ環境で起動した codex 子プロセスが失敗した場合、利用者向けエラーに最低限\n(a) 子プロセスの exit code、(b) セッションログのパス、を含める。配備リンクが存在しない\nまたは dangling で、PATH fallback も失敗した場合は、`cargo make bootstrap` の（再）実行に\nよる再解決を案内する。"
+        "citation": "サニタイズ環境で起動した codex 子プロセスが失敗した場合、利用者向けエラーに最低限 (a) 子プロセスの exit code、(b) セッションログのパス、を含める。配備リンクが存在しない または dangling で、PATH fallback も失敗した場合は、`cargo make bootstrap` の（再）実行による再解決を案内する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -504,6 +527,29 @@
         "data": {
           "file_path": "knowledge/adr/2026-07-18-1359-codex-resolve-and-link-provisioning.md",
           "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "eaf0cb5be3014bb561f1a1d257512f579c1b3bb0f5d21637384c5a7f5f2091a6",
+      "evidence_hash": "8fb4ccd4d00d81ca143cd856910decea0f7992f2f19e01e5edd506de36640ced",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp codex-runtime provision` は、明示的な `--project-root` があればその値を優先する。指定がなければ invocation directory から Git root を探索し、発見した root を配備先の project root とする。Git repository 外で探索に失敗した場合は、成功として扱わず、`CommandOutcome` を通じて typed failure を報告する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "From any subdirectory of a Git repository, invoking `sotp codex-runtime provision` without `--project-root` discovers that repository's Git root and provisions the repo-local codex link under it. An explicit `--project-root` takes precedence over discovery. Invoking without the option outside a discoverable Git repository reports a typed `CommandOutcome` failure and does not provision a link."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-18-1359-codex-resolve-and-link-provisioning.md",
+          "decision_id": "D6"
         }
       }
     }

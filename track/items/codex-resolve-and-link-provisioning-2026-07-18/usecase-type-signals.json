@@ -1,9 +1,26 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-18T10:00:40Z",
-  "declaration_hash": "0952e0969c5e9d6a21b00c01095d0c4231a85a7aea0984ac0f3b47408be1a201",
-  "implementation_input_hash": "a5928ef8cb44616971dd2fa37e6de6a9538bee6ac93d6bb912bd0efcf67a9797",
+  "generated_at": "2026-07-18T16:59:28Z",
+  "declaration_hash": "7cccd79861a7b25f95cb2a434ce343db9f93e511505cf5650d6f2ea7ff2377f5",
+  "implementation_input_hash": "00be805a825c646ad05034ff907c3347e897fabceecc4acb1db77c33fd436787",
   "signals": [
+    {
+      "type_name": "CodexRuntimeProjectRootDiscoveryError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "CodexRuntimeProjectRootDiscoveryPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "CodexRuntimeProvisionError",
       "kind_tag": "error_type",

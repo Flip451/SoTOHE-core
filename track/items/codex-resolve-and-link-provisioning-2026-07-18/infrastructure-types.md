@@ -22,6 +22,7 @@
 | CodexReviewFixRunner | secondary_adapter | modify | impl ReviewFixRunner | 🔵 | 🔵 |
 | CodexReviewer | secondary_adapter | modify | impl Reviewer | 🔵 | 🔵 |
 | FsCodexRuntimeProvisioner | secondary_adapter | add | impl CodexRuntimeProvisionPort, impl Default | 🔵 | 🔵 |
+| GitCodexRuntimeProjectRootDiscoveryAdapter | secondary_adapter | add | impl CodexRuntimeProjectRootDiscoveryPort, impl Default | 🔵 | 🔵 |
 
 ## Free Functions
 

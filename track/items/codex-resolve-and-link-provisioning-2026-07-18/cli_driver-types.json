@@ -61,7 +61,7 @@
   "types": {
     "CodexRuntimeDriver": {
       "action": "add",
-      "docs": "Adapts a validated CLI provisioning request to the Codex runtime provisioning service.",
+      "docs": "Change `CodexRuntimeDriver` to capture the invocation directory, invoke one provisioning application service, and render capture or service results. IN-06, AC-07.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -78,18 +78,18 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-01",
+          "anchor": "IN-06",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         },
         {
-          "anchor": "GO-02",
+          "anchor": "AC-07",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         }
       ]
     },
     "CodexRuntimeInput": {
       "action": "add",
-      "docs": "Carries the typed repository root from the CLI boundary into the provisioning driver.",
+      "docs": "Change `CodexRuntimeInput` to carry the provisioning request. IN-06, AC-07.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -97,7 +97,7 @@
           "fields": [
             {
               "name": "project_root",
-              "ty": "std::path::PathBuf"
+              "ty": "Option<std::path::PathBuf>"
             }
           ],
           "has_stripped_fields": false,
@@ -111,15 +111,11 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-01",
+          "anchor": "IN-06",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         },
         {
-          "anchor": "AC-01",
-          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
-        },
-        {
-          "anchor": "AC-02",
+          "anchor": "AC-07",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         }
       ]

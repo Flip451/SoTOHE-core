@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 19, yellow: 0, red: 0 }
+signals: { blue: 21, yellow: 0, red: 0 }
 ---
 
 # codex reviewer runtime の bootstrap 解決リンク（resolve & link）配備
@@ -19,6 +19,7 @@ signals: { blue: 19, yellow: 0, red: 0 }
 - [IN-03] review fixer、dry-fix、およびそれらが起動する nested reviewer を含む全 codex spawn 経路で、project-root 相対の repo-local link を最初に使い、存在しない・実行不能・dangling の場合だけ OS PATH に fallback する共通の解決規約を適用する。 [adr: knowledge/adr/2026-07-18-1359-codex-resolve-and-link-provisioning.md#D2] [tasks: T002]
 - [IN-04] runtime の `CODEX_BIN` 読み取り、`resolve_codex_via_asdf` と asdf 向け環境引き継ぎ、source / overlay Makefile の `CODEX_BIN` inline 解決を撤去する。`#[cfg(test)]` のテスト専用 `SOTP_CODEX_BIN` は維持する。 [adr: knowledge/adr/2026-07-18-1359-codex-resolve-and-link-provisioning.md#D3] [tasks: T002, T004]
 - [IN-05] サニタイズ環境で起動した codex の失敗報告と session log に、復旧・実行経路の判断に必要な情報を記録する。 [adr: knowledge/adr/2026-07-18-1359-codex-resolve-and-link-provisioning.md#D4] [tasks: T002]
+- [IN-06] `sotp codex-runtime provision` は `--project-root` が明示された場合にその値を配備先の project root として使い、省略された場合は任意の repository subdirectory を current working directory として Git root を発見し、その root 配下の repo-local link に配備する。Git root を発見できない場合は typed `CommandOutcome` failure として報告する。 [adr: knowledge/adr/2026-07-18-1359-codex-resolve-and-link-provisioning.md#D6] [tasks: T001, T003]
 
 ### Out of Scope
 - [OUT-01] Linux 以外または symlink 制約のあるプラットフォーム向けのコピー配備など、symlink を代替する配備方式は初版の対象外とする。 [adr: knowledge/adr/2026-07-18-1359-codex-resolve-and-link-provisioning.md#D5]
@@ -37,16 +38,16 @@ signals: { blue: 19, yellow: 0, red: 0 }
 - [ ] [AC-04] When the repo-local link is selected, the spawned child's PATH begins with the recorded public-entry parent directory, so the selected launcher finds its colocated runtime without depending on a sanitized HOME-compatible shim. [adr: knowledge/adr/2026-07-18-1359-codex-resolve-and-link-provisioning.md#D2] [tasks: T002]
 - [ ] [AC-05] Production codex resolution no longer reads runtime `CODEX_BIN`, invokes asdf resolution, or injects asdf-specific environment values; source and overlay Makefiles no longer contain `CODEX_BIN` inline resolution, while test-only `SOTP_CODEX_BIN` behavior remains available under test configuration. [adr: knowledge/adr/2026-07-18-1359-codex-resolve-and-link-provisioning.md#D3] [tasks: T002, T004]
 - [ ] [AC-06] A failed sanitized codex child reports its exit code and session-log path. If no valid link and no PATH fallback are available, that report also directs the user to rerun `cargo make bootstrap`; the session log records the resolved real path and the result of `codex --version` for every spawn outcome. [adr: knowledge/adr/2026-07-18-1359-codex-resolve-and-link-provisioning.md#D4] [tasks: T002]
+- [ ] [AC-07] From any subdirectory of a Git repository, invoking `sotp codex-runtime provision` without `--project-root` discovers that repository's Git root and provisions the repo-local codex link under it. An explicit `--project-root` takes precedence over discovery. Invoking without the option outside a discoverable Git repository reports a typed `CommandOutcome` failure and does not provision a link. [adr: knowledge/adr/2026-07-18-1359-codex-resolve-and-link-provisioning.md#D6] [tasks: T001, T003]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/coding-principles.md#Rules
 - knowledge/conventions/prefer-type-safe-abstractions.md#Rules
 - knowledge/conventions/enforce-by-mechanism.md#Rules
 - knowledge/conventions/responsibility-boundary.md#Rules
-- knowledge/conventions/no-upstream-restatement.md#Rules
 
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 19  🟡 0  🔴 0
+🔵 21  🟡 0  🔴 0
 

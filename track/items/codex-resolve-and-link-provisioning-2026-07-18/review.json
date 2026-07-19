@@ -1,21 +1,79 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
+    "spec": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
-          "at": "2026-07-18T09:37:11Z"
+          "hash": "rvw1:sha256:e3b3b030697c860bee185cbe3d950f8b3078fe5f97fd91b674954807385d2fd3",
+          "at": "2026-07-18T07:13:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-02 の「actionable diagnostic」は判定条件が定義されておらず、決定論的に検証できません。D1 が要求する「何をプローブしたか」「なぜ失敗したか」「利用者が取れる選択肢」が AC 本文に含まれないため、汎用エラーを表示してリンク作成を避けるだけの実装でも合格し得ます。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json",
+              "line": 176,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:e3b3b030697c860bee185cbe3d950f8b3078fe5f97fd91b674954807385d2fd3",
+          "at": "2026-07-18T07:18:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
-          "at": "2026-07-18T09:41:57Z"
+          "hash": "rvw1:sha256:9fe41c734e9640c6861c7addc7dac3f47734619eecf14a177b69c4f6f6f22b12",
+          "at": "2026-07-18T07:20:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7142169eddaac2956c386f6632c92e845cd66c727bbb89cd2b388c60c4a98ea",
+          "at": "2026-07-18T15:55:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`related_conventions` にある `no-upstream-restatement.md` は、自身の Scope で `spec.json` を明示的に適用外とし、impl-plan と型カタログだけを対象としている。この spec に対する規範としては自己明白に無関係なので、参照を削除する必要がある。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json",
+              "line": 263,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:f7142169eddaac2956c386f6632c92e845cd66c727bbb89cd2b388c60c4a98ea",
+          "at": "2026-07-18T15:59:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6348686ad7a9d11758fbca3b79d2f1fc1fca4f5e7c07c91eb6e6e08aec900e7",
+          "at": "2026-07-18T16:01:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0324ccad099abcddc4388120fe41ebf6cb25fe203be6b9da3c3916096fe42493",
+          "at": "2026-07-19T00:37:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0324ccad099abcddc4388120fe41ebf6cb25fe203be6b9da3c3916096fe42493",
+          "at": "2026-07-19T00:38:14Z"
         }
       ]
     },
@@ -150,6 +208,648 @@
           "findings": [],
           "hash": "rvw1:sha256:97397f5c554974a93727d89340d79ea6cda3534ac779ea9cb92a6d5114b0102b",
           "at": "2026-07-18T10:20:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01b582202a791e3cbcdc2545a8be3312f8d416fdbdb37fb446ce6dd9dddb60bb",
+          "at": "2026-07-18T14:28:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::commands::codex_runtime::resolve_provision_project_root` と `CodexRuntimeProvisionArgs::project_root` は、`None` を「プロセス作業ディレクトリから Git root を探索する」という新しい分岐として定義していますが、参照先の IN-01／AC-01／AC-02 は Codex 候補の検証・リンク配備を規定するだけで、この CLI 省略時契約を規定していません。該当する upstream spec 要素で根拠付けるか、未規定の分岐を型契約から除いてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli-types.json",
+              "line": 64,
+              "category": "SoT integrity"
+            },
+            {
+              "message": "`CodexRuntimeCompositionRoot` に `discover_project_root` を追加すると、純粋な DI を担う `CompositionRoot` が外部リポジトリ探索まで実行し、driver 配線と探索という別々の責務を同じ unit struct に束ねます。`type-designer-kind-selection.md` R1 の CompositionRoot 契約に従い、探索は port／adapter 境界へ置き、composition root はそれを配線して返すだけにしてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli_composition-types.json",
+              "line": 17,
+              "category": "Single Responsibility violation"
+            },
+            {
+              "message": "`CodexRuntimeCompositionRoot::discover_project_root` は実際には `CompositionError::Infrastructure` しか生成できないのに、5用途を共有する `CompositionError` を返すため、呼び出し側に `ConfigLoad`、`AdapterInit`、`WiringFailed`、`Usecase` という到達不能な variant まで扱わせます。entry docs に生成可能 subset の記載や共有型を使う根拠もないため、探索専用の精密な error 型を宣言してください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli_composition-types.json",
+              "line": 19,
+              "category": "per-method error imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:01b582202a791e3cbcdc2545a8be3312f8d416fdbdb37fb446ce6dd9dddb60bb",
+          "at": "2026-07-18T14:35:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::commands::codex_runtime::execute` docs restate the upstream dispatch/precedence/rendering behavior instead of referring to the spec anchor; replace the behavioral prose with an anchor-only intent per `no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli-types.json",
+              "line": 7,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeProvisionArgs` docs restate the optional-root precedence and discovery behavior from the spec; the catalogue should cite the upstream contract rather than reproduce it.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli-types.json",
+              "line": 430,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeCompositionRoot` docs restate the complete wiring and non-invocation behavior; this is upstream design rationale/contract and should be represented by anchor references only.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli_composition-types.json",
+              "line": 46,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeDriver` docs restate root precedence, service orchestration, rendering, and dependency-boundary rationale; replace the prose contract with upstream anchor references.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli_driver-types.json",
+              "line": 68,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeInput` docs restate explicit-vs-discovered root behavior; this duplicates the upstream behavioral contract and should use anchor references instead.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli_driver-types.json",
+              "line": 94,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`GitCodexRuntimeProjectRootDiscoveryAdapter` docs restate its failure mapping and injection topology; these are upstream design/behavior details that should be referenced by anchors rather than repeated.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
+              "line": 610,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeProjectRootDiscoveryPort` docs restate the application-boundary and caller topology; this upstream architecture rationale should not be duplicated in the catalogue docs.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+              "line": 127,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeProjectRootDiscoveryService` docs restate boundary leakage prevention, precedence, and rendering behavior belonging to the upstream contract; use anchor references instead.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+              "line": 155,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeProjectRootDiscoveryError` docs restate the failure semantics, construction path, propagation, and CLI rendering contract; the catalogue should cite the spec rather than reproduce it.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+              "line": 411,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeProjectRootDiscoveryInteractor` docs restate the delegation and sanctioned-boundary rationale from the upstream design; replace this prose with anchor references.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+              "line": 443,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e7a06b7e41764deb26d8125eb199c6d7cdad3a110c0472602b78e2bd1fb26855",
+          "at": "2026-07-18T15:56:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::commands::codex_runtime::execute` の `docs` が引数変換、root を解決しないこと、driver 呼び出し、exit-code 変換という挙動を散文で再記述しています。`no-upstream-restatement.md` に従い、変更対象・操作と IN-06／AC-07 の参照だけにしてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli-types.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeProvisionArgs` の `docs` が explicit root の優先と `None` 時の Git-root discovery という IN-06／AC-07 の契約を再記述しています。挙動本文を削除し、anchor 参照に置き換えてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli-types.json",
+              "line": 432,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeCompositionRoot` の `docs` が adapter→interactor→service→driver の完全な配線手順と非実行契約を再記述しています。`no-upstream-restatement.md` に従い、composition 対象と anchor 参照だけにしてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli_composition-types.json",
+              "line": 39,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeDriver` の `docs` が root の優先順位、discovery/provisioning の実行、失敗の rendering、依存境界の理由を再記述しています。これらは IN-06／AC-07 を参照し、catalogue では変更対象と役割だけを記述してください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli_driver-types.json",
+              "line": 68,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeInput` の `docs` が `Some` と `None` の優先・discovery 挙動を再記述しています。型の目的と IN-06／AC-07 の anchor 参照だけにしてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/cli_driver-types.json",
+              "line": 96,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`GitCodexRuntimeProjectRootDiscoveryAdapter` の `docs` が `SystemGitRepo::discover` の再利用、failure mapping、DiagnosticMessage 構築、injection topology を散文で再記述しています。変更対象と IN-06／AC-07 の参照だけにしてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/infrastructure-types.json",
+              "line": 610,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeProjectRootDiscoveryPort` の `docs` が current-directory discovery と interactor／driver 間の境界構成を再記述しています。`no-upstream-restatement.md` に従い、port の追加と IN-06／AC-07 の参照だけにしてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+              "line": 129,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeProjectRootDiscoveryPort::discover` は Git プロセスを伴う外部 I/O port ですが、`is_async: false` であり、entry docs に同期・blocking 境界を選ぶ理由がありません。同期選択を明記するか async 化し、`CodexRuntimeProjectRootDiscoveryService` と実行色を揃えてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+              "line": 134,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "`CodexRuntimeProjectRootDiscoveryService` の `docs` が SecondaryPort の非漏洩、explicit-over-discovered precedence、CommandOutcome rendering を再記述しています。型の追加と IN-06／AC-07 の参照だけにしてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+              "line": 162,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeProjectRootDiscoveryError` の `docs` が失敗条件、adapter での構築、service での伝搬、driver での rendering まで再記述しています。挙動本文を upstream anchor 参照に置き換えてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+              "line": 413,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CodexRuntimeProjectRootDiscoveryInteractor` の `docs` が port への委譲と「sanctioned application-service boundary」という設計理由を再記述しています。`no-upstream-restatement.md` に従い、実装対象と IN-06／AC-07 の参照だけにしてください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+              "line": 447,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e7a06b7e41764deb26d8125eb199c6d7cdad3a110c0472602b78e2bd1fb26855",
+          "at": "2026-07-18T16:03:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b27d8b3094931d224d8bdb04d9b1ce1344e5dce8235c1b53aeeac97af36cb7ea",
+          "at": "2026-07-18T16:51:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodexRuntimeProjectRootDiscoveryPort::discover_from` は Git subprocess を実行する外部 I/O port ですが、`is_async: false` であり、entry docs に同期・blocking 境界を選ぶ理由がありません。async 化するか、one-shot の bounded blocking operation として同期実行を選ぶ契約を明記してください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+              "line": 117,
+              "category": "sync/async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:b27d8b3094931d224d8bdb04d9b1ce1344e5dce8235c1b53aeeac97af36cb7ea",
+          "at": "2026-07-18T16:55:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5c83c210779cc80c4924a882f8fde9341ee88946109d65da7ba2420df275678",
+          "at": "2026-07-18T17:10:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5c83c210779cc80c4924a882f8fde9341ee88946109d65da7ba2420df275678",
+          "at": "2026-07-18T17:12:17Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71b3db4a1c44e54048039ed353e5194fd13cb7262fce45a603ff95ae7025b4fa",
+          "at": "2026-07-18T09:37:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71b3db4a1c44e54048039ed353e5194fd13cb7262fce45a603ff95ae7025b4fa",
+          "at": "2026-07-18T09:39:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`handle` can invoke two separate use-case services for one request: it calls `project_root_discovery_service.discover()` and then `service.provision(...)`. The cli_driver policy requires exactly one interactor per request; move root-resolution orchestration into a usecase application service and inject that single service here.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/codex_runtime.rs",
+              "line": 36,
+              "category": "handle not delegating to single use case"
+            }
+          ],
+          "hash": "rvw1:sha256:94e555ab85d3c72cd3c020edb6ae6d30dd3a2404cf14682bacb5e0d26b6713b3",
+          "at": "2026-07-18T15:55:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`handle` conditionally invokes the project-root discovery interactor and then invokes the provisioning interactor, so an omitted root causes two use-case calls and runtime branching between interactors in the primary adapter. Move root resolution and provisioning behind one use-case application service and have the driver perform a single invoke→render flow.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/codex_runtime.rs",
+              "line": 40,
+              "category": "handle not delegating to single use case"
+            }
+          ],
+          "hash": "rvw1:sha256:94e555ab85d3c72cd3c020edb6ae6d30dd3a2404cf14682bacb5e0d26b6713b3",
+          "at": "2026-07-18T15:58:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26bef3deefe81342c1d19d81d33c8e5fbaf8afa132abd39b42f4a0980b58c130",
+          "at": "2026-07-18T16:51:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:26bef3deefe81342c1d19d81d33c8e5fbaf8afa132abd39b42f4a0980b58c130",
+          "at": "2026-07-18T16:52:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5f0aef583228a0881528ba49578185e683ea41289a4b594b67ef3dd7a171a7e",
+          "at": "2026-07-18T17:11:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e5f0aef583228a0881528ba49578185e683ea41289a4b594b67ef3dd7a171a7e",
+          "at": "2026-07-18T17:12:11Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
+          "at": "2026-07-18T09:37:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8968471800d24b08f5818de416865cede80e51d2772c359bf0a764bd3d21baa8",
+          "at": "2026-07-18T09:41:57Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7dce0bdfa2de1b2fe2a78509d64d317899d7bc21848e8b685eec4a112cd00b11",
+          "at": "2026-07-18T05:37:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7dce0bdfa2de1b2fe2a78509d64d317899d7bc21848e8b685eec4a112cd00b11",
+          "at": "2026-07-18T05:43:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1537b5098a228b4d4ab0a96c9495c0884006907450d8e854b1fc64330eca5040",
+          "at": "2026-07-19T00:37:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1537b5098a228b4d4ab0a96c9495c0884006907450d8e854b1fc64330eca5040",
+          "at": "2026-07-19T00:39:22Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description restates behavioral rationale: “so bootstrap callers receive actionable provisioning failures through the existing layered boundary.” Keep only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description restates the resolver behavior contract, including link preference, PATH fallback, probing, logging, recovery guidance, and environment inheritance. Keep only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description restates the provisioning behavior contract, including probe sequencing, npm fallback restrictions, atomic linking, and prohibited state changes. Keep only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 description restates upstream bootstrap constraints and behavior: generic Makefile wiring, removal of inline resolution, and the integrated regression contract. Keep only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 description restates the design rationale and behavior contract for typed errors, hexagonal direction, and Makefile-side resolution. Section descriptions should not restate upstream design prose.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 description restates the resolver behavior contract and enumerates its downstream execution paths. Section descriptions should not restate upstream design prose.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 47,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 description restates the symlink provisioning behavior and prohibited implementation details. Section descriptions should not restate upstream design prose.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 58,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S4 description restates bootstrap wiring and consumer-test behavior rather than limiting itself to plan organization. Section descriptions should not restate upstream design prose.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 69,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:f2e870740a7bffa7677262b1b4321d1658a4bf1ed73d37f7ca845c82c50da262",
+          "at": "2026-07-18T07:14:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `plan.summary` array is empty even though the upstream spec defines GO-01 and GO-02. Goal mappings are intentionally excluded from `task-coverage.json`, so `impl-plan.json#plan.summary` must provide goal-to-task traceability; currently neither goal is mapped.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 30,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:670acb76c8c048017706828334f79c96ca2d22a085caec51721e3571446b75d2",
+          "at": "2026-07-18T07:16:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fff3ccd32e5989988be2f163d350e58e44ed93c3419d950a607f434268632a48",
+          "at": "2026-07-18T07:17:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 は `CodexRuntimeCompositionRoot` を実装対象に含みますが、この root が配線する `FsCodexRuntimeProvisioner` は後続の T003 に帰属しています。一方、T003 は T001 が追加する `CodexRuntimeProvisionPort` に依存するため、現状は相互依存となり、どちらも個別にコンパイル可能な commit にできません。composition root とその task-contract attribution を T003、または T003 後の新規 task へ移してください。",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 6,
+              "category": "dependency cycle or wrong ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:fff3ccd32e5989988be2f163d350e58e44ed93c3419d950a607f434268632a48",
+          "at": "2026-07-18T07:24:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9dfb00a73d310fc0d5845159a8f837c9e0643e16538a71bc264418ac2694ec7",
+          "at": "2026-07-18T07:28:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68c532657c656bd02ecf25a5152efb5649ce6f6e86c1c72dc91f4bf0735071d0",
+          "at": "2026-07-18T09:36:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68c532657c656bd02ecf25a5152efb5649ce6f6e86c1c72dc91f4bf0735071d0",
+          "at": "2026-07-18T09:41:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac53a3c863ea58080c8c09dccca94582754649a64e5c0acd5d76a7eae332e054",
+          "at": "2026-07-18T10:37:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac53a3c863ea58080c8c09dccca94582754649a64e5c0acd5d76a7eae332e054",
+          "at": "2026-07-18T10:40:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa3824025d106b6ec4bf9872dfd5b741c32e4e603005666a7902b28b338b8be0",
+          "at": "2026-07-18T14:28:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa3824025d106b6ec4bf9872dfd5b741c32e4e603005666a7902b28b338b8be0",
+          "at": "2026-07-18T14:30:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description includes an upstream behavior-contract restatement: “An explicit project root takes precedence; otherwise the driver requests Git-root discovery and reports discovery failure as a typed CommandOutcome.” Keep only target + operation + anchor cite; cite knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 description restates the upstream behavior contract (“explicit-root precedence and typed Git-root discovery failure”). Remove that rationale/behavior prose and retain target + operation + anchor cites; cite knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 39,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:37944587bff43ee5a4d5d2a30a5cbca225156092a8e7a4837c2177bfe48130ff",
+          "at": "2026-07-18T15:55:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ee40d0451157031d3f88a18099bea50cb03e7412fe512254cc91feddd8b07cd",
+          "at": "2026-07-18T15:57:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001’s description names only the project-root discovery port (and generic error types), but its contract also attributes `CodexRuntimeProjectRootDiscoveryInteractor` and `CodexRuntimeProjectRootDiscoveryService`. Those catalogue symbols are outside the task boundary as currently described. Name the discovery service and interactor in T001 so the executable task and its attributions agree.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/task-contract.json",
+              "line": 28,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:5ee40d0451157031d3f88a18099bea50cb03e7412fe512254cc91feddd8b07cd",
+          "at": "2026-07-18T16:01:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 restates upstream behavior-contract prose: “Cover explicit project-root precedence, subdirectory Git-root discovery, typed discovery failure, and the provisioning command path.” Retain target + operation + anchor cites only; cite knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T001 claims to implement CodexRuntimeProjectRootDiscoveryInteractor and CodexRuntimeProjectRootDiscoveryService, but task-contract.json does not attribute either catalogue entry to T001. Add those task attributions or remove the claimed symbols from T001.",
+              "severity": "P1",
+              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/task-contract.json",
+              "line": 5,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:9957e7981eba3bbfd99cfc5fcb28638728d8f3bbd1d6493d0d14b42c379a6d98",
+          "at": "2026-07-18T16:51:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:368261b7fd19b30f7a15d12244b5c0febd9d88fdda283d0ff6a5e6eb5d1389e1",
+          "at": "2026-07-18T16:54:10Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b254af5672d3ab0df682a6313c43290fd522aa1437a1470ebadefcc8c73cc10",
+          "at": "2026-07-18T09:37:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9b254af5672d3ab0df682a6313c43290fd522aa1437a1470ebadefcc8c73cc10",
+          "at": "2026-07-18T09:39:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7685761b34d65fbd34b0a3440875c0d8c2ff8234c1968ffac9f586d9de7e61a",
+          "at": "2026-07-18T15:55:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`discover()` has no starting-directory input, so the usecase depends on ambient process state: its sole production adapter reads the process-wide current directory and spawns Git through `SystemGitRepo::discover()`. Documenting that dependency does not satisfy the scope policy requiring runtime values to enter through usecase parameters; concurrent `chdir` activity can also select the wrong repository. Accept a starting path on the service/port and use `discover_from`, or resolve the root at the CLI boundary and pass it in.",
+              "severity": "P1",
+              "file": "libs/usecase/src/codex_runtime.rs",
+              "line": 74,
+              "category": "implicit time / env / process dependency"
+            }
+          ],
+          "hash": "rvw1:sha256:e7685761b34d65fbd34b0a3440875c0d8c2ff8234c1968ffac9f586d9de7e61a",
+          "at": "2026-07-18T15:59:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ffbfb687f870e6e23d581a4c047a52e62bd33552c0ed11cfbe340901d10218a",
+          "at": "2026-07-18T16:50:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ffbfb687f870e6e23d581a4c047a52e62bd33552c0ed11cfbe340901d10218a",
+          "at": "2026-07-18T16:52:53Z"
         }
       ]
     },
@@ -196,24 +896,315 @@
           "findings": [],
           "hash": "rvw1:sha256:bf35d50165f64b3a58b0aba34a5f24b4a8d546836b834dcd9d2036ceb2d96126",
           "at": "2026-07-18T10:32:38Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9b254af5672d3ab0df682a6313c43290fd522aa1437a1470ebadefcc8c73cc10",
-          "at": "2026-07-18T09:37:14Z"
+          "hash": "rvw1:sha256:9a04e62de372da70eec21836e7b5731f07062c441463d343611b9ae9a1c5699f",
+          "at": "2026-07-19T00:37:30Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9b254af5672d3ab0df682a6313c43290fd522aa1437a1470ebadefcc8c73cc10",
-          "at": "2026-07-18T09:39:39Z"
+          "hash": "rvw1:sha256:9a04e62de372da70eec21836e7b5731f07062c441463d343611b9ae9a1c5699f",
+          "at": "2026-07-19T00:39:41Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcf7ca8baf02fca80fe94f1b172726a889c31c7520af359a182e2e3847de4702",
+          "at": "2026-07-18T09:36:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodexRuntimeCompositionRoot::provision` immediately calls `CodexRuntimeDriver::handle(input)` and returns its `CommandOutcome`. This starts the invoke/render flow inside `cli_composition`, although `CompositionRoot` is pure DI and should return the wired driver for `apps/cli` to invoke. Return `CodexRuntimeDriver` from the composition root and move `.handle(input)` to the CLI command handler.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/codex_runtime.rs",
+              "line": 30,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:fcf7ca8baf02fca80fe94f1b172726a889c31c7520af359a182e2e3847de4702",
+          "at": "2026-07-18T09:40:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CodexRuntimeCompositionRoot` no longer implements the catalogue-defined public `provision(input: CodexRuntimeInput) -> CommandOutcome` method; it exposes `codex_runtime_driver()` instead. This breaks the declared composition-root API and any callers generated or wired against the catalogue signature.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/codex_runtime.rs",
+              "line": 15,
+              "category": "wiring/API signature mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
+          "at": "2026-07-18T09:55:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
+          "at": "2026-07-18T09:56:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
+          "at": "2026-07-18T09:57:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:053d08c72e53e5e1d2ef83b9c43d35eb128ba50184483bf341f7a450417dd043",
+          "at": "2026-07-18T12:04:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:053d08c72e53e5e1d2ef83b9c43d35eb128ba50184483bf341f7a450417dd043",
+          "at": "2026-07-18T12:07:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:795be5aeae103d525722cddf17d1038aa20dd260c00326b70b5a03b4a705a522",
+          "at": "2026-07-18T12:36:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:795be5aeae103d525722cddf17d1038aa20dd260c00326b70b5a03b4a705a522",
+          "at": "2026-07-18T12:38:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbbf1237efefb402629683a29c2965315c776d878f2883d55685638bbe308568",
+          "at": "2026-07-18T13:05:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbbf1237efefb402629683a29c2965315c776d878f2883d55685638bbe308568",
+          "at": "2026-07-18T13:07:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd05333a3591b43d8e1f7317856524cc252cc76582f3debac7aed32ea74c6cb5",
+          "at": "2026-07-18T14:28:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`discover_project_root` assembles the user-facing diagnostic `cannot discover git repository root: …` inside the composition root. That text is surfaced by the CLI, so this is a render leak; propagate the typed infrastructure failure without presentation wording and let the primary adapter render the diagnostic.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/codex_runtime.rs",
+              "line": 25,
+              "category": "render leak"
+            }
+          ],
+          "hash": "rvw1:sha256:dd05333a3591b43d8e1f7317856524cc252cc76582f3debac7aed32ea74c6cb5",
+          "at": "2026-07-18T14:31:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2a4d7b997232d949cafb067d56c33a30602c9b9bbb48d3fd2adfcec2506b7e1c",
+          "at": "2026-07-18T14:34:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa9eeeef81d7a150e0fdbd5436d6d12b595157b06003d11896e38c23d4149a8e",
+          "at": "2026-07-18T15:55:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa9eeeef81d7a150e0fdbd5436d6d12b595157b06003d11896e38c23d4149a8e",
+          "at": "2026-07-18T15:57:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d3b40c86fbe87d3c775382a2d782da42546fd635684c196f68f6a8ed652576d",
+          "at": "2026-07-18T16:51:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d3b40c86fbe87d3c775382a2d782da42546fd635684c196f68f6a8ed652576d",
+          "at": "2026-07-18T16:52:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The focused composition test constructs `CodexRuntimeInput` without the required `invocation_directory` field, so `cli_composition` fails to compile after the driver input contract changed.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/codex_runtime.rs",
+              "line": 56,
+              "category": "wiring correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3c31ee3cc05181182b5a39f5ea773157552ad63203e39a6f9c639373175aa831",
+          "at": "2026-07-18T17:10:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The focused composition test constructs `CodexRuntimeInput` without the required `invocation_directory` field, so this crate's tests do not compile against the current driver input type.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/codex_runtime.rs",
+              "line": 57,
+              "category": "wiring correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3c31ee3cc05181182b5a39f5ea773157552ad63203e39a6f9c639373175aa831",
+          "at": "2026-07-18T17:11:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c31ee3cc05181182b5a39f5ea773157552ad63203e39a6f9c639373175aa831",
+          "at": "2026-07-18T17:13:00Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
+          "at": "2026-07-18T09:36:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
+          "at": "2026-07-18T09:41:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
+          "at": "2026-07-18T09:55:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
+          "at": "2026-07-18T10:10:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e28aa56a8d3a02e6bcdd534083d454a1a70fc0eb475883be5cac0f863953e198",
+          "at": "2026-07-18T14:28:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`--project-root` が省略された場合のリポジトリルート解決、失敗分岐、診断出力を Driver 呼び出し前に行っており、bin が parse→dispatch→emit を超える複数段のオーケストレーションとアプリケーション I/O を担っています。`.harness/custom/review-prompts/cli.md` の thin-bin 規約に反します。`architecture-rules.json` の依存境界、および `type-designer-kind-selection.md` R1（CompositionRoot は純粋な DI、PrimaryAdapter は invoke+render）に従い、optional root の解決を cli_driver/usecase/infrastructure 側へ移し、bin は typed Input を `driver.handle` に渡して `CommandOutcome` を emit するだけにしてください。",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/codex_runtime.rs",
+              "line": 55,
+              "category": "business logic in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:e28aa56a8d3a02e6bcdd534083d454a1a70fc0eb475883be5cac0f863953e198",
+          "at": "2026-07-18T14:31:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b05ad7fd33f6de50563e94bc9c9d211cdb4f28d3f0b2031c53b7d708176f7711",
+          "at": "2026-07-18T15:55:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b05ad7fd33f6de50563e94bc9c9d211cdb4f28d3f0b2031c53b7d708176f7711",
+          "at": "2026-07-18T15:56:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efb9e7730f47774be7d622be7a060412ce61c3fd6118ecaa71a1443b6a04983a",
+          "at": "2026-07-18T16:50:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "本番ハンドラが `std::env::current_dir()` で実行ディレクトリを取得し、その成否を分岐してから Driver を呼んでいます。これは引数の parse→typed Input→`driver.handle`→emit を超えるアプリケーション入力の解決であり、失敗時には Driver の `CommandOutcome` も迂回します。`architecture-rules.json` の CLI 配送境界と `type-designer-kind-selection.md` R1（CompositionRoot は純 DI、PrimaryAdapter の invoke+render は cli_driver）に従い、bin は `project_root` のみを渡し、実行ディレクトリの取得と失敗の outcome 化を Driver の背後へ移してください。",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/codex_runtime.rs",
+              "line": 53,
+              "category": "business logic in bin"
+            }
+          ],
+          "hash": "rvw1:sha256:efb9e7730f47774be7d622be7a060412ce61c3fd6118ecaa71a1443b6a04983a",
+          "at": "2026-07-18T16:52:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:735d35ef8d4493ca69206b7325269d1b54d9c45042a3526ba99df9468985d35c",
+          "at": "2026-07-18T17:10:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:735d35ef8d4493ca69206b7325269d1b54d9c45042a3526ba99df9468985d35c",
+          "at": "2026-07-18T17:11:42Z"
         }
       ]
     },
@@ -568,344 +1559,49 @@
           "findings": [],
           "hash": "rvw1:sha256:323a88e3a25c0a1a8c71ff9261145511e76126317508ebfc367b567f657fb625",
           "at": "2026-07-18T13:46:47Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71b3db4a1c44e54048039ed353e5194fd13cb7262fce45a603ff95ae7025b4fa",
-          "at": "2026-07-18T09:37:02Z"
         },
         {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71b3db4a1c44e54048039ed353e5194fd13cb7262fce45a603ff95ae7025b4fa",
-          "at": "2026-07-18T09:39:32Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fcf7ca8baf02fca80fe94f1b172726a889c31c7520af359a182e2e3847de4702",
-          "at": "2026-07-18T09:36:58Z"
+          "hash": "rvw1:sha256:7480fdbd52eede8219cc022989c676a6f91d77296bc3e8e8b0625356dbec2392",
+          "at": "2026-07-18T15:56:12Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`CodexRuntimeCompositionRoot::provision` immediately calls `CodexRuntimeDriver::handle(input)` and returns its `CommandOutcome`. This starts the invoke/render flow inside `cli_composition`, although `CompositionRoot` is pure DI and should return the wired driver for `apps/cli` to invoke. Return `CodexRuntimeDriver` from the composition root and move `.handle(input)` to the CLI command handler.",
+              "message": "`discover()` delegates to `SystemGitRepo::discover()`, whose `git rev-parse --show-toplevel` call uses `Command::output()` without a timeout or output cap. Since `git` is resolved from the caller's PATH, a stalled or output-spamming executable can hang provisioning indefinitely or exhaust memory. Use the bounded process runner or add equivalent limits.",
               "severity": "P1",
-              "file": "apps/cli-composition/src/codex_runtime.rs",
-              "line": 30,
-              "category": "invoke leak"
+              "file": "libs/infrastructure/src/codex_runtime.rs",
+              "line": 41,
+              "category": "unbounded I/O"
             }
           ],
-          "hash": "rvw1:sha256:fcf7ca8baf02fca80fe94f1b172726a889c31c7520af359a182e2e3847de4702",
-          "at": "2026-07-18T09:40:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CodexRuntimeCompositionRoot` no longer implements the catalogue-defined public `provision(input: CodexRuntimeInput) -> CommandOutcome` method; it exposes `codex_runtime_driver()` instead. This breaks the declared composition-root API and any callers generated or wired against the catalogue signature.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/codex_runtime.rs",
-              "line": 15,
-              "category": "wiring/API signature mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
-          "at": "2026-07-18T09:55:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
-          "at": "2026-07-18T09:56:11Z"
+          "hash": "rvw1:sha256:7480fdbd52eede8219cc022989c676a6f91d77296bc3e8e8b0625356dbec2392",
+          "at": "2026-07-18T16:01:38Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2d8b51f6a1ec6093562123dd2b3191c8cde996ab92eb4815cacc678910f76c62",
-          "at": "2026-07-18T09:57:45Z"
+          "hash": "rvw1:sha256:65c37cb0fa215d2667e5685a750d57e46395afe44ddb7227f44154b932c182e5",
+          "at": "2026-07-18T16:05:54Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:053d08c72e53e5e1d2ef83b9c43d35eb128ba50184483bf341f7a450417dd043",
-          "at": "2026-07-18T12:04:09Z"
+          "hash": "rvw1:sha256:74f24049fa87c5f2893f6c19edeec1b7c39842141cb093c6033a2a256460c0de",
+          "at": "2026-07-18T16:51:15Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:053d08c72e53e5e1d2ef83b9c43d35eb128ba50184483bf341f7a450417dd043",
-          "at": "2026-07-18T12:07:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:795be5aeae103d525722cddf17d1038aa20dd260c00326b70b5a03b4a705a522",
-          "at": "2026-07-18T12:36:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:795be5aeae103d525722cddf17d1038aa20dd260c00326b70b5a03b4a705a522",
-          "at": "2026-07-18T12:38:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbbf1237efefb402629683a29c2965315c776d878f2883d55685638bbe308568",
-          "at": "2026-07-18T13:05:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbbf1237efefb402629683a29c2965315c776d878f2883d55685638bbe308568",
-          "at": "2026-07-18T13:07:41Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 description restates behavioral rationale: “so bootstrap callers receive actionable provisioning failures through the existing layered boundary.” Keep only target, operation, and anchor cite.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T002 description restates the resolver behavior contract, including link preference, PATH fallback, probing, logging, recovery guidance, and environment inheritance. Keep only target, operation, and anchor cite.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 12,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T003 description restates the provisioning behavior contract, including probe sequencing, npm fallback restrictions, atomic linking, and prohibited state changes. Keep only target, operation, and anchor cite.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 18,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T004 description restates upstream bootstrap constraints and behavior: generic Makefile wiring, removal of inline resolution, and the integrated regression contract. Keep only target, operation, and anchor cite.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 24,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S1 description restates the design rationale and behavior contract for typed errors, hexagonal direction, and Makefile-side resolution. Section descriptions should not restate upstream design prose.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 36,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S2 description restates the resolver behavior contract and enumerates its downstream execution paths. Section descriptions should not restate upstream design prose.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 47,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S3 description restates the symlink provisioning behavior and prohibited implementation details. Section descriptions should not restate upstream design prose.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 58,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S4 description restates bootstrap wiring and consumer-test behavior rather than limiting itself to plan organization. Section descriptions should not restate upstream design prose.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 69,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:f2e870740a7bffa7677262b1b4321d1658a4bf1ed73d37f7ca845c82c50da262",
-          "at": "2026-07-18T07:14:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `plan.summary` array is empty even though the upstream spec defines GO-01 and GO-02. Goal mappings are intentionally excluded from `task-coverage.json`, so `impl-plan.json#plan.summary` must provide goal-to-task traceability; currently neither goal is mapped.",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 30,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:670acb76c8c048017706828334f79c96ca2d22a085caec51721e3571446b75d2",
-          "at": "2026-07-18T07:16:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fff3ccd32e5989988be2f163d350e58e44ed93c3419d950a607f434268632a48",
-          "at": "2026-07-18T07:17:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 は `CodexRuntimeCompositionRoot` を実装対象に含みますが、この root が配線する `FsCodexRuntimeProvisioner` は後続の T003 に帰属しています。一方、T003 は T001 が追加する `CodexRuntimeProvisionPort` に依存するため、現状は相互依存となり、どちらも個別にコンパイル可能な commit にできません。composition root とその task-contract attribution を T003、または T003 後の新規 task へ移してください。",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/impl-plan.json",
-              "line": 6,
-              "category": "dependency cycle or wrong ordering"
-            }
-          ],
-          "hash": "rvw1:sha256:fff3ccd32e5989988be2f163d350e58e44ed93c3419d950a607f434268632a48",
-          "at": "2026-07-18T07:24:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9dfb00a73d310fc0d5845159a8f837c9e0643e16538a71bc264418ac2694ec7",
-          "at": "2026-07-18T07:28:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68c532657c656bd02ecf25a5152efb5649ce6f6e86c1c72dc91f4bf0735071d0",
-          "at": "2026-07-18T09:36:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68c532657c656bd02ecf25a5152efb5649ce6f6e86c1c72dc91f4bf0735071d0",
-          "at": "2026-07-18T09:41:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ac53a3c863ea58080c8c09dccca94582754649a64e5c0acd5d76a7eae332e054",
-          "at": "2026-07-18T10:37:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ac53a3c863ea58080c8c09dccca94582754649a64e5c0acd5d76a7eae332e054",
-          "at": "2026-07-18T10:40:01Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e3b3b030697c860bee185cbe3d950f8b3078fe5f97fd91b674954807385d2fd3",
-          "at": "2026-07-18T07:13:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-02 の「actionable diagnostic」は判定条件が定義されておらず、決定論的に検証できません。D1 が要求する「何をプローブしたか」「なぜ失敗したか」「利用者が取れる選択肢」が AC 本文に含まれないため、汎用エラーを表示してリンク作成を避けるだけの実装でも合格し得ます。",
-              "severity": "P1",
-              "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json",
-              "line": 176,
-              "category": "acceptance criterion non-observable"
-            }
-          ],
-          "hash": "rvw1:sha256:e3b3b030697c860bee185cbe3d950f8b3078fe5f97fd91b674954807385d2fd3",
-          "at": "2026-07-18T07:18:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9fe41c734e9640c6861c7addc7dac3f47734619eecf14a177b69c4f6f6f22b12",
-          "at": "2026-07-18T07:20:09Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7dce0bdfa2de1b2fe2a78509d64d317899d7bc21848e8b685eec4a112cd00b11",
-          "at": "2026-07-18T05:37:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7dce0bdfa2de1b2fe2a78509d64d317899d7bc21848e8b685eec4a112cd00b11",
-          "at": "2026-07-18T05:43:17Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
-          "at": "2026-07-18T09:36:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f4c260be8e784dd53106822e2aad5d6710a73cba6de1d1fe3e5899f360eb47bf",
-          "at": "2026-07-18T09:41:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
-          "at": "2026-07-18T09:55:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d9f7f98d5630bf5a1908bce1edeb4e3618b99a77b1a7a72c72346594007691fd",
-          "at": "2026-07-18T10:10:43Z"
+          "hash": "rvw1:sha256:74f24049fa87c5f2893f6c19edeec1b7c39842141cb093c6033a2a256460c0de",
+          "at": "2026-07-18T16:52:43Z"
         }
       ]
     }

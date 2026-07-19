@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "5bc1659f701cc1d6bd4169d182dc14bd9f1969e6752ffb82d97fac4c70dd20f1",
+  "catalogue_declaration_hash": "040c5e695a9f2450a49c93bff334dfa1a8ee23da020a4a5d894708d5b58c05cf",
   "signals": [
     {
       "type_name": "CodexCapabilityAdapter",
@@ -36,6 +36,11 @@
       "type_name": "FsCodexRuntimeProvisioner",
       "signal": "blue",
       "entry_hash": "663a03e54e2c8f89722136e7f32a9fd0c60fb3d160b78c6ca9d6b07a0834c1d6"
+    },
+    {
+      "type_name": "GitCodexRuntimeProjectRootDiscoveryAdapter",
+      "signal": "blue",
+      "entry_hash": "be9cef7adba8ab7ae7ab964af89f2fe9ca8695e56d382f47a5a1a8f9fb1dd92e"
     },
     {
       "type_name": "ResolvedCodexRuntime",

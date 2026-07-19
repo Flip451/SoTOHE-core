@@ -16,16 +16,22 @@ impl CodexRuntimeCompositionRoot {
     /// return it without invoking it.
     #[must_use]
     pub fn codex_runtime_driver(&self) -> cli_driver::codex_runtime::CodexRuntimeDriver {
-        use infrastructure::codex_runtime::FsCodexRuntimeProvisioner;
+        use infrastructure::codex_runtime::{
+            FsCodexRuntimeProvisioner, GitCodexRuntimeProjectRootDiscoveryAdapter,
+        };
         use usecase::codex_runtime::{
-            CodexRuntimeProvisionInteractor, CodexRuntimeProvisionPort,
-            CodexRuntimeProvisionService,
+            CodexRuntimeProjectRootDiscoveryPort, CodexRuntimeProvisionInteractor,
+            CodexRuntimeProvisionPort, CodexRuntimeProvisionService,
         };
 
         let provisioner =
             Arc::new(FsCodexRuntimeProvisioner::new()) as Arc<dyn CodexRuntimeProvisionPort>;
-        let service = Arc::new(CodexRuntimeProvisionInteractor::new(provisioner))
-            as Arc<dyn CodexRuntimeProvisionService>;
+        let project_root_discovery_port = Arc::new(GitCodexRuntimeProjectRootDiscoveryAdapter::new())
+            as Arc<dyn CodexRuntimeProjectRootDiscoveryPort>;
+        let service = Arc::new(CodexRuntimeProvisionInteractor::new(
+            provisioner,
+            project_root_discovery_port,
+        )) as Arc<dyn CodexRuntimeProvisionService>;
         cli_driver::codex_runtime::CodexRuntimeDriver::new(service)
     }
 }
@@ -48,7 +54,7 @@ mod tests {
         let fixture = tempfile::tempdir().expect("fixture must be created");
         let outcome = CodexRuntimeCompositionRoot::new()
             .codex_runtime_driver()
-            .handle(CodexRuntimeInput { project_root: fixture.path().join("missing") });
+            .handle(CodexRuntimeInput { project_root: Some(fixture.path().join("missing")) });
 
         assert_eq!(outcome.exit_code, 1);
         assert!(outcome.stdout.is_none());

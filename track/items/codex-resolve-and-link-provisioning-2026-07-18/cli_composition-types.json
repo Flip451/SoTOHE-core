@@ -36,7 +36,7 @@
   "types": {
     "CodexRuntimeCompositionRoot": {
       "action": "add",
-      "docs": "Wires filesystem provisioning infrastructure into and returns the Codex runtime CLI driver without invoking it.",
+      "docs": "Change `CodexRuntimeCompositionRoot` to wire the Codex runtime command graph. IN-06, AC-07.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -51,11 +51,11 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-01",
+          "anchor": "IN-06",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         },
         {
-          "anchor": "GO-02",
+          "anchor": "AC-07",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         }
       ]

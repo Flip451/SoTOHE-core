@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-18T10:15:40Z",
-  "declaration_hash": "0d1fc8a0c372afbb7555394635aa6c6e39cc31a1923869076ec899122eaa9959",
-  "implementation_input_hash": "450cd3e4fadf251e6469ae9d22fff198552f028962dfeed693384f4ca07f04b6",
+  "generated_at": "2026-07-18T17:06:58Z",
+  "declaration_hash": "ad96d929ccd714f12028c0eadf8a8002d6a725fd1ea6dac2553e14fe8bce80db",
+  "implementation_input_hash": "9ebbdce5e5b46cd9aaaca42aa1d5a67d4893d70125a29a8562723b3673f9616d",
   "signals": [
     {
       "type_name": "CliCommand",

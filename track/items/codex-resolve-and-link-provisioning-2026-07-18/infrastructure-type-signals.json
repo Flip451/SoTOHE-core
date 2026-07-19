@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-18T13:43:38Z",
-  "declaration_hash": "5bc1659f701cc1d6bd4169d182dc14bd9f1969e6752ffb82d97fac4c70dd20f1",
-  "implementation_input_hash": "ac84cda051488720849314ab4749d3d6551ced749cf9438f268b9b559bc52b99",
+  "generated_at": "2026-07-18T16:35:06Z",
+  "declaration_hash": "040c5e695a9f2450a49c93bff334dfa1a8ee23da020a4a5d894708d5b58c05cf",
+  "implementation_input_hash": "13fd4619baf273b278ed158a49470424719367709ccb18a826cc0a3e659d2b52",
   "signals": [
     {
       "type_name": "CodexCapabilityAdapter",
@@ -64,6 +64,16 @@
       "found_type": true,
       "found_items": [
         "CodexRuntimeProvisionPort",
+        "Default"
+      ]
+    },
+    {
+      "type_name": "GitCodexRuntimeProjectRootDiscoveryAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CodexRuntimeProjectRootDiscoveryPort",
         "Default"
       ]
     },

@@ -3,11 +3,59 @@
   "layer": "usecase",
   "entries": [
     {
-      "claim_hash": "0f688527df945b5826edb5694cb4d0c4ff33961c2a0def89c8ebc3eaa51c1686",
+      "claim_hash": "49fc341e5b446701b322296b4f50ecd69e7093ac5f820939d8262c364a011f3a",
+      "evidence_hash": "b0717c13788ff61718f4f864dfaf71b9c34b1fd3bd38fd42e626eeb882082ad8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Git root を発見できない場合は typed `CommandOutcome` failure として報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CodexRuntimeProjectRootDiscoveryError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`sotp codex-runtime provision` は `--project-root` が明示された場合にその値を配備先の project root として使い、省略された場合は任意の repository subdirectory を current working directory として Git root を発見し、その root 配下の repo-local link に配備する。Git root を発見できない場合は typed `CommandOutcome` failure として報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "49fc341e5b446701b322296b4f50ecd69e7093ac5f820939d8262c364a011f3a",
+      "evidence_hash": "eaf0cb5be3014bb561f1a1d257512f579c1b3bb0f5d21637384c5a7f5f2091a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Invoking without the option outside a discoverable Git repository reports a typed `CommandOutcome` failure and does not provision a link."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CodexRuntimeProjectRootDiscoveryError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "From any subdirectory of a Git repository, invoking `sotp codex-runtime provision` without `--project-root` discovers that repository's Git root and provisions the repo-local codex link under it. An explicit `--project-root` takes precedence over discovery. Invoking without the option outside a discoverable Git repository reports a typed `CommandOutcome` failure and does not provision a link."
+        }
+      }
+    },
+    {
+      "claim_hash": "b552b88acc3fea3346d3d26e9705c3a4893a3eb9781d4dbe5c8bb612837195e8",
       "evidence_hash": "4962bd783441ab4fc6f505d289f478034f5f6db810f2bc4613b77a7f447a2bca",
       "verdict": {
         "kind": "pass",
-        "citation": "通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。"
+        "citation": "`cargo make bootstrap` に、通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。処理は再実行可能で、既存リンクを最新の解決結果へ張り直す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -27,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "0f688527df945b5826edb5694cb4d0c4ff33961c2a0def89c8ebc3eaa51c1686",
+      "claim_hash": "b552b88acc3fea3346d3d26e9705c3a4893a3eb9781d4dbe5c8bb612837195e8",
       "evidence_hash": "032232e8e137e32021342a868c9a95937cf0bde1a45b4f7c56821403881225d3",
       "verdict": {
         "kind": "pass",
@@ -51,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "0f688527df945b5826edb5694cb4d0c4ff33961c2a0def89c8ebc3eaa51c1686",
+      "claim_hash": "b552b88acc3fea3346d3d26e9705c3a4893a3eb9781d4dbe5c8bb612837195e8",
       "evidence_hash": "a5dfe453fd3a72f783343e1b7c3b3dcb08e6f50f1a568c3c9fd610dc02e80bf0",
       "verdict": {
         "kind": "pass",
@@ -75,11 +123,59 @@
       }
     },
     {
-      "claim_hash": "3c5d7297d003e66e409ad982687b03cd7ed91578610af2ab877fc8570483e30a",
+      "claim_hash": "b552b88acc3fea3346d3d26e9705c3a4893a3eb9781d4dbe5c8bb612837195e8",
+      "evidence_hash": "b0717c13788ff61718f4f864dfaf71b9c34b1fd3bd38fd42e626eeb882082ad8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Git root を発見できない場合は typed `CommandOutcome` failure として報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CodexRuntimeProvisionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`sotp codex-runtime provision` は `--project-root` が明示された場合にその値を配備先の project root として使い、省略された場合は任意の repository subdirectory を current working directory として Git root を発見し、その root 配下の repo-local link に配備する。Git root を発見できない場合は typed `CommandOutcome` failure として報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b552b88acc3fea3346d3d26e9705c3a4893a3eb9781d4dbe5c8bb612837195e8",
+      "evidence_hash": "eaf0cb5be3014bb561f1a1d257512f579c1b3bb0f5d21637384c5a7f5f2091a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Invoking without the option outside a discoverable Git repository reports a typed `CommandOutcome` failure and does not provision a link."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CodexRuntimeProvisionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "From any subdirectory of a Git repository, invoking `sotp codex-runtime provision` without `--project-root` discovers that repository's Git root and provisions the repo-local codex link under it. An explicit `--project-root` takes precedence over discovery. Invoking without the option outside a discoverable Git repository reports a typed `CommandOutcome` failure and does not provision a link."
+        }
+      }
+    },
+    {
+      "claim_hash": "01fd7c7f01471509619280de87fdcfd4945c537930844cec2cdc4f67b119cc08",
       "evidence_hash": "4962bd783441ab4fc6f505d289f478034f5f6db810f2bc4613b77a7f447a2bca",
       "verdict": {
         "kind": "pass",
-        "citation": "通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。処理は再実行可能で、既存リンクを最新の解決結果へ張り直す。"
+        "citation": "`cargo make bootstrap` に、通常環境で codex 候補をサニタイズ模擬環境の `--version` で検証し、成功した公開エントリを repo-local の gitignored symlink として配備する処理を含める。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -99,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "3c5d7297d003e66e409ad982687b03cd7ed91578610af2ab877fc8570483e30a",
+      "claim_hash": "01fd7c7f01471509619280de87fdcfd4945c537930844cec2cdc4f67b119cc08",
       "evidence_hash": "cb1ebe21f52caa9dd5db8b0016120778db6e7ae991c2653a73a5d25b26b3fc2e",
       "verdict": {
         "kind": "pass",
@@ -123,11 +219,11 @@
       }
     },
     {
-      "claim_hash": "3c5d7297d003e66e409ad982687b03cd7ed91578610af2ab877fc8570483e30a",
+      "claim_hash": "01fd7c7f01471509619280de87fdcfd4945c537930844cec2cdc4f67b119cc08",
       "evidence_hash": "0e91149840eb2c0608435a477743725eca0997507e540abf72c22966e65c073d",
       "verdict": {
         "kind": "pass",
-        "citation": "bootstrap fails when neither the PATH candidate nor the public npm fallback passes the sanitized-simulated probe"
+        "citation": "bootstrap fails when neither the PATH candidate nor the public npm fallback passes the sanitized-simulated probe; its diagnostic identifies each attempted source (PATH candidate and public npm fallback), states the failing probe result for each attempted source, and directs the user to repair or install a codex entry before rerunning `cargo make bootstrap`. It does not create a link to an unverified candidate."
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -143,6 +239,54 @@
           "section": "acceptance_criteria",
           "element_id": "AC-02",
           "text_label": "bootstrap fails when neither the PATH candidate nor the public npm fallback passes the sanitized-simulated probe; its diagnostic identifies each attempted source (PATH candidate and public npm fallback), states the failing probe result for each attempted source, and directs the user to repair or install a codex entry before rerunning `cargo make bootstrap`. It does not create a link to an unverified candidate."
+        }
+      }
+    },
+    {
+      "claim_hash": "01fd7c7f01471509619280de87fdcfd4945c537930844cec2cdc4f67b119cc08",
+      "evidence_hash": "b0717c13788ff61718f4f864dfaf71b9c34b1fd3bd38fd42e626eeb882082ad8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp codex-runtime provision` は `--project-root` が明示された場合にその値を配備先の project root として使い、省略された場合は任意の repository subdirectory を current working directory として Git root を発見し、その root 配下の repo-local link に配備する。Git root を発見できない場合は typed `CommandOutcome` failure として報告する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CodexRuntimeProvisionInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`sotp codex-runtime provision` は `--project-root` が明示された場合にその値を配備先の project root として使い、省略された場合は任意の repository subdirectory を current working directory として Git root を発見し、その root 配下の repo-local link に配備する。Git root を発見できない場合は typed `CommandOutcome` failure として報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "01fd7c7f01471509619280de87fdcfd4945c537930844cec2cdc4f67b119cc08",
+      "evidence_hash": "eaf0cb5be3014bb561f1a1d257512f579c1b3bb0f5d21637384c5a7f5f2091a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "From any subdirectory of a Git repository, invoking `sotp codex-runtime provision` without `--project-root` discovers that repository's Git root and provisions the repo-local codex link under it. An explicit `--project-root` takes precedence over discovery. Invoking without the option outside a discoverable Git repository reports a typed `CommandOutcome` failure and does not provision a link."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CodexRuntimeProvisionInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "From any subdirectory of a Git repository, invoking `sotp codex-runtime provision` without `--project-root` discovers that repository's Git root and provisions the repo-local codex link under it. An explicit `--project-root` takes precedence over discovery. Invoking without the option outside a discoverable Git repository reports a typed `CommandOutcome` failure and does not provision a link."
         }
       }
     },
@@ -191,6 +335,54 @@
           "section": "in_scope",
           "element_id": "IN-05",
           "text_label": "サニタイズ環境で起動した codex の失敗報告と session log に、復旧・実行経路の判断に必要な情報を記録する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "932e75f33f91778856cfcd4d9a026a94e9da151ef29b98c99f2b9c8724f29e72",
+      "evidence_hash": "b0717c13788ff61718f4f864dfaf71b9c34b1fd3bd38fd42e626eeb882082ad8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "省略された場合は任意の repository subdirectory を current working directory として Git root を発見し、その root 配下の repo-local link に配備する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CodexRuntimeProjectRootDiscoveryPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`sotp codex-runtime provision` は `--project-root` が明示された場合にその値を配備先の project root として使い、省略された場合は任意の repository subdirectory を current working directory として Git root を発見し、その root 配下の repo-local link に配備する。Git root を発見できない場合は typed `CommandOutcome` failure として報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "932e75f33f91778856cfcd4d9a026a94e9da151ef29b98c99f2b9c8724f29e72",
+      "evidence_hash": "eaf0cb5be3014bb561f1a1d257512f579c1b3bb0f5d21637384c5a7f5f2091a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "From any subdirectory of a Git repository, invoking `sotp codex-runtime provision` without `--project-root` discovers that repository's Git root"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CodexRuntimeProjectRootDiscoveryPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "From any subdirectory of a Git repository, invoking `sotp codex-runtime provision` without `--project-root` discovers that repository's Git root and provisions the repo-local codex link under it. An explicit `--project-root` takes precedence over discovery. Invoking without the option outside a discoverable Git repository reports a typed `CommandOutcome` failure and does not provision a link."
         }
       }
     },
@@ -267,7 +459,7 @@
       }
     },
     {
-      "claim_hash": "456703613cf5ee2825d83ea9bbff558f536809dd16d27dbacadbedf8a462a633",
+      "claim_hash": "ca7bdae51fe0ab8473d0179a076cfb35a009220b3bda03559ac0bbb9662a6fba",
       "evidence_hash": "4962bd783441ab4fc6f505d289f478034f5f6db810f2bc4613b77a7f447a2bca",
       "verdict": {
         "kind": "pass",
@@ -291,7 +483,7 @@
       }
     },
     {
-      "claim_hash": "456703613cf5ee2825d83ea9bbff558f536809dd16d27dbacadbedf8a462a633",
+      "claim_hash": "ca7bdae51fe0ab8473d0179a076cfb35a009220b3bda03559ac0bbb9662a6fba",
       "evidence_hash": "cb1ebe21f52caa9dd5db8b0016120778db6e7ae991c2653a73a5d25b26b3fc2e",
       "verdict": {
         "kind": "pass",
@@ -315,7 +507,7 @@
       }
     },
     {
-      "claim_hash": "456703613cf5ee2825d83ea9bbff558f536809dd16d27dbacadbedf8a462a633",
+      "claim_hash": "ca7bdae51fe0ab8473d0179a076cfb35a009220b3bda03559ac0bbb9662a6fba",
       "evidence_hash": "0e91149840eb2c0608435a477743725eca0997507e540abf72c22966e65c073d",
       "verdict": {
         "kind": "pass",
@@ -335,6 +527,54 @@
           "section": "acceptance_criteria",
           "element_id": "AC-02",
           "text_label": "bootstrap fails when neither the PATH candidate nor the public npm fallback passes the sanitized-simulated probe; its diagnostic identifies each attempted source (PATH candidate and public npm fallback), states the failing probe result for each attempted source, and directs the user to repair or install a codex entry before rerunning `cargo make bootstrap`. It does not create a link to an unverified candidate."
+        }
+      }
+    },
+    {
+      "claim_hash": "ca7bdae51fe0ab8473d0179a076cfb35a009220b3bda03559ac0bbb9662a6fba",
+      "evidence_hash": "b0717c13788ff61718f4f864dfaf71b9c34b1fd3bd38fd42e626eeb882082ad8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp codex-runtime provision` は `--project-root` が明示された場合にその値を配備先の project root として使い、省略された場合は任意の repository subdirectory を current working directory として Git root を発見し、その root 配下の repo-local link に配備する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CodexRuntimeProvisionService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`sotp codex-runtime provision` は `--project-root` が明示された場合にその値を配備先の project root として使い、省略された場合は任意の repository subdirectory を current working directory として Git root を発見し、その root 配下の repo-local link に配備する。Git root を発見できない場合は typed `CommandOutcome` failure として報告する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ca7bdae51fe0ab8473d0179a076cfb35a009220b3bda03559ac0bbb9662a6fba",
+      "evidence_hash": "eaf0cb5be3014bb561f1a1d257512f579c1b3bb0f5d21637384c5a7f5f2091a6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "From any subdirectory of a Git repository, invoking `sotp codex-runtime provision` without `--project-root` discovers that repository's Git root and provisions the repo-local codex link under it. An explicit `--project-root` takes precedence over discovery."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/codex-resolve-and-link-provisioning-2026-07-18/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CodexRuntimeProvisionService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "From any subdirectory of a Git repository, invoking `sotp codex-runtime provision` without `--project-root` discovers that repository's Git root and provisions the repo-local codex link under it. An explicit `--project-root` takes precedence over discovery. Invoking without the option outside a discoverable Git repository reports a typed `CommandOutcome` failure and does not provision a link."
         }
       }
     },

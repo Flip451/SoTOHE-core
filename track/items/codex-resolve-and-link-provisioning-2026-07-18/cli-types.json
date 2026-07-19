@@ -3,7 +3,7 @@
   "functions": {
     "cli::commands::codex_runtime::execute": {
       "action": "add",
-      "docs": "Obtains the wired Codex runtime driver from delivery-layer composition and invokes it for the explicit maintenance command.",
+      "docs": "Change `cli::commands::codex_runtime::execute` to dispatch through the Codex runtime composition root. IN-06, AC-07.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -16,15 +16,11 @@
       "role": "FreeFunction",
       "spec_refs": [
         {
-          "anchor": "IN-01",
+          "anchor": "IN-06",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         },
         {
-          "anchor": "AC-01",
-          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
-        },
-        {
-          "anchor": "AC-02",
+          "anchor": "AC-07",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         }
       ]
@@ -388,18 +384,18 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-01",
+          "anchor": "IN-06",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         },
         {
-          "anchor": "GO-02",
+          "anchor": "AC-07",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         }
       ]
     },
     "CodexRuntimeCommand": {
       "action": "add",
-      "docs": "Selects an explicit Codex runtime maintenance operation.",
+      "docs": "Selects the Codex runtime provisioning operation whose optional root is resolved behind the driver boundary.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -422,18 +418,18 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-01",
+          "anchor": "IN-06",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         },
         {
-          "anchor": "GO-02",
+          "anchor": "AC-07",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         }
       ]
     },
     "CodexRuntimeProvisionArgs": {
       "action": "add",
-      "docs": "Captures the repository root for explicit Codex runtime provisioning.",
+      "docs": "Change `CodexRuntimeProvisionArgs` to supply the provisioning command input. IN-06, AC-07.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -441,7 +437,7 @@
           "fields": [
             {
               "name": "project_root",
-              "ty": "std::path::PathBuf"
+              "ty": "Option<std::path::PathBuf>"
             }
           ],
           "has_stripped_fields": false,
@@ -455,15 +451,11 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-01",
+          "anchor": "IN-06",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         },
         {
-          "anchor": "AC-01",
-          "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
-        },
-        {
-          "anchor": "AC-02",
+          "anchor": "AC-07",
           "file": "track/items/codex-resolve-and-link-provisioning-2026-07-18/spec.json"
         }
       ]

@@ -22,8 +22,8 @@ pub enum CodexRuntimeCommand {
 #[derive(Args)]
 pub struct CodexRuntimeProvisionArgs {
     /// Repository root that receives the runtime link.
-    #[arg(long, default_value = ".")]
-    pub project_root: PathBuf,
+    #[arg(long)]
+    pub project_root: Option<PathBuf>,
 }
 
 /// Execute a Codex runtime command with its already-wired primary adapter.
@@ -74,7 +74,11 @@ mod tests {
     struct SucceedingService;
 
     impl CodexRuntimeProvisionService for SucceedingService {
-        fn provision(&self, _project_root: &Path) -> Result<(), CodexRuntimeProvisionError> {
+        fn provision(
+            &self,
+            _project_root: Option<&Path>,
+            _invocation_directory: &Path,
+        ) -> Result<(), CodexRuntimeProvisionError> {
             Ok(())
         }
     }
@@ -82,11 +86,19 @@ mod tests {
     struct FailingService;
 
     impl CodexRuntimeProvisionService for FailingService {
-        fn provision(&self, _project_root: &Path) -> Result<(), CodexRuntimeProvisionError> {
+        fn provision(
+            &self,
+            _project_root: Option<&Path>,
+            _invocation_directory: &Path,
+        ) -> Result<(), CodexRuntimeProvisionError> {
             let detail = DiagnosticMessage::try_new("install Codex and rerun bootstrap".to_owned())
                 .expect("test diagnostic must be valid");
             Err(CodexRuntimeProvisionError::NoUsableCandidate(detail))
         }
+    }
+
+    fn test_driver(service: Arc<dyn CodexRuntimeProvisionService>) -> CodexRuntimeDriver {
+        CodexRuntimeDriver::new(service)
     }
 
     #[test]
@@ -96,7 +108,7 @@ mod tests {
 
         match parsed.command {
             CodexRuntimeCommand::Provision(args) => {
-                assert_eq!(args.project_root, PathBuf::from("."))
+                assert_eq!(args.project_root, None)
             }
         }
     }
@@ -108,7 +120,7 @@ mod tests {
 
         match parsed.command {
             CodexRuntimeCommand::Provision(args) => {
-                assert_eq!(args.project_root, PathBuf::from("/repo"));
+                assert_eq!(args.project_root, Some(PathBuf::from("/repo")));
             }
         }
     }
@@ -118,7 +130,7 @@ mod tests {
         let command = TestCli::try_parse_from(["test", "provision"])
             .expect("provision command must parse")
             .command;
-        let driver = CodexRuntimeDriver::new(Arc::new(SucceedingService));
+        let driver = test_driver(Arc::new(SucceedingService));
 
         let exit_code = execute_with_driver(command, &driver);
 
@@ -130,7 +142,7 @@ mod tests {
         let command = TestCli::try_parse_from(["test", "provision"])
             .expect("provision command must parse")
             .command;
-        let driver = CodexRuntimeDriver::new(Arc::new(FailingService));
+        let driver = test_driver(Arc::new(FailingService));
 
         let exit_code = execute_with_driver(command, &driver);
 

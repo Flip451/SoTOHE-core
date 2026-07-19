@@ -10,9 +10,9 @@ GO-02: T001, T002, T003.
 
 ### S1 — Provisioning command boundary
 
-> Implement the CLI, cli_driver, and usecase provisioning command path and its focused tests (IN-01, IN-02, CN-01, AC-01, AC-02).
+> Implement the CLI, cli_driver, and usecase provisioning command path with focused tests (IN-01, IN-02, IN-06, CN-01, AC-01, AC-02, AC-07).
 
-- [x] **T001**: Add the catalogue-defined Codex runtime provisioning service, port, interactor, error type, cli_driver input/driver, CLI command/arguments, and focused command-path tests (IN-01, IN-02, CN-01, AC-01, AC-02). (`574821fdd5711a301db5b21a0c4f6d2ecec499d3`)
+- [x] **T001**: Implement CodexRuntimeProvisionError, CodexRuntimeProjectRootDiscoveryError, CodexRuntimeProvisionPort, CodexRuntimeProjectRootDiscoveryPort, CodexRuntimeProvisionService, and CodexRuntimeProvisionInteractor; CodexRuntimeDriver and CodexRuntimeInput; and the public CLI entries CliCommand, CodexRuntimeCommand, CodexRuntimeProvisionArgs, and cli::commands::codex_runtime::execute, with focused tests (IN-01, IN-02, IN-06, CN-01, AC-01, AC-02, AC-07). (`574821fdd5711a301db5b21a0c4f6d2ecec499d3`)
 
 ### S2 — Repository-first runtime resolution for all Codex spawns
 
@@ -22,9 +22,9 @@ GO-02: T001, T002, T003.
 
 ### S3 — Verified filesystem link provisioning
 
-> Implement the filesystem provisioner behind its usecase port, then wire it through the composition root and add focused provisioner/composition tests (IN-01, IN-02, CN-01, AC-01, AC-02).
+> Implement the filesystem provisioner and Git-root discovery adapter behind their usecase ports, then wire both through the composition root and add focused provisioner/composition tests (IN-01, IN-02, IN-06, CN-01, AC-01, AC-02, AC-07).
 
-- [x] **T003**: Add the filesystem Codex runtime provisioner implementation for the usecase port, wire it through the catalogue-defined composition root after the command path is available, and add focused provisioner/composition tests (IN-01, IN-02, CN-01, AC-01, AC-02). (`574821fdd5711a301db5b21a0c4f6d2ecec499d3`)
+- [x] **T003**: Add the filesystem Codex runtime provisioner and Git project-root discovery adapter implementations for their usecase ports, wire both through the catalogue-defined composition root after the command path is available, and add focused provisioner/composition tests (IN-01, IN-02, IN-06, CN-01, AC-01, AC-02, AC-07). (`574821fdd5711a301db5b21a0c4f6d2ecec499d3`)
 
 ### S4 — Bootstrap configuration and consumer regression alignment
 

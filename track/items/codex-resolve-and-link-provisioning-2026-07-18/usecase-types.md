@@ -4,13 +4,15 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CodexRuntimeProvisionError | error_type | add | ProjectRootInvalid, NoUsableCandidate, NpmQueryFailed, LinkUpdateFailed | 🔵 | 🔵 |
+| CodexRuntimeProjectRootDiscoveryError | error_type | add | GitRootDiscoveryFailed | 🔵 | 🔵 |
+| CodexRuntimeProvisionError | error_type | add | ProjectRootInvalid, NoUsableCandidate, NpmQueryFailed, LinkUpdateFailed, ProjectRootDiscoveryFailed | 🔵 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CapabilityProviderPort | secondary_port | reference | fn provider(&self) -> &ProviderName, fn dispatch(&self, request: &CapabilityDispatchRequest) -> Result<CapabilityDispatchOutcome, CapabilityExecError> | 🔵 | 🔵 |
+| CodexRuntimeProjectRootDiscoveryPort | secondary_port | add | fn discover_from(&self, start_directory: &std::path::Path) -> Result<std::path::PathBuf, CodexRuntimeProjectRootDiscoveryError> | 🔵 | 🔵 |
 | CodexRuntimeProvisionPort | secondary_port | add | fn provision(&self, project_root: &std::path::Path) -> Result<(), CodexRuntimeProvisionError> | 🔵 | 🔵 |
 | DryCheckAgentPort | secondary_port | reference | fn judge(&self, changed_fragment: &domain::semantic_dup::CodeFragment, candidate_fragment: &domain::semantic_dup::CodeFragment, tier: DryCheckJudgeTier) -> Result<DryCheckAgentJudgment, DryCheckAgentError> | 🔵 | 🔵 |
 | ReviewFixRunner | secondary_port | reference | fn run_fix(&self, command: RunReviewFixCommand) -> Result<RunReviewFixOutput, ReviewFixRunnerError> | 🔵 | 🔵 |
@@ -20,7 +22,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CodexRuntimeProvisionService | application_service | add | fn provision(&self, project_root: &std::path::Path) -> Result<(), CodexRuntimeProvisionError> | 🔵 | 🔵 |
+| CodexRuntimeProvisionService | application_service | add | fn provision(&self, project_root: Option<&std::path::Path>, invocation_directory: &std::path::Path) -> Result<(), CodexRuntimeProvisionError> | 🔵 | 🔵 |
 
 ## Interactors
 

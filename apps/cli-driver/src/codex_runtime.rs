@@ -10,8 +10,8 @@ use crate::render::CommandOutcome;
 /// Typed input for Codex runtime provisioning.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CodexRuntimeInput {
-    /// Repository root that receives the runtime link.
-    pub project_root: PathBuf,
+    /// Explicit repository root that receives the runtime link, when supplied.
+    pub project_root: Option<PathBuf>,
 }
 
 /// Primary adapter for the Codex runtime provisioning command.
@@ -29,7 +29,15 @@ impl CodexRuntimeDriver {
     /// Handle a Codex runtime provisioning request.
     #[must_use]
     pub fn handle(&self, input: CodexRuntimeInput) -> CommandOutcome {
-        match self.service.provision(input.project_root.as_path()) {
+        let invocation_directory = match std::env::current_dir() {
+            Ok(directory) => directory,
+            Err(error) => {
+                return CommandOutcome::failure(Some(format!(
+                    "failed to determine Codex runtime invocation directory: {error}"
+                )));
+            }
+        };
+        match self.service.provision(input.project_root.as_deref(), &invocation_directory) {
             Ok(()) => CommandOutcome::success(Some("[OK] Codex runtime provisioned".to_owned())),
             Err(error) => CommandOutcome::failure(Some(error.to_string())),
         }
@@ -39,8 +47,8 @@ impl CodexRuntimeDriver {
 #[cfg(test)]
 #[allow(clippy::expect_used)]
 mod tests {
-    use std::path::Path;
-    use std::sync::Arc;
+    use std::path::{Path, PathBuf};
+    use std::sync::{Arc, Mutex};
 
     use usecase::{
         DiagnosticMessage,
@@ -49,10 +57,18 @@ mod tests {
 
     use super::{CodexRuntimeDriver, CodexRuntimeInput};
 
-    struct SucceedingService;
+    struct RecordingService {
+        received_request: Mutex<Option<(Option<PathBuf>, PathBuf)>>,
+    }
 
-    impl CodexRuntimeProvisionService for SucceedingService {
-        fn provision(&self, _project_root: &Path) -> Result<(), CodexRuntimeProvisionError> {
+    impl CodexRuntimeProvisionService for RecordingService {
+        fn provision(
+            &self,
+            project_root: Option<&Path>,
+            invocation_directory: &Path,
+        ) -> Result<(), CodexRuntimeProvisionError> {
+            *self.received_request.lock().expect("test mutex must not be poisoned") =
+                Some((project_root.map(Path::to_path_buf), invocation_directory.to_path_buf()));
             Ok(())
         }
     }
@@ -60,7 +76,11 @@ mod tests {
     struct FailingService;
 
     impl CodexRuntimeProvisionService for FailingService {
-        fn provision(&self, _project_root: &Path) -> Result<(), CodexRuntimeProvisionError> {
+        fn provision(
+            &self,
+            _project_root: Option<&Path>,
+            _invocation_directory: &Path,
+        ) -> Result<(), CodexRuntimeProvisionError> {
             let detail = DiagnosticMessage::try_new("no verified Codex candidate".to_owned())
                 .expect("test diagnostic must be valid");
             Err(CodexRuntimeProvisionError::NoUsableCandidate(detail))
@@ -68,21 +88,45 @@ mod tests {
     }
 
     #[test]
-    fn test_handle_success_returns_provisioned_outcome() {
-        let driver = CodexRuntimeDriver::new(Arc::new(SucceedingService));
+    fn test_handle_forwards_explicit_root_and_invocation_directory_once() {
+        let service = Arc::new(RecordingService { received_request: Mutex::new(None) });
+        let driver = CodexRuntimeDriver::new(service.clone());
+        let invocation_directory =
+            std::env::current_dir().expect("test invocation directory must be readable");
 
-        let outcome = driver.handle(CodexRuntimeInput { project_root: "/workspace".into() });
+        let outcome = driver
+            .handle(CodexRuntimeInput { project_root: Some(PathBuf::from("/explicit/project")) });
 
         assert_eq!(outcome.exit_code, 0);
         assert_eq!(outcome.stdout.as_deref(), Some("[OK] Codex runtime provisioned"));
         assert_eq!(outcome.stderr, None);
+        assert_eq!(
+            *service.received_request.lock().expect("test mutex must not be poisoned"),
+            Some((Some(PathBuf::from("/explicit/project")), invocation_directory))
+        );
     }
 
     #[test]
-    fn test_handle_service_failure_returns_diagnostic() {
+    fn test_handle_forwards_omitted_root_and_invocation_directory_once() {
+        let service = Arc::new(RecordingService { received_request: Mutex::new(None) });
+        let driver = CodexRuntimeDriver::new(service.clone());
+        let invocation_directory =
+            std::env::current_dir().expect("test invocation directory must be readable");
+
+        let outcome = driver.handle(CodexRuntimeInput { project_root: None });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            *service.received_request.lock().expect("test mutex must not be poisoned"),
+            Some((None, invocation_directory))
+        );
+    }
+
+    #[test]
+    fn test_handle_service_failure_returns_typed_diagnostic() {
         let driver = CodexRuntimeDriver::new(Arc::new(FailingService));
 
-        let outcome = driver.handle(CodexRuntimeInput { project_root: "/workspace".into() });
+        let outcome = driver.handle(CodexRuntimeInput { project_root: None });
 
         assert_eq!(outcome.exit_code, 1);
         assert_eq!(outcome.stdout, None);
