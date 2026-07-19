@@ -16,7 +16,6 @@ User invokes this command as `/track:merge`. `$ARGUMENTS` supplies the PR number
   - `gh pr view --json number -q .number` (only when `$ARGUMENTS` is empty)
   - `bin/sotp pr wait-and-merge <pr_number>` (method omitted → configured default)
   - `bin/sotp pr wait-and-merge <pr_number> --method <method>` (only when the user explicitly supplied a method)
-
 ## Report format
 
 After execution, summarize:

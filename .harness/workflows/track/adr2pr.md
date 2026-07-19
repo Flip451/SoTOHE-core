@@ -105,15 +105,19 @@ sections (see `.harness/workflows/track/plan.md`; do not re-state them here).
 
 Do NOT invoke the `plan` workflow: after Step 1, the orchestrator is on a `track/<id>` branch,
 so the `plan` workflow's Phase 0 (`init`, which requires the configured base branch) would fail;
-and the `plan`
-workflow's Termination section can pause for a user decision when ADR working-tree diffs are
-present (violates Constraint 2). Plan artifacts are staged at Step 6 and committed at Step 7.
+and the `plan` workflow's Termination section leaves expected escalation diffs and track-born
+drafts for the PR merge audit. Plan artifacts are staged at Step 6 and committed at Step 7.
 
-Signal resolution rule for 🟡 (yellow): the `plan` workflow allows 🟡 to advance with a
-warning, but this `adr2pr` workflow requires 🟡 to be resolved before Step 9 (`full-cycle`
-begins). Any remaining 🟡 at Step 10 (`pr-review`) will surface as a merge blocker. If Phase 1
-or Phase 2 returns 🟡 after all reds are cleared, re-invoke the relevant writer to address
-the yellow before proceeding to the next step.
+Signal resolution rule for 🟡 (yellow): the `plan` workflow allows 🟡 to advance with a warning.
+A track-born new-ADR draft or amendment proposal intentionally remains 🟡 through Step 9 and
+Step 10 without re-invoking an unchanged writer. `adr2pr` stops at the reviewed PR; the later
+`merge` workflow's strict gate blocks merge until user adjudication, and that workflow's
+recovery lane (`.harness/workflows/track/merge.md` §Failure / recovery) owns the executable
+follow-through: after adjudication it dispatches `adr-editor` to promote the draft's grounds to
+`user_decision_ref`, stamps the track-born ADR with kind `new-adr` and its required reason,
+commits through the guarded flow, and re-invokes merge. Other 🟡 signals should be addressed by the owning
+writer before proceeding when they are actionable; any remaining 🟡 at Step 10 is reported as
+carried to that later merge gate.
 
 **Step 6: review workflow — plan artifacts**
 
@@ -155,8 +159,9 @@ Build the comment's provenance table by walking the ledger in append order, sele
 records whose `source` equals that primary filename and which occur after that source's `init`
 record. Exclude every other source's records, irrespective of kind. For each selected
 `escalation`, use its D3-compliant `reason` to show the origin-input source and summary, the
-`adr-diagnoser` verdict summary, the stamp hash and timestamp, and the commit that introduced
-the ledger row. For each selected `non-semantic-fix`, show its kind, stamp hash and timestamp,
+stamp hash and timestamp, and the commit that introduced the ledger row; include the
+`adr-diagnoser` verdict summary only when the reason records one (an expected-edit escalation
+carries no verdict — render `該当なし` for that field, not `記録なし`). For each selected `non-semantic-fix`, show its kind, stamp hash and timestamp,
 and introducing commit, and label it `非意味的な再刻印`; it has no required reason and must
 not be rendered as `記録なし`. Preserve any other selected kind faithfully with its recorded
 fields rather than dropping it.
@@ -230,9 +235,11 @@ All gates are binary; no step begins until the previous step's gate passes.
 3. **Batch-first execution**: `full-cycle` implements the full feature batch before review and
    commit by default. Per-task commit split is triggered only when a layer's cumulative diff
    is about to exceed its per-scope ceiling.
-4. **Signals must be resolved**: resolve every 🔴 at the phase where it surfaces. For 🟡:
-   resolve all yellows before Step 9 (`full-cycle`) begins; any remaining 🟡 at Step 10 will
-   surface as a merge blocker for the user.
+4. **Signals must be resolved**: resolve every 🔴 at the phase where it surfaces. For 🟡, resolve
+   actionable signals before Step 9 (`full-cycle`) begins. A track-born new-ADR draft or
+   amendment proposal intentionally remains 🟡 through Step 10; `adr2pr` hands it to the later
+   `merge` workflow, whose strict gate blocks merge until user adjudication promotes the grounds
+   and the track-born ADR receives its required `new-adr` stamp.
 5. **Phase 0 approval exception**: after the Step 2 ADR-baseline review reaches `zero_findings`,
    pause for the user-approval escalation described in Step 2 before stamping or committing the
    ADR baseline. This is the sole exception adr2pr itself adds to Constraint 2. The only other
@@ -250,4 +257,5 @@ All gates are binary; no step begins until the previous step's gate passes.
   provenance fallback when applicable, or a reported non-fatal posting/preparation failure
 - Per-step gate verdicts and commits produced
 - Any per-scope ceiling batch split decisions made during `full-cycle`
-- Confirmation that all 🔴/🟡 signals are resolved before Step 9
+- Confirmation that all 🔴 and actionable 🟡 signals are resolved before Step 9, with any
+  intentional track-born draft / amendment 🟡 carried to the strict merge gate

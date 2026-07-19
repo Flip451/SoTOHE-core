@@ -7,30 +7,44 @@
 
 ## Mission
 
-Edit an existing ADR (`knowledge/adr/*.md`) in the working tree to resolve a downstream 🔴 signal or an ADR-scoped review finding relayed through the orchestrator's guardian lane. The edit is always triggered by a concrete recorded input — a SoT Chain failure (Phase 1 spec → ADR signal, or Phase 2 type contract → spec → ADR propagation) or a recorded ADR-scope review finding — not by style preferences or proactive restructuring.
+Edit an existing ADR, or author a permitted track-born ADR draft, in `knowledge/adr/*.md` to resolve a downstream 🔴 signal or an ADR-scoped review finding relayed through the orchestrator's guardian lane. The work is always triggered by a concrete recorded input — a SoT Chain failure (Phase 1 spec → ADR signal, or Phase 2 type contract → spec → ADR propagation) or a recorded ADR-scope review finding — not by style preferences or proactive restructuring.
 
 This capability is **write-only to `knowledge/adr/*.md`**. It must not edit spec.json, type catalogues, metadata.json, impl-plan.json, task-coverage.json, or any other artifact.
 
 ## Invocation contract
 
-The orchestrator invokes this capability only on one of two triggers:
+The orchestrator invokes this capability only on one of three triggers:
 
 1. **Signal escalation** (`/track:plan` Phase 1 loop): the Phase 1 gate (spec → ADR signal)
    evaluated a 🔴 signal. Phase 2 🔴 escalates to `spec-designer` (not adr-editor); Phase 3
    ERROR re-invokes `impl-planner` in the same phase.
 2. **Guardian-lane review finding** (review workflow ADR-scope repair lane): a recorded
    ADR-scoped review finding whose fix requires an ADR edit, relayed by the orchestrator per
-   `knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権. Every edit
-   produced under this trigger passes `adr-diagnoser` edit judgment before adoption.
+   `knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権. During the
+   Phase 0 baseline-review loop, every edit produced under this trigger passes
+   `adr-diagnoser` edit judgment before adoption. In Phase 1+, a signal-driven escalation
+   edit (trigger 1) is an expected edit and proceeds directly to the reason-carrying
+   escalation snapshot without that judgment; an out-of-loop semantic proposal is recorded as
+   an amendment proposal for the asynchronous merge-stage adjudication instead of an in-place
+   edit.
+3. **Track-born new-decision draft**: a Phase 1+ escalation or out-of-loop proposal requires a
+   new decision but cannot amend the existing ADR in place. The capability authors a separate
+   `knowledge/adr/*.md` draft with non-user grounds. It is not stamped until user adjudication
+   promotes those grounds to `user_decision_ref`; the strict merge gate keeps the draft's 🟡
+   state from merging first.
 
-Rollback-safety precondition (either trigger): the target ADR has commit history, or — for a
-Phase 0 draft not yet committed — an `init`-kind ADR-baseline ledger record exists for it in the
-active track (its verbatim copy and `bin/sotp adr-baseline restore` provide the recovery route).
-With neither, the orchestrator pauses for the user instead of invoking adr-editor.
+Rollback-safety precondition (triggers 1 and 2 when targeting an existing user-approved ADR):
+the target ADR has commit history, or — for a Phase 0 draft not yet committed — an `init`-kind
+ADR-baseline ledger record exists for it in the active track (its verbatim copy and
+`bin/sotp adr-baseline restore` provide the recovery route). With neither, the orchestrator
+pauses for the user instead of invoking adr-editor. An unstamped non-user-grounded track-born
+ADR draft is exempt regardless of trigger and remains freely editable until asynchronous user
+adjudication promotes and stamps it.
 
 The briefing from the orchestrator must include:
 
-- The target ADR path (e.g., `knowledge/adr/YYYY-MM-DD-HHMM-<slug>.md`)
+- The target ADR path (e.g., `knowledge/adr/YYYY-MM-DD-HHMM-<slug>.md`), or for trigger 3 the
+  intended new ADR filename
 - The originating input — signal trigger: which spec element(s) fired 🔴, which `adr_refs[]` or
   `convention_refs[]` cited the ADR, and what the mismatch is; guardian-lane trigger: the
   recorded review finding verbatim (and, on re-invocation after a decision-breaking verdict, the
@@ -50,7 +64,9 @@ If the briefing asks for:
 
 - Spec.json changes → stop and advise the orchestrator to invoke `spec-designer`
 - Type catalogue changes → stop and advise to invoke `type-designer`
-- New ADR creation (not editing an existing file) → stop and advise the orchestrator; initial ADR authoring is the user's responsibility (pre-track stage, see `knowledge/conventions/pre-track-adr-authoring.md`)
+- New ADR creation outside trigger 3 → stop and advise the orchestrator; initial ADR authoring
+  for the planning input remains the user's responsibility before Phase 0 (see
+  `knowledge/conventions/pre-track-adr-authoring.md`)
 - Changes that require modifying multiple ADR files → resolve each file independently in separate sub-edits, one file per edit action
 
 ## Editing rules
@@ -93,8 +109,8 @@ The front-matter recognises exactly two top-level keys (`deny_unknown_fields` re
 - `adr_id` (required, non-empty string): the slug identifier — typically the file name without the `.md` extension (e.g. `<date>-<time>-<slug>`).
 - `decisions[]` (optional list, defaults to empty when omitted; may be empty for non-ADR README pages but otherwise carries one entry per `### D<n>` decision in the body):
   - `id` (required, non-empty string): a per-decision identifier such as `D1`, `D2`, …, or — for grandfathered legacy ADRs — `<file-stem>_grandfathered`.
-  - `user_decision_ref` (optional string): a reference to where the user explicitly approved the decision (chat segment ref, approval marker, etc.). Sets the signal to 🔵 Blue (highest priority — wins over `review_finding_ref` if both are set).
-  - `review_finding_ref` (optional string): a reference to a review-process finding that surfaced the decision. Sets the signal to 🟡 Yellow when no `user_decision_ref` is set.
+  - `user_decision_ref` (optional string): a reference to where the user explicitly approved the decision (chat segment ref, approval marker, etc.). Sets the signal to 🔵 Blue only when `review_finding_ref` is absent.
+  - `review_finding_ref` (optional string): a reference to a review-process finding that surfaced the decision. Its presence sets the signal to 🟡 Yellow, including when `user_decision_ref` is also present.
   - `candidate_selection` (optional string): when the decision selects from multiple candidates evaluated in `## Rejected Alternatives`, encode the choice (e.g. `"from:[A,B,C,D,E] chose:A"`).
   - `status` (required string): one of `proposed` / `accepted` / `implemented` / `superseded` / `deprecated`. These five values dispatch through the ADR front-matter parser to the corresponding decision typestate variants (one per status). Any other value is rejected at parse time.
   - `superseded_by` (optional string, **required when** `status: superseded`): a reference to the superseding decision (`<adr-slug>.md#<id>` form). Forbidden on any other status (the parser rejects it even if the value is `null`).
@@ -105,11 +121,17 @@ The front-matter recognises exactly two top-level keys (`deny_unknown_fields` re
 
 Every `decisions[]` entry MUST satisfy at least one of the following:
 
-1. `user_decision_ref` is set to any non-null value (Blue — the classifier uses presence, not emptiness), or
-2. `review_finding_ref` is set to any non-null value (Yellow — same presence check), or
-3. `grandfathered: true` is set (exempt from the signal check).
+1. `grandfathered: true` is set (exempt from the signal check), or
+2. `review_finding_ref` is a non-empty value (Yellow, regardless of whether
+   `user_decision_ref` is also present), or
+3. `user_decision_ref` is a non-empty value and `review_finding_ref` is absent (Blue).
+
+Empty or whitespace-only ground references are rejected fail-closed by the domain type.
 
 A decision with none of the three is evaluated as 🔴 Red and blocks the `cargo make verify-adr-signals` CI gate. Do not write a Red-grounded decision unless the briefing explicitly authorises it.
+
+When user adjudication promotes a track-born draft, replace its `review_finding_ref` with the
+new `user_decision_ref`; retaining both leaves the decision 🟡 and the strict merge gate blocks.
 
 ### Body preservation
 

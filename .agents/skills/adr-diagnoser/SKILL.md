@@ -1,7 +1,7 @@
 ---
 name: adr-diagnoser
 sandbox: read-only
-description: Use when Codex is assigned the SoTOHE `adr-diagnoser` capability — the guardian of ADR decisions. In edit-judgment mode it judges whether an in-track ADR edit preserves or breaks the recorded decisions (supplying a decision-preserving alternative or a no-change rationale when breaking); in mismatch mode it classifies an ADR-baseline byte mismatch as non-semantic restamp, deviation, or unknown-editor. Always returns a structured read-only verdict for the orchestrator.
+description: Use when Codex is assigned the SoTOHE `adr-diagnoser` capability — the guardian of ADR decisions. In edit-judgment mode it judges whether an ADR edit inside the Phase 0 baseline-review loop preserves or breaks the recorded decisions (supplying a decision-preserving alternative or a no-change rationale when breaking; Phase 1+ expected escalation edits stamp directly and are not edit-judgment inputs); in mismatch mode it classifies an unexpected ADR-baseline byte mismatch as non-semantic restamp, deviation, or unknown-editor. Always returns a structured read-only verdict for the orchestrator.
 ---
 
 # ADR-Diagnoser (Codex skill)

@@ -160,18 +160,28 @@ The `review-fix-lead` capability self-resolves its modification boundary via
 capability directly.
 
 **ADR-scope repair lane (before re-launching the affected review).** The orchestrator, rather
-than `review-fix-lead`, owns any ADR edit requested by an ADR-scoped finding. First resolve the
-ADR's effective merge-target lifecycle. For a post-merge semantic finding, do not dispatch an
-in-place editor. Dispatch `adr-diagnoser` in edit-judgment mode against the finding as a
-semantic proposal with its post-merge lifecycle judgment, relay its `alternative` or
-`no_change_rationale` verbatim to the finding's origin, and route an alternative through the
-new-ADR draft path required by `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`.
-For a pre-merge ADR, dispatch `adr-editor` with the finding as the originating input, then
-immediately dispatch `adr-diagnoser` in edit-judgment mode against that edit. Follow
-`knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権` for the resulting
-adopt-or-revert/relay action and its adjudication point. Re-launch the affected ADR review only
-after that guardian path completes; do not create an intermediate baseline stamp. This lane is
-capability-routed through the active profile and does not introduce a provider-specific branch.
+than `review-fix-lead`, owns any ADR edit requested by an ADR-scoped finding. Classify the
+finding by phase first, then lifecycle, using these mutually exclusive cases:
+
+1. **Inside the Phase 0 baseline-review loop**: every semantic proposal enters guardian
+   judgment. For a pre-merge ADR, dispatch `adr-editor` with the finding as the originating
+   input, then immediately dispatch `adr-diagnoser` in edit-judgment mode against that edit.
+   For a post-merge ADR, do not request an in-place edit; dispatch `adr-diagnoser` in
+   edit-judgment mode against the proposal so its `alternative` or `no_change_rationale` is
+   relayed through the retained Phase 0 adjudication lane. Follow
+   `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権` for the resulting
+   adopt-or-revert/relay action and its adjudication point. Re-launch the affected ADR review
+   only after that guardian path completes; do not create an intermediate baseline stamp.
+2. **After Phase 0** (the baseline is committed): a finding on an existing unstamped
+   track-born draft is applied to that draft through adr-editor, without guardian judgment; it
+   remains non-user grounded and freely editable. Every other ADR-scoped semantic finding is an
+   out-of-loop proposal: do not perform an in-place edit and do not pause the pipeline — dispatch
+   `adr-editor` trigger 3 to author a separate track-born ADR draft recording the amendment
+   proposal (non-user grounds → chain ⓪ 🟡; the strict merge gate forces asynchronous user
+   adjudication before merge).
+
+This lane is capability-routed through the active profile and does not introduce a
+provider-specific branch.
 
 The handoff channel into this lane is the recorded round itself: a fixer honoring the ADR
 semantic freeze applies no ADR edit, leaves the finding recorded on the round

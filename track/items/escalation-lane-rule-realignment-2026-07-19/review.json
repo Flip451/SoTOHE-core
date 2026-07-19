@@ -1,42 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d55cb9fba61977590ae2e9435df04ada264cf39af04a3f27338c4d4d1e40879d",
-          "at": "2026-07-19T01:30:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d55cb9fba61977590ae2e9435df04ada264cf39af04a3f27338c4d4d1e40879d",
-          "at": "2026-07-19T01:32:28Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:261b2eacac0d337233cbb257f7437a67dd68ee9e043492b062ae35cc2f5e6f8c",
-          "at": "2026-07-19T01:51:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:261b2eacac0d337233cbb257f7437a67dd68ee9e043492b062ae35cc2f5e6f8c",
-          "at": "2026-07-19T01:54:53Z"
-        }
-      ]
-    },
     "types": {
       "rounds": [
         {
@@ -142,6 +106,422 @@
           "findings": [],
           "hash": "rvw1:sha256:0b037475ca89df93f8efd8e6dc2fbc71d329609c3db35825d08c6333f16577a4",
           "at": "2026-07-19T02:03:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3311620e8f4579dc3a57e1b915122bab5d4b14b94fa44a25b61fcc8ac3892010",
+          "at": "2026-07-19T02:11:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3311620e8f4579dc3a57e1b915122bab5d4b14b94fa44a25b61fcc8ac3892010",
+          "at": "2026-07-19T02:13:46Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1+ の expected escalation editsは `adr-diagnoser` を経由しない新ルールに変更されていますが、同じ convention の責務表とReview Checklistは依然として「track内のADR編集ごと」「in-trackのADR編集ごと」に全編集へ guardian判定を要求しています。これによりPhase 1+の運用契約が自己矛盾し、実行者が判定を必須と解釈し得ます。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 40,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:65c46dc5aa47aa5f33e4a9bc2fb4bc50660bee9b3a22465b28e0c05ddc7ea9b6",
+          "at": "2026-07-19T02:12:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efe9681e1d9cccc4aa27662af7536854c06804086e4197d6ed9e36f2e21e3cb4",
+          "at": "2026-07-19T02:13:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `decision-breaking` action now unconditionally forbids a synchronous pause, but this mode is limited to the Phase 0 baseline-review loop. Phase 0 requires unresolved decision-breaking proposals to wait for user adjudication before stamping or committing. Qualify the asynchronous draft route to post-Phase-0 proposals and preserve the Phase 0 escalation path.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 85,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "The revised capability permits edit judgment only in Phase 0, yet this Phase 1 post-merge branch still dispatches it; `.harness/workflows/track/review.md:165` does likewise after Phase 0. These calls are now outside the capability contract. Route them directly to the asynchronous amendment/new-ADR lane or retain an explicit proposal-classification mode.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 130,
+              "category": "command_wiring_breakage"
+            },
+            {
+              "message": "The new workflows require recording a track-born Yellow amendment/new-ADR draft, but the sole ADR writer still refuses new ADR creation, while the convention prohibits the orchestrator from directly editing ADR files. No permitted writer can therefore create the artifact required by the asynchronous lane.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-editor.md",
+              "line": 58,
+              "category": "command_wiring_breakage"
+            },
+            {
+              "message": "Phase 1 edits are now stamped immediately and must not cause synchronous adjudication, but Termination still pauses for accept/revert/manual-edit whenever such an ADR diff exists. Besides contradicting the new autonomous rule, choosing `revert` after the escalation snapshot leaves the ADR bytes inconsistent with the latest baseline. Remove or realign this stale termination path and the matching convention text.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 180,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "The asynchronous new-decision route deliberately remains Yellow until user adjudication at PR/merge, but `adr2pr` still requires every Yellow to be resolved before Step 9 while forbidding user pauses before Step 10. Such a draft can never reach its intended adjudication point, so the autonomous workflow deadlocks or repeatedly invokes an unchanged writer.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 112,
+              "category": "convention_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:efe9681e1d9cccc4aa27662af7536854c06804086e4197d6ed9e36f2e21e3cb4",
+          "at": "2026-07-19T02:21:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This branch forbids invoking `adr-editor`, but the referenced new-ADR path and the newly added trigger 3 require `adr-editor` to author the track-born draft. A post-merge proposal therefore has no executable writer path. Forbid only in-place editing and explicitly dispatch trigger 3.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 130,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "Unapproved track-born drafts are supposed to remain freely editable without synchronous adjudication, yet this no-history rule, plan step d, and the adr-editor rollback precondition still pause instead. Review also classifies every post-Phase-0 semantic finding as a new amendment rather than permitting edits to an unstamped draft. Consequently a newly created draft cannot be refined after another signal or review finding.",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 22,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "The front-matter rules still claim `user_decision_ref` wins when `review_finding_ref` is also present. `knowledge/conventions/adr.md` states the opposite: any retained `review_finding_ref` keeps the decision Yellow. The new promotion path may therefore add user grounds while remaining permanently merge-blocked; it must replace/remove the review grounds and document the real precedence.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-editor.md",
+              "line": 109,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "The SSoT now explicitly terminates without a user accept/revert decision, but `.claude/commands/track/plan.md:54` still requires reporting “the user's termination decision.” This stale adapter contract can reintroduce the removed synchronous pause and violates adapter–SSoT synchronization.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 181,
+              "category": "adapter_ssot_sync"
+            },
+            {
+              "message": "The new Yellow exception at lines 111–116 is contradicted by retained Constraint 4 here and the output contract at line 254, both of which still require all Yellow signals to be resolved before Step 9. `.claude/commands/track/adr2pr.md:56` repeats the stale requirement. Track-born drafts therefore remain blocked before their intended PR/merge adjudication point.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 234,
+              "category": "adapter_ssot_sync"
+            }
+          ],
+          "hash": "rvw1:sha256:c37d97b4d0ef1f594415d11fab78ec4e386b94a65f5e61e7ae1886014a1b6c8b",
+          "at": "2026-07-19T02:32:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "新設された trigger 3（track-born new-decision draft）は「commit 履歴も baseline 刻印も要求しない」と定義されていますが、直後の共通 Rollback-safety precondition は「既存 ADR の commit 履歴、または Phase 0 draft の init baseline ledger」が必須で、trigger 3 の新規 ADR draft を満たせません。この矛盾により、Phase 1+ の新 decision 経路で adr-editor を起動できなくなります。",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-editor.md",
+              "line": 36,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6bb9ff78026699f2591b9f0fa177abbaab2071238f04f2dbfdc45fcffd3e7c6a",
+          "at": "2026-07-19T02:36:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1 loop step e は post-merge ADR の場合に「変更されていない merged ADR に対して `spec-design` を再起動しない」と明示していますが、直後の step g は例外なく「escalation edit が stamp または amendment proposal の後に `spec-design` を再起動する」と指示しています。post-merge の trigger 3 経路で再起動可否が矛盾し、意図しない再試行やループを起こし得ます。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 149,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8b641697c724634a5dd0570345c1f6071c26fe3bd7ab32837fff2560749da721",
+          "at": "2026-07-19T02:38:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1+（Phase 0後）のADR-scope semantic findingについて、review workflowは「amendment proposalとして記録」するだけで、`adr-editor` trigger 3による新しい track-born ADR draftの作成を指示していません。一方、`adr-editor` capabilityとpre-track conventionは、新decisionの提案を別ADR draftとして作成し、非user groundsでchain ⓪の🟡を発生させる契約です。このままではstrict merge gateが評価すべきdraftが存在せず、提案が実行可能な成果物として配線されません。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 175,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:f3b7cb5552d3fbe4fa84324235c9d29d172ba1fa539eef2b2ba1925a621722a7",
+          "at": "2026-07-19T02:39:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:998216260299d0406a61071dd3e4c29070cd8f2a51eac6e5c5232b090f7c479f",
+          "at": "2026-07-19T02:40:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Mismatch mode still lists `adr-baseline check-review` as a byte-mismatch trigger, but the review workflow and convention define that command as checking only init-stamp presence and ledger integrity; byte comparison occurs at commit/CI. This can misroute a missing or corrupt review ledger into semantic mismatch diagnosis. Limit this mode to `check-commit`/CI byte failures.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 25,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "The post-merge alternative path still hands new-ADR authoring to user + main and explicitly says `adr-editor` does not create it. That contradicts trigger 3 and the asynchronous D7 lane, which require `adr-editor` to author the separate non-user-grounded draft. Route the alternative back through `adr-editor` trigger 3.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 91,
+              "category": "command_wiring_breakage"
+            },
+            {
+              "message": "The rollback exception covers trigger 3 creation only. Subsequent signal/review edits to an existing unstamped track-born draft use triggers 1 or 2 and therefore hit this history/init requirement, contradicting the review workflow and convention that such drafts remain freely editable. Exempt unstamped non-user-grounded track-born drafts regardless of trigger, or define an explicit revision trigger.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-editor.md",
+              "line": 36,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "This grounds rule still says any non-null `user_decision_ref` is Blue and that presence, not emptiness, is what matters. The ADR convention rejects blank references and makes any retained `review_finding_ref` Yellow even when a user ref is also present. Following this rule can produce invalid front matter or misreport a merge-blocking decision as Blue.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-editor.md",
+              "line": 123,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "This places the strict merge gate and user adjudication in Step 10, but Step 10 delegates to `pr-review`, whose SSoT explicitly performs no merge and never invokes `wait-and-merge`. The Yellow draft actually survives adr2pr and is blocked only by the separate merge workflow. Correct the gate location and document the later promotion/stamping recovery path.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 113,
+              "category": "command_wiring_breakage"
+            },
+            {
+              "message": "The task preamble still registers Termination as requiring a user decision, contradicting the Termination procedure and Claude adapter, which explicitly forbid a synchronous accept/revert decision for expected edits and track-born drafts. This stale task contract can reintroduce the removed pause.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 55,
+              "category": "adapter_ssot_sync"
+            },
+            {
+              "message": "This failure rule still pauses every pre-merge ADR edit lacking commit history, including an unstamped track-born draft. That contradicts the explicit exception at lines 130–131 and the convention that such drafts require neither history nor a synchronous pause. Restrict this recovery rule to existing user-approved ADRs.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 236,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "The Purpose still states without qualification that ADR generation is removed from `/track:plan` and that plan performs only preflight. Later rules now require Phase 1+ to invoke `adr-editor` to create track-born ADR drafts. Limit this statement to generation of the primary input ADR.",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 5,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "This unqualified “Good” example still routes a review finding requesting a decision change through `adr-diagnoser`. That is valid only in the Phase 0 baseline-review loop; after Phase 0 the new contract bypasses edit judgment and dispatches `adr-editor` trigger 3. Qualify the example as Phase 0 or show the post-Phase-0 route separately.",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 75,
+              "category": "convention_contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:998216260299d0406a61071dd3e4c29070cd8f2a51eac6e5c5232b090f7c479f",
+          "at": "2026-07-19T02:49:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The repair lane branches on lifecycle before phase. A post-merge semantic finding during Phase 0 therefore bypasses `adr-diagnoser` and immediately creates a trigger-3 draft, contradicting the retained Phase 0 guardian contract. After Phase 0, the same post-merge finding also matches both trigger-3 branches and may dispatch twice. Define mutually exclusive phase × lifecycle cases and preserve guardian judgment for Phase 0.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 164,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "This assigns promotion of ADR front matter to the orchestrator, while the writer table and the direct-edit prohibition reserve every `knowledge/adr/*.md` mutation to `adr-editor`. Promotion is not a baseline snapshot operation, so the atomic snapshot command cannot perform it. Require the orchestrator to dispatch `adr-editor` for the ref replacement, then perform the `new-adr` snapshot itself.",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 59,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "The intentional-Yellow handoff has no executable recovery in the referenced `merge` workflow. `adr2pr` has already terminated, while `merge` only invokes `wait-and-merge` and stops on a strict-gate failure; it does not obtain adjudication, dispatch `adr-editor`, create the `new-adr` snapshot, or commit/push/re-review the resulting changes. Consequently the documented track-born-draft path dead-ends at merge. Wire an explicit permitted recovery workflow before retrying merge.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 113,
+              "category": "command_wiring_breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:64a680d1fde9e75e3fa6080ece80ec4bf38fef79e636af95bb31f8734c044b85",
+          "at": "2026-07-19T02:59:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`merge.md` の Failure / recovery は、意図的な🟡が strict merge gate でブロックされた場合に `adr-editor` を起動し、ADRをstampして guarded flowでcommitし、push後にmergeを再実行する手順を定義しています。一方、同じworkflowのOutputsは「No local commits are created by this workflow」と明記しています。この矛盾により、ユーザー裁定後の必須復旧手順をworkflow自身が禁止しており、mergeを完了できません。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/merge.md",
+              "line": 66,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:44feaf2d953be83f598c06f0f668e9931706a44234890927eae00d964c5c61a0",
+          "at": "2026-07-19T03:03:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5ac185e5c9538cbb91df1b811a9f75196223671197b44cdc2e8a2aa60e93b8d",
+          "at": "2026-07-19T03:04:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The recovery section depends on a strict signal gate, but the canonical `wait-and-merge` sequence and Gates table declare only task completion, CI polling, and the wrapper exit gate. This leaves a merge-blocking gate absent from the workflow contract even though the wrapper enforces it. Add the strict merge-signal check and its verdict to the sequence and gate table.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/merge.md",
+              "line": 41,
+              "category": "command_wiring_breakage"
+            },
+            {
+              "message": "The new recovery requires capability dispatch, snapshotting, review/commit orchestration, and a safe push, but the Claude merge adapter still declares only `gh pr view` and `wait-and-merge` wrappers and has no provider-routed `adr-editor` invocation. The recovery is therefore not executable through that adapter without inventing provider-specific behavior or risking direct git operations. Update the adapter with the required dispatch and wrapper framing.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/merge.md",
+              "line": 78,
+              "category": "adapter_ssot_sync"
+            },
+            {
+              "message": "This recovery performs local ADR edits, snapshots, and commits without first ensuring that the current checkout is the target PR's head branch. Because the workflow accepts an explicit PR number from any branch, it can stamp or commit against the wrong track context. Resolve the PR head and require or establish that matching `track/<id>` branch before any recovery mutation.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/merge.md",
+              "line": 81,
+              "category": "command_wiring_breakage"
+            },
+            {
+              "message": "After the adjudication recovery creates and pushes a new commit, it immediately re-invokes merge. The prior `pr-review` terminal verdict applies to the old HEAD, and automated PR review is not automatically refreshed by this path. Re-run the canonical `pr-review` workflow to a terminal zero-findings/approved-deviation state before retrying merge.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/merge.md",
+              "line": 83,
+              "category": "command_wiring_breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:a5ac185e5c9538cbb91df1b811a9f75196223671197b44cdc2e8a2aa60e93b8d",
+          "at": "2026-07-19T03:08:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`.claude/commands/track/merge.md` の追加された Intentional-🟡 recovery 節が、workflow SSoT のFailure / recovery手順（branch解決、adr-editor dispatch、snapshot、guarded commit、push、pr-review再実行）を詳細に複製しています。adapterは起動形態・Tool制約・報告形式に限定しworkflow logicを複製しないという adapter-SSoT 契約に違反し、将来の更新時に手順が乖離します。",
+              "severity": "P1",
+              "file": ".claude/commands/track/merge.md",
+              "line": 19,
+              "category": "adapter-SSoT 同期 check"
+            }
+          ],
+          "hash": "rvw1:sha256:3447cfa46413b87e4c4e2dc6efdf5b6af94089c56f091345921ef44ca174fd75",
+          "at": "2026-07-19T03:10:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:94dfabccc5158e1aee74e7b4a9ef24b54f3051c069133767d4e7faeaf3ebb186",
+          "at": "2026-07-19T03:11:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`wait-and-merge` does not surface merge-strict signal evaluation through the polled PR checks. Its implementation runs `check_strict_merge_gate` after the task guard and before entering the `gh pr checks` polling loop, returning `[BLOCKED] strict spec signal gate failed` directly. Describing this as a failing PR check miswires the gate sequence and recovery trigger; document it as a separate wrapper step and route that direct failure to the intentional-🟡 adjudication path.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/merge.md",
+              "line": 46,
+              "category": "command_wiring_breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:94dfabccc5158e1aee74e7b4a9ef24b54f3051c069133767d4e7faeaf3ebb186",
+          "at": "2026-07-19T03:15:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:841b5bf2f5de8fdb40e847647fa2f3268c1d64e1b55db307744f5718be585be1",
+          "at": "2026-07-19T03:20:51Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d55cb9fba61977590ae2e9435df04ada264cf39af04a3f27338c4d4d1e40879d",
+          "at": "2026-07-19T01:30:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d55cb9fba61977590ae2e9435df04ada264cf39af04a3f27338c4d4d1e40879d",
+          "at": "2026-07-19T01:32:28Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:261b2eacac0d337233cbb257f7437a67dd68ee9e043492b062ae35cc2f5e6f8c",
+          "at": "2026-07-19T01:51:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:261b2eacac0d337233cbb257f7437a67dd68ee9e043492b062ae35cc2f5e6f8c",
+          "at": "2026-07-19T01:54:53Z"
         }
       ]
     }

@@ -10,18 +10,23 @@ Guard the ADR's recorded decisions throughout a track. The capability returns re
 verdicts in two modes. It never becomes part of a binary gate's decision path and never writes
 a baseline, restores an ADR, or edits an ADR.
 
-1. **Edit judgment (守護者判定)** — for every in-track ADR edit (the Phase 0 baseline-review
-   loop and the Phase 1+ signal-driven escalation loops), judge **before adoption / stamping**
-   whether the edit breaks the recorded decisions. Decision-preserving refinement is
-   admissible; a decision-breaking edit is reverted by the orchestrator, and this capability
-   must then present either a decision-preserving alternative or a reasoned no-change
-   statement, which the orchestrator relays verbatim to the finding's origin. The surrounding
-   loop contract lives in `knowledge/conventions/pre-track-adr-authoring.md`
-   §In-track 意味変更の裁定権. This lane exists only for an ADR whose effective merge-target
-   status is pre-merge; a semantic proposal for a merged ADR must be routed as a new-ADR draft.
+1. **Edit judgment (守護者判定)** — for ADR edits inside the **Phase 0 baseline-review
+   loop**, judge **before adoption / stamping** whether the edit breaks the recorded
+   decisions. Decision-preserving refinement is admissible; a decision-breaking edit is
+   reverted by the orchestrator, and this capability must then present either a
+   decision-preserving alternative or a reasoned no-change statement, which the orchestrator
+   relays verbatim to the finding's origin. The surrounding loop contract lives in
+   `knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権. This lane
+   exists only for an ADR whose effective merge-target status is pre-merge; a semantic
+   proposal for a merged ADR must be routed as a new-ADR draft. **Phase 1+ grounding
+   escalation edits are expected edits and are NOT gated by this judgment** — the
+   orchestrator proceeds directly to the reason-carrying escalation snapshot after the
+   adr-editor edit; this capability's remaining post for those phases is mode 2 below.
 2. **Mismatch classification** — classify an ADR-baseline byte mismatch **after**
-   `adr-baseline check-review`, `adr-baseline check-commit`, or the track-aware CI path has
-   blocked, comparing the current ADR with its latest recorded baseline.
+   `adr-baseline check-commit` or the track-aware CI byte-check path has blocked, comparing the
+   current ADR with its latest recorded baseline. `adr-baseline check-review` instead checks the
+   required init designation and ledger integrity; its failure is not a byte-mismatch input to
+   this mode.
 
 ## Invocation contract
 
@@ -32,8 +37,8 @@ The mode is determined by the briefing content.
 - the direct `knowledge/adr/` source filename and active track id;
 - the pre-edit text and the proposed / applied edit (or their diff);
 - the originating finding or proposal that motivated the edit, verbatim;
-- the phase context (Phase 0 baseline-review loop, or the Phase 1+ loop and its trigger
-  signal).
+- the phase context (the Phase 0 baseline-review loop; a Phase 1+ expected escalation edit
+  is not a valid edit-judgment input — it stamps directly).
 - the effective merge-target lifecycle judgment (pre-merge or post-merge) under
   `knowledge/conventions/adr.md` §Lifecycle;
 - if Phase 0 has already reached a user adjudication that explicitly adopts a
@@ -78,15 +83,16 @@ Return exactly one verdict:
 
 | verdict | Use when | Orchestrator action |
 |---|---|---|
-| `decision-preserved` | Either (a) the ADR is pre-merge and the edit only refines, clarifies, or strengthens grounding without overturning, narrowing, or replacing any recorded decision in the applicable comparison reference, or (b) the ADR is post-merge and the edit is limited to a typo, reference-path, or back-reference correction with no semantic effect. | For (a), adopt the edit: Phase 0 loop continues without stamping; Phase 1+ proceeds to the escalation snapshot. For (b), adopt it only through the normal non-semantic correction/restamp route; it is not a semantic escalation. |
-| `decision-breaking` | The edit overturns, narrows, or replaces a recorded decision — or its effect on a decision is uncertain. Uncertainty fails closed. | Revert the edit. Relay this capability's `alternative` or `no_change_rationale` verbatim to the finding's origin; record the proposal and verdict for the adjudication point (Phase 0 user escalation / merge audit). |
+| `decision-preserved` | Either (a) the ADR is pre-merge and the edit only refines, clarifies, or strengthens grounding without overturning, narrowing, or replacing any recorded decision in the applicable comparison reference, or (b) the ADR is post-merge and the edit is limited to a typo, reference-path, or back-reference correction with no semantic effect. | For (a), adopt the edit: the Phase 0 loop continues without stamping. For (b), adopt it only through the normal non-semantic correction/restamp route; it is not a semantic escalation. |
+| `decision-breaking` | The edit overturns, narrows, or replaces a recorded decision — or its effect on a decision is uncertain. Uncertainty fails closed. | Revert the edit. Relay this capability's `alternative` or `no_change_rationale` verbatim to the finding's origin. In this Phase 0 lane, an unresolved conflict is carried to the Phase 0 user escalation, without stamping, and waits for that adjudication. A post-Phase-0 new-decision proposal is not an edit-judgment input: it is recorded with non-user grounds (`review_finding_ref` etc.) as a draft / amendment proposal under chain ⓪ 🟡, and the strict merge gate enforces user adjudication asynchronously before merge; after that adjudication, the orchestrator dispatches adr-editor to promote the grounds to `user_decision_ref`, then stamps the track-born ADR (kind: new-adr, reason required). |
 
 For a `decision-breaking` verdict this capability MUST supply exactly one of:
 
 - `alternative` — a decision-preserving way to address the originating concern. For a
   pre-merge ADR, an adopted edit alternative is applied by adr-editor; for a post-merge ADR,
-  it is a new-ADR draft and is handed to the user + main pre-track authoring and approval path.
-  Neither adr-editor nor this capability creates that new ADR;
+  it is a separate track-born new-ADR draft authored by adr-editor trigger 3 with non-user
+  grounds. The strict merge gate defers its user adjudication asynchronously; this capability
+  does not create the draft;
 - `no_change_rationale` — a reasoned statement that no modification is needed.
 
 A bare rejection carrying neither field is an invalid output.
@@ -164,11 +170,11 @@ for `deviation`, the briefing-injection requirement.
   existing ADR in this track.
 - In edit judgment, `alternative` is prose inside the verdict output. For a pre-merge ADR,
   applying an adopted edit alternative is adr-editor's work after the orchestrator relays it.
-  For a post-merge ADR, an alternative is a new-ADR draft and must follow the user + main
-  pre-track authoring and approval path; adr-editor does not create it. This capability never
-  edits an ADR to demonstrate its own alternative, and its verdict is relayed to the finding's
-  origin verbatim — the orchestrator must not rewrite or summarize it into an adjudication of
-  its own.
+  For a post-merge ADR, the orchestrator dispatches adr-editor trigger 3 to author the separate
+  track-born new-ADR draft with non-user grounds; the strict merge gate defers user adjudication
+  asynchronously. This capability never edits an ADR to demonstrate its own alternative, and
+  its verdict is relayed to the finding's origin verbatim — the orchestrator must not rewrite or
+  summarize it into an adjudication of its own.
 
 ## Session resume
 

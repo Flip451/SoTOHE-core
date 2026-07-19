@@ -51,5 +51,5 @@ On completion, present:
 1. Per-phase gate results (🔵🟡🔴 / OK / ERROR) and final `max_retry` counters per loop.
 2. Generated track artifact paths (`metadata.json` / `spec.json` / `<layer>-types.json` / `impl-plan.json` / `task-coverage.json`).
 3. Back-and-forth edits that occurred (target artifact and its writer).
-4. ADR working-tree diff against HEAD (if any) and the user's termination decision.
+4. ADR working-tree diff against HEAD (if any) — expected escalation diffs and track-born drafts are reported as carried to the PR merge audit (no synchronous termination decision is requested).
 5. Suggested next commands: standard lane (`/track:implement` → `/track:review` → `/track:commit`, or `/track:full-cycle`) or planning-review-first (`/track:review` → `/track:commit`).

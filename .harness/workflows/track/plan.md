@@ -52,7 +52,8 @@ stays visible across phases and back-and-forth loops:
 2. Phase 1 loop — invoke `spec-design` workflow, evaluate spec → ADR signal, escalate on 🔴
 3. Phase 2 loop — invoke `type-design` workflow, evaluate type → spec signal per layer, escalate on 🔴
 4. Phase 3 loop — invoke `impl-plan` workflow, evaluate task-coverage gate, re-invoke on ERROR
-5. Termination — ADR working-tree diff presentation and user decision
+5. Termination — ADR working-tree diff presentation and PR merge-audit handoff (no synchronous
+   accept / revert / manual-edit decision for an expected escalation diff or track-born draft)
 
 Mark each item `in_progress` before executing and `completed` after it passes. When back-and-forth
 escalation runs, append a sub-task for each re-invocation.
@@ -125,22 +126,31 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
      c. If the ADR is pre-merge and has commit history, invoke the `adr-editor` capability.
         Briefing must include the 🔴 element(s), ADR path, the resolved `merge_target` value,
         and the constraint "edit working tree only; do not commit inside the loop".
-     d. If the ADR is pre-merge and has no commit history, pause for user — instruct them to
-        commit the ADR first.
-     e. If the ADR is post-merge, do not invoke `adr-editor`. Dispatch `adr-diagnoser` in
-        edit-judgment mode on the recorded semantic proposal with its lifecycle judgment, then
-        relay its `alternative` or `no_change_rationale` verbatim and use the new-ADR draft path
-        required by `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`.
-        Stop this escalation pending that path; do not re-invoke `spec-design` against an
-        unchanged merged ADR.
-     f. After every pre-merge ADR edit, invoke `adr-diagnoser` in edit-judgment mode before adoption, as
-        required by `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`.
-        On a decision-preserving verdict, adopt and stamp the edit through the normal escalation
-        path. On a decision-breaking verdict, revert it and relay the verdict's `alternative` or
-        `no_change_rationale` verbatim to the originating signal/finding; route an unresolved
-        conflict to that norm's adjudication point.
-     g. After the pre-merge guardian loop resolves, re-invoke `spec-design`. Count against `max_retry`; on
-        overflow, stop.
+     d. If the ADR is pre-merge, has no commit history, and carries a user-approved decision
+        (`user_decision_ref` present), pause for user — instruct them to commit the ADR first
+        (rollback-safety). A track-born draft with only non-user grounds and no stamp is
+        outside the freeze and is edited freely in the normal lane without a pause.
+     e. If the ADR is post-merge, do not invoke `adr-editor` for an in-place edit or
+        `adr-diagnoser` in edit-judgment mode. Instead dispatch `adr-editor` trigger 3 to author
+        the separate new-ADR draft required by
+        `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`, with
+        non-user grounds so chain ⓪ remains 🟡 until merge-stage adjudication. Do not re-invoke
+        `spec-design` against the unchanged merged ADR.
+     f. A pre-merge ADR edit produced by this escalation is an **expected edit** per
+        `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`: adopt it
+        and stamp it directly through the escalation snapshot (kind: escalation, self-contained
+        reason required) without an `adr-diagnoser` edit-judgment gate. `adr-diagnoser` remains
+        the triage route for unexpected baseline mismatches only. If the escalation instead
+        calls for a NEW decision (not a preserving refinement of the recorded ones), do not
+        pause the pipeline for a synchronous adjudication: dispatch `adr-editor` trigger 3 to
+        author a draft with non-user grounds so chain ⓪ evaluates 🟡 and the strict merge gate
+        forces the asynchronous user adjudication before merge; after that adjudication, dispatch
+        `adr-editor` to promote the grounds to `user_decision_ref`, then stamp the track-born ADR
+        with kind: new-adr and its required reason.
+     g. After a pre-merge in-place escalation edit is stamped, re-invoke `spec-design`. Count
+        against `max_retry`; on overflow, stop. A trigger 3 amendment/new-decision draft does
+        not change the existing ADR that produced the signal, so record the proposal for
+        asynchronous merge-stage adjudication and do not retry that unchanged signal.
 
 ### Phase 2 loop: type-design workflow
 
@@ -171,12 +181,12 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
 
 After Phase 3 OK (or `max_retry` overflow anywhere):
 
-1. Check whether the ADR working tree differs from HEAD.
-2. If the diff is non-empty, present it to the user and ask for a decision:
-   - **accept**: stage and commit the ADR alongside other artifacts
-   - **revert**: discard the ADR working-tree changes
-   - **manual edit**: pause for the user to refine further
-   - **abort**: stop the workflow and leave the tree as-is
+1. Check whether the ADR working tree differs from HEAD. Expected Phase 1+ escalation edits have
+   already received their escalation snapshots; track-born drafts remain 🟡 until the strict merge
+   gate obtains user adjudication.
+2. Do not pause for accept / revert / manual-edit solely because of either kind of diff. Record
+   the diff for the PR merge audit. An unexpected baseline mismatch remains fail-closed and must
+   enter the mismatch-classification / restore route before termination.
 3. Mark the Termination task `completed`.
 
 ### Writer ownership
@@ -224,11 +234,12 @@ operations, environment-breaking changes. Artifact generation uses post-hoc revi
 - **Non-compatible branch**: report the branch and available options.
 - **Phase N 🔴 after max_retry overflows**: stop and present options (continue with warnings,
   abort, manual edit).
-- **Pre-merge `adr-editor` path without commit history**: pause for user to commit the ADR
-  first, then resume.
-- **Post-merge Phase 1 ADR proposal**: route through `adr-diagnoser` to the new-ADR draft path
-  specified by `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`; do
-  not retry the unchanged signal.
+- **Pre-merge existing user-approved ADR path without commit history**: pause for user to commit
+  the ADR first, then resume. An unstamped non-user-grounded track-born draft remains editable
+  without history or a synchronous pause.
+- **Post-merge Phase 1 ADR proposal**: record it through the new-ADR draft path specified by
+  `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`; do not retry the
+  unchanged signal.
 - **`[ESCALATE]` from `ref-verify`**: report to user and stop. Do not retry.
 
 ## Outputs
@@ -239,5 +250,6 @@ operations, environment-breaking changes. Artifact generation uses post-hoc revi
 - `track/items/<id>/impl-plan.json` + `task-coverage.json` (Phase 3)
 - Per-phase gate results (🔵🟡🔴 / OK / ERROR) and final `max_retry` counters
 - Back-and-forth edits that occurred (target artifact and its writer)
-- ADR working-tree diff against HEAD (if any) and user termination decision
+- ADR working-tree diff against HEAD (if any), its snapshot / draft status, and PR merge-audit
+  handoff
 - The guarded Phase 0 ADR-baseline commit result

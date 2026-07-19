@@ -53,6 +53,6 @@ After execution, summarize:
 1. Each step's gate verdict and the commits produced.
 2. PR URL and the final `/track:pr-review` result (confirming no merge was performed).
 3. Any per-scope ceiling batch split decisions made during full-cycle.
-4. Confirmation that all 🔴/🟡 signals are resolved.
+4. Confirmation that all 🔴 and actionable 🟡 signals are resolved, with any intentional track-born draft / amendment 🟡 explicitly reported as carried to the strict merge gate.
 5. The terminal primary-ADR diff-comment result: posted URL, or its empty-diff/provenance
    fallback outcome, or the reported non-fatal posting failure.
