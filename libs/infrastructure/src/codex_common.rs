@@ -136,12 +136,20 @@ pub fn resolve_codex_runtime(
         }
     }
 
+    // PATH entries may be relative to the caller's working directory. Capture
+    // that directory before locating and probing the candidate so the stored
+    // runtime remains valid when a later spawn changes its working directory.
+    let probe_directory = std::env::current_dir().map_err(|error| {
+        CodexRuntimeResolveError::PathFallbackUnavailable(diagnostic(format!(
+            "cannot determine current directory for PATH fallback: {error}; rerun `cargo make bootstrap`"
+        )))
+    })?;
     let fallback = find_on_path(Path::new("codex")).ok_or_else(|| {
         CodexRuntimeResolveError::PathFallbackUnavailable(diagnostic(
             "no usable repository Codex link or PATH fallback was found; rerun `cargo make bootstrap` to provision Codex".to_owned(),
         ))
     })?;
-    resolve_runtime_candidate(fallback.into_os_string(), None, "PATH fallback")
+    resolve_path_fallback(fallback, &probe_directory)
 }
 
 /// Resolves Codex after discovering the repository root from the caller's
@@ -208,6 +216,15 @@ fn resolve_runtime_candidate(
     let mut version = String::from_utf8_lossy(&output.stdout).into_owned();
     version.push_str(&String::from_utf8_lossy(&output.stderr));
     Ok(ResolvedCodexRuntime { executable, path_prefix, real_path, version })
+}
+
+fn resolve_path_fallback(
+    fallback: PathBuf,
+    probe_directory: &Path,
+) -> Result<ResolvedCodexRuntime, CodexRuntimeResolveError> {
+    let fallback = if fallback.is_absolute() { fallback } else { probe_directory.join(fallback) };
+    let path_prefix = fallback.parent().map(PathBuf::from);
+    resolve_runtime_candidate(fallback.into_os_string(), path_prefix, "PATH fallback")
 }
 
 fn find_on_path(executable: &Path) -> Option<PathBuf> {
@@ -555,6 +572,40 @@ mod tests {
 
         assert!(output.status.success());
         assert_eq!(String::from_utf8_lossy(&output.stdout), "verified\n");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_path_fallback_from_relative_entry_spawns_from_different_child_directory() {
+        use std::os::unix::fs::PermissionsExt as _;
+
+        let workspace = tempfile::tempdir().expect("workspace is created");
+        let probe_directory = workspace.path().join("caller");
+        let child_directory = workspace.path().join("repository");
+        let launcher = probe_directory.join("node_modules/.bin/codex");
+        std::fs::create_dir_all(launcher.parent().expect("launcher has parent"))
+            .expect("launcher directory is created");
+        std::fs::create_dir_all(&child_directory).expect("child directory is created");
+        std::fs::write(&launcher, "#!/bin/sh\nprintf 'codex fallback-version\\n'\n")
+            .expect("launcher is written");
+        let mut permissions =
+            std::fs::metadata(&launcher).expect("launcher metadata").permissions();
+        permissions.set_mode(0o755);
+        std::fs::set_permissions(&launcher, permissions).expect("launcher is executable");
+
+        let runtime =
+            resolve_path_fallback(PathBuf::from("node_modules/.bin/codex"), &probe_directory)
+                .expect("relative fallback resolves");
+
+        assert_eq!(runtime.executable(), launcher.as_os_str());
+        assert_eq!(runtime.path_prefix(), launcher.parent());
+        let mut command = Command::new(runtime.executable());
+        command.arg("--version").current_dir(&child_directory);
+        configure_codex_command(&mut command, &runtime).expect("runtime configures child");
+        let output = command.output().expect("fallback executes from child directory");
+
+        assert!(output.status.success());
+        assert_eq!(String::from_utf8_lossy(&output.stdout), "codex fallback-version\n");
     }
 
     struct CountingReader {
