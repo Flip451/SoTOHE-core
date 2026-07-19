@@ -1,0 +1,396 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "dbb194dc135b40e5f7dae2ec5c335eec8a36697bacfb38cbbd4dbe2561ff90d2",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「不一致は adr-diagnoser がトリアージし、非意味的編集のみ再刻印を許す」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "in-track ADR 編集と track-born ADR の裁定を扱う運用文書を、予期された編集、予期しない baseline 不一致、および未承認の新規 decision を区別する D5–D7 の経路へ整合させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "dbb194dc135b40e5f7dae2ec5c335eec8a36697bacfb38cbbd4dbe2561ff90d2",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「正規の ADR 編集 — Phase 1-3 の grounding escalation で orchestrator 自身が adr-editor に指示した編集 — は『予期された編集』であり、diagnoser を経由せず編集直後に snapshot を実行する。D5 のトリアージは予期しない不一致の専用経路である。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "in-track ADR 編集と track-born ADR の裁定を扱う運用文書を、予期された編集、予期しない baseline 不一致、および未承認の新規 decision を区別する D5–D7 の経路へ整合させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "dbb194dc135b40e5f7dae2ec5c335eec8a36697bacfb38cbbd4dbe2561ff90d2",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "分岐点刻印なら、改変された working tree は次の commit で baseline と不一致になり D5 のトリアージが捕捉する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "in-track ADR 編集と track-born ADR の裁定を扱う運用文書を、予期された編集、予期しない baseline 不一致、および未承認の新規 decision を区別する D5–D7 の経路へ整合させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "dd6668596869c6334191f87c5ad2fb3ca7b63ba24d572c1fe7b516f08f46f2f9",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "正規の ADR 編集 — Phase 1-3 の grounding escalation で orchestrator 自身が adr-editor に指示した編集 — は「予期された編集」であり、diagnoser を経由せず編集直後に snapshot を実行する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "pre-track ADR authoring convention の Phase 1 以降の自律区間を、grounding escalation で orchestrator が adr-editor に指示した編集は予期された編集として扱い、編集直後に reason 必須の escalation snapshot を実行する規範へ更新する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "50660274747e023731bafc99570f55b70c1d2308e9194609199f4deb1c15ac6f",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "不一致は adr-diagnoser がトリアージし、非意味的編集のみ再刻印を許す"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "guardian capability 契約と escalation lane の workflow 文書を、adr-diagnoser が予期しない baseline byte mismatch の D5 トリアージだけを担い、予期された escalation 編集の前提判定を要求しない記述へ整合させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "50660274747e023731bafc99570f55b70c1d2308e9194609199f4deb1c15ac6f",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "正規の ADR 編集 — Phase 1-3 の grounding escalation で orchestrator 自身が adr-editor に指示した編集 — は「予期された編集」であり、diagnoser を経由せず編集直後に snapshot を実行する。D5 のトリアージは予期しない不一致の専用経路である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "guardian capability 契約と escalation lane の workflow 文書を、adr-diagnoser が予期しない baseline byte mismatch の D5 トリアージだけを担い、予期された escalation 編集の前提判定を要求しない記述へ整合させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "e2fe2dc16ca0af6e97aa3990596f50bd36919b37c66ed6352b62334a5d9509d9",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "非 user 系の根拠（review_finding_ref 等）に留まる限り chain ⓪ が 🟡 と評価し、merge gate（strict）が merge 前の user 裁定を機械的に強制する。… user 裁定が届いた時点…で、orchestrator が根拠を user_decision_ref へ昇格させ、その直後に working tree から刻印する（kind: \"new-adr\"、reason 必須 — D6）"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "guardian-facing operational docs を、非 user 系根拠だけの track-born ADR は chain ⓪ の 🟡 評価と strict merge gate により非同期の user 裁定を待てること、user_decision_ref 昇格後に reason 必須の new-adr snapshot を実行することへ整合させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "b8b0d902dc3f896802c925d425b79740154ae34e5ffd6f0a0c25a09480f53ee4",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "diagnoser を含む判定系 capability は read-only であり verdict を返すのみ。orchestrator も複製や ledger を手作業では書かない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "primary ADR 本文またはその D5–D7 の決定を編集、再解釈、または supersede すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "a3fd5be81d9cf225b36a1fa17664c804834f30b20e23c8166d1891cc0b609dd8",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本機構が守るのは user の承認成果物であり、user 承認前の新規成果物の変化を遮らない"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "adr_user signal evaluator、signal-gates の strictness、または user_decision_ref の chain ⓪ 評価機構を変更すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "5780d8526538625b5a1f167c4f37fb1726ec8bef917a5a608f2ec31220521ca6",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本機構が守るのは user の承認成果物であり、user 承認前の新規成果物の変化を遮らない"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-03",
+          "text_label": "Phase 0 の user 承認エスカレーション、または pr-review の Accepted Deviations で既に要求される同期 pause を変更すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "a5924dc5ead8f4bd949383219dec2f9b7e9fe5268dd6cbc4621375e3f59bd258",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "baseline への書込は orchestrator が起動する原子的機械コマンドに限る；意味を持ち込む刻印（kind: escalation / new-adr）では `--reason` を必須とし；diagnoser を含む判定系 capability は read-only であり verdict を返すのみ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "運用文書は escalation / new-adr snapshot の reason 必須、orchestrator 起動の原子的な機械書込、判定 capability の read-only 性を矛盾なく記述する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7c8b8fcc27407c0a4c690d4c3062a2c694b230c28a4cfc1114abdb3fb7d699f",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "block 後、orchestrator は read-only の adr-diagnoser capability を dispatch し、baseline 最新版との diff を判定させる:\n\n1. **非意味的編集**（誤字・整形・参照 path 修正等）→ 再刻印 verdict"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "D5 の diagnoser triage は経路不明の baseline 乖離に限定し、非意味的 mismatch の再刻印、意味的 mismatch の復元、判断不能時の fail-closed を保持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "10318361c7a35fc9d2465f11e434f0ba35e0696bf2ca1963c526fc982116699d",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "非 user 系の根拠（review_finding_ref 等）に留まる限り chain ⓪ が 🟡 と評価し、merge gate（strict）が merge 前の user 裁定を機械的に強制する。user 裁定が届いた時点で、orchestrator が根拠を user_decision_ref へ昇格させ、その直後に working tree から刻印する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "新規 decision の user 裁定を同期 pause として一般化せず、非 user 根拠の間は 🟡 と strict merge gate を用い、裁定後にだけ user_decision_ref 昇格と new-adr snapshot を行う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "a5ab67dae51812c2d0c1aac0375a5f92a51923d7f13a7860b5c4915e23565b10",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "正規の ADR 編集 — Phase 1-3 の grounding escalation で orchestrator 自身が adr-editor に指示した編集 — は「予期された編集」であり、diagnoser を経由せず編集直後に snapshot を実行する。D5 のトリアージは予期しない不一致の専用経路である。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "Phase 1–3 grounding escalation の adr-editor 編集後、operational docs は adr-diagnoser verdict を待たず escalation kind と自己完結の reason による snapshot へ進む経路を記述する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "57de3ac7a9e0e4a12a4d019fb09bd5c2a097c9d4184cd3d20ac73df3b61a6035",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「不一致は adr-diagnoser がトリアージし、非意味的編集のみ再刻印を許す」および「判断に迷う場合」は逸脱側に倒す（fail-closed）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "baseline mismatch が予期しない場合に限り、operational docs は adr-diagnoser の read-only verdict を起点として D5 の non-semantic restamp、deviation restore、または fail-closed routing を選ぶ。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "9f391a5400b1e6440f66af7e90cbf5484849387d94ac768e93b89e4ffe39da14",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "非 user 系の根拠（review_finding_ref 等）に留まる限り chain ⓪ が 🟡 と評価し、merge gate（strict）が merge 前の user 裁定を機械的に強制する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "review finding 等の非 user 根拠しか持たない新規 ADR について、guardian verdict と workflow が同期 user adjudication を要求せず、chain ⓪ 🟡 と strict merge gate が merge 前の裁定を強制する経路を記述する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "05c0a591e0709f31bb0e404f893514a10d21cf724f66a36466f7f94ba69cecc7",
+      "evidence_hash": "21523efaed53b1c3e0a373b57742101b064306172ad8e50312a5af30785812cc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "user 裁定が届いた時点（同席 hearing では即時、自発起草では PR review 等の非同期裁定時）で、orchestrator が根拠を user_decision_ref へ昇格させ、その直後に working tree から刻印する（kind: \"new-adr\"、reason 必須 — D6）— 以後この ADR は通常の凍結対象になる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "user 裁定後の track-born ADR は、user_decision_ref を昇格してから working tree を new-adr kind と reason 必須で snapshot し、以後の通常の凍結対象となる経路を記述する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-2001-adr-decision-freeze.md",
+          "decision_id": "D7"
+        }
+      }
+    }
+  ]
+}

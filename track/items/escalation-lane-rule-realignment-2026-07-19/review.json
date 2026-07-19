@@ -18,6 +18,132 @@
           "at": "2026-07-19T01:32:28Z"
         }
       ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:261b2eacac0d337233cbb257f7437a67dd68ee9e043492b062ae35cc2f5e6f8c",
+          "at": "2026-07-19T01:51:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:261b2eacac0d337233cbb257f7437a67dd68ee9e043492b062ae35cc2f5e6f8c",
+          "at": "2026-07-19T01:54:53Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00898baf5bf5642c354de714866651f0a52438c1ae39b6ebf45eee320dee32f0",
+          "at": "2026-07-19T01:51:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00898baf5bf5642c354de714866651f0a52438c1ae39b6ebf45eee320dee32f0",
+          "at": "2026-07-19T01:53:33Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description restates the upstream D6/IN-01 behavior contract instead of only naming target, operation, and anchor.",
+              "severity": "P1",
+              "file": "track/items/escalation-lane-rule-realignment-2026-07-19/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description restates the upstream D5/D7 behavior contract instead of only naming target, operation, and anchor.",
+              "severity": "P1",
+              "file": "track/items/escalation-lane-rule-realignment-2026-07-19/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description restates the upstream D5/D6/D7 behavior contract and out-of-scope pauses instead of only naming target, operation, and anchor.",
+              "severity": "P1",
+              "file": "track/items/escalation-lane-rule-realignment-2026-07-19/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 description restates the expected-edit D6 route rather than using only target, operation, and anchor.",
+              "severity": "P1",
+              "file": "track/items/escalation-lane-rule-realignment-2026-07-19/impl-plan.json",
+              "line": 33,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 description restates the D5/D7 behavior contract rather than using only target, operation, and anchor.",
+              "severity": "P1",
+              "file": "track/items/escalation-lane-rule-realignment-2026-07-19/impl-plan.json",
+              "line": 43,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 description restates the out-of-scope synchronous-pause contract rather than using only target, operation, and anchor.",
+              "severity": "P1",
+              "file": "track/items/escalation-lane-rule-realignment-2026-07-19/impl-plan.json",
+              "line": 53,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "AC-01 through AC-04 are mapped to T001–T003, but the corresponding task descriptions contain no validation step, making the acceptance-criterion coverage non-executable.",
+              "severity": "P1",
+              "file": "track/items/escalation-lane-rule-realignment-2026-07-19/task-coverage.json",
+              "line": 18,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:eda659d28ab7b5c5a298710ed1ab1051c73ca89e58599998775c7c4e1198f94d",
+          "at": "2026-07-19T01:51:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:315ca91d2d2b8324ab2bf6cb03d48e4061fd0aefd99ad3815ecbc929b42fccb1",
+          "at": "2026-07-19T01:53:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 only updates `.harness/capabilities/adr-diagnoser.md`, while `.agents/skills/adr-diagnoser/SKILL.md` still advertises edit-judgment mode and `.harness/capabilities/adr-editor.md` still requires that judgment before adopting edits. T003 is limited to three workflow files, so executing the plan leaves live contracts invoking the mode removed under IN-02/D5–D7. Add these files to an anchored task, or create a separate task, and update coverage accordingly.",
+              "severity": "P1",
+              "file": "track/items/escalation-lane-rule-realignment-2026-07-19/impl-plan.json",
+              "line": 12,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:315ca91d2d2b8324ab2bf6cb03d48e4061fd0aefd99ad3815ecbc929b42fccb1",
+          "at": "2026-07-19T01:58:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b037475ca89df93f8efd8e6dc2fbc71d329609c3db35825d08c6333f16577a4",
+          "at": "2026-07-19T02:03:29Z"
+        }
+      ]
     }
   }
 }
