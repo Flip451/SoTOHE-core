@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Update the input-contract and handoff documentation in `.harness/workflows/track/adr2pr.md` and `.harness/workflows/track/init.md`. IN-01/IN-02/IN-03/IN-04/OS-01/OS-02/CN-01/CN-02/CN-03/AC-01/AC-02/AC-03/AC-04.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Update invocation guidance in `.claude/commands/track/adr2pr.md` and `.agents/skills/track-adr2pr/SKILL.md`. IN-01/IN-02/IN-03/IN-04/OS-01/OS-02/CN-01/CN-02/CN-03/AC-01/AC-02/AC-03/AC-04.",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "GO-01: T001, T002.",
+      "GO-02: T001, T002.",
+      "All Phase 2 catalogues are empty; the implementation surface is workflow SSoT and provider-adapter documentation, so no catalogue entries are attributed."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Provider-neutral adr2pr input resolution",
+        "description": [
+          "Update `.harness/workflows/track/adr2pr.md` and `.harness/workflows/track/init.md`. IN-01/IN-02/IN-03/IN-04/OS-01/OS-02/CN-01/CN-02/CN-03/AC-01/AC-02/AC-03/AC-04."
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Claude and Codex adapter invocation alignment",
+        "description": [
+          "Update `.claude/commands/track/adr2pr.md` and `.agents/skills/track-adr2pr/SKILL.md`. IN-01/IN-02/IN-03/IN-04/OS-01/OS-02/CN-01/CN-02/CN-03/AC-01/AC-02/AC-03/AC-04."
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      }
+    ]
+  }
+}
