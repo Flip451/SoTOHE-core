@@ -33,6 +33,78 @@
         }
       ]
     },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-01 is not deterministically observable: it requires that a reader can distinguish and execute the Phase 0/Phase 1+ procedures, but provides no checkable document/state condition or procedure for establishing that outcome.",
+              "severity": "P1",
+              "file": "track/items/two-box-decision-separation-realignment-2026-07-19/spec.json",
+              "line": 208,
+              "category": "acceptance criterion non-observable"
+            },
+            {
+              "message": "The related_conventions list cites coding-principles.md and prefer-type-safe-abstractions.md, although this is explicitly a documentation-only track with Rust implementation out of scope; these citations are self-evidently unrelated to the behavioral contract being specified.",
+              "severity": "P1",
+              "file": "track/items/two-box-decision-separation-realignment-2026-07-19/spec.json",
+              "line": 303,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:090439e464fa6a99316c4e36990fdd806d37db6b5ae0ef6bf86b08c17d07c80b",
+          "at": "2026-07-20T09:36:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1beb7575643a0d6dea70e93c97282eab4ae235a4bcfbc9564f8fb7afe13a5a5",
+          "at": "2026-07-20T09:38:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1beb7575643a0d6dea70e93c97282eab4ae235a4bcfbc9564f8fb7afe13a5a5",
+          "at": "2026-07-20T09:40:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47c8c3d1c7948f4757e09d88fb9703a548a31a3dd03ed8eab35bb5ff0c58c6b4",
+          "at": "2026-07-20T09:59:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47c8c3d1c7948f4757e09d88fb9703a548a31a3dd03ed8eab35bb5ff0c58c6b4",
+          "at": "2026-07-20T10:01:05Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e51b2987da3401b4414dfdc2389d0af1df4ee7be1210ddd452d34e117e3a2c7",
+          "at": "2026-07-20T09:42:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e51b2987da3401b4414dfdc2389d0af1df4ee7be1210ddd452d34e117e3a2c7",
+          "at": "2026-07-20T09:45:34Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -774,6 +846,67 @@
           "findings": [],
           "hash": "rvw1:sha256:a5835bd6c78a99e492f55e36ca9a16145e3ab4b24c2d22f3eca32cb35c0177fb",
           "at": "2026-07-20T09:02:51Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description includes upstream behavioral rationale (Phase 0 convergence, diagnostic audit, user decision, boundary closure, and input-box freeze). Keep only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/two-box-decision-separation-realignment-2026-07-19/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description restates the upstream ADR/spec contract in prose (edit auditing, delta classification, re-audit, triage, verdict ownership, and front matter). Keep only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/two-box-decision-separation-realignment-2026-07-19/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description restates the upstream workflow behavior (fail-closed checks, Phase 0/Phase 1+ paths, recovery, deferred implementation, and terminal audit). Keep only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/two-box-decision-separation-realignment-2026-07-19/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 description restates the behavioral contract by describing Phase 0 convergence and input-box freeze. Use a concise execution summary with the task reference instead.",
+              "severity": "P1",
+              "file": "track/items/two-box-decision-separation-realignment-2026-07-19/impl-plan.json",
+              "line": 33,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 description restates the two-box operating behavior and workflow consumers. Use a concise execution summary with the task reference instead.",
+              "severity": "P1",
+              "file": "track/items/two-box-decision-separation-realignment-2026-07-19/impl-plan.json",
+              "line": 53,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:ff17db281c0e934bb947521e4829dd17455293df72c4c5e962bfe1e03c37b61b",
+          "at": "2026-07-20T09:47:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d2771b61df1d013dbbf5f2a8785323888d4dd8416fea8c0957eaca2ff71ca2d",
+          "at": "2026-07-20T09:49:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2d2771b61df1d013dbbf5f2a8785323888d4dd8416fea8c0957eaca2ff71ca2d",
+          "at": "2026-07-20T09:53:45Z"
         }
       ]
     }
