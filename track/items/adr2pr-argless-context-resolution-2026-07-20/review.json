@@ -1,74 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 の description が、明示入力優先・文脈解決・確認／選択・init への明示 forwarding という upstream の挙動契約を散文で再記述しています。変更対象・操作・anchor cite のみに縮約してください。",
-              "severity": "P1",
-              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/impl-plan.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T002 の description が、optional input・明示値優先・文脈解決・確認／選択・init forwarding という upstream の挙動契約を散文で再記述しています。変更対象・操作・anchor cite のみに縮約してください。",
-              "severity": "P1",
-              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/impl-plan.json",
-              "line": 12,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "section S1 の description が、init の必須入力維持を含む upstream の契約を散文で再記述しています。変更対象・操作・anchor cite のみに縮約してください。",
-              "severity": "P1",
-              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/impl-plan.json",
-              "line": 28,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "section S2 の description が、provider adapter と workflow の契約同期および init adapter 非変更を散文で再記述しています。変更対象・操作・anchor cite のみに縮約してください。",
-              "severity": "P1",
-              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/impl-plan.json",
-              "line": 38,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:db827661805e59512f01797276ecc56bfd6fe83a00c6f12ac160443cc2947297",
-          "at": "2026-07-20T16:03:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:65fe1d949da1d11754ce6da288cfa2b7dd6e946af0a5d172b6a530d0b0ba04bc",
-          "at": "2026-07-20T16:06:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:65fe1d949da1d11754ce6da288cfa2b7dd6e946af0a5d172b6a530d0b0ba04bc",
-          "at": "2026-07-20T16:12:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dd479305fd1c550cc000dd921b3e52df828719af747c671b2be8134e045c9f8d",
-          "at": "2026-07-20T16:21:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dd479305fd1c550cc000dd921b3e52df828719af747c671b2be8134e045c9f8d",
-          "at": "2026-07-20T16:23:41Z"
-        }
-      ]
-    },
     "types": {
       "rounds": [
         {
@@ -160,6 +92,88 @@
           "findings": [],
           "hash": "rvw1:sha256:4155913b86112747d45ea45f4709de142a5bb27e76d81552219203f7d619be49",
           "at": "2026-07-20T16:09:04Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 の description が、明示入力優先・文脈解決・確認／選択・init への明示 forwarding という upstream の挙動契約を散文で再記述しています。変更対象・操作・anchor cite のみに縮約してください。",
+              "severity": "P1",
+              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 の description が、optional input・明示値優先・文脈解決・確認／選択・init forwarding という upstream の挙動契約を散文で再記述しています。変更対象・操作・anchor cite のみに縮約してください。",
+              "severity": "P1",
+              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "section S1 の description が、init の必須入力維持を含む upstream の契約を散文で再記述しています。変更対象・操作・anchor cite のみに縮約してください。",
+              "severity": "P1",
+              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/impl-plan.json",
+              "line": 28,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "section S2 の description が、provider adapter と workflow の契約同期および init adapter 非変更を散文で再記述しています。変更対象・操作・anchor cite のみに縮約してください。",
+              "severity": "P1",
+              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/impl-plan.json",
+              "line": 38,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:db827661805e59512f01797276ecc56bfd6fe83a00c6f12ac160443cc2947297",
+          "at": "2026-07-20T16:03:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65fe1d949da1d11754ce6da288cfa2b7dd6e946af0a5d172b6a530d0b0ba04bc",
+          "at": "2026-07-20T16:06:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65fe1d949da1d11754ce6da288cfa2b7dd6e946af0a5d172b6a530d0b0ba04bc",
+          "at": "2026-07-20T16:12:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd479305fd1c550cc000dd921b3e52df828719af747c671b2be8134e045c9f8d",
+          "at": "2026-07-20T16:21:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd479305fd1c550cc000dd921b3e52df828719af747c671b2be8134e045c9f8d",
+          "at": "2026-07-20T16:23:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee308489ad7489e7c5833df2d97a35527945bcb6fbed904bfa812c5a51f4b8e7",
+          "at": "2026-07-20T16:28:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee308489ad7489e7c5833df2d97a35527945bcb6fbed904bfa812c5a51f4b8e7",
+          "at": "2026-07-20T16:30:32Z"
         }
       ]
     }
