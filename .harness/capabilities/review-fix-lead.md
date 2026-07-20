@@ -57,20 +57,23 @@ in `.harness/config/review-scope.json`.
 
 ## ADR baseline semantic freeze
 
-When the assigned scope includes ADR files, do not change an ADR's semantics from its recorded
-baseline. A semantic finding must be reported as an amendment proposal, not applied as an
-in-place ADR edit. Judge ADR completeness by whether it faithfully records the decision, not by
-whether a different design would be preferable. A current ADR byte mismatch is a normal Phase 0
-draft state and does not block a review loop; byte matching is enforced at the commit gate and
-track-aware CI. If the ADR-baseline review check blocks on its retained ledger-integrity
-conditions, stop the fixer and let the orchestrator use the sanctioned recovery route described
-by the review workflow.
+When a finding requires *any* edit to an ADR, never make that edit yourself. Under the two-box
+model (`knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権), the
+orchestrator routes every ADR change through adr-editor and adr-diagnoser: Phase 0 uses the
+in-place convergence or user-present hearing lane; after the Phase 0 adjudication boundary,
+semantic changes use the delta lane and proposed non-semantic changes use the
+apply-then-classify lane. Judge ADR completeness by whether it faithfully records the decision,
+not by whether a different design would be preferable. A current ADR byte mismatch before the
+boundary is a normal draft state and does not block a review loop; byte matching is enforced at
+the commit gate and track-aware CI. If the ADR-baseline review check blocks on its retained
+ledger-integrity conditions, stop the fixer and let the orchestrator use the sanctioned recovery
+route described by the review workflow.
 
 **Termination contract (guardian-lane handoff).** When a round records a finding whose fix
-requires an ADR semantic edit, do not re-loop on it: apply any other in-scope fixes that do not
-touch ADR semantics, leave the semantic finding recorded on the round (`findings_remain`), and
-terminate immediately with `failed`, citing that finding as the reason. This `failed` is the
-deterministic handoff into the orchestrator's guardian lane
+requires an ADR edit, do not re-loop on it: apply any other in-scope fixes that do not touch an
+ADR, leave the ADR finding recorded on the round (`findings_remain`), and terminate immediately
+with `failed`, citing that finding as the reason. This `failed` is the deterministic handoff into
+the orchestrator's guardian lane
 (`.harness/workflows/track/review.md` Step 4), not a tooling error; continuing the loop in the
 hope that the reviewer withdraws the finding is prohibited.
 
@@ -109,8 +112,8 @@ After each reviewer invocation, parse the verdict from command output:
 
 - `zero_findings` → proceed to the canonical API confirmation step (mandatory before reporting
   `completed`).
-- `findings_remain` → proceed to the fix phase — unless every remaining finding requires an ADR
-  semantic edit, in which case terminate per the guardian-lane handoff
+- `findings_remain` → proceed to the fix phase. If one or more findings requires an ADR edit,
+  apply every other in-scope non-ADR fix, then terminate per the guardian-lane handoff
   (§ADR baseline semantic freeze).
 - Error → return `failed`.
 
@@ -182,7 +185,7 @@ Return exactly one of the following statuses:
 |--------|---------|
 | `completed` | The assigned `round_type` returned `zero_findings`, confirmed via the canonical API (`bin/sotp review results --limit 1` shows `findings: zero_findings`). |
 | `blocked_cross_scope` | A fix requires modifying files outside this capability's scope. Include the list of out-of-scope files needed. |
-| `failed` | Unrecoverable error (CI failure, reviewer crash, task-contract gate block, etc.), or the ADR guardian-lane handoff: an ADR-scoped semantic finding remains recorded under the semantic freeze (§ADR baseline semantic freeze). Include error details or the finding reference. |
+| `failed` | Unrecoverable error (CI failure, reviewer crash, task-contract gate block, etc.), or the ADR guardian-lane handoff: an ADR finding requiring an ADR edit remains recorded under the semantic freeze (§ADR baseline semantic freeze). Include error details or the finding reference. |
 
 ## Boundary with other capabilities
 

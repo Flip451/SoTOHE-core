@@ -28,7 +28,22 @@ Determine the target PR number, either from the caller's explicit argument or (a
 convenience) via `gh pr view --json number -q .number` for the current branch. Parse an optional
 merge method appended to the argument (e.g. `123 squash`) only when supplied literally.
 
-**Step 1: Wait and merge**
+**Step 1: Terminal audit**
+
+Before every merge attempt, present the merge-stage terminal audit required by
+`knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権` to the user. Audit
+every protected source (every source with a ledger record), from its protection-start record to
+its current terminal bytes, with per-record provenance and the adjacent diff for every
+`non-semantic-fix` record. This audit is required even when every terminal diff is empty.
+
+If the user adjudicates a record as a misclassified semantic change, complete the corrective
+restoration route before continuing. Any audit-triggered mutation, including an adoption or
+rejection recovery, invalidates the presentation: re-run the required review / commit / push /
+PR-review work, then re-invoke this workflow so a fresh all-protected-source audit occurs before
+the next merge attempt. Do not invoke the merge wrapper until this audit has completed without a
+recovery.
+
+**Step 2: Wait and merge**
 
 Invoke the merge wrapper. Omit `--method` unless the caller explicitly supplied one — passing an
 empty or implicit default would bypass the configured merge method.
@@ -43,14 +58,23 @@ bin/sotp pr wait-and-merge <pr_number> --method <method>    # explicit caller ov
 1. **Task completion guard**: blocks merge if any tasks in the PR's track `metadata.json` are
    unresolved (not `done` or `skipped`). This is the only workflow that enforces task
    completion — push and PR review are allowed with unresolved tasks.
-2. Polls `gh pr checks` every 15 seconds with a 10 minute timeout.
-3. **Method resolution**: when `--method` is omitted, resolves the merge method from the PR's
+2. **Strict merge-signal gate**: evaluates the signal-gate configuration at merge strictness
+   (🟡 also blocks) after the task guard and before polling. On failure, `wait-and-merge`
+   exits directly with a blocked report; it is not a polled PR check. An intentional 🟡 —
+   an admitted delta draft awaiting the user's adjudication — routes to the dedicated
+   adjudication recovery below.
+3. Polls `gh pr checks` every 15 seconds with a 10 minute timeout.
+4. **Method resolution**: when `--method` is omitted, resolves the merge method from the PR's
    track `branch_strategy_snapshot.merge_method`; an explicit `--method` always overrides it.
-4. On all checks passed: merges via `gh pr merge --<method>`.
-5. On any check failed: stops and reports the failing checks.
-6. On timeout: stops and reports the pending checks.
+5. On all checks passed: merges via `gh pr merge --<method>`.
+6. On any check failed: stops and reports the failing checks.
+7. On timeout: stops and reports the pending checks.
 
-**Step 2: Post-merge**
+This workflow also hosts the merge-stage user adjudication of the two-box model
+(`knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`): admitted
+delta drafts and the terminal audit are decided here, with the user present at invocation.
+
+**Step 3: Post-merge**
 
 After a successful merge:
 
@@ -63,11 +87,18 @@ After a successful merge:
 
 | Step | Gate | Verdict |
 |------|------|---------|
-| 1    | `bin/sotp pr wait-and-merge` exits 0 | pass / fail |
-| 1    | Task completion guard passes | pass / fail |
+| 1    | All-protected-source terminal audit completes without recovery | pass / fail |
+| 2    | `bin/sotp pr wait-and-merge` exits 0 | pass / fail |
+| 2    | Task completion guard passes | pass / fail |
+| 2    | Strict merge-signal gate passes before polling | pass / fail (intentional-🟡 failure → adjudication recovery) |
+| 2    | Polled PR checks all green | pass / fail |
 
-Both gates are enforced inside `bin/sotp pr wait-and-merge`. A non-zero exit code ends the
-workflow immediately — the workflow does not retry, and does not proceed to Step 2.
+The Step 1 terminal audit is an orchestrator-enforced gate outside
+`bin/sotp pr wait-and-merge`; the Step 2 task, signal, and PR-check guards are enforced inside
+that wrapper. An ordinary non-zero wrapper exit ends this invocation without proceeding to
+Step 3. The exception is a strict merge-signal block caused by an intentional 🟡 admitted
+delta draft: enter the adjudication recovery below, complete its required work, and re-invoke
+this workflow from Step 1 for a fresh terminal audit.
 
 ## Failure / recovery
 
@@ -75,6 +106,34 @@ workflow immediately — the workflow does not retry, and does not proceed to St
   <task_id> done|skipped`), then re-invoke the workflow.
 - **Failing PR checks**: fix the underlying failure (source change / infra flake / config), push
   a new commit, and re-invoke.
+- **Strict merge gate blocked on an intentional 🟡 (admitted delta draft)**: this block is
+  the designed adjudication point — the user is present at this workflow's invocation, so
+  obtain their adjudication here. Before any recovery mutation, resolve the PR's head branch
+  (`gh pr view <pr_number> --json headRefName`) and establish that checkout
+  (`bin/sotp track branch switch <track-id>` when not already on it) so every edit,
+  admission re-judgment, stamp, and commit lands in the PR's own track context. Then follow
+  the merge-stage procedures of
+  `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`:
+  - **Adoption**: dispatch `adr-editor` to promote the draft's grounds to
+    `user_decision_ref` (an edit that voids the admission — re-judge and re-admit via
+    `adr-diagnoser`), pass the adoption-conformance re-audit, then run
+    `bin/sotp adr-baseline snapshot --source <file> --kind new-adr --reason <text>` (the
+    reason records the origin-input provenance and the judgment summaries). Commit through
+    the guarded review → commit flow, push via `bin/sotp pr push`, re-run the canonical
+    `pr-review` workflow to a terminal state, and only then re-invoke this workflow.
+  - **Rejection**: dispatch `adr-editor` to delete the draft (or apply the instructed
+    revision), then pass the rejection-conformance re-audit. A deletion is final only after
+    that re-audit. A revision invalidates admission, so re-run the three-way admission judgment
+    before the revised candidate is cited or carried forward; on a bounce, remove it and return
+    the resolution to its origin. Rework every downstream artifact that cited or derived from
+    the deleted or newly admitted revised draft in SoT-chain order, then follow the same
+    commit → push → `pr-review` → re-invoke sequence.
+  Do not bypass or weaken the gate.
+- **Terminal-audit misclassification adjudication**: when the user adjudicates a presented
+  ledger record as a misclassified semantic change, run the corrective-restoration route
+  (adr-editor restores the prior valid text, adr-diagnoser confirms the byte match, then a
+  reason-less `--kind non-semantic-fix` restamp), complete any required re-processing, and
+  re-invoke.
 - **Wait timeout**: inspect the pending checks (`bin/sotp pr status <pr_number>`) and either wait
   longer (re-invoke) or diagnose the blocked check.
 
@@ -83,4 +142,6 @@ workflow immediately — the workflow does not retry, and does not proceed to St
 - Merged PR (or an explicit failure report — the workflow does not merge on any error path).
 - A short post-merge summary (PR URL, merge method, resulting commit, next recommended
   command).
-- No local commits are created by this workflow.
+- The normal successful merge path creates no local commits. A recovery that follows user
+  adjudication of an intentional 🟡 may create a guarded commit before the workflow is
+  re-invoked.

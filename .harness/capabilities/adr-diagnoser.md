@@ -1,177 +1,177 @@
 # ADR-Diagnoser — Capability Operations
 
 > Provider-agnostic operational SSoT for the SoTOHE `adr-diagnoser` capability. Its Codex
-> skill supplies provider-native framing; this file defines the recovery judgment and its
+> skill supplies provider-native framing; this file defines the guardian judgments and their
 > handoff to the orchestrator.
 
 ## Mission
 
-Guard the ADR's recorded decisions throughout a track. The capability returns read-only
-verdicts in two modes. It never becomes part of a binary gate's decision path and never writes
-a baseline, restores an ADR, or edits an ADR.
+Guard the recorded ADR decisions throughout a track under the two-box model (input box =
+init-stamped ADRs, frozen after the Phase 0 adjudication boundary; delta box = admitted
+track-born drafts). The capability returns read-only verdicts in four modes. It never becomes
+part of a binary gate's decision path and never writes a baseline, restores an ADR, or edits
+an ADR. The surrounding lane contract lives in
+`knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権.
 
-1. **Edit judgment (守護者判定)** — for every in-track ADR edit (the Phase 0 baseline-review
-   loop and the Phase 1+ signal-driven escalation loops), judge **before adoption / stamping**
-   whether the edit breaks the recorded decisions. Decision-preserving refinement is
-   admissible; a decision-breaking edit is reverted by the orchestrator, and this capability
-   must then present either a decision-preserving alternative or a reasoned no-change
-   statement, which the orchestrator relays verbatim to the finding's origin. The surrounding
-   loop contract lives in `knowledge/conventions/pre-track-adr-authoring.md`
-   §In-track 意味変更の裁定権. This lane exists only for an ADR whose effective merge-target
-   status is pre-merge; a semantic proposal for a merged ADR must be routed as a new-ADR draft.
-2. **Mismatch classification** — classify an ADR-baseline byte mismatch **after**
-   `adr-baseline check-review`, `adr-baseline check-commit`, or the track-aware CI path has
-   blocked, comparing the current ADR with its latest recorded baseline.
+1. **Edit judgment (Phase 0 収束ループ)** — for every in-place edit applied to an input-box
+   ADR during the Phase 0 baseline-review loop, judge the applied edit (concrete diff)
+   immediately after application: decision-preserving → retained; decision-breaking →
+   reverted, with a preserving alternative or a reasoned no-change statement relayed
+   verbatim to the finding's origin.
+2. **Delta admission judgment (Phase 1+ 三択)** — for every authored or revised delta
+   candidate, return the three-way admission verdict: (a) admit / (b) bounce with a
+   decision-preserving resolution / (c) admit as a decision-modification proposal.
+3. **Classification & conformance** — classify an applied in-place fix on an input-box ADR
+   as semantic or non-semantic (Phase 1+ non-semantic-fix lane), and re-audit
+   user-decision implementation edits for conformance (Phase 0 hearing implementation /
+   adoption / rejection / corrective restoration).
+4. **Mismatch classification** — triage an unexpected byte divergence after a gate blocked
+   (commit gate / track-aware CI), comparing the current ADR with its latest recorded
+   baseline (any kind, historical escalation records included).
 
 ## Invocation contract
 
-The mode is determined by the briefing content.
+The mode is determined by the briefing content. Before returning a verdict, read the briefing,
+the current source ADR, and the relevant diff. For edit judgment, classification/conformance,
+and mismatch classification, also read the source's latest recorded copy and ledger entry under
+`track/items/<track-id>/adr-baseline/`. A pre-admission delta candidate has no ledger record:
+for admission, read its candidate bytes plus the recorded-decision context and latest records of
+any declared target instead. Do not infer a semantic conclusion from a byte diff alone.
 
-**Edit judgment** — the orchestrator supplies a briefing containing:
+**Edit judgment (Phase 0)** — briefing contains: the source filename and track id; the
+applied edit (concrete diff); the originating finding verbatim; the effective merge-target
+lifecycle judgment (`knowledge/conventions/adr.md` §Lifecycle); and, once the user has
+adjudicated at the Phase 0 escalation, that adjudication verbatim — the adjudicated text
+becomes the comparison reference for subsequent judgments (it is not a stamp). The
+reference for「元の決定」is the latest explicitly user-approved decision set; during the
+loop before any adjudication, the init record is that reference. A post-merge input ADR may
+receive only typo / reference-path / back-reference changes in place; judge any post-merge
+semantic edit `decision-breaking` and return it to the user-present new-ADR/hearing lane. Do
+not present a delta candidate before Phase 1+.
 
-- the direct `knowledge/adr/` source filename and active track id;
-- the pre-edit text and the proposed / applied edit (or their diff);
-- the originating finding or proposal that motivated the edit, verbatim;
-- the phase context (Phase 0 baseline-review loop, or the Phase 1+ loop and its trigger
-  signal).
-- the effective merge-target lifecycle judgment (pre-merge or post-merge) under
-  `knowledge/conventions/adr.md` §Lifecycle;
-- if Phase 0 has already reached a user adjudication that explicitly adopts a
-  decision-changing proposal, that adjudication verbatim, its proposed
-  `user_decision_ref`, and the adopted decision text.
+**Delta admission judgment (Phase 1+)** — briefing contains: the candidate's path and
+current text; its declared relations (supersedes / refines targets — declared in the draft
+body until the front-matter fields are implemented); the originating input (🔴 signal /
+review finding / proposal) verbatim; and the recorded-decision context. Judge the candidate
+bytes and relation declarations as one unit:
 
-The reference for「元の決定」is the latest explicitly user-approved decision set: the
-front-matter `decisions[]` entries and the `## Decision` section's semantics. During Phase 0,
-the init record is that reference until the user adjudicates a decision-changing proposal. Such
-an explicit adjudication becomes the comparison reference for the fresh review of its adopted
-text (including its proposed `user_decision_ref`); it is **not** a baseline snapshot and does
-not authorize a stamp. The init record remains the user-facing diff base until the Phase 0
-approval → stamp step. This lets the guardian protect the newly adjudicated user decision on
-the re-review rather than repeatedly rejecting the text the user just selected.
+- Zero-target candidates (independent new decisions) still require judgment: confirm the
+  candidate changes and conflicts with no recorded decision's effective content → (a).
+  A discovered conflict names the affected decision(s) and reroutes as (b)/(c).
+- Targeted candidates: each target must be the relation chain's current effective head
+  (the latest adopted modification, else the original decision); a non-head target is
+  bounced with a re-target instruction. Return per-decision verdicts.
+- Classification: a candidate that changes no recorded decision's effective content is (a).
+  For decision-modifying candidates, evaluate the three decision-preserving resolutions —
+  a preserving alternative wording, a downstream (spec 等) resolution, or a reasoned
+  rejection of the originating input. If any exists → (b), presenting it. If none exists →
+  (c), stating why none of the three forms holds and enumerating the modification targets.
+  Uncertainty fails closed to (b) with the uncertainty and the grounds needed for
+  re-judgment stated.
 
-**Mismatch classification** — the orchestrator supplies a briefing containing:
+**Classification & conformance** — briefing contains the applied diff and its authorizing
+context. Four sub-forms:
 
-- the triggering check and its failure output;
-- the direct `knowledge/adr/` source filename and active track id;
-- the current ADR and latest-baseline diff (or their repository-relative paths);
-- the originating capability, if it is known, and any relevant editing history.
-- the effective merge-target lifecycle judgment (pre-merge or post-merge) under
-  `knowledge/conventions/adr.md` §Lifecycle.
+- *Semantic/non-semantic classification*: for an applied in-place fix on an input-box ADR
+  in Phase 1+, return `non-semantic` (typo / reference-path / formatting with no effect on
+  recorded decisions — retained and restamped by the orchestrator) or `semantic`
+  (reverted; content re-authored as a delta candidate). Uncertainty is `semantic`.
+- *Adoption / rejection conformance*: for a user-decision implementation edit (grounds
+  promotion on adoption; deletion or instructed revision on rejection), judge whether the
+  applied diff faithfully implements the user's adjudication and touches nothing else —
+  `adoption-conformant` / `rejection-conformant`, or `deviating` (reverted and returned to
+  the user). This is NOT a decision-preservation judgment; the comparison basis is the
+  adjudication content.
+- *Phase 0 hearing implementation conformance*: when a user-present hearing authorizes a
+  new decision, judge whether the applied edit faithfully records that hearing — either its
+  authorized addition to a pre-merge input ADR or its authorized new ADR with
+  `user_decision_ref` grounds — and touches nothing else. Return `hearing-conformant`, after
+  which the orchestrator may init-stamp a new file and resume fresh review; otherwise return
+  `deviating` (revert and return to the user). This is not an edit-judgment or delta-admission
+  decision: the comparison basis is the hearing content.
+- *Restoration confirmation*: for a corrective restoration, confirm the restored text
+  byte-matches the targeted existing valid ledger record — `restoration-confirmed` or
+  `restoration-mismatch` (fail closed; no restamp).
 
-In both modes: before returning a verdict, read the briefing, the current source ADR, the
-latest recorded copy and ledger entry under `track/items/<track-id>/adr-baseline/`, and the
-relevant diff. Read the freeze-mechanism ADR's decision text when the briefing does not
-already quote the applicable constraint. Do not infer a semantic conclusion from a byte diff
-alone.
+**Mismatch classification** — briefing contains: the triggering check and its failure
+output; the source filename and track id; the current-vs-latest-baseline diff; the
+originating capability if known; the lifecycle judgment. The comparison basis is the
+source's latest ledger record regardless of kind (init / cite / new-adr / non-semantic-fix /
+review-refinement / historical escalation).
 
-## Judgment
+## Verdicts
 
-### Edit judgment
-
-First apply the supplied lifecycle judgment. A post-merge ADR may receive only typo,
-reference-path, or back-reference changes. For any post-merge semantic proposal, return
-`decision-breaking` regardless of whether its content would otherwise preserve the old decision,
-and provide an `alternative` that presents the preserving route as a new-ADR draft (or a
-`no_change_rationale`). Do not authorize an in-place semantic edit of a merged ADR.
-
-Return exactly one verdict:
+### Edit judgment (Phase 0)
 
 | verdict | Use when | Orchestrator action |
 |---|---|---|
-| `decision-preserved` | Either (a) the ADR is pre-merge and the edit only refines, clarifies, or strengthens grounding without overturning, narrowing, or replacing any recorded decision in the applicable comparison reference, or (b) the ADR is post-merge and the edit is limited to a typo, reference-path, or back-reference correction with no semantic effect. | For (a), adopt the edit: Phase 0 loop continues without stamping; Phase 1+ proceeds to the escalation snapshot. For (b), adopt it only through the normal non-semantic correction/restamp route; it is not a semantic escalation. |
-| `decision-breaking` | The edit overturns, narrows, or replaces a recorded decision — or its effect on a decision is uncertain. Uncertainty fails closed. | Revert the edit. Relay this capability's `alternative` or `no_change_rationale` verbatim to the finding's origin; record the proposal and verdict for the adjudication point (Phase 0 user escalation / merge audit). |
+| `decision-preserved` | The applied edit refines, clarifies, or strengthens grounding without overturning, narrowing, or replacing any recorded decision in the applicable comparison reference (or, for a post-merge input ADR, is limited to typo / reference-path / back-reference). | Retain the edit in the working tree; the loop continues without stamping. |
+| `decision-breaking` | The edit overturns, narrows, or replaces a recorded decision — or its effect is uncertain (fail closed). | Revert the edit; relay this capability's `alternative` or `no_change_rationale` verbatim to the finding's origin; unresolved conflicts go to the Phase 0 user adjudication. |
 
-For a `decision-breaking` verdict this capability MUST supply exactly one of:
+For `decision-breaking`, supply exactly one of `alternative` (a decision-preserving way to
+address the concern) or `no_change_rationale` (a reasoned statement that no modification is
+needed). A bare rejection is invalid.
 
-- `alternative` — a decision-preserving way to address the originating concern. For a
-  pre-merge ADR, an adopted edit alternative is applied by adr-editor; for a post-merge ADR,
-  it is a new-ADR draft and is handed to the user + main pre-track authoring and approval path.
-  Neither adr-editor nor this capability creates that new ADR;
-- `no_change_rationale` — a reasoned statement that no modification is needed.
+### Delta admission judgment (Phase 1+)
 
-A bare rejection carrying neither field is an invalid output.
+| verdict | Use when | Orchestrator action |
+|---|---|---|
+| `(a) admit` | No recorded decision's effective content changes (independent new decision or decision-preserving clarification), confirmed even for zero-target candidates. | Admit the candidate to the delta box (verdict tracked in dispatch/review records until the admission marker is implemented). The draft stays 🟡. |
+| `(b) bounce` | A decision-preserving resolution exists (alternative wording / downstream resolution / reasoned origin rejection), a target is not the chain head, or the judgment is uncertain. | Have adr-editor remove the candidate from the working tree; return the per-decision verdict set and the presented resolution (or re-target / additional-grounds instruction) to the origin. No admission, no stamp. |
+| `(c) modification proposal` | No preserving resolution exists for at least one targeted decision — its modification is indispensable — and no target received (b). | Admit as an explicit decision-modification proposal (targets enumerated); it awaits the user's asynchronous adjudication at the merge stage. |
+
+Routing is fail-closed: any (b) bounces the whole candidate; (c) requires no (b); (a)
+requires all targets (a).
+
+### Classification & conformance
+
+Return the applicable single verdict: `non-semantic` / `semantic`;
+`hearing-conformant` / `adoption-conformant` / `rejection-conformant` / `deviating`;
+`restoration-confirmed` / `restoration-mismatch`. Uncertainty always takes the
+fail-closed branch (`semantic` / `deviating` / `restoration-mismatch`).
 
 ### Mismatch classification
 
-Return exactly one verdict:
-
 | verdict | Use when | Orchestrator action |
 |---|---|---|
-| `non-semantic-restamp` | Every difference is non-semantic and permitted by the supplied lifecycle judgment: for a pre-merge ADR, e.g. a typo, formatting-only change, or reference-path correction; for a post-merge ADR, only a typo, reference-path, or back-reference correction. In either case it must not alter the recorded decision. | Run `bin/sotp adr-baseline snapshot --source <file> --kind non-semantic-fix`, then retry the triggering check. |
-| `deviation` | The difference changes ADR meaning, is non-semantic but not permitted by the supplied lifecycle judgment, or its semantic effect is uncertain, and the originating capability is known. Uncertainty fails closed. | Run `bin/sotp adr-baseline restore --source <file>`, then inject the mismatch history into the originating capability's briefing. The briefing must require an amendment proposal, not an in-place ADR edit. |
-| `unknown-editor` | The difference is semantic or uncertain, or non-semantic but not permitted by the supplied lifecycle judgment, and the originating capability cannot be identified. | Run `bin/sotp adr-baseline restore --source <file>`, record the history in the track's optional `observations.md`, then retry or continue from the restored state. |
-
-The capability judges only the difference against the latest baseline. It does not assess whether
-the proposed amendment is desirable and it must not approve an in-place semantic change.
+| `non-semantic-restamp` | Every difference is non-semantic and lifecycle-permitted, altering no recorded decision. | Run `bin/sotp adr-baseline snapshot --source <file> --kind non-semantic-fix`, then retry the triggering check. |
+| `deviation` | The difference changes ADR meaning, is lifecycle-prohibited, or is uncertain (fail closed), and the originating capability is known. | Run `bin/sotp adr-baseline restore --source <file>`, then inject the mismatch history into the originating capability's briefing. Before the Phase 0 boundary, semantic content returns to the user-present hearing/new-ADR lane; after the boundary, it re-enters through the delta lane, never as an in-place edit. |
+| `unknown-editor` | As `deviation` but the originating capability cannot be identified. | Run `bin/sotp adr-baseline restore --source <file>`, record the history in the track's optional `observations.md`, then retry from the restored state. |
 
 ## Output contract
 
-Return exactly one object matching the invocation mode, with no surrounding prose or Markdown.
+Return exactly one JSON object matching the invocation mode, with no surrounding prose.
+Every object carries a required non-empty Japanese `reason` naming the affected decision
+id(s) / records and the grounds for the verdict.
 
-**Edit judgment**: return exactly one of the following valid output shapes.
-
-```json
-{
-  "verdict": "decision-preserved",
-  "reason": "non-empty Japanese explanation naming the affected decision id(s) and why the edit preserves them"
-}
-```
-
-```json
-{
-  "verdict": "decision-breaking",
-  "reason": "non-empty Japanese explanation naming the affected decision id(s) and why the edit breaks them",
-  "alternative": "決定を保全したまま指摘に応える編集案 (日本語)"
-}
-```
-
-```json
-{
-  "verdict": "decision-breaking",
-  "reason": "non-empty Japanese explanation naming the affected decision id(s) and why the edit breaks them",
-  "no_change_rationale": "修正不要と判断する理由 (日本語)"
-}
-```
-
-`verdict` and `reason` are required. The two `decision-breaking` forms are exclusive: exactly
-one of `alternative` / `no_change_rationale` must be present (both absent or both present is
-invalid). For `decision-preserved`, both must be absent.
-
-**Mismatch classification**:
-
-```json
-{
-  "verdict": "non-semantic-restamp | deviation | unknown-editor",
-  "reason": "non-empty Japanese explanation of the compared change and classification",
-  "recommended_next_action": "non-empty Japanese orchestrator action"
-}
-```
-
-All fields are required. `reason` must identify the source filename and explain why the change is
-non-semantic and lifecycle-permitted, semantic, non-semantic but lifecycle-prohibited, or
-uncertain. `recommended_next_action` must name the applicable snapshot or restore route and,
-for `deviation`, the briefing-injection requirement.
+- Edit judgment: `{ "verdict": "decision-preserved" | "decision-breaking", "reason": …,
+  ["alternative" | "no_change_rationale"]: … }` — the two `decision-breaking` fields are
+  exclusive and exactly one must be present; both absent for `decision-preserved`.
+- Delta admission: `{ "verdict": "admit" | "bounce" | "modification-proposal",
+  "per_decision": [{"target": "<file>#<id>", "class": "a"|"b"|"c", "reason": …}, …],
+  "reason": …, ["resolution" | "retarget" | "required_grounds"]: … }` — `per_decision` is
+  empty for zero-target candidates; a `bounce` must carry the presented resolution, the
+  re-target instruction, or the required additional grounds.
+- Classification & conformance: `{ "verdict": "<applicable value>", "reason": … }`.
+- Mismatch classification: `{ "verdict": "non-semantic-restamp" | "deviation" |
+  "unknown-editor", "reason": …, "recommended_next_action": … }`.
 
 ## Boundaries
 
 - Read-only verdicts only. Do not edit `knowledge/adr/`, `track/items/<track-id>/adr-baseline/`,
   `observations.md`, or any other repository file.
-- Do not run `bin/sotp adr-baseline snapshot` or `bin/sotp adr-baseline restore`; those writes
-  belong to the orchestrator after it consumes the verdict.
+- Do not run `bin/sotp adr-baseline snapshot` or `restore`; those writes belong to the
+  orchestrator after it consumes the verdict.
 - Do not change `signal-gates.json`, run an `adr_user` evaluator, or add LLM judgment to a gate.
 - Do not invoke writer capabilities, transition tasks, stage, commit, push, or create a PR.
-- An amendment proposal is a report for later user adjudication, never authorization to change an
-  existing ADR in this track.
-- In edit judgment, `alternative` is prose inside the verdict output. For a pre-merge ADR,
-  applying an adopted edit alternative is adr-editor's work after the orchestrator relays it.
-  For a post-merge ADR, an alternative is a new-ADR draft and must follow the user + main
-  pre-track authoring and approval path; adr-editor does not create it. This capability never
-  edits an ADR to demonstrate its own alternative, and its verdict is relayed to the finding's
-  origin verbatim — the orchestrator must not rewrite or summarize it into an adjudication of
-  its own.
+- Never approve an in-place semantic change to an input-box ADR after the Phase 0 boundary;
+  the semantic route is the delta lane.
+- Verdicts are relayed to the finding's origin verbatim — the orchestrator must not rewrite
+  or summarize them into an adjudication of its own.
 
 ## Session resume
 
-When dispatched with `--resume`, first check whether the briefing, current ADR, latest baseline,
-or ledger entry changed since the previous session. Re-read every changed input before returning a
-verdict. A failed or expired resume starts fresh and does not weaken the judgment.
+When dispatched with `--resume`, first check whether the briefing, current ADR, latest
+baseline, or ledger entry changed since the previous session. Re-read every changed input
+before returning a verdict. A failed or expired resume starts fresh and does not weaken the
+judgment.

@@ -16,6 +16,8 @@ User invokes this command as `/track:merge`. `$ARGUMENTS` supplies the PR number
   - `gh pr view --json number -q .number` (only when `$ARGUMENTS` is empty)
   - `bin/sotp pr wait-and-merge <pr_number>` (method omitted → configured default)
   - `bin/sotp pr wait-and-merge <pr_number> --method <method>` (only when the user explicitly supplied a method)
+- **Adjudication recovery**: when the merge command reports that recovery is required, follow
+  the recovery lane in the workflow SSoT; this adapter does not restate or perform it.
 
 ## Report format
 
@@ -23,5 +25,7 @@ After execution, summarize:
 
 1. PR number and URL.
 2. Final check status (all passed / specific failing checks / pending on timeout).
-3. Merge result (success with resolved method and resulting commit, or failure reason).
-4. Recommended next command (`/track:done` on success).
+3. Adjudication outcomes, when the recovery lane ran (adopted / rejected drafts, audit
+   verdicts, resulting commits).
+4. Merge result (success with resolved method and resulting commit, or failure reason).
+5. Recommended next command (`/track:done` on success).

@@ -3,21 +3,18 @@
   "tasks": [
     {
       "id": "T001",
-      "description": "`knowledge/conventions/pre-track-adr-authoring.md`: revise the in-track meaning-change authority section (IN-01/CN-01/CN-02/AC-01).",
-      "status": "todo",
-      "commit_hash": null
+      "description": "`knowledge/conventions/pre-track-adr-authoring.md`: revise the in-track meaning-change authority section, then perform the AC-01 acceptance check (IN-01/CN-01/CN-02/AC-01).",
+      "status": "done"
     },
     {
       "id": "T002",
-      "description": "The `adr-diagnoser` and `adr-editor` capability contracts and corresponding `.agents/skills` descriptions: align the capability contracts (IN-02/IN-04/CN-01/CN-02/AC-02/AC-04).",
-      "status": "todo",
-      "commit_hash": null
+      "description": "The `adr-diagnoser` and `adr-editor` capability contracts and corresponding `.agents/skills` descriptions: align the capability contracts, then perform the AC-02 and AC-04 acceptance checks (IN-02/IN-04/CN-01/CN-02/AC-02/AC-04).",
+      "status": "done"
     },
     {
       "id": "T003",
-      "description": "The track-plan, track-review, track-adr2pr, and merge workflow SSoTs with their thin adapters: realign the workflow documents (IN-03/IN-04/CN-01/CN-02/AC-03/AC-04/AC-05).",
-      "status": "todo",
-      "commit_hash": null
+      "description": "The track-plan, track-review, track-adr2pr, and merge workflow SSoTs with their thin adapters: realign the workflow documents, then perform the AC-03, AC-04, and AC-05 acceptance checks (IN-03/IN-04/CN-01/CN-02/AC-03/AC-04/AC-05).",
+      "status": "done"
     }
   ],
   "plan": {

@@ -73,16 +73,24 @@ verdict reverts the edit and relays its `alternative` or `no_change_rationale` v
 finding's origin, following
 `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`.
 
-When all required scopes reach `zero_findings`, stop and escalate to the user with the init-stamp
-diff and every guardian-withheld proposal. The escalation message must present the diff content
+When all required scopes reach `zero_findings`, or the Phase 0 review returns its guardian-conflict
+`adjudication-ready` exception, stop and escalate to the user with the init-stamp
+diff, every guardian-withheld proposal, and every hearing-required proposal with its grounds. The escalation message must present the diff content
 itself in the user-visible chat body — the changed hunks verbatim or a faithful hunk-by-hunk
 summary — before asking for the decision; tool output, file-path references, or attachments the
 user may not see do not satisfy this presentation requirement. This Phase 0 escalation is the
-single exception adr2pr itself adds to Constraint 2. Only after user approval may the approved ADR text be stamped and the
-ADR-baseline commit proceed. If adjudication changes the ADR text, send it through guardian
-judgment and start a fresh review; do not stamp an intermediate draft. Skip the additional stamp
-only when no review-loop edit occurred and the approved ADR remains byte-identical to the init
-record; otherwise stamp the approved text before the ADR-baseline commit.
+single exception adr2pr itself adds to Constraint 2. After user approval, close the Phase 0
+adjudication boundary per the `plan` workflow SSoT's Phase 0 steps 3-4: apply the approval
+`user_decision_ref` via adr-editor, obtain the applicable adr-diagnoser conformance verdict
+(including `hearing-conformant` before init-stamping any hearing-authored ADR), reconverge the current
+hash through a fresh review, record one boundary review-refinement stamp for every input-box
+source whose converged text differs from its own init record (transitional measure: the existing escalation
+kind with the reason opening declaring a review-refinement record), then run the `review`
+workflow again to `zero_findings` before staging so its hash includes the final baseline ledger
+and copies, then proceed to the ADR-baseline commit. Skip the additional stamp only for a
+source that remains byte-identical to its own init record, but still run that final review before
+staging. If the adjudication changes the ADR text, route the edit through the guardian cycle and
+start a fresh review; never stamp an intermediate draft.
 
 **Step 3: Stage**
 
@@ -104,16 +112,16 @@ defined in the `plan` workflow SSoT's "Phase 1 loop", "Phase 2 loop", and "Phase
 sections (see `.harness/workflows/track/plan.md`; do not re-state them here).
 
 Do NOT invoke the `plan` workflow: after Step 1, the orchestrator is on a `track/<id>` branch,
-so the `plan` workflow's Phase 0 (`init`, which requires the configured base branch) would fail;
-and the `plan`
-workflow's Termination section can pause for a user decision when ADR working-tree diffs are
-present (violates Constraint 2). Plan artifacts are staged at Step 6 and committed at Step 7.
+so the `plan` workflow's Phase 0 (`init`, which requires the configured base branch) would fail.
+Plan artifacts are staged at Step 6 and committed at Step 7.
 
 Signal resolution rule for 🟡 (yellow): the `plan` workflow allows 🟡 to advance with a
-warning, but this `adr2pr` workflow requires 🟡 to be resolved before Step 9 (`full-cycle`
-begins). Any remaining 🟡 at Step 10 (`pr-review`) will surface as a merge blocker. If Phase 1
-or Phase 2 returns 🟡 after all reds are cleared, re-invoke the relevant writer to address
-the yellow before proceeding to the next step.
+warning, but this `adr2pr` workflow requires actionable 🟡 to be resolved before Step 9
+(`full-cycle` begins). If Phase 1 or Phase 2 returns 🟡 after all reds are cleared,
+re-invoke the relevant writer to address the yellow before proceeding. Exception: the
+chain ⓪ 🟡 of an admitted delta draft is intentional — it rides to Step 10 and the strict
+merge gate, where the merge workflow's adjudication recovery obtains the user decision;
+do not attempt to resolve it inside this workflow.
 
 **Step 6: review workflow — plan artifacts**
 
@@ -142,38 +150,47 @@ PR-based review (whole track branch vs the configured merge target). The workflo
 reviewed PR. No merge
 is performed.
 
-**Step 11: primary ADR baseline diff comment**
+**Step 11: all-protected-source terminal audit comment**
 
 Run this terminal phase only after Step 10 reaches its terminal state: machine PASS (explicit
-zero findings) or user-approved Accepted Deviations. Retain the direct primary-ADR filename
-supplied to Step 1. From that source's `init` record in the active track's ADR-baseline ledger,
-read the corresponding recorded baseline copy and compare it with the terminal
-`knowledge/adr/<primary-adr-file>` bytes. Never reconstruct the baseline or hand-edit a ledger
-copy. Render the resulting unified diff in a temporary comment body.
+zero findings) or user-approved Accepted Deviations. This is the merge-stage terminal audit:
+its subject is every **protected source** — every source holding at least one record in the
+active track's ADR-baseline ledger. For each protected source, the audit baseline is its
+FIRST ledger record (protection start: init for a primary, cite for a later-protected
+source, new-adr for an adopted delta). Read that recorded baseline copy and compare it with
+the terminal `knowledge/adr/<source>` bytes. Never reconstruct a baseline or hand-edit a
+ledger copy. Render the resulting per-source unified diffs in a temporary comment body.
 
-Build the comment's provenance table by walking the ledger in append order, selecting only
-records whose `source` equals that primary filename and which occur after that source's `init`
-record. Exclude every other source's records, irrespective of kind. For each selected
-`escalation`, use its D3-compliant `reason` to show the origin-input source and summary, the
-`adr-diagnoser` verdict summary, the stamp hash and timestamp, and the commit that introduced
-the ledger row. For each selected `non-semantic-fix`, show its kind, stamp hash and timestamp,
-and introducing commit, and label it `非意味的な再刻印`; it has no required reason and must
-not be rendered as `記録なし`. Preserve any other selected kind faithfully with its recorded
-fields rather than dropping it.
+Build each source's provenance table by walking the ledger in append order over that
+source's records from and including its protection-start record. For each record, show its kind, stamp
+hash and timestamp, and the commit that introduced the ledger row. For a reason-carrying
+record (a boundary review-refinement record — transitional measure: recorded under the
+escalation kind with the reason opening declaring it — or an adoption new-adr record), show
+the reason's origin-input summary and guardian verdict summary. For each `non-semantic-fix`
+record, additionally show its adjacent-record diff (against the immediately preceding ledger
+record) and label it `非意味的な再刻印` — it has no required reason and must not be rendered
+as `記録なし`; an empty terminal diff never hides an intermediate restamp because it appears
+in this adjacent diff. Preserve any other kind (including historical escalation records)
+faithfully with its recorded fields rather than dropping it.
 
-The ledger reason is free prose. If a pre-D3 or otherwise deficient escalation record does not
-let the renderer recover its origin-input summary or guardian-verdict summary, show `記録なし`
-for only the unrecoverable field and retain all remaining recorded information. Do not guess or
-turn that fallback into a posting failure. Derive each introducing commit from repository history
-for the ledger row; if it cannot be recovered, show `記録なし` for that field as well.
+The ledger reason is free prose. If a legacy or otherwise deficient record does not let the
+renderer recover its origin-input summary or guardian-verdict summary, show `記録なし` for
+only the unrecoverable field and retain all remaining recorded information. Do not guess or
+turn that fallback into a posting failure. Derive each introducing commit from repository
+history for the ledger row; if it cannot be recovered, show `記録なし` for that field as
+well. The semantic adjudication of each presented record belongs to the user at this audit;
+a record the user adjudicates as a misclassified semantic change is recovered through the
+corrective-restoration route defined in
+`knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`.
 
-Always prepare and post the comment, including when the terminal diff is empty. When the
-terminal diff is non-empty, present the diff and the provenance table without any byte-match
-claim. The following two status strings apply only when the terminal diff is empty: with no
-selected post-init record, state `terminal text byte-matches the init stamp; no post-init
-change-history records`; with selected records, state `terminal text byte-matches the init
-stamp; intermediate change history is recorded` and include the complete provenance table. An
-empty diff must never be treated as proof that no in-track edit occurred.
+Always prepare and post the comment, including when every terminal diff is empty. When a
+source's terminal diff is non-empty, present the diff and the provenance table without any
+byte-match claim. For a source whose terminal diff is empty: with no record after its
+protection-start record, state `terminal text byte-matches the protection-start stamp; no
+later change-history records`; with later records, state `terminal text byte-matches the
+protection-start stamp; intermediate change history is recorded` and include the complete
+provenance table. An empty diff must never be treated as proof that no in-track edit
+occurred.
 
 Resolve the PR author at runtime with `gh pr view --json author` and begin the comment with that
 author's `@login`; do not hardcode a handle. Write the comment body to a file under the
@@ -201,7 +218,7 @@ or retry by using the review-request path.
 | 8 | `commit` CI + git commit OK | proceed / ERROR |
 | 9 | `full-cycle` completes (all batches committed) | proceed / stop |
 | 10 | `pr-review` reaches a terminal state: machine PASS (explicit zero findings) or user-approved Accepted Deviations | terminal / loop |
-| 11 | One independently posted primary-ADR diff comment, or a reported non-fatal posting/preparation failure | complete / reported |
+| 11 | One independently posted all-protected-source terminal-audit comment, or a reported non-fatal posting/preparation failure | complete / reported |
 
 All gates are binary; no step begins until the previous step's gate passes.
 
@@ -231,9 +248,11 @@ All gates are binary; no step begins until the previous step's gate passes.
    commit by default. Per-task commit split is triggered only when a layer's cumulative diff
    is about to exceed its per-scope ceiling.
 4. **Signals must be resolved**: resolve every 🔴 at the phase where it surfaces. For 🟡:
-   resolve all yellows before Step 9 (`full-cycle`) begins; any remaining 🟡 at Step 10 will
-   surface as a merge blocker for the user.
-5. **Phase 0 approval exception**: after the Step 2 ADR-baseline review reaches `zero_findings`,
+   resolve all actionable yellows before Step 9 (`full-cycle`) begins; an admitted delta
+   draft's intentional chain ⓪ 🟡 may remain for the merge-stage adjudication and will surface
+   as its designed merge blocker for the user.
+5. **Phase 0 approval exception**: after the Step 2 ADR-baseline review reaches `zero_findings`
+   or the guardian-conflict `adjudication-ready` terminal state,
    pause for the user-approval escalation described in Step 2 before stamping or committing the
    ADR baseline. This is the sole exception adr2pr itself adds to Constraint 2. The only other
    user pause in the sequence is inherited, not added: Step 10's Accepted-Deviations terminal
@@ -246,8 +265,10 @@ All gates are binary; no step begins until the previous step's gate passes.
   commit(s), optional lifecycle tail commit
 - Pull request (created or reused; not merged)
 - PR URL and terminal `pr-review` state
-- Primary-ADR baseline-diff comment result: posted comment URL, empty-diff outcome and
-  provenance fallback when applicable, or a reported non-fatal posting/preparation failure
+- All-protected-source terminal-audit comment result: posted comment URL, per-source empty-diff
+  and provenance fallback outcomes when applicable, or a reported non-fatal
+  posting/preparation failure
 - Per-step gate verdicts and commits produced
 - Any per-scope ceiling batch split decisions made during `full-cycle`
-- Confirmation that all 🔴/🟡 signals are resolved before Step 9
+- Confirmation that all 🔴 and actionable 🟡 signals are resolved before Step 9, plus any
+  admitted delta drafts intentionally left 🟡 for merge-stage adjudication
