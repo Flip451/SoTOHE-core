@@ -231,6 +231,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [DRY ゲートを利用者設定で切り替え可能にし、既定を無効（opt-in）とする](2026-06-19-2335-dry-gate-configurable-default-off.md) | — | 2026-06-19 |
 | [長くなった CI の短縮 — ソースを変えずキャッシュ戦略のみ見直す](2026-06-01-0336-ci-shorten-cache-strategy-only.md) | — | 2026-06-01 |
 | [モジュールサイズ制限の厳格化と分割リファクタリング](2026-06-06-1609-enforce-module-size-limit-splitting.md) | Proposed | 2026-06-06 |
+| [ビルド成果物によるディスク圧迫の解消と dry gate 重量依存の feature flag 化](2026-07-20-1608-disk-footprint-and-dry-feature-gating.md) | Proposed | 2026-07-20 |
 
 ### DRY / リファクタ
 
