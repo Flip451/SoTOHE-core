@@ -1,0 +1,781 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0bf92a6c7ad4e8150c153b4e6e6527862bcc1a40bd927246a196c9f3cf0cd5ec",
+          "at": "2026-07-20T09:05:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0bf92a6c7ad4e8150c153b4e6e6527862bcc1a40bd927246a196c9f3cf0cd5ec",
+          "at": "2026-07-20T09:07:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f512bcea807c0995ee72b8edf55fe961b0003ffb5af4cabd3e85886ad021aaf",
+          "at": "2026-07-20T09:09:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f512bcea807c0995ee72b8edf55fe961b0003ffb5af4cabd3e85886ad021aaf",
+          "at": "2026-07-20T09:11:20Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8a26437fd22da5341d83e8c5531f251e9b085182df921d042b65470696692c0",
+          "at": "2026-07-19T06:44:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 は user の「裁定後」に無条件で `user_decision_ref` へ昇格・刻印すると定めていますが、D3(c) は「採用時」にのみ supersede/refinement が成立するとしています。棄却も裁定結果なので、workflow/spec は棄却された draft まで承認済みとして凍結する解釈が可能です。昇格条件を明示的な採用に限定し、棄却時の扱いも規定してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 33,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "D3 の三分類が排他的かつ網羅的ではありません。(a) は「精緻化」を矛盾なしとして扱う一方、(c) も `refinement` を入力決定の修正として扱うため、同じ draft が両方に該当し得ます。また「入力決定と矛盾するが保全代案がなく、修正も必要とは判定されない」場合の経路がありません。このままでは adr-diagnoser capability と downstream workflow が決定論的な acceptance criteria を導出できないため、decision-preserving clarification と decision-modifying refinement の境界、および残余ケースの処理を明記してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 39,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:a8a26437fd22da5341d83e8c5531f251e9b085182df921d042b65470696692c0",
+          "at": "2026-07-19T06:48:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24b806dbe5ddf6a40439d1d4bcc0f55f97c32fe9226eefccda5ac01614422cdc",
+          "at": "2026-07-19T06:55:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 freezes the input ADR set for the entire track, but D2 routes semantic changes to delta drafts only in Phase 1+. A semantic defect found during the Phase 0 baseline review is therefore neither editable in place nor eligible for the replacement lane. The Phase 0 review workflow cannot derive an observable outcome for this case; specify how Phase 0 findings enter the two-box model.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 33,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D2 permits downstream spec work to cite an unapproved delta draft, but on user rejection it only defines deletion/revision of the draft and restoration of lifecycle metadata. It does not require invalidating and reworking the dependent spec, catalogues, implementation plan, and implementation before merge. Deleting the draft can leave broken references or behavior derived from a rejected decision, so the downstream review/merge workflow lacks a safe rejection outcome.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 33,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:24b806dbe5ddf6a40439d1d4bcc0f55f97c32fe9226eefccda5ac01614422cdc",
+          "at": "2026-07-19T07:00:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1217b9e40254f15f4e7902b07fe60596214f91085afeb6e41edbb7a49666de5b",
+          "at": "2026-07-19T07:09:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 は「init との byte 乖離は常に」不一致トリアージへ送る一方で、同じ段落で `non-semantic-fix` lane を存続させています。許可された誤字・参照修正も init とは恒久的に byte 不一致になるため、文面どおり init を比較基準にすると再刻印後も毎回トリアージされます。下流の baseline checker が収束可能な比較基準（init か、許可済み最新刻印か）を導出できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 29,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "D2 は対象 ADR の pre/post-merge を問わず既存決定の変更を扱いますが、D3 の分類基準は init 時点の「入力箱」だけです。Phase 1+ で後から発見・cite された既存 ADR を refine/supersede する draft は入力決定を変えないため (a) に入り、明示的な決定修正提案である (c) には到達できません。したがって三分類は宣言どおり網羅的ではなく、adr-diagnoser と workflow がそのケースを一意に処理できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 37,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:1217b9e40254f15f4e7902b07fe60596214f91085afeb6e41edbb7a49666de5b",
+          "at": "2026-07-19T07:14:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe03a5be49942b284c143413aeb7ad58346bbd7ec61936a78eb529ccf18db64f",
+          "at": "2026-07-19T07:17:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe03a5be49942b284c143413aeb7ad58346bbd7ec61936a78eb529ccf18db64f",
+          "at": "2026-07-19T07:21:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed10aebc808a7c8bb81e44047ff8e5515bb719874b7d17290293dd675c2908b1",
+          "at": "2026-07-19T07:37:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed10aebc808a7c8bb81e44047ff8e5515bb719874b7d17290293dd675c2908b1",
+          "at": "2026-07-19T07:42:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a53daa072532d379f0696893afafa86e9164a02a79d55e82d64aa64e32035ce",
+          "at": "2026-07-19T07:51:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 は全 finding／提案を入力 ADR に一時適用し、adr-diagnoser が「非意味的」と判定すれば non-semantic-fix として恒久化します。このため、実際には意味的な変更を diagnoser が誤分類すると入力箱が書き換わり、Rejected Alternative B が却下した fail-open 経路を再導入します。D1 および Positive consequence の「誤判定による変質経路が構造的に消える」という主張とも整合しません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 33,
+              "category": "rejected alternative re-emerges in decisions"
+            }
+          ],
+          "hash": "rvw1:sha256:6a53daa072532d379f0696893afafa86e9164a02a79d55e82d64aa64e32035ce",
+          "at": "2026-07-19T07:57:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a88a9fcd5b4e30a25ff2c98165a4e7b91c1d781b5c47a9a9c2bd24c4326ae976",
+          "at": "2026-07-19T08:02:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は delta draft 全体を排他的な三分類へ送りますが、複数 decision に触れる draft で、一方には (b) の保全、他方には (c) の変更妥当判定が同時に成立する場合の優先順位・draft 分割・複数 verdict を定義していません。このため分類は実際には排他的でなく、adr-diagnoser contract と routing の受入条件を一意に導出できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 37,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D3(c) は採用時に対象 decision が superseded/refined になると定める一方、D1 は入力 ADR の意味的 in-place 更新を禁じ、D2 は棄却時に他 ADR へ追加済みの lifecycle metadata を戻すことだけを述べています。対象 ADR の status/back-reference をいつ、どの lane と stamp kind で更新するのかが未定義なため、workflow は入力箱の凍結を守りつつ「矛盾が併存しない」採用処理を実装できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 41,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:a88a9fcd5b4e30a25ff2c98165a4e7b91c1d781b5c47a9a9c2bd24c4326ae976",
+          "at": "2026-07-19T08:07:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03a7cc858fc4f546c684ee7cf9c270238b58eba1d3e3c617f6b480ff507fc877",
+          "at": "2026-07-19T08:12:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 は入力箱について「track 中いかなる意味変更も行わない」「baseline からの乖離は常に不意の変更としてトリアージする」と定めていますが、D2 は全 finding／提案をまず入力 ADR へ適用し、意味的変更でも判定完了までは working tree に保持する正規経路を定めています。この expected な一時乖離を D1 の不一致トリアージへ送るのか、D2 の edit-judgment 経路へ送るのかを downstream workflow が一意に導出できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 29,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "D3 が掲げる「実効内容を変えるか」という単一基準は (a) とそれ以外しか区別できず、(b) の「既存決定を保つべき」と (c) の「変更が妥当」を分ける判定条件がありません。`adr-diagnoser` capability と review／plan workflow は同じ decision-modifying draft を差し戻すか user 裁定へ入庫するかについて観測可能な acceptance criteria を導出できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 37,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:03a7cc858fc4f546c684ee7cf9c270238b58eba1d3e3c617f6b480ff507fc877",
+          "at": "2026-07-19T08:18:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:02feb393fc2d7501e3a30d06512d9479fe99464227df248a9d7a18174b11488e",
+          "at": "2026-07-19T08:25:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:02feb393fc2d7501e3a30d06512d9479fe99464227df248a9d7a18174b11488e",
+          "at": "2026-07-19T08:30:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D6 contradicts D1/D3 by classifying `decision status`/`superseded_by` lifecycle metadata written into an input ADR as `non-semantic-fix`. Those fields change the ADR’s recorded decision lifecycle and are therefore semantic changes under D1’s immutable input-box rule; routing them through the non-semantic-fix lane permits the very in-place semantic mutation D1 abolishes.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 68,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:341c1db930436b998ea8443dda7a8f0f4072983f9d277edb08f546c6a238c7d1",
+          "at": "2026-07-19T12:33:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17adb8e36e932e7d184cb925fbc37d64ffbdbbe7222b7d210b7b14a7295c710e",
+          "at": "2026-07-19T12:41:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5 の (b)(2) と (c) はどちらも「decision-preserving resolution が存在しない」場合を扱いますが、両者を分ける条件が未定義の「変更が妥当か」に留まっています。理由の記載を要求しても判定基準自体は循環したままで、adr-diagnoser と downstream workflow は同じ decision-modifying draft を差し戻すか user 裁定へ送るかを一意に導出できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 58,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D6 は採用済み (c) draft の関係を delta ADR 側だけに記録し、対象 ADR の lifecycle metadata を変更せず effective lifecycle を導出するとしていますが、対象 ADR・decision・関係種別を格納する機械可読な形式と導出規則がありません。現行 front-matter では対象側の `superseded_by` しか lifecycle 関係を表せないため、spec、signal gate、effective-view の各 consumer はどの決定が supersede/refinement されたかを確定できず、「矛盾が併存しない」という保証を実装できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 68,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D6 の fail-closed 説明は棄却 draft を削除した場合にしか成立しません。同じ段落で許可される「同じ draft を改稿して再提出」では参照 path/anchor が残り得るため Chain ① は 🔴 にならず、棄却前の文面から導出された spec・catalogue・実装を stale と判定する version binding や永続的な invalidation 条件もありません。この分岐では downstream 再作業を merge 前に強制できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 70,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D1/D4 の入力箱は複数 ADR を含み得るのに、D7 はすべての non-semantic-fix 再刻印が `terminal primary-ADR` の provenance record に現れるとしています。Related の 0340 D1 はその記録を primary ADR の source に限定し、他 source を明示的に除外するため、secondary input ADR の誤分類は必須 terminal audit に現れません。監査対象を入力箱全体へ広げるのか、D7 の保証を primary ADR に限定するのかが未決定です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 74,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:17adb8e36e932e7d184cb925fbc37d64ffbdbbe7222b7d210b7b14a7295c710e",
+          "at": "2026-07-19T12:49:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dca78b0e88685ba225bae7fff9b7cff1609241f837b67649b480db935f0685d2",
+          "at": "2026-07-19T12:58:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 は byte 比較基準を init または最新の non-semantic-fix 刻印に限定しているが、D6 で採用された delta ADR は new-adr 刻印、init 後に cite された既存 ADR は cite 刻印しか持たない。D3 はそれらの後続意味変更も delta lane に送るため、commit gate／CI が new-adr・cite を比較基準として扱うのかを明記しないと、fail-closed 検出の対象を downstream spec が決定できない。全刻印種別について baseline 選択規則を定義する必要がある。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 46,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D6 の `supersedes` / `refines` は scalar field だが、D5 は一つの delta decision が複数の記録済み decision を変更対象にすることを許している。「対象 decision ごと」に同名 scalar key を持たせることは YAML schema で表現できないため、複数関係を list として表すのか、delta decision を対象ごとに分割するのかを決定する必要がある。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 68,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D6 は `supersedes` と `refines` のどちらを選ぶか、および `refines` の場合に旧 decision と delta decision をどう合成して effective decision を導出するかを定義していない。にもかかわらず consumer が lifecycle を導出し矛盾が残らないことを要求しているため、spec／signal／effective-view の受入条件を作れない。両 relation の選択基準と effective-view 意味論を明示する必要がある。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 68,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:dca78b0e88685ba225bae7fff9b7cff1609241f837b67649b480db935f0685d2",
+          "at": "2026-07-19T13:04:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:684d453fdf166b91f68780a6bb1649da1063a874a9ce38da8ccb62050bbc81dd",
+          "at": "2026-07-19T13:10:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 は `cite` / `new-adr` source も最新刻印との照合対象にし、そこへの `non-semantic-fix` 再刻印を許容していますが、D7 の terminal audit は init-designated source だけを対象にしています。そのため、後から cite した既存 ADR や採用済み delta ADR で意味変更が非意味的と誤分類されても監査に現れず、「すべての non-semantic-fix 再刻印が必ず現れる」「明示採用なしに意味変更を恒久化できない」という結論が成立しません。監査対象を全 protected source に広げるなど、二箱の外にある刻印 source も残余リスク制御へ含めてください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 74,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "`delta-wins` は delta とその直接 target の競合しか解決しません。複数の採用済み delta が同じ decision をそれぞれ `refines` / `supersedes` した場合の排他条件・順序・衝突拒否が定義されていないため、両方が effective set に入り、どちらを優先するか決められません。これは末尾の「矛盾が併存しない」とも整合せず、spec・signal・effective-view consumer が effective content を決定的に導出できません。relation graph の一意性または明示的な優先規則を定義してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 68,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:684d453fdf166b91f68780a6bb1649da1063a874a9ce38da8ccb62050bbc81dd",
+          "at": "2026-07-19T13:18:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f2f1499187be4d4766ac1576158b959c873aeed3b7916dc59517c4c3521c64e",
+          "at": "2026-07-19T13:24:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 requires adr-editor to apply every proposed input-ADR edit to the working tree before classification, including edits later judged semantic, while D1 categorically says the pipeline never makes any semantic change to the input box during the track. Reverting afterward guarantees only checkpoint equality, not the stated invariant, so downstream spec/workflow cannot determine whether transient semantic divergence is allowed. Define D1 in terms of changes being admitted, stamped, or reaching a checkpoint so it composes with D4.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 54,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:8f2f1499187be4d4766ac1576158b959c873aeed3b7916dc59517c4c3521c64e",
+          "at": "2026-07-19T13:32:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1204501194186b242e1bb79970377a3370bd7a9a57508a480f3bd0e98ae843b1",
+          "at": "2026-07-19T13:36:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1204501194186b242e1bb79970377a3370bd7a9a57508a480f3bd0e98ae843b1",
+          "at": "2026-07-19T13:41:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ee341aa027c9366dcd71192e56615d0b8a5941366d0f2dbe628e1cafb6bfdb3",
+          "at": "2026-07-20T01:57:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7e5c7c27795a16d45b84ea8937fe00b2cb82874e3838b6bd828087e765ffe30",
+          "at": "2026-07-20T02:07:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 omits the existing `escalation` kind when selecting the latest ledger baseline, even though historical input ADRs may already have escalation records under the decision-freeze workflow. For such an ADR whose current bytes equal its latest historical escalation snapshot, the prescribed comparison instead uses an older snapshot and deterministically reports a false unexpected divergence, undermining the fail-closed check for existing tracks. The decision needs to define how historical escalation snapshots participate in baseline selection (or explicitly define a migration baseline).",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 61,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:6511746b157d31a5bb23e9ad1b67a56121ee0957ef25bf2debda9489b49d5537",
+          "at": "2026-07-20T02:14:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4d8964388c9db2c973279cbcbd6516dbbd0dc56d7bde67cc6a8f81489bf9800",
+          "at": "2026-07-20T02:52:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4(c) is defined as a proposal whose adoption necessarily changes a recorded decision, but D5 permits stamping every adopted draft only when re-audit returns `decision-preserved`. No c-specific success verdict or comparison baseline against the user-adopted delta is defined, so downstream adr-diagnoser/workflow contracts cannot determine how a valid (c) proposal ever reaches `kind: new-adr`.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 92,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "D6 cannot recover from the misclassification it claims to control. D1 makes the latest `non-semantic-fix` record the comparison baseline, while D3 forbids semantic restamping after Phase 0. Restoring the pre-edit text after a semantic edit was mistakenly stamped therefore creates a semantic mismatch against that latest baseline, which D1 blocks and D3 cannot reconcile. A corrective-baseline or erroneous-record supersession rule is required for downstream gates to converge.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 110,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:b4d8964388c9db2c973279cbcbd6516dbbd0dc56d7bde67cc6a8f81489bf9800",
+          "at": "2026-07-20T02:57:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff207b0a85fd8295640302afdcbb1d5efd3debf14588035e0c08c55859f54b32",
+          "at": "2026-07-20T03:04:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 0 の最終承認後に `user_decision_ref` を追加すると ADR scope の review hash が stale になりますが、D2 は adr-diagnoser の再監査だけで snapshot → ADR-baseline commit に進んでいます。commit gate は current hash の review approval を要求するため、この手順では commit が block されます。承認 ref を含む文面を fresh review で再収束し、追加修正が生じた場合は user 裁定へ戻す遷移を明記してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 64,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:ff207b0a85fd8295640302afdcbb1d5efd3debf14588035e0c08c55859f54b32",
+          "at": "2026-07-20T03:13:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8040357570ff1ad2b494556302df8fa4d7789752a429e8c89f12d22cbdd47cc6",
+          "at": "2026-07-20T03:19:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5 の `supersedes` 合成規則は多段 chain で一意に決まりません。たとえば `D0 <-refines- D1 <-supersedes- D2` では、「対象を effective set から除外する」は D1 だけを除いて D0 を残す一方、「その時点までの chain の規範内容を全面置換する」は D0 も置換する読みになります。明示された downstream consumer（spec / signal / effective-view）が異なる effective content を導出し得るため、`supersedes` が chain prefix 全体を無効化するのか immediate target のみを無効化するのかを決定として明確化してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 100,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:8040357570ff1ad2b494556302df8fa4d7789752a429e8c89f12d22cbdd47cc6",
+          "at": "2026-07-20T03:25:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c1be33b936f7e76cacc7a1bd46fb38603311cad36f1244438f369ccbd9a58542",
+          "at": "2026-07-20T03:29:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61bff1ea4d8828b0d1daffd18ec69e7fc5d953ca0c0929f69a3c9d9040c46bff",
+          "at": "2026-07-20T03:47:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Amendment proposal: D3 puts every newly authored draft into the delta box before D4 runs, but D4 says class (b) drafts must be returned without admission. Because the delta box is defined as the set of authored track-born ADRs and no separate candidate state or removal step exists, downstream workflows cannot determine whether a rejected draft remains in `knowledge/adr/` and becomes citeable. Make admission occur only after an (a)/(c) verdict, or define the pre-admission state and (b) cleanup explicitly.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 72,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "Amendment proposal: the rejection path requires `decision-preserved` before a user-rejected draft may be deleted, but it never defines the comparison decision. Comparing against the draft makes deletion decision-breaking, while comparing against recorded input decisions makes it trivially preserved; the former can restore a draft the user explicitly rejected. Define a rejection-conformance check or its exact baseline so the adr-diagnoser and orchestrator can implement this branch deterministically.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 104,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "Amendment proposal: D6 claims every misclassified `non-semantic-fix` can be found, but only requires a baseline-to-terminal diff plus provenance records and does not identify who semantically adjudicates each record. An intermediate semantic restamp that is later reverted can leave an empty terminal diff, while ledger metadata alone cannot expose its semantic content; the subsequent recovery trigger is therefore not derivable. Specify per-record/adjacent-snapshot comparison and the user or guardian adjudication step.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 110,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:61bff1ea4d8828b0d1daffd18ec69e7fc5d953ca0c0929f69a3c9d9040c46bff",
+          "at": "2026-07-20T03:53:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:322f563250f8474763eaacf39b383e56b196a04774f10efb874947cc1b28eeb1",
+          "at": "2026-07-20T04:00:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4は入庫時に(a)/(c)のadmission classを付与するとしていますが、その永続化先や機械可読形式を定義していません。入庫前候補と入庫済みdraftはいずれも未刻印かつ非user系根拠のADRなので、再開後のorchestrator、Chain ⓪、spec、strict merge gateは「cite禁止の候補」と「cite可能なdelta」を区別できません。下流が入庫状態を判定できる永続的な契約が必要です。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 85,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D6の`baseline-vs-terminal diff`は、sourceごとにどのledger entryをbaselineとして選ぶかを定義していません。init/cite/new-adr/historical escalationを含むsourceでは、最初の保護記録、最新のsanctioned記録、特定kindのいずれを選ぶかで監査内容が変わります。D1の「最新記録」を使うとcheckpoint通過後のterminal diffは常に空になり得るため、terminal-audit workflowが再現可能な比較を実装できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 111,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D6のcorrective restampはD3のPhase 1+ freezeと矛盾します。userが既存`non-semantic-fix`を「誤分類された意味変更」と裁定した場合、その変更を旧baselineへ戻すdiff自体も現在文面の意味を変えます。D3はsemanticなconcrete diffを保持せずdelta laneへ送るよう要求しますが、D6は同じ操作をin-placeで保持し、byte一致だけを確認して`non-semantic-fix`として刻印します。下流capabilityが従うべき優先規則または明示的な例外契約がありません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 113,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:322f563250f8474763eaacf39b383e56b196a04774f10efb874947cc1b28eeb1",
+          "at": "2026-07-20T04:06:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 does not define how an independent new-decision draft with no existing decision target is classified: its “all targeted decisions are (a)” rule is vacuously true for zero targets, while head checking and per-decision routing otherwise assume at least one target. Downstream admission/schema validation cannot derive an observable rule for validating and admitting targetless independent deltas.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 91,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:5aa353d604832bf7c09639893b0726f72a65634e5284dc38916e0eb423334d6d",
+          "at": "2026-07-20T04:13:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e7d0b1d382cfb4117af75ca991693ac6c9686079a39b51eb1401464514dd3f5",
+          "at": "2026-07-20T04:18:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61866efe33470106f8bd13560e895c8041af5e75c21c911b53a561d845a0dea8",
+          "at": "2026-07-20T04:31:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1/D3/Neutral は「どの phase でも新しい escalation 刻印を作成しない」「新規刻印用途から全面引退」と規定する一方、D2 は `review-refinement` enum 実装前の Phase 0 境界で、新規 ledger entry を `kind: escalation` として作成させています。「意味上は review-refinement なので数えない」だけでは実際の kind は変わらず、下流の spec/validator が Phase 0 の `--kind escalation` を許可すべきか拒否すべきか一意に導出できません。禁止を Phase 1+ に限定するか、この経過措置を明示的な例外として統一してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 69,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:61866efe33470106f8bd13560e895c8041af5e75c21c911b53a561d845a0dea8",
+          "at": "2026-07-20T04:37:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7bd4fc0ff0b96067b36e05b878777b21a7d99a8975c47a07e82e24a8d36c9da2",
+          "at": "2026-07-20T04:41:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 は「入庫前の候補」の起草・改稿時だけ再判定を要求しています。admission marker 付与後の draft を通常改稿する際に marker を無効化して D4 を再実行する一般手順がないため、下流 spec は現行 bytes が diagnoser verdict と一致しない draft を cite できてしまいます。既存の stale-target／棄却時だけでなく、入庫後の全改稿に対する再入庫条件を決定してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 83,
+              "category": "decision underspecified for downstream consumption"
+            },
+            {
+              "message": "D1 は byte 照合を Phase 0 裁定境界が閉じた後に限定していますが、同じ Decision は最初の ADR-baseline commit が byte 照合を通過した時点で境界を閉じるとしています。境界を閉じる commit では照合が既に有効なのか未有効なのかが循環しており、commit gate／CI の発火条件を一意に実装できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 52,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "D4 は admission 前の候補に `supersedes`／`refines` target が既に存在する前提で head 検査と分類を行いますが、D5 は採用時に adr-editor が relation を選択・記録すると定めています。採用時に relation を新設・変更できるなら D4 verdict はその relation を評価しておらず、D4 に従うなら D5 の選択手順は成立しません。relation の確定時点と、変更時の再判定要否を統一してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 105,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:7bd4fc0ff0b96067b36e05b878777b21a7d99a8975c47a07e82e24a8d36c9da2",
+          "at": "2026-07-20T04:48:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82d01900cc8d787ad84192da7bfc8eb3dba2720f89db8ba8301d45a5bedb68d2",
+          "at": "2026-07-20T04:57:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82d01900cc8d787ad84192da7bfc8eb3dba2720f89db8ba8301d45a5bedb68d2",
+          "at": "2026-07-20T05:06:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1〜D6 の本文は gate 発火、ledger 判定、routing、front-matter schema、復旧手順などの運用手順を詳細に規定しており、D7 自身の「ADR は決定と理由だけを記録する」という委譲方針とも不整合です。これらの手順詳細が二箱分離という決定を埋もれさせるため、ADR には決定と理由だけを残し、運用詳細を conventions / capability / workflow SSoT へ委譲してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 70,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:c2752f42e7fb9a35420e145f292d345fe79af5f1367bc9715f636c79b3003842",
+          "at": "2026-07-20T07:50:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:da28e740d08186346d0a52d59f8c7120225dda48ba41de8214b31e97ea5b104d",
+          "at": "2026-07-20T07:56:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1〜D6 は byte 照合の発火場所、Phase 0 の編集・刻印手順、delta 入庫の分類・routing、採用/棄却処理、terminal 監査といった運用手順・ゲート配線を決定本文に埋め込んでおり、D7 の「運用詳細は conventions / capability / workflow SSoT に委譲する」という自身の方針と不整合です。ADR には入力箱・delta 箱の境界と承認責任という決定だけを残し、手順や発火条件を委譲してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+              "line": 47,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:4a0099a0acc798bfa504ddd233ace63ff21ac29d58c132794ea0b313170f1048",
+          "at": "2026-07-20T08:02:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a0099a0acc798bfa504ddd233ace63ff21ac29d58c132794ea0b313170f1048",
+          "at": "2026-07-20T08:05:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a0099a0acc798bfa504ddd233ace63ff21ac29d58c132794ea0b313170f1048",
+          "at": "2026-07-20T08:08:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e96cfb1e173b0169840786d2199d9cd51486aa18ea2fc4205103afb7d870cde",
+          "at": "2026-07-20T08:45:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e96cfb1e173b0169840786d2199d9cd51486aa18ea2fc4205103afb7d870cde",
+          "at": "2026-07-20T08:48:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0dbd1a5df16fa0a28883dae7240401c043444b8d5fb1ea6ea7cffca99dd3a82",
+          "at": "2026-07-20T08:56:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0dbd1a5df16fa0a28883dae7240401c043444b8d5fb1ea6ea7cffca99dd3a82",
+          "at": "2026-07-20T08:58:48Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5835bd6c78a99e492f55e36ca9a16145e3ab4b24c2d22f3eca32cb35c0177fb",
+          "at": "2026-07-20T09:00:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5835bd6c78a99e492f55e36ca9a16145e3ab4b24c2d22f3eca32cb35c0177fb",
+          "at": "2026-07-20T09:02:51Z"
+        }
+      ]
+    }
+  }
+}
