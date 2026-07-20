@@ -50,29 +50,34 @@ PR-review work, then re-invoke this workflow so a fresh all-protected-source aud
 the next merge attempt. Do not invoke the merge wrapper until this audit has completed without a
 recovery.
 
-**Step 2: Head-bound wait and merge**
+**Step 2: Wait and merge**
 
-This step requires `bin/sotp pr wait-and-merge` to accept the audited head OID and bind it to
-the native merge operation (for example, by carrying it to `gh pr merge --match-head-commit`).
-The current wrapper does not yet provide that binding. Until the follow-up implementation ships,
-stop after the terminal audit with an explicit `expected-head binding unavailable` failure: do
-not invoke the wrapper and do not merge. A pre-invocation or post-outcome comparison cannot make
-an unbound polling-and-merge window safe.
+Immediately before invoking the wrapper, re-resolve the PR head OID (`gh pr view <pr_number>
+--json headRefOid`) and verify it still equals the Step 0-verified OID whose bytes the Step 1
+audit presented. A mismatch means the audited bytes are no longer the merge candidate: abort
+without invoking the wrapper and re-invoke this workflow from Step 0 for a fresh audit.
 
-Once the binding is available, immediately before invoking the wrapper re-resolve the PR head
-OID (`gh pr view <pr_number> --json headRefOid`) and verify it still equals the Step 0-verified
-OID whose bytes the Step 1 audit presented. A mismatch means the audited bytes are no longer the
-merge candidate: abort without invoking the wrapper and re-invoke this workflow from Step 0 for
-a fresh audit. Invoke the wrapper with that audited OID as its required expected-head value; it
-must reject a ref change during polling or before merge. Omit `--method` unless the caller
-explicitly supplied one — passing an empty or implicit default would bypass the configured merge
-method. The follow-up wrapper implementation owns the exact invocation syntax; no current
-`wait-and-merge` command form is authorized to merge without that expected-head value.
+The current wrapper re-fetches the remote ref while polling and merging without binding the
+audited OID, so a head change inside that window is not rejected mechanically. This residual
+window is a user-adjudicated accepted operational trade-off, not an oversight: the workflow is
+user-attended at invocation and the repository is single-writer, so a head change inside the
+window can originate only from the operator's own concurrent push. The target state remains the
+follow-up wrapper implementation that carries the audited OID into the native merge (e.g.
+`gh pr merge --match-head-commit`); once it ships, the head-bound form becomes the only
+authorized invocation and this residual window closes.
 
 After every wrapper outcome, re-resolve the PR head OID and compare it with the audited OID; on
 success, also verify that the merge result records that audited PR-head commit (rather than
 comparing the generated merge commit itself). Any mismatch is a fail-closed audit-invalidating
 incident for corrective adjudication, never an ordinary success or failure.
+
+Invoke the merge wrapper. Omit `--method` unless the caller explicitly supplied one — passing an
+empty or implicit default would bypass the configured merge method.
+
+```
+bin/sotp pr wait-and-merge <pr_number>                     # method resolved from configured default
+bin/sotp pr wait-and-merge <pr_number> --method <method>    # explicit caller override
+```
 
 `bin/sotp pr wait-and-merge` performs:
 
@@ -90,8 +95,8 @@ incident for corrective adjudication, never an ordinary success or failure.
 3. Polls `gh pr checks` every 15 seconds with a 10 minute timeout.
 4. **Method resolution**: when `--method` is omitted, resolves the merge method from the PR's
    track `branch_strategy_snapshot.merge_method`; an explicit `--method` always overrides it.
-5. On all checks passed and the expected-head value still matches: merges via
-   `gh pr merge --<method>` bound to that expected head.
+5. On all checks passed: merges via `gh pr merge --<method>`. (The follow-up implementation
+   will additionally bind the audited expected-head OID to this merge call.)
 6. On any check failed: stops and reports the failing checks.
 7. On timeout: stops and reports the pending checks.
 
@@ -113,16 +118,15 @@ After a successful merge:
 | Step | Gate | Verdict |
 |------|------|---------|
 | 1    | All-protected-source terminal audit completes without recovery | pass / fail |
-| 2    | Expected-head binding is available and the wrapper carries the audited OID into the native merge | pass / fail (unavailable → stop without wrapper invocation or merge) |
-| 2    | Pre-invocation and post-outcome PR-head checks match the audited OID | pass / fail (pre-invocation mismatch → re-invoke from Step 0; post-outcome mismatch → audit-invalidating incident to the user) |
+| 2    | Pre-invocation and post-outcome PR-head checks match the audited OID | pass / fail (pre-invocation mismatch → re-invoke from Step 0; post-outcome mismatch → audit-invalidating incident to the user; the in-wrapper window is the user-adjudicated accepted residual until the head-bound wrapper ships) |
 | 2    | `bin/sotp pr wait-and-merge` exits 0 | pass / fail |
 | 2    | Task completion guard passes | pass / fail |
 | 2    | Strict merge-signal gate passes before polling | pass / fail (blocked → block triage; guardian-confirmed intentional 🟡 → adjudication recovery) |
 | 2    | Polled PR checks all green | pass / fail |
 
-The Step 1 terminal audit and Step 2 expected-head-availability check are orchestrator-enforced
-gates outside `bin/sotp pr wait-and-merge`; the wrapper receives the audited OID and enforces it
-at merge time. The Step 2 task, signal, and PR-check guards are enforced inside that wrapper.
+The Step 1 terminal audit and the Step 2 head-OID checks are orchestrator-enforced gates
+outside `bin/sotp pr wait-and-merge`. The Step 2 task, signal, and PR-check guards are
+enforced inside that wrapper.
 An ordinary non-zero wrapper exit ends this invocation without proceeding to Step 3. The
 exception is a strict merge-signal block that the block triage below confirms as an intentional
 🟡 admitted delta draft: enter the adjudication recovery, complete its required work, and
@@ -134,9 +138,10 @@ re-invoke this workflow from Step 1 for a fresh terminal audit.
   <task_id> done|skipped`), then re-invoke the workflow.
 - **Failing PR checks**: fix the underlying failure (source change / infra flake / config), push
   a new commit, and re-invoke.
-- **Expected-head binding unavailable**: do not invoke the merge wrapper and do not merge. The
-  terminal audit is not transferable across its unbound polling-and-merge window. Wait for the
-  follow-up wrapper implementation, then re-invoke from Step 0 for a fresh audit.
+- **Post-outcome head-OID mismatch (audit-invalidating incident)**: the merged or gated bytes
+  were never presented in the required terminal audit. Stop immediately and surface the
+  mismatch to the user for corrective adjudication; never report it as an ordinary success or
+  failure.
 - **Strict merge gate blocked (block triage first)**: the wrapper's blocked report does not
   distinguish an intentional 🟡 from an ordinary signal failure, and no machine admission
   record exists yet. The orchestrator must not make that distinction by judging content.
