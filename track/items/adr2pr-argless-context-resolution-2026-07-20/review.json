@@ -1,6 +1,46 @@
 {
   "schema_version": 2,
   "scopes": {
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:17f17f5d3db661609fb2575b52d17f428dde877a0e7b1de195e0640cf8f2a4c2",
+          "at": "2026-07-20T16:03:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`No Panics in Library Code` applies to Rust production code, but this spec’s declared implementation surface is workflow/provider documentation with intentionally empty type catalogues. The citation is self-evidently off-topic and falsely suggests an in-scope Rust implementation constraint; remove it from `related_conventions`.",
+              "severity": "P1",
+              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/spec.json",
+              "line": 217,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`Prefer Type-Safe Abstractions` governs code/type design, while this docs-only feature intentionally has no catalogue entries or typed implementation surface. This unrelated citation can misdirect downstream planning toward out-of-scope type work; remove it from `related_conventions`.",
+              "severity": "P1",
+              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/spec.json",
+              "line": 221,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:17f17f5d3db661609fb2575b52d17f428dde877a0e7b1de195e0640cf8f2a4c2",
+          "at": "2026-07-20T16:07:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4155913b86112747d45ea45f4709de142a5bb27e76d81552219203f7d619be49",
+          "at": "2026-07-20T16:09:04Z"
+        }
+      ]
+    },
     "types": {
       "rounds": [
         {
@@ -52,46 +92,35 @@
           "findings": [],
           "hash": "rvw1:sha256:15e6ab9586a5c558bbaaba9927f0818cd0b08ec26b81096deb696085a3d55bba",
           "at": "2026-07-20T16:24:33Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The zero-candidate branch permits proceeding after the user merely supplies missing values, without the required exactly-once confirmation of the completed feature-name + primary-ADR pair. This contradicts the preceding input-acquisition contract and the adapter/ADR intent that every branch confirms the completed pair before Step 1; require confirmation after supplied values are received.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 55,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0378f618ac43d3760a438b9b817e854bd84f0ce6a78c6083fc3a7644e8953064",
+          "at": "2026-07-20T16:36:45Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:17f17f5d3db661609fb2575b52d17f428dde877a0e7b1de195e0640cf8f2a4c2",
-          "at": "2026-07-20T16:03:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`No Panics in Library Code` applies to Rust production code, but this spec’s declared implementation surface is workflow/provider documentation with intentionally empty type catalogues. The citation is self-evidently off-topic and falsely suggests an in-scope Rust implementation constraint; remove it from `related_conventions`.",
-              "severity": "P1",
-              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/spec.json",
-              "line": 217,
-              "category": "broken cross-reference at narrative level"
-            },
-            {
-              "message": "`Prefer Type-Safe Abstractions` governs code/type design, while this docs-only feature intentionally has no catalogue entries or typed implementation surface. This unrelated citation can misdirect downstream planning toward out-of-scope type work; remove it from `related_conventions`.",
-              "severity": "P1",
-              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/spec.json",
-              "line": 221,
-              "category": "broken cross-reference at narrative level"
-            }
-          ],
-          "hash": "rvw1:sha256:17f17f5d3db661609fb2575b52d17f428dde877a0e7b1de195e0640cf8f2a4c2",
-          "at": "2026-07-20T16:07:05Z"
+          "hash": "rvw1:sha256:1a26e9f762b29a6be619d3fb46ccdff8b61e716d4035fee6699be576c8f58d00",
+          "at": "2026-07-20T16:37:52Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4155913b86112747d45ea45f4709de142a5bb27e76d81552219203f7d619be49",
-          "at": "2026-07-20T16:09:04Z"
+          "hash": "rvw1:sha256:1a26e9f762b29a6be619d3fb46ccdff8b61e716d4035fee6699be576c8f58d00",
+          "at": "2026-07-20T16:40:29Z"
         }
       ]
     },

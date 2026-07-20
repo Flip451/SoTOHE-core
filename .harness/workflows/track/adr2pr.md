@@ -44,13 +44,19 @@ Sub-workflows used (in execution order):
 - **Input acquisition (before Step 1, when the track needs initialization)** — fill any value
   missing from the invocation with its conversation-context resolution, keeping every
   explicitly supplied value as-is. Present the completed feature-name + primary-ADR pair to
-  the user exactly once and proceed only after that confirmation. When context resolution is
-  not unique (multiple candidates or none), present the candidate ADR filenames and feature
-  names and wait for the user's selection before proceeding; never substitute a mechanical
-  rule alone (e.g. newest unstarted ADR) for context resolution, and never stop fail-closed
-  instead of offering the selection. This confirmation/selection is invocation-time input
-  acquisition, not a workflow-step pause; from Step 1 onward the sequence remains autonomous
-  per Constraint 2.
+  the user exactly once and proceed only after that confirmation. When context yields
+  multiple candidates, present the candidate ADR filenames and feature names and wait for the
+  user's selection before presenting the selected completed pair exactly once and waiting for
+  that confirmation. When context yields no candidate (e.g. a fresh or unrelated
+  conversation), do not present an empty selection and do not choose an unrelated candidate:
+  ask the user to supply the missing feature name and/or primary-ADR filename directly, or —
+  when no relevant ADR exists at all — to author one first per the ADR input above; after the
+  supplied values complete the pair, present that pair exactly once and wait for the user's
+  confirmation. In every branch, never substitute a mechanical rule alone (e.g. newest
+  unstarted ADR) for context resolution, and never stop without offering the user one of
+  these interactions; progression to Step 1 always waits for the user's confirmation. This
+  interaction is invocation-time input acquisition, not a workflow-step
+  pause; from Step 1 onward the sequence remains autonomous per Constraint 2.
 - **Track initialization state** — Step 1 is conditional: if a `track/<id>` branch already
   exists with `metadata.json`, skip `init` and start at Step 2.
 - **Autonomy level** — this workflow is fully autonomous except for the mandated Phase 0
