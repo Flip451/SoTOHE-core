@@ -211,7 +211,7 @@ or retry by using the review-request path.
 | Step | Gate | Verdict |
 |------|------|---------|
 | 1 | `init` OK or pre-existing track | proceed / ERROR |
-| 2 | `review` check-approved exit 0 | proceed / blocked |
+| 2 | `review` check-approved exit 0, or the review workflow's `adjudication-ready` terminal outcome | proceed (check-approved) / proceed to the Step 2 user adjudication (adjudication-ready — its retained ADR findings block `check-approved` by design, and the post-adjudication fresh review must still reach `check-approved` before Step 3 staging) / blocked |
 | 4 | `commit` CI + git commit OK | proceed / ERROR |
 | 5 | Phase 1-3 gates (per `plan` SSoT loop rules) | proceed / escalate / stop |
 | 6 | `review` check-approved exit 0 (plan artifacts) | proceed / blocked |
