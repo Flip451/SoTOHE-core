@@ -1,7 +1,7 @@
 ---
 name: adr-editor
 sandbox: workspace-write
-description: Use when Codex is assigned the SoTOHE ADR editor capability during a back-and-forth planning loop. Edits a target ADR only when a downstream SoT signal needs a persistent decision clarification.
+description: Use when Codex is assigned the SoTOHE ADR editor capability — the single in-track writer for knowledge/adr/*.md under the two-box model. Applies Phase 0 convergence edits on input-box ADRs, authors / revises / deletes Phase 1+ delta candidates (track-born draft ADRs), applies non-semantic in-place fixes, and implements explicit user adjudications (grounds promotion, rejection deletion or revision, corrective restoration). Every applied edit is judged or re-audited afterwards by adr-diagnoser; this skill edits the working tree only and never commits or snapshots.
 ---
 
 # ADR-Editor (Codex skill)

@@ -43,7 +43,7 @@ After the caller has consumed a parseable ADR-diagnoser verdict, the **orchestra
 workflow or either diagnoser capability, performs the recovery write:
 
 - `non-semantic-restamp` → run `bin/sotp adr-baseline snapshot --source <file> --kind non-semantic-fix`, then retry the triggering check.
-- `deviation` → run `bin/sotp adr-baseline restore --source <file>`, inject the mismatch history into the originating capability briefing, and require an amendment proposal rather than an in-place ADR edit.
+- `deviation` → run `bin/sotp adr-baseline restore --source <file>`, inject the mismatch history into the originating capability briefing, and route semantic content by the adjudication boundary: before Phase 0 closes, use the user-present hearing/new-ADR lane; after it closes, use the delta-candidate lane rather than an in-place ADR edit.
 - `unknown-editor` → run `bin/sotp adr-baseline restore --source <file>`, record the history in the optional `observations.md`, then retry or continue from the restored state.
 
 Snapshot, restore, briefing injection, and observation recording are all orchestrator actions
@@ -121,7 +121,11 @@ Other diagnostic input:
 For a `rollback-diagnoser` routing decision, the calling orchestrator inspects `routing_target`
 and dispatches:
 
-- `adr` → author a new ADR (`adr:add`) or invoke the `adr-editor` capability (existing ADR D)
+- `adr` → route by the Phase 0 adjudication boundary. Before closure, use the user-present
+  new-ADR/hearing lane for a semantic need (or adr-editor's Phase 0 in-place convergence lane
+  only when lifecycle-permitted). After closure, dispatch adr-editor to author or revise a
+  delta candidate, then adr-diagnoser for the three-way admission judgment; do not invoke
+  `/adr:add` or edit the frozen input-box ADR in place.
 - `spec` → re-invoke the `spec-design` workflow (Phase 1 partial re-entry)
 - `type` → re-invoke the `type-design` workflow (Phase 2 partial re-entry)
 - `impl_plan` → re-invoke the `impl-plan` workflow (Phase 3 partial re-entry)

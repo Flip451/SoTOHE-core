@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "`knowledge/conventions/pre-track-adr-authoring.md`: revise the in-track meaning-change authority section, then perform the AC-01 acceptance check (IN-01/CN-01/CN-02/AC-01).",
+      "status": "done"
+    },
+    {
+      "id": "T002",
+      "description": "The `adr-diagnoser` and `adr-editor` capability contracts and corresponding `.agents/skills` descriptions: align the capability contracts, then perform the AC-02 and AC-04 acceptance checks (IN-02/IN-04/CN-01/CN-02/AC-02/AC-04).",
+      "status": "done"
+    },
+    {
+      "id": "T003",
+      "description": "The track-plan, track-review, track-adr2pr, and merge workflow SSoTs with their thin adapters: realign the workflow documents, then perform the AC-03, AC-04, and AC-05 acceptance checks (IN-03/IN-04/CN-01/CN-02/AC-03/AC-04/AC-05).",
+      "status": "done"
+    }
+  ],
+  "plan": {
+    "summary": [
+      "GO-01 is covered by T001, T002, and T003; enforced element mappings are recorded in task-coverage.json.",
+      "This documentation-only plan has no type-catalogue implementation entries; task-contract.json records empty attribution lists for every task."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Phase 0 convention boundary",
+        "description": [
+          "Execute T001."
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "ADR capability contract alignment",
+        "description": [
+          "Execute T002 before T003."
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Workflow and adapter realignment",
+        "description": [
+          "Execute T003 after T001 and T002."
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      }
+    ]
+  }
+}

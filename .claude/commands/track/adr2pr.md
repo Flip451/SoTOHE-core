@@ -29,22 +29,12 @@ is recorded as that track's init baseline.
   discipline body as the task prompt. Never invoke a capability's Agent-tool subagent without
   that delegation outcome; this adapter must not resolve or assume the provider itself. Pass
   `--resume` only when continuing the same assignment (`.claude/rules/08-orchestration.md`).
-- **Autonomy boundary (Phase 0 user approval)**: the workflow SSoT's fully-autonomous
-  constraint carries one mandated exception per
-  `knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権 — when the
-  Phase 0 ADR-baseline review reaches `zero_findings`, stop and escalate to the user with the
-  init-stamp diff and any guardian-withheld proposals; only after user approval may the
-  post-approval stamp and ADR-baseline commit proceed. The only other pause is inherited from
-  the delegated pr-review workflow: recording Accepted Deviations at its terminal state
-  requires that workflow's explicit user approval. No other step pauses for confirmation.
+- **Interaction boundaries**: honor the workflow SSoT's user-interaction and terminal-state
+  rules; this adapter does not restate them.
 - **Staging**: `bin/sotp git add-all`
 - **Commit**: write to `tmp/track-commit/commit-message.txt`, then `cargo make track-commit-message`
-- **Terminal diff comment**: the workflow's terminal step resolves the author via
-  `gh pr view --json author`, writes the comment body under `tmp/pr-audit/`, and posts via the
-  argv-validating wrapper `cargo make pr-audit-comment -- tmp/pr-audit/<body-file>` (both
-  commands allowlisted in `.claude/settings.json`; direct `gh pr comment` is not allowlisted,
-  and the wrapper rejects paths outside `tmp/pr-audit/`); do not route it through
-  `bin/sotp pr review-cycle`.
+- **Terminal audit comment**: use only the workflow SSoT's approved wrapper; do not invoke
+  `gh pr comment` directly or route the audit through `bin/sotp pr review-cycle`.
 
 ## Report format
 
@@ -53,6 +43,7 @@ After execution, summarize:
 1. Each step's gate verdict and the commits produced.
 2. PR URL and the final `/track:pr-review` result (confirming no merge was performed).
 3. Any per-scope ceiling batch split decisions made during full-cycle.
-4. Confirmation that all 🔴/🟡 signals are resolved.
-5. The terminal primary-ADR diff-comment result: posted URL, or its empty-diff/provenance
-   fallback outcome, or the reported non-fatal posting failure.
+4. Confirmation that all 🔴 and actionable 🟡 signals are resolved, plus any admitted delta
+   drafts intentionally left 🟡 for merge-stage adjudication.
+5. The all-protected-source terminal-audit comment result: posted URL, per-source
+   empty-diff/provenance fallback outcomes, or the reported non-fatal posting failure.

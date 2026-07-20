@@ -10,7 +10,9 @@
 Run the review → fix → review cycle for the current track. The workflow drives each required
 scope through at least one fast round and one final round until every required scope reaches
 `zero_findings` at the `final` round level. The workflow must not complete until every required
-scope reaches `final` `zero_findings` (or the `NotStarted` bypass applies — see Step 6).
+scope reaches `final` `zero_findings` (or the `NotStarted` bypass applies — see Step 6). During
+the Phase 0 baseline review only, the guardian-conflict exception below may instead end the
+workflow `adjudication-ready`; it permits user adjudication but never commit.
 No commit may proceed until this workflow reports `check-approved` success.
 
 The review-fix loop per scope is delegated to the `review-fix-lead` capability
@@ -160,18 +162,54 @@ The `review-fix-lead` capability self-resolves its modification boundary via
 capability directly.
 
 **ADR-scope repair lane (before re-launching the affected review).** The orchestrator, rather
-than `review-fix-lead`, owns any ADR edit requested by an ADR-scoped finding. First resolve the
-ADR's effective merge-target lifecycle. For a post-merge semantic finding, do not dispatch an
-in-place editor. Dispatch `adr-diagnoser` in edit-judgment mode against the finding as a
-semantic proposal with its post-merge lifecycle judgment, relay its `alternative` or
-`no_change_rationale` verbatim to the finding's origin, and route an alternative through the
-new-ADR draft path required by `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`.
-For a pre-merge ADR, dispatch `adr-editor` with the finding as the originating input, then
-immediately dispatch `adr-diagnoser` in edit-judgment mode against that edit. Follow
-`knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権` for the resulting
-adopt-or-revert/relay action and its adjudication point. Re-launch the affected ADR review only
-after that guardian path completes; do not create an intermediate baseline stamp. This lane is
+than `review-fix-lead`, owns any ADR change requested by an ADR-scoped finding, per
+`knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`. The lane forks
+on the Phase 0 adjudication boundary:
+
+- **Before the boundary (Phase 0 baseline-review loop)**: when the recorded reviewer finding
+  or guardian verdict explicitly identifies a NEW decision as hearing-required, route from
+  that record mechanically, independent of the input ADR's lifecycle. Do not apply it or
+  create a delta candidate; carry it to the user-present hearing lane. The orchestrator must
+  not infer that classification. For an existing decision, dispatch `adr-editor` to apply the
+  fix in place on the input-box ADR, then
+  immediately dispatch `adr-diagnoser` in edit-judgment mode against the applied edit. A
+  post-merge input ADR accepts only typo / reference-path / back-reference fixes in place:
+  route a semantic finding on it directly to the user-present new-ADR/hearing lane instead.
+  For an applied edit, decision-preserved → retain and re-launch the review;
+  decision-breaking → have adr-editor revert, relay the `alternative` /
+  `no_change_rationale` verbatim to the reviewer, and carry an unresolved conflict to the
+  Phase 0 user adjudication. Do not create an intermediate baseline stamp.
+- **After the boundary (Phase 1+)**: the input box is frozen, and the orchestrator never
+  selects a lane by classifying a finding as semantic or non-semantic itself. A finding
+  with no existing input-box target (it requests a new decision) routes structurally to
+  delta-candidate authoring: dispatch `adr-editor` to author the candidate, then
+  `adr-diagnoser` for the three-way admission judgment (admit / bounce-with-resolution /
+  modification-proposal). For an existing input-box target, the recorded finding itself
+  must expressly limit the proposal to a typo, broken cross-reference, or newer-ADR
+  back-reference before the apply-then-classify lane is available: dispatch `adr-editor`
+  to apply that proposed fix in place, then `adr-diagnoser` to classify the concrete diff.
+  A non-semantic verdict retains the edit and restamps kind `non-semantic-fix`; a semantic
+  or uncertain verdict reverts to the pre-edit text and re-authors the content as a delta
+  candidate into the same three-way admission judgment. Every other existing-target
+  proposal — including a proposal whose scope is ambiguous or expressly semantic — bypasses
+  the in-place lane:
+  carry the proposal verbatim to `adr-editor` for delta-candidate authoring, then to
+  `adr-diagnoser` for the same three-way admission judgment. The orchestrator does not
+  supply a semantic classification in either branch. An admitted draft stays 🟡 for the
+  merge-stage user adjudication; a bounce removes the candidate and returns the resolution
+  to the finding's origin.
+
+Re-launch the affected ADR review only after the applicable lane completes. This lane is
 capability-routed through the active profile and does not introduce a provider-specific branch.
+
+**Phase 0 guardian-conflict exception.** When every required non-ADR scope is
+`zero_findings` (approved and not-required scopes do not block), and all remaining ADR findings
+are either guardian-withheld decision conflicts with their required `alternative` or
+`no_change_rationale`, or hearing-required findings recorded as needing a new decision and the
+user-present hearing lane, stop as `adjudication-ready` rather than relaunching the same findings. This is
+not `check-approved` and cannot stage or commit; present the whole set together for the user
+adjudication, then after its implementation and re-audit resume the ordinary loop to final
+`zero_findings`.
 
 The handoff channel into this lane is the recorded round itself: a fixer honoring the ADR
 semantic freeze applies no ADR edit, leaves the finding recorded on the round
@@ -179,13 +217,13 @@ semantic freeze applies no ADR edit, leaves the finding recorded on the round
 orchestrator reads the recorded finding via
 `bin/sotp review results --track-id <track-id> --scope <adr-scope> --round-type <round-type> --limit 1`
 and enters the guardian lane. No dedicated fixer status exists for this lane; for an ADR-scoped
-semantic finding, `failed` + a recorded finding is the expected handoff, not a tooling error.
+ADR finding, `failed` + a recorded finding is the expected handoff, not a tooling error.
 
 Fixer terminal statuses (uniform across providers):
 
 - `completed` — fast `zero_findings` confirmed; proceed to Step 5 for this scope immediately
 - `blocked_cross_scope` — fix dependencies in other scopes, then relaunch this scope
-- `failed` / timeout — for an ADR-scoped semantic finding with a recorded round, this is the
+- `failed` / timeout — for an ADR-scoped finding requiring an ADR edit with a recorded round, this is the
   guardian-lane handoff (see above); otherwise relaunch or report to user depending on cause
 
 **Step 5: Escalate to final round (per-scope, immediate)**
@@ -206,7 +244,7 @@ Final round fixer terminal statuses:
 
 - `completed` — scope is review-complete
 - `blocked_cross_scope` — fix cross-scope dependencies, then relaunch
-- `failed` / timeout — for an ADR-scoped semantic finding with a recorded round, this is the
+- `failed` / timeout — for an ADR-scoped finding requiring an ADR edit with a recorded round, this is the
   guardian-lane handoff (see above); otherwise relaunch or report to user depending on cause
 
 **Step 6: Final validation**
@@ -242,7 +280,7 @@ All five gates must pass before the workflow reports readiness.
   enforce byte matching.
 - **Fixer `blocked_cross_scope`**: fix the cross-scope dependencies from the orchestrator
   context, then relaunch the affected scope.
-- **Fixer `failed` / timeout**: for an ADR-scoped semantic finding with a recorded round, enter
+- **Fixer `failed` / timeout**: for an ADR-scoped finding requiring an ADR edit with a recorded round, enter
   the guardian lane before any retry. Otherwise relaunch (up to 2 retries). If retries also
   fail, report to the user and ask for a decision.
 - **`cargo make ci` failure**: fix the CI failure (format, clippy, test), re-run, and continue
@@ -255,7 +293,12 @@ All five gates must pass before the workflow reports readiness.
 
 - `tmp/reviewer-runtime/briefing-{scope}.md` files (written by this workflow, read by fixers)
 - `review.json` (updated by the review-fix-lead capability)
-- Per-scope `final` round verdicts (surfaced to caller)
+- Per-scope `final` round verdicts (surfaced to caller), or, for the Phase 0
+  guardian-conflict exception, an explicit `adjudication-ready` terminal outcome instead of
+  review completion. That outcome carries the grouped ADR findings: each guardian-withheld
+  proposal with its verbatim `alternative` / `no_change_rationale`, and each
+  hearing-required proposal with its recorded grounds, plus the init-stamp diff for the user
+  adjudication handoff.
 - Findings fixed (with file references, from fixer output)
 - CI result and `check-approved` result
 - Commit readiness signal (pass / fail)
