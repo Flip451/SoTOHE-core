@@ -179,13 +179,25 @@ on the Phase 0 adjudication boundary:
   decision-breaking → have adr-editor revert, relay the `alternative` /
   `no_change_rationale` verbatim to the reviewer, and carry an unresolved conflict to the
   Phase 0 user adjudication. Do not create an intermediate baseline stamp.
-- **After the boundary (Phase 1+)**: the input box is frozen. A semantic finding becomes a
-  delta candidate: dispatch `adr-editor` to author it, then `adr-diagnoser` for the
-  three-way admission judgment (admit / bounce-with-resolution / modification-proposal).
-  An admitted draft stays 🟡 for the merge-stage user adjudication; a bounce removes the
-  candidate and returns the resolution to the finding's origin. A non-semantic finding
-  uses the apply-then-classify lane (apply → classify → retain + non-semantic-fix restamp
-  only on a non-semantic verdict).
+- **After the boundary (Phase 1+)**: the input box is frozen, and the orchestrator never
+  selects a lane by classifying a finding as semantic or non-semantic itself. A finding
+  with no existing input-box target (it requests a new decision) routes structurally to
+  delta-candidate authoring: dispatch `adr-editor` to author the candidate, then
+  `adr-diagnoser` for the three-way admission judgment (admit / bounce-with-resolution /
+  modification-proposal). For an existing input-box target, the recorded finding itself
+  must expressly limit the proposal to a typo, broken cross-reference, or newer-ADR
+  back-reference before the apply-then-classify lane is available: dispatch `adr-editor`
+  to apply that proposed fix in place, then `adr-diagnoser` to classify the concrete diff.
+  A non-semantic verdict retains the edit and restamps kind `non-semantic-fix`; a semantic
+  or uncertain verdict reverts to the pre-edit text and re-authors the content as a delta
+  candidate into the same three-way admission judgment. Every other existing-target
+  proposal — including a proposal whose scope is ambiguous or expressly semantic — bypasses
+  the in-place lane:
+  carry the proposal verbatim to `adr-editor` for delta-candidate authoring, then to
+  `adr-diagnoser` for the same three-way admission judgment. The orchestrator does not
+  supply a semantic classification in either branch. An admitted draft stays 🟡 for the
+  merge-stage user adjudication; a bounce removes the candidate and returns the resolution
+  to the finding's origin.
 
 Re-launch the affected ADR review only after the applicable lane completes. This lane is
 capability-routed through the active profile and does not introduce a provider-specific branch.
