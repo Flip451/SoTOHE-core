@@ -83,6 +83,7 @@ ADR の意味は user に属する。track が ADR を扱う全期間につい�
 - byte 照合 — commit gate と track-aware CI (`cargo make ci-track` と PR CI の同等 check) でのみ発火する。比較基準は当該 source の ledger 最新記録であり、kind を問わない (init / cite / new-adr / non-semantic-fix / review-refinement、および旧 workflow の historical escalation)。
 - escalation kind — 新規刻印用途から引退する。唯一の例外は Phase 0 境界刻印の経過措置であり、review-refinement kind の実装後に失効する。escalation の意味 (下流失敗の遡上) は new-adr 刻印 reason 内の起点来歴として保持される。
 - 目標仕様と経過措置 — review-refinement kind、admission marker (`admission_class`)、`supersedes` / `refines` の front-matter field は文書上の目標仕様であり、Rust 実装 (enum・schema・validator) は後続 track が行う。実装までは: 境界刻印は escalation kind で代用し、入庫判定の verdict は dispatch / レビュー記録で追跡し、relation の宣言は draft 本文 (Decision / Related) で行う — front-matter へ未実装 field を書いてはならない (parser が未知 field を拒否する)。
+- 入庫判定の機械 enforcement も同様に未実装である: byte 照合ゲートは draft を coverage 対象外とするため、入庫前と入庫済みの候補を機械的には区別できない。後続 track が入庫 verdict の機械記録 (判定済み文面の hash を含む) と cite 時の検証を実装するまでは、**cite 直前に** orchestrator が候補の current bytes を adr-diagnoser へ再提出して入庫 verdict を取得し、その verdict に基づく同一作業で cite する。再提出から cite までに一 byte でも改稿された候補は未入庫として扱い、再判定なしに cite してはならない。この手続きゲートにより「入庫前候補への cite 禁止」を暫定的に byte-bound に運用する。ただし track-born draft の決定は根拠が `review_finding_ref` である限り 🟡 と評価され、strict merge gate が user 裁定まで merge を止めるため、未判定の内容が user レビューなしに正式決定へ到達する経路はない。
 
 ## Examples
 

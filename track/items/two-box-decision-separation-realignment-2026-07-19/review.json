@@ -1,6 +1,506 @@
 {
   "schema_version": 2,
   "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5835bd6c78a99e492f55e36ca9a16145e3ab4b24c2d22f3eca32cb35c0177fb",
+          "at": "2026-07-20T09:00:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5835bd6c78a99e492f55e36ca9a16145e3ab4b24c2d22f3eca32cb35c0177fb",
+          "at": "2026-07-20T09:02:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The canonical plan workflow still retains the abolished Termination user-decision lane: it asks the user to accept/revert/manual-edit/abort any ADR working-tree diff and its Outputs still promise a user termination decision. This contradicts the two-box contract (Termination is triage-only; admitted drafts remain 🟡 for merge-stage adjudication) and the updated `/track:plan` adapter.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 188,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "The `/track:merge` adapter duplicates provider-independent workflow logic by prescribing the strict-gate/terminal-audit recovery sequence (branch resolution, capability dispatch, stamping, guarded commit, push, and re-review). The adapter-SSoT policy requires adapters to remain thin and delegate workflow logic to `.harness/workflows/track/merge.md`; this duplication can drift from the SSoT.",
+              "severity": "P1",
+              "file": ".claude/commands/track/merge.md",
+              "line": 19,
+              "category": "adapter-SSoT 同期 check"
+            }
+          ],
+          "hash": "rvw1:sha256:3b0c47f3bb88e6aed4ace5a8f55fd7fc6bed92eccc6199f63cf04af169ca2cb8",
+          "at": "2026-07-20T10:18:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:656af45caec3f8494244cdff76350f87853eca89eb762ca34b191dbafeeba63b",
+          "at": "2026-07-20T10:19:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR の非意味的 finding も guardian lane へ handoff する必要があります。この規則は semantic edit だけを handoff し、それ以外の in-scope fix を fixer に適用させるため、typo や参照 path の finding では review-fix-lead が ADR を直接編集できます。これは全 ADR write を adr-editor → adr-diagnoser に限定する convention と review workflow を迂回し、境界後には必要な分類・restamp も行われません。",
+              "severity": "P1",
+              "file": ".harness/capabilities/review-fix-lead.md",
+              "line": 73,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "Phase 0 の post-merge ADR に対する semantic finding の正規経路が矛盾しています。この行は delta candidate へ送りますが、同 capability の trigger 2 と convention は delta candidate を Phase 1+ 専用とし、Phase 0 では作らないと規定しています。adr-diagnoser も同じ不整合な経路を提示するため、この finding を処理する有効な editor trigger がありません。Phase 0 の user 同席 new-ADR/hearing lane へ統一するか、delta lane の適用範囲を全契約で整合させてください。",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-editor.md",
+              "line": 107,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "Fresh review の後に boundary snapshot を追加すると、その snapshot が追跡対象の `adr-baseline/` ledger/copy（`other` scope）を変更して review hash を stale にします。その直後の commit workflow は `review check-approved` を要求するため、ADR が init から変わる通常経路では commit が通りません。adr2pr にも同じ順序があります。stamp 後に review を再実行するか、baseline 生成物を明示的な review-operational 対象として扱う必要があります。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 114,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "この宣言に対応する terminal-audit step が merge sequence にありません。`wait-and-merge` は yellow がなければそのまま merge するため、直接 `/track:merge` を使う経路は監査を完全に飛ばします。また adr2pr の監査コメント後に delta を採用すると、新しい `new-adr` record はそのコメントに含まれず、re-invoke 時にも監査は再生成されません。各 successful merge の直前、adjudication recovery 後も含めて全 protected source の監査を必須 gate としてください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/merge.md",
+              "line": 58,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "この adapter は admitted delta の chain ⓪ yellow を意図的に残して完了できると規定していますが、report format は依然として「全 🔴/🟡 が解消済み」の確認を要求しています。有効な admitted-delta 実行ではこの報告を真にできず、merge readiness を誤表示します。SSoT と adapter の双方で「actionable yellow のみ解消」とし、残る admitted drafts を明示的に報告してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 38,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:656af45caec3f8494244cdff76350f87853eca89eb762ca34b191dbafeeba63b",
+          "at": "2026-07-20T10:33:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The blanket “in every mode” pre-read requires a latest baseline copy and ledger entry during delta admission, but a pre-admission track-born candidate intentionally has no ledger record. This can block admission of every new candidate; restrict that requirement to recorded target decisions/mismatch modes and allow candidate bytes plus recorded-decision context for admission.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 34,
+              "category": "capability routing mismatch"
+            },
+            {
+              "message": "The `deviation` action unconditionally routes restored semantic content to the delta lane. A mismatch can arise at the Phase 0 commit gate before that commit closes the adjudication boundary, where the convention requires the user-present hearing/new-ADR lane instead. Make this recovery boundary-aware; `diagnose.md` repeats the same unconditional route.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 129,
+              "category": "capability routing mismatch"
+            },
+            {
+              "message": "The before-boundary repair branch says to apply the fix in place while explicitly disallowing post-merge semantic edits, but it provides no user-present new-ADR/hearing route for such findings. Consequently that class of Phase 0 finding has no executable repair lane and the review cannot reconverge.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 167,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The handoff was widened to findings requiring any ADR edit, but verdict parsing, the output contract, and the review workflow still recognize only semantic ADR findings as guardian-lane handoffs. A non-semantic ADR finding can therefore be treated as a generic failure and retried/reported instead of entering the apply-then-classify lane.",
+              "severity": "P1",
+              "file": ".harness/capabilities/review-fix-lead.md",
+              "line": 60,
+              "category": "capability routing mismatch"
+            },
+            {
+              "message": "An instructed rejection revision changes candidate bytes and therefore invalidates its admission, but this branch performs only rejection-conformance and downstream rework. It must re-run the three-way admission judgment before the revised candidate can be cited or carried toward merge.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/merge.md",
+              "line": 120,
+              "category": "capability routing mismatch"
+            },
+            {
+              "message": "The admitted-draft exception permits its intentional chain-⓪ yellow through Step 9, while Constraints and Outputs still require all yellows to be resolved before Step 9. An executor cannot satisfy both contracts and may incorrectly try to eliminate or block on the admitted draft; qualify those remaining requirements as actionable yellows.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 122,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "The audit may use an adoption `new-adr` record as a source’s protection-start record, but the provenance walk excludes that starting record. This drops the adoption record’s origin and guardian summaries—despite the following rule promising them—and leaves a source with only that record without its required per-record provenance.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 164,
+              "category": "hook coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:3f00e4072fc649f90592cde931c4cf14f5059fa15714906b1ce1f9c27f07f887",
+          "at": "2026-07-20T10:42:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This gate rule is stale after adding Step 1 and intentional-yellow recovery. The terminal audit is orchestrator-enforced before `wait-and-merge`, not enforced inside that wrapper, and an intentional-🟡 nonzero exit must enter the adjudication recovery at line 105 rather than end the workflow immediately. Following this sentence can therefore skip the mandatory audit or abort the designed recovery; distinguish the external audit gate and the recoverable strict-signal exit from ordinary wrapper failures.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/merge.md",
+              "line": 96,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:e17e81102af7d7357ddb096d90465b5c7ec2598f1d6f478275b633777ad9f525",
+          "at": "2026-07-20T10:52:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `adr` rollback dispatch still routes an in-track diagnosis to `/adr:add` or an edit of the existing ADR. These diagnosis triggers occur after planning/implementation has begun, while `/adr:add` is the pre-track hearing surface and the two-box convention freezes input ADRs after the Phase 0 boundary. Following this instruction can bypass delta-candidate admission and merge-stage adjudication. Make this dispatch boundary-aware: use the Phase 0 hearing lane before closure and the adr-editor → adr-diagnoser delta-admission lane afterward.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/diagnose.md",
+              "line": 124,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:025f46278c058645a823fcb90a0af993ae17d7675962d53ad8f1e29ad7427b06",
+          "at": "2026-07-20T10:58:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 0 の guardian conflict を user 裁定へ運ぶ経路が到達不能です。手順 2 は reviewer が finding を維持した場合に手順 3 へ載せると定めていますが、手順 3 は全 required scope の `zero_findings` を前提とします。一方、review-fix-lead は当該 ADR finding を `findings_remain` のまま記録し、review workflow も final `zero_findings` まで完了できません。このため実際の決定対立は Phase 0 で無限に再レビューされ、裁定境界を閉じられません。guardian-withheld conflict だけが残った状態を明示的な adjudication-ready terminal state として review/plan/adr2pr に配線するか、finding とは別の記録へ退避して zero_findings に到達できる契約が必要です。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 51,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3cab4c77b585a168c98b8a2fa9c24ae4cf6a60269d1a55543b02921b1228fb9d",
+          "at": "2026-07-20T11:02:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adjudication-ready` が「残る ADR finding が唯一の 1 件」の場合に限定されています。reviewer は severity policy に一致する findings を全件返し、複数の decision conflict が同時に guardian-withheld になり得ます。その場合は `zero_findings` にもこの例外にも到達できず、全提案をまとめて裁定する Phase 0 が再び停止します。非 ADR scope が zero で、残る ADR findings のすべてが必要な `alternative` / `no_change_rationale` を持つ guardian conflict なら adjudication-ready とする必要があります。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 51,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "Claude adapter の Phase 0 pause 条件が依然 `zero_findings` のみに限定され、workflow SSoT Step 2 が新設した `adjudication-ready` terminal state と同期していません。さらに SSoT の Constraint 5 も同じ古い条件を残しているため、adapter を実行する host は guardian conflict 時に user 裁定へ停止できません。adapter と Constraint 5 の双方へ `zero_findings` または `adjudication-ready` の条件を反映してください。",
+              "severity": "P1",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 35,
+              "category": "adapter-SSoT sync violation"
+            }
+          ],
+          "hash": "rvw1:sha256:91fe41471184b0b3d0d06b70ef2875c323e5e894b012186dc046a0841956986e",
+          "at": "2026-07-20T11:06:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adjudication-ready` の条件が、required かどうかを問わず「非 ADR scope が zero_findings」であることを要求しています。しかし review workflow は empty な scope を `not required` として skip するため、それらは `zero_findings` になりません。特に Phase 0 では未作成成果物の scope が多数 not-required になり、この例外へ到達できなくなります。convention と review workflow の条件を「すべての required 非 ADR scope が zero_findings（approved / not-required は阻害しない）」へ揃えてください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 51,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "Phase 0 の post-merge input ADR に対する semantic finding は、適用済み edit や adr-diagnoser verdict を作らず user-present new-ADR/hearing lane へ直接送られます。一方、非 zero_findings で許される `adjudication-ready` は、全 ADR findings が guardian-withheld で `alternative` / `no_change_rationale` を持つ場合だけです。この finding はその条件を生成できないため、即時 hearing なら「finding 単位で user を割り込ませない」規約に反し、即時停止しなければ review が行き詰まります。new-decision / hearing-required finding を明示的な adjudication-ready class として配線する必要があります。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 172,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3d3268b11d3225bb87326a109d06ca9cbcaefb7696d18367bd20aa35acfb6672",
+          "at": "2026-07-20T11:08:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "adjudication-ready の hearing 分岐が post-merge input ADR の semantic finding に限定されていますが、直前の規約は pre-merge ADR でも「新決定が必要」なら in-place 編集せず user-present hearing へ送るよう要求しています。この hearing-required finding は guardian-withheld verdict を生成せず、現在の (a)/(b) のどちらにも該当しないため、zero_findings にも adjudication-ready にも到達できません。lifecycle ではなく、すべての hearing-required findings を対象にする条件へ convention と review workflow を揃えてください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 51,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "Plan workflow は `adjudication-ready` を受理するようになりましたが、user に提示する内容が init diff と guardian-withheld proposals のみに限定されています。review workflow は hearing-required findings だけでも adjudication-ready を返せるため、この経路では裁定対象の提案と根拠が user に提示されず、fresh review で同じ finding が残ります。convention が要求する hearing-required proposals と grounds も必ず提示してください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 104,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "Adr2pr workflow とその Claude adapter は adjudication-ready を認識しますが、提示 payload は guardian-withheld proposals のみで、review workflow が新たに返す hearing-required proposals を運びません。hearing-only の adjudication-ready では user が裁定対象を確認できず Phase 0 を閉じられないため、SSoT と adapter の双方で hearing-required proposals と根拠を転送してください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 78,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:205dda67e0983e626dbb8a6faf3d5cb59ac1c29eb6c4f30afdce2b28938ce129",
+          "at": "2026-07-20T11:10:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 0 の hearing-required lane で post-merge input ADR の意味変更を新 ADR として実装する writer 経路がありません。規約は全 in-track ADR write を adr-editor に限定していますが、adr-editor は新規作成を Phase 1+ delta 候補に限定し、initial authoring は `/adr:add` として拒否します。一方、review/plan は Phase 0 user hearing 後にこの新 ADR を作成・保護開始刻印する手順を持たず、通常の approval-ref 適用と review-refinement 刻印しか定義していません。このため hearing を承認しても guarded commit へ進めません。adr-editor に Phase 0 user-hearing 実装 trigger と適切な baseline protection route を定義するか、別の authorized writer lane を規約・workflow 全体へ明示的に配線してください。",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-editor.md",
+              "line": 77,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e6666956ad138272b7fb305adf23c28df00e00e33c2a894bcca770082b0fce87",
+          "at": "2026-07-20T11:13:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The adr2pr workflow still describes the plan workflow's Termination section as able to pause for a user decision when ADR working-tree diffs are present. The current plan SSoT explicitly changed Termination to triage-only with no user decision; this stale rationale contradicts the two-box workflow and can mislead orchestration.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 113,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2ff075cfd8ddf9f2d22d91d0c78763ce54d7894269b33852c6137bd1e00173b7",
+          "at": "2026-07-20T11:16:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:92c23f4b066971ee79aa15993da760e66586c9603a8bbc47f790813783431766",
+          "at": "2026-07-20T11:17:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "adr-editor の新しい Phase 0 hearing trigger は、作成した ADR を hearing 内容に対して conformance re-audit することを必須にし、plan workflow もその成功後にのみ init 刻印へ進みます。しかし adr-diagnoser の conformance contract は adoption / rejection / corrective restoration しか定義せず、出力 schema に hearing 実装の成功 verdict がありません。そのため trigger 5 の編集後に返せる parseable な成功判定がなく、new ADR を init-stamp して Phase 0 を閉じられません。既存 conformance mode に `hearing-conformant`（および fail-closed な deviating 経路）を追加し、skill summary と workflow の期待 verdict を同期してください。",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-diagnoser.md",
+              "line": 79,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:92c23f4b066971ee79aa15993da760e66586c9603a8bbc47f790813783431766",
+          "at": "2026-07-20T11:19:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 0 hearing trigger always instructs adr-editor to create a new ADR. However, the canonical convention and plan workflow require decisions concerning a pre-merge input ADR to be appended to that ADR; only post-merge inputs require a new file. The diagnoser already recognizes both cases, so this writer contract would produce the wrong artifact for the pre-merge path. Branch this trigger by lifecycle and explicitly support the authorized in-place addition.",
+              "severity": "P1",
+              "file": ".harness/capabilities/adr-editor.md",
+              "line": 46,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5a59041adc37217eea560ea3fba7eea3bc629eea5f8758df8b1503cc14a1e2df",
+          "at": "2026-07-20T11:25:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 11's operational body now requires one audit comment covering every protected ADR source, but the gate, output contract, and Claude adapter still describe a primary-ADR-only comment. This stale completion criterion can allow later-protected sources to be omitted despite the terminal-audit convention. Update all three surfaces to require and report the all-protected-source audit.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 221,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "The Claude adapter duplicates the workflow's Phase 0 gate conditions, adjudication state transition, admitted-delta behavior, and pause rules. These are provider-independent workflow logic and violate the thin-adapter contract, creating a second authority that can drift from the SSoT. Replace this block with a concise instruction to honor the workflow SSoT's interaction boundaries.",
+              "severity": "P1",
+              "file": ".claude/commands/track/adr2pr.md",
+              "line": 32,
+              "category": "adapter-SSoT sync"
+            }
+          ],
+          "hash": "rvw1:sha256:5537c606c121d9dc6d9a2f0682f10df17d494cf2ad852203ef35acd7354175cb",
+          "at": "2026-07-20T11:29:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Phase 0 repair lane sends every pre-merge ADR finding through an immediate in-place edit and diverts only post-merge semantic findings to the hearing lane. The convention requires any finding that needs a new decision—including one concerning a pre-merge ADR—to remain unapplied until the user-present hearing. As written, a pre-merge new-decision finding bypasses that adjudication and also fits neither guardian verdict cleanly. Add a hearing-required branch before invoking adr-editor, independent of lifecycle.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 169,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:62ee5f9e9e0fa54998029371eb129729fae2dfe70b2aa790e1ec2b0aa0f59271",
+          "at": "2026-07-20T11:33:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The repair workflow now tells the orchestrator to classify whether a finding needs a new decision. The convention limits the orchestrator to dispatch and verdict-based routing and explicitly forbids it from performing semantic classification. Require an explicit recorded reviewer/guardian classification (or add an adr-diagnoser verdict for this case) and have the orchestrator route mechanically from that result.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 169,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f83a7ba29b929536cecd8139e3e9c7e2f698c7952ed2ec5926a5ce22d72df428",
+          "at": "2026-07-20T11:35:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The workflow introduces an `adjudication-ready` terminal state that `plan` and `adr2pr` consume, but its output contract still exposes only final-round verdicts, CI/check-approved results, and commit readiness. Those outputs do not exist or pass on the exception path, so callers lack a declared way to distinguish the intentional adjudication handoff from an ordinary failed/incomplete review or receive its grouped proposals. Add an explicit `adjudication-ready` terminal output and proposal/grounds payload.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/review.md",
+              "line": 284,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:6ce9adea1253590d1c1a6c4764bab0b61b6dc2dfccbcba492c109d99eedc1b89",
+          "at": "2026-07-20T11:37:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 0 can now add hearing-authored ADRs to the input box, each with its own init record, but boundary closure still specifies one review-refinement stamp against “the” init record. Baseline snapshots and commit-gate comparisons are source-specific, so if more than one input ADR diverges during convergence, a single stamp leaves the other source mismatched and blocks the baseline commit. Iterate over every input-box source and create one boundary stamp for each source whose converged bytes differ from its own init record.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 119,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:c7ee14d6eecea958bfe6e757b2b364b93fe20b3af4071223c5756254c6553e7b",
+          "at": "2026-07-20T11:40:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c509310a7d308f04a0d8835069f9c41f847844d4920c0202f5db873e947ae4da",
+          "at": "2026-07-20T11:42:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1cf30cc03c7561045baba47e4d1db2e8725d589569859e92c32c66408af636c6",
+          "at": "2026-07-20T11:48:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1cf30cc03c7561045baba47e4d1db2e8725d589569859e92c32c66408af636c6",
+          "at": "2026-07-20T11:50:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ab860558595886c89256f5d9b5ce5afd05bd92048ae737fe7469f98cd40f3954",
+          "at": "2026-07-20T12:10:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 1+ の input-box freeze は `knowledge/conventions/adr.md:130-136` の lifecycle 規則と矛盾します。同規則は merge target 未到達の ADR なら review・実装中も同じファイルを直接編集できると明記しているため、Phase 0 commit 後も pre-merge の input ADR について in-place 編集と delta 候補化の二つの指示が併存します。`adr.md` 側も Phase 0 裁定境界で限定するなど、規約を同期してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 66,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "入庫を判定済み bytes に束縛するという line 68 の規則を、ここで追加された手続きゲートでは保証できません。現在の adr-diagnoser verdict/output record には候補本文の hash がなく、draft は baseline coverage からも除外されるため、入庫後に改稿された候補でも古い「記録済み verdict」の存在だけで cite・commit できてしまいます。strict merge gate は後段の user 裁定を保証するだけで、入庫前 cite 禁止を満たしません。hash 付き機械記録の実装までは、cite 直前に current bytes を fresh 再判定する等の byte-bound な暫定手順が必要です。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 86,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:ab860558595886c89256f5d9b5ce5afd05bd92048ae737fe7469f98cd40f3954",
+          "at": "2026-07-20T12:19:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e298271b1dcc358859b9353f6c0d8d25d36925a46a1cbefa099a65c118f37fb",
+          "at": "2026-07-20T12:22:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`decisions[].status: superseded` は後続 decision に置換された状態を表し、`superseded_by` で後継を記録する仕組みとして依然規定されていますが、`pre-track-adr-authoring.md:74` は adopted delta の関係を delta 側だけに置き、入力 decision の `status` / `superseded_by` を更新しないよう要求しています。同じ supersession に対して相反する表現規則が残るため、二箱モデルの adoption を現行 `superseded` status の適用外として明記するなど、両 convention の同期が必要です。",
+              "severity": "P1",
+              "file": "knowledge/conventions/adr.md",
+              "line": 56,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0e298271b1dcc358859b9353f6c0d8d25d36925a46a1cbefa099a65c118f37fb",
+          "at": "2026-07-20T12:27:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7dc9b36839c920912930521d009da93b61e309260735f319865b3d28ad9dfdd2",
+          "at": "2026-07-20T12:30:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7dc9b36839c920912930521d009da93b61e309260735f319865b3d28ad9dfdd2",
+          "at": "2026-07-20T12:32:03Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -30,24 +530,6 @@
           "findings": [],
           "hash": "rvw1:sha256:4f512bcea807c0995ee72b8edf55fe961b0003ffb5af4cabd3e85886ad021aaf",
           "at": "2026-07-20T09:11:20Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e51b2987da3401b4414dfdc2389d0af1df4ee7be1210ddd452d34e117e3a2c7",
-          "at": "2026-07-20T09:42:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e51b2987da3401b4414dfdc2389d0af1df4ee7be1210ddd452d34e117e3a2c7",
-          "at": "2026-07-20T09:45:34Z"
         }
       ]
     },
@@ -181,6 +663,60 @@
           "findings": [],
           "hash": "rvw1:sha256:fb02ff72e6c930f9d6a90564cc8e256da2a77691c0410727efda3db08302de51",
           "at": "2026-07-20T11:58:58Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-01 is not deterministically observable: it requires that a reader can distinguish and execute the Phase 0/Phase 1+ procedures, but provides no checkable document/state condition or procedure for establishing that outcome.",
+              "severity": "P1",
+              "file": "track/items/two-box-decision-separation-realignment-2026-07-19/spec.json",
+              "line": 208,
+              "category": "acceptance criterion non-observable"
+            },
+            {
+              "message": "The related_conventions list cites coding-principles.md and prefer-type-safe-abstractions.md, although this is explicitly a documentation-only track with Rust implementation out of scope; these citations are self-evidently unrelated to the behavioral contract being specified.",
+              "severity": "P1",
+              "file": "track/items/two-box-decision-separation-realignment-2026-07-19/spec.json",
+              "line": 303,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:090439e464fa6a99316c4e36990fdd806d37db6b5ae0ef6bf86b08c17d07c80b",
+          "at": "2026-07-20T09:36:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1beb7575643a0d6dea70e93c97282eab4ae235a4bcfbc9564f8fb7afe13a5a5",
+          "at": "2026-07-20T09:38:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b1beb7575643a0d6dea70e93c97282eab4ae235a4bcfbc9564f8fb7afe13a5a5",
+          "at": "2026-07-20T09:40:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47c8c3d1c7948f4757e09d88fb9703a548a31a3dd03ed8eab35bb5ff0c58c6b4",
+          "at": "2026-07-20T09:59:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:47c8c3d1c7948f4757e09d88fb9703a548a31a3dd03ed8eab35bb5ff0c58c6b4",
+          "at": "2026-07-20T10:01:05Z"
         }
       ]
     },
@@ -910,492 +1446,21 @@
         }
       ]
     },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-01 is not deterministically observable: it requires that a reader can distinguish and execute the Phase 0/Phase 1+ procedures, but provides no checkable document/state condition or procedure for establishing that outcome.",
-              "severity": "P1",
-              "file": "track/items/two-box-decision-separation-realignment-2026-07-19/spec.json",
-              "line": 208,
-              "category": "acceptance criterion non-observable"
-            },
-            {
-              "message": "The related_conventions list cites coding-principles.md and prefer-type-safe-abstractions.md, although this is explicitly a documentation-only track with Rust implementation out of scope; these citations are self-evidently unrelated to the behavioral contract being specified.",
-              "severity": "P1",
-              "file": "track/items/two-box-decision-separation-realignment-2026-07-19/spec.json",
-              "line": 303,
-              "category": "broken cross-reference at narrative level"
-            }
-          ],
-          "hash": "rvw1:sha256:090439e464fa6a99316c4e36990fdd806d37db6b5ae0ef6bf86b08c17d07c80b",
-          "at": "2026-07-20T09:36:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b1beb7575643a0d6dea70e93c97282eab4ae235a4bcfbc9564f8fb7afe13a5a5",
-          "at": "2026-07-20T09:38:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b1beb7575643a0d6dea70e93c97282eab4ae235a4bcfbc9564f8fb7afe13a5a5",
-          "at": "2026-07-20T09:40:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47c8c3d1c7948f4757e09d88fb9703a548a31a3dd03ed8eab35bb5ff0c58c6b4",
-          "at": "2026-07-20T09:59:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:47c8c3d1c7948f4757e09d88fb9703a548a31a3dd03ed8eab35bb5ff0c58c6b4",
-          "at": "2026-07-20T10:01:05Z"
-        }
-      ]
-    },
-    "harness-policy": {
+    "types": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a5835bd6c78a99e492f55e36ca9a16145e3ab4b24c2d22f3eca32cb35c0177fb",
-          "at": "2026-07-20T09:00:04Z"
+          "hash": "rvw1:sha256:4e51b2987da3401b4414dfdc2389d0af1df4ee7be1210ddd452d34e117e3a2c7",
+          "at": "2026-07-20T09:42:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a5835bd6c78a99e492f55e36ca9a16145e3ab4b24c2d22f3eca32cb35c0177fb",
-          "at": "2026-07-20T09:02:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The canonical plan workflow still retains the abolished Termination user-decision lane: it asks the user to accept/revert/manual-edit/abort any ADR working-tree diff and its Outputs still promise a user termination decision. This contradicts the two-box contract (Termination is triage-only; admitted drafts remain 🟡 for merge-stage adjudication) and the updated `/track:plan` adapter.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/plan.md",
-              "line": 188,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "The `/track:merge` adapter duplicates provider-independent workflow logic by prescribing the strict-gate/terminal-audit recovery sequence (branch resolution, capability dispatch, stamping, guarded commit, push, and re-review). The adapter-SSoT policy requires adapters to remain thin and delegate workflow logic to `.harness/workflows/track/merge.md`; this duplication can drift from the SSoT.",
-              "severity": "P1",
-              "file": ".claude/commands/track/merge.md",
-              "line": 19,
-              "category": "adapter-SSoT 同期 check"
-            }
-          ],
-          "hash": "rvw1:sha256:3b0c47f3bb88e6aed4ace5a8f55fd7fc6bed92eccc6199f63cf04af169ca2cb8",
-          "at": "2026-07-20T10:18:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:656af45caec3f8494244cdff76350f87853eca89eb762ca34b191dbafeeba63b",
-          "at": "2026-07-20T10:19:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "ADR の非意味的 finding も guardian lane へ handoff する必要があります。この規則は semantic edit だけを handoff し、それ以外の in-scope fix を fixer に適用させるため、typo や参照 path の finding では review-fix-lead が ADR を直接編集できます。これは全 ADR write を adr-editor → adr-diagnoser に限定する convention と review workflow を迂回し、境界後には必要な分類・restamp も行われません。",
-              "severity": "P1",
-              "file": ".harness/capabilities/review-fix-lead.md",
-              "line": 73,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "Phase 0 の post-merge ADR に対する semantic finding の正規経路が矛盾しています。この行は delta candidate へ送りますが、同 capability の trigger 2 と convention は delta candidate を Phase 1+ 専用とし、Phase 0 では作らないと規定しています。adr-diagnoser も同じ不整合な経路を提示するため、この finding を処理する有効な editor trigger がありません。Phase 0 の user 同席 new-ADR/hearing lane へ統一するか、delta lane の適用範囲を全契約で整合させてください。",
-              "severity": "P1",
-              "file": ".harness/capabilities/adr-editor.md",
-              "line": 107,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "Fresh review の後に boundary snapshot を追加すると、その snapshot が追跡対象の `adr-baseline/` ledger/copy（`other` scope）を変更して review hash を stale にします。その直後の commit workflow は `review check-approved` を要求するため、ADR が init から変わる通常経路では commit が通りません。adr2pr にも同じ順序があります。stamp 後に review を再実行するか、baseline 生成物を明示的な review-operational 対象として扱う必要があります。",
-              "severity": "P1",
-              "file": ".harness/workflows/track/plan.md",
-              "line": 114,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "この宣言に対応する terminal-audit step が merge sequence にありません。`wait-and-merge` は yellow がなければそのまま merge するため、直接 `/track:merge` を使う経路は監査を完全に飛ばします。また adr2pr の監査コメント後に delta を採用すると、新しい `new-adr` record はそのコメントに含まれず、re-invoke 時にも監査は再生成されません。各 successful merge の直前、adjudication recovery 後も含めて全 protected source の監査を必須 gate としてください。",
-              "severity": "P1",
-              "file": ".harness/workflows/track/merge.md",
-              "line": 58,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "この adapter は admitted delta の chain ⓪ yellow を意図的に残して完了できると規定していますが、report format は依然として「全 🔴/🟡 が解消済み」の確認を要求しています。有効な admitted-delta 実行ではこの報告を真にできず、merge readiness を誤表示します。SSoT と adapter の双方で「actionable yellow のみ解消」とし、残る admitted drafts を明示的に報告してください。",
-              "severity": "P1",
-              "file": ".claude/commands/track/adr2pr.md",
-              "line": 38,
-              "category": "adapter-SSoT synchronization"
-            }
-          ],
-          "hash": "rvw1:sha256:656af45caec3f8494244cdff76350f87853eca89eb762ca34b191dbafeeba63b",
-          "at": "2026-07-20T10:33:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The blanket “in every mode” pre-read requires a latest baseline copy and ledger entry during delta admission, but a pre-admission track-born candidate intentionally has no ledger record. This can block admission of every new candidate; restrict that requirement to recorded target decisions/mismatch modes and allow candidate bytes plus recorded-decision context for admission.",
-              "severity": "P1",
-              "file": ".harness/capabilities/adr-diagnoser.md",
-              "line": 34,
-              "category": "capability routing mismatch"
-            },
-            {
-              "message": "The `deviation` action unconditionally routes restored semantic content to the delta lane. A mismatch can arise at the Phase 0 commit gate before that commit closes the adjudication boundary, where the convention requires the user-present hearing/new-ADR lane instead. Make this recovery boundary-aware; `diagnose.md` repeats the same unconditional route.",
-              "severity": "P1",
-              "file": ".harness/capabilities/adr-diagnoser.md",
-              "line": 129,
-              "category": "capability routing mismatch"
-            },
-            {
-              "message": "The before-boundary repair branch says to apply the fix in place while explicitly disallowing post-merge semantic edits, but it provides no user-present new-ADR/hearing route for such findings. Consequently that class of Phase 0 finding has no executable repair lane and the review cannot reconverge.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 167,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "The handoff was widened to findings requiring any ADR edit, but verdict parsing, the output contract, and the review workflow still recognize only semantic ADR findings as guardian-lane handoffs. A non-semantic ADR finding can therefore be treated as a generic failure and retried/reported instead of entering the apply-then-classify lane.",
-              "severity": "P1",
-              "file": ".harness/capabilities/review-fix-lead.md",
-              "line": 60,
-              "category": "capability routing mismatch"
-            },
-            {
-              "message": "An instructed rejection revision changes candidate bytes and therefore invalidates its admission, but this branch performs only rejection-conformance and downstream rework. It must re-run the three-way admission judgment before the revised candidate can be cited or carried toward merge.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/merge.md",
-              "line": 120,
-              "category": "capability routing mismatch"
-            },
-            {
-              "message": "The admitted-draft exception permits its intentional chain-⓪ yellow through Step 9, while Constraints and Outputs still require all yellows to be resolved before Step 9. An executor cannot satisfy both contracts and may incorrectly try to eliminate or block on the admitted draft; qualify those remaining requirements as actionable yellows.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/adr2pr.md",
-              "line": 122,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "The audit may use an adoption `new-adr` record as a source’s protection-start record, but the provenance walk excludes that starting record. This drops the adoption record’s origin and guardian summaries—despite the following rule promising them—and leaves a source with only that record without its required per-record provenance.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/adr2pr.md",
-              "line": 164,
-              "category": "hook coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:3f00e4072fc649f90592cde931c4cf14f5059fa15714906b1ce1f9c27f07f887",
-          "at": "2026-07-20T10:42:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This gate rule is stale after adding Step 1 and intentional-yellow recovery. The terminal audit is orchestrator-enforced before `wait-and-merge`, not enforced inside that wrapper, and an intentional-🟡 nonzero exit must enter the adjudication recovery at line 105 rather than end the workflow immediately. Following this sentence can therefore skip the mandatory audit or abort the designed recovery; distinguish the external audit gate and the recoverable strict-signal exit from ordinary wrapper failures.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/merge.md",
-              "line": 96,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:e17e81102af7d7357ddb096d90465b5c7ec2598f1d6f478275b633777ad9f525",
-          "at": "2026-07-20T10:52:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `adr` rollback dispatch still routes an in-track diagnosis to `/adr:add` or an edit of the existing ADR. These diagnosis triggers occur after planning/implementation has begun, while `/adr:add` is the pre-track hearing surface and the two-box convention freezes input ADRs after the Phase 0 boundary. Following this instruction can bypass delta-candidate admission and merge-stage adjudication. Make this dispatch boundary-aware: use the Phase 0 hearing lane before closure and the adr-editor → adr-diagnoser delta-admission lane afterward.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/diagnose.md",
-              "line": 124,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:025f46278c058645a823fcb90a0af993ae17d7675962d53ad8f1e29ad7427b06",
-          "at": "2026-07-20T10:58:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Phase 0 の guardian conflict を user 裁定へ運ぶ経路が到達不能です。手順 2 は reviewer が finding を維持した場合に手順 3 へ載せると定めていますが、手順 3 は全 required scope の `zero_findings` を前提とします。一方、review-fix-lead は当該 ADR finding を `findings_remain` のまま記録し、review workflow も final `zero_findings` まで完了できません。このため実際の決定対立は Phase 0 で無限に再レビューされ、裁定境界を閉じられません。guardian-withheld conflict だけが残った状態を明示的な adjudication-ready terminal state として review/plan/adr2pr に配線するか、finding とは別の記録へ退避して zero_findings に到達できる契約が必要です。",
-              "severity": "P1",
-              "file": "knowledge/conventions/pre-track-adr-authoring.md",
-              "line": 51,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:3cab4c77b585a168c98b8a2fa9c24ae4cf6a60269d1a55543b02921b1228fb9d",
-          "at": "2026-07-20T11:02:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`adjudication-ready` が「残る ADR finding が唯一の 1 件」の場合に限定されています。reviewer は severity policy に一致する findings を全件返し、複数の decision conflict が同時に guardian-withheld になり得ます。その場合は `zero_findings` にもこの例外にも到達できず、全提案をまとめて裁定する Phase 0 が再び停止します。非 ADR scope が zero で、残る ADR findings のすべてが必要な `alternative` / `no_change_rationale` を持つ guardian conflict なら adjudication-ready とする必要があります。",
-              "severity": "P1",
-              "file": "knowledge/conventions/pre-track-adr-authoring.md",
-              "line": 51,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "Claude adapter の Phase 0 pause 条件が依然 `zero_findings` のみに限定され、workflow SSoT Step 2 が新設した `adjudication-ready` terminal state と同期していません。さらに SSoT の Constraint 5 も同じ古い条件を残しているため、adapter を実行する host は guardian conflict 時に user 裁定へ停止できません。adapter と Constraint 5 の双方へ `zero_findings` または `adjudication-ready` の条件を反映してください。",
-              "severity": "P1",
-              "file": ".claude/commands/track/adr2pr.md",
-              "line": 35,
-              "category": "adapter-SSoT sync violation"
-            }
-          ],
-          "hash": "rvw1:sha256:91fe41471184b0b3d0d06b70ef2875c323e5e894b012186dc046a0841956986e",
-          "at": "2026-07-20T11:06:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`adjudication-ready` の条件が、required かどうかを問わず「非 ADR scope が zero_findings」であることを要求しています。しかし review workflow は empty な scope を `not required` として skip するため、それらは `zero_findings` になりません。特に Phase 0 では未作成成果物の scope が多数 not-required になり、この例外へ到達できなくなります。convention と review workflow の条件を「すべての required 非 ADR scope が zero_findings（approved / not-required は阻害しない）」へ揃えてください。",
-              "severity": "P1",
-              "file": "knowledge/conventions/pre-track-adr-authoring.md",
-              "line": 51,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "Phase 0 の post-merge input ADR に対する semantic finding は、適用済み edit や adr-diagnoser verdict を作らず user-present new-ADR/hearing lane へ直接送られます。一方、非 zero_findings で許される `adjudication-ready` は、全 ADR findings が guardian-withheld で `alternative` / `no_change_rationale` を持つ場合だけです。この finding はその条件を生成できないため、即時 hearing なら「finding 単位で user を割り込ませない」規約に反し、即時停止しなければ review が行き詰まります。new-decision / hearing-required finding を明示的な adjudication-ready class として配線する必要があります。",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 172,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:3d3268b11d3225bb87326a109d06ca9cbcaefb7696d18367bd20aa35acfb6672",
-          "at": "2026-07-20T11:08:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "adjudication-ready の hearing 分岐が post-merge input ADR の semantic finding に限定されていますが、直前の規約は pre-merge ADR でも「新決定が必要」なら in-place 編集せず user-present hearing へ送るよう要求しています。この hearing-required finding は guardian-withheld verdict を生成せず、現在の (a)/(b) のどちらにも該当しないため、zero_findings にも adjudication-ready にも到達できません。lifecycle ではなく、すべての hearing-required findings を対象にする条件へ convention と review workflow を揃えてください。",
-              "severity": "P1",
-              "file": "knowledge/conventions/pre-track-adr-authoring.md",
-              "line": 51,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "Plan workflow は `adjudication-ready` を受理するようになりましたが、user に提示する内容が init diff と guardian-withheld proposals のみに限定されています。review workflow は hearing-required findings だけでも adjudication-ready を返せるため、この経路では裁定対象の提案と根拠が user に提示されず、fresh review で同じ finding が残ります。convention が要求する hearing-required proposals と grounds も必ず提示してください。",
-              "severity": "P1",
-              "file": ".harness/workflows/track/plan.md",
-              "line": 104,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "Adr2pr workflow とその Claude adapter は adjudication-ready を認識しますが、提示 payload は guardian-withheld proposals のみで、review workflow が新たに返す hearing-required proposals を運びません。hearing-only の adjudication-ready では user が裁定対象を確認できず Phase 0 を閉じられないため、SSoT と adapter の双方で hearing-required proposals と根拠を転送してください。",
-              "severity": "P1",
-              "file": ".harness/workflows/track/adr2pr.md",
-              "line": 78,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:205dda67e0983e626dbb8a6faf3d5cb59ac1c29eb6c4f30afdce2b28938ce129",
-          "at": "2026-07-20T11:10:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Phase 0 の hearing-required lane で post-merge input ADR の意味変更を新 ADR として実装する writer 経路がありません。規約は全 in-track ADR write を adr-editor に限定していますが、adr-editor は新規作成を Phase 1+ delta 候補に限定し、initial authoring は `/adr:add` として拒否します。一方、review/plan は Phase 0 user hearing 後にこの新 ADR を作成・保護開始刻印する手順を持たず、通常の approval-ref 適用と review-refinement 刻印しか定義していません。このため hearing を承認しても guarded commit へ進めません。adr-editor に Phase 0 user-hearing 実装 trigger と適切な baseline protection route を定義するか、別の authorized writer lane を規約・workflow 全体へ明示的に配線してください。",
-              "severity": "P1",
-              "file": ".harness/capabilities/adr-editor.md",
-              "line": 77,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:e6666956ad138272b7fb305adf23c28df00e00e33c2a894bcca770082b0fce87",
-          "at": "2026-07-20T11:13:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The adr2pr workflow still describes the plan workflow's Termination section as able to pause for a user decision when ADR working-tree diffs are present. The current plan SSoT explicitly changed Termination to triage-only with no user decision; this stale rationale contradicts the two-box workflow and can mislead orchestration.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/adr2pr.md",
-              "line": 113,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:2ff075cfd8ddf9f2d22d91d0c78763ce54d7894269b33852c6137bd1e00173b7",
-          "at": "2026-07-20T11:16:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:92c23f4b066971ee79aa15993da760e66586c9603a8bbc47f790813783431766",
-          "at": "2026-07-20T11:17:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "adr-editor の新しい Phase 0 hearing trigger は、作成した ADR を hearing 内容に対して conformance re-audit することを必須にし、plan workflow もその成功後にのみ init 刻印へ進みます。しかし adr-diagnoser の conformance contract は adoption / rejection / corrective restoration しか定義せず、出力 schema に hearing 実装の成功 verdict がありません。そのため trigger 5 の編集後に返せる parseable な成功判定がなく、new ADR を init-stamp して Phase 0 を閉じられません。既存 conformance mode に `hearing-conformant`（および fail-closed な deviating 経路）を追加し、skill summary と workflow の期待 verdict を同期してください。",
-              "severity": "P1",
-              "file": ".harness/capabilities/adr-diagnoser.md",
-              "line": 79,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:92c23f4b066971ee79aa15993da760e66586c9603a8bbc47f790813783431766",
-          "at": "2026-07-20T11:19:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Phase 0 hearing trigger always instructs adr-editor to create a new ADR. However, the canonical convention and plan workflow require decisions concerning a pre-merge input ADR to be appended to that ADR; only post-merge inputs require a new file. The diagnoser already recognizes both cases, so this writer contract would produce the wrong artifact for the pre-merge path. Branch this trigger by lifecycle and explicitly support the authorized in-place addition.",
-              "severity": "P1",
-              "file": ".harness/capabilities/adr-editor.md",
-              "line": 46,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:5a59041adc37217eea560ea3fba7eea3bc629eea5f8758df8b1503cc14a1e2df",
-          "at": "2026-07-20T11:25:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 11's operational body now requires one audit comment covering every protected ADR source, but the gate, output contract, and Claude adapter still describe a primary-ADR-only comment. This stale completion criterion can allow later-protected sources to be omitted despite the terminal-audit convention. Update all three surfaces to require and report the all-protected-source audit.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/adr2pr.md",
-              "line": 221,
-              "category": "convention contradiction"
-            },
-            {
-              "message": "The Claude adapter duplicates the workflow's Phase 0 gate conditions, adjudication state transition, admitted-delta behavior, and pause rules. These are provider-independent workflow logic and violate the thin-adapter contract, creating a second authority that can drift from the SSoT. Replace this block with a concise instruction to honor the workflow SSoT's interaction boundaries.",
-              "severity": "P1",
-              "file": ".claude/commands/track/adr2pr.md",
-              "line": 32,
-              "category": "adapter-SSoT sync"
-            }
-          ],
-          "hash": "rvw1:sha256:5537c606c121d9dc6d9a2f0682f10df17d494cf2ad852203ef35acd7354175cb",
-          "at": "2026-07-20T11:29:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Phase 0 repair lane sends every pre-merge ADR finding through an immediate in-place edit and diverts only post-merge semantic findings to the hearing lane. The convention requires any finding that needs a new decision—including one concerning a pre-merge ADR—to remain unapplied until the user-present hearing. As written, a pre-merge new-decision finding bypasses that adjudication and also fits neither guardian verdict cleanly. Add a hearing-required branch before invoking adr-editor, independent of lifecycle.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 169,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:62ee5f9e9e0fa54998029371eb129729fae2dfe70b2aa790e1ec2b0aa0f59271",
-          "at": "2026-07-20T11:33:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The repair workflow now tells the orchestrator to classify whether a finding needs a new decision. The convention limits the orchestrator to dispatch and verdict-based routing and explicitly forbids it from performing semantic classification. Require an explicit recorded reviewer/guardian classification (or add an adr-diagnoser verdict for this case) and have the orchestrator route mechanically from that result.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 169,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f83a7ba29b929536cecd8139e3e9c7e2f698c7952ed2ec5926a5ce22d72df428",
-          "at": "2026-07-20T11:35:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The workflow introduces an `adjudication-ready` terminal state that `plan` and `adr2pr` consume, but its output contract still exposes only final-round verdicts, CI/check-approved results, and commit readiness. Those outputs do not exist or pass on the exception path, so callers lack a declared way to distinguish the intentional adjudication handoff from an ordinary failed/incomplete review or receive its grouped proposals. Add an explicit `adjudication-ready` terminal output and proposal/grounds payload.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 284,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:6ce9adea1253590d1c1a6c4764bab0b61b6dc2dfccbcba492c109d99eedc1b89",
-          "at": "2026-07-20T11:37:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Phase 0 can now add hearing-authored ADRs to the input box, each with its own init record, but boundary closure still specifies one review-refinement stamp against “the” init record. Baseline snapshots and commit-gate comparisons are source-specific, so if more than one input ADR diverges during convergence, a single stamp leaves the other source mismatched and blocks the baseline commit. Iterate over every input-box source and create one boundary stamp for each source whose converged bytes differ from its own init record.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/plan.md",
-              "line": 119,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:c7ee14d6eecea958bfe6e757b2b364b93fe20b3af4071223c5756254c6553e7b",
-          "at": "2026-07-20T11:40:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c509310a7d308f04a0d8835069f9c41f847844d4920c0202f5db873e947ae4da",
-          "at": "2026-07-20T11:42:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1cf30cc03c7561045baba47e4d1db2e8725d589569859e92c32c66408af636c6",
-          "at": "2026-07-20T11:48:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1cf30cc03c7561045baba47e4d1db2e8725d589569859e92c32c66408af636c6",
-          "at": "2026-07-20T11:50:44Z"
+          "hash": "rvw1:sha256:4e51b2987da3401b4414dfdc2389d0af1df4ee7be1210ddd452d34e117e3a2c7",
+          "at": "2026-07-20T09:45:34Z"
         }
       ]
     }
