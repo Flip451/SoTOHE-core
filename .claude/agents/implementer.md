@@ -8,7 +8,8 @@ tools:
   - Write
   - Edit
   - Bash
-description: Claude subagent adapter for implementer when routing dispatches the Claude path.
+description: |
+  Claude subagent adapter for implementer when routing dispatches the Claude path. Invoke via `bin/sotp capability exec` — never directly through the Agent tool: direct Agent-tool invocation bypasses provider / model resolution, while `bin/sotp capability exec` is the canonical route that internally resolves them from `.harness/config/agent-profiles.json`.
 ---
 
 # Implementer Agent

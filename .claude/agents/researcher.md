@@ -7,7 +7,8 @@ tools:
   - Glob
   - WebFetch
   - WebSearch
-description: Research-only Claude adapter for the SoTOHE researcher capability.
+description: |
+  Research-only Claude adapter for the SoTOHE researcher capability. Invoke via `bin/sotp capability exec` — never directly through the Agent tool: direct Agent-tool invocation bypasses provider / model resolution, while `bin/sotp capability exec` is the canonical route that internally resolves them from `.harness/config/agent-profiles.json`.
 ---
 
 # Researcher Agent
