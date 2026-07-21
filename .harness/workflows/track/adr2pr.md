@@ -43,8 +43,13 @@ Sub-workflows used (in execution order):
   to `init`.
 - **Input acquisition (before Step 1, when the track needs initialization)** — fill any value
   missing from the invocation with its conversation-context resolution, keeping every
-  explicitly supplied value as-is. Present the completed feature-name + primary-ADR pair to
-  the user exactly once and proceed only after that confirmation. When context yields
+  explicitly supplied value as-is. Before presenting the pair, verify the pair's ADR filename
+  — explicitly supplied or context-resolved — exists under `knowledge/adr/`; if it does not
+  (e.g. a mistyped or deleted explicit filename), return to the user for a corrected filename
+  (or ADR authoring) instead of carrying it into the confirmation or Step 1 — precedence of an
+  explicit value never waives this existence check. Present the completed, existence-verified
+  feature-name + primary-ADR pair to the user exactly once and proceed only after that
+  confirmation. When context yields
   multiple candidates, present the candidate ADR filenames and feature names and wait for the
   user's selection before presenting the selected completed pair exactly once and waiting for
   that confirmation. When context yields no candidate (e.g. a fresh or unrelated
