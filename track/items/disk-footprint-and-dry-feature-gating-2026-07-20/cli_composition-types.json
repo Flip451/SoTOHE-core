@@ -1,0 +1,39 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "DryCompositionRoot": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "dry::shim",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "SemanticDupCompositionRoot": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "semantic_dup",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "`libs/infrastructure/Cargo.toml` の `semantic-dup` feature と重量依存の宣言、`libs/infrastructure/src/{lib.rs,semantic_dup/**}` の公開 API、ならびに `dry_check/{dry_write_driver.rs,corpus_meta.rs,dry_write_driver/{fragments.rs,manifest.rs,persistent_index.rs}}` と `track/fixpoint_resolve_driver.rs` の consumer を cfg gate または feature-off 実装へ切り替え、feature-on/off build coverage を追加する。IN-01, CN-01, AC-01。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "`apps/cli-composition/Cargo.toml`、`apps/cli-composition/src/{lib.rs,semantic_dup/**}`、`apps/cli/{Cargo.toml,src/{main.rs,commands/{dry.rs,semantic_dup.rs}}}` に `semantic-dup` feature 伝播と feature-off command dispatch を実装し、両 build 構成の command coverage を追加する。IN-01, IN-02, CN-01, CN-02, AC-01, AC-02。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "新規 `.harness/config/disk-maintenance.toml` と `Makefile.toml` に sccache 上限・cleanup scope の設定読取および maintenance task を追加し、設定値の検証を追加する。IN-03, CN-03, AC-03, AC-04。",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "`.github/workflows/ci.yml` と `Makefile.toml` の clippy/test CI entry points、および `build-sotp` を更新し、feature-on CI と default feature-off binary build の checks を追加する。IN-04, CN-04, AC-05。",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "GO-01 → T001, T002",
+      "GO-02 → T002",
+      "GO-03 → T003",
+      "GO-04 → T004"
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Default-off semantic-dup feature boundary",
+        "description": [
+          "`libs/infrastructure/{Cargo.toml,src/{lib.rs,semantic_dup/**}}` の cfg gate 化を T001 で実施し、その後 `apps/cli-composition/` と `apps/cli/` の feature 伝播を T002 で実施する。IN-01, IN-02, CN-01, CN-02, AC-01, AC-02。"
+        ],
+        "task_ids": [
+          "T001",
+          "T002"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Configurable disk maintenance",
+        "description": [
+          "新規 `.harness/config/disk-maintenance.toml` と `Makefile.toml` の設定読取・maintenance task を T003 で追加する。IN-03, CN-03, AC-03, AC-04。"
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Feature-aware continuous verification",
+        "description": [
+          "T001/T002 後に `.github/workflows/ci.yml` と `Makefile.toml` の CI entry points および `build-sotp` を T004 で更新する。IN-04, CN-04, AC-05。"
+        ],
+        "task_ids": [
+          "T004"
+        ]
+      }
+    ]
+  }
+}

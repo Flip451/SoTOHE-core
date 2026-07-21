@@ -1,0 +1,135 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::semantic_dup::extractor::extract_code_fragments": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "CodeFragmentExtractorAdapter": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "semantic_dup::fragment_extractor_adapter",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "FastEmbedAdapter": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "semantic_dup::embedding",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "LanceDbSemanticIndexAdapter": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "semantic_dup::index",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "NoopSemanticIndexPort": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "semantic_dup::noop_adapter",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "NullInsertIndexProxy": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "semantic_dup::null_insert_proxy",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "PersistentIndexLock": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "semantic_dup::null_insert_proxy",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "PersistentIndexLockError": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "semantic_dup::null_insert_proxy",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    }
+  }
+}

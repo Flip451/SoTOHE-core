@@ -1,0 +1,390 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "025525a0c1e178f3b12882335dd2bcf125161eb261cd87846f2835f14cc39157",
+      "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CodeFragmentExtractorAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "025525a0c1e178f3b12882335dd2bcf125161eb261cd87846f2835f14cc39157",
+      "evidence_hash": "45a4a7706d9c0ead8a8b106827cd24d0163f99b3ecb6c0d77a41a1ae60c86824",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CodeFragmentExtractorAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c4310c5b4ff59e95be6ea25156ddaf55a2f5d2949439183fc9cafc807b268d1c",
+      "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FastEmbedAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c4310c5b4ff59e95be6ea25156ddaf55a2f5d2949439183fc9cafc807b268d1c",
+      "evidence_hash": "45a4a7706d9c0ead8a8b106827cd24d0163f99b3ecb6c0d77a41a1ae60c86824",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FastEmbedAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9831f29b40c22816f4ff6c2ce9c4d2ffde86594e26a566c5195422766e86746c",
+      "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "LanceDbSemanticIndexAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9831f29b40c22816f4ff6c2ce9c4d2ffde86594e26a566c5195422766e86746c",
+      "evidence_hash": "45a4a7706d9c0ead8a8b106827cd24d0163f99b3ecb6c0d77a41a1ae60c86824",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "LanceDbSemanticIndexAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cdbfd90113540b509586063ff5dc1b74facf72d91254a2cb9fa2b2d29305dbbb",
+      "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "NoopSemanticIndexPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cdbfd90113540b509586063ff5dc1b74facf72d91254a2cb9fa2b2d29305dbbb",
+      "evidence_hash": "45a4a7706d9c0ead8a8b106827cd24d0163f99b3ecb6c0d77a41a1ae60c86824",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "NoopSemanticIndexPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3491a1831e448f8f82e74708166b782b4357cac6a3d06ebbc36b17a4146d84a8",
+      "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "NullInsertIndexProxy"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3491a1831e448f8f82e74708166b782b4357cac6a3d06ebbc36b17a4146d84a8",
+      "evidence_hash": "45a4a7706d9c0ead8a8b106827cd24d0163f99b3ecb6c0d77a41a1ae60c86824",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "NullInsertIndexProxy"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3491a1831e448f8f82e74708166b782b4357cac6a3d06ebbc36b17a4146d84a8",
+      "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "PersistentIndexLock"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3491a1831e448f8f82e74708166b782b4357cac6a3d06ebbc36b17a4146d84a8",
+      "evidence_hash": "45a4a7706d9c0ead8a8b106827cd24d0163f99b3ecb6c0d77a41a1ae60c86824",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "PersistentIndexLock"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3491a1831e448f8f82e74708166b782b4357cac6a3d06ebbc36b17a4146d84a8",
+      "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "PersistentIndexLockError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3491a1831e448f8f82e74708166b782b4357cac6a3d06ebbc36b17a4146d84a8",
+      "evidence_hash": "45a4a7706d9c0ead8a8b106827cd24d0163f99b3ecb6c0d77a41a1ae60c86824",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "PersistentIndexLockError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "61a0285a81e28d3902495caaae956e6011a0c7492bf8902ec64f806ddab40ba3",
+      "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::semantic_dup::extractor::extract_code_fragments"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "61a0285a81e28d3902495caaae956e6011a0c7492bf8902ec64f806ddab40ba3",
+      "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+        }
+      }
+    }
+  ]
+}

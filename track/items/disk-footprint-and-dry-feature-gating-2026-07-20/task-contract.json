@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "track_id": "disk-footprint-and-dry-feature-gating-2026-07-20",
+  "entries": {
+    "T001": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "CodeFragmentExtractorAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "FastEmbedAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "LanceDbSemanticIndexAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "NoopSemanticIndexPort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "NullInsertIndexProxy"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "PersistentIndexLock"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "PersistentIndexLockError"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::semantic_dup::extractor::extract_code_fragments"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock"
+      }
+    ],
+    "T002": [
+      {
+        "layer": "cli_composition",
+        "entry_key": "DryCompositionRoot"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "SemanticDupCompositionRoot"
+      }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "c45ca425f32a11a316e7a443c345d861c7512759789c5dab5db6a7f40b61f5a1",
+  "signals": [
+    {
+      "type_name": "DryCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "3c11d885f2a291fdc8e3baa8bf3796cad7dba932e007f9b74daf41842d66706e"
+    },
+    {
+      "type_name": "SemanticDupCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "1892181d56e0fabad0cb52cef11e5dbaa9a21c6806dda97bbf49c0d7871e25f2"
+    }
+  ]
+}

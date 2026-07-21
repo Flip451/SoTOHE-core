@@ -1,0 +1,488 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "5182c5f68bef91244a63d0c5b114218c93a1cc6bae7e0a71a2ec8abfb6541995",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure` の `semantic_dup/` 実装が使う重量依存（`fastembed` / `ort` / `lancedb` / `arrow` 系）を optional dependency にし、cargo feature `semantic-dup` の配下に置く。既定ビルド（default features）ではこれらを compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "semantic-dup の重量依存を `semantic-dup` cargo feature の配下に置き、既定ビルドでは当該依存を compile / link しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "a3a8db472c0072b06a8b921cc54bc598515d4e82bfb21b9bb1e64a91eb9de660",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`semantic-dup` feature 無効でビルドした sotp で dry 系コマンドを実行した場合、サブコマンドは登録されたまま、実行時に「この binary は semantic-dup feature 無効でビルドされている」ことを明示してエラー終了する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "`semantic-dup` feature 無効の binary における dry 系コマンドを、feature 無効であることを明示する fail-closed エラー終了とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "5dbd08057768c93ff331df05b0d37fec316dd0a5c3e57d0dbe4419843e7ae4e7",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sccache のキャッシュサイズに上限を設定し、`target/` と `.cache/` 配下をまとめて掃除するメンテナンスタスクを新設する。上限値と掃除対象の範囲は hard-code せず、既定値を持つ設定ファイル（`.harness/config/` 配下）経由で利用者が変更できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "sccache のサイズ上限と `target/`・`.cache/` の掃除を、既定値と利用者による変更経路を持つ設定可能な機構として提供する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "ae440c33acd511c36d04fa3444a6fee1a9f6cd033fd958250257fc9d7b562218",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "リポジトリの CI 検査（clippy / test）は `semantic-dup` feature を有効にして実行し、feature gate 内のコードの腐敗を防ぐ。sotp binary ビルドの既定は軽量（feature off）とし、dry gate を利用する場合のみ feature on でビルドする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-04",
+          "text_label": "CI の clippy と test は `semantic-dup` feature を有効にして実行し、sotp binary の既定ビルドは feature 無効の軽量構成とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure` の `semantic_dup/` 実装が使う重量依存（`fastembed` / `ort` / `lancedb` / `arrow` 系）を optional dependency にし、cargo feature `semantic-dup` の配下に置く。既定ビルド（default features）ではこれらを compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f5b89939a169f61a6798b1161eca5f65a6f2cec18c29bf0afd67c598130ff19d",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`semantic-dup` feature 無効でビルドした sotp で dry 系コマンドを実行した場合、サブコマンドは登録されたまま、実行時に「この binary は semantic-dup feature 無効でビルドされている」ことを明示してエラー終了する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "432380eb93c60222854fd2f38664996bf1089f1c456ea55ca69a3394e994f38e",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sccache のキャッシュサイズに上限を設定し、`target/` と `.cache/` 配下をまとめて掃除するメンテナンスタスクを新設する。上限値と掃除対象の範囲は hard-code せず、既定値を持つ設定ファイル（`.harness/config/` 配下）経由で利用者が変更できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。上限値と掃除対象範囲は `.harness/config/` 配下の既定値を持つ設定ファイルで利用者が変更できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "86f59a6b94ed65396fe5fbf4f9e8d46a91bad5c9ddfe154f61e0f6cc67bd7b20",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "リポジトリの CI 検査（clippy / test）は `semantic-dup` feature を有効にして実行し、feature gate 内のコードの腐敗を防ぐ。sotp binary ビルドの既定は軽量（feature off）とし、dry gate を利用する場合のみ feature on でビルドする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "リポジトリ CI の clippy と test を `semantic-dup` feature 有効で実行し、feature gate 内コードを継続して compile・検証する。一方で sotp binary の既定ビルドは軽量な feature 無効のままとする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "977034ac2fdc0fef3452bb3041793523e2bac74cb8e55035bbd73814b060d98b",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure` の `semantic_dup/` 実装が使う重量依存（`fastembed` / `ort` / `lancedb` / `arrow` 系）を optional dependency にし、cargo feature `semantic-dup` の配下に置く。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "semantic-dup 機能を別 binary または別 crate に分離すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "25bf47422ab544bb04ebd13023a3db6bf62016f59a6a17e5296a412155a45abf",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure` の `semantic_dup/` 実装が使う重量依存（`fastembed` / `ort` / `lancedb` / `arrow` 系）を optional dependency にし、cargo feature `semantic-dup` の配下に置く。既定ビルド（default features）ではこれらを compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "ONNX、lancedb 等の重量依存を軽量な代替実装へ置き換えること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ac7437a6cd6c786734c2ea099ba63b023c65dfa234fcdedc7aadf72886852ef2",
+      "evidence_hash": "3738b11969de6fdd34afdab8b2714907973ad2855c1fafa4753d78860037b9b8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "DRY ゲート（`sotp dry check-approved` による commit ブロックと DFP 修正ループ）を、無条件必須から利用者設定で有効/無効を切り替えられるようにする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "DRY gate の runtime 有効・無効ポリシーを変更すること。既存の repository-wide opt-in 設定は維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ac7437a6cd6c786734c2ea099ba63b023c65dfa234fcdedc7aadf72886852ef2",
+      "evidence_hash": "3738b11969de6fdd34afdab8b2714907973ad2855c1fafa4753d78860037b9b8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既定は `enabled: false`。`enabled: false` のとき DRY ゲートは走らず（検出も DFP 修正ループも実行しない）"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "DRY gate の runtime 有効・無効ポリシーを変更すること。既存の repository-wide opt-in 設定は維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-19-2335-dry-gate-configurable-default-off.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "05ce8eadcc93d0cc4b0508329a9dbb5b86046a0b5a3fce584f0513bca5c5f8e1",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cargo feature `semantic-dup` の配下に置く。既定ビルド（default features）ではこれらを compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "cargo feature の名称は `semantic-dup` とし、既定 feature に含めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ff3d00668298d02ebba952fc48879672f46994547aae0101ea6d42778fa8a376",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "silent skip や自動 fallback はしない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "feature 無効 binary の dry 系コマンドは silent skip または自動 fallback を行わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "5b6348359247bdcb26aaeb60041d1b7ba25abd460773a89de08ea46ecdae0655",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "上限値と掃除対象の範囲は hard-code せず、既定値を持つ設定ファイル（`.harness/config/` 配下）経由で利用者が変更できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "sccache 上限および掃除対象は暗黙に hard-code せず、`.harness/config/` 配下の設定ファイルに既定値と利用者による変更経路を持たせる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "a29255fb47fd3d10fb1973b91dbf90796933f9723676f5119ad784f5575b61f4",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "リポジトリの CI 検査（clippy / test）は `semantic-dup` feature を有効にして実行し、feature gate 内のコードの腐敗を防ぐ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "CI の clippy / test は `semantic-dup` feature 有効で実行して gate 内コードの腐敗を防ぐ。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "45a4a7706d9c0ead8a8b106827cd24d0163f99b3ecb6c0d77a41a1ae60c86824",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure` の `semantic_dup/` 実装が使う重量依存（`fastembed` / `ort` / `lancedb` / `arrow` 系）を optional dependency にし、cargo feature `semantic-dup` の配下に置く。既定ビルド（default features）ではこれらを compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7a32b1cdf6ebfc97a72932aa505aaac5e00710898dea2cefd6e249476af2b603",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "サブコマンドは登録されたまま、実行時に「この binary は semantic-dup feature 無効でビルドされている」ことを明示してエラー終了する。silent skip や自動 fallback はしない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "feature 無効でビルドした binary から dry 系コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "e04faadc2c92ed6cc3c4a76c04db5f58cebc10d461b93b98c0aecb7f06fce8a7",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sccache のキャッシュサイズに上限を設定し、`target/` と `.cache/` 配下をまとめて掃除するメンテナンスタスクを新設する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "0365ca8a4ddac5400fdb42414c933da84e463118b6bd8883c674e296a1d5f5c0",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "上限値と掃除対象の範囲は hard-code せず、既定値を持つ設定ファイル（`.harness/config/` 配下）経由で利用者が変更できるようにする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "4cdb1e4e17eafed7da5c4457fc53494c12dac3b21bbd05483624047aefd9bacb",
+      "evidence_hash": "9e1df18e278e6bb801f316b6b72766d65896613490b9770e0950fd4929701d16",
+      "verdict": {
+        "kind": "pass",
+        "citation": "リポジトリの CI 検査（clippy / test）は `semantic-dup` feature を有効にして実行し、… sotp binary ビルドの既定は軽量（feature off）とし、dry gate を利用する場合のみ feature on でビルドする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "CI の clippy と test は `semantic-dup` feature を有効にして実行され、通常の sotp binary ビルドは feature 無効の軽量構成を既定とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+          "decision_id": "D4"
+        }
+      }
+    }
+  ]
+}

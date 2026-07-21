@@ -1,6 +1,138 @@
 {
   "schema_version": 2,
   "scopes": {
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description is non-executable: it names only the infrastructure generally, omits a concrete target file or symbol, and has no AC/IN/CN/spec anchor.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002 description is non-executable: it names only the CLI stack, omits a concrete target file or symbol, and has no AC/IN/CN/spec anchor.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 13,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003 description is non-executable: although it names configuration and cargo-make areas, it lacks concrete target files or symbols and has no AC/IN/CN/spec anchor.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 20,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T004 description is non-executable: it names CI and cargo-make generally, omits concrete target files or symbols, and has no AC/IN/CN/spec anchor.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 27,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "The T001 description restates upstream behavior and rationale (default-off dependency exclusion and opt-in availability) instead of using only target + operation + anchor. Cite knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The T002 description restates the feature-off fail-closed contract and feature-on behavior in prose instead of using only target + operation + anchor. Cite knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 13,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The T003 description restates configurable defaults, cleanup behavior, and the prohibition on implicit constants in prose instead of using only target + operation + anchor. Cite knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 20,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The T004 description restates CI feature policy and the lightweight default binary policy in prose instead of using only target + operation + anchor. Cite knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 27,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Plan section S1 restates implementation ordering and feature-off behavior in prose rather than limiting the section description to executable planning references; this is upstream restatement under the impl-plan policy. Cite knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 38,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Plan section S2 restates the configurable cache/cleanup behavior in prose rather than limiting the section description to executable planning references; this is upstream restatement under the impl-plan policy. Cite knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 49,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Plan section S3 restates the feature-boundary sequencing rationale in prose rather than limiting the section description to executable planning references; this is upstream restatement under the impl-plan policy. Cite knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 57,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:8c18d2183ce6df1ba5fbf36aab010a6174e11247ed79ff82d6f881835a289ee4",
+          "at": "2026-07-21T02:09:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a84fa53423875b2b81e2f1762b4de580b91225a17a24a0fdb01043f50fe2d179",
+          "at": "2026-07-21T02:12:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 の変更境界は feature-off build を成立させられません。対象を `libs/infrastructure/src/{lib.rs,semantic_dup/**}` に限定していますが、`dry_check/dry_write_driver.rs`、`dry_check/dry_write_driver/persistent_index.rs`、`dry_check/corpus_meta.rs`、`track/fixpoint_resolve_driver.rs` などが cfg gate 対象 API を無条件参照しています。これらの consumer を gate または feature-off 実装へ切り替える対象も T001（または先行タスク）に明記しないと、実装者が変更境界を発明する必要があり AC-01 の feature-off build coverage を通せません。",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "`plan.summary` が存在せず、GO-01〜GO-04 の task traceability がありません。goal は `task-coverage.json` の対象外なので、scope policy が要求する通り summary に GO-01→T001/T002、GO-02→T002、GO-03→T003、GO-04→T004 のような対応を記録してください。",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 29,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T002 は `cli_composition / DupIndexBuildInput` に帰属していますが、CURRENT の `cli_composition-types.json` および type-signals に同 entry は存在しません。そのため `bin/sotp task-contract coverage` は `InvalidEntryRef` で BLOCKED になります。stale な帰属を除くか、type-designer 経由で必要な catalogue entry を復元して CURRENT catalogue と一致させてください。",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/task-contract.json",
+              "line": 50,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:a84fa53423875b2b81e2f1762b4de580b91225a17a24a0fdb01043f50fe2d179",
+          "at": "2026-07-21T02:21:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9d78fe20c3a0ad1e1b1bca8496787852e9c9189e4ad30084e63bf7cbeab9da8",
+          "at": "2026-07-21T02:26:42Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -16,6 +148,89 @@
           "findings": [],
           "hash": "rvw1:sha256:68c5d043a1c49b390ede19ba9875c29e2000ed2f407eb400a54945b2a10e0509",
           "at": "2026-07-20T16:37:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbce46cbd7d9888425e53eba356cff36fbacf550be9d227a0785735b65bd5a3c",
+          "at": "2026-07-21T02:09:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbce46cbd7d9888425e53eba356cff36fbacf550be9d227a0785735b65bd5a3c",
+          "at": "2026-07-21T02:11:06Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7d389e2091dd4a7073f3207016f04724ac1f22471809d5c691982ea2f3dc2ec",
+          "at": "2026-07-21T02:09:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7d389e2091dd4a7073f3207016f04724ac1f22471809d5c691982ea2f3dc2ec",
+          "at": "2026-07-21T02:12:48Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:191cd290bb49ba986d8f7d51aad8a1d5a17bf7bd4514cdbd652e48cb38c09cbf",
+          "at": "2026-07-21T02:09:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_composition::DupIndexBuildInput` is a lightweight DTO containing only two `PathBuf` fields, yet it is the sole input DTO marked `delete`; the sibling semantic-dup input DTOs remain. `IN-01` only grounds gating infrastructure's heavyweight dependencies and does not justify removing this DTO, contradicting the briefing's explicit statement that input DTOs remain outside the catalogue. Remove this tombstone.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_composition-types.json",
+              "line": 24,
+              "category": "SoT integrity: action/spec_refs mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:191cd290bb49ba986d8f7d51aad8a1d5a17bf7bd4514cdbd652e48cb38c09cbf",
+          "at": "2026-07-21T02:15:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca3f956456dd47d59fc0e0fb063af3f6ce3062030a8ddff6ef5ea950ee600c16",
+          "at": "2026-07-21T02:24:24Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1112ebef71f1076f314c8e722846d25700bdb3be73ad1431f1ad6d2641ff3613",
+          "at": "2026-07-21T02:09:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1112ebef71f1076f314c8e722846d25700bdb3be73ad1431f1ad6d2641ff3613",
+          "at": "2026-07-21T02:12:00Z"
         }
       ]
     }
