@@ -13,6 +13,7 @@ tools:
   - WebSearch
 description: |
   Phase 3 writer for /track:impl-plan. Authors `impl-plan.json` (tasks + plan.sections) and `task-coverage.json` (spec element ↔ task mapping) from the existing `spec.json` and per-layer type catalogues, writes them directly, and evaluates the task-coverage binary gate internally. Does NOT re-open Phase 1 spec decisions or Phase 2 type decisions — if either is ambiguous, raise it as an open question so the orchestrator can run the back-and-forth loop. Mirrors the `impl-planner` capability in `.harness/config/agent-profiles.json` and declares explicit Opus routing via frontmatter.
+  Invoke via `bin/sotp capability exec` — never directly through the Agent tool: direct Agent-tool invocation bypasses provider / model resolution, while `bin/sotp capability exec` is the canonical route that internally resolves them from `.harness/config/agent-profiles.json`.
 ---
 
 # Impl-Planner Agent

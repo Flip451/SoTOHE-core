@@ -1,7 +1,8 @@
 ---
 name: dry-fix-lead
 model: claude-opus-4-7[1m]
-description: Claude subagent adapter for dry-fix-lead when routing dispatches the Claude path.
+description: |
+  Claude subagent adapter for dry-fix-lead when routing dispatches the Claude path. Invoke via `cargo make track-local-dry-fix` — never directly through the Agent tool: direct Agent-tool invocation bypasses provider / model resolution, while the wrapper is the canonical route that internally resolves them from `.harness/config/agent-profiles.json`.
 ---
 
 # Dry-Fix-Lead Agent
